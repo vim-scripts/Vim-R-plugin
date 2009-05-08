@@ -1,0 +1,87 @@
+This is a mirror of http://www.vim.org/scripts/script.php?script_id=2628
+
+This plugin improves Vim's support for editing R code and makes it possible to integrate Vim with R. The functionality is similar to what you can find in Tinn-R and ess mode of emacs. This filetype plugin uses either screen or Conque Shell plugin (Linux, OS X, or other Unix) or python (Microsoft Windows) to communicate with R. 
+
+Screenshots and Debian package: http://sites.google.com/site/jalvesaq/vimrplugin
+
+MAIN FEATURES:
+
+
+  * Syntax highlighting for R syntax, including:
+      - Special characters in strings.
+      - Functions of all installed packages (must be updated manually).
+      - Special highlighting for R output (.Rout files).
+  * Smart indentation for R syntax.
+  * Integrated communication with R:
+      - Start/Close R.
+      - Send lines, selection, paragraphs, functions, blocks, entire file.
+      - Send commands with the object under cursor as argument: help, args, plot, print, str, summary, example, names.
+      - Send to R the Sweave and pdflatex commands.
+      - Run R inside a Vim's buffer (with Conque Shell plugin; currently available only on Unix -- Linux or OS X).
+  * Omni completion (auto-completion) for R objects (.GlobalEnv and installed packages. The list of installed packages must be updated manually.
+  * Ability to see R's documentation in a Vim's buffer:
+      - Automatic calculation of the best layout of the R documentation buffer (split the window either horizontally or vertically according to the available room).
+      - Automatic formating of the text to fit the panel width.
+      - Send code and commands to R (useful to run examples).
+      - Jump to another R documentation.
+      - Syntax highlighting of R documentation.
+  * Object browser (.GlobalEnv and loaded packages; must be updated manually):
+      - Send commands with object under cursor as argument.
+      - Call R's help() with object under cursor as argument.
+      - Syntax highlighting of the object browser.
+  * Most of the plugin's behavior is customizable.
+
+
+
+USE: Please, read the plugin's documentation.
+
+FILES:
+   autoload/rcomplete.vim
+   autoload/rplugin.vim
+   bitmaps/RClearAll.bmp
+   bitmaps/RClearAll.png
+   bitmaps/RClear.bmp
+   bitmaps/RClear.png
+   bitmaps/RClose.bmp
+   bitmaps/RClose.png
+   bitmaps/ricon.png
+   bitmaps/ricon.xbm
+   bitmaps/RListSpace.bmp
+   bitmaps/RListSpace.png
+   bitmaps/RSendBlock.bmp
+   bitmaps/RSendBlock.png
+   bitmaps/RSendFile.bmp
+   bitmaps/RSendFile.png
+   bitmaps/RSendFunction.bmp
+   bitmaps/RSendFunction.png
+   bitmaps/RSendLine.bmp
+   bitmaps/RSendLine.png
+   bitmaps/RSendParagraph.bmp
+   bitmaps/RSendParagraph.png
+   bitmaps/RSendSelection.bmp
+   bitmaps/RSendSelection.png
+   bitmaps/RStart.bmp
+   bitmaps/RStart.png
+   doc/r-plugin.txt
+   ftdetect/r.vim
+   ftplugin/rhelp.vim
+   ftplugin/rnoweb.vim
+   ftplugin/r.vim
+   ftplugin/rbrowser.vim
+   indent/r.vim
+   r-plugin/build_omni_list.R
+   r-plugin/etags2ctags.R
+   r-plugin/functions.vim
+   r-plugin/omnilist
+   r-plugin/vimbrowser.R
+   r-plugin/vimhelp.R
+   r-plugin/rpager.sh
+   r-plugin/rperl.vim
+   r-plugin/rpython.vim
+   r-plugin/specialfuns.R
+   r-plugin/vimActivate.js
+   syntax/rbrowser.vim
+   syntax/rdoc.vim
+   syntax/rout.vim
+   syntax/r.vim
+
