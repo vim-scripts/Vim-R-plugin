@@ -8,33 +8,16 @@
 " Last Change: 2009 May
 "
 " Functions added by Jakson Alves de Aquino:
-"   CheckRpipe(), GetFirstChar(lin), GoDown(), SendLinesToR(), SendBlockToR(),
-"   SendFileToR(), RHelp(), BuildRTags(), StartR(whatr, kbdclk), SignalToR(),
-"   ReplaceUnderS(), AboutRPlugin(), MakeRMenu() and UnMakeRMenu().
+"   CheckRpipe(), GetFirstChar(), GoDown(), SendLinesToR(), SendBlockToR(),
+"   SendFileToR(), SendFunctionToR(), RHelp(), BuildRTags(), StartR(),
+"   SignalToR(), ReplaceUnderS(), MakeRMenu() and UnMakeRMenu().
 "
 " Code written in vim is sent to R through a perl pipe [funnel.pl, by Larry
 " Clapp <vim@theclapp.org> (modifiedy by Jakson Aquino and renamed to
 " rfunnel.pl)], as individual lines, blocks, or the whole file.
+"
+" Please see doc/r-plugin.txt for usage details.
 
-" Press <F2> to open a new xterm with a new R interpreter listening
-" to its standard input (you can type R commands into the xterm)
-" as well as to code pasted from within vim.
-"
-" In insert mode, <S-Enter> sends the active line to R and moves to the next
-" line (write and process mode).
-"
-" Maps:
-"       <F1>       Run R args() with word under cursor as parameter
-"       <F2>	   Start a listening R interpreter in new xterm
-"       <F3>	   Start a listening R-devel interpreter in new xterm
-"       <F4>	   Start a listening R --vanilla interpreter in new xterm
-"       <F5>       Run current file
-"       <F6>       Stop R
-"       <F7>	   Kill R
-"       <F8>	   Build tags file (/tmp/.Rtags-user) for <C-X><C-O>
-"       <F9>       Run line under cursor or selected blocks and go to next line
-"       	   of code
-"       <S-Enter>  Write and process
 
 " This plugin does not work on Windows
 if has("gui_win32")
@@ -172,6 +155,60 @@ function! SendBlockToR()
   call GoDown()
 endfunction
 
+function! CountBraces(line)
+  let line2 = substitute(a:line, "{", "", "g")
+  let line3 = substitute(a:line, "}", "", "g")
+  let result = len(line3) - len(line2)
+  return result
+endfunction
+
+function! SendFunctionToR()
+  if CheckRpipe()
+    return
+  endif
+  echon
+  let line = getline(".")
+  let i = line(".")
+  while i > 0 && line !~ "function"
+    let i -= 1
+    let line = getline(i)
+  endwhile
+  if i == 0
+    return
+  endif
+  let functionline = i
+  while i > 0 && line !~ "<-"
+    let i -= 1
+    let line = getline(i)
+  endwhile
+  if i == 0
+    return
+  endif
+  let firstline = i
+  let i = functionline
+  let line = getline(i)
+  let tt = line("$")
+  while i < tt && line !~ "{"
+    let i += 1
+    let line = getline(i)
+  endwhile
+  if i == tt
+    return
+  endif
+  let nb = CountBraces(line)
+  while i < tt && nb > 0
+    let i += 1
+    let line = getline(i)
+    let nb += CountBraces(line)
+  endwhile
+  if nb != 0
+    return
+  endif
+  let lastline = i
+  let lines = getline(firstline, lastline)
+  call writefile(lines, b:pipefname)
+endfunction
+
 function! SendFileToR()
   if CheckRpipe()
     return
@@ -182,14 +219,31 @@ function! SendFileToR()
 endfunction
 
 " Call args() for the word under cursor
-function! RHelp()
+function! RHelp(type)
   if CheckRpipe()
     return
   endif
   echon
+  " Go back some columns if character under cursor is not valid
+  let curcol = col(".")
+  let curline = line(".")
+  let line = getline(curline)
+  let i = curcol
+  while i > 0 && (line[i] == ' ' || line[i] == '(' || line[i] == 0)
+    let i -= 1
+    call cursor(curline, i)
+  endwhile
   let rkeyword = expand("<cword>")
-  let rhelpcmd = printf("args('%s')", rkeyword)
-  call writefile([rhelpcmd], b:pipefname)
+  " Put the cursor back into its original position and run the R command
+  call cursor(curline, curcol)
+  if len(rkeyword) > 0
+    if a:type == "a"
+      let rhelpcmd = printf("args('%s')", rkeyword)
+    else
+      let rhelpcmd = printf("?%s", rkeyword)
+    endif
+    call writefile([rhelpcmd], b:pipefname)
+  endif
 endfunction
 
 " Tell R to create a 'tags' file (/tmp/.Rtags-user-time) listing all currently
@@ -267,8 +321,15 @@ endfunction
 function! ReplaceUnderS()
   let j = col(".")
   let s = getline(".")
+  if j > 3 && s[j-3] == "<" && s[j-2] == "-" && s[j-1] == " "
+    let i = line(".")
+    call cursor(i, j-3)
+    put = '_'
+    execute 'normal kJ4h4xl'
+    return
+  endif
   let isString = 0
-  while j >= 0
+  while j > 0
     if s[j] == " "
       break
     endif
@@ -282,7 +343,7 @@ function! ReplaceUnderS()
     execute "normal a <- "
   else
     put = '_'
-    execute "normal kgJ"
+    execute 'normal kgJ'
   endif
 endfunction
 
@@ -319,6 +380,10 @@ noremap <buffer> <F9> :call SendLinesToR(1)<CR>0
 inoremap <buffer> <F9> <Esc>:call SendLinesToR(1)<CR>0i
 " vnoremap <buffer> <F9> :call SendBlockToR(1)<CR>0
 
+" Send function which the cursor is in
+noremap <buffer> <C-F9> :call SendFunctionToR()<CR>0
+inoremap <buffer> <C-F9> <Esc>:call SendFunctionToR()<CR>0i
+
 " Write and process mode (somehow mapping <C-Enter> does not work)
 inoremap <S-Enter> <Esc>:call SendLinesToR(0)<CR>o
 
@@ -332,16 +397,15 @@ noremap <buffer> <F5> :call SendFileToR()<CR>
 inoremap <buffer> <F5> <Esc>:call SendFileToR()<CR>a
 
 " Call R function args()
-noremap <buffer> <F1> :call RHelp()<CR>
-inoremap <buffer> <F1> <Esc>:call RHelp()<CR>a
+noremap <buffer> <F1> :call RHelp("a")<CR>
+inoremap <buffer> <F1> <Esc>:call RHelp("a")<CR>a
+
+" Call R function help()
+noremap <buffer> <C-H> :call RHelp("h")<CR>
+inoremap <buffer> <C-H> <Esc>:call RHelp("h")<CR>a
 
 " Replace "underline" with " <- "
 imap <buffer> _ <Esc>:call ReplaceUnderS()<CR>a
-
-function! AboutRPlugin()
-  redraw
-  echo "\nKnown bugs:\n\nIf you press <C-C> in the xterm window the terminal will close but R will not be killed.  If this happens or if you want to kill R because it is taking too much time to finish a process, would may try the button 'Kill R process' or press <F7>. If this does not work, you will have to find the PID of R and kill it manually."
-endfunction
 
 function! MakeRMenu()
   if b:hasrmenu == 1
@@ -355,24 +419,27 @@ function! MakeRMenu()
   imenu R.Send\ &lines<Tab><F9> <Esc>:call SendLinesToR(1)<CR>0a
   amenu R.Send\ &selected\ lines<Tab><F9> :call SendBlockToR()<CR>0
   imenu R.Send\ &selected\ lines<Tab><F9> <Esc>:call SendBlockToR()<CR>0
+  amenu R.Send\ current\ &function<Tab><C-F9> :call SendFunctionToR()<CR>0
+  imenu R.Send\ current\ &function<Tab><C-F9> <Esc>:call SendFunctionToR()<CR>0
   imenu R.Send\ line\ and\ &open\ a\ new\ one<Tab><S-Enter> <Esc>:call SendLinesToR(0)<CR>o
   amenu R.Send\ &file<Tab><F5> :call SendFileToR()<CR>
   menu R.-Sep2- <nul>
-  amenu R.Run\ &args()<Tab><F1> :call RHelp()<CR>
+  amenu R.Run\ &args()<Tab><F1> :call RHelp("a")<CR>
+  amenu R.Run\ &help()<Tab><C-H> :call RHelp("h")<CR>
   amenu R.Rebuild\ list\ of\ objects<Tab><F8> :call BuildRTags()<CR>
-  amenu R.About\ the\ plugin :call AboutRPlugin()<CR>
+  amenu R.About\ the\ plugin :help vim-r-plugin<CR>
   menu R.-Sep3- <nul>
   amenu R.Stop\ R<Tab><F6> :call SignalToR("INT")<CR>
   amenu R.Kill\ R<Tab><F7> :call SignalToR("TERM")<CR>
   amenu icon=rstart ToolBar.RStart :call StartR("R", "click")<CR>
   amenu icon=rline ToolBar.RLine :call SendLinesToR(1)<CR>
   amenu icon=rregion ToolBar.RRegion :call SendBlockToR()<CR>
-  "amenu icon=rbuffer ToolBar.RBuffer :call SendFileToR()<CR>
+  amenu icon=rfunction ToolBar.RFunction :call SendFunctionToR()<CR>
   amenu icon=rcomplete ToolBar.RTags :call BuildRTags()<CR>
   tmenu ToolBar.RStart Start R
   tmenu ToolBar.RLine Send current line to R
   tmenu ToolBar.RRegion Send selected lines to R
-  "tmenu ToolBar.RBuffer Send file to R
+  tmenu ToolBar.RFunction Send current function to R
   tmenu ToolBar.RTags Rebuild list of objects
   if b:hastoolbarkill
     amenu icon=rstop ToolBar.RStop :call SignalToR("INT")<CR>
@@ -390,10 +457,11 @@ function! UnMakeRMenu()
   aunmenu R
   if b:hastoolbarkill
     aunmenu ToolBar.RKill
+    aunmenu ToolBar.RStop
   endif
   aunmenu ToolBar.RTags
-  "aunmenu ToolBar.RBuffer
   aunmenu ToolBar.RRegion
+  aunmenu ToolBar.RFunction
   aunmenu ToolBar.RLine
   aunmenu ToolBar.RStart
   let b:hasrmenu = 0

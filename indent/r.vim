@@ -1,12 +1,8 @@
 " Vim indent file
 " Language:	R
 " Author:	Jakson Alves de Aquino <jalvesaq@gmail.com>
-" URL:		
-" Last Change:	
-" Version:	
-" Notes:  
-" Changes: 
-" Options: 
+" URL:		http://www.vim.org/scripts/script.php?script_id=2628
+" Last Change:	May 09, 2009
 
 " Based on awk.vim and on the script written by Jeremy Stephens:
 " http://biostat.mc.vanderbilt.edu/twiki/pub/Main/RVim/indent-r.vim
