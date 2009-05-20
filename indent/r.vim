@@ -67,7 +67,7 @@ function GetRIndent()
   " Indent blocks enclosed by {}
   if cline =~ '^\s*}'
     let ind = ind - &sw
-    return ind
+    "return ind
   endif
   if line =~ '{\s*$'
     let ind = ind + &sw

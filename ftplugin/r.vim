@@ -51,6 +51,15 @@ endif
 " outdated.
 let b:needsnewtags = 1
 
+" Automatically call R's function help.start() the first time <C-H> is pressed:
+let b:needshstart = 1
+if exists("g:vimrplugin_nohstart")
+  let b:needshstart = 0
+endif
+if exists("g:vimrplugin_browser_time") == 0
+  let g:vimrplugin_browser_time = 4
+endif
+
 " Make the R 'tags' file name
 let b:rtagsfile = printf("/tmp/.Rtags-%s", userlogin)
 
@@ -114,7 +123,7 @@ function! GoDown()
   let lastLine = line("$")
   let curline = getline(".")
   let fc = GetFirstChar(curline)
-  while i < lastLine && (fc == '#' || len(curline) == 0)
+  while i < lastLine && (fc == '#' || strlen(curline) == 0)
     let i = i + 1
     call cursor(i, 1)
     let curline = getline(i)
@@ -140,6 +149,21 @@ function! SendLinesToR(godown)
   endif
 endfunction
 
+function! CheckBlockSize(lines, type)
+  let nbytes = len(a:lines)
+  for str in a:lines
+    let nbytes += strlen(str)
+    if a:type == "block" && str =~ "library"
+      let b:needsnewtags = 1
+    endif
+  endfor
+  if nbytes > 4000
+    call RWarningMsg("We can send to R at most 4000 bytes at once, but this " . a:type . " has " . nbytes . " bytes.")
+    return 1
+  endif
+  return 0
+endfunction
+
 " The above function doesn't work when using the mouse
 function! SendBlockToR()
   if CheckRpipe()
@@ -151,14 +175,16 @@ function! SendBlockToR()
     return
   endif
   let lines = getline("'<", "'>")
-  call writefile(lines, b:pipefname)
-  call GoDown()
+  if CheckBlockSize(lines, "block") == 0
+    call writefile(lines, b:pipefname)
+    call GoDown()
+  endif
 endfunction
 
 function! CountBraces(line)
   let line2 = substitute(a:line, "{", "", "g")
   let line3 = substitute(a:line, "}", "", "g")
-  let result = len(line3) - len(line2)
+  let result = strlen(line3) - strlen(line2)
   return result
 endfunction
 
@@ -206,7 +232,9 @@ function! SendFunctionToR()
   endif
   let lastline = i
   let lines = getline(firstline, lastline)
-  call writefile(lines, b:pipefname)
+  if CheckBlockSize(lines, "function") == 0
+    call writefile(lines, b:pipefname)
+  endif
 endfunction
 
 function! SendFileToR()
@@ -214,8 +242,10 @@ function! SendFileToR()
     return
   endif
   echon
-  let thelines = getline("1", line("$"))
-  call writefile(thelines, b:pipefname)
+  let lines = getline("1", line("$"))
+  if CheckBlockSize(lines, "file") == 0
+    call writefile(lines, b:pipefname)
+  endif
 endfunction
 
 " Call args() for the word under cursor
@@ -228,19 +258,29 @@ function! RHelp(type)
   let curcol = col(".")
   let curline = line(".")
   let line = getline(curline)
-  let i = curcol
-  while i > 0 && (line[i] == ' ' || line[i] == '(' || line[i] == 0)
+  let i = curcol - 1
+  while i > 1 && (line[i] == ' ' || line[i] == '(')
     let i -= 1
     call cursor(curline, i)
   endwhile
-  let rkeyword = expand("<cword>")
+  let rkeyword = expand("<cWORD>")
+  let rkeyword = substitute(rkeyword, "(.*", "", "g")
   " Put the cursor back into its original position and run the R command
   call cursor(curline, curcol)
-  if len(rkeyword) > 0
+  if strlen(rkeyword) > 0
     if a:type == "a"
       let rhelpcmd = printf("args('%s')", rkeyword)
     else
-      let rhelpcmd = printf("?%s", rkeyword)
+      if b:needshstart == 1
+	let b:needshstart = 0
+        call writefile(["help.start()"], b:pipefname)
+        let wt = g:vimrplugin_browser_time
+        while wt > 0
+          sleep
+	  let wt -= 1
+        endwhile
+      endif
+      let rhelpcmd = printf("help('%s')", rkeyword)
     endif
     call writefile([rhelpcmd], b:pipefname)
   endif
@@ -378,19 +418,20 @@ inoremap <buffer> <F7> <Esc>:call SignalToR("TERM")<CR>i
 " Send line under cursor to R
 noremap <buffer> <F9> :call SendLinesToR(1)<CR>0
 inoremap <buffer> <F9> <Esc>:call SendLinesToR(1)<CR>0i
-" vnoremap <buffer> <F9> :call SendBlockToR(1)<CR>0
+vnoremap <buffer> <F9> <Esc>:call SendBlockToR()<CR>
+
+" For compatibility with original plugin
+if exists("g:vimrplugin_map_r")
+  vnoremap <buffer> r <Esc>:call SendBlockToR()<CR>
+endif
+
 
 " Send function which the cursor is in
-noremap <buffer> <C-F9> :call SendFunctionToR()<CR>0
-inoremap <buffer> <C-F9> <Esc>:call SendFunctionToR()<CR>0i
+noremap <buffer> <C-F9> :call SendFunctionToR()<CR>
+inoremap <buffer> <C-F9> <Esc>:call SendFunctionToR()<CR>i
 
 " Write and process mode (somehow mapping <C-Enter> does not work)
 inoremap <S-Enter> <Esc>:call SendLinesToR(0)<CR>o
-
-" Send block of lines (for compatibility with original plugin)
-if exists("g:vimrplugin_map_r")
-  vnoremap <buffer> r :call SendBlockToR(1)<CR>
-endif
 
 " Send current file to R
 noremap <buffer> <F5> :call SendFileToR()<CR>
@@ -419,8 +460,8 @@ function! MakeRMenu()
   imenu R.Send\ &lines<Tab><F9> <Esc>:call SendLinesToR(1)<CR>0a
   amenu R.Send\ &selected\ lines<Tab><F9> :call SendBlockToR()<CR>0
   imenu R.Send\ &selected\ lines<Tab><F9> <Esc>:call SendBlockToR()<CR>0
-  amenu R.Send\ current\ &function<Tab><C-F9> :call SendFunctionToR()<CR>0
-  imenu R.Send\ current\ &function<Tab><C-F9> <Esc>:call SendFunctionToR()<CR>0
+  amenu R.Send\ current\ &function<Tab><C-F9> :call SendFunctionToR()<CR>
+  imenu R.Send\ current\ &function<Tab><C-F9> <Esc>:call SendFunctionToR()<CR>
   imenu R.Send\ line\ and\ &open\ a\ new\ one<Tab><S-Enter> <Esc>:call SendLinesToR(0)<CR>o
   amenu R.Send\ &file<Tab><F5> :call SendFileToR()<CR>
   menu R.-Sep2- <nul>

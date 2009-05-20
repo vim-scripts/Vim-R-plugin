@@ -1,7 +1,3 @@
-.opt.showerr <- getOption("show.error.messages")
-
-# Comment the following line if debugging the code:
-options(show.error.messages = FALSE)
 
 vim.rtags <- function() {
   unlink(.vimtagsfile)
@@ -10,18 +6,36 @@ vim.rtags <- function() {
   sink(.vimtagsfile)
   len <- length(envnames)
   for(i in 1:len){
-    env <- envnames[i]
-    obj.list <- ls(name=envnames[i])
-    env <- sub("package:", "", env)
+    obj.list <- objects(envnames[i])
+    env <- sub("package:", "", envnames[i])
     l <- length(obj.list)
     if(l > 0){
       for(j in 1:l){
-        obj.class <- "unknownClass"
-        try( obj.class <- class(eval(parse(text=obj.list[j]))))
-        cat(obj.list[j], obj.class, env, "\n")
+        haspunct <- grepl("[[:punct:]]", obj.list[j])
+        if(haspunct[1]){
+          ok <- grepl("[[:alnum:]]\\.[[:alnum:]]", obj.list[j])
+          if(ok[1]){
+            haspunct  <- FALSE
+            haspp <- grepl("[[:punct:]][[:punct:]]", obj.list[j])
+            if(haspp[1])
+              haspunct = TRUE
+          }
+        }
+        if(haspunct[1]){
+          obj.class <- "unknowClass"
+        } else {
+          if(obj.list[j] == "break" || obj.list[j] == "for" ||
+            obj.list[j] == "function" || obj.list[j] == "if" ||
+            obj.list[j] == "repeat" || obj.list[j] == "while"){
+            obj.class <- "flow-control"
+          } else {
+            obj.class <- class(eval(parse(text=obj.list[j])))
+          }
+        }
+        cat(obj.list[j], " ", obj.class[1], " ", env, "\n", sep="")
         if(obj.class[1] == "data.frame" || obj.class[1] == "list" ||
-        (length(obj.class) > 1 && (obj.class[2] == "data.frame" ||
-        obj.class[2] == "list"))){
+          (length(obj.class) > 1 && (obj.class[2] == "data.frame" ||
+              obj.class[2] == "list"))){
           obj <- eval(parse(text=obj.list[j]))
           obj.names <- names(obj)
           obj.len <- length(obj)
@@ -37,7 +51,4 @@ vim.rtags <- function() {
 }
 
 vim.rtags()
-
-options(show.error.messages = .opt.showerr)
-rm(.opt.showerr)
 

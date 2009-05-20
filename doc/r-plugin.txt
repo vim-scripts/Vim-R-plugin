@@ -4,7 +4,7 @@
                             Plugin to work with R~
 
 Author: Jakson A. Aquino (jalvesaq@gmail.com)
-Last Change: 16 May 2009
+Last Change: 19 May 2009
 
 For Vim version 7.2 and above
 
@@ -15,7 +15,7 @@ For Vim version 7.2 and above
 3. Installation                                 |r-plugin-installation|
 4. Use                                          |r-plugin-use|
 5. How the plugin works                         |r-plugin-functioning|
-6. Known bugs                                   |r-plugin-known-bugs|
+6. Known bugs and workarounds                   |r-plugin-known-bugs|
 7. Options                                      |r-plugin-options|
 8. Files                                        |r-plugin-files|
 
@@ -30,14 +30,14 @@ The last version of this plugin is available at:
 
     http://www.vim.org/scripts/script.php?script_id=2628
 
-The plugin is under development. What now is default behavior may become
+The plugin is under development. What now is default behavior might become
 optional and key bindings might change in the future. Please, tell me your
 preferences and suggestions and report any bugs.
 
 
 ==============================================================================
 2. Main features~
-
+                                                      *r-plugin-features*
   Linux/Unix only:~
 
     * Communication with R.
@@ -52,7 +52,7 @@ preferences and suggestions and report any bugs.
 
 ==============================================================================
 3. Installation~
-                                                      *r-plugin-instalation*
+                                                     *r-plugin-installation*
 
 Install the following packages
 
@@ -99,27 +99,14 @@ emulator. The file ftplugin/r.vim has an example of how to use gnome-terminal.
 Desktop integration~
 
 If you prefer to use the file manager instead of a terminal emulator to
-navigate in the directory tree and to open files, you should do the following:
+navigate in the directory tree and to open files, you might be interested in
+configuring your file manager to use the script ~/.vim/open-gvim-here to open
+R source code. For example, if you use Gnome, open nautilus, right click a
+file whose extension is .R, choose the menu item "Properties" and configure
+the "Open with" command.
 
-   1. Uncompress the archive:
->
-      sudo tar -xvf ~/.vim/tools/r-plugin-desktop.tar -C /
-<
-   2. Open you file manager and configure it to use the script
-      /usr/local/bin/vim-r-plugin to open R source code and to associate
-      *.R with the icon /usr/local/share/pixmaps/vim-r-plugin.xpm.
-
-      If you use Gnome, in order to do the above steps, open nautilus, right
-      click a file whose extension is .R and choose the menu item
-      "Properties".
-
-The archive ~/.vim/tools/r-plugin-desktop.tar contains the following files:
->
-   usr/local/bin/vim-r-plugin
-   usr/local/share/pixmaps/vim-r-plugin.xpm
-<
-The script /usr/local/bin/vim-r-plugin simply changes to the file's directory
-before opening it.
+The script open-gvim-here simply changes to the file's directory before
+opening it.
 
 
 ==============================================================================
@@ -135,20 +122,20 @@ Don't hit CTRL-C in the terminal window. Instead, you should either press the
 Key bindings~
 
 The plugin has the following key biddings, with the corresponding menu items
-and, in some cases, tool bar buttons: 
+and, in some cases, tool bar buttons:
 
    <C-H>     Run R args() with word under cursor as parameter.
    <F1>      Run R args() with word under cursor as parameter.
    <F2>      Start a listening R interpreter in new xterm.
    <F3>      Start a listening R-devel interpreter in new xterm.
    <F4>      Start a listening R --vanilla interpreter in new xterm.
-   <F5>      Send current file to R.
+   <F5>      Send the current file to R.
    <F6>      Stop R.
    <F7>      Kill R.
    <F8>      Build tags file (/tmp/.Rtags-user-time) for omni completion.
-   <F9>      Send current line or selected block and go to next line of code.
-   <C-F9>    Send current function.
-   <S-Enter> Send current line to R and open a new line (insert mode only).
+   <F9>      Send the current line or selected code and go to the next line.
+   <C-F9>    Send the current function.
+   <S-Enter> Send the current line to R and open a new line (insert mode only).
    _         Write " <- ", if not inside a string. Please, type "_" again if
              the function yields " <- " when you really needs "_".
 
@@ -167,7 +154,7 @@ autocomplete function will not work. Other limitation is that you should never
 hit CTRL-C in the terminal window.
 
 Each Vim buffer runs its own instance of R in a separated terminal emulator
-because the pipe has an unique name for each buffer. The pipe name is made
+because the pipe has a unique name for each buffer. The pipe name is made
 using the user name and the seconds of localtime(). Hence, a name clash is
 possible if a single user starts more than one Vim buffer at the same second.
 This will happen if you open many files at the same time in different tabs.
@@ -178,45 +165,67 @@ For example:
 Omni completion~
 
 You should type <C-X><C-O> to start the |omni-completion|. Since it's
-uncomfortable to type such a combination of keys, you may want to map an
-easier combination for omni completion. I, for example, have the following in
-my |vimrc|:
+uncomfortable to type such a combination of keys, you might want to map an
+easier combination for omni completion in your |vimrc|. For example:
 >
    imap <C-Space> <C-X><C-O>
 <
 The omni completion shows the name of the object, its class and its
-environment (mostly frequently, its package name). Vim sends to R the command
+environment (most frequently, its package name). Vim sends to R the command
 to source the script ~/.vim/tools/rtags.R, which produces the tags file used
-for omni completion.  You might rebuild the tags file at any time, but Vim
+for omni completion.  You can rebuild the tags file at any time, but Vim
 will automatically build it the first time you use the omni completion
 feature.  After you send to R a line of code containing the string "library",
 Vim will turn on the flag indicating the need of rebuilding the tags file.
 Then, if you try an omni completion, the tags file will be rebuilt
 automatically. You still need to build the tags file manually to add the names
 of other objects created after the tags file. The string "library" is not
-detected if you send the whole file to R and if you send blocks of code using
-either the ToolBar button or the menu.
+detected if you send the whole file to R.
 
 While building the tags file, if a data.frame is found, its columns are also
 added to the list of objects. When you try to complete the name of a
 data.frame, the columns are not shown, but when the data.frame name is already
-complete, and you include the '$' symbol, the next completion will include the
-columns.
+complete, and you have inserted the '$' symbol, the next completion will
+include the column names.
 
 
 ==============================================================================
-6. Known bugs~
+6. Known bugs and workarounds~
                                                       *r-plugin-known-bugs*
+
+You should never hit CTRL-C~
 
 You should never hit CTRL-C in the terminal emulator window. If you hit CTRL-C
 in the terminal window, the terminal will close, but R will not be killed, and
 it will not stop its work. You can stop R from Vim by hitting the key <F6> or
 by clicking in the corresponding menu item (R / Stop R process) or tool bar
-button. You might be used to use CTRL-C to make R stop immediately a length
+button. You may be used to use CTRL-C to make R stop immediately a length
 process, but currently you can't do this if R is running through a pipe.
 
-Sending large blocks of code to R freezes the terminal emulator window.  You
-have to kill R and close the terminal.
+You cannot send large blocks of code to R~
+
+The plugin does not send more than 4000 bytes at once to R because it could
+freeze the terminal emulator window. If you have large blocks of code to send
+to R, you will not be able to send the whole code at once.
+
+The terminal emulator truncates big lines sent by Vim~
+
+The truncated lines are not a xterm limitation, but an issue with running R
+through a pipe (and I don't know how to solve it). However, I don't see this
+annoying problem as a serious bug because you still have the entire lines in
+the script that you are editing with Vim. You can break the lines in Vim
+before sending them to R, and, in my opinion, the code will become more
+readable.
+
+R's autocomplete function does not work in the terminal and~
+you cannot scroll R help files in the terminal emulator~
+
+It seems that R doesn't use GNU Readline when called through a pipe. That's
+why you can't complete object names with <Tab> in the terminal window (and
+that's why I created the omni function for Vim). Regarding the scroll issue in
+R help, the best solution for me is to do "help.start()" in the terminal
+window before using help(). This will be done automatically by the plugin (see
+|g:vimrplugin_nohstart|for details).
 
 
 ==============================================================================
@@ -224,11 +233,24 @@ have to kill R and close the terminal.
                                                       *r-plugin-options*
                                                       *g:vimrplugin_map_r*
 
-Currently there is only one option, g:vimrplugin_map_r, to map the letter 'r'
-to send line(s) to R when Vim is in normal mode (for compatibility with the
-original plugin). To activate this option, put in your |vimrc|:
+If the variable g:vimrplugin_map_r exists, the plugin will map the letter 'r'
+to send lines to R when there are visually selected lines (for compatibility
+with the original plugin). To activate this option, put in your |vimrc|:
 >
    let g:vimrplugin_map_r = 1
+<
+                                                   *g:vimrplugin_nohstart*
+The plugin will call R's function help.start() the first time that you press
+<C-H>. To inhibit this behavior, you should put in your |vimrc|:
+>
+   let g:vimrplugin_nohstart = 1
+<
+After calling help.start(), the plugin will wait 4 seconds before sending to R
+the help command. If your browser needs either more or less time to start, you
+may want to add the following global variable (with the appropriate value) to
+your|vimrc|:
+>
+   let g:vimrplugin_browser_time = 4
 <
 
 ==============================================================================
@@ -263,6 +285,7 @@ directory after the installation:
    | `-- r.vim
    `-- tools
     |-- rfunnel.pl
+    |-- open-gvim-here
     `-- rtags.R
 
 ==============================================================================
