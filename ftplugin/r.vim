@@ -8,7 +8,7 @@
 " Last Change: 2009 May
 "
 " Functions added by Jakson Alves de Aquino:
-"   CheckRpipe(), GetFirstChar(), GoDown(), SendLinesToR(), SendBlockToR(),
+"   CheckRpipe(), GetFirstChar(), GoDown(), SendLineToR(), SendBlockToR(),
 "   SendFileToR(), SendFunctionToR(), RHelp(), BuildRTags(), StartR(),
 "   SignalToR(), ReplaceUnderS(), MakeRMenu() and UnMakeRMenu().
 "
@@ -59,6 +59,17 @@ endif
 if exists("g:vimrplugin_browser_time") == 0
   let g:vimrplugin_browser_time = 4
 endif
+
+" What terminal is preferred:
+if exists("g:vimrplugin_term_cmd")
+  let b:term_cmd = g:vimrplugin_term_cmd
+else
+  let b:term_cmd = "uxterm -T 'R' -e"
+endif
+
+" Automatically source the script tools/rargs.R the first time <S-F1> is
+" pressed:
+let b:needsrargs = 1
 
 " Make the R 'tags' file name
 let b:rtagsfile = printf("/tmp/.Rtags-%s", userlogin)
@@ -131,10 +142,8 @@ function! GoDown()
   endwhile
 endfunction
 
-" Send current line or block of lines (the function is called recursively when
-" more multiple line are selected and the mouse is not used)
-" Don't go down if called by <S-Enter>.
-function! SendLinesToR(godown)
+" Send current line to R. Don't go down if called by <S-Enter>.
+function! SendLineToR(godown)
   if CheckRpipe()
     return
   endif
@@ -149,6 +158,7 @@ function! SendLinesToR(godown)
   endif
 endfunction
 
+" Big chunks of text might obstruct the pipe.
 function! CheckBlockSize(lines, type)
   let nbytes = len(a:lines)
   for str in a:lines
@@ -164,7 +174,7 @@ function! CheckBlockSize(lines, type)
   return 0
 endfunction
 
-" The above function doesn't work when using the mouse
+" Send visually selected lines.
 function! SendBlockToR()
   if CheckRpipe()
     return
@@ -269,7 +279,11 @@ function! RHelp(type)
   call cursor(curline, curcol)
   if strlen(rkeyword) > 0
     if a:type == "a"
-      let rhelpcmd = printf("args('%s')", rkeyword)
+      if b:needsrargs
+        let b:needsrargs = 0
+        call writefile(["source(\"~/.vim/tools/rargs.R\")"], b:pipefname)
+      endif
+      let rhelpcmd = printf("vim.list.args('%s')", rkeyword)
     else
       if b:needshstart == 1
 	let b:needshstart = 0
@@ -343,8 +357,7 @@ function! StartR(whatr, kbdclk)
     return
   endif
   " Run R
-  "let opencmd = printf("gnome-terminal -t R -x ~/.vim/tools/rfunnel.pl %s \"%s\"&", b:pipefname, a:whatr)
-  let opencmd = printf("uxterm -T 'R' -e ~/.vim/tools/rfunnel.pl %s \"%s && echo -e 'Interpreter has finished. Exiting. Goodbye.'\"&", b:pipefname, a:whatr)
+  let opencmd = printf("%s ~/.vim/tools/rfunnel.pl %s \"%s && echo -e 'Interpreter has finished. Exiting. Goodbye.'\"&", b:term_cmd, b:pipefname, a:whatr)
   let rlog = system(opencmd)
   if rlog != ""
     call RWarningMsg(rlog)
@@ -358,6 +371,7 @@ function! StartR(whatr, kbdclk)
   echon
 endfunction
 
+
 function! ReplaceUnderS()
   let j = col(".")
   let s = getline(".")
@@ -365,7 +379,7 @@ function! ReplaceUnderS()
     let i = line(".")
     call cursor(i, j-3)
     put = '_'
-    execute 'normal kJ4h4xl'
+    execute 'normal! kJ4h4xl'
     return
   endif
   let isString = 0
@@ -380,45 +394,99 @@ function! ReplaceUnderS()
     let j = j - 1
   endwhile
   if isString == 0
-    execute "normal a <- "
+    execute "normal! a <- "
   else
     put = '_'
-    execute 'normal kgJ'
+    execute 'normal! kgJ'
   endif
 endfunction
 
+" For each noremap we need a vnoremap including <Esc> before the :call,
+" otherwise vim will call the function as many times as the number of selected
+" lines. If we put the <Esc> in the noremap, vim will bell.
+
 " Start a listening R interpreter in new xterm
-noremap <buffer> <F2> :call StartR("R", "kbd")<CR>
-inoremap <buffer> <F2> <Esc>:call StartR("R", "kbd")<CR>a
-" Avoid that N terminal windows are opened when there are N lines selected:
-vnoremap <buffer> <F2> <Esc>:call StartR("R", "kdb")<CR>
+if hasmapto('<Plug>RStart')
+  noremap <buffer> <Plug>RStart :call StartR("R", "kbd")<CR>
+  vnoremap <buffer> <Plug>RStart <Esc>:call StartR("R", "kbd")<CR>
+  inoremap <buffer> <Plug>RStart <Esc>:call StartR("R", "kbd")<CR>a
+else
+  noremap <buffer> <F2> :call StartR("R", "kbd")<CR>
+  vnoremap <buffer> <F2> <Esc>:call StartR("R", "kbd")<CR>
+  inoremap <buffer> <F2> <Esc>:call StartR("R", "kbd")<CR>a
+endif
 
 " Start a listening R-devel interpreter in new xterm
-noremap <buffer> <F3> :call StartR("R-devel", "kbd")<CR>
-inoremap <buffer> <F3> <Esc>:call StartR("R-devel", "kbd")<CR>a
-vnoremap <buffer> <F3> <Esc>:call StartR("R-devel", "kbd")<CR>
+if hasmapto('<Plug>RStart-dev')
+  noremap <buffer> <Plug>RStart-dev :call StartR("R-devel", "kbd")<CR>
+  vnoremap <buffer> <Plug>RStart-dev <Esc>:call StartR("R-devel", "kbd")<CR>
+  inoremap <buffer> <Plug>RStart-dev <Esc>:call StartR("R-devel", "kbd")<CR>a
+else
+  noremap <buffer> <F3> :call StartR("R-devel", "kbd")<CR>
+  vnoremap <buffer> <F3> <Esc>:call StartR("R-devel", "kbd")<CR>
+  inoremap <buffer> <F3> <Esc>:call StartR("R-devel", "kbd")<CR>a
+endif
 
 " Start a listening R --vanilla interpreter in new xterm
-noremap <buffer> <F4> :call StartR("R --vanilla", "kbd")<CR>
-inoremap <buffer> <F4> <Esc>:call StartR("R --vanilla", "kbd")<CR>a
-vnoremap <buffer> <F4> <Esc>:call StartR("R --vanilla", "kbd")<CR>
+if hasmapto('<Plug>RStart-vanilla')
+  noremap <buffer> <Plug>RStart-vanilla :call StartR("R --vanilla", "kbd")<CR>
+  vnoremap <buffer> <Plug>RStart-vanilla <Esc>:call StartR("R --vanilla", "kbd")<CR>
+  inoremap <buffer> <Plug>RStart-vanilla <Esc>:call StartR("R --vanilla", "kbd")<CR>a
+else
+  noremap <buffer> <F4> :call StartR("R --vanilla", "kbd")<CR>
+  vnoremap <buffer> <F4> <Esc>:call StartR("R --vanilla", "kbd")<CR>
+  inoremap <buffer> <F4> <Esc>:call StartR("R --vanilla", "kbd")<CR>a
+endif
 
-" Send line under cursor to R
-noremap <buffer> <F8> :call BuildRTags()<CR>
-inoremap <buffer> <F8> <Esc>:call BuildRTags()<CR>i
+" Build tags file for omni completion
+if hasmapto('<Plug>RBuildTags')
+  noremap <buffer> <Plug>RBuildTags :call BuildRTags()<CR>
+  vnoremap <buffer> <Plug>RBuildTags <Esc>:call BuildRTags()<CR>
+  inoremap <buffer> <Plug>RBuildTags <Esc>:call BuildRTags()<CR>i
+else
+  noremap <buffer> <F8> :call BuildRTags()<CR>
+  vnoremap <buffer> <F8> <Esc>:call BuildRTags()<CR>
+  inoremap <buffer> <F8> <Esc>:call BuildRTags()<CR>i
+endif
+
+" Stop R process
+if hasmapto('<Plug>RStop')
+  noremap <buffer> <Plug>RStop :call SignalToR("INT")<CR>
+  vnoremap <buffer> <Plug>RStop <Esc>:call SignalToR("INT")<CR>
+  inoremap <buffer> <Plug>RStop <Esc>:call SignalToR("INT")<CR>i
+else
+  noremap <buffer> <F6> :call SignalToR("INT")<CR>
+  vnoremap <buffer> <F6> <Esc>:call SignalToR("INT")<CR>
+  inoremap <buffer> <F6> <Esc>:call SignalToR("INT")<CR>i
+endif
 
 " Kill R process
-noremap <buffer> <F6> :call SignalToR("INT")<CR>
-inoremap <buffer> <F6> <Esc>:call SignalToR("INT")<CR>i
-
-" Kill R process
-noremap <buffer> <F7> :call SignalToR("TERM")<CR>
-inoremap <buffer> <F7> <Esc>:call SignalToR("TERM")<CR>i
+if hasmapto('<Plug>RKill')
+  noremap <buffer> <Plug>RKill :call SignalToR("TERM")<CR>
+  vnoremap <buffer> <Plug>RKill <Esc>:call SignalToR("TERM")<CR>
+  inoremap <buffer> <Plug>RKill <Esc>:call SignalToR("TERM")<CR>i
+else
+  noremap <buffer> <F7> :call SignalToR("TERM")<CR>
+  vnoremap <buffer> <F7> <Esc>:call SignalToR("TERM")<CR>
+  inoremap <buffer> <F7> <Esc>:call SignalToR("TERM")<CR>i
+endif
 
 " Send line under cursor to R
-noremap <buffer> <F9> :call SendLinesToR(1)<CR>0
-inoremap <buffer> <F9> <Esc>:call SendLinesToR(1)<CR>0i
-vnoremap <buffer> <F9> <Esc>:call SendBlockToR()<CR>
+if hasmapto('<Plug>RSendLine')
+  noremap <buffer> <Plug>RSendLine :call SendLineToR(1)<CR>0
+  vnoremap <buffer> <Plug>RSendLine <Esc>:call SendLineToR(1)<CR>0
+  inoremap <buffer> <Plug>RSendLine <Esc>:call SendLineToR(1)<CR>0i
+else
+  noremap <buffer> <F9> :call SendLineToR(1)<CR>0
+  inoremap <buffer> <F9> <Esc>:call SendLineToR(1)<CR>0i
+endif
+
+" Send block of lines to R
+if hasmapto('<Plug>RSendBlock')
+  vnoremap <buffer> <Plug>RSendBlock <Esc>:call SendBlockToR()<CR>
+else
+  vnoremap <buffer> <F9> <Esc>:call SendBlockToR()<CR>0
+endif
 
 " For compatibility with original plugin
 if exists("g:vimrplugin_map_r")
@@ -427,23 +495,55 @@ endif
 
 
 " Send function which the cursor is in
-noremap <buffer> <C-F9> :call SendFunctionToR()<CR>
-inoremap <buffer> <C-F9> <Esc>:call SendFunctionToR()<CR>i
+if hasmapto('<Plug>RSendFunction')
+  noremap <buffer> <Plug>RSendFunction :call SendFunctionToR()<CR>
+  vnoremap <buffer> <Plug>RSendFunction <Esc>:call SendFunctionToR()<CR>
+  inoremap <buffer> <Plug>RSendFunction <Esc>:call SendFunctionToR()<CR>i
+else
+  noremap <buffer> <C-F9> :call SendFunctionToR()<CR>
+  vnoremap <buffer> <C-F9> <Esc>:call SendFunctionToR()<CR>
+  inoremap <buffer> <C-F9> <Esc>:call SendFunctionToR()<CR>i
+endif
 
 " Write and process mode (somehow mapping <C-Enter> does not work)
-inoremap <S-Enter> <Esc>:call SendLinesToR(0)<CR>o
+if hasmapto('<Plug>RSendLineAndOpenNewOne')
+  inoremap <buffer> <Plug>RSendLineAndOpenNewOne <Esc>:call SendLineToR(0)<CR>o
+else
+  inoremap <buffer> <S-Enter> <Esc>:call SendLineToR(0)<CR>o
+endif
 
 " Send current file to R
-noremap <buffer> <F5> :call SendFileToR()<CR>
-inoremap <buffer> <F5> <Esc>:call SendFileToR()<CR>a
+if hasmapto('<Plug>RSendFile')
+  noremap <buffer> <Plug>RSendFile :call SendFileToR()<CR>
+  vnoremap <buffer> <Plug>RSendFile <Esc>:call SendFileToR()<CR>
+  inoremap <buffer> <Plug>RSendFile <Esc>:call SendFileToR()<CR>a
+else
+  noremap <buffer> <F5> :call SendFileToR()<CR>
+  vnoremap <buffer> <F5> <Esc>:call SendFileToR()<CR>
+  inoremap <buffer> <F5> <Esc>:call SendFileToR()<CR>a
+endif
 
 " Call R function args()
-noremap <buffer> <F1> :call RHelp("a")<CR>
-inoremap <buffer> <F1> <Esc>:call RHelp("a")<CR>a
+if hasmapto('<Plug>RShowArgs')
+  noremap <buffer> <Plug>RShowArgs :call RHelp("a")<CR>
+  vnoremap <buffer> <Plug>RShowArgs <Esc>:call RHelp("a")<CR>
+  inoremap <buffer> <Plug>RShowArgs <Esc>:call RHelp("a")<CR>a
+else
+  noremap <buffer> <S-F1> :call RHelp("a")<CR>
+  vnoremap <buffer> <S-F1> <Esc>:call RHelp("a")<CR>
+  inoremap <buffer> <S-F1> <Esc>:call RHelp("a")<CR>a
+endif
 
 " Call R function help()
-noremap <buffer> <C-H> :call RHelp("h")<CR>
-inoremap <buffer> <C-H> <Esc>:call RHelp("h")<CR>a
+if hasmapto('<Plug>RHelp')
+  noremap <buffer> <Plug>RHelp :call RHelp("h")<CR>
+  vnoremap <buffer> <Plug>RHelp <Esc>:call RHelp("h")<CR>
+  inoremap <buffer> <Plug>RHelp <Esc>:call RHelp("h")<CR>a
+else
+  noremap <buffer> <C-H> :call RHelp("h")<CR>
+  vnoremap <buffer> <C-H> <Esc>:call RHelp("h")<CR>
+  inoremap <buffer> <C-H> <Esc>:call RHelp("h")<CR>a
+endif
 
 " Replace "underline" with " <- "
 imap <buffer> _ <Esc>:call ReplaceUnderS()<CR>a
@@ -452,28 +552,81 @@ function! MakeRMenu()
   if b:hasrmenu == 1
     return
   endif
-  amenu &R.Start\ &R<Tab><F2> :call StartR("R", "click")<CR>
-  amenu R.Start\ R-&devel<Tab><F3> :call StartR("R-devel", "click")<CR>
-  amenu R.Start\ R\ --&vanilla<Tab><F4> :call StartR("R --vanilla", "click")<CR>
+  if hasmapto('<Plug>RStart')
+    amenu &R.Start\ &R :call StartR("R", "click")<CR>
+  else
+    amenu &R.Start\ &R<Tab><F2> :call StartR("R", "click")<CR>
+  endif
+  if hasmapto('<Plug>RStart-dev')
+    amenu R.Start\ R-&devel :call StartR("R-devel", "click")<CR>
+  else
+    amenu R.Start\ R-&devel<Tab><F3> :call StartR("R-devel", "click")<CR>
+  endif
+  if hasmapto('<Plug>RStart-vanilla')
+    amenu R.Start\ R\ --&vanilla :call StartR("R --vanilla", "click")<CR>
+  else
+    amenu R.Start\ R\ --&vanilla<Tab><F4> :call StartR("R --vanilla", "click")<CR>
+  endif
   menu R.-Sep1- <nul>
-  amenu R.Send\ &lines<Tab><F9> :call SendLinesToR(1)<CR>0
-  imenu R.Send\ &lines<Tab><F9> <Esc>:call SendLinesToR(1)<CR>0a
-  amenu R.Send\ &selected\ lines<Tab><F9> :call SendBlockToR()<CR>0
-  imenu R.Send\ &selected\ lines<Tab><F9> <Esc>:call SendBlockToR()<CR>0
-  amenu R.Send\ current\ &function<Tab><C-F9> :call SendFunctionToR()<CR>
-  imenu R.Send\ current\ &function<Tab><C-F9> <Esc>:call SendFunctionToR()<CR>
-  imenu R.Send\ line\ and\ &open\ a\ new\ one<Tab><S-Enter> <Esc>:call SendLinesToR(0)<CR>o
-  amenu R.Send\ &file<Tab><F5> :call SendFileToR()<CR>
+  if hasmapto('<Plug>RSendLine')
+    amenu R.Send\ &line :call SendLineToR(1)<CR>0
+    imenu R.Send\ &line <Esc>:call SendLineToR(1)<CR>0a
+  else
+    amenu R.Send\ &line<Tab><F9> :call SendLineToR(1)<CR>0
+    imenu R.Send\ &line<Tab><F9> <Esc>:call SendLineToR(1)<CR>0a
+  endif
+  if hasmapto('<Plug>RSendBlock')
+    vmenu R.Send\ &selected\ lines :call SendBlockToR()<CR>0
+  else
+    vmenu R.Send\ &selected\ lines<Tab><F9> :call SendBlockToR()<CR>0
+  endif
+  if hasmapto('<Plug>RSendFunction')
+    amenu R.Send\ current\ &function :call SendFunctionToR()<CR>
+    imenu R.Send\ current\ &function <Esc>:call SendFunctionToR()<CR>
+  else
+    amenu R.Send\ current\ &function<Tab><C-F9> :call SendFunctionToR()<CR>
+    imenu R.Send\ current\ &function<Tab><C-F9> <Esc>:call SendFunctionToR()<CR>
+  endif
+  if hasmapto('<Plug>RSendLineAndOpenNewOne')
+    imenu R.Send\ line\ and\ &open\ a\ new\ one <Esc>:call SendLineToR(0)<CR>o
+  else
+    imenu R.Send\ line\ and\ &open\ a\ new\ one<Tab><S-Enter> <Esc>:call SendLineToR(0)<CR>o
+  endif
+  if hasmapto('<Plug>RSendFile')
+    amenu R.Send\ &file :call SendFileToR()<CR>
+  else
+    amenu R.Send\ &file<Tab><F5> :call SendFileToR()<CR>
+  endif
   menu R.-Sep2- <nul>
-  amenu R.Run\ &args()<Tab><F1> :call RHelp("a")<CR>
-  amenu R.Run\ &help()<Tab><C-H> :call RHelp("h")<CR>
-  amenu R.Rebuild\ list\ of\ objects<Tab><F8> :call BuildRTags()<CR>
+  if hasmapto('<Plug>RShowArgs')
+    amenu R.Run\ &args() :call RHelp("a")<CR>
+  else
+    amenu R.Run\ &args()<Tab><S-F1> :call RHelp("a")<CR>
+  endif
+  if hasmapto('<Plug>RHelp')
+    amenu R.Run\ &help() :call RHelp("h")<CR>
+  else
+    amenu R.Run\ &help()<Tab><C-H> :call RHelp("h")<CR>
+  endif
+  if hasmapto('<Plug>RBuildTags')
+    amenu R.Rebuild\ list\ of\ objects :call BuildRTags()<CR>
+  else
+    amenu R.Rebuild\ list\ of\ objects<Tab><F8> :call BuildRTags()<CR>
+  endif
   amenu R.About\ the\ plugin :help vim-r-plugin<CR>
   menu R.-Sep3- <nul>
-  amenu R.Stop\ R<Tab><F6> :call SignalToR("INT")<CR>
-  amenu R.Kill\ R<Tab><F7> :call SignalToR("TERM")<CR>
+  if hasmapto('<Plug>RStop')
+    amenu R.Stop\ R :call SignalToR("INT")<CR>
+  else
+    amenu R.Stop\ R<Tab><F6> :call SignalToR("INT")<CR>
+  endif
+  if hasmapto('<Plug>RKill')
+    amenu R.Kill\ R :call SignalToR("TERM")<CR>
+  else
+    amenu R.Kill\ R<Tab><F7> :call SignalToR("TERM")<CR>
+  endif
   amenu icon=rstart ToolBar.RStart :call StartR("R", "click")<CR>
-  amenu icon=rline ToolBar.RLine :call SendLinesToR(1)<CR>
+  amenu icon=rline ToolBar.RLine :call SendLineToR(1)<CR>
   amenu icon=rregion ToolBar.RRegion :call SendBlockToR()<CR>
   amenu icon=rfunction ToolBar.RFunction :call SendFunctionToR()<CR>
   amenu icon=rcomplete ToolBar.RTags :call BuildRTags()<CR>
@@ -512,5 +665,4 @@ augroup RStatMenu
   au BufEnter * if &filetype == "r" | call MakeRMenu() | endif
   au BufLeave * if &filetype == "r" | call UnMakeRMenu() | endif
 augroup END
-
 

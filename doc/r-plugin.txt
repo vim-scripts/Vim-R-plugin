@@ -4,7 +4,7 @@
                             Plugin to work with R~
 
 Author: Jakson A. Aquino (jalvesaq@gmail.com)
-Last Change: 19 May 2009
+Last Change: 23 May 2009
 
 For Vim version 7.2 and above
 
@@ -17,7 +17,8 @@ For Vim version 7.2 and above
 5. How the plugin works                         |r-plugin-functioning|
 6. Known bugs and workarounds                   |r-plugin-known-bugs|
 7. Options                                      |r-plugin-options|
-8. Files                                        |r-plugin-files|
+8. Custom key bindings                          |r-plugin-custom-key-bindings|
+9. Files                                        |r-plugin-files|
 
 ==============================================================================
 1. Overview~
@@ -124,8 +125,8 @@ Key bindings~
 The plugin has the following key biddings, with the corresponding menu items
 and, in some cases, tool bar buttons:
 
-   <C-H>     Run R args() with word under cursor as parameter.
-   <F1>      Run R args() with word under cursor as parameter.
+   <C-H>     Run R help() with word under cursor as parameter.
+   <S-F1>    Run R args() with word under cursor as parameter.
    <F2>      Start a listening R interpreter in new xterm.
    <F3>      Start a listening R-devel interpreter in new xterm.
    <F4>      Start a listening R --vanilla interpreter in new xterm.
@@ -136,9 +137,12 @@ and, in some cases, tool bar buttons:
    <F9>      Send the current line or selected code and go to the next line.
    <C-F9>    Send the current function.
    <S-Enter> Send the current line to R and open a new line (insert mode only).
-   _         Write " <- ", if not inside a string. Please, type "_" again if
-             the function yields " <- " when you really needs "_".
+   <_>       In insert mode, write " <- ", if not inside a string. Please,
+	     type "_" again if the function yields " <- " when you really
+	     needs "_".
 
+You can customize all key bindings, except <_>
+(see|r-plugin-custom-key-bindings|).
 
 ==============================================================================
 5. How the plugin works~
@@ -231,6 +235,28 @@ window before using help(). This will be done automatically by the plugin (see
 ==============================================================================
 7. Options~
                                                       *r-plugin-options*
+
+                                                    *g:vimrplugin_term_cmd*
+The plugin uses uxterm to run R, but you may define another terminal emulator
+in your|vimrc|by setting the variable g:vimrplugin_term_cmd, as in the example
+below:
+>
+   let g:vimrplugin_term_cmd = "gnome-terminal -t R -x"
+<
+                                                   *g:vimrplugin_nohstart*
+The plugin will call R's function help.start() the first time that you press
+<C-H>. To inhibit this behavior, you should put in your |vimrc|:
+>
+   let g:vimrplugin_nohstart = 1
+<
+                                                *g:vimrplugin_browser_time*
+After calling help.start(), the plugin will wait 4 seconds before sending to R
+the help command. If your browser needs either more or less time to start, you
+may want to add the following global variable (with the appropriate value) to
+your|vimrc|:
+>
+   let g:vimrplugin_browser_time = 4
+<
                                                       *g:vimrplugin_map_r*
 
 If the variable g:vimrplugin_map_r exists, the plugin will map the letter 'r'
@@ -239,22 +265,67 @@ with the original plugin). To activate this option, put in your |vimrc|:
 >
    let g:vimrplugin_map_r = 1
 <
-                                                   *g:vimrplugin_nohstart*
-The plugin will call R's function help.start() the first time that you press
-<C-H>. To inhibit this behavior, you should put in your |vimrc|:
+
+==============================================================================
+8. Custom key bindings~
+                                                 *r-plugin-custom-key-bindings*
+
+To customize a key binding you should put in your|vimrc|something like:
 >
-   let g:vimrplugin_nohstart = 1
+   map <C-F2> <Plug>RStart
+   imap <C-F2> <Plug>RStart
+   vmap <C-F2> <Plug>RStart
 <
-After calling help.start(), the plugin will wait 4 seconds before sending to R
-the help command. If your browser needs either more or less time to start, you
-may want to add the following global variable (with the appropriate value) to
-your|vimrc|:
+In the above example, R would be started by pressing <C-F2> instead of the
+default <F2>. It is necessary to create three maps for most functions because
+the way the function is called is slightly different according to Vim's mode
+(normal, insert or visual). Custom key bindings are not shown in Vim's menu,
+but you can type|:map|to see the list of current mappings.  Below is the
+complete list of customizable key bindings with their default values. You may
+simply copy and paste the list or part of it to your|vimrc|and edit the key
+bindings:
 >
-   let g:vimrplugin_browser_time = 4
+   map  <S-F1>    <Plug>RShowArgs
+   imap <S-F1>    <Plug>RShowArgs
+   vmap <S-F1>    <Plug>RShowArgs
+   map  <C-H>     <Plug>RHelp
+   imap <C-H>     <Plug>RHelp
+   vmap <C-H>     <Plug>RHelp
+   map  <F2>      <Plug>RStart
+   imap <F2>      <Plug>RStart
+   vmap <F2>      <Plug>RStart
+   map  <F3>      <Plug>RStart-dev
+   imap <F3>      <Plug>RStart-dev
+   vmap <F3>      <Plug>RStart-dev
+   map  <F4>      <Plug>RStart-vanilla
+   imap <F4>      <Plug>RStart-vanilla
+   vmap <F4>      <Plug>RStart-vanilla
+   map  <F5>      <Plug>RSendFile
+   imap <F5>      <Plug>RSendFile
+   vmap <F5>      <Plug>RSendFile
+   map  <F6>      <Plug>RStop
+   imap <F6>      <Plug>RStop
+   vmap <F6>      <Plug>RStop
+   map  <F7>      <Plug>RKill
+   imap <F7>      <Plug>RKill
+   vmap <F7>      <Plug>RKill
+   map  <F8>      <Plug>RBuildTags
+   imap <F8>      <Plug>RBuildTags
+   vmap <F8>      <Plug>RBuildTags
+   map  <F9>      <Plug>RSendLine
+   imap <F9>      <Plug>RSendLine
+   vmap <F9>      <Plug>RSendLine
+   map  <S-Enter> <Plug>RSendLineAndOpenNewOne
+   imap <S-Enter> <Plug>RSendLineAndOpenNewOne
+   vmap <S-Enter> <Plug>RSendLineAndOpenNewOne
+   vmap <F9>      <Plug>RSendBlock
+   map  <C-F9>    <Plug>RSendFunction
+   imap <C-F9>    <Plug>RSendFunction
+   vmap <C-F9>    <Plug>RSendFunction
 <
 
 ==============================================================================
-8. Files~
+9. Files~
                                                       *r-plugin-files*
 
 The following files are part of the plugin and should be in your ~/.vim
@@ -262,31 +333,33 @@ directory after the installation:
 
    .
    |-- after
-   | |-- filetype.vim
-   | `-- syntax
-   | `-- r.vim
+   |   |-- filetype.vim
+   |   `-- syntax
+   |       `-- r.vim
    |-- autoload
-   | `-- rcomplete.vim
+   |   `-- rcomplete.vim
    |-- bitmaps
-   | |-- rbuffer.xpm
-   | |-- rcomplete.xpm
-   | |-- rfunction.xpm
-   | |-- rkill.xpm
-   | |-- rline.xpm
-   | |-- rregion.xpm
-   | `-- rstart.xpm
+   |   |-- rbuffer.xpm
+   |   |-- rcomplete.xpm
+   |   |-- rfunction.xpm
+   |   |-- rkill.xpm
+   |   |-- rline.xpm
+   |   |-- rregion.xpm
+   |   |-- rstart.xpm
+   |   `-- rstop.xpm
    |-- doc
-   | `-- r-plugin.txt
+   |   `-- r-plugin.txt
    |-- ftplugin
-   | |-- r.vim
-   | |-- rhelp.vim -> r.vim
-   | `-- rnoweb.vim -> r.vim
+   |   |-- r.vim
+   |   |-- rhelp.vim -> r.vim
+   |   `-- rnoweb.vim -> r.vim
    |-- indent
-   | `-- r.vim
+   |   `-- r.vim
    `-- tools
-    |-- rfunnel.pl
-    |-- open-gvim-here
-    `-- rtags.R
+       |-- open-gvim-here
+       |-- rargs.R
+       |-- rfunnel.pl
+       `-- rtags.R
 
 ==============================================================================
  vim:tw=78:ts=8:ft=help:norl:
