@@ -81,7 +81,7 @@ function GetRIndent()
       let ind = ind - &sw
     endif
   endif
-  if plnum > 0 && (pline =~ '^\s*\(if\|while\|for\)\s*(.*)\s*$' || pline =~ '^\s*else\s*')
+  if plnum > 0 && (pline =~ '^\s*\(if\|while\|for\)\s*(.*)\s*$' || pline =~ '^\s*else\s*') && pline !~ '.*{\s*$'
     let ind = ind - &sw
   endif
 

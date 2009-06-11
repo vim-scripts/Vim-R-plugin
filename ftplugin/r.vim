@@ -54,10 +54,19 @@ let b:needsnewtags = 1
 " Automatically call R's function help.start() the first time <C-H> is pressed:
 let b:needshstart = 1
 if exists("g:vimrplugin_nohstart")
-  let b:needshstart = 0
+  if g:vimrplugin_nohstart != 0
+    let b:needshstart = 0
+  endif
 endif
 if exists("g:vimrplugin_browser_time") == 0
   let g:vimrplugin_browser_time = 4
+endif
+
+let b:replace_us = 1
+if exists("g:vimrplugin_underscore")
+  if g:vimrplugin_underscore != 0
+    let b:replace_us = 0
+  endif
 endif
 
 " What terminal is preferred:
@@ -74,8 +83,14 @@ let b:needsrargs = 1
 " Make the R 'tags' file name
 let b:rtagsfile = printf("/tmp/.Rtags-%s", userlogin)
 
-" Make a random name for the pipe
-let b:pipefname = printf("/tmp/.r-pipe-%s-%s", userlogin, localtime())
+if exists("g:vimrplugin_single_pipe")
+  " Make a unique name for the pipe
+  let b:pipefname = printf("/tmp/.r-pipe-%s", userlogin)
+else
+  " Make a random name for the pipe
+  let b:pipefname = printf("/tmp/.r-pipe-%s-%s", userlogin, localtime())
+endif
+
 let b:rpidfile = b:pipefname . ".Rpid"
 
 " Set completion with CTRL-X CTRL-O to autoloaded function.
@@ -86,11 +101,14 @@ endif
 " Disable backup for r-pipe
 setl backupskip=/tmp/.r-pipe*
 
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" From the orignal plugin:
 " Set tabstop so it is compatible with the emacs edited code. Personally, I
 " prefer shiftwidth=2, which I have in my .vimrc anyway
-set expandtab
-set shiftwidth=4
-set tabstop=8
+" set expandtab
+" set shiftwidth=4
+" set tabstop=8
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 function! SignalToR(signal)
   if filereadable(b:rpidfile)
@@ -265,18 +283,26 @@ function! RHelp(type)
   endif
   echon
   " Go back some columns if character under cursor is not valid
-  let curcol = col(".")
   let curline = line(".")
   let line = getline(curline)
-  let i = curcol - 1
-  while i > 1 && (line[i] == ' ' || line[i] == '(')
+  " line index starts in 0; cursor index starts in 1:
+  let i = col(".") - 1
+  while i > 0 && (line[i] == ' ' || line[i] == '(')
     let i -= 1
-    call cursor(curline, i)
   endwhile
-  let rkeyword = expand("<cWORD>")
-  let rkeyword = substitute(rkeyword, "(.*", "", "g")
-  " Put the cursor back into its original position and run the R command
-  call cursor(curline, curcol)
+  " Go back until the begining of the word:
+  while i > 0 && line[i] != ' ' && line[i] != '('
+    let i -= 1
+  endwhile
+  let llen = strlen(line)
+  if i < (llen - 1) && (line[i] == ' ' || line[i] == '(')
+    let i += 1
+  endif
+  let kstart = i
+  while i < llen && line[i] != ' ' && line[i] != '('
+    let i += 1
+  endwhile
+  let rkeyword = strpart(line, kstart, i - kstart)
   if strlen(rkeyword) > 0
     if a:type == "a"
       if b:needsrargs
@@ -368,6 +394,17 @@ function! StartR(whatr, kbdclk)
   tmenu ToolBar.RStop Stop R process
   tmenu ToolBar.RKill Kill R process
   let b:hastoolbarkill = 1
+  if !exists("g:vimrplugin_nohstart")
+    let b:needshstart = 1
+  endif
+  if exists("g:vimrplugin_nohstart")
+    if g:vimrplugin_nohstart == 0
+      let b:needshstart = 1
+    else
+      let b:needshstart = 0
+    endif
+  endif
+  let b:needsrargs = 1
   echon
 endfunction
 
@@ -376,28 +413,27 @@ function! ReplaceUnderS()
   let j = col(".")
   let s = getline(".")
   if j > 3 && s[j-3] == "<" && s[j-2] == "-" && s[j-1] == " "
-    let i = line(".")
-    call cursor(i, j-3)
-    put = '_'
-    execute 'normal! kJ4h4xl'
+    execute "normal! 3h3xr_"
     return
   endif
+
   let isString = 0
-  while j > 0
-    if s[j] == " "
-      break
+  let i = 0
+  while i < j
+    if s[i] == '"'
+      if isString == 0
+	let isString = 1
+      else
+	let isString = 0
+      endif
     endif
-    if s[j] == '"'
-      let isString = 1
-      break
-    endif
-    let j = j - 1
+    let i += 1
   endwhile
+
   if isString == 0
     execute "normal! a <- "
   else
-    put = '_'
-    execute 'normal! kgJ'
+    execute "normal! a_"
   endif
 endfunction
 
@@ -546,7 +582,10 @@ else
 endif
 
 " Replace "underline" with " <- "
-imap <buffer> _ <Esc>:call ReplaceUnderS()<CR>a
+if b:replace_us
+  imap <buffer> _ <Esc>:call ReplaceUnderS()<CR>a
+endif
+
 
 function! MakeRMenu()
   if b:hasrmenu == 1

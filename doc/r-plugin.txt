@@ -4,7 +4,7 @@
                             Plugin to work with R~
 
 Author: Jakson A. Aquino (jalvesaq@gmail.com)
-Last Change: 23 May 2009
+Last Change: 10 Jun 2009
 
 For Vim version 7.2 and above
 
@@ -243,6 +243,11 @@ below:
 >
    let g:vimrplugin_term_cmd = "gnome-terminal -t R -x"
 <
+                                                *g:vimrplugin_underscore*
+To disable the underscore replacement with " <- " put in your |vimrc|:
+>
+   let g:vimrplugin_underscore = 1
+<
                                                    *g:vimrplugin_nohstart*
 The plugin will call R's function help.start() the first time that you press
 <C-H>. To inhibit this behavior, you should put in your |vimrc|:
@@ -257,6 +262,18 @@ your|vimrc|:
 >
    let g:vimrplugin_browser_time = 4
 <
+In addition to using help.start() you may also want to use less as the default
+pager for R's help. You can use the script ~/.vim/tools/rpager.sh which will
+call less by putting in your ~/.Rprofile:
+>
+   options(pager="~/.vim/tools/rpager.sh")
+<
+                                                  *g:vimrplugin_single_pipe*
+If you prefer that all Vim buffers use the same R process, put the following
+option in your |vimrc|:
+>
+   let g:vimrplugin_single_pipe = 1
+<
                                                       *g:vimrplugin_map_r*
 
 If the variable g:vimrplugin_map_r exists, the plugin will map the letter 'r'
@@ -264,6 +281,14 @@ to send lines to R when there are visually selected lines (for compatibility
 with the original plugin). To activate this option, put in your |vimrc|:
 >
    let g:vimrplugin_map_r = 1
+<
+You may want to put in your |vimrc|the following three lines which are in the
+original plugin and are intended to increase compatibility with emacs edited
+code:
+>
+   set expandtab
+   set shiftwidth=4
+   set tabstop=8
 <
 
 ==============================================================================
@@ -359,6 +384,7 @@ directory after the installation:
        |-- open-gvim-here
        |-- rargs.R
        |-- rfunnel.pl
+       |-- rpager.sh
        `-- rtags.R
 
 ==============================================================================
