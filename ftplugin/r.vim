@@ -62,6 +62,12 @@ if exists("g:vimrplugin_browser_time") == 0
   let g:vimrplugin_browser_time = 4
 endif
 
+if exists("g:vimrplugin_pipe_limit")
+  let b:pipe_limit = g:vimrplugin_pipe_limit
+else
+  let b:pipe_limit = 4000
+endif
+
 let b:replace_us = 1
 if exists("g:vimrplugin_underscore")
   if g:vimrplugin_underscore != 0
@@ -69,11 +75,37 @@ if exists("g:vimrplugin_underscore")
   endif
 endif
 
-" What terminal is preferred:
+
+" Terminal options:
+let b:term_cmd = "uxterm -xrm '*iconPixmap: " . expand("~") . "/.vim/bitmaps/ricon.xbm' -T '" . expand("%:t") . "' -e"
+
+if exists("g:vimrplugin_term")
+  if g:vimrplugin_term == "xterm"
+    let b:term_cmd = "xterm -xrm '*iconPixmap: " . expand("~") . "/.vim/bitmaps/ricon.xbm' -T '" . expand("%:t") . "' -e"
+  endif
+  if g:vimrplugin_term == "gnome-terminal"
+    " Cannot set icon: http://bugzilla.gnome.org/show_bug.cgi?id=126081
+    let b:term_cmd = "gnome-terminal --working-directory='" . expand("%:p:h") . "' -t 'R - " . expand("%:t") . "' -x"
+  endif
+  if g:vimrplugin_term == "konsole"
+    let b:term_cmd = "konsole --workdir '" . expand("%:p:h") . "' --icon ~/.vim/bitmaps/ricon.png --title '" . expand("%:t") . "' -e"
+  endif
+  if g:vimrplugin_term == "xfce4-terminal"
+    let b:term_cmd = "xfce4-terminal --working-directory='" . expand("%:p:h") . "' -t 'R - " . expand("%:t") . "' -x"
+  endif
+  if g:vimrplugin_term == "Eterm"
+    let b:term_cmd = "Eterm --icon ~/.vim/bitmaps/ricon.png -n '" . expand("%:t") . "' -e"
+  endif
+  if g:vimrplugin_term == "rxvt"
+    let b:term_cmd = "rxvt -title 'R - " . expand("%:t") . "' -e"
+  endif
+  if g:vimrplugin_term == "aterm"
+    let b:term_cmd = "aterm -title 'R - " . expand("%:t") . "' -e"
+  endif
+endif
+
 if exists("g:vimrplugin_term_cmd")
   let b:term_cmd = g:vimrplugin_term_cmd
-else
-  let b:term_cmd = "uxterm -T 'R' -e"
 endif
 
 " Automatically source the script tools/rargs.R the first time <S-F1> is
@@ -102,7 +134,7 @@ endif
 setl backupskip=/tmp/.r-pipe*
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" From the orignal plugin:
+" From the original plugin:
 " Set tabstop so it is compatible with the emacs edited code. Personally, I
 " prefer shiftwidth=2, which I have in my .vimrc anyway
 " set expandtab
@@ -185,8 +217,8 @@ function! CheckBlockSize(lines, type)
       let b:needsnewtags = 1
     endif
   endfor
-  if nbytes > 4000
-    call RWarningMsg("We can send to R at most 4000 bytes at once, but this " . a:type . " has " . nbytes . " bytes.")
+  if nbytes > b:pipe_limit
+    call RWarningMsg("We can send to R at most " . b:pipe_limit . " bytes at once, but this " . a:type . " has " . nbytes . " bytes.")
     return 1
   endif
   return 0
@@ -382,9 +414,14 @@ function! StartR(whatr, kbdclk)
     endif
     return
   endif
-  " Run R
-  let opencmd = printf("%s ~/.vim/tools/rfunnel.pl %s \"%s && echo -e 'Interpreter has finished. Exiting. Goodbye.'\"&", b:term_cmd, b:pipefname, a:whatr)
+
+  let opencmd = printf("%s ~/.vim/tools/rfunnel.pl %s \"%s && echo -e 'Interpreter has finished. Please close any remaining help pager or web browser that you have opened.'\"&", b:term_cmd, b:pipefname, a:whatr)
+
+  " Change to buffer's directory, run R, and go back to original directory:
+  lcd %:p:h
   let rlog = system(opencmd)
+  lcd -
+
   if rlog != ""
     call RWarningMsg(rlog)
     return
@@ -545,7 +582,7 @@ endif
 if hasmapto('<Plug>RSendLineAndOpenNewOne')
   inoremap <buffer> <Plug>RSendLineAndOpenNewOne <Esc>:call SendLineToR(0)<CR>o
 else
-  inoremap <buffer> <S-Enter> <Esc>:call SendLineToR(0)<CR>o
+  inoremap <buffer> <M-Enter> <Esc>:call SendLineToR(0)<CR>o
 endif
 
 " Send current file to R
@@ -629,7 +666,7 @@ function! MakeRMenu()
   if hasmapto('<Plug>RSendLineAndOpenNewOne')
     imenu R.Send\ line\ and\ &open\ a\ new\ one <Esc>:call SendLineToR(0)<CR>o
   else
-    imenu R.Send\ line\ and\ &open\ a\ new\ one<Tab><S-Enter> <Esc>:call SendLineToR(0)<CR>o
+    imenu R.Send\ line\ and\ &open\ a\ new\ one<Tab><M-Enter> <Esc>:call SendLineToR(0)<CR>o
   endif
   if hasmapto('<Plug>RSendFile')
     amenu R.Send\ &file :call SendFileToR()<CR>

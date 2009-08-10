@@ -1,9 +1,0 @@
-#!/bin/sh
-
-
-DIRTOGO=`dirname "$1"`
-FILETOOPEN=`basename "$1"`
-
-cd $DIRTOGO
-gvim $FILETOOPEN
-

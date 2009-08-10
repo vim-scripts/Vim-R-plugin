@@ -4,7 +4,7 @@
                             Plugin to work with R~
 
 Author: Jakson A. Aquino (jalvesaq@gmail.com)
-Last Change: 10 Jun 2009
+Last Change: 10 Aug 2009
 
 For Vim version 7.2 and above
 
@@ -90,24 +90,9 @@ Optional steps~
 
 Edit Vim's ToolBar and remove the buttons that you never use.  The plugin adds
 some buttons to the tool bar, but you may not see them because gvim has too
-many buttons by default. For example:
->
-   aunmenu ToolBar.Open
-<
-You can edit the file ftplugin/r.vim and replace xterm by other terminal
-emulator. The file ftplugin/r.vim has an example of how to use gnome-terminal.
+many buttons by default. Please see:
 
-Desktop integration~
-
-If you prefer to use the file manager instead of a terminal emulator to
-navigate in the directory tree and to open files, you might be interested in
-configuring your file manager to use the script ~/.vim/open-gvim-here to open
-R source code. For example, if you use Gnome, open nautilus, right click a
-file whose extension is .R, choose the menu item "Properties" and configure
-the "Open with" command.
-
-The script open-gvim-here simply changes to the file's directory before
-opening it.
+   http://vim.wikia.com/wiki/Hide_specific_ToolBar_buttons
 
 
 ==============================================================================
@@ -136,7 +121,7 @@ and, in some cases, tool bar buttons:
    <F8>      Build tags file (/tmp/.Rtags-user-time) for omni completion.
    <F9>      Send the current line or selected code and go to the next line.
    <C-F9>    Send the current function.
-   <S-Enter> Send the current line to R and open a new line (insert mode only).
+   <M-Enter> Send the current line to R and open a new line (insert mode only).
    <_>       In insert mode, write " <- ", if not inside a string. Please,
 	     type "_" again if the function yields " <- " when you really
 	     needs "_".
@@ -197,6 +182,16 @@ include the column names.
 6. Known bugs and workarounds~
                                                       *r-plugin-known-bugs*
 
+Some correctly written code is wrongly indented. All other know bugs are due
+to running R through a pipe. The definitive solution would be to find a better
+means of communication between Vim and R.
+
+You should never close the xterm directly~
+
+You should always finish the R session with R's quit() command. If you close
+the xterm directly, R will still be running and may begin to run crazily. Vim
+will freeze if you try to send code to R.
+
 You should never hit CTRL-C~
 
 You should never hit CTRL-C in the terminal emulator window. If you hit CTRL-C
@@ -209,17 +204,22 @@ process, but currently you can't do this if R is running through a pipe.
 You cannot send large blocks of code to R~
 
 The plugin does not send more than 4000 bytes at once to R because it could
-freeze the terminal emulator window. If you have large blocks of code to send
-to R, you will not be able to send the whole code at once.
+freeze the terminal emulator window. If you have larger blocks of code to send
+to R, you will not be able to send the whole code at once, unless you change
+this value. See|g:vimrplugin_pipe_limit|.
+
+You should close any pager or web browser opened by R~
+
+After doing "quit()" in R, you still have to close any pager running in
+separate terminal emulator or web browser that were opened by R's "help()" or
+"?" commands. Otherwise the terminal emulator where R was running will not
+close and the pipe file will not be deleted. It's not necessary to close the
+web browser if it was already open when help.start() was done.
 
 The terminal emulator truncates big lines sent by Vim~
 
 The truncated lines are not a xterm limitation, but an issue with running R
-through a pipe (and I don't know how to solve it). However, I don't see this
-annoying problem as a serious bug because you still have the entire lines in
-the script that you are editing with Vim. You can break the lines in Vim
-before sending them to R, and, in my opinion, the code will become more
-readable.
+through a pipe. You may break the lines in Vim before sending them to R.
 
 R's autocomplete function does not work in the terminal and~
 you cannot scroll R help files in the terminal emulator~
@@ -227,8 +227,8 @@ you cannot scroll R help files in the terminal emulator~
 It seems that R doesn't use GNU Readline when called through a pipe. That's
 why you can't complete object names with <Tab> in the terminal window (and
 that's why I created the omni function for Vim). Regarding the scroll issue in
-R help, the best solution for me is to do "help.start()" in the terminal
-window before using help(). This will be done automatically by the plugin (see
+R help(), workarounds are to use less as pager or do "help.start()" in the
+terminal window before using help(). Please, see |r-pager| and
 |g:vimrplugin_nohstart|for details).
 
 
@@ -236,10 +236,19 @@ window before using help(). This will be done automatically by the plugin (see
 7. Options~
                                                       *r-plugin-options*
 
-                                                    *g:vimrplugin_term_cmd*
+                                                    *g:vimrplugin_term*
 The plugin uses uxterm to run R, but you may define another terminal emulator
-in your|vimrc|by setting the variable g:vimrplugin_term_cmd, as in the example
+in your|vimrc|by setting the variable g:vimrplugin_term, as in the example
 below:
+>
+   let g:vimrplugin_term = "gnome-terminal"
+<
+Supported terminals are: xterm, gnome-terminal, konsole, xfce4-terminal,
+Eterm, rxvt and aterm.
+                                                    *g:vimrplugin_term_cmd*
+If your terminal emulator is not listed above, or if you are not satisfied
+with the way your terminal emulator is called by the plugin, you may define in
+your|vimrc|the variable g:vimrplugin_term_cmd, as in the example below:
 >
    let g:vimrplugin_term_cmd = "gnome-terminal -t R -x"
 <
@@ -247,6 +256,13 @@ below:
 To disable the underscore replacement with " <- " put in your |vimrc|:
 >
    let g:vimrplugin_underscore = 1
+<
+                                                         *r-pager*
+You may also want to use less in a separate terminal emulator as the default
+pager for R's help. You can use the script ~/.vim/tools/rpager.sh (which will
+call less) by putting in your ~/.Rprofile:
+>
+   options(pager="~/.vim/tools/rpager.sh")
 <
                                                    *g:vimrplugin_nohstart*
 The plugin will call R's function help.start() the first time that you press
@@ -262,17 +278,18 @@ your|vimrc|:
 >
    let g:vimrplugin_browser_time = 4
 <
-In addition to using help.start() you may also want to use less as the default
-pager for R's help. You can use the script ~/.vim/tools/rpager.sh which will
-call less by putting in your ~/.Rprofile:
->
-   options(pager="~/.vim/tools/rpager.sh")
-<
                                                   *g:vimrplugin_single_pipe*
 If you prefer that all Vim buffers use the same R process, put the following
 option in your |vimrc|:
 >
    let g:vimrplugin_single_pipe = 1
+<
+                                                  *g:vimrplugin_pipe_limit*
+By default, the plugin will send at most 4000 bytes of data to R to decrease
+the probability of obstructing the pipe, but you can increase this value at
+your own risk. Example:
+>
+   let g:vimrplugin_pipe_limit = 5000
 <
                                                       *g:vimrplugin_map_r*
 
@@ -282,7 +299,7 @@ with the original plugin). To activate this option, put in your |vimrc|:
 >
    let g:vimrplugin_map_r = 1
 <
-You may want to put in your |vimrc|the following three lines which are in the
+You may want to put in your|vimrc|the following three lines which are in the
 original plugin and are intended to increase compatibility with emacs edited
 code:
 >
@@ -340,9 +357,9 @@ bindings:
    map  <F9>      <Plug>RSendLine
    imap <F9>      <Plug>RSendLine
    vmap <F9>      <Plug>RSendLine
-   map  <S-Enter> <Plug>RSendLineAndOpenNewOne
-   imap <S-Enter> <Plug>RSendLineAndOpenNewOne
-   vmap <S-Enter> <Plug>RSendLineAndOpenNewOne
+   map  <M-Enter> <Plug>RSendLineAndOpenNewOne
+   imap <M-Enter> <Plug>RSendLineAndOpenNewOne
+   vmap <M-Enter> <Plug>RSendLineAndOpenNewOne
    vmap <F9>      <Plug>RSendBlock
    map  <C-F9>    <Plug>RSendFunction
    imap <C-F9>    <Plug>RSendFunction
@@ -367,6 +384,8 @@ directory after the installation:
    |   |-- rbuffer.xpm
    |   |-- rcomplete.xpm
    |   |-- rfunction.xpm
+   |   |-- ricon.png
+   |   |-- ricon.xbm
    |   |-- rkill.xpm
    |   |-- rline.xpm
    |   |-- rregion.xpm
@@ -381,7 +400,6 @@ directory after the installation:
    |-- indent
    |   `-- r.vim
    `-- tools
-       |-- open-gvim-here
        |-- rargs.R
        |-- rfunnel.pl
        |-- rpager.sh
