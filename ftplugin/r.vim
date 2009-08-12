@@ -5,16 +5,12 @@
 " Author: Fernando Henrique Ferraz Pereira da Rosa <feferraz@ime.usp.br>
 " Author: Johannes Ranke <jranke@uni-bremen.de>
 " Maintainer: Jakson Alves de Aquino <jalvesaq@gmail.com>
-" Last Change: 2009 May
+" Last Change: 2009 Aug
 "
 " Functions added by Jakson Alves de Aquino:
-"   CheckRpipe(), GetFirstChar(), GoDown(), SendLineToR(), SendBlockToR(),
+"   GetFirstChar(), GoDown(), SendLineToR(), SendBlockToR(),
 "   SendFileToR(), SendFunctionToR(), RHelp(), BuildRTags(), StartR(),
-"   SignalToR(), ReplaceUnderS(), MakeRMenu() and UnMakeRMenu().
-"
-" Code written in vim is sent to R through a perl pipe [funnel.pl, by Larry
-" Clapp <vim@theclapp.org> (modifiedy by Jakson Aquino and renamed to
-" rfunnel.pl)], as individual lines, blocks, or the whole file.
+"   ReplaceUnderS(), MakeRMenu() and UnMakeRMenu().
 "
 " Please see doc/r-plugin.txt for usage details.
 
@@ -33,7 +29,6 @@ endif
 let b:did_ftplugin = 1
 
 let b:hasrmenu = 0
-let b:hastoolbarkill = 0
 
 " From changelog.vim
 let userlogin = system('whoami')
@@ -52,20 +47,14 @@ endif
 let b:needsnewtags = 1
 
 " Automatically call R's function help.start() the first time <C-H> is pressed:
-let b:needshstart = 1
-if exists("g:vimrplugin_nohstart")
-  if g:vimrplugin_nohstart != 0
-    let b:needshstart = 0
+let b:needshstart = 0
+if exists("g:vimrplugin_hstart")
+  if g:vimrplugin_hstart == 1
+    let b:needshstart = 1
   endif
 endif
 if exists("g:vimrplugin_browser_time") == 0
   let g:vimrplugin_browser_time = 4
-endif
-
-if exists("g:vimrplugin_pipe_limit")
-  let b:pipe_limit = g:vimrplugin_pipe_limit
-else
-  let b:pipe_limit = 4000
 endif
 
 let b:replace_us = 1
@@ -75,35 +64,54 @@ if exists("g:vimrplugin_underscore")
   endif
 endif
 
+function! RWarningMsg(wmsg)
+  echohl WarningMsg
+  echo a:wmsg
+  echohl Normal
+endfunction
 
-" Terminal options:
-let b:term_cmd = "uxterm -xrm '*iconPixmap: " . expand("~") . "/.vim/bitmaps/ricon.xbm' -T '" . expand("%:t") . "' -e"
-
-if exists("g:vimrplugin_term")
-  if g:vimrplugin_term == "xterm"
-    let b:term_cmd = "xterm -xrm '*iconPixmap: " . expand("~") . "/.vim/bitmaps/ricon.xbm' -T '" . expand("%:t") . "' -e"
-  endif
-  if g:vimrplugin_term == "gnome-terminal"
-    " Cannot set icon: http://bugzilla.gnome.org/show_bug.cgi?id=126081
-    let b:term_cmd = "gnome-terminal --working-directory='" . expand("%:p:h") . "' -t 'R - " . expand("%:t") . "' -x"
-  endif
-  if g:vimrplugin_term == "konsole"
-    let b:term_cmd = "konsole --workdir '" . expand("%:p:h") . "' --icon ~/.vim/bitmaps/ricon.png --title '" . expand("%:t") . "' -e"
-  endif
-  if g:vimrplugin_term == "xfce4-terminal"
-    let b:term_cmd = "xfce4-terminal --working-directory='" . expand("%:p:h") . "' -t 'R - " . expand("%:t") . "' -x"
-  endif
-  if g:vimrplugin_term == "Eterm"
-    let b:term_cmd = "Eterm --icon ~/.vim/bitmaps/ricon.png -n '" . expand("%:t") . "' -e"
-  endif
-  if g:vimrplugin_term == "rxvt"
-    let b:term_cmd = "rxvt -title 'R - " . expand("%:t") . "' -e"
-  endif
-  if g:vimrplugin_term == "aterm"
-    let b:term_cmd = "aterm -title 'R - " . expand("%:t") . "' -e"
-  endif
+if !executable('screen')
+  call RWarningMsg("Please, install 'screen' to run vim-r-plugin")
+  sleep 3
+  finish
 endif
 
+
+" Choose a terminal (code adapted from screen.vim)
+let s:terminals = ['gnome-terminal', 'konsole', 'xfce4-terminal', 'Eterm', 'rxvt', 'aterm', 'xterm' ]
+if !exists("g:vimrplugin_term")
+  for term in s:terminals
+    if executable(term)
+      let g:vimrplugin_term = term
+      break
+    endif
+  endfor
+endif
+
+if !exists("g:vimrplugin_term") && !exists("g:vimrplugin_term_cmd")
+  call RWarningMsg("Please, set the variable 'g:vimrplugin_term_cmd' in your .vimrc.\nRead the plugin documentation for details.")
+  sleep 4
+  finish
+endif
+
+if g:vimrplugin_term == "gnome-terminal" || g:vimrplugin_term == "xfce4-terminal"
+  " Cannot set icon: http://bugzilla.gnome.org/show_bug.cgi?id=126081
+  let b:term_cmd = g:vimrplugin_term . " --working-directory='" . expand("%:p:h") . "' -e"
+endif
+if g:vimrplugin_term == "konsole"
+  let b:term_cmd = "konsole --workdir '" . expand("%:p:h") . "' --icon ~/.vim/bitmaps/ricon.png -e"
+endif
+if g:vimrplugin_term == "Eterm"
+  let b:term_cmd = "Eterm --icon ~/.vim/bitmaps/ricon.png -e"
+endif
+if g:vimrplugin_term == "rxvt" || g:vimrplugin_term == "aterm"
+  let b:term_cmd = g:vimrplugin_term . " -e"
+endif
+if g:vimrplugin_term == "xterm" || g:vimrplugin_term == "uxterm"
+  let b:term_cmd = g:vimrplugin_term . " -xrm '*iconPixmap: " . expand("~") . "/.vim/bitmaps/ricon.xbm' -e"
+endif
+
+" Override default settings:
 if exists("g:vimrplugin_term_cmd")
   let b:term_cmd = g:vimrplugin_term_cmd
 endif
@@ -115,23 +123,18 @@ let b:needsrargs = 1
 " Make the R 'tags' file name
 let b:rtagsfile = printf("/tmp/.Rtags-%s", userlogin)
 
-if exists("g:vimrplugin_single_pipe")
-  " Make a unique name for the pipe
-  let b:pipefname = printf("/tmp/.r-pipe-%s", userlogin)
+if exists("g:vimrplugin_single_r")
+  " Make a unique name for the screen session
+  let b:screensname = printf("vimrplugin-%s", userlogin)
 else
-  " Make a random name for the pipe
-  let b:pipefname = printf("/tmp/.r-pipe-%s-%s", userlogin, localtime())
+  " Make a random name for the screen session
+  let b:screensname = printf("vimrplugin-%s-%s", userlogin, localtime())
 endif
-
-let b:rpidfile = b:pipefname . ".Rpid"
 
 " Set completion with CTRL-X CTRL-O to autoloaded function.
 if exists('&ofu')
   setlocal ofu=rcomplete#CompleteR
 endif
-
-" Disable backup for r-pipe
-setl backupskip=/tmp/.r-pipe*
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " From the original plugin:
@@ -142,30 +145,23 @@ setl backupskip=/tmp/.r-pipe*
 " set tabstop=8
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-function! SignalToR(signal)
-  if filereadable(b:rpidfile)
-    let tmp = readfile(b:rpidfile)
-    let rparent = tmp[0]
-    let awkprog = "{if(\$2 == " . rparent . ") print \$1}"
-    let getpid = printf("ps -eo pid,ppid,comm | grep %s | awk '%s'", rparent, awkprog)
-    let rpid = system(getpid)
-    let killcmd = "kill -s " . a:signal . " " . rpid
-    call system(killcmd)
+function! SendCmdToScreen(cmd)
+  if a:cmd =~ "library"
+    let b:needsnewtags = 1
+  endif
+  let str = substitute(a:cmd, "'", "'\\\\''", "g")
+  let scmd = 'screen -S ' . b:screensname . " -X stuff '" . str . "'"
+  let rlog = system(scmd)
+  if rlog != ""
+    call RWarningMsg(rlog)
+    return
   endif
 endfunction
 
-function! RWarningMsg(wmsg)
-  echohl WarningMsg
-  echo a:wmsg
-  echohl Normal
-endfunction
-
-function! CheckRpipe()
-  if filewritable(b:pipefname) == 0
-    call RWarningMsg(b:pipefname . " not found!")
-    return 1
-  endif
-  return 0
+function! SendLinesToScreen(lines)
+  for str in a:lines
+    call SendCmdToScreen(str)
+  endfor
 endfunction
 
 " Get first non blank character
@@ -194,51 +190,25 @@ endfunction
 
 " Send current line to R. Don't go down if called by <S-Enter>.
 function! SendLineToR(godown)
-  if CheckRpipe()
-    return
-  endif
   echon
   let line = getline(".")
-  if line =~ "library"
-    let b:needsnewtags = 1
-  endif
-  call writefile([line], b:pipefname)
+  call SendCmdToScreen(line)
   if a:godown
     call GoDown()
   endif
 endfunction
 
-" Big chunks of text might obstruct the pipe.
-function! CheckBlockSize(lines, type)
-  let nbytes = len(a:lines)
-  for str in a:lines
-    let nbytes += strlen(str)
-    if a:type == "block" && str =~ "library"
-      let b:needsnewtags = 1
-    endif
-  endfor
-  if nbytes > b:pipe_limit
-    call RWarningMsg("We can send to R at most " . b:pipe_limit . " bytes at once, but this " . a:type . " has " . nbytes . " bytes.")
-    return 1
-  endif
-  return 0
-endfunction
 
 " Send visually selected lines.
 function! SendBlockToR()
-  if CheckRpipe()
-    return
-  endif
   echon
   if line("'<") == line("'>")
     call RWarningMsg("No block selected.")
     return
   endif
   let lines = getline("'<", "'>")
-  if CheckBlockSize(lines, "block") == 0
-    call writefile(lines, b:pipefname)
-    call GoDown()
-  endif
+  call SendLinesToScreen(lines)
+  call GoDown()
 endfunction
 
 function! CountBraces(line)
@@ -249,9 +219,6 @@ function! CountBraces(line)
 endfunction
 
 function! SendFunctionToR()
-  if CheckRpipe()
-    return
-  endif
   echon
   let line = getline(".")
   let i = line(".")
@@ -292,27 +259,17 @@ function! SendFunctionToR()
   endif
   let lastline = i
   let lines = getline(firstline, lastline)
-  if CheckBlockSize(lines, "function") == 0
-    call writefile(lines, b:pipefname)
-  endif
+  call SendLinesToScreen(lines)
 endfunction
 
 function! SendFileToR()
-  if CheckRpipe()
-    return
-  endif
   echon
   let lines = getline("1", line("$"))
-  if CheckBlockSize(lines, "file") == 0
-    call writefile(lines, b:pipefname)
-  endif
+  call SendLinesToScreen(lines)
 endfunction
 
 " Call args() for the word under cursor
 function! RHelp(type)
-  if CheckRpipe()
-    return
-  endif
   echon
   " Go back some columns if character under cursor is not valid
   let curline = line(".")
@@ -339,13 +296,13 @@ function! RHelp(type)
     if a:type == "a"
       if b:needsrargs
         let b:needsrargs = 0
-        call writefile(["source(\"~/.vim/tools/rargs.R\")"], b:pipefname)
+        call SendCmdToScreen('source("~/.vim/tools/rargs.R")')
       endif
       let rhelpcmd = printf("vim.list.args('%s')", rkeyword)
     else
       if b:needshstart == 1
 	let b:needshstart = 0
-        call writefile(["help.start()"], b:pipefname)
+        call SendCmdToScreen("help.start()")
         let wt = g:vimrplugin_browser_time
         while wt > 0
           sleep
@@ -354,21 +311,18 @@ function! RHelp(type)
       endif
       let rhelpcmd = printf("help('%s')", rkeyword)
     endif
-    call writefile([rhelpcmd], b:pipefname)
+    call SendCmdToScreen(rhelpcmd)
   endif
 endfunction
 
 " Tell R to create a 'tags' file (/tmp/.Rtags-user-time) listing all currently
 " available objects in its environment. The file is necessary omni completion.
 function! BuildRTags()
-  if CheckRpipe()
-    return
-  endif
   let tagscmd = printf(".vimtagsfile <- \"%s\"", b:rtagsfile)
-  call writefile([tagscmd], b:pipefname)
+  call SendCmdToScreen(tagscmd)
   let tagscmd = "source(\"~/.vim/tools/rtags.R\")"
   let b:needsnewtags = 0
-  call writefile([tagscmd], b:pipefname)
+  call SendCmdToScreen(tagscmd)
   " Wait while R is writing the tags file
   sleep
   let i = 1
@@ -388,34 +342,25 @@ function! BuildRTags()
 endfunction
 
 function! StartR(whatr, kbdclk)
-  let rcmd = printf("\:%s", a:whatr)
-  " Truncate the string if there is an empty space
-  let spchar = stridx(rcmd, " ")
-  if spchar != -1
-    let rcmd = strpart(rcmd, 0, spchar)
-  endif
-  " Check whether the R executable exists
-  if exists(rcmd) == 0
-    if a:kbdclk == "click"
-      let msg = printf("Cannot start \"%s\": command not found.", a:whatr)
-      call confirm(msg, "&OK", "Warning")
+  if exists("g:vimrplugin_noscreenrc")
+    let srcfile = " "
+  else
+    let scrfile = "/tmp/." . b:screensname . ".screenrc"
+    if exists("g:vimrplugin_single_r")
+      let scrtitle = "hardstatus string R"
     else
-      call RWarningMsg(a:whatr . " not found.")
+      let scrtitle = 'hardstatus string "' . expand("%:t") . '"'
     endif
-    return
+    let scrtxt = ["hardstatus lastline", scrtitle, "caption splitonly", 'caption string "Vim-R-plugin"', "termcapinfo xterm* 'ti@:te@'"]
+    call writefile(scrtxt, scrfile)
+    let scrfile = "-c " . scrfile
   endif
-  " Check whether the pipe was already open
-  if filewritable(b:pipefname) == 1
-    if a:kbdclk == "click"
-      let msg = printf("The fifo %s already exists. I'll not open it again.", b:pipefname)
-      call confirm(msg, "&OK", "Warning")
-    else
-      call RWarningMsg(b:pipefname . " already exists")
-    endif
-    return
+  " Some terminals want quotes (see screen.vim)
+  if b:term_cmd =~ "gnome-terminal" || b:term_cmd =~ "xfce4-terminal"
+    let opencmd = printf("%s 'screen %s -d -RR -S %s %s' &", b:term_cmd, scrfile, b:screensname, a:whatr)
+  else
+    let opencmd = printf("%s screen %s -d -RR -S %s %s &", b:term_cmd, scrfile, b:screensname, a:whatr)
   endif
-
-  let opencmd = printf("%s ~/.vim/tools/rfunnel.pl %s \"%s && echo -e 'Interpreter has finished. Please close any remaining help pager or web browser that you have opened.'\"&", b:term_cmd, b:pipefname, a:whatr)
 
   " Change to buffer's directory, run R, and go back to original directory:
   lcd %:p:h
@@ -426,16 +371,11 @@ function! StartR(whatr, kbdclk)
     call RWarningMsg(rlog)
     return
   endif
-  amenu icon=rstop ToolBar.RStop :call SignalToR("INT")<CR>
-  amenu icon=rkill ToolBar.RKill :call SignalToR("TERM")<CR>
-  tmenu ToolBar.RStop Stop R process
-  tmenu ToolBar.RKill Kill R process
-  let b:hastoolbarkill = 1
-  if !exists("g:vimrplugin_nohstart")
-    let b:needshstart = 1
+  if !exists("g:vimrplugin_hstart")
+    let b:needshstart = 0
   endif
-  if exists("g:vimrplugin_nohstart")
-    if g:vimrplugin_nohstart == 0
+  if exists("g:vimrplugin_hstart")
+    if g:vimrplugin_hstart == 1
       let b:needshstart = 1
     else
       let b:needshstart = 0
@@ -489,22 +429,11 @@ else
   inoremap <buffer> <F2> <Esc>:call StartR("R", "kbd")<CR>a
 endif
 
-" Start a listening R-devel interpreter in new xterm
-if hasmapto('<Plug>RStart-dev')
-  noremap <buffer> <Plug>RStart-dev :call StartR("R-devel", "kbd")<CR>
-  vnoremap <buffer> <Plug>RStart-dev <Esc>:call StartR("R-devel", "kbd")<CR>
-  inoremap <buffer> <Plug>RStart-dev <Esc>:call StartR("R-devel", "kbd")<CR>a
-else
-  noremap <buffer> <F3> :call StartR("R-devel", "kbd")<CR>
-  vnoremap <buffer> <F3> <Esc>:call StartR("R-devel", "kbd")<CR>
-  inoremap <buffer> <F3> <Esc>:call StartR("R-devel", "kbd")<CR>a
-endif
-
 " Start a listening R --vanilla interpreter in new xterm
-if hasmapto('<Plug>RStart-vanilla')
-  noremap <buffer> <Plug>RStart-vanilla :call StartR("R --vanilla", "kbd")<CR>
-  vnoremap <buffer> <Plug>RStart-vanilla <Esc>:call StartR("R --vanilla", "kbd")<CR>
-  inoremap <buffer> <Plug>RStart-vanilla <Esc>:call StartR("R --vanilla", "kbd")<CR>a
+if hasmapto('<Plug>RvanillaStart')
+  noremap <buffer> <Plug>RvanillaStart :call StartR("R --vanilla", "kbd")<CR>
+  vnoremap <buffer> <Plug>RvanillaStart <Esc>:call StartR("R --vanilla", "kbd")<CR>
+  inoremap <buffer> <Plug>RvanillaStart <Esc>:call StartR("R --vanilla", "kbd")<CR>a
 else
   noremap <buffer> <F4> :call StartR("R --vanilla", "kbd")<CR>
   vnoremap <buffer> <F4> <Esc>:call StartR("R --vanilla", "kbd")<CR>
@@ -522,27 +451,6 @@ else
   inoremap <buffer> <F8> <Esc>:call BuildRTags()<CR>i
 endif
 
-" Stop R process
-if hasmapto('<Plug>RStop')
-  noremap <buffer> <Plug>RStop :call SignalToR("INT")<CR>
-  vnoremap <buffer> <Plug>RStop <Esc>:call SignalToR("INT")<CR>
-  inoremap <buffer> <Plug>RStop <Esc>:call SignalToR("INT")<CR>i
-else
-  noremap <buffer> <F6> :call SignalToR("INT")<CR>
-  vnoremap <buffer> <F6> <Esc>:call SignalToR("INT")<CR>
-  inoremap <buffer> <F6> <Esc>:call SignalToR("INT")<CR>i
-endif
-
-" Kill R process
-if hasmapto('<Plug>RKill')
-  noremap <buffer> <Plug>RKill :call SignalToR("TERM")<CR>
-  vnoremap <buffer> <Plug>RKill <Esc>:call SignalToR("TERM")<CR>
-  inoremap <buffer> <Plug>RKill <Esc>:call SignalToR("TERM")<CR>i
-else
-  noremap <buffer> <F7> :call SignalToR("TERM")<CR>
-  vnoremap <buffer> <F7> <Esc>:call SignalToR("TERM")<CR>
-  inoremap <buffer> <F7> <Esc>:call SignalToR("TERM")<CR>i
-endif
 
 " Send line under cursor to R
 if hasmapto('<Plug>RSendLine')
@@ -579,10 +487,10 @@ else
 endif
 
 " Write and process mode (somehow mapping <C-Enter> does not work)
-if hasmapto('<Plug>RSendLineAndOpenNewOne')
-  inoremap <buffer> <Plug>RSendLineAndOpenNewOne <Esc>:call SendLineToR(0)<CR>o
+if hasmapto('<Plug>RSendLAndOpenNewOne')
+  inoremap <buffer> <Plug>RSendLAndOpenNewOne <Esc>:call SendLineToR(0)<CR>o
 else
-  inoremap <buffer> <M-Enter> <Esc>:call SendLineToR(0)<CR>o
+  inoremap <buffer> <S-Enter> <Esc>:call SendLineToR(0)<CR>o
 endif
 
 " Send current file to R
@@ -633,12 +541,7 @@ function! MakeRMenu()
   else
     amenu &R.Start\ &R<Tab><F2> :call StartR("R", "click")<CR>
   endif
-  if hasmapto('<Plug>RStart-dev')
-    amenu R.Start\ R-&devel :call StartR("R-devel", "click")<CR>
-  else
-    amenu R.Start\ R-&devel<Tab><F3> :call StartR("R-devel", "click")<CR>
-  endif
-  if hasmapto('<Plug>RStart-vanilla')
+  if hasmapto('<Plug>RvanillaStart')
     amenu R.Start\ R\ --&vanilla :call StartR("R --vanilla", "click")<CR>
   else
     amenu R.Start\ R\ --&vanilla<Tab><F4> :call StartR("R --vanilla", "click")<CR>
@@ -663,10 +566,10 @@ function! MakeRMenu()
     amenu R.Send\ current\ &function<Tab><C-F9> :call SendFunctionToR()<CR>
     imenu R.Send\ current\ &function<Tab><C-F9> <Esc>:call SendFunctionToR()<CR>
   endif
-  if hasmapto('<Plug>RSendLineAndOpenNewOne')
+  if hasmapto('<Plug>RSendLAndOpenNewOne')
     imenu R.Send\ line\ and\ &open\ a\ new\ one <Esc>:call SendLineToR(0)<CR>o
   else
-    imenu R.Send\ line\ and\ &open\ a\ new\ one<Tab><M-Enter> <Esc>:call SendLineToR(0)<CR>o
+    imenu R.Send\ line\ and\ &open\ a\ new\ one<Tab><S-Enter> <Esc>:call SendLineToR(0)<CR>o
   endif
   if hasmapto('<Plug>RSendFile')
     amenu R.Send\ &file :call SendFileToR()<CR>
@@ -690,17 +593,7 @@ function! MakeRMenu()
     amenu R.Rebuild\ list\ of\ objects<Tab><F8> :call BuildRTags()<CR>
   endif
   amenu R.About\ the\ plugin :help vim-r-plugin<CR>
-  menu R.-Sep3- <nul>
-  if hasmapto('<Plug>RStop')
-    amenu R.Stop\ R :call SignalToR("INT")<CR>
-  else
-    amenu R.Stop\ R<Tab><F6> :call SignalToR("INT")<CR>
-  endif
-  if hasmapto('<Plug>RKill')
-    amenu R.Kill\ R :call SignalToR("TERM")<CR>
-  else
-    amenu R.Kill\ R<Tab><F7> :call SignalToR("TERM")<CR>
-  endif
+
   amenu icon=rstart ToolBar.RStart :call StartR("R", "click")<CR>
   amenu icon=rline ToolBar.RLine :call SendLineToR(1)<CR>
   amenu icon=rregion ToolBar.RRegion :call SendBlockToR()<CR>
@@ -711,12 +604,6 @@ function! MakeRMenu()
   tmenu ToolBar.RRegion Send selected lines to R
   tmenu ToolBar.RFunction Send current function to R
   tmenu ToolBar.RTags Rebuild list of objects
-  if b:hastoolbarkill
-    amenu icon=rstop ToolBar.RStop :call SignalToR("INT")<CR>
-    amenu icon=rkill ToolBar.RKill :call SignalToR("TERM")<CR>
-    tmenu ToolBar.RStop Stop R process
-    tmenu ToolBar.RKill Kill R process
-  endif
   let b:hasrmenu = 1
 endfunction
 
@@ -725,10 +612,6 @@ function! UnMakeRMenu()
     return
   endif
   aunmenu R
-  if b:hastoolbarkill
-    aunmenu ToolBar.RKill
-    aunmenu ToolBar.RStop
-  endif
   aunmenu ToolBar.RTags
   aunmenu ToolBar.RRegion
   aunmenu ToolBar.RFunction
