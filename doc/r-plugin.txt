@@ -4,7 +4,7 @@
                             Plugin to work with R~
 
 Author: Jakson A. Aquino (jalvesaq@gmail.com)
-Last Change: 11 Aug 2009
+Last Change: 28 Aug 2009
 
 For Vim version 7.2 and above
 
@@ -15,7 +15,7 @@ For Vim version 7.2 and above
 3. Installation                                 |r-plugin-installation|
 4. Use                                          |r-plugin-use|
 5. How the plugin works                         |r-plugin-functioning|
-6. Indentation bugs                             |r-plugin-indent-bugs|
+6. Know bugs and workarounds                    |r-plugin-known-bugs|
 7. Options                                      |r-plugin-options|
 8. Custom key bindings                          |r-plugin-custom-key-bindings|
 9. Files                                        |r-plugin-files|
@@ -127,15 +127,10 @@ except <_> (see|r-plugin-custom-key-bindings|).
 
 Communication through screen~
 
-Each Vim buffer runs its own instance of R in a separated terminal emulator
-because the screen sessions have unique name. The name is made using the user
-name and the seconds of localtime(). Hence, a name clash is possible if a
-single user starts more than one Vim buffer at the same second.  This will
-happen if you open many files at the same time in different tabs.  For
-example:
->
-   gvim -p file1.R file2.R file3.R
-<
+By default, each Vim buffer runs its own instance of R in a separated terminal
+emulator because the screen sessions have unique names. The names are made
+using the user name and the seconds of localtime(). Hence, a name clash is
+possible if a single user starts more than one Vim buffer at the same second.
 You can change this behavior and make all Vim buffers use the same R process
 (see |g:vimrplugin_single_r|).
 
@@ -167,10 +162,22 @@ include the column names.
 
 
 ==============================================================================
-6. Indentation bugs~
-                                                      *r-plugin-indent-bugs*
+6. Know bugs and workarounds~
+                                                      *r-plugin-known-bugs*
 
-Some correctly written code are wrongly indented. Examples:
+R session is detached when GVim is closed~
+
+If you launch GVim through a custom keyboard shortcut, the problem may be
+solved if you add -f as parameter to GVim. The R session will also be detached
+when GVim is closed if you launch GVim by the command line in a terminal
+emulator, and, then, close the terminal-emulator. In any case, to reattach the
+R session, open a new terminal window and type:
+>
+   screen -r
+<
+Indentation~
+
+Correctly written code might be wrongly indented. Examples:
 
    this code                               is indented as:~
    if(T)                                   if(T)
@@ -190,7 +197,7 @@ Some correctly written code are wrongly indented. Examples:
 7. Options~
                                                       *r-plugin-options*
 
-                                                    *g:vimrplugin_term*
+                                                     *g:vimrplugin_term*
 
 
 The plugin uses as terminal emulator the first executable that it finds from

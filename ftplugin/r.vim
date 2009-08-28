@@ -72,10 +72,12 @@ endfunction
 
 if !executable('screen')
   call RWarningMsg("Please, install 'screen' to run vim-r-plugin")
-  sleep 3
+  sleep 2
   finish
 endif
 
+" Special screenrc file
+let b:scrfile = " "
 
 " Choose a terminal (code adapted from screen.vim)
 let s:terminals = ['gnome-terminal', 'konsole', 'xfce4-terminal', 'Eterm', 'rxvt', 'aterm', 'xterm' ]
@@ -90,7 +92,7 @@ endif
 
 if !exists("g:vimrplugin_term") && !exists("g:vimrplugin_term_cmd")
   call RWarningMsg("Please, set the variable 'g:vimrplugin_term_cmd' in your .vimrc.\nRead the plugin documentation for details.")
-  sleep 4
+  sleep 3
   finish
 endif
 
@@ -149,19 +151,19 @@ function! SendCmdToScreen(cmd)
   if a:cmd =~ "library"
     let b:needsnewtags = 1
   endif
-  let str = substitute(a:cmd, "'", "'\\\\''", "g")
-  let scmd = 'screen -S ' . b:screensname . " -X stuff '" . str . "'"
-  let rlog = system(scmd)
-  if rlog != ""
-    call RWarningMsg(rlog)
-    return
+  if &filetype == "rnoweb"
+    let line = getline(".")
+    if line =~ "^@$"
+      return
+    endif
   endif
-endfunction
-
-function! SendLinesToScreen(lines)
-  for str in a:lines
-    call SendCmdToScreen(str)
-  endfor
+  let str = substitute(a:cmd, "'", "'\\\\''", "g")
+  let scmd = 'screen -S ' . b:screensname . " -X stuff '" . str . "\<C-M>'"
+  let rlog = system(scmd)
+  if v:shell_error
+    let rlog = substitute(rlog, '\n', '', 'g')
+    call RWarningMsg(rlog)
+  endif
 endfunction
 
 " Get first non blank character
@@ -175,9 +177,21 @@ endfunction
 
 " Skip empty lines and lines whose first non blank char is '#'
 function! GoDown()
+  let lastLine = line("$")
+  if &filetype == "rnoweb"
+    let i = line(".")
+    let curline = getline(".")
+    let fc = curline[0]
+    if fc == '@'
+      while i < lastLine && curline !~ "^<<.*$"
+        let i = i + 1
+        call cursor(i, 1)
+        let curline = getline(i)
+      endwhile
+    endif
+  endif
   let i = line(".") + 1
   call cursor(i, 1)
-  let lastLine = line("$")
   let curline = getline(".")
   let fc = GetFirstChar(curline)
   while i < lastLine && (fc == '#' || strlen(curline) == 0)
@@ -198,7 +212,6 @@ function! SendLineToR(godown)
   endif
 endfunction
 
-
 " Send visually selected lines.
 function! SendBlockToR()
   echon
@@ -207,7 +220,9 @@ function! SendBlockToR()
     return
   endif
   let lines = getline("'<", "'>")
-  call SendLinesToScreen(lines)
+  for str in lines
+    call SendCmdToScreen(str)
+  endfor
   call GoDown()
 endfunction
 
@@ -216,6 +231,23 @@ function! CountBraces(line)
   let line3 = substitute(a:line, "}", "", "g")
   let result = strlen(line3) - strlen(line2)
   return result
+endfunction
+
+" Code adapted from screen.vim
+" The function is currently unused because the I had the following problem:
+" the lines were pasted into R console too fast and R's output was mixed with
+" the sent code resulting in R's errors.
+function! SendLinesToScreen(lines)
+  let tmp = tempname()
+  call writefile(a:lines, tmp)
+  let scmd = 'screen -S ' . b:screensname .
+        \ ' -X eval "msgwait 0" "readbuf ' . tmp . '" "paste ." "msgwait 1"'
+  let rlog = system(scmd)
+  if v:shell_error
+    let rlog = substitute(rlog, '\n', '', 'g')
+    call RWarningMsg(rlog)
+  endif
+  call delete(tmp)
 endfunction
 
 function! SendFunctionToR()
@@ -259,13 +291,17 @@ function! SendFunctionToR()
   endif
   let lastline = i
   let lines = getline(firstline, lastline)
-  call SendLinesToScreen(lines)
+  for str in lines
+    call SendCmdToScreen(str)
+  endfor
 endfunction
 
 function! SendFileToR()
   echon
   let lines = getline("1", line("$"))
-  call SendLinesToScreen(lines)
+  for str in lines
+    call SendCmdToScreen(str)
+  endfor
 endfunction
 
 " Call args() for the word under cursor
@@ -343,23 +379,25 @@ endfunction
 
 function! StartR(whatr, kbdclk)
   if exists("g:vimrplugin_noscreenrc")
-    let srcfile = " "
+    let scrrc = " "
   else
-    let scrfile = "/tmp/." . b:screensname . ".screenrc"
+    let b:scrfile = "/tmp/." . b:screensname . ".screenrc"
     if exists("g:vimrplugin_single_r")
       let scrtitle = "hardstatus string R"
     else
       let scrtitle = 'hardstatus string "' . expand("%:t") . '"'
     endif
-    let scrtxt = ["hardstatus lastline", scrtitle, "caption splitonly", 'caption string "Vim-R-plugin"', "termcapinfo xterm* 'ti@:te@'"]
-    call writefile(scrtxt, scrfile)
-    let scrfile = "-c " . scrfile
+    let scrtxt = ["msgwait 1", "hardstatus lastline", scrtitle,
+          \ "caption splitonly", 'caption string "Vim-R-plugin"',
+          \ "termcapinfo xterm* 'ti@:te@'", 'vbell off']
+    call writefile(scrtxt, b:scrfile)
+    let scrrc = "-c " . b:scrfile
   endif
   " Some terminals want quotes (see screen.vim)
   if b:term_cmd =~ "gnome-terminal" || b:term_cmd =~ "xfce4-terminal"
-    let opencmd = printf("%s 'screen %s -d -RR -S %s %s' &", b:term_cmd, scrfile, b:screensname, a:whatr)
+    let opencmd = printf("%s 'screen %s -d -RR -S %s %s' &", b:term_cmd, scrrc, b:screensname, a:whatr)
   else
-    let opencmd = printf("%s screen %s -d -RR -S %s %s &", b:term_cmd, scrfile, b:screensname, a:whatr)
+    let opencmd = printf("%s screen %s -d -RR -S %s %s &", b:term_cmd, scrrc, b:screensname, a:whatr)
   endif
 
   " Change to buffer's directory, run R, and go back to original directory:
@@ -367,10 +405,11 @@ function! StartR(whatr, kbdclk)
   let rlog = system(opencmd)
   lcd -
 
-  if rlog != ""
+  if v:shell_error
     call RWarningMsg(rlog)
     return
   endif
+  
   if !exists("g:vimrplugin_hstart")
     let b:needshstart = 0
   endif
@@ -607,7 +646,14 @@ function! MakeRMenu()
   let b:hasrmenu = 1
 endfunction
 
+function! DeleteScreenRC()
+  if filereadable(b:scrfile)
+    call delete(b:scrfile)
+  endif
+endfunction
+
 function! UnMakeRMenu()
+  call DeleteScreenRC()
   if b:hasrmenu == 0
     return
   endif
@@ -620,8 +666,9 @@ function! UnMakeRMenu()
   let b:hasrmenu = 0
 endfunction
 
-augroup RStatMenu
+augroup VimRPlugin
   au BufEnter * if &filetype == "r" | call MakeRMenu() | endif
   au BufLeave * if &filetype == "r" | call UnMakeRMenu() | endif
+  au VimLeave * if &filetype == "r" | call DeleteScreenRC() | endif
 augroup END
 

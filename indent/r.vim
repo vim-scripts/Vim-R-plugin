@@ -18,6 +18,11 @@ if exists("*GetRIndent")
   finish
 endif
 
+" Quit if the buffer is rnoweb:
+if &filetype == "rnoweb"
+  finish
+endif
+
 function! s:Get_paren_balance(line, o, c)
    let line2 = substitute(a:line, a:o, "", "g")
    let openp = strlen(a:line) - strlen(line2)
@@ -154,6 +159,16 @@ function GetRIndent()
     let ind = ind - &sw
   endif
 
+  " If you set this option in your .vimrc, the plugin will try to align the
+  " arguments of a function that has too many arguments to fit in one line.
+  " However, you'll have to manually indent the first line after the parenthesis
+  " closing the list of arguments. This option isn't documented in the plugin
+  " documentation (~/.vim/doc/r-plugin.txt) because it's a buggy option.
+  if exists("g:vimrplugin_funcargsalign")
+    if line =~ '.*function\s*(.*$'
+      let ind = stridx(line, "(") + 1
+    endif
+  endif
 
   return ind
 endfunction
