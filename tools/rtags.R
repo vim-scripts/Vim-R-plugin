@@ -1,5 +1,5 @@
 
-vim.rtags <- function() {
+.vim.rtags <- function() {
   unlink(.vimtagsfile)
   cat("Building 'tags' file for vim omni completion.\n")
   envnames <- search()
@@ -28,14 +28,14 @@ vim.rtags <- function() {
             obj.list[j] == "function" || obj.list[j] == "if" ||
             obj.list[j] == "repeat" || obj.list[j] == "while"){
             obj.class <- "flow-control"
+            islist <- FALSE
           } else {
             obj.class <- class(eval(parse(text=obj.list[j])))
+            islist <- is.list(eval(parse(text=obj.list[j])))
           }
         }
         cat(obj.list[j], " ", obj.class[1], " ", env, "\n", sep="")
-        if(obj.class[1] == "data.frame" || obj.class[1] == "list" ||
-          (length(obj.class) > 1 && (obj.class[2] == "data.frame" ||
-              obj.class[2] == "list"))){
+        if(islist){
           obj <- eval(parse(text=obj.list[j]))
           obj.names <- names(obj)
           obj.len <- length(obj)
@@ -50,5 +50,5 @@ vim.rtags <- function() {
   sink()
 }
 
-vim.rtags()
+.vim.rtags()
 

@@ -1,5 +1,5 @@
 
-vim.list.args <- function(ff){
+.vim.list.args <- function(ff){
   knownGenerics <- c(names(.knownS3Generics),
     tools:::.get_internal_S3_generics()) # from methods()
   keyf <- paste("^", ff, "$", sep="")
