@@ -6,7 +6,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          José Cláudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 091004
+Version: 091016
 
 For Vim version 7.2 and above
 
@@ -15,7 +15,7 @@ For Vim version 7.2 and above
  3. Installation                                |r-plugin-installation|
  4. Use                                         |r-plugin-use|
  5. How the plugin works                        |r-plugin-functioning|
- 6. Know bugs and workarounds                   |r-plugin-known-bugs|
+ 6. Known bugs and workarounds                  |r-plugin-known-bugs|
  7. Options                                     |r-plugin-options|
  8. Custom key bindings                         |r-plugin-custom-key-bindings|
  9. Files                                       |r-plugin-files|
@@ -27,19 +27,22 @@ For Vim version 7.2 and above
 1. Overview~
                                                            *r-plugin-overview*
 
-This plugin improves Vim's support to edit R code.
+This plugin improves Vim's support for editing R code and makes it possible to
+integrate Vim with R.
 
 It uses some ideas and code from Johannes Ranke's (vim-r-plugin), Eric Van
 Dewoestine's (screen plugin) and some ideas from Tinn-R (Windows only) project.
 
-The last version of this plugin is available at:
+Please understand that this plugin is developing and changing rapidly! 
+Future releases may change default behavior and key bindings. 
+
+The latest version of this plugin is available at:
 
     http://www.vim.org/scripts/script.php?script_id=2628
 
-The plugin is under development!
-What now is default behavior might become optional and key bindings might
-change in the future. Please, tell us your preferences and suggestions
-and report any bugs.
+Constructive feedback is welcomed. Please submit bug reports and  feature
+requests to the developers, we are very interested in what you like and what
+you would like to see in future releases.
 
 
 ------------------------------------------------------------------------------
@@ -47,14 +50,13 @@ and report any bugs.
                                                            *r-plugin-features*
 2.1. Linux/Unix only:~
 
-  * Communication with R.
+  * Integrated communication with R;
   * Omni completion for R objects.
 
 2.2. All platforms:~
 
-  * Indent R code.
-  * Small improvements in syntax highlight: added 'T' and 'F' as booleans
-    and set strings and comments as spell regions.
+  * Syntax highlighting for R syntax;
+  * Smart indentation for R syntax.
 
 
 ------------------------------------------------------------------------------
@@ -62,14 +64,20 @@ and report any bugs.
                                                        *r-plugin-installation*
 3.1. Dependencies~
 
-The plugin's dependencies are installed differently according to the operating
-system. Basically it is necessary:
+This plugin requires users to install two external dependencies. Before using
+this plugin, you must install:
 
-  screen - http://www.vim.org/scripts/script.php?script_id=2711
-  R      - http://www.r-project.org/
+    * screen - http://www.gnu.org/software/screen/
+    * R-Project - http://www.r-project.org/
 
-The software above is already packaged for most GNU/Linux distributions and
-other Unix variants.
+This software is already packaged for most GNU/Linux distributions and other
+Unix variants. In fact, screen is installed by default on many Linux 
+distributions.
+
+Unfortunately, installation instructions for these dependencies varies widely
+and are beyond the scope of this documentation. Please review the installation
+instructions for your operating system for these external dependencies.
+
 
 3.2. General instructions~
 
@@ -113,9 +121,9 @@ many buttons by default. Please see:
 
 Key bindings~
 
-The plugin has many key biddings, with the corresponding menu items and, in
+This plugin has many key bindings, which correspond with menu entries and, in
 some cases, toolbar buttons. In the list below, the backslash represents the
-'mapleader' variable and an upper case Fn key means Shift+Fn.
+'localleader' variable (see |<LocalLeader>|)
 
 Start/Close
   . Start R (default)                      \rf
@@ -127,24 +135,32 @@ Start/Close
 -----------------------------------------------
 
 Send
-  . File                                    f5
-  . File (echo)                             F5
+  . File                                   \aa
+  . File (echo)                            \ae
   --------------------------------------------
-  . Block (cur)                             f6
-  . Block (cur, echo)                       F6
-  . Block (cur, echo and down)             ^F6
+  . Block (cur)                            \bb
+  . Block (cur, echo)                      \be
+  . Block (cur, down)                      \bd
+  . Block (cur, echo and down)             \ba
   --------------------------------------------
-  . Function (cur)                          f7
-  . Function (cur and down)                 F7
+  . Function (cur)                         \ff
+  . Function (cur echo)                    \fe
+  . Function (cur and down)                \fd
+  . Function (cur, echo and down)          \fa
   --------------------------------------------
-  . Selection                               f8
-  . Selection (echo)                        F8
-  . Selection (and down)                    f9
-  . Selection (echo and down)               F9
+  . Paragraph                              \pp
+  . Paragraph (echo)                       \pe
+  . Paragraph (and down)                   \pd
+  . Paragraph (echo and down)              \pa
   --------------------------------------------
-  . Line                                    f8
-  . Line (and down)                         f9
-  . Line (and new one)                  \Enter
+  . Selection                              \ss
+  . Selection (echo)                       \se
+  . Selection (and down)                   \sd
+  . Selection (echo and down)              \sa
+  --------------------------------------------
+  . Line                                    \l
+  . Line (and down)                         \d
+  . Line (and new one)                      \q
 -----------------------------------------------
 
 Control
@@ -171,13 +187,23 @@ Control
   --------------------------------------------
   . Rebuild (list of objects)              \ro
  
-  . <_> In insert mode, write " <- ", if not inside a string. Please,
-	      type "_" again if the function yields " <- " when you really
-	      needs "_".
 
-Please, see|r-plugin-custom-key-bindings|to know how to customize the key
-bindings without editing the plugin directly, and|g:vimrplugin_underscore|to
+  . R syntax uses " <- " to assign values to variables which is inconvenient
+  to type. In insert mode, typing a single underscore, <_>, will write " <- ",
+  unless you are typing inside a string. If necessary, it is possible to
+  insert an actual underscore into your file by typing a second underscore.
+  This behavior is similar to the EMACS ESS mode some users may be familiar
+  with and is enabled by default.
+
+The key bindings \sw and \sp are useful only if the file type is rnoweb
+(.Rnw). When the cursor is over the @ character that finishes an R chunk,
+the sending of all commands to R is suspended and the shortcut to send the
+current line makes the cursor to jump to the next chunk.
+
+Please see |r-plugin-custom-key-bindings| to learn how to customize the key
+bindings without editing the plugin directly, and |g:vimrplugin_underscore| to
 to disable underscore replacement.
+
 
 ------------------------------------------------------------------------------
 5. How the plugin works~
@@ -185,59 +211,62 @@ to disable underscore replacement.
 
 5.1. Communication through screen~
 
-Vim calls screen to run R and, then, sends commands to R through screen. By
-default, all Vim's buffer share the same R process, but it's also possible to
-configure Vim so that each buffer runs its own instance of R in a separated
+The r-plugin uses screen to communicate with R. First, the plugin initiates a
+new screen session and  uses this to start new R process. The plugin's menu
+options, toolbar buttons and key bindings can then be used to communicate with
+the newly started R process. The plugin sends commands to R through screen. By
+default, all Vim buffers share the same R process, but it is also possible to
+configure Vim so that each buffer runs its own instance of R in a separate
 terminal emulator. In this case, the screen sessions have unique names. The
-names are made using the user name and the seconds of localtime().  Hence, a
+names are made using the user name and the seconds of localtime(). Hence, a
 name clash is possible if a single user starts more than one Vim buffer at the
-same second. You can change this behavior and make all Vim buffers use the
-same R process (see |g:vimrplugin_single_r|).
+same second. To change the default behavior and force all Vim buffers to use
+different R processes see |g:vimrplugin_single_r|.
 
 5.2. Omni completion~
 
-You should type <C-X><C-O> to start the |omni-completion|. Since it's
-uncomfortable to type such a combination of keys, you might want to map an
-easier combination for omni completion in your |vimrc|. For example:
+To start |omni-completion|, type <C-X><C-O>. Since it can be uncomfortable to
+type such a combination of keys, you might want to map an easier combination 
+for omni completion in your |vimrc|. For example:
 >
   imap <C-Space> <C-X><C-O>
 <
+Omni completion shows the name of the object, its class and its
+environment (most frequently, its package name). 
 
-The omni completion shows the name of the object, its class and its
-environment (most frequently, its package name). Vim sends to R the command
-to source the script ~/.vim/tools/rtags.R, which produces the tags file used
-for omni completion.
+You can build/rebuild the tags file at any time, but Vim will automatically 
+build it the first time you use the omni completion feature. Remember, 
+you must rebuild the tags file manually to add the names of other objects
+created after building the tags file.
 
-You can rebuild the tags file at any time, but Vim
-will automatically build it the first time you use the omni completion
-feature.
+If a data.frame is found, while building the tags file, the columns in the
+data.frame are added to the list of objects. When you try to use omni
+completion to complete the name of a data.frame, the columns are not shown.
+But when the data.frame name is already complete, and you have inserted the 
+'$' symbol, omni completion will show the column names.
 
-After you send to R a line of code containing the string "library",
-Vim will turn on the flag indicating the need of rebuilding the tags file.
-Then, if you try an omni completion, the tags file will be rebuilt
-automatically.
+When you send a line of code containing the string "library" to the R process,
+Vim will turn on the flag indicating the need to rebuild the tags file. This
+will force omni completion to rebuild the tags file the next time omni
+completion is used. However, if you send the entire file to R, Vim will not
+recognize the "library" string and will not order omni completion to rebuild
+the tags file. 
 
-You still need to build the tags file manually to add the names
-of other objects created after the tags file. The string "library" is not
-detected if you send the whole file to R.
-
-While building the tags file, if a data.frame is found, its columns are also
-added to the list of objects. When you try to complete the name of a
-data.frame, the columns are not shown, but when the data.frame name is already
-complete, and you have inserted the '$' symbol, the next completion will
-include the column names.
+The tags file used for omni completion is built by the R function contained
+in the script ~/.vim/tools/rtags. This function is sourced by R, which causes
+R to create the tags file used by Vim.
 
 
 ------------------------------------------------------------------------------
-6. Know bugs and workarounds~
+6. Known bugs and workarounds~
                                                          *r-plugin-known-bugs*
 6.1. R session is detached when GVim is closed~
 
 If you launch GVim through a custom keyboard shortcut, the problem may be
 solved if you add -f as parameter to GVim. The R session will also be detached
 when GVim is closed if you launch GVim by the command line in a terminal
-emulator, and, then, close the terminal-emulator. In any case, to reattach the
-R session, open a new terminal window and type:
+emulator, and, then, close the terminal-emulator. In any case, to reattach to 
+the R session, open a new terminal window and type:
 >
   screen -r
 <
@@ -267,18 +296,25 @@ Correctly written code might be wrongly indented. Examples:
 7.1. Terminal emulator~
                                                            *g:vimrplugin_term*
 
-The plugin uses as terminal emulator the first executable that it finds from
-this list: gnome-terminal, konsole, xfce4-terminal, Eterm, rxvt, aterm, xterm.
-However, if your terminal of choice is not the first to be found, you may
-define it in your|vimrc|by setting the variable g:vimrplugin_term, as in the
-example below:
+The plugin uses the first terminal emulator that it finds in the following
+list:
+    1. gnome-terminal, 
+    2. konsole, 
+    3. xfce4-terminal, 
+    4. Eterm, 
+    5. rxvt, 
+    6. aterm, 
+    7. xterm.
+
+If Vim does not select your favorite terminal emulator, you may define it in 
+your |vimrc| by setting the variable g:vimrplugin_term, as shown below:
 >
   let g:vimrplugin_term = "xterm"
 <
                                                        *g:vimrplugin_term_cmd*
 If your terminal emulator is not listed above, or if you are not satisfied
 with the way your terminal emulator is called by the plugin, you may define in
-your|vimrc|the variable g:vimrplugin_term_cmd, as in the example below:
+your |vimrc| the variable g:vimrplugin_term_cmd, as in the example below:
 >
   let g:vimrplugin_term_cmd = "gnome-terminal -t R -e"
 <
@@ -297,7 +333,10 @@ pager for R's help. You can use the script ~/.vim/tools/rpager.sh (which will
 call less) by putting in your ~/.Rprofile:
 >
   options(pager="~/.vim/tools/rpager.sh")
-<
+
+This script can be easily modified to use your favorite terminal emulator. The
+script contains options for several popular emulators such as gnome-terminal
+and konsole but defaults to xterm.
 
 7.4. Html help~
                                                          *g:vimrplugin_hstart*
@@ -310,7 +349,7 @@ The plugin can call R's function help.start() the first time that you press
 After calling help.start(), the plugin will wait 4 seconds before sending to R
 the help command. If your browser needs either more or less time to start, you
 may want to add the following global variable (with the appropriate value) to
-your|vimrc|:
+your |vimrc|:
 >
   let g:vimrplugin_browser_time = 4
 <
@@ -318,7 +357,7 @@ your|vimrc|:
 7.5. Number of R processes~
                                                        *g:vimrplugin_nosingler*
 If you prefer that each Vim buffer uses its own R process, put the following
-option in your|vimrc|:
+option in your |vimrc|:
 >
   let g:vimrplugin_nosingler = 1
 <
@@ -326,37 +365,96 @@ option in your|vimrc|:
 7.6. Screen configuration~
                                                      *g:vimrplugin_noscreenrc*
 Vim runs screen with a special configuration file. If you want to use
-your own ~/.screenrc, put in your|vimrc|:
+your own ~/.screenrc, put in your |vimrc|:
 >
   let g:vimrplugin_noscreenrc = 1
 <
 
-7.7. Map 'r'~
+7.7. Integration with screen.vim~
+                                                   *g:vimrplugin_screenplugin*
+By default, the r-plugin does not use screen.vim plugin, written by Eric Van
+Dewoestine. If you prefer to use both plugins at the same time, download and
+install the screen.vim (version 0.8 or above) from:
+
+  http://www.vim.org/scripts/script.php?script_id=2711
+
+Using both plugins at the same time is especially useful for users who may
+prefer to use Vim and R from the command-line, rather than using the graphical
+interface provided by GVim.
+
+To integrate the r-plugin with screen.vim you will need to add the following 
+to your |vimrc|:
+>
+  let g:vimrplugin_screenplugin = 1
+<
+Note: Read the screen.vim description at plugin/screen.vim, especially the
+section "Gotchas" (the E325 is caused by the presence of 'swapfile'). This
+problem will not happen if you start Vim from within a screen session, as in
+the example below. However, when starting Vim from within screen you will not
+be able to start a new R session after closing the first one with the \rq
+command. Moreover, you will have to manually switch from one screen region to
+another and kill them.
+
+A sample detachable session could be:
+  - Start vim through screen:
+      screen vim theScript.R
+  - Use Vim to start an R session:
+      \rf
+  - Send code from Vim to R, and, then, detach Vim and R with <c-a>d
+  - Some time latter reattach the screen session:
+      screen -r
+  - Type <c-a>S to split the region, <c-a><tab> to go the other region and
+    <c-a>n until you get one region with Vim and the other with R.
+  - When you have finished to use Vim and R close them and type exit to
+    quit the screen session.
+
+Here are several useful screen shortcuts:
+  <c-a><tab>        go from Vim to R and vice-versa
+  <c-a>:resize N    set the height of the current window to N lines
+  <c-a>n            switch to the next screen session
+  <c-a>p            switch to the previous screen session
+  <c-a>S            split the current region in two new ones
+  <c-a>X            kill the current region
+
+By default, screen waits briefly after it receives external commands and
+other default options may not be what you want. Please read screen
+documentation to know how to configure it. Below is a sample ~/.screenrc you
+may consider as a starting point to create your own:
+>
+  msgwait 0
+  termcapinfo xterm* 'ti@:te@'
+  vbell off
+  term screen-256color
+<
+
+7.8. Map 'r'~
                                                           *g:vimrplugin_map_r*
-If the variable g:vimrplugin_map_r exists, the plugin will map the letter 'r'
-to send lines to R when there are visually selected lines (for compatibility
-with the original plugin). To activate this option, put in your |vimrc|:
+Some users may already be familiar with the key bindings from earlier releases
+of the r-plugin. If the variable g:vimrplugin_map_r exists, the plugin will 
+map the letter 'r' to send lines to R when there are visually selected lines,
+for compatibility with the original plugin. To activate this option, insert 
+the following into |vimrc|:
 >
   let g:vimrplugin_map_r = 1
 <
 
-You may want to put in your |vimrc| the following three lines which are in the
-original plugin and are intended to increase compatibility with emacs edited
-code:
+You may want to add the following three lines to your |vimrc| which were in 
+the original plugin and will increase compatibility with code edited with
+Emacs:
 >
   set expandtab
   set shiftwidth=4
   set tabstop=8
 <
 
-7.8. maxdeparse~
+7.9. maxdeparse~
                                                      *g:vimrplugin_maxdeparse*
 You can set the argument maxdeparse to be passed to R's source() function. Example:
 >
   let g:vimrplugin_maxdeparse = 300
 <
 
-7.9. LaTeX command~
+7.10. LaTeX command~
                                                        *g:vimrplugin_latexcmd*
 By default, Vim calls pdflatex to produce a pdf document from the .tex file
 produced by the R Sweave command. You can use the option g:vimrplugin_latexcmd
@@ -368,26 +466,24 @@ to change this behavior. Example:
 ------------------------------------------------------------------------------
 8. Custom key bindings~
                                                 *r-plugin-custom-key-bindings*
+When creating custom key bindings for the r-plugin, it is necessary to create
+three maps for most functions because the way the function is called is 
+different in each Vim mode. Thus, key bindings must be made for normal mode, 
+insert mode, and visual mode.
 
-To customize a key binding you should put in your|vimrc|something like:
+To customize a key binding you should put in your |vimrc| something like:
 >
-  map <C-F2> <Plug>RStart
-  imap <C-F2> <Plug>RStart
-  vmap <C-F2> <Plug>RStart
+  map <F2> <Plug>RStart
+  imap <F2> <Plug>RStart
+  vmap <F2> <Plug>RStart
 <
+The above example shows how you can increase compatibility with old versions
+of the r-plugin, by changing the key binding used to start R from
+<LocalLeader>rf to the old default value, <F2>.
 
-In the above example, R would be started by pressing <C-F2> instead of the
-default <F2>.
-
-It is necessary to create three maps for most functions because
-the way the function is called is slightly different according to Vim's mode:
-- normal
-- insert
-- visual.
-
-Custom key bindings are not shown in Vim's menu,
-but you can type |:map| to see the list of current mappings, and below is the
-list of the names for custom key bindings:
+Custom key bindings are not shown in Vim's menu, but you can type |:map| to 
+see the list of current mappings, and below is the list of the names for 
+custom key bindings:
 >
   RBuildTags             RESendSelection           RSendLine
   RClearAll              RHelp                     RSendMBlock
@@ -402,10 +498,35 @@ list of the names for custom key bindings:
   RESendFile             RSendFunction             RSweave
   RESendMBlock           RSendLAndOpenNewOne       RvanillaStart
 <
+The plugin also contains a function called RAction which allows you to build
+ad-hoc commands to R. This function takes the name of an R function such as
+"levels" or "table" and the word under the cursor, and passes them to R as a
+command. 
+
+For example, if your cursor is sitting on top of the object called gender and
+you call the RAction function, with an argument such as levels, Vim will pass
+the command levels(gender) to R, which will show you the levels of the object
+gender.
+
+To make it even easier to use this function, you could write a custom key
+binding that would allow you to rapidly get the levels of the object under
+your cursor. Add the following to your |vimrc| to have an easy way to pass R
+the levels command.
+>
+  map <Leader>rk :call RAction("levels")<CR>
+<
+then (assuming that the leader key is "\") if you type \rk R will receive the
+command
+>
+  levels(myObject)
+<
+You should replace <Leader>rk with the key binding that you want to use and
+"levels" with the R function that you want to call.
+
+
 ------------------------------------------------------------------------------
 9. Files~
                                                               *r-plugin-files*
-
 The following files are part of the plugin and should be in your ~/.vim
 directory after the installation:
 
@@ -450,27 +571,54 @@ directory after the installation:
 ------------------------------------------------------------------------------
 10. FAQ~
                                                                 *r-plugin-faq*
-- Marked blocks: how it works?
-  Vim allows several marks (bookmarks). The most common is to use |a..z| marks.
-  If the cursor is among any two marks, (marking the begin and end of a block)
-  all instructions contained between these two marks will be sent to R.
+
+10.1. How can I make the plugin active for all file types?~
+  If you want to make most of the plugin functions available for any file
+  type, create a symbolic link to ftplugin/r.vim in the plugin directory. For
+  example, if you installed the plugin in your home directory do the following
+  commands in a terminal emulator:
+>
+  cd ~/.vim/plugin
+  ln -s ../ftplugin/r.vim
+<
+
+10.2. How do marked blocks work?~
+  Vim allows several marks (bookmarks). The most commonly used marks are |a..z|.
+  If the cursor is between any two marks, the plugin will send all of the 
+  lines between them to R.
   
-  It is recommended the use of the plugin showmarks, available at
-  http://www.vim.org/scripts/script.php?script_id=152, to visualize manage the
-  marks. You may want to add the following two lines to your|vimrc|to
-  customize shomarks behavior:
+  To make it easier to remember where blocks begin and end, we recommended 
+  that you use the showmarks plugin available at:
+
+http://www.vim.org/scripts/script.php?script_id=152
+  
+  This plugin makes it possible to visually manage your marks. You may want 
+  to add the following two lines to your |vimrc| to customize showmarks 
+  behavior:
 >
   let marksCloseWhenSelected = 0
   let showmarks_include = "abcdefghijklmnopqrstuvwxyz"
 <
 
-- Stop R from within Vim: is it possible?
+10.3. Is it possible to stop R from within Vim?~
   Sorry, it is not possible. You have to press ^C into R's terminal emulator.
 
 
 ------------------------------------------------------------------------------
 11. News~
                                                                *r-plugin-news*                                                      
+091016 (2009-10-16)
+* The plugin now can run together with screen.vim, thanks to Eric Van
+  Dewoestine, the author of screen.vim, who added script integration to
+  screen.vim.
+* Andy Choens has made many improvements on the documentation.
+* Added the possibility of custom key binding creation to call any R function
+  with the word under cursor as argument.
+* The key bindings related with Sweave are activated even if the file type is
+  not rnoweb.
+* Replaced <Leader> with <LocalLeader> in the key bindings.
+* Added "Send Paragraph" commands.
+
 091004 (2009-10-04)
 * José Cláudio Faria has began to work in the project as co-author.
 * Some ideas from Tinn-R project were ported to the plugin.
@@ -479,20 +627,24 @@ directory after the installation:
 
 090828 (2009-08-28)
 * Faster startup.
-* Better support for Rnoweb files: the cursor goes to '^<<' if the sent line is '^@$'.
+* Better support for Rnoweb files: the cursor goes to '^<<' if the sent line
+  is '^@$'.
 
 090811 (2009-08-12)
-* Now use screen instead of funnel.pl. The bugs and limitations related with funnel.pl are solved.
+* Now use screen instead of funnel.pl. The bugs and limitations related with
+  funnel.pl are solved.
 * Deleted key binding for R-devel.
 * Automatically detect available terminal emulators and choose one of them.
-* By default, no longer calls help.start() the first time that <C-H> is pressed.
+* By default, no longer calls help.start() the first time that <C-H> is
+  pressed.
 
 090810 (2009-08-10)
 * Added R icons for some terminal emulators.
 * Removed the script open-gvim-here. You may use Vim's option autochdir.
 * Added option g:vimrplugin_term.
 * Improved indentation script.
-* Changed key binding from <S-Enter>, which doesn't work in any terminal, to <M-Enter>, which at least works in xterm.
+* Changed key binding from <S-Enter>, which doesn't work in any terminal, to
+  <M-Enter>, which at least works in xterm.
 
 090610 (2009-06-11)
 * The options expandtab, shiftwidth and tabstop are no longer set by the plugin.
@@ -500,21 +652,26 @@ directory after the installation:
 * Fixed bug in underscore replacement.
 * Fixed small bug in code indentation.
 * Added scipt rpager.sh.
-* Added two new plugin options: no underscore replacement and fixed name for the pipe file instead of random one.
+* Added two new plugin options: no underscore replacement and fixed name for
+  the pipe file instead of random one.
 
 090523 (2009-05-23)
 * Key bindings now are customizable.
 * Default key binding for calling R's args() changed to <S-F1>.
-* New R script rargs.R gives better results for generic functions than R's args() called directly.
+* New R script rargs.R gives better results for generic functions than R's
+  args() called directly.
 
 090519 (2009-05-20)
 * Don't send large blocks of code to R to avoid xterm freezing.
-* Automatically call help.start() after <C-H> is pressed for the first time, and wait 4 seconds for the browser start before calling R's help(). These features are customizable.
+* Automatically call help.start() after <C-H> is pressed for the first time,
+  and wait 4 seconds for the browser start before calling R's help(). These
+  features are customizable.
 * Fixed tags file script.
 
 090516 (2009-05-16)
 * Added documentation.
-* Added ability to send function to R, revert the automatic convertion of "_" into "<-" and call R's help().
+* Added ability to send function to R, revert the automatic conversion of "_"
+  into "<-" and call R's help().
 * Added archive with some files to ease desktop integration, if desired.
 
 090507 (2009-05-08)

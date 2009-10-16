@@ -2,12 +2,11 @@
 " ftplugin for R files
 "
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
-"          and
 "          José Cláudio Faria <joseclaudio.faria@gmail.com>
 "          
-"          Based on previous work by Johannes Ranke <jranke@uni-bremen.de>
+"          Based on previous work by Johannes Ranke
 "
-" Last Change: 2009/10/04
+" Last Change: 2009/10/16
 "
 " Please see doc/r-plugin.txt for usage details.
 "==========================================================================
@@ -60,6 +59,12 @@ if exists("g:vimrplugin_underscore")
   if g:vimrplugin_underscore != 0
     let b:replace_us = 0
   endif
+endif
+
+if exists("g:vimrplugin_screenplugin") && !has('gui_running')
+  let b:usescreenplugin = 1
+else
+  let b:usescreenplugin = 0
 endif
 
 function! RWarningMsg(wmsg)
@@ -152,6 +157,10 @@ function! SendCmdToScreen(cmd)
       return 1
     endif
   endif
+  if b:usescreenplugin
+    call g:ScreenShellSend(a:cmd)
+    return 1
+  end
   let str = substitute(a:cmd, "'", "'\\\\''", "g")
   let scmd = 'screen -S ' . b:screensname . " -X stuff '" . str . "\<C-M>'"
   let rlog = system(scmd)
@@ -209,26 +218,53 @@ function! SendLineToR(godown)
   endif
 endfunction
 
-" Send selected lines.
-function! SendSelectionToR(t, e, m)
-  echon
-  if a:t == "v"
-    if line("'<") == line("'>")
-      let i = col("'<") - 1
-      let j = col("'>") - i
-      let l = getline("'<")
-      let line = strpart(l, i, j)
-      let ok = SendCmdToScreen(line)
-      if ok && a:m =~ "down"
-        call GoDown()
-      endif
-      return
+" Send paragraph to R
+function! SendParagraphToR(e, m)
+  let i = line(".")
+  let c = col(".")
+  let max = line("$")
+  let j = i
+  let gotempty = 0
+  while j < max
+    let j = j + 1
+    let line = getline(j)
+    if line =~ "^\s*$"
+      break
     endif
-    let lines = getline("'<", "'>")
-  else
-    let lines = getline("'a", "'b")
+  endwhile
+  let lines = getline(i, j)
+  let ok = RSourceLines(lines, a:e)
+  if ok == 0
+    return
   endif
+  if j < max
+    call cursor(j, 1)
+  else
+    call cursor(max, 1)
+  endif
+  if a:m == "down"
+    call GoDown()
+  else
+    call cursor(i, c)
+  endif
+  echon
+endfunction
 
+" Send selected lines.
+function! SendSelectionToR(e, m)
+  echon
+  if line("'<") == line("'>")
+    let i = col("'<") - 1
+    let j = col("'>") - i
+    let l = getline("'<")
+    let line = strpart(l, i, j)
+    let ok = SendCmdToScreen(line)
+    if ok && a:m =~ "down"
+      call GoDown()
+    endif
+    return
+  endif
+  let lines = getline("'<", "'>")
   let ok = RSourceLines(lines, a:e)
   if ok == 0
     return
@@ -236,9 +272,7 @@ function! SendSelectionToR(t, e, m)
   if a:m == "down"
     call GoDown()
   else
-    if a:t == "v"
-      normal! gv
-    endif
+    normal! gv
   endif
 endfunction
 
@@ -264,7 +298,7 @@ function! RSourceLines(lines, e)
   return ok
 endfunction
 
-function! SendFunctionToR(m)
+function! SendFunctionToR(e, m)
   echon
   let line = getline(".")
   let i = line(".")
@@ -305,7 +339,7 @@ function! SendFunctionToR(m)
   endif
   let lastline = i
   let lines = getline(firstline, lastline)
-  let ok = RSourceLines(lines, "silent")
+  let ok = RSourceLines(lines, a:e)
   if  ok == 0
     return
   endif
@@ -326,7 +360,7 @@ function! SendFileToR(e)
 endfunction
 
 " Call R funtions for the word under cursor
-function! RAction(type)
+function! RAction(rcmd)
   echon
   " Go back some columns if character under cursor is not valid
   let curline = line(".")
@@ -355,7 +389,7 @@ function! RAction(type)
   endif
   let rkeyword = strpart(line, kstart, i - kstart)
   if strlen(rkeyword) > 0
-    if a:type == "help"
+    if a:rcmd == "help"
       if b:needshstart == 1
         let b:needshstart = 0
         let ok = SendCmdToScreen("help.start()")
@@ -368,26 +402,9 @@ function! RAction(type)
           let wt -= 1
         endwhile
       endif
-      let rhelpcmd = printf("help('%s')", rkeyword)
-    elseif a:type == "args"
-      let rhelpcmd = printf("args('%s')", rkeyword)
-    elseif a:type == "example"
-      let rhelpcmd = printf("example('%s')", rkeyword)
-    elseif a:type == "summary"
-      let rhelpcmd = printf("summary(%s)", rkeyword)
-    elseif a:type == "plot"
-      let rhelpcmd = printf("plot(%s)", rkeyword)
-    elseif a:type == "plot&summary"
-      let rhelpcmd = printf("plot(%s); summary(%s)", rkeyword, rkeyword)
-    elseif a:type == "print"
-      let rhelpcmd = printf("print(%s)", rkeyword)
-    elseif a:type == "str"
-      let rhelpcmd = printf("str(%s)", rkeyword)
-    elseif a:type == "names"
-      let rhelpcmd = printf("names(%s)", rkeyword)  
     endif
-
-    let ok = SendCmdToScreen(rhelpcmd)
+    let raction = a:rcmd . "(" . rkeyword . ")"
+    let ok = SendCmdToScreen(raction)
     if ok == 0
       return
     endif
@@ -438,38 +455,6 @@ function! StartR(whatr)
       endif
     endif
   endif
-  if exists("g:vimrplugin_noscreenrc")
-    let scrrc = " "
-  else
-    let b:scrfile = "/tmp/." . b:screensname . ".screenrc"
-    if exists("g:vimrplugin_nosingler")
-      let scrtitle = 'hardstatus string "' . expand("%:t") . '"'
-    else
-      let scrtitle = "hardstatus string R"
-    endif
-    let scrtxt = ["msgwait 1", "hardstatus lastline", scrtitle,
-          \ "caption splitonly", 'caption string "Vim-R-plugin"',
-          \ "termcapinfo xterm* 'ti@:te@'", 'vbell off']
-    call writefile(scrtxt, b:scrfile)
-    let scrrc = "-c " . b:scrfile
-  endif
-  " Some terminals want quotes (see screen.vim)
-  if b:term_cmd =~ "gnome-terminal" || b:term_cmd =~ "xfce4-terminal"
-    let opencmd = printf("%s 'screen %s -d -RR -S %s %s' &", b:term_cmd, scrrc, b:screensname, rcmd)
-  else
-    let opencmd = printf("%s screen %s -d -RR -S %s %s &", b:term_cmd, scrrc, b:screensname, rcmd)
-  endif
-
-  " Change to buffer's directory, run R, and go back to original directory:
-  lcd %:p:h
-  let rlog = system(opencmd)
-  lcd -
-
-  if v:shell_error
-    call RWarningMsg(rlog)
-    return
-  endif
-
   if !exists("g:vimrplugin_hstart")
     let b:needshstart = 0
   endif
@@ -481,6 +466,51 @@ function! StartR(whatr)
     endif
   endif
   let b:needsrargs = 1
+  if b:usescreenplugin
+    exec 'ScreenShell ' . rcmd
+  else
+    if exists("g:vimrplugin_noscreenrc")
+      let scrrc = " "
+    else
+      let b:scrfile = "/tmp/." . b:screensname . ".screenrc"
+      if exists("g:vimrplugin_nosingler")
+        let scrtitle = 'hardstatus string "' . expand("%:t") . '"'
+      else
+        let scrtitle = "hardstatus string R"
+      endif
+      let scrtxt = ["msgwait 1", "hardstatus lastline", scrtitle,
+            \ "caption splitonly", 'caption string "Vim-R-plugin"',
+            \ "termcapinfo xterm* 'ti@:te@'", 'vbell off']
+      call writefile(scrtxt, b:scrfile)
+      let scrrc = "-c " . b:scrfile
+    endif
+    " Some terminals want quotes (see screen.vim)
+    if b:term_cmd =~ "gnome-terminal" || b:term_cmd =~ "xfce4-terminal"
+      let opencmd = printf("%s 'screen %s -d -RR -S %s %s' &", b:term_cmd, scrrc, b:screensname, rcmd)
+    else
+      let opencmd = printf("%s screen %s -d -RR -S %s %s &", b:term_cmd, scrrc, b:screensname, rcmd)
+    endif
+    " Change to buffer's directory, run R, and go back to original directory:
+    lcd %:p:h
+    let rlog = system(opencmd)
+    lcd -
+    if v:shell_error
+      call RWarningMsg(rlog)
+      return
+    endif
+  endif
+  echon
+endfunction
+
+function! RQuit(how)
+  if a:how == "save"
+    call SendCmdToScreen('quit(save = "yes")')
+  else
+    call SendCmdToScreen('quit(save = "no")')
+  endif
+  if b:usescreenplugin && exists(':ScreenQuit')
+      ScreenQuit
+  endif
   echon
 endfunction
 
@@ -491,7 +521,6 @@ function! ReplaceUnderS()
     execute "normal! 3h3xr_"
     return
   endif
-
   let isString = 0
   let i = 0
   while i < j
@@ -504,7 +533,6 @@ function! ReplaceUnderS()
     endif
     let i += 1
   endwhile
-
   if isString == 0
     execute "normal! a <- "
   else
@@ -603,418 +631,183 @@ endif
 " For each noremap we need a vnoremap including <Esc> before the :call,
 " otherwise vim will call the function as many times as the number of selected
 " lines. If we put the <Esc> in the noremap, vim will bell.
-"
+" RCreateMaps Args:
+"   type : modes to which create maps (normal, visual and insert) and whether
+"          the cursor have to go the beginning of the line
+"   plug : the <Plug>Name
+"   combo: the combination of letter that make the shortcut
+"   target: the command or function to be called
+function! s:RCreateMaps(type, plug, combo, target)
+  if a:type =~ '0'
+    let tg = a:target . '<CR>0'
+    let il = 'i'
+  else
+    let tg = a:target . '<CR>'
+    let il = 'a'
+  endif
+  if a:type =~ "n"
+    if hasmapto(a:plug, "n")
+      exec 'noremap <buffer> ' . a:plug . ' ' . tg
+    else
+      exec 'noremap <buffer> <LocalLeader>' . a:combo . ' ' . tg
+    endif
+  endif
+  if a:type =~ "v"
+    if hasmapto(a:plug, "v")
+      exec 'vnoremap <buffer> ' . a:plug . ' <Esc>' . tg
+    else
+      exec 'vnoremap <buffer> <LocalLeader>' . a:combo . ' <Esc>' . tg
+    endif
+  endif
+  if a:type =~ "i"
+    if hasmapto(a:plug, "i")
+      exec 'inoremap <buffer> ' . a:plug . ' <Esc>' . tg . il
+    else
+      exec 'inoremap <buffer> <LocalLeader>' . a:combo . ' <Esc>' . tg . il
+    endif
+  endif
+endfunction
+
 "----------------------------------------------------------------------------
 " ***Start/Close***
 "----------------------------------------------------------------------------
-" *Start*
-" ---------------------------
-" Start R 
-if hasmapto('<Plug>RStart')
-  noremap <buffer> <Plug>RStart :call StartR("R")<CR>
-  vnoremap <buffer> <Plug>RStart <Esc>:call StartR("R")<CR>
-  inoremap <buffer> <Plug>RStart <Esc>:call StartR("R")<CR>a
-else
-  noremap <buffer> <Leader>rf :call StartR("R")<CR>
-  vnoremap <buffer> <Leader>rf <Esc>:call StartR("R")<CR>
-  inoremap <buffer> <Leader>rf <Esc>:call StartR("R")<CR>a
-endif
+" Start
+"-------------------------------------
+call s:RCreateMaps("nvi", '<Plug>RStart',        'rf', ':call StartR("R")')
+call s:RCreateMaps("nvi", '<Plug>RvanillaStart', 'rv', ':call StartR("vanilla")')
+call s:RCreateMaps("nvi", '<Plug>RCustomStart',  'rc', ':call StartR("custom")')
 
-" Start R --vannila
-if hasmapto('<Plug>RvanillaStart')
-  noremap <buffer> <Plug>RvanillaStart :call StartR("vanilla")<CR>
-  vnoremap <buffer> <Plug>RvanillaStart <Esc>:call StartR("vanilla")<CR>
-  inoremap <buffer> <Plug>RvanillaStart <Esc>:call StartR("vanilla")<CR>a
-else
-  noremap <buffer> <Leader>rv :call StartR("vanilla")<CR>
-  vnoremap <buffer> <Leader>rv <Esc>:call StartR("vanilla")<CR>
-  inoremap <buffer> <Leader>rv <Esc>:call StartR("vanilla")<CR>a
-endif
-
-" Start R (custom) 
-if hasmapto('<Plug>RCustomStart')
-  noremap <buffer> <Plug>RCustomStart :call StartR("custom")<CR>
-  vnoremap <buffer> <Plug>RCustomStart <Esc>:call StartR("custom")<CR>
-  inoremap <buffer> <Plug>RCustomStart <Esc>:call StartR("custom")<CR>a
-else
-  noremap <buffer> <Leader>rc :call StartR("custom")<CR>
-  vnoremap <buffer> <Leader>rc <Esc>:call StartR("custom")<CR>
-  inoremap <buffer> <Leader>rc <Esc>:call StartR("custom")<CR>a
-endif
-
-" *Close*
-" ---------------------------
-" Close R (no save)
-if hasmapto('<Plug>RClose')
-  noremap <buffer> <Plug>RClose :call SendCmdToScreen('quit(save = "no")')<CR>
-  vnoremap <buffer> <Plug>RClose <Esc>:call SendCmdToScreen('quit(save = "no")')<CR>
-  inoremap <buffer> <Plug>RClose <Esc>:call SendCmdToScreen('quit(save = "no")')<CR>a
-else
-  noremap <buffer> <Leader>rq :call SendCmdToScreen('quit(save = "no")')<CR>
-  vnoremap <buffer> <Leader>rq <Esc>:call SendCmdToScreen('quit(save = "no")')<CR>
-  inoremap <buffer> <Leader>rq <Esc>:call SendCmdToScreen('quit(save = "no")')<CR>a
-endif
-
-" Close R (save workspace)
-if hasmapto('<Plug>RSaveClose')
-  noremap <buffer> <Plug>RSaveClose :call SendCmdToScreen('quit(save = "yes")')<CR>
-  vnoremap <buffer> <Plug>RSaveClose <Esc>:call SendCmdToScreen('quit(save = "yes")')<CR>
-  inoremap <buffer> <Plug>RSaveClose <Esc>:call SendCmdToScreen('quit(save = "yes")')<CR>a
-else
-  noremap <buffer> <Leader>rw :call SendCmdToScreen('quit(save = "yes")')<CR>
-  vnoremap <buffer> <Leader>rw <Esc>:call SendCmdToScreen('quit(save = "yes")')<CR>
-  inoremap <buffer> <Leader>rw <Esc>:call SendCmdToScreen('quit(save = "yes")')<CR>a
-endif
+" Close
+"-------------------------------------
+call s:RCreateMaps("nvi", '<Plug>RClose',        'rq', ":call RQuit('nosave')")
+call s:RCreateMaps("nvi", '<Plug>RSaveClose',    'rw', ":call RQuit('save')")
 
 "----------------------------------------------------------------------------
-" ***Send***
+" ***Send*** (e=echo, d=down, a=all)
 "----------------------------------------------------------------------------
-" *File*
-" ---------------------------
-" File 
-if hasmapto('<Plug>RSendFile')
-  noremap <buffer> <Plug>RSendFile :call SendFileToR("silent")<CR>
-  vnoremap <buffer> <Plug>RSendFile <Esc>:call SendFileToR("silent")<CR>
-  inoremap <buffer> <Plug>RSendFile <Esc>:call SendFileToR("silent")<CR>a
-else
-  noremap <buffer> <F5> :call SendFileToR("silent")<CR>
-  vnoremap <buffer> <F5> <Esc>:call SendFileToR("silent")<CR>
-  inoremap <buffer> <F5> <Esc>:call SendFileToR("silent")<CR>a
-endif
+" File
+"-------------------------------------
+call s:RCreateMaps("nvi", '<Plug>RSendFile',      'aa', ':call SendFileToR("silent")')
+call s:RCreateMaps("nvi", '<Plug>RESendFile',     'ae', ':call SendFileToR("echo")')
 
-" File (echo)
-if hasmapto('<Plug>RESendFile')
-  noremap <buffer> <Plug>RESendFile :call SendFileToR("echo")<CR>
-  vnoremap <buffer> <Plug>RESendFile <Esc>:call SendFileToR("echo")<CR>
-  inoremap <buffer> <Plug>RESendFile <Esc>:call SendFileToR("echo")<CR>a
-else
-  noremap <buffer> <S-F5> :call SendFileToR("echo")<CR>
-  vnoremap <buffer> <S-F5> <Esc>:call SendFileToR("echo")<CR>
-  inoremap <buffer> <S-F5> <Esc>:call SendFileToR("echo")<CR>a
-endif
+" Block
+"-------------------------------------
+call s:RCreateMaps("ni", '<Plug>RSendMBlock',     'bb', ':call SendMBlockToR("silent", "stay")')
+call s:RCreateMaps("ni", '<Plug>RESendMBlock',    'be', ':call SendMBlockToR("echo", "stay")')
+call s:RCreateMaps("ni", '<Plug>RDSendMBlock',    'bd', ':call SendMBlockToR("silent", "down")')
+call s:RCreateMaps("ni", '<Plug>REDSendMBlock',   'ba', ':call SendMBlockToR("echo", "down")')
 
-" *Block*
-" ---------------------------
-" Block (cur)
-if hasmapto('<Plug>RSendMBlock')
-  noremap <buffer> <Plug>RSendMBlock :call SendMBlockToR("silent", "stay")<CR>
-  inoremap <buffer> <Plug>RSendMBlock <Esc>:call SendMBlockToR("silent", "stay")<CR>i
-else
-  noremap <buffer> <F6> :call SendMBlockToR("silent", "stay")<CR>
-  inoremap <buffer> <F6> <Esc>:call SendMBlockToR("silent", "stay")<CR>i
-endif
+" Function
+"-------------------------------------
+call s:RCreateMaps("nvi", '<Plug>RSendFunction',  'ff', ':call SendFunctionToR("silent", "stay")')
+call s:RCreateMaps("nvi", '<Plug>RDSendFunction', 'fe', ':call SendFunctionToR("echo", "stay")')
+call s:RCreateMaps("nvi", '<Plug>RDSendFunction', 'fd', ':call SendFunctionToR("silent", "down")')
+call s:RCreateMaps("nvi", '<Plug>RDSendFunction', 'fa', ':call SendFunctionToR("echo", "down")')
 
-" Block (cur, echo)
-if hasmapto('<Plug>RESendMBlock')
-  noremap <buffer> <Plug>RESendMBlock :call SendMBlockToR("echo", "stay")<CR>
-  inoremap <buffer> <Plug>RESendMBlock <Esc>:call SendMBlockToR("echo, "stay"")<CR>i
-else
-  noremap <buffer> <S-F6> :call SendMBlockToR("echo", "stay")<CR>
-  inoremap <buffer> <S-F6> <Esc>:call SendMBlockToR("echo", "stay")<CR>i
-endif
+" Selection
+"-------------------------------------
+call s:RCreateMaps("v0", '<Plug>RSendSelection',   'ss', ':call SendSelectionToR("silent", "stay")')
+call s:RCreateMaps("v0", '<Plug>RESendSelection',  'se', ':call SendSelectionToR("echo", "stay")')
+call s:RCreateMaps("v0", '<Plug>RDSendSelection',  'sd', ':call SendSelectionToR("silent", "down")')
+call s:RCreateMaps("v0", '<Plug>REDSendSelection', 'sa', ':call SendSelectionToR("echo", "down")')
 
-" Block (cur, echo and down)
-if hasmapto('<Plug>REDSendMBlock')
-  noremap <buffer> <Plug>REDSendMBlock :call SendMBlockToR("echo" "down")<CR>
-  inoremap <buffer> <Plug>REDSendMBlock <Esc>:call SendMBlockToR("echo" "down")<CR>i
-else
-  noremap <buffer> <C-S-F6> :call SendMBlockToR("echo", "down")<CR>
-  inoremap <buffer> <C-S-F6> <Esc>:call SendMBlockToR("echo", "down")<CR>
-  inoremap <buffer> <C-S-F6> <Esc>:call SendMBlockToR("echo", "down")<CR>i
-endif
-
-" *Function*
-" ---------------------------
-" Function (cur)
-if hasmapto('<Plug>RSendFunction')
-  noremap <buffer> <Plug>RSendFunction :call SendFunctionToR("stay")<CR>
-  vnoremap <buffer> <Plug>RSendFunction <Esc>:call SendFunctionToR("stay")<CR>
-  inoremap <buffer> <Plug>RSendFunction <Esc>:call SendFunctionToR("stay")<CR>i
-else
-  noremap <buffer> <F7> :call SendFunctionToR("stay")<CR>
-  vnoremap <buffer> <F7> <Esc>:call SendFunctionToR("stay")<CR>
-  inoremap <buffer> <F7> <Esc>:call SendFunctionToR("stay")<CR>i
-endif
-
-" Function (cur and down)
-if hasmapto('<Plug>RDSendFunction')
-  noremap <buffer> <Plug>RDSendFunction :call SendFunctionToR("down")<CR>
-  vnoremap <buffer> <Plug>RDSendFunction <Esc>:call SendFunctionToR("down")<CR>
-  inoremap <buffer> <Plug>RDSendFunction <Esc>:call SendFunctionToR("down")<CR>i
-else
-  noremap <buffer> <S-F7> :call SendFunctionToR("down")<CR>
-  vnoremap <buffer> <S-F7> <Esc>:call SendFunctionToR("down")<CR>
-  inoremap <buffer> <S-F7> <Esc>:call SendFunctionToR("down")<CR>i
-endif
+" Paragraph
+"-------------------------------------
+call s:RCreateMaps("ni", '<Plug>RSendParagraph',   'pp', ':call SendParagraphToR("silent", "stay")')
+call s:RCreateMaps("ni", '<Plug>RESendParagraph',  'pe', ':call SendParagraphToR("echo", "stay")')
+call s:RCreateMaps("ni", '<Plug>RDSendParagraph',  'pd', ':call SendParagraphToR("silent", "down")')
+call s:RCreateMaps("ni", '<Plug>REDSendParagraph', 'pa', ':call SendParagraphToR("echo", "down")')
 
 " 'Send line' must become before 'Send selection' because they share the same
 " shortcut. Otherwise, 'Send selection' will send the selection as many times as
 " are the number of selected lines.
 " *Line*
-" ---------------------------
-" Line
-if hasmapto('<Plug>RSendLine')
-  noremap <buffer> <Plug>RSendLine :call SendLineToR("stay")<CR>0
-  inoremap <buffer> <Plug>RSendLine <Esc>:call SendLineToR("stay")<CR>0i
-else
-  noremap <buffer> <F8> :call SendLineToR("stay")<CR>0
-  inoremap <buffer> <F8> <Esc>:call SendLineToR("stay")<CR>0i
-endif
+"-------------------------------------
+call s:RCreateMaps("ni0", '<Plug>RSendLine', 'l', ':call SendLineToR("stay")')
+call s:RCreateMaps('ni0', '<Plug>RDSendLine', 'd', ':call SendLineToR("down")')
 
-"Line (and down)
-if hasmapto('<Plug>RDSendLine')
-  noremap <buffer> <Plug>RDSendLine :call SendLineToR("down")<CR>0
-  inoremap <buffer> <Plug>RDSendLine <Esc>:call SendLineToR("down")<CR>0i
-else
-  noremap <buffer> <F9> :call SendLineToR("down")<CR>0
-  inoremap <buffer> <F9> <Esc>:call SendLineToR("down")<CR>0i
-endif
-
-" Line (and new one)
-if hasmapto('<Plug>RSendLAndOpenNewOne')
+" We can't call RCreateMaps because of the 'o' command at the end of the map:
+if hasmapto('<Plug>RSendLAndOpenNewOne', 'i')
   inoremap <buffer> <Plug>RSendLAndOpenNewOne <Esc>:call SendLineToR("stay")<CR>o
 else
-  inoremap <buffer> \q <Esc>:call SendLineToR("stay")<CR>o
+  inoremap <buffer> <LocalLeader>q <Esc>:call SendLineToR("stay")<CR>o
 endif
 
 " For compatibility with Johannes Ranke's plugin
 if exists("g:vimrplugin_map_r")
-  vnoremap <buffer> r <Esc>:call SendSelectionToR("v", "silent", "down")<CR>
-endif
-
-" 'Send line' must become before 'Send selection' because they share the same
-" shortcut. Otherwise, 'Send selection' will send the selection as many times as
-" are the number of selected lines.
-" *Selection*
-" ---------------------------
-" Selection
-if hasmapto('<Plug>RSendSelection')
-  vnoremap <buffer> <Plug>RSendSelection <Esc>:call SendSelectionToR("v", "silent", "stay")<CR>
-else
-  vnoremap <buffer> <F8> <Esc>:call SendSelectionToR("v", "silent", "stay")<CR>0
-endif
-
-" Selection (echo)
-if hasmapto('<Plug>RESendSelection')
-  vnoremap <buffer> <Plug>RESendSelection <Esc>:call SendSelectionToR("v", "echo", "stay")<CR>
-else
-  vnoremap <buffer> <S-F8> <Esc>:call SendSelectionToR("v", "echo", "stay")<CR>0
-endif
-
-" Selection (and down)
-if hasmapto('<Plug>RDSendSelection')
-  vnoremap <buffer> <Plug>RSendSelection <Esc>:call SendSelectionToR("v", "silent", "down")<CR>
-else
-  vnoremap <buffer> <F9> <Esc>:call SendSelectionToR("v", "silent", "down")<CR>0
-endif
-
-" Send selection to R (echo, down)
-if hasmapto('<Plug>REDSendSelection')
-  vnoremap <buffer> <Plug>RESendSelection <Esc>:call SendSelectionToR("v", "echo", "down")<CR>
-else
-  vnoremap <buffer> <S-F9> <Esc>:call SendSelectionToR("v", "echo", "down")<CR>0
+  vnoremap <buffer> r <Esc>:call SendSelectionToR("silent", "down")<CR>
 endif
 
 "----------------------------------------------------------------------------
-" Control
+" ***Control***
 "----------------------------------------------------------------------------
-" List space
-if hasmapto('<Plug>RListSpace')
-  noremap <buffer> <Plug>RListSpace :call SendCmdToScreen("ls()")<CR>
-  vnoremap <buffer> <Plug>RListSpace <Esc>:call SendCmdToScreen("ls()")<CR>
-  inoremap <buffer> <Plug>RListSpace <Esc>:call SendCmdToScreen("ls()")<CR>
-else
-  noremap <buffer> <Leader>rl :call SendCmdToScreen("ls()")<CR>
-  vnoremap <buffer> <Leader>rl <Esc>:call SendCmdToScreen("ls()")<CR>
-  inoremap <buffer> <Leader>rl <Esc>:call SendCmdToScreen("ls()")<CR>i
-endif
+" List space, clear console, clear all
+"-------------------------------------
+call s:RCreateMaps("nvi", '<Plug>RListSpace',    'rl', ':call SendCmdToScreen("ls()")<CR>:echon')
+call s:RCreateMaps("nvi", '<Plug>RClearConsole', 'rr', ':call SendCmdToScreen("")<CR>:echon')
+call s:RCreateMaps("nvi", '<Plug>RClearAll',     'rm', ':call RClearAll()')
 
-" Clear console
-if hasmapto('<Plug>RClearConsole')
-  noremap <buffer> <Plug>RClearConsole :call SendCmdToScreen("")<CR>
-  vnoremap <buffer> <Plug>RClearConsole <Esc>:call SendCmdToScreen("")<CR>
-  inoremap <buffer> <Plug>RClearConsole <Esc>:call SendCmdToScreen("")<CR>i
-else
-  noremap <buffer> <Leader>rr :call SendCmdToScreen("")<CR>
-  vnoremap <buffer> <Leader>rr <Esc>:call SendCmdToScreen("")<CR>
-  inoremap <buffer> <Leader>rr <Esc>:call SendCmdToScreen("")<CR>i
-endif
+" Print, names, structure
+"-------------------------------------
+call s:RCreateMaps("nvi", '<Plug>RObjectPr',     'rp', ':call RAction("print")')
+call s:RCreateMaps("nvi", '<Plug>RObjectNames',  'rn', ':call RAction("names")')
+call s:RCreateMaps("nvi", '<Plug>RObjectStr',    'rt', ':call RAction("str")')
 
-" Clear all
-if hasmapto('<Plug>RClearAll')
-  noremap <buffer> <Plug>RClearAll :call RClearAll()<CR>
-  vnoremap <buffer> <Plug>RClearAll <Esc>:call RClearAll()<CR>
-  inoremap <buffer> <Plug>RClearAll <Esc>:call RClearAll()<CR>i
-else
-  noremap <buffer> <Leader>rm :call RClearAll()<CR>
-  vnoremap <buffer> <Leader>rm <Esc>:call RClearAll()<CR>
-  inoremap <buffer> <Leader>rm <Esc>:call RClearAll()<CR>i
-endif
+" Arguments, example, help
+"-------------------------------------
+call s:RCreateMaps("nvi", '<Plug>RShowArgs',     'ra', ':call RAction("args")')
+call s:RCreateMaps("nvi", '<Plug>RShowEx',       're', ':call RAction("example")')
+call s:RCreateMaps("nvi", '<Plug>RHelp',         'rh', ':call RAction("help")')
 
-" ---------------------------
-" Object (print)
-if hasmapto('<Plug>RObjectPr')
-  noremap <buffer> <Plug>RObjectPr :call RAction("print")<CR>
-  vnoremap <buffer> <Plug>RObjectPr <Esc>:call RAction("print")<CR>
-  inoremap <buffer> <Plug>RObjectPr <Esc>:call RAction("print")<CR>a
-else
-  noremap <buffer> <Leader>rp :call RAction("print")<CR>
-  vnoremap <buffer> <Leader>rp <Esc>:call RAction("print")<CR>
-  inoremap <buffer> <Leader>rp <Esc>:call RAction("print")<CR>a
-endif
+" Summary, plot, both
+"-------------------------------------
+call s:RCreateMaps("nvi", '<Plug>RSummary',      'rs', ':call RAction("summary")')
+call s:RCreateMaps("nvi", '<Plug>RPlot',         'rg', ':call RAction("plot")')
+call s:RCreateMaps("nvi", '<Plug>RSPlot',        'rb', ':call RAction("plot")<CR>:call RAction("summary")')
 
-" Object (names)
-if hasmapto('<Plug>RObjectNames')
-  noremap <buffer> <Plug>RObjectNames :call RAction("names")<CR>
-  vnoremap <buffer> <Plug>RObjectNames <Esc>:call RAction("names")<CR>
-  inoremap <buffer> <Plug>RObjectNames <Esc>:call RAction("names")<CR>a
-else
-  noremap <buffer> <Leader>rn :call RAction("names")<CR>
-  vnoremap <buffer> <Leader>rn <Esc>:call RAction("names")<CR>
-  inoremap <buffer> <Leader>rn <Esc>:call RAction("names")<CR>a
-endif
-
-" Object (str)
-if hasmapto('<Plug>RObjectStr')
-  noremap <buffer> <Plug>RObjectStr :call RAction("str")<CR>
-  vnoremap <buffer> <Plug>RObjectStr <Esc>:call RAction("str")<CR>
-  inoremap <buffer> <Plug>RObjectStr <Esc>:call RAction("str")<CR>a
-else
-  noremap <buffer> <Leader>rt :call RAction("str")<CR>
-  vnoremap <buffer> <Leader>rt <Esc>:call RAction("str")<CR>
-  inoremap <buffer> <Leader>rt <Esc>:call RAction("str")<CR>a
-endif
-
-" ---------------------------
-" Arguments (cur)
-if hasmapto('<Plug>RShowArgs')
-  noremap <buffer> <Plug>RShowArgs :call RAction("args")<CR>
-  vnoremap <buffer> <Plug>RShowArgs <Esc>:call RAction("args")<CR>
-  inoremap <buffer> <Plug>RShowArgs <Esc>:call RAction("args")<CR>a
-else
-  noremap <buffer> <Leader>ra :call RAction("args")<CR>
-  vnoremap <buffer> <Leader>ra <Esc>:call RAction("args")<CR>
-  inoremap <buffer> <Leader>ra <Esc>:call RAction("args")<CR>a
-endif
-
-" Example (cur)
-if hasmapto('<Plug>RShowEx')
-  noremap <buffer> <Plug>RShowEx :call RAction("example")<CR>
-  vnoremap <buffer> <Plug>RShowEx <Esc>:call RAction("example")<CR>
-  inoremap <buffer> <Plug>RShowEx <Esc>:call RAction("example")<CR>a
-else
-  noremap <buffer> <Leader>re :call RAction("example")<CR>
-  vnoremap <buffer> <Leader>re <Esc>:call RAction("example")<CR>
-  inoremap <buffer> <Leader>re <Esc>:call RAction("example")<CR>a
-endif
-
-" Help (cur)
-if hasmapto('<Plug>RHelp')
-  noremap <buffer> <Plug>RHelp :call RAction("help")<CR>
-  vnoremap <buffer> <Plug>RHelp <Esc>:call RAction("help")<CR>
-  inoremap <buffer> <Plug>RHelp <Esc>:call RAction("help")<CR>a
-else
-  noremap <buffer> <Leader>rh :call RAction("help")<CR>
-  vnoremap <buffer> <Leader>rh <Esc>:call RAction("help")<CR>
-  inoremap <buffer> <Leader>rh <Esc>:call RAction("help")<CR>a
-endif
-
-" ---------------------------
-" Summary (cur)
-if hasmapto('<Plug>RSummary')
-  noremap <buffer> <Plug>RSummary :call RAction("summary")<CR>
-  vnoremap <buffer> <Plug>RSummary <Esc>:call RAction("sumary")<CR>
-  inoremap <buffer> <Plug>RSummary <Esc>:call RAction("summary")<CR>a
-else
-  noremap <buffer> <Leader>rs :call RAction("summary")<CR>
-  vnoremap <buffer> <Leader>rs <Esc>:call RAction("summary")<CR>
-  inoremap <buffer> <Leader>rs <Esc>:call RAction("summary")<CR>a
-endif
-
-" Plot (cur)
-if hasmapto('<Plug>RPlot')
-  noremap <buffer> <Plug>RPlot :call RAction("plot")<CR>
-  vnoremap <buffer> <Plug>RPlot <Esc>:call RAction("plot")<CR>
-  inoremap <buffer> <Plug>RPlot <Esc>:call RAction("plot")<CR>a
-else
-  noremap <buffer> <Leader>rg :call RAction("plot")<CR>
-  vnoremap <buffer> <Leader>rg <Esc>:call RAction("plot")<CR>
-  inoremap <buffer> <Leader>rg <Esc>:call RAction("plot")<CR>a
-endif
-
-" Plot and summary (cur)
-if hasmapto('<Plug>RSPlot')
-  noremap <buffer> <Plug>RSPlot :call RAction("plot&summary")<CR>
-  vnoremap <buffer> <Plug>RSPlot <Esc>:call RAction("plot&summary")<CR>
-  inoremap <buffer> <Plug>RSPlot <Esc>:call RAction("plot&summary")<CR>a
-else
-  noremap <buffer> <Leader>rb :call RAction("plot&summary")<CR>
-  vnoremap <buffer> <Leader>rb <Esc>:call RAction("plot&summary")<CR>
-  inoremap <buffer> <Leader>rb <Esc>:call RAction("plot&summary")<CR>a
-endif
-
-" ---------------------------
 " Set working directory
-if hasmapto('<Plug>RSetwd')
-  noremap <buffer> <Plug>RSetwd :call RSetWD()<CR>
-  vnoremap <buffer> <Plug>RSetwd <Esc>:call RSetWD()<CR>
-  inoremap <buffer> <Plug>RSetwd <Esc>:call RSetWD()<CR>a
-else
-  noremap <buffer> <Leader>rd :call RSetWD()<CR>
-  vnoremap <buffer> <Leader>rd <Esc>:call RSetWD()<CR>
-  inoremap <buffer> <Leader>rd <Esc>:call RSetWD()<CR>a
-endif
+"-------------------------------------
+call s:RCreateMaps("nvi", '<Plug>RSetwd',        'rd', ':call RSetWD()')
 
-" ---------------------------
 " Sweave (cur file)
-if &filetype == "rnoweb"
-  if hasmapto('<Plug>RSweave')
-    noremap <buffer> <Plug>RSweave :call RSweave()<CR>
-    vnoremap <buffer> <Plug>RSweave <Esc>:call RSweave()<CR>
-    inoremap <buffer> <Plug>RSweave <Esc>:call RSweave()<CR>a
-  else
-    noremap <buffer> \sw :call RSweave()<CR>
-    vnoremap <buffer> \sw <Esc>:call RSweave()<CR>
-    inoremap <buffer> \sw <Esc>:call RSweave()<CR>a
-  endif
-endif
+"-------------------------------------
+call s:RCreateMaps("nvi", '<Plug>RSweave',       'sw', ':call RSweave()')
+call s:RCreateMaps("nvi", '<Plug>RMakePDF',      'sp', ':call RMakePDF()')
 
-" Sweave and PDF (cur file)
-if &filetype == "rnoweb"
-  if hasmapto('<Plug>RMakePDF')
-    noremap <buffer> <Plug>RMakePDF :call RMakePDF()<CR>
-    vnoremap <buffer> <Plug>RMakePDF <Esc>:call RMakePDF()<CR>
-    inoremap <buffer> <Plug>RMakePDF <Esc>:call RMakePDF()<CR>a
-  else
-    noremap <buffer> \sp :call RMakePDF()<CR>
-    vnoremap <buffer> \sp <Esc>:call RMakePDF()<CR>
-    inoremap <buffer> \sp <Esc>:call RMakePDF()<CR>a
-  endif
-endif
-
-" ---------------------------
 " Build tags file for omni completion
-if hasmapto('<Plug>RBuildTags')
-  noremap <buffer> <Plug>RBuildTags :call BuildRTags()<CR>
-  vnoremap <buffer> <Plug>RBuildTags <Esc>:call BuildRTags()<CR>
-  inoremap <buffer> <Plug>RBuildTags <Esc>:call BuildRTags()<CR>i
-else
-  noremap <buffer> <Leader>ro :call BuildRTags()<CR>
-  vnoremap <buffer> <Leader>ro <Esc>:call BuildRTags()<CR>
-  inoremap <buffer> <Leader>ro <Esc>:call BuildRTags()<CR>i
-endif
+"-------------------------------------
+call s:RCreateMaps("nvi", '<Plug>RBuildTags',    'ro', ':call BuildRTags()')
 
-" Stop R
-"if hasmapto('<Plug>RStop')
-"  noremap <buffer> <Plug>RStop :call SendCmdToScreen('cat("not implemented yet\n")')<CR>
-"  vnoremap <buffer> <Plug>RStop <Esc>:call SendCmdToScreen('cat("not implemented yet\n")')<CR>
-"  inoremap <buffer> <Plug>RStop <Esc>:call SendCmdToScreen('cat("not implemented yet\n")')<CR>i
-"else
-"  noremap <buffer> <C-S-F4> :call SendCmdToScreen('cat("not implemented yet\n")')<CR>
-"  vnoremap <buffer> <C-S-F4> <Esc>:call SendCmdToScreen('cat("not implemented yet\n")')<CR>
-"  inoremap <buffer> <C-S-F4> <Esc>:call SendCmdToScreen('cat("not implemented yet\n")')<CR>i
-"endif
-
+function! s:RCreateMenuItem(type, label, plug, combo, target)
+  if a:type =~ '0'
+    let tg = a:target . '<CR>0'
+    let il = 'i'
+  else
+    let tg = a:target . '<CR>'
+    let il = 'a'
+  endif
+  if a:type =~ "n"
+    if hasmapto(a:plug, "n")
+      exec 'nmenu &R.' . a:label . ' ' . tg
+    else
+      exec 'nmenu &R.' . a:label . '<Tab>\\' . a:combo . ' ' . tg
+    endif
+  endif
+  if a:type =~ "v"
+    if hasmapto(a:plug, "v")
+      exec 'vmenu &R.' . a:label . ' ' . tg
+    else
+      exec 'vmenu &R.' . a:label . '<Tab>\\' . a:combo . ' ' . '<Esc>' . tg
+    endif
+  endif
+  if a:type =~ "i"
+    if hasmapto(a:plug, "i")
+      exec 'imenu &R.' . a:label . ' ' . tg . il
+    else
+      exec 'imenu &R.' . a:label . '<Tab>\\' . a:combo . ' ' . '<Esc>' . tg . il
+    endif
+  endif
+endfunction
 
 " Menu R
 function! MakeRMenu()
@@ -1024,314 +817,88 @@ function! MakeRMenu()
   "----------------------------------------------------------------------------
   " Start/Close
   "----------------------------------------------------------------------------
-  " Start R
-  if hasmapto('<Plug>RStart')
-    amenu &R.Start/Close.Start\ R\ (default) :call StartR("R")<CR>
-  else
-    amenu &R.Start/Close.Start\ R\ (default)<Tab>\\rf :call StartR("R")<CR>
-  endif
-
-  " Start R --vannila
-  if hasmapto('<Plug>RvanillaStart')
-    amenu R.Start/Close.Start\ R\ --vanilla :call StartR("vanilla")<CR>
-  else
-    amenu R.Start/Close.Start\ R\ --vanilla<Tab>\\rv :call StartR("Rvanilla")<CR>
-  endif
-
-  " Start R (custom)
-  if hasmapto('<Plug>RCustomStart')
-    amenu R.Start/Close.Start\ R\ (custom) :call StartR("custom")<CR>
-  else
-    amenu R.Start/Close.Start\ R\ (custom)<Tab>\\rc :call StartR("custom")<CR>
-  endif
-
+  call s:RCreateMenuItem("nvi", 'Start/Close.Start\ R\ (default)', '<Plug>RStart', 'rf', ':call StartR("R")')
+  call s:RCreateMenuItem("nvi", 'Start/Close.Start\ R\ --vanilla', '<Plug>RvanillaStart', 'rv', ':call StartR("vanilla")')
+  call s:RCreateMenuItem("nvi", 'Start/Close.Start\ R\ (custom)', '<Plug>RCustomStart', 'rc', ':call StartR("custom")')
   "-------------------------------
   menu R.Start/Close.-Sep1- <nul>
-
-  " Close R (no save)
-  if hasmapto('<Plug>RClose')
-    amenu R.Start/Close.Close\ R\ (no\ save) :call SendCmdToScreen('quit(save = "no")')<CR>
-  else
-    amenu R.Start/Close.Close\ R\ (no\ save)<Tab>\\rq :call SendCmdToScreen('quit(save = "no")')<CR>
-  endif
-
-  " Close R (save workspace)
-  if hasmapto('<Plug>RSaveClose')
-    amenu R.Start/Close.Close\ R\ (save\ workspace) :call SendCmdToScreen('quit(save = "yes")')<CR>
-  else
-    amenu R.Start/Close.Close\ R\ (save\ workspace)<Tab>\\rw :call SendCmdToScreen('quit(save = "yes")')<CR>
-  endif
+  call s:RCreateMenuItem("nvi", 'Start/Close.Close\ R\ (no\ save)', '<Plug>RClose', 'rq', ":call SendCmdToScreen('quit(save = \"no\")')")
+  call s:RCreateMenuItem("nvi", 'Start/Close.Close\ R\ (save\ workspace)', '<Plug>RSaveClose', 'rw', ":call SendCmdToScreen('quit(save = \"yes\")')")
 
   "----------------------------------------------------------------------------
   " Send
   "----------------------------------------------------------------------------
-  " File
-  if hasmapto('<Plug>RSendFile')
-    amenu R.Send.File :call SendFileToR("silent")<CR>
-  else
-    amenu R.Send.File<Tab>f5 :call SendFileToR("silent")<CR>
-  endif
-
-  " File (echo)
-  if hasmapto('<Plug>RESendFile')
-    amenu R.Send.File\ (echo) :call SendFileToR("echo")<CR>
-  else
-    amenu R.Send.File\ (echo)<Tab>F5 :call SendFileToR("echo")<CR>
-  endif
-
+  call s:RCreateMenuItem("nvi", 'Send.File', '<Plug>RSendFile', 'aa', ':call SendFileToR("silent")')
+  call s:RCreateMenuItem("nvi", 'Send.File\ (echo)', '<Plug>RESendFile', 'ae', ':call SendFileToR("echo")')
   "-------------------------------
   menu R.Send.-Sep1- <nul>
-
-  " Block (cur)
-  if hasmapto('<Plug>RSendMBlock')
-    amenu R.Send.Block\ (cur) :call SendMBlockToR("silent", "stay")<CR>
-  else
-    amenu R.Send.Block\ (cur)<Tab>f6 :call SendMBlockToR("silent", "stay")<CR>
-  endif
-
-  " Block (cur, echo)
-  if hasmapto('<Plug>RESendMBlock')
-    amenu R.Send.Block\ (cur,\ echo) :call SendMBlockToR("echo", "stay")<CR>
-  else
-    amenu R.Send.Block\ (cur,\ echo)<Tab>F6 :call SendMBlockToR("echo", "stay")<CR>
-  endif
-
-  " Block (cur, echo and down)
-  if hasmapto('<Plug>REDSendMBlock')
-    amenu R.Send.Block\ (cur,\ echo\ and\ down) :call SendMBlockToR("echo", "down")<CR>
-  else
-    amenu R.Send.Block\ (cur,\ echo\ and\ down)<Tab>^F6 :call SendMBlockToR("echo", "down")<CR>
-  endif
-  
+  call s:RCreateMenuItem("ni", 'Send.Block\ (cur)', '<Plug>RSendMBlock', 'bb', ':call SendMBlockToR("silent", "stay")')
+  call s:RCreateMenuItem("ni", 'Send.Block\ (cur,\ echo)', '<Plug>RESendMBlock', 'be', ':call SendMBlockToR("echo", "stay")')
+  call s:RCreateMenuItem("ni", 'Send.Block\ (cur,\ down)', '<Plug>RDSendMBlock', 'bd', ':call SendMBlockToR("silent", "down")')
+  call s:RCreateMenuItem("ni", 'Send.Block\ (cur,\ echo\ and\ down)', '<Plug>REDSendMBlock', 'ba', ':call SendMBlockToR("echo", "down")')
   "-------------------------------
   menu R.Send.-Sep2- <nul>
-
-  " Function (cur)
-  if hasmapto('<Plug>RSendFunction')
-    amenu R.Send.Function\ (cur) :call SendFunctionToR("stay")<CR>
-    imenu R.Send.Function\ (cur) <Esc> :call SendFunctionToR("stay")<CR>
-  else
-    amenu R.Send.Function\ (cur)<Tab>f7 :call SendFunctionToR("stay")<CR>
-    imenu R.Send.Function\ (cur)<Tab>f7 <Esc> :call SendFunctionToR("stay")<CR>
-  endif
-
-  " Function (cur and down)
-  if hasmapto('<Plug>RDSendFunction')
-    amenu R.Send.Function\ (cur\ and\ down) :call SendFunctionToR("down")<CR>
-    imenu R.Send.Function\ (cur\ and\ down) <Esc> :call SendFunctionToR("down")<CR>
-  else
-    amenu R.Send.Function\ (cur\ and\ down)<Tab>F7 :call SendFunctionToR("down")<CR>
-    imenu R.Send.Function\ (cur\ and\ down)<Tab>F7 <Esc> :call SendFunctionToR("down")<CR>
-  endif
-
+  call s:RCreateMenuItem("ni", 'Send.Function\ (cur)', '<Plug>RSendFunction', 'ff', ':call SendFunctionToR("silent", "stay")')
+  call s:RCreateMenuItem("ni", 'Send.Function\ (cur,\ echo)', '<Plug>RESendFunction', 'fe', ':call SendFunctionToR("echo", "stay")')
+  call s:RCreateMenuItem("ni", 'Send.Function\ (cur\ and\ down)', '<Plug>RDSendFunction', 'fd', ':call SendFunctionToR("silent", "down")')
+  call s:RCreateMenuItem("ni", 'Send.Function\ (cur,\ echo\ and\ down)', '<Plug>REDSendFunction', 'fa', ':call SendFunctionToR("echo", "down")')
   "-------------------------------
   menu R.Send.-Sep3- <nul>
-
-  " Selection
-  if hasmapto('<Plug>RSendSelection')
-    vmenu R.Send.Selection<Esc> :call SendSelectionToR("v", "silent", "stay")<CR>0
-  else
-    vmenu R.Send.Selection<Tab>f8 <Esc> :call SendSelectionToR("v", "silent", "stay")<CR>0
-  endif
-
-  " Selection (echo)
-  if hasmapto('<Plug>RESendSelection')
-    vmenu R.Send.Selection\ (echo)<Esc> :call SendSelectionToR("v", "echo", "stay")<CR>0
-  else
-    vmenu R.Send.Selection\ (echo)<Tab>F8 <Esc> :call SendSelectionToR("v", "echo", "stay")<CR>0
-  endif
-
-  " Selection (and down)
-  if hasmapto('<Plug>RDSendSelection')
-    vmenu R.Send.Selection\ (and\ down)<Esc> :call SendSelectionToR("v", "silent", "down")<CR>0
-  else
-    vmenu R.Send.Selection\ (and\ down)<Tab>f9 <Esc> :call SendSelectionToR("v", "silent", "down")<CR>0
-  endif
-
-  " Selection (echo and down)
-  if hasmapto('<Plug>REDSendSelection')
-    vmenu R.Send.Selection\ (echo\ and\ down) <Esc> :call SendSelectionToR("v", "echo", "down")<CR>0
-  else
-    vmenu R.Send.Selection\ (echo\ and\ down)<Tab>F9 <Esc> :call SendSelectionToR("v", "echo", "down")<CR>0
-  endif
-
+  call s:RCreateMenuItem("v0", 'Send.Selection', '<Plug>RSendSelection', 'ss', ':call SendSelectionToR("silent", "stay")')
+  call s:RCreateMenuItem("v0", 'Send.Selection\ (echo)', '<Plug>RESendSelection', 'se', ':call SendSelectionToR("echo", "stay")')
+  call s:RCreateMenuItem("v0", 'Send.Selection\ (and\ down)', '<Plug>RDSendSelection', 'sd', ':call SendSelectionToR("silent", "down")')
+  call s:RCreateMenuItem("v0", 'Send.Selection\ (echo\ and\ down)', '<Plug>REDSendSelection', 'sa', ':call SendSelectionToR("echo", "down")')
   "-------------------------------
   menu R.Send.-Sep4- <nul>
+  call s:RCreateMenuItem("ni", 'Send.Paragraph', '<Plug>RSendParagraph', 'pp', ':call SendParagraphToR("silent", "stay")')
+  call s:RCreateMenuItem("ni", 'Send.Paragraph\ (echo)', '<Plug>RESendParagraph', 'pe', ':call SendParagraphToR("echo", "stay")')
+  call s:RCreateMenuItem("ni", 'Send.Paragraph\ (and\ down)', '<Plug>RDSendParagraph', 'pd', ':call SendParagraphToR("silent", "down")')
+  call s:RCreateMenuItem("ni", 'Send.Paragraph\ (echo\ and\ down)', '<Plug>REDSendParagraph', 'pa', ':call SendParagraphToR("echo", "down")')
+  "-------------------------------
+  menu R.Send.-Sep5- <nul>
+  call s:RCreateMenuItem("ni0", 'Send.Line', '<Plug>RSendLine', 'l', ':call SendLineToR("stay")')
+  call s:RCreateMenuItem("ni0", 'Send.Line\ (and\ down)', '<Plug>RDSendLine', 'd', ':call SendLineToR("down")')
 
-  " Line
-  if hasmapto('<Plug>RSendLine')
-    amenu R.Send.Line :call SendLineToR("stay")<CR>0
-    imenu R.Send.Line <Esc> :call SendLineToR("stay")<CR>0a
-  else
-    amenu R.Send.Line<Tab>f8 :call SendLineToR("stay")<CR>0
-    imenu R.Send.Line<Tab>f8 <Esc> :call SendLineToR("stay")<CR>0a
-  endif
-
-  "Line (and down)
-  if hasmapto('<Plug>RDSendLine')
-    amenu R.Send.Line\ (and\ down) :call SendLineToR("down")<CR>0
-    imenu R.Send.Line\ (and\ down) <Esc> :call SendLineToR("down")<CR>0a
-  else
-    amenu R.Send.Line\ (and\ down)<Tab>f9 :call SendLineToR("down")<CR>0
-    imenu R.Send.Line\ (and\ down)<Tab>f9 <Esc> :call SendLineToR("down")<CR>0a
-  endif
-
-  " Line (and new one)
+  " We can't call RCreateMenuItem because of the 'o' command at the end of the map:
   if hasmapto('<Plug>RSendLAndOpenNewOne')
-    imenu R.Send.Line\ (and\ new\ one) <Esc> :call SendLineToR("stay")<CR>o
+    imenu R.Send.Line\ (and\ new\ one) <Plug>RSendLAndOpenNewOne <Esc>:call SendLineToR("stay")<CR>o
   else
-    imenu R.Send.Line\ (and\ new\ one)<Tab>\\q <Esc> :call SendLineToR("stay")<CR>o
+    imenu R.Send.Line\ (and\ new\ one)<Tab>\\q <Esc>:call SendLineToR("stay")<CR>o
   endif
 
   "----------------------------------------------------------------------------
   " Control
   "----------------------------------------------------------------------------
-  " List space
-  if hasmapto('<Plug>RListSpace')
-    amenu R.Control.List\ space :call SendCmdToScreen("ls()")<CR>
-  else
-    amenu R.Control.List\ space<Tab>\\rl :call SendCmdToScreen("ls()")<CR>
-  endif
-
-  " Clear console
-  if hasmapto('<Plug>RClearConsole')
-    amenu R.Control.Clear\ console\ screen :call SendCmdToScreen("")<CR>
-  else
-    amenu R.Control.Clear\ console\ screen<Tab>\\rr :call SendCmdToScreen("")<CR>
-  endif
-
-  " Clear all
-  if hasmapto('<Plug>RClearAll')
-    amenu R.Control.Clear\ all :call RClearAll()<CR>
-  else
-    amenu R.Control.Remove\ all<Tab>\\rm :call RClearAll()<CR>
-  endif
-
+  call s:RCreateMenuItem("nvi", 'Control.List\ space', '<Plug>RListSpace', 'rl', ':call SendCmdToScreen("ls()")')
+  call s:RCreateMenuItem("nvi", 'Control.Clear\ console\ screen', '<Plug>RClearConsole', 'rr', ':call SendCmdToScreen("")')
+  call s:RCreateMenuItem("nvi", 'Control.Clear\ all', '<Plug>RClearAll', 'rm', ':call RClearAll()')
   "-------------------------------
   menu R.Control.-Sep1- <nul>
-
-  " Object (print)
-  if hasmapto('<Plug>RObjectPr')
-    amenu R.Control.Object\ (print) :call RAction("print")<CR>
-  else
-    amenu R.Control.Object\ (print)<Tab>\\rp :call RAction("print")<CR>
-  endif
-
-  " Object (names)
-  if hasmapto('<Plug>RObjectNames')
-    amenu R.Control.Object\ (names) :call RAction("names")<CR>
-  else
-    amenu R.Control.Object\ (names)<Tab>\\rn :call RAction("names")<CR>
-  endif
-  
-  " Object (str)
-  if hasmapto('<Plug>RObjectStr')
-    amenu R.Control.Object\ (str) :call RAction("str")<CR>
-  else
-    amenu R.Control.Object\ (str)<Tab>\\rt :call RAction("str")<CR>
-  endif
-
+  call s:RCreateMenuItem("nvi", 'Control.Object\ (print)', '<Plug>RObjectPr', 'rp', ':call RAction("print")')
+  call s:RCreateMenuItem("nvi", 'Control.Object\ (names)', '<Plug>RObjectNames', 'rn', ':call RAction("names")')
+  call s:RCreateMenuItem("nvi", 'Control.Object\ (str)', '<Plug>RObjectStr', 'rt', ':call RAction("str")')
   "-------------------------------
   menu R.Control.-Sep2- <nul>
-
-  " Arguments (cur)
-  if hasmapto('<Plug>RShowArgs')
-    amenu R.Control.Arguments\ (cur) :call RAction("args")<CR>
-  else
-    amenu R.Control.Arguments\ (cur)<Tab>\\ra :call RAction("args")<CR>
-  endif
-
-  " Example (cur)
-  if hasmapto('<Plug>RShowEx')
-    amenu R.Control.Example\ (cur) :call RAction("example")<CR>
-  else
-    amenu R.Control.Example\ (cur)<Tab>\\re :call RAction("example")<CR>
-  endif
-
-  " Help (cur)
-  if hasmapto('<Plug>RHelp')
-    amenu R.Control.Help\ (cur) :call RAction("help")<CR>
-  else
-    amenu R.Control.Help\ (cur)<Tab>\\rh :call RAction("help")<CR>
-  endif
-
+  call s:RCreateMenuItem("nvi", 'Control.Arguments\ (cur)', '<Plug>RShowArgs', 'ra', ':call RAction("args")')
+  call s:RCreateMenuItem("nvi", 'Control.Example\ (cur)', '<Plug>RShowEx', 're', ':call RAction("example")')
+  call s:RCreateMenuItem("nvi", 'Control.Help\ (cur)', '<Plug>RHelp', 'rh', ':call RAction("help")')
   "-------------------------------
   menu R.Control.-Sep3- <nul>
-  
-  " Summary (cur)
-  if hasmapto('<Plug>RSummary')
-    amenu R.Control.Summary\ (cur) :call RAction("summary")<CR>
-  else
-    amenu R.Control.Summary\ (cur)<Tab>\\rs :call RAction("summary")<CR>
-  endif
-
-  " Plot (cur)
-  if hasmapto('<Plug>RPlot')
-    amenu R.Control.Plot\ (cur) :call RAction("plot")<CR>
-  else
-    amenu R.Control.Plot\ (cur)<Tab>\\rg :call RAction("plot")<CR>
-  endif
-
-  " Plot and summary (cur)
-  if hasmapto('<Plug>RSPlot')
-    amenu R.Control.Plot\ and\ summary\ (cur) :call RAction("plot&summary")<CR>
-  else
-    amenu R.Control.Plot\ and\ summary\ (cur)<Tab>\\rb :call RAction("plot&summary")<CR>
-  endif
-
+  call s:RCreateMenuItem("nvi", 'Control.Summary\ (cur)', '<Plug>RSummary', 'rs', ':call RAction("summary")')
+  call s:RCreateMenuItem("nvi", 'Control.Plot\ (cur)', '<Plug>RPlot', 'rg', ':call RAction("plot")')
+  call s:RCreateMenuItem("nvi", 'Control.Plot\ and\ summary\ (cur)', '<Plug>RSPlot', 'rb', ':call RAction("plot")<CR>:call RAction("summary")')
   "-------------------------------
   menu R.Control.-Sep4- <nul>
-
-  " Set working directory
-  if hasmapto('<Plug>RSetwd')
-    amenu R.Control.Set\ working\ directory\ (cur\ file\ path) <Esc>:call RSetWD()<CR>
-  else
-    amenu R.Control.Set\ working\ directory\ (cur\ file\ path)<Tab>\\rd <Esc>:call RSetWD()<CR>
-  endif
-
+  call s:RCreateMenuItem("nvi", 'Control.Set\ working\ directory\ (cur\ file\ path)', '<Plug>RSetwd', 'rd', ':call RSetWD()')
   "-------------------------------
-  if &filetype == "rnoweb"
-    menu R.Control.-Sep5- <nul>
-  endif  
-
-  " Sweave (cur file)
-  if &filetype == "rnoweb"
-    if hasmapto('<Plug>RSweave')
-      amenu R.Control.Sweave\ (cur\ file) :call RSweave()<CR>
-    else
-      amenu R.Control.Sweave\ (cur\ file)<Tab>\\sw :call RSweave()<CR>
-    endif
-  endif
-
-  " Sweave and PDF (cur file)
-  if &filetype == "rnoweb"
-    if hasmapto('<Plug>RMakePDF')
-      amenu R.Control.Sweave\ and\ PDF\ (cur\ file) :call RMakePDF()<CR>
-    else
-      amenu R.Control.Sweave\ and\ PDF\ (cur\ file)<Tab>\\sp :call RMakePDF()<CR>
-    endif
-  endif
-
+  menu R.Control.-Sep5- <nul>
+  call s:RCreateMenuItem("nvi", 'Control.Sweave\ (cur\ file)', '<Plug>RSweave', 'sw', ':call RSweave()')
+  call s:RCreateMenuItem("nvi", 'Control.Sweave\ and\ PDF\ (cur\ file)', '<Plug>RMakePDF', 'sp', ':call RMakePDF()')
   "-------------------------------
   menu R.Control.-Sep6- <nul>
-
-  " Rebuild list of objects
-  if hasmapto('<Plug>RBuildTags')
-    amenu R.Control.Rebuild\ list\ of\ objects :call BuildRTags()<CR>
-  else
-    amenu R.Control.Rebuild\ list\ of\ objects<Tab>\\ro :call BuildRTags()<CR>
-  endif
-
-  " Stop (process)
-"  if hasmapto('<Plug>RStop')
-"    amenu R.Control.Stop\ (process) :call SendCmdToScreen('cat("not implemented yet\n")')<CR>
-"  else
-"    amenu R.Control.Stop\ (process)<Tab><C-S-F4> :call SendCmdToScreen('cat("not implemented yet\n")')<CR>
-"  endif
-
+  call s:RCreateMenuItem("nvi", 'Control.Rebuild\ list\ of\ objects', '<Plug>RBuildTags', 'ro', ':call BuildRTags()')
   "-------------------------------
   menu R.-Sep7- <nul>
-  
   "----------------------------------------------------------------------------
   " About
   "----------------------------------------------------------------------------
@@ -1346,26 +913,27 @@ function! MakeRMenu()
   "---------------------------
   amenu icon=r-send-file ToolBar.RSendFile :call SendFileToR("echo")<CR>
   amenu icon=r-send-block ToolBar.RSendBlock :call SendMBlockToR("echo", "down")<CR>
-  amenu icon=r-send-function ToolBar.RSendFunction :call SendFunctionToR("down")<CR>
-  vmenu icon=r-send-selection ToolBar.RSendSelection <ESC> :call SendSelectionToR("v", "echo", "down")<CR>
+  amenu icon=r-send-function ToolBar.RSendFunction :call SendFunctionToR("echo", "down")<CR>
+  vmenu icon=r-send-selection ToolBar.RSendSelection <ESC>:call SendSelectionToR("echo", "down")<CR>
+  amenu icon=r-send-paragraph ToolBar.RSendParagraph <ESC>:call SendParagraphToR("echo", "down")<CR>
   amenu icon=r-send-line ToolBar.RSendLine :call SendLineToR("down")<CR>
   "---------------------------
   amenu icon=r-control-listspace ToolBar.RListSpace :call SendCmdToScreen("ls()")<CR>
   amenu icon=r-control-clear ToolBar.RClear :call SendCmdToScreen("")<CR>
   amenu icon=r-control-clearall ToolBar.RClearAll :call RClearAll()<CR>
 
-  "Hints
-  tmenu ToolBar.RStart Start R
+  " Hints
+  tmenu ToolBar.RStart Start R (default)
   tmenu ToolBar.RClose Close R (no save)
   tmenu ToolBar.RSendFile Send file (echo)
-  tmenu ToolBar.RSendBlock Send current block and go down (echo)
-  tmenu ToolBar.RSendFunction Send current function and go down
-  tmenu ToolBar.RSendSelection Send selection and go down (echo)
-  tmenu ToolBar.RSendLine Send current line and go down
+  tmenu ToolBar.RSendBlock Send block (cur, echo and down)
+  tmenu ToolBar.RSendFunction Send function (cur, echo and down)
+  tmenu ToolBar.RSendSelection Send selection (cur, echo and down)
+  tmenu ToolBar.RSendParagraph Send paragraph (cur, echo and down)
+  tmenu ToolBar.RSendLine Send line (cur and down)
   tmenu ToolBar.RListSpace List objects
   tmenu ToolBar.RClear Clear the console screen
   tmenu ToolBar.RClearAll Remove objects from workspace and clear the console screen
-
   let b:hasrmenu = 1
 endfunction
 
@@ -1386,18 +954,51 @@ function! UnMakeRMenu()
   aunmenu ToolBar.RListSpace
   aunmenu ToolBar.RSendLine
   aunmenu ToolBar.RSendSelection
+  aunmenu ToolBar.RSendParagraph
   aunmenu ToolBar.RSendFunction
   aunmenu ToolBar.RSendBlock
   aunmenu ToolBar.RSendFile
   aunmenu ToolBar.RClose
   aunmenu ToolBar.RStart
-
   let b:hasrmenu = 0
 endfunction
+
+" Activate the menu and toolbar buttons if the user sets the file type as 'r':
+call MakeRMenu()
 
 augroup VimRPlugin
   au BufEnter * if (&filetype == "r" || &filetype == "rnoweb" || &filetype == "rhelp") | call MakeRMenu() | endif
   au BufLeave * if (&filetype == "r" || &filetype == "rnoweb" || &filetype == "rhelp") | call UnMakeRMenu() | endif
   au VimLeave * if (&filetype == "r" || &filetype == "rnoweb" || &filetype == "rhelp") | call DeleteScreenRC() | endif
+  au FileType * if (&filetype == "r" || &filetype == "rnoweb" || &filetype == "rhelp") | call MakeRMenu() | endif
 augroup END
 
+"==========================================================================
+" CHANGELOG FOR DEVELOPERS
+"==========================================================================
+"
+" CHANGES SINCE 091004 (2009 OCT 04)
+"-----------------------------------
+" * RAction() now receives the name of the function to call. The quotes were
+"   eliminated since they were not strictly necessary and, now, the user can
+"   create key bindings to call any R function.
+" 
+" * Replaced <Leader> with <LocalLeader> because Vim documentation recommends
+"   the use of LocalLeader in file type plugins.
+" 
+" * Removed argument "t" from SendSelectionToR() because it was no longer used.
+" 
+" * Rnoweb related key bindings activated by default to allow the use of the
+"   plugin as a global plugin (through the creation of a symbolic link to
+"   ftplugin/r.vim in the plugin directory).
+"
+" * Syntax highlight: recognition of special characters inside character
+"   strings.
+"
+" * Integration with screen.vim
+"
+" * New function: RCreateMaps()
+"
+" * Changes in key binding for Send functions.
+"
+" * New function RCreateMenuItem()

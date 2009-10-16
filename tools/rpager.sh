@@ -10,4 +10,5 @@ then
 else
   xterm -T "$XTT - R Help" -e less $RHELPFILE &
   #gnome-terminal -t "$XTT - R Help" -x less $RHELPFILE &
+  #konsole --new-tab -p tabtitle="R Help - $XTT" -e less $RHELPFILE &
 fi
