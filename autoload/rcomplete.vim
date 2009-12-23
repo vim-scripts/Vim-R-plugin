@@ -15,11 +15,14 @@ fun! rcomplete#CompleteR(findstart, base)
     return start
   else
     if b:needsnewtags == 1
-      call BuildRTags()
+      call BuildRTags("GlobalEnv")
     endif
     let res = []
-    let flines = readfile(b:rtagsfile)
-    let flen = len(flines)
+    if strlen(a:base) == 0
+      return res
+    endif
+    let flines2 = readfile(b:rtagsfile)
+    let flines = b:flines1 + flines2
     " The char '$' at the end of 'a:base' is treated as end of line, and
     " the pattern is never found in 'line'.
     let newbase = '^' . substitute(a:base, "\\$$", "", "")
@@ -29,8 +32,10 @@ fun! rcomplete#CompleteR(findstart, base)
         if a:base !~ '\$' && line =~ '\$'
           continue
         endif
-	let tmp1 = split(line)
-	let tmp2 = {'word': tmp1[0], 'menu': tmp1[1] . ' ' . tmp1[2]}
+	"let tmp1 = split(line)
+	"let tmp2 = {'word': tmp1[0], 'menu': tmp1[1] . ' ' . tmp1[2]}
+	let tmp1 = split(line,':')
+	let tmp2 = {'word': tmp1[0], 'menu': tmp1[1] . ' ' . tmp1[2], 'info': tmp1[3]}
 	call add(res, tmp2)
       endif
     endfor

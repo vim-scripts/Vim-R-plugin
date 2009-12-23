@@ -1,0 +1,2537 @@
+acf:function:stats:x, lag.max=character(0), type=c("c", "correlation", "covariance", "partial"), plot=TRUE, na.action=na.fail, demean=TRUE, ...
+acf2AR:function:stats:acf
+add1:function:stats:Generic Method
+addmargins:function:stats:A, margin=c("seq_along", "dim(A)"), FUN=sum, quiet=FALSE
+add.scope:function:stats:terms1, terms2
+aggregate:function:stats:x, ...
+aggregate.data.frame:function:stats:x, by, FUN, ...
+aggregate.default:function:stats:x, ...
+aggregate.ts:function:stats:x, nfrequency=1, FUN=sum, ndeltat=1, ts.eps=c("getOption", "ts.eps"), ...
+AIC:function:stats:Generic Method
+alias:function:stats:object, ...
+anova:function:stats:Generic Method
+anova.glm:function:stats:object, ..., dispersion=character(0), test=character(0)
+anova.glmlist:function:stats:object, ..., dispersion=character(0), test=character(0)
+anovalist.lm:function:stats:object, ..., test=character(0)
+anova.lm:function:stats:object, ...
+anova.lmlist:function:stats:object, ..., scale=0, test="F"
+anova.mlm:function:stats:object, ..., test=c("c", "Pillai", "Wilks", "Hotelling-Lawley", "Roy", "Spherical"), Sigma=c("diag", "p"), T=c("Thin.row", "proj(M) - proj(X)"), M=c("diag", "p"), X=c("~", "0"), idata=c("data.frame", "seq_len(p)"), tol=1e-07
+ansari.test:function:stats:x, ...
+aov:function:stats:formula, data=character(0), projections=FALSE, qr=TRUE, contrasts=character(0), ...
+approx:function:stats:x, y=character(0), xout, method="linear", n=50, yleft, yright, rule=1, f=0, ties=mean
+approxfun:function:stats:x, y=character(0), method="linear", yleft, yright, rule=1, f=0, ties=mean
+ar:function:stats:x, aic=TRUE, order.max=character(0), method=c("c", "yule-walker", "burg", "ols", "mle", "yw"), na.action=na.fail, series=c("deparse", "substitute(x)"), ...
+ar.burg:function:stats:x, ...
+arima:function:stats:x, order=c("c", "0", "0", "0"), seasonal=c("list", "c(0, 0, 0)", "NA"), xreg=character(0), include.mean=TRUE, transform.pars=TRUE, fixed=character(0), init=character(0), method=c("c", "CSS-ML", "ML", "CSS"), n.cond, optim.method="BFGS", optim.control=list, kappa=1e+06
+arima0:function:stats:x, order=c("c", "0", "0", "0"), seasonal=c("list", "c(0, 0, 0)", "NA"), xreg=character(0), include.mean=TRUE, delta=0,01, transform.pars=TRUE, fixed=character(0), init=character(0), method=c("c", "ML", "CSS"), n.cond, optim.control=list
+arima0.diag:function:stats:...
+arima.sim:function:stats:model, n, rand.gen=rnorm, innov=c("rand.gen", "n", "..."), n.start=NA, start.innov=c("rand.gen", "n.start", "..."), ...
+ARMAacf:function:stats:ar=c("numeric", "0"), ma=c("numeric", "0"), lag.max=r, pacf=FALSE
+ARMAtoMA:function:stats:ar=c("numeric", "0"), ma=c("numeric", "0"), lag.max
+ar.mle:function:stats:x, aic=TRUE, order.max=character(0), na.action=na.fail, demean=TRUE, series=character(0), ...
+ar.ols:function:stats:x, aic=TRUE, order.max=character(0), na.action=na.fail, demean=TRUE, intercept=demean, series=character(0), ...
+ar.yw:function:stats:x, ...
+as.dendrogram:function:stats:object, ...
+as.dist:function:stats:m, diag=FALSE, upper=FALSE
+as.formula:function:stats:object, env=parent.frame
+as.hclust:function:stats:x, ...
+asOneSidedFormula:function:stats:object
+as.stepfun:function:stats:x, ...
+as.ts:function:stats:x, ...
+ave:function:stats:x, ..., FUN=mean
+bandwidth.kernel:function:stats:k
+bartlett.test:function:stats:x, ...
+binomial:function:stats:link="logit"
+binom.test:function:stats:x, n, p=0,5, alternative=c("c", "two.sided", "less", "greater"), conf.level=0,95
+biplot:function:stats:Generic Method
+Box.test:function:stats:x, lag=1, type=c("c", "Box-Pierce", "Ljung-Box"), fitdf=0
+bw.bcv:function:stats:x, nb=1000, lower=c("*", "0.1", "hmax"), upper=hmax, tol=c("*", "0.1", "lower")
+bw.nrd:function:stats:x
+bw.nrd0:function:stats:x
+bw.SJ:function:stats:x, nb=1000, lower=c("*", "0.1", "hmax"), upper=hmax, method=c("c", "ste", "dpi"), tol=c("*", "0.1", "lower")
+bw.ucv:function:stats:x, nb=1000, lower=c("*", "0.1", "hmax"), upper=hmax, tol=c("*", "0.1", "lower")
+C:function:stats:object, contr, how.many, ...
+cancor:function:stats:x, y, xcenter=TRUE, ycenter=TRUE
+case.names:function:stats:object, ...
+ccf:function:stats:x, y, lag.max=character(0), type=c("c", "correlation", "covariance"), plot=TRUE, na.action=na.fail, ...
+chisq.test:function:stats:x, y=character(0), correct=TRUE, p=c("rep", "1/length(x)", "length(x)"), rescale.p=FALSE, simulate.p.value=FALSE, B=2000
+clearNames:function:stats:object
+cmdscale:function:stats:d, k=2, eig=FALSE, add=FALSE, x.ret=FALSE
+coef:function:stats:Generic Method
+coefficients:function:stats:object, ...
+complete.cases:function:stats:...
+confint:function:stats:Generic Method
+confint.default:function:stats:object, parm, level=0,95, ...
+constrOptim:function:stats:theta, f, grad, ui, ci, mu=1e-04, control=list, method=c("if", "is.null(grad)", "Nelder-Mead", "BFGS"), outer.iterations=100, outer.eps=1e-05, ...
+contrasts:function:stats:x, contrasts=TRUE, sparse=FALSE
+contrasts<-:unknowClass:stats:x, how.many, value
+contr.helmert:function:stats:n, contrasts=TRUE, sparse=FALSE
+contr.poly:function:stats:n, scores=c(":", "1", "n"), contrasts=TRUE, sparse=FALSE
+contr.SAS:function:stats:n, contrasts=TRUE, sparse=FALSE
+contr.sum:function:stats:n, contrasts=TRUE, sparse=FALSE
+contr.treatment:function:stats:n, base=1, contrasts=TRUE, sparse=FALSE
+convolve:function:stats:x, y, conj=TRUE, type=c("c", "circular", "open", "filter")
+cooks.distance:function:stats:model, ...
+cophenetic:function:stats:x
+cor:function:stats:x, y=character(0), use="everything", method=c("c", "pearson", "kendall", "spearman")
+cor.test:function:stats:x, ...
+cov:function:stats:x, y=character(0), use="everything", method=c("c", "pearson", "kendall", "spearman")
+cov2cor:function:stats:V
+covratio:function:stats:model, infl=c("lm.influence", "model", "FALSE"), res=c("weighted.residuals", "model")
+cov.wt:function:stats:x, wt=c("rep", "1/nrow(x)", "nrow(x)"), cor=FALSE, center=TRUE, method=c("c", "unbiased", "ML")
+cpgram:function:stats:ts, taper=0,1, main=c("paste", "Series: ", "deparse(substitute(ts))"), ci.col="blue"
+cutree:function:stats:tree, k=character(0), h=character(0)
+cycle:function:stats:x, ...
+D:function:stats:expr, name
+dbeta:function:stats:x, shape1, shape2, ncp=0, log=FALSE
+dbinom:function:stats:x, size, prob, log=FALSE
+dcauchy:function:stats:x, location=0, scale=1, log=FALSE
+dchisq:function:stats:x, df, ncp=0, log=FALSE
+decompose:function:stats:x, type=c("c", "additive", "multiplicative"), filter=character(0)
+delete.response:function:stats:termobj
+deltat:function:stats:x, ...
+dendrapply:function:stats:X, FUN, ...
+density:function:stats:x, ...
+density.default:function:stats:x, bw="nrd0", adjust=1, kernel=c("c", "gaussian", "epanechnikov", "rectangular", "triangular", "biweight", "cosine", "optcosine"), weights=character(0), window=kernel, width, give.Rkern=FALSE, n=512, from, to, cut=3, na.rm=FALSE, ...
+deriv:function:stats:expr, ...
+deriv3:function:stats:expr, ...
+deriv3.default:function:stats:expr, namevec, function.arg=character(0), tag=".expr", hessian=TRUE, ...
+deriv3.formula:function:stats:expr, namevec, function.arg=character(0), tag=".expr", hessian=TRUE, ...
+deriv.default:function:stats:expr, namevec, function.arg=character(0), tag=".expr", hessian=FALSE, ...
+deriv.formula:function:stats:expr, namevec, function.arg=character(0), tag=".expr", hessian=FALSE, ...
+deviance:function:stats:Generic Method
+dexp:function:stats:x, rate=1, log=FALSE
+df:function:stats:x, df1, df2, ncp, log=FALSE
+dfbeta:function:stats:model, ...
+dfbetas:function:stats:model, ...
+dffits:function:stats:model, infl=c("lm.influence", "model", "FALSE"), res=c("weighted.residuals", "model")
+df.kernel:function:stats:k
+df.residual:function:stats:Generic Method
+dgamma:function:stats:x, shape, rate=1, scale=c("/", "1", "rate"), log=FALSE
+dgeom:function:stats:x, prob, log=FALSE
+dhyper:function:stats:x, m, n, k, log=FALSE
+diffinv:function:stats:x, ...
+diff.ts:function:stats:x, lag=1, differences=1, ...
+dist:function:stats:x, method="euclidean", diag=FALSE, upper=FALSE, p=2
+dlnorm:function:stats:x, meanlog=0, sdlog=1, log=FALSE
+dlogis:function:stats:x, location=0, scale=1, log=FALSE
+dmultinom:function:stats:x, size=character(0), prob, log=FALSE
+dnbinom:function:stats:x, size, prob, mu, log=FALSE
+dnorm:function:stats:x, mean=0, sd=1, log=FALSE
+dpois:function:stats:x, lambda, log=FALSE
+drop1:function:stats:Generic Method
+drop.scope:function:stats:terms1, terms2
+drop.terms:function:stats:termobj, dropx=character(0), keep.response=FALSE
+dsignrank:function:stats:x, n, log=FALSE
+dt:function:stats:x, df, ncp, log=FALSE
+dummy.coef:function:stats:object, ...
+dunif:function:stats:x, min=0, max=1, log=FALSE
+dweibull:function:stats:x, shape, scale=1, log=FALSE
+dwilcox:function:stats:x, m, n, log=FALSE
+ecdf:function:stats:x
+eff.aovlist:function:stats:aovlist
+effects:function:stats:object, ...
+embed:function:stats:x, dimension=1
+end:function:stats:x, ...
+estVar:function:stats:object, ...
+expand.model.frame:function:stats:model, extras, envir=c("environment", "formula(model)"), na.expand=FALSE
+extractAIC:function:stats:Generic Method
+factanal:function:stats:x, factors, data=character(0), covmat=character(0), n.obs=NA, subset, na.action, start=character(0), scores=c("c", "none", "regression", "Bartlett"), rotation="varimax", control=character(0), ...
+factor.scope:function:stats:factor, scope
+family:function:stats:object, ...
+fft:function:stats:z, inverse=FALSE
+filter:function:stats:x, filter, method=c("c", "convolution", "recursive"), sides=2, circular=FALSE, init=character(0)
+fisher.test:function:stats:x, y=character(0), workspace=2e+05, hybrid=FALSE, control=list, or=1, alternative="two.sided", conf.int=TRUE, conf.level=0,95, simulate.p.value=FALSE, B=2000
+fitted:function:stats:Generic Method
+fitted.values:function:stats:object, ...
+fivenum:function:stats:x, na.rm=TRUE
+fligner.test:function:stats:x, ...
+formula:function:stats:Generic Method
+frequency:function:stats:x, ...
+friedman.test:function:stats:y, ...
+ftable:function:stats:x, ...
+Gamma:function:stats:link="inverse"
+gaussian:function:stats:link="identity"
+get_all_vars:unknowClass:stats:formula, data=character(0), ...
+getInitial:function:stats:object, data, ...
+glm:function:stats:formula, family=gaussian, data, weights, subset, na.action, start=character(0), etastart, mustart, offset, control=c("glm.control", "..."), model=TRUE, method="glm.fit", x=FALSE, y=TRUE, contrasts=character(0), ...
+glm.control:function:stats:epsilon=1e-08, maxit=25, trace=FALSE
+glm.fit:function:stats:x, y, weights=c("rep", "1", "nobs"), start=character(0), etastart=character(0), mustart=character(0), offset=c("rep", "0", "nobs"), family=gaussian, control=glm.control, intercept=TRUE
+glm.fit.null:function:stats:x, y, weights, start=character(0), etastart=character(0), mustart=character(0), offset, family=gaussian, control=glm.control, intercept=FALSE
+hasTsp:function:stats:x
+hat:function:stats:x, intercept=TRUE
+hatvalues:function:stats:model, ...
+hatvalues.lm:function:stats:model, infl=c("lm.influence", "model", "FALSE"), ...
+hclust:function:stats:d, method="complete", members=character(0)
+heatmap:function:stats:x, Rowv=character(0), Colv=c("if", "symm", "Rowv", "NULL"), distfun=dist, hclustfun=hclust, reorderfun=c("function", "list(d = , w = )", "reorder(d, w)", "NULL"), add.expr, symm=FALSE, revC=c("identical", "Colv", "Rowv"), scale=c("c", "row", "column", "none"), na.rm=TRUE, margins=c("c", "5", "5"), ColSideColors, RowSideColors, cexRow=c("+", "0.2", "1/log10(nr)"), cexCol=c("+", "0.2", "1/log10(nc)"), labRow=character(0), labCol=character(0), main=character(0), xlab=character(0), ylab=character(0), keep.dendro=FALSE, verbose=c("getOption", "verbose"), ...
+HoltWinters:function:stats:x, alpha=character(0), beta=character(0), gamma=character(0), seasonal=c("c", "additive", "multiplicative"), start.periods=2, l.start=character(0), b.start=character(0), s.start=character(0), optim.start=c("c", "0.3", "0.1", "0.1"), optim.control=list
+influence:function:stats:model, ...
+influence.measures:function:stats:model
+integrate:function:stats:f, lower, upper, ..., subdivisions=100, rel.tol=c("^", ".Machine$double.eps", "0.25"), abs.tol=rel.tol, stop.on.error=TRUE, keep.xy=FALSE, aux=character(0)
+interaction.plot:function:stats:x.factor, trace.factor, response, fun=mean, type=c("c", "l", "p", "b"), legend=TRUE, trace.label=c("deparse", "substitute(trace.factor)"), fixed=FALSE, xlab=c("deparse", "substitute(x.factor)"), ylab=ylabel, ylim=c("range", "cells", "TRUE"), lty=c(":", "nc", "1"), col=1, pch=c("c", "1:9", "0", "letters"), xpd=character(0), leg.bg=c("par", "bg"), leg.bty="n", xtick=FALSE, xaxt=c("par", "xaxt"), axes=TRUE, ...
+inverse.gaussian:function:stats:link="1/mu^2"
+IQR:function:stats:x, na.rm=FALSE
+is.empty.model:function:stats:x
+is.leaf:function:stats:object
+is.mts:function:stats:x
+isoreg:function:stats:x, y=character(0)
+is.stepfun:function:stats:x
+is.ts:function:stats:x
+is.tskernel:function:stats:k
+KalmanForecast:function:stats:n.ahead=10, mod, fast=TRUE
+KalmanLike:function:stats:y, mod, nit=0, fast=TRUE
+KalmanRun:function:stats:y, mod, nit=0, fast=TRUE
+KalmanSmooth:function:stats:y, mod, nit=0
+kernapply:function:stats:x, ...
+kernel:function:stats:coef, m=c("+", "length(coef)", "1"), r, name="unknown"
+kmeans:function:stats:x, centers, iter.max=10, nstart=1, algorithm=c("c", "Hartigan-Wong", "Lloyd", "Forgy", "MacQueen")
+knots:function:stats:Fn, ...
+kruskal.test:function:stats:x, ...
+ksmooth:function:stats:x, y, kernel=c("c", "box", "normal"), bandwidth=0,5, range.x=c("range", "x"), n.points=c("max", "100", "length(x)"), x.points
+ks.test:function:stats:x, y, ..., alternative=c("c", "two.sided", "less", "greater"), exact=character(0)
+lag:function:stats:x, ...
+lag.plot:function:stats:x, lags=1, layout=character(0), set.lags=c(":", "1", "lags"), main=character(0), asp=1, diag=TRUE, diag.col="gray", type="p", oma=character(0), ask=character(0), do.lines=c("(", "n <= 150"), labels=do.lines, ...
+line:function:stats:x, y=character(0)
+lines.ts:function:stats:x, ...
+lm:function:stats:formula, data, subset, weights, na.action, method="qr", model=TRUE, x=FALSE, y=FALSE, qr=TRUE, singular.ok=TRUE, contrasts=character(0), offset, ...
+lm.fit:function:stats:x, y, offset=character(0), method="qr", tol=1e-07, singular.ok=TRUE, ...
+lm.fit.null:function:stats:x, y, method="qr", tol=1e-07, ...
+lm.influence:function:stats:model, do.coef=TRUE
+lm.wfit:function:stats:x, y, w, offset=character(0), method="qr", tol=1e-07, singular.ok=TRUE, ...
+lm.wfit.null:function:stats:x, y, w, method="qr", tol=1e-07, ...
+loadings:function:stats:x
+loess:function:stats:formula, data, weights, subset, na.action, model=FALSE, span=0,75, enp.target, degree=2, parametric=FALSE, drop.square=FALSE, normalize=TRUE, family=c("c", "gaussian", "symmetric"), method=c("c", "loess", "model.frame"), control=c("loess.control", "..."), ...
+loess.control:function:stats:surface=c("c", "interpolate", "direct"), statistics=c("c", "approximate", "exact"), trace.hat=c("c", "exact", "approximate"), cell=0,2, iterations=4, ...
+loess.smooth:function:stats:x, y, span=c("/", "2", "3"), degree=1, family=c("c", "symmetric", "gaussian"), evaluation=50, ...
+logLik:function:stats:Generic Method
+loglin:function:stats:table, margin, start=c("rep", "1", "length(table)"), fit=FALSE, eps=0,1, iter=20, param=FALSE, print=TRUE
+lowess:function:stats:x, y=character(0), f=c("/", "2", "3"), iter=3, delta=c("*", "0.01", "diff(range(xy$x[o]))")
+ls.diag:function:stats:ls.out
+lsfit:function:stats:x, y, wt=character(0), intercept=TRUE, tolerance=1e-07, yname=character(0)
+ls.print:function:stats:ls.out, digits=4, print.it=TRUE
+mad:function:stats:x, center=c("median", "x"), constant=1,4826, na.rm=FALSE, low=FALSE, high=FALSE
+mahalanobis:function:stats:x, center, cov, inverted=FALSE, ...
+makeARIMA:function:stats:phi, theta, Delta, kappa=1e+06
+make.link:function:stats:link
+makepredictcall:function:stats:var, call
+manova:function:stats:...
+mantelhaen.test:function:stats:x, y=character(0), z=character(0), alternative=c("c", "two.sided", "less", "greater"), correct=TRUE, exact=FALSE, conf.level=0,95
+mauchley.test:function:stats:...
+mauchly.test:function:stats:object, ...
+mcnemar.test:function:stats:x, y=character(0), correct=TRUE
+median:function:stats:x, na.rm=FALSE
+median.default:function:stats:x, na.rm=FALSE
+medpolish:function:stats:x, eps=0,01, maxiter=10, trace.iter=TRUE, na.rm=FALSE
+model.extract:function:stats:frame, component
+model.frame:function:stats:Generic Method
+model.frame.aovlist:function:stats:formula, data=character(0), ...
+model.frame.default:function:stats:formula, data=character(0), subset=character(0), na.action=na.fail, drop.unused.levels=FALSE, xlev=character(0), ...
+model.frame.glm:function:stats:formula, ...
+model.frame.lm:function:stats:formula, ...
+model.matrix:function:stats:Generic Method
+model.matrix.default:function:stats:object, data=c("environment", "object"), contrasts.arg=character(0), xlev=character(0), ...
+model.matrix.lm:function:stats:object, ...
+model.offset:function:stats:x
+model.response:function:stats:data, type="any"
+model.tables:function:stats:x, ...
+model.weights:function:stats:x
+monthplot:function:stats:x, ...
+mood.test:function:stats:x, ...
+mvfft:function:stats:z, inverse=FALSE
+na.action:function:stats:object, ...
+na.contiguous:function:stats:object, ...
+na.exclude:function:stats:object, ...
+na.fail:function:stats:object, ...
+na.omit:function:stats:object, ...
+na.pass:function:stats:object, ...
+napredict:function:stats:omit, x, ...
+naprint:function:stats:x, ...
+naresid:function:stats:omit, x, ...
+nextn:function:stats:n, factors=c("c", "2", "3", "5")
+nlm:function:stats:f, p, ..., hessian=FALSE, typsize=c("rep", "1", "length(p)"), fscale=1, print.level=0, ndigit=12, gradtol=1e-06, stepmax=c("max", "1000 * sqrt(sum((p/typsize)^2))", "1000"), steptol=1e-06, iterlim=100, check.analyticals=TRUE
+nlminb:function:stats:start, objective, gradient=character(0), hessian=character(0), ..., scale=1, control=list, lower=c("-", "Inf"), upper=Inf
+nls:function:stats:formula, data=parent.frame, start, control=nls.control, algorithm=c("c", "default", "plinear", "port"), trace=FALSE, subset, weights, na.action, model=FALSE, lower=c("-", "Inf"), upper=Inf, ...
+nls.control:function:stats:maxiter=50, tol=1e-05, minFactor=c("/", "1", "1024"), printEval=FALSE, warnOnly=FALSE
+NLSstAsymptotic:function:stats:xy
+NLSstClosestX:function:stats:xy, yval
+NLSstLfAsymptote:function:stats:xy
+NLSstRtAsymptote:function:stats:xy
+numericDeriv:function:stats:expr, theta, rho=parent.frame, dir=1
+offset:function:stats:object
+oneway.test:function:stats:formula, data, subset, na.action, var.equal=FALSE
+optim:function:stats:par, fn, gr=character(0), ..., method=c("c", "Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN"), lower=c("-", "Inf"), upper=Inf, control=list, hessian=FALSE
+optimise:function:stats:f, interval, ..., lower=c("min", "interval"), upper=c("max", "interval"), maximum=FALSE, tol=c("^", ".Machine$double.eps", "0.25")
+optimize:function:stats:f, interval, ..., lower=c("min", "interval"), upper=c("max", "interval"), maximum=FALSE, tol=c("^", ".Machine$double.eps", "0.25")
+order.dendrogram:function:stats:x
+pacf:function:stats:x, lag.max, plot, na.action, ...
+p.adjust:function:stats:p, method=p.adjust.methods, n=c("length", "p")
+p.adjust.methods:character:stats:Not a function
+pairwise.prop.test:function:stats:x, n, p.adjust.method=p.adjust.methods, ...
+pairwise.table:function:stats:compare.levels, level.names, p.adjust.method
+pairwise.t.test:function:stats:x, g, p.adjust.method=p.adjust.methods, pool.sd=c("!", "paired"), paired=FALSE, alternative=c("c", "two.sided", "less", "greater"), ...
+pairwise.wilcox.test:function:stats:x, g, p.adjust.method=p.adjust.methods, paired=FALSE, ...
+pbeta:function:stats:q, shape1, shape2, ncp=0, lower.tail=TRUE, log.p=FALSE
+pbinom:function:stats:q, size, prob, lower.tail=TRUE, log.p=FALSE
+pbirthday:function:stats:n, classes=365, coincident=2
+pcauchy:function:stats:q, location=0, scale=1, lower.tail=TRUE, log.p=FALSE
+pchisq:function:stats:q, df, ncp=0, lower.tail=TRUE, log.p=FALSE
+pexp:function:stats:q, rate=1, lower.tail=TRUE, log.p=FALSE
+pf:function:stats:q, df1, df2, ncp, lower.tail=TRUE, log.p=FALSE
+pgamma:function:stats:q, shape, rate=1, scale=c("/", "1", "rate"), lower.tail=TRUE, log.p=FALSE
+pgeom:function:stats:q, prob, lower.tail=TRUE, log.p=FALSE
+phyper:function:stats:q, m, n, k, lower.tail=TRUE, log.p=FALSE
+plclust:function:stats:tree, hang=0,1, unit=FALSE, level=FALSE, hmin=0, square=TRUE, labels=character(0), plot.=TRUE, axes=TRUE, frame.plot=FALSE, ann=TRUE, main="", sub=character(0), xlab=character(0), ylab="Height"
+plnorm:function:stats:q, meanlog=0, sdlog=1, lower.tail=TRUE, log.p=FALSE
+plogis:function:stats:q, location=0, scale=1, lower.tail=TRUE, log.p=FALSE
+plot.density:function:stats:x, main=character(0), xlab=character(0), ylab="Density", type="l", zero.line=TRUE, ...
+plot.ecdf:function:stats:x, ..., ylab="Fn(x)", verticals=FALSE, col.01line="gray70", pch=19
+plot.lm:function:stats:x, which=c("c", "1:3", "5"), caption=c("list", "Residuals vs Fitted", "Normal Q-Q", "Scale-Location", "Cook's distance", "Residuals vs Leverage", "expression(\"Cook's dist vs Leverage  \" * h[ii]/(1 - h[ii]))"), panel=c("if", "add.smooth", "panel.smooth", "points"), sub.caption=character(0), main="", ask=c("&&", "prod(par(\"mfcol\")) < length(which)", "dev.interactive()"), ..., id.n=3, labels.id=c("names", "residuals(x)"), cex.id=0,75, qqline=TRUE, cook.levels=c("c", "0.5", "1"), add.smooth=c("getOption", "add.smooth"), label.pos=c("c", "4", "2"), cex.caption=1
+plot.mlm:function:stats:x, ...
+plot.spec:function:stats:x, add=FALSE, ci=0,95, log=c("c", "yes", "dB", "no"), xlab="frequency", ylab=character(0), type="l", ci.col="blue", ci.lty=3, main=character(0), sub=character(0), plot.type=c("c", "marginal", "coherency", "phase"), ...
+plot.spec.coherency:function:stats:x, ci=0,95, xlab="frequency", ylab="squared coherency", ylim=c("c", "0", "1"), type="l", main=character(0), ci.col="blue", ci.lty=3, ...
+plot.spec.phase:function:stats:x, ci=0,95, xlab="frequency", ylab="phase", ylim=c("c", "-pi", "pi"), type="l", main=character(0), ci.col="blue", ci.lty=3, ...
+plot.stepfun:function:stats:x, xval, xlim, ylim=c("range", "c(y, Fn.kn)"), xlab="x", ylab="f(x)", main=character(0), add=FALSE, verticals=TRUE, do.points=c("(", "n < 1000"), pch=c("par", "pch"), col=c("par", "col"), col.points=col, cex.points=c("par", "cex"), col.hor=col, col.vert=col, lty=c("par", "lty"), lwd=c("par", "lwd"), ...
+plot.ts:function:stats:x, y=character(0), plot.type=c("c", "multiple", "single"), xy.labels, xy.lines, panel=lines, nc, yax.flip=FALSE, mar.multi=c("c", "0", "5.1", "0", "if (yax.flip) 5.1 else 2.1"), oma.multi=c("c", "6", "0", "5", "0"), axes=TRUE, ...
+plot.TukeyHSD:function:stats:x, ...
+pnbinom:function:stats:q, size, prob, mu, lower.tail=TRUE, log.p=FALSE
+pnorm:function:stats:q, mean=0, sd=1, lower.tail=TRUE, log.p=FALSE
+poisson:function:stats:link="log"
+poisson.test:function:stats:x, T=1, r=1, alternative=c("c", "two.sided", "less", "greater"), conf.level=0,95
+poly:function:stats:x, ..., degree=1, coefs=character(0), raw=FALSE
+polym:function:stats:..., degree=1, raw=FALSE
+power:function:stats:lambda=1
+power.anova.test:function:stats:groups=character(0), n=character(0), between.var=character(0), within.var=character(0), sig.level=0,05, power=character(0)
+power.prop.test:function:stats:n=character(0), p1=character(0), p2=character(0), sig.level=0,05, power=character(0), alternative=c("c", "two.sided", "one.sided"), strict=FALSE
+power.t.test:function:stats:n=character(0), delta=character(0), sd=1, sig.level=0,05, power=character(0), type=c("c", "two.sample", "one.sample", "paired"), alternative=c("c", "two.sided", "one.sided"), strict=FALSE
+ppoints:function:stats:n, a=c("ifelse", "n <= 10", "3/8", "1/2")
+ppois:function:stats:q, lambda, lower.tail=TRUE, log.p=FALSE
+ppr:function:stats:x, ...
+PP.test:function:stats:x, lshort=TRUE
+prcomp:function:stats:x, ...
+predict:function:stats:Generic Method
+predict.glm:function:stats:object, newdata=character(0), type=c("c", "link", "response", "terms"), se.fit=FALSE, dispersion=character(0), terms=character(0), na.action=na.pass, ...
+predict.lm:function:stats:object, newdata, se.fit=FALSE, scale=character(0), df=Inf, interval=c("c", "none", "confidence", "prediction"), level=0,95, type=c("c", "response", "terms"), terms=character(0), na.action=na.pass, pred.var=c("/", "res.var", "weights"), weights=1, ...
+predict.mlm:function:stats:object, newdata, se.fit=FALSE, na.action=na.pass, ...
+predict.poly:function:stats:object, newdata, ...
+preplot:function:stats:object, ...
+princomp:function:stats:x, ...
+print.anova:function:stats:x, digits=c("max", "getOption(\"digits\") - 2", "3"), signif.stars=c("getOption", "show.signif.stars"), ...
+print.coefmat:function:stats:x, digits=c("max", "3", "getOption(\"digits\") - 2"), signif.stars=c("getOption", "show.signif.stars"), dig.tst=c("max", "1", "min(5, digits - 1)"), cs.ind, tst.ind, zap.ind=c("integer", "0"), P.values=character(0), has.Pvalue, eps.Pvalue=c("$", ".Machine", "double.eps"), na.print="", ...
+printCoefmat:function:stats:x, digits=c("max", "3", "getOption(\"digits\") - 2"), signif.stars=c("getOption", "show.signif.stars"), signif.legend=signif.stars, dig.tst=c("max", "1", "min(5, digits - 1)"), cs.ind=c(":", "1", "k"), tst.ind=c("+", "k", "1"), zap.ind=c("integer", "0"), P.values=character(0), has.Pvalue=c("&&", "nc >= 4", "substr(colnames(x)[nc], 1, 3) == \"Pr(\""), eps.Pvalue=c("$", ".Machine", "double.eps"), na.print="NA", ...
+print.density:function:stats:x, digits=character(0), ...
+print.family:function:stats:x, ...
+print.formula:function:stats:x, ...
+print.ftable:function:stats:x, digits=c("getOption", "digits"), ...
+print.glm:function:stats:x, digits=c("max", "3", "getOption(\"digits\") - 3"), ...
+print.infl:function:stats:x, digits=c("max", "3", "getOption(\"digits\") - 4"), ...
+print.integrate:function:stats:x, digits=c("getOption", "digits"), ...
+print.lm:function:stats:x, digits=c("max", "3", "getOption(\"digits\") - 3"), ...
+print.logLik:function:stats:x, digits=c("getOption", "digits"), ...
+print.terms:function:stats:x, ...
+print.ts:function:stats:x, calendar, ...
+profile:function:stats:Generic Method
+proj:function:stats:object, ...
+promax:function:stats:x, m=4
+prop.test:function:stats:x, n, p=character(0), alternative=c("c", "two.sided", "less", "greater"), conf.level=0,95, correct=TRUE
+prop.trend.test:function:stats:x, n, score=c("seq_along", "x")
+psignrank:function:stats:q, n, lower.tail=TRUE, log.p=FALSE
+pt:function:stats:q, df, ncp, lower.tail=TRUE, log.p=FALSE
+ptukey:function:stats:q, nmeans, df, nranges=1, lower.tail=TRUE, log.p=FALSE
+punif:function:stats:q, min=0, max=1, lower.tail=TRUE, log.p=FALSE
+pweibull:function:stats:q, shape, scale=1, lower.tail=TRUE, log.p=FALSE
+pwilcox:function:stats:q, m, n, lower.tail=TRUE, log.p=FALSE
+qbeta:function:stats:p, shape1, shape2, ncp=0, lower.tail=TRUE, log.p=FALSE
+qbinom:function:stats:p, size, prob, lower.tail=TRUE, log.p=FALSE
+qbirthday:function:stats:prob=0,5, classes=365, coincident=2
+qcauchy:function:stats:p, location=0, scale=1, lower.tail=TRUE, log.p=FALSE
+qchisq:function:stats:p, df, ncp=0, lower.tail=TRUE, log.p=FALSE
+qexp:function:stats:p, rate=1, lower.tail=TRUE, log.p=FALSE
+qf:function:stats:p, df1, df2, ncp, lower.tail=TRUE, log.p=FALSE
+qgamma:function:stats:p, shape, rate=1, scale=c("/", "1", "rate"), lower.tail=TRUE, log.p=FALSE
+qgeom:function:stats:p, prob, lower.tail=TRUE, log.p=FALSE
+qhyper:function:stats:p, m, n, k, lower.tail=TRUE, log.p=FALSE
+qlnorm:function:stats:p, meanlog=0, sdlog=1, lower.tail=TRUE, log.p=FALSE
+qlogis:function:stats:p, location=0, scale=1, lower.tail=TRUE, log.p=FALSE
+qnbinom:function:stats:p, size, prob, mu, lower.tail=TRUE, log.p=FALSE
+qnorm:function:stats:p, mean=0, sd=1, lower.tail=TRUE, log.p=FALSE
+qpois:function:stats:p, lambda, lower.tail=TRUE, log.p=FALSE
+qqline:function:stats:y, datax=FALSE, ...
+qqnorm:function:stats:Generic Method
+qqnorm.default:function:stats:y, ylim, main="Normal Q-Q Plot", xlab="Theoretical Quantiles", ylab="Sample Quantiles", plot.it=TRUE, datax=FALSE, ...
+qqplot:function:stats:x, y, plot.it=TRUE, xlab=c("deparse", "substitute(x)"), ylab=c("deparse", "substitute(y)"), ...
+qsignrank:function:stats:p, n, lower.tail=TRUE, log.p=FALSE
+qt:function:stats:p, df, ncp, lower.tail=TRUE, log.p=FALSE
+qtukey:function:stats:p, nmeans, df, nranges=1, lower.tail=TRUE, log.p=FALSE
+quade.test:function:stats:y, ...
+quantile:function:stats:x, ...
+quantile.default:function:stats:x, probs=c("seq", "0", "1", "0.25"), na.rm=FALSE, names=TRUE, type=7, ...
+quasi:function:stats:link="identity", variance="constant"
+quasibinomial:function:stats:link="logit"
+quasipoisson:function:stats:link="log"
+qunif:function:stats:p, min=0, max=1, lower.tail=TRUE, log.p=FALSE
+qweibull:function:stats:p, shape, scale=1, lower.tail=TRUE, log.p=FALSE
+qwilcox:function:stats:p, m, n, lower.tail=TRUE, log.p=FALSE
+r2dtable:function:stats:n, r, c
+rbeta:function:stats:n, shape1, shape2, ncp=0
+rbinom:function:stats:n, size, prob
+rcauchy:function:stats:n, location=0, scale=1
+rchisq:function:stats:n, df, ncp=0
+read.ftable:function:stats:file, sep="", quote=""", row.var.names, col.vars, skip=0
+rect.hclust:function:stats:tree, k=character(0), which=character(0), x=character(0), h=character(0), border=2, cluster=character(0)
+reformulate:function:stats:termlabels, response=character(0)
+relevel:function:stats:x, ref, ...
+reorder:function:stats:x, ...
+replications:function:stats:formula, data=character(0), na.action
+reshape:function:stats:data, varying=character(0), v.names=character(0), timevar="time", idvar="id", ids=c(":", "1", "NROW(data)"), times=c("seq_along", "varying[[1]]"), drop=character(0), direction, new.row.names=character(0), sep=".", split=c("if", "sep == \"\"", "{", "{")
+reshapeLong:function:stats:x, jvars, ilev=c("row.names", "x"), jlev=c("[", "names(x)", "jvars"), iname="reshape.i", jname="reshape.j", vname="reshape.v"
+reshapeWide:function:stats:x, i, j, val, jnames=c("levels", "j")
+resid:function:stats:object, ...
+residuals:function:stats:Generic Method
+residuals.default:function:stats:object, ...
+residuals.glm:function:stats:object, type=c("c", "deviance", "pearson", "working", "response", "partial"), ...
+residuals.lm:function:stats:object, type=c("c", "working", "response", "deviance", "pearson", "partial"), ...
+rexp:function:stats:n, rate=1
+rf:function:stats:n, df1, df2, ncp
+rgamma:function:stats:n, shape, rate=1, scale=c("/", "1", "rate")
+rgeom:function:stats:n, prob
+rhyper:function:stats:nn, m, n, k
+rlnorm:function:stats:n, meanlog=0, sdlog=1
+rlogis:function:stats:n, location=0, scale=1
+rmultinom:function:stats:n, size, prob
+rnbinom:function:stats:n, size, prob, mu
+rnorm:function:stats:n, mean=0, sd=1
+rpois:function:stats:n, lambda
+rsignrank:function:stats:nn, n
+rstandard:function:stats:model, ...
+rstandard.glm:function:stats:model, infl=c("lm.influence", "model", "FALSE"), ...
+rstandard.lm:function:stats:model, infl=c("lm.influence", "model", "FALSE"), sd=c("sqrt", "deviance(model)/df.residual(model)"), ...
+rstudent:function:stats:model, ...
+rstudent.glm:function:stats:model, infl=c("influence", "model", "FALSE"), ...
+rstudent.lm:function:stats:model, infl=c("lm.influence", "model", "FALSE"), res=c("$", "infl", "wt.res"), ...
+rt:function:stats:n, df, ncp
+runif:function:stats:n, min=0, max=1
+runmed:function:stats:x, k, endrule=c("c", "median", "keep", "constant"), algorithm=character(0), print.level=0
+rweibull:function:stats:n, shape, scale=1
+rwilcox:function:stats:nn, m, n
+scatter.smooth:function:stats:x, y=character(0), span=c("/", "2", "3"), degree=1, family=c("c", "symmetric", "gaussian"), xlab=character(0), ylab=character(0), ylim=c("range", "y", "prediction$y", "TRUE"), evaluation=50, ...
+screeplot:function:stats:x, ...
+sd:function:stats:x, na.rm=FALSE
+se.contrast:function:stats:Generic Method
+selfStart:function:stats:model, initial, parameters, template
+setNames:function:stats:object, nm
+shapiro.test:function:stats:x
+simulate:function:stats:object, nsim=1, seed=character(0), ...
+smooth:function:stats:x, kind=c("c", "3RS3R", "3RSS", "3RSR", "3R", "3", "S"), twiceit=FALSE, endrule="Tukey", do.ends=FALSE
+smoothEnds:function:stats:y, k=3
+smooth.spline:function:stats:x, y=character(0), w=character(0), df, spar=character(0), cv=FALSE, all.knots=FALSE, nknots=character(0), keep.data=TRUE, df.offset=0, penalty=1, control.spar=list
+sortedXyData:function:stats:x, y, data
+spec.ar:function:stats:x, n.freq, order=character(0), plot=TRUE, na.action=na.fail, method="yule-walker", ...
+spec.pgram:function:stats:x, spans=character(0), kernel=character(0), taper=0,1, pad=0, fast=TRUE, demean=FALSE, detrend=TRUE, plot=TRUE, na.action=na.fail, ...
+spec.taper:function:stats:x, p=0,1
+spectrum:function:stats:x, ..., method=c("c", "pgram", "ar")
+spline:function:stats:x, y=character(0), n=c("*", "3", "length(x)"), method="fmm", xmin=c("min", "x"), xmax=c("max", "x"), xout, ties=mean
+splinefun:function:stats:x, y=character(0), method=c("c", "fmm", "periodic", "natural", "monoH.FC"), ties=mean
+splinefunH:function:stats:x, y, m
+SSasymp:selfStart:stats:input, Asym, R0, lrc
+SSasympOff:selfStart:stats:input, Asym, lrc, c0
+SSasympOrig:selfStart:stats:input, Asym, lrc
+SSbiexp:selfStart:stats:input, A1, lrc1, A2, lrc2
+SSD:function:stats:object, ...
+SSfol:selfStart:stats:Dose, input, lKe, lKa, lCl
+SSfpl:selfStart:stats:input, A, B, xmid, scal
+SSgompertz:selfStart:stats:x, Asym, b2, b3
+SSlogis:selfStart:stats:input, Asym, xmid, scal
+SSmicmen:selfStart:stats:input, Vm, K
+SSweibull:selfStart:stats:x, Asym, Drop, lrc, pwr
+start:function:stats:x, ...
+stat.anova:function:stats:table, test=c("c", "Chisq", "F", "Cp"), scale, df.scale, n
+step:function:stats:object, scope, scale=0, direction=c("c", "both", "backward", "forward"), trace=1, keep=character(0), steps=1000, k=2, ...
+stepfun:function:stats:x, y, f=c("as.numeric", "right"), ties="ordered", right=FALSE
+stl:function:stats:x, s.window, s.degree=0, t.window=character(0), t.degree=1, l.window=c("nextodd", "period"), l.degree=t.degree, s.jump=c("ceiling", "s.window/10"), t.jump=c("ceiling", "t.window/10"), l.jump=c("ceiling", "l.window/10"), robust=FALSE, inner=c("if", "robust", "1", "2"), outer=c("if", "robust", "15", "0"), na.action=na.fail
+StructTS:function:stats:x, type=c("c", "level", "trend", "BSM"), init=character(0), fixed=character(0), optim.control=character(0)
+summary.aov:function:stats:object, intercept=FALSE, split, expand.split=TRUE, keep.zero.df=TRUE, ...
+summary.aovlist:function:stats:object, ...
+summary.glm:function:stats:object, dispersion=character(0), correlation=FALSE, symbolic.cor=FALSE, ...
+summary.infl:function:stats:object, digits=c("max", "2", "getOption(\"digits\") - 5"), ...
+summary.lm:function:stats:object, correlation=FALSE, symbolic.cor=FALSE, ...
+summary.manova:function:stats:object, test=c("c", "Pillai", "Wilks", "Hotelling-Lawley", "Roy"), intercept=FALSE, tol=1e-07, ...
+summary.mlm:function:stats:object, ...
+summary.stepfun:function:stats:object, ...
+supsmu:function:stats:x, y, wt=c("rep", "1", "n"), span="cv", periodic=FALSE, bass=0
+symnum:function:stats:x, cutpoints=c("c", "0.3", "0.6", "0.8", "0.9", "0.95"), symbols=c("if", "numeric.x", "c(\" \", \".\", \",\", \"+\", \"*\", \"B\")", "c(\".\", \"|\")"), legend=c(">=", "length(symbols)", "3"), na="?", eps=1e-05, numeric.x=c("is.numeric", "x"), corr=c("&&", "missing(cutpoints)", "numeric.x"), show.max=c("if", "corr", "1"), show.min=character(0), abbr.colnames=has.colnames, lower.triangular=c("&&", "corr && is.numeric(x)", "is.matrix(x)"), diag.lower.tri=c("&&", "corr", "!is.null(show.max)")
+termplot:function:stats:model, data=character(0), envir=c("environment", "formula(model)"), partial.resid=FALSE, rug=FALSE, terms=character(0), se=FALSE, xlabs=character(0), ylabs=character(0), main=character(0), col.term=2, lwd.term=1,5, col.se="orange", lty.se=2, lwd.se=1, col.res="gray", cex=1, pch=c("par", "pch"), col.smth="darkred", lty.smth=2, span.smth=c("/", "2", "3"), ask=c("&&", "dev.interactive()", "nb.fig < n.tms"), use.factor.levels=TRUE, smooth=character(0), ylim="common", ...
+terms:function:stats:Generic Method
+terms.aovlist:function:stats:x, ...
+terms.default:function:stats:x, ...
+terms.formula:function:stats:x, specials=character(0), abb=character(0), data=character(0), neg.out=TRUE, keep.order=FALSE, simplify=FALSE, ..., allowDotAsName=FALSE
+terms.terms:function:stats:x, ...
+time:function:stats:x, ...
+toeplitz:function:stats:x
+ts:function:stats:data=NA, start=1, end=c("numeric", "0"), frequency=1, deltat=1, ts.eps=c("getOption", "ts.eps"), class=c("if", "nseries > 1", "c(\"mts\", \"ts\")", "ts"), names=c("if", "!is.null(dimnames(data))", "colnames(data)", "paste(\"Series\", seq(nseries))")
+tsdiag:function:stats:object, gof.lag, ...
+ts.intersect:function:stats:..., dframe=FALSE
+tsp:function:stats:x
+tsp<-:unknowClass:stats:x, value
+ts.plot:function:stats:..., gpars=list
+tsSmooth:function:stats:object, ...
+ts.union:function:stats:..., dframe=FALSE
+t.test:function:stats:x, ...
+TukeyHSD:function:stats:x, which, ordered=FALSE, conf.level=0,95, ...
+TukeyHSD.aov:function:stats:x, which=c("seq_along", "tabs"), ordered=FALSE, conf.level=0,95, ...
+uniroot:function:stats:f, interval, ..., lower=c("min", "interval"), upper=c("max", "interval"), f.lower=c("f", "lower", "..."), f.upper=c("f", "upper", "..."), tol=c("^", ".Machine$double.eps", "0.25"), maxiter=1000
+update:function:stats:Generic Method
+update.default:function:stats:object, formula., ..., evaluate=TRUE
+update.formula:function:stats:old, new, ...
+var:function:stats:x, y=character(0), na.rm=FALSE, use
+variable.names:function:stats:object, ...
+varimax:function:stats:x, normalize=TRUE, eps=1e-05
+var.test:function:stats:x, ...
+vcov:function:stats:Generic Method
+weighted.mean:function:stats:x, w, ...
+weighted.residuals:function:stats:obj, drop0=TRUE
+weights:function:stats:object, ...
+wilcox.test:function:stats:x, ...
+window:function:stats:x, ...
+window<-:unknowClass:stats:x, ..., value
+write.ftable:function:stats:x, file="", quote=TRUE, append=FALSE, digits=c("getOption", "digits")
+xtabs:function:stats:formula=c("~", "."), data=parent.frame, subset, sparse=FALSE, na.action, exclude=c("c", "NA", "NaN"), drop.unused.levels=FALSE
+abline:function:graphics:a=character(0), b=character(0), h=character(0), v=character(0), reg=character(0), coef=character(0), untf=FALSE, ...
+arrows:function:graphics:x0, y0, x1=x0, y1=y0, length=0,25, angle=30, code=2, col=c("par", "fg"), lty=c("par", "lty"), lwd=c("par", "lwd"), ...
+assocplot:function:graphics:x, col=c("c", "black", "red"), space=0,3, main=character(0), xlab=character(0), ylab=character(0)
+axis:function:graphics:side, at=character(0), labels=TRUE, tick=TRUE, line=NA, pos=NA, outer=FALSE, font=NA, lty="solid", lwd=1, lwd.ticks=lwd, col=character(0), col.ticks=character(0), hadj=NA, padj=NA, ...
+Axis:function:graphics:x=character(0), at=character(0), ..., side, labels=character(0)
+axis.Date:function:graphics:side, x, at, format, labels=TRUE, ...
+axis.POSIXct:function:graphics:side, x, at, format, labels=TRUE, ...
+axTicks:function:graphics:side, axp=character(0), usr=character(0), log=character(0)
+barplot:function:graphics:height, ...
+barplot.default:function:graphics:height, width=1, space=character(0), names.arg=character(0), legend.text=character(0), beside=FALSE, horiz=FALSE, density=character(0), angle=45, col=character(0), border=c("par", "fg"), main=character(0), sub=character(0), xlab=character(0), ylab=character(0), xlim=character(0), ylim=character(0), xpd=TRUE, log="", axes=TRUE, axisnames=TRUE, cex.axis=c("par", "cex.axis"), cex.names=c("par", "cex.axis"), inside=TRUE, plot=TRUE, axis.lty=0, offset=0, add=FALSE, args.legend=character(0), ...
+box:function:graphics:which="plot", lty="solid", ...
+boxplot:function:graphics:x, ...
+boxplot.default:function:graphics:x, ..., range=1,5, width=character(0), varwidth=FALSE, notch=FALSE, outline=TRUE, names, plot=TRUE, border=c("par", "fg"), col=character(0), log="", pars=c("list", "0.8", "0.5", "0.5"), horizontal=FALSE, add=FALSE, at=character(0)
+boxplot.matrix:function:graphics:x, use.cols=TRUE, ...
+bxp:function:graphics:z, notch=FALSE, width=character(0), varwidth=FALSE, outline=TRUE, notch.frac=0,5, log="", border=c("par", "fg"), pars=character(0), frame.plot=axes, horizontal=FALSE, add=FALSE, at=character(0), show.names=character(0), ...
+cdplot:function:graphics:x, ...
+clip:function:graphics:x1, x2, y1, y2
+close.screen:function:graphics:n, all.screens=FALSE
+co.intervals:function:graphics:x, number=6, overlap=0,5
+contour:function:graphics:Generic Method
+contour.default:function:graphics:x=c("seq", "0", "1", "nrow(z)"), y=c("seq", "0", "1", "ncol(z)"), z, nlevels=10, levels=c("pretty", "zlim", "nlevels"), labels=character(0), xlim=c("range", "x", "TRUE"), ylim=c("range", "y", "TRUE"), zlim=c("range", "z", "TRUE"), labcex=0,6, drawlabels=TRUE, method="flattest", vfont, axes=TRUE, frame.plot=axes, col=c("par", "fg"), lty=c("par", "lty"), lwd=c("par", "lwd"), add=FALSE, ...
+coplot:function:graphics:formula, data, given.values, panel=points, rows, columns, show.given=TRUE, col=c("par", "fg"), pch=c("par", "pch"), bar.bg=c("c", "gray(0.8)", "gray(0.95)"), xlab=c("c", "x.name", "paste(\"Given :\", a.name)"), ylab=c("c", "y.name", "paste(\"Given :\", b.name)"), subscripts=FALSE, axlabels=c("function", "list(f = )", "abbreviate(levels(f))", "NULL"), number=6, overlap=0,5, xlim, ylim, ...
+curve:function:graphics:expr, from=character(0), to=character(0), n=101, add=FALSE, type="l", ylab=character(0), log=character(0), xlim=character(0), ...
+dotchart:function:graphics:x, labels=character(0), groups=character(0), gdata=character(0), cex=c("par", "cex"), pch=21, gpch=21, bg=c("par", "bg"), color=c("par", "fg"), gcolor=c("par", "fg"), lcolor="gray", xlim=c("range", "x[is.finite(x)]"), main=character(0), xlab=character(0), ylab=character(0), ...
+erase.screen:function:graphics:n=cur.screen
+filled.contour:function:graphics:x=c("seq", "0", "1", "nrow(z)"), y=c("seq", "0", "1", "ncol(z)"), z, xlim=c("range", "x", "TRUE"), ylim=c("range", "y", "TRUE"), zlim=c("range", "z", "TRUE"), levels=c("pretty", "zlim", "nlevels"), nlevels=20, color.palette=cm.colors, col=c("color.palette", "length(levels) - 1"), plot.title, plot.axes, key.title, key.axes, asp=NA, xaxs="i", yaxs="i", las=1, axes=TRUE, frame.plot=axes, ...
+fourfoldplot:function:graphics:x, color=c("c", "#99CCFF", "#6699CC"), conf.level=0,95, std=c("c", "margins", "ind.max", "all.max"), margin=c("c", "1", "2"), space=0,2, main=character(0), mfrow=character(0), mfcol=character(0)
+frame:function:graphics:No arguments
+grconvertX:function:graphics:x, from="user", to="user"
+grconvertY:function:graphics:y, from="user", to="user"
+grid:function:graphics:nx=character(0), ny=nx, col="lightgray", lty="dotted", lwd=c("par", "lwd"), equilogs=TRUE
+hist:function:graphics:Generic Method
+hist.default:function:graphics:x, breaks="Sturges", freq=character(0), probability=c("!", "freq"), include.lowest=TRUE, right=TRUE, density=character(0), angle=45, col=character(0), border=character(0), main=c("paste", "Histogram of", "xname"), xlim=c("range", "breaks"), ylim=character(0), xlab=xname, ylab, axes=TRUE, plot=TRUE, labels=FALSE, nclass=character(0), ...
+identify:function:graphics:Generic Method
+image:function:graphics:Generic Method
+image.default:function:graphics:x=c("seq", "0", "1", "nrow(z)"), y=c("seq", "0", "1", "ncol(z)"), z, zlim=c("range", "z[is.finite(z)]"), xlim=c("range", "x"), ylim=c("range", "y"), col=c("heat.colors", "12"), add=FALSE, xaxs="i", yaxs="i", xlab, ylab, breaks, oldstyle=FALSE, ...
+layout:function:graphics:mat, widths=c("rep", "1", "ncol(mat)"), heights=c("rep", "1", "nrow(mat)"), respect=FALSE
+layout.show:function:graphics:n=1
+lcm:function:graphics:x
+legend:function:graphics:x, y=character(0), legend, fill=character(0), col=c("par", "col"), border="black", lty, lwd, pch, angle=45, density=character(0), bty="o", bg=c("par", "bg"), box.lwd=c("par", "lwd"), box.lty=c("par", "lty"), box.col=c("par", "fg"), pt.bg=NA, cex=1, pt.cex=cex, pt.lwd=lwd, xjust=0, yjust=1, x.intersp=1, y.intersp=1, adj=c("c", "0", "0.5"), text.width=character(0), text.col=c("par", "col"), merge=c("&&", "do.lines", "has.pch"), trace=FALSE, plot=TRUE, ncol=1, horiz=FALSE, title=character(0), inset=0, xpd, title.col=text.col
+lines:function:graphics:Generic Method
+lines.default:function:graphics:x, y=character(0), type="l", ...
+locator:function:graphics:n=512, type="n", ...
+matlines:function:graphics:x, y, type="l", lty=c(":", "1", "5"), lwd=1, pch=character(0), col=c(":", "1", "6"), ...
+matplot:function:graphics:x, y, type="p", lty=c(":", "1", "5"), lwd=1, lend=c("par", "lend"), pch=character(0), col=c(":", "1", "6"), cex=character(0), bg=NA, xlab=character(0), ylab=character(0), xlim=character(0), ylim=character(0), ..., add=FALSE, verbose=c("getOption", "verbose")
+matpoints:function:graphics:x, y, type="p", lty=c(":", "1", "5"), lwd=1, pch=character(0), col=c(":", "1", "6"), ...
+mosaicplot:function:graphics:x, ...
+mtext:function:graphics:text, side=3, line=0, outer=FALSE, at=NA, adj=NA, padj=NA, cex=NA, col=NA, font=NA, ...
+pairs:function:graphics:Generic Method
+pairs.default:function:graphics:x, labels, panel=points, ..., lower.panel=panel, upper.panel=panel, diag.panel=character(0), text.panel=textPanel, label.pos=c("+", "0.5", "has.diag/3"), cex.labels=character(0), font.labels=1, row1attop=TRUE, gap=1
+panel.smooth:function:graphics:x, y, col=c("par", "col"), bg=NA, pch=c("par", "pch"), cex=1, col.smooth="red", span=c("/", "2", "3"), iter=3, ...
+par:function:graphics:..., no.readonly=FALSE
+persp:function:graphics:x, ...
+pie:function:graphics:x, labels=c("names", "x"), edges=200, radius=0,8, clockwise=FALSE, init.angle=c("if", "clockwise", "90", "0"), density=character(0), angle=45, col=character(0), border=character(0), lty=character(0), main=character(0), ...
+piechart:function:graphics:x, labels=c("names", "x"), edges=200, radius=0,8, density=character(0), angle=45, col=character(0), main=character(0), ...
+plot:function:graphics:Generic Method
+plot.default:function:graphics:x, y=character(0), type="p", xlim=character(0), ylim=character(0), log="", main=character(0), sub=character(0), xlab=character(0), ylab=character(0), ann=c("par", "ann"), axes=TRUE, frame.plot=axes, panel.first=character(0), panel.last=character(0), asp=NA, ...
+plot.design:function:graphics:x, y=character(0), fun=mean, data=character(0), ..., ylim=character(0), xlab="Factors", ylab=character(0), main=character(0), ask=character(0), xaxt=c("par", "xaxt"), axes=TRUE, xtick=FALSE
+plot.new:function:graphics:No arguments
+plot.window:function:graphics:xlim, ylim, log="", asp=NA, ...
+plot.xy:function:graphics:xy, type, pch=c("par", "pch"), lty=c("par", "lty"), col=c("par", "col"), bg=NA, cex=1, lwd=c("par", "lwd"), ...
+points:function:graphics:Generic Method
+points.default:function:graphics:x, y=character(0), type="p", ...
+polygon:function:graphics:x, y=character(0), density=character(0), angle=45, border=character(0), col=NA, lty=c("par", "lty"), ..., fillOddEven=FALSE
+rect:function:graphics:xleft, ybottom, xright, ytop, density=character(0), angle=45, col=NA, border=character(0), lty=c("par", "lty"), lwd=c("par", "lwd"), ...
+rug:function:graphics:x, ticksize=0,03, side=1, lwd=0,5, col=c("par", "fg"), quiet=c("<", "getOption(\"warn\")", "0"), ...
+screen:function:graphics:n=cur.screen, new=TRUE
+segments:function:graphics:x0, y0, x1=x0, y1=y0, col=c("par", "fg"), lty=c("par", "lty"), lwd=c("par", "lwd"), ...
+smoothScatter:function:graphics:x, y=character(0), nbin=128, bandwidth, colramp=c("colorRampPalette", "c(\"white\", blues9)"), nrpoints=100, pch=".", cex=1, col="black", transformation=c("function", "list(x = )", "x^0.25", "NULL"), postPlotHook=box, xlab=character(0), ylab=character(0), xlim, ylim, xaxs=c("par", "xaxs"), yaxs=c("par", "yaxs"), ...
+spineplot:function:graphics:x, ...
+split.screen:function:graphics:figs, screen, erase=TRUE
+stars:function:graphics:x, full=TRUE, scale=TRUE, radius=TRUE, labels=c("[[", "dimnames(x)", "1"), locations=character(0), nrow=character(0), ncol=character(0), len=1, key.loc=character(0), key.labels=c("[[", "dimnames(x)", "2"), key.xpd=TRUE, xlim=character(0), ylim=character(0), flip.labels=character(0), draw.segments=FALSE, col.segments=c(":", "1", "n.seg"), col.stars=NA, axes=FALSE, frame.plot=axes, main=character(0), sub=character(0), xlab="", ylab="", cex=0,8, lwd=0,25, lty=c("par", "lty"), xpd=FALSE, mar=c("pmin", "par(\"mar\")", "1.1 + c(2 * axes + (xlab != \"\"), 2 * axes + (ylab != \"\"), 1, 0)"), add=FALSE, plot=TRUE, ...
+stem:function:graphics:x, scale=1, width=80, atom=1e-08
+strheight:function:graphics:s, units="user", cex=character(0), font=character(0), vfont=character(0), ...
+stripchart:function:graphics:x, ...
+strwidth:function:graphics:s, units="user", cex=character(0), font=character(0), vfont=character(0), ...
+sunflowerplot:function:graphics:x, y=character(0), number, log="", digits=6, xlab=character(0), ylab=character(0), xlim=character(0), ylim=character(0), add=FALSE, rotate=FALSE, pch=16, cex=0,8, cex.fact=1,5, col=c("par", "col"), bg=NA, size=c("/", "1", "8"), seg.col=2, seg.lwd=1,5, ...
+symbols:function:graphics:x, y=character(0), circles, squares, rectangles, stars, thermometers, boxplots, inches=TRUE, add=FALSE, fg=c("par", "col"), bg=NA, xlab=character(0), ylab=character(0), main=character(0), xlim=character(0), ylim=character(0), ...
+text:function:graphics:Generic Method
+text.default:function:graphics:x, y=character(0), labels=c("seq_along", "x"), adj=character(0), pos=character(0), offset=0,5, vfont=character(0), cex=1, col=character(0), font=character(0), ...
+title:function:graphics:main=character(0), sub=character(0), xlab=character(0), ylab=character(0), line=NA, outer=FALSE, ...
+xinch:function:graphics:x=1, warn.log=TRUE
+xspline:function:graphics:x, y=character(0), shape=0, open=TRUE, repEnds=TRUE, draw=TRUE, border=c("par", "fg"), col=NA, ...
+xyinch:function:graphics:xy=1, warn.log=TRUE
+yinch:function:graphics:y=1, warn.log=TRUE
+as.graphicsAnnot:function:grDevices:x
+bitmap:function:grDevices:file, type="png16m", height=7, width=7, res=72, units="in", pointsize, taa=NA, gaa=NA, ...
+blues9:character:grDevices:Not a function
+bmp:function:grDevices:filename="Rplot%03d.bmp", width=480, height=480, units="px", pointsize=12, bg="white", res=NA, ..., type=c("c", "cairo", "Xlib", "quartz"), antialias
+boxplot.stats:function:grDevices:x, coef=1,5, do.conf=TRUE, do.out=TRUE
+cairo_pdf:unknowClass:grDevices:filename=c("if", "onefile", "Rplots.pdf", "Rplot%03d.pdf"), width=7, height=7, pointsize=12, onefile=FALSE, bg="white", antialias=c("c", "default", "none", "gray", "subpixel")
+cairo_ps:unknowClass:grDevices:filename=c("if", "onefile", "Rplots.ps", "Rplot%03d.ps"), width=7, height=7, pointsize=12, onefile=FALSE, bg="white", antialias=c("c", "default", "none", "gray", "subpixel")
+check.options:function:grDevices:new, name.opt, reset=FALSE, assign.opt=FALSE, envir=.GlobalEnv, check.attributes=c("c", "mode", "length"), override.check=FALSE
+chull:function:grDevices:x, y=character(0)
+CIDFont:function:grDevices:family, cmap, cmapEncoding, pdfresource=""
+cm:function:grDevices:x
+cm.colors:function:grDevices:n, alpha=1
+col2rgb:function:grDevices:col, alpha=FALSE
+colorConverter:function:grDevices:toXYZ, fromXYZ, name, white=character(0)
+colorRamp:function:grDevices:colors, bias=1, space=c("c", "rgb", "Lab"), interpolate=c("c", "linear", "spline")
+colorRampPalette:function:grDevices:colors, ...
+colors:function:grDevices:No arguments
+colorspaces:list:grDevices:Not a function
+colorspaces$XYZ:colorConverter:grDevices:Not a function
+colorspaces$Apple RGB:RGBcolorConvertercolorConverter:grDevices:Not a function
+colorspaces$sRGB:RGBcolorConvertercolorConverter:grDevices:Not a function
+colorspaces$CIE RGB:RGBcolorConvertercolorConverter:grDevices:Not a function
+colorspaces$Lab:colorConverter:grDevices:Not a function
+colorspaces$Luv:colorConverter:grDevices:Not a function
+colours:function:grDevices:No arguments
+contourLines:function:grDevices:x=c("seq", "0", "1", "nrow(z)"), y=c("seq", "0", "1", "ncol(z)"), z, nlevels=10, levels=c("pretty", "range(z, na.rm = TRUE)", "nlevels")
+convertColor:function:grDevices:color, from, to, from.ref.white=character(0), to.ref.white=character(0), scale.in=1, scale.out=1, clip=TRUE
+densCols:function:grDevices:x, y=character(0), nbin=128, bandwidth, colramp=c("colorRampPalette", "blues9[-(1:3)]")
+dev2bitmap:function:grDevices:file, type="png16m", height=7, width=7, res=72, units="in", pointsize, ..., method=c("c", "postscript", "pdf"), taa=NA, gaa=NA
+devAskNewPage:function:grDevices:ask=character(0)
+dev.control:function:grDevices:displaylist=c, displaylist=inhibit, displaylist=enable
+dev.copy:function:grDevices:device, ..., which=dev.next
+dev.copy2eps:function:grDevices:...
+dev.copy2pdf:function:grDevices:..., out.type="pdf"
+dev.cur:function:grDevices:No arguments
+deviceIsInteractive:function:grDevices:name=character(0)
+dev.interactive:function:grDevices:orNone=FALSE
+dev.list:function:grDevices:No arguments
+dev.new:function:grDevices:...
+dev.next:function:grDevices:which=dev.cur
+dev.off:function:grDevices:which=dev.cur
+dev.prev:function:grDevices:which=dev.cur
+dev.print:function:grDevices:device=postscript, ...
+dev.set:function:grDevices:which=dev.next
+dev.size:function:grDevices:units=c, units=in, units=cm, units=px
+embedFonts:function:grDevices:file, format, outfile=file, fontpaths="", options=""
+extendrange:function:grDevices:x, r=c("range", "x", "TRUE"), f=0,05
+getGraphicsEvent:function:grDevices:prompt="Waiting for input", onMouseDown=character(0), onMouseMove=character(0), onMouseUp=character(0), onKeybd=character(0)
+graphics.off:function:grDevices:No arguments
+gray:function:grDevices:level
+gray.colors:function:grDevices:n, start=0,3, end=0,9, gamma=2,2
+grey:function:grDevices:level
+grey.colors:function:grDevices:n, start=0,3, end=0,9, gamma=2,2
+hcl:function:grDevices:h=0, c=35, l=85, alpha=1, fixup=TRUE
+heat.colors:function:grDevices:n, alpha=1
+Hershey:list:grDevices:Not a function
+Hershey$typeface:character:grDevices:Not a function
+Hershey$fontindex:character:grDevices:Not a function
+Hershey$allowed:matrix:grDevices:Not a function
+hsv:function:grDevices:h=1, s=1, v=1, gamma=1, alpha=1
+jpeg:function:grDevices:filename="Rplot%03d.jpeg", width=480, height=480, units="px", pointsize=12, quality=75, bg="white", res=NA, ..., type=c("c", "cairo", "Xlib", "quartz"), antialias
+make.rgb:function:grDevices:red, green, blue, name=character(0), white="D65", gamma=2,2
+n2mfrow:function:grDevices:nr.plots
+nclass.FD:function:grDevices:x
+nclass.scott:function:grDevices:x
+nclass.Sturges:function:grDevices:x
+palette:function:grDevices:value
+pdf:function:grDevices:file=c("ifelse", "onefile", "Rplots.pdf", "Rplot%03d.pdf"), width, height, onefile, family, title, fonts, version, paper, encoding, bg, fg, pointsize, pagecentre, colormodel, useDingbats, useKerning, fillOddEven
+pdfFonts:function:grDevices:...
+pdf.options:function:grDevices:..., reset=FALSE
+pictex:function:grDevices:file="Rplots.tex", width=5, height=4, debug=FALSE, bg="white", fg="black"
+png:function:grDevices:filename="Rplot%03d.png", width=480, height=480, units="px", pointsize=12, bg="white", res=NA, ..., type=c("c", "cairo", "Xlib", "quartz"), antialias
+postscript:function:grDevices:file=c("ifelse", "onefile", "Rplots.ps", "Rplot%03d.ps"), onefile, family, title, fonts, encoding, bg, fg, width, height, horizontal, pointsize, paper, pagecentre, print.it, command, colormodel, useKerning, fillOddEven
+postscriptFont:function:grDevices:family, metrics, encoding="default"
+postscriptFonts:function:grDevices:...
+ps.options:function:grDevices:..., reset=FALSE, override.check=FALSE
+quartz:function:grDevices:title, width, height, pointsize, family, fontsmooth, antialias, type, file=character(0), bg, canvas, dpi
+quartzFont:function:grDevices:family
+quartzFonts:function:grDevices:...
+quartz.options:function:grDevices:..., reset=FALSE
+rainbow:function:grDevices:n, s=1, v=1, start=0, end=c("/", "max(1, n - 1)", "n"), gamma=1, alpha=1
+recordGraphics:function:grDevices:expr, list, env
+recordPlot:function:grDevices:No arguments
+replayPlot:function:grDevices:x
+rgb:function:grDevices:red, green, blue, alpha, names=character(0), maxColorValue=1
+rgb2hsv:function:grDevices:r, g=character(0), b=character(0), gamma=1, maxColorValue=255
+savePlot:function:grDevices:filename=c("paste", "Rplot", "type", "."), type=c("c", "png", "jpeg", "tiff", "bmp"), device=dev.cur
+setEPS:function:grDevices:...
+setPS:function:grDevices:...
+svg:function:grDevices:filename=c("if", "onefile", "Rplots.svg", "Rplot%03d.svg"), width=7, height=7, pointsize=12, onefile=FALSE, bg="white", antialias=c("c", "default", "none", "gray", "subpixel")
+terrain.colors:function:grDevices:n, alpha=1
+tiff:function:grDevices:filename="Rplot%03d.tiff", width=480, height=480, units="px", pointsize=12, compression=c("c", "none", "rle", "lzw", "jpeg", "zip"), bg="white", res=NA, ..., type=c("c", "cairo", "Xlib", "quartz"), antialias
+topo.colors:function:grDevices:n, alpha=1
+trans3d:function:grDevices:x, y, z, pmat
+Type1Font:function:grDevices:family, metrics, encoding="default"
+x11:function:grDevices:display="", width, height, pointsize, gamma, bg, canvas, fonts, xpos, ypos, title, type, antialias
+X11:function:grDevices:display="", width, height, pointsize, gamma, bg, canvas, fonts, xpos, ypos, title, type, antialias
+X11Font:function:grDevices:font
+X11Fonts:function:grDevices:...
+X11.options:function:grDevices:..., reset=FALSE
+xfig:function:grDevices:file=c("ifelse", "onefile", "Rplots.fig", "Rplot%03d.fig"), onefile=FALSE, encoding="none", paper="default", horizontal=TRUE, width=0, height=0, family="Helvetica", pointsize=12, bg="transparent", fg="black", pagecentre=TRUE, defaultfont=FALSE, textspecial=FALSE
+xy.coords:function:grDevices:x, y=character(0), xlab=character(0), ylab=character(0), log=character(0), recycle=FALSE
+xyTable:function:grDevices:x, y=character(0), digits
+xyz.coords:function:grDevices:x, y=character(0), z=character(0), xlab=character(0), ylab=character(0), zlab=character(0), log=character(0), recycle=FALSE
+?:unknowClass:utils:e1, e2
+alarm:function:utils:No arguments
+apropos:function:utils:what, where=FALSE, ignore.case=TRUE, mode="any"
+argsAnywhere:function:utils:x
+aspell:function:utils:files, filter, control=list, encoding="unknown"
+as.person:function:utils:x
+as.personList:function:utils:x
+as.relistable:function:utils:x
+as.roman:function:utils:x
+assignInNamespace:function:utils:x, value, ns, pos=c("-", "1"), envir=c("as.environment", "pos")
+available.packages:function:utils:contriburl=c("contrib.url", "getOption(\"repos\")", "type"), method, fields=character(0), type=c("getOption", "pkgType"), filters=character(0)
+browseEnv:function:utils:envir=.GlobalEnv, pattern, excludepatt="^last\.warning", html=c("!=", ".Platform$OS.type", "mac"), expanded=TRUE, properties=character(0), main=character(0), debugMe=FALSE
+browseURL:function:utils:url, browser=c("getOption", "browser"), encodeIfNeeded=FALSE
+browseVignettes:function:utils:package=character(0), lib.loc=character(0), all=TRUE
+bug.report:function:utils:subject="", ccaddress=c("Sys.getenv", "USER"), method=c("getOption", "mailer"), address="r-bugs@r-project.org", file="R.bug.report"
+capture.output:function:utils:..., file=character(0), append=FALSE
+checkCRAN:function:utils:method
+chooseCRANmirror:function:utils:graphics=getOption, graphics=menu.graphics
+citation:function:utils:package="base", lib.loc=character(0)
+citEntry:function:utils:entry, textVersion, header=character(0), footer=character(0), ...
+citFooter:function:utils:...
+citHeader:function:utils:...
+close.socket:function:utils:socket, ...
+combn:function:utils:x, m, FUN=character(0), simplify=TRUE, ...
+compareVersion:function:utils:a, b
+contrib.url:function:utils:repos, type=c("getOption", "pkgType")
+count.fields:function:utils:file, sep="", quote=""'", skip=0, blank.lines.skip=TRUE, comment.char="#"
+CRAN.packages:function:utils:CRAN=c("getOption", "repos"), method, contriburl=c("contrib.url", "CRAN")
+data:function:utils:..., list=c("character", "0"), package=character(0), lib.loc=character(0), verbose=c("getOption", "verbose"), envir=.GlobalEnv
+dataentry:function:utils:data, modes
+data.entry:function:utils:..., Modes=character(0), Names=character(0)
+de:function:utils:..., Modes=list, Names=character(0)
+debugger:function:utils:dump=last.dump
+demo:function:utils:topic, package=character(0), lib.loc=character(0), character.only=FALSE, verbose=c("getOption", "verbose"), echo=TRUE, ask=c("getOption", "demo.ask")
+de.ncols:function:utils:inlist
+de.restore:function:utils:inlist, ncols, coltypes, argnames, args
+de.setup:function:utils:ilist, list.names, incols
+download.file:function:utils:url, destfile, method, quiet=FALSE, mode="w", cacheOK=TRUE
+download.packages:function:utils:pkgs, destdir, available=character(0), repos=c("getOption", "repos"), contriburl=c("contrib.url", "repos", "type"), method, type=c("getOption", "pkgType"), ...
+dump.frames:function:utils:dumpto="last.dump", to.file=FALSE
+edit:function:utils:Generic Method
+emacs:function:utils:name=character(0), file=""
+example:function:utils:topic, package=character(0), lib.loc=character(0), local=FALSE, echo=TRUE, verbose=c("getOption", "verbose"), setRNG=FALSE, ask=c("getOption", "example.ask"), prompt.prefix=c("abbreviate", "topic", "6")
+file.edit:function:utils:..., title=file, editor=c("getOption", "editor")
+file_test:unknowClass:utils:op, x, y
+find:function:utils:what, mode="any", numeric=FALSE, simple.words=TRUE
+findLineNum:function:utils:srcfile, line, nameonly=TRUE, envir=parent.frame, lastenv
+fix:function:utils:x, ...
+fixInNamespace:function:utils:x, ns, pos=c("-", "1"), envir=c("as.environment", "pos"), ...
+flush.console:function:utils:No arguments
+formatOL:function:utils:x, type="arabic", offset=0, start=1, width=c("*", "0.9", "getOption(\"width\")")
+formatUL:function:utils:x, label="*", offset=0, width=c("*", "0.9", "getOption(\"width\")")
+getAnywhere:function:utils:x
+getCRANmirrors:function:utils:all=FALSE, local.only=FALSE
+getFromNamespace:function:utils:x, ns, pos=c("-", "1"), envir=c("as.environment", "pos")
+getS3method:function:utils:f, class, optional=FALSE
+getTxtProgressBar:function:utils:pb
+glob2rx:function:utils:pattern, trim.head=FALSE, trim.tail=TRUE
+head:function:utils:x, ...
+head.matrix:function:utils:x, n=6, ...
+help:function:utils:topic, package=character(0), lib.loc=character(0), verbose=c("getOption", "verbose"), try.all.packages=c("getOption", "help.try.all.packages"), help_type=c("getOption", "help_type"), chmhelp=c("getOption", "chmhelp"), htmlhelp=c("getOption", "htmlhelp"), offline=FALSE
+help.request:function:utils:subject="", ccaddress=c("Sys.getenv", "USER"), method=c("getOption", "mailer"), address="r-help@R-project.org", file="R.help.request"
+help.search:function:utils:pattern, fields=c("c", "alias", "concept", "title"), apropos, keyword, whatis, ignore.case=TRUE, package=character(0), lib.loc=character(0), help.db=c("getOption", "help.db"), verbose=c("getOption", "verbose"), rebuild=FALSE, agrep=character(0), use_UTF8=FALSE
+help.start:function:utils:update=FALSE, gui="irrelevant", browser=c("getOption", "browser"), remote=character(0)
+history:function:utils:max.show=25, reverse=FALSE, pattern, ...
+index.search:function:utils:topic, path, file="AnIndex", type="help"
+installed.packages:function:utils:lib.loc=character(0), priority=character(0), noCache=FALSE, fields=character(0)
+install.packages:function:utils:pkgs, lib, repos=c("getOption", "repos"), contriburl=c("contrib.url", "repos", "type"), method, available=character(0), destdir=character(0), dependencies=NA, type=c("getOption", "pkgType"), configure.args=c("getOption", "configure.args"), configure.vars=c("getOption", "configure.vars"), clean=FALSE, Ncpus=c("getOption", "Ncpus"), ...
+is.relistable:function:utils:x
+limitedLabels:function:utils:value, maxwidth=c("-", "getOption(\"width\")", "5")
+loadhistory:function:utils:file=".Rhistory"
+localeToCharset:function:utils:locale=Sys.getlocale, locale=LC_CTYPE
+lsf.str:function:utils:pos=c("-", "1"), envir, ...
+ls.str:function:utils:pos=c("-", "1"), name, envir, all.names=FALSE, pattern, mode="any"
+make.packages.html:function:utils:lib.loc=.libPaths, temp=TRUE, verbose=TRUE
+makeRweaveLatexCodeRunner:function:utils:evalFunc=RweaveEvalWithOpt
+make.socket:function:utils:host="localhost", port, fail=TRUE, server=FALSE
+memory.limit:function:utils:size=NA
+memory.size:function:utils:max=FALSE
+menu:function:utils:choices, graphics=FALSE, title=""
+methods:function:utils:generic.function, class
+mirror2html:function:utils:mirrors=character(0), file="mirrors.html", head="mirrors-head.html", foot="mirrors-foot.html"
+modifyList:function:utils:x, val
+new.packages:function:utils:lib.loc=character(0), repos=c("getOption", "repos"), contriburl=c("contrib.url", "repos", "type"), instPkgs=c("installed.packages", "lib.loc"), method, available=character(0), ask=FALSE, ..., type=c("getOption", "pkgType")
+news:function:utils:query, package="R", lib.loc=character(0), format=character(0), reader=character(0), db=character(0)
+normalizePath:function:utils:path
+nsl:function:utils:hostname
+object.size:function:utils:x
+old.packages:function:utils:lib.loc=character(0), repos=c("getOption", "repos"), contriburl=c("contrib.url", "repos", "type"), instPkgs=c("installed.packages", "lib.loc"), method, available=character(0), checkBuilt=FALSE, type=c("getOption", "pkgType")
+package.contents:function:utils:pkg, lib.loc=character(0)
+packageDescription:function:utils:pkg, lib.loc=character(0), fields=character(0), drop=TRUE, encoding=""
+package.skeleton:function:utils:name="anRpackage", list=character, environment=.GlobalEnv, path=".", force=FALSE, namespace=FALSE, code_files=character
+packageStatus:function:utils:lib.loc=character(0), repositories=character(0), method, type=c("getOption", "pkgType")
+page:function:utils:x, method=c("c", "dput", "print"), ...
+person:function:utils:first="", last="", middle="", email=""
+personList:function:utils:...
+pico:function:utils:name=character(0), file=""
+prompt:function:utils:object, filename=character(0), name=character(0), ...
+promptData:function:utils:object, filename=character(0), name=character(0)
+promptPackage:function:utils:package, lib.loc=character(0), filename=character(0), name=character(0), final=FALSE
+rc.getOption:function:utils:name
+rc.options:function:utils:...
+rc.settings:function:utils:ops, ns, args, func, ipck, S3, data, help, argdb, files
+rc.status:function:utils:No arguments
+readCitationFile:function:utils:file, meta=character(0)
+read.csv:function:utils:file, header=TRUE, sep=",", quote=""", dec=".", fill=TRUE, comment.char="", ...
+read.csv2:function:utils:file, header=TRUE, sep=";", quote=""", dec=",", fill=TRUE, comment.char="", ...
+read.delim:function:utils:file, header=TRUE, sep="	", quote=""", dec=".", fill=TRUE, comment.char="", ...
+read.delim2:function:utils:file, header=TRUE, sep="	", quote=""", dec=",", fill=TRUE, comment.char="", ...
+read.DIF:function:utils:file, header=FALSE, dec=".", row.names, col.names, as.is=c("!", "stringsAsFactors"), na.strings="NA", colClasses=NA, nrows=c("-", "1"), skip=0, check.names=TRUE, blank.lines.skip=TRUE, stringsAsFactors=default.stringsAsFactors, transpose=FALSE
+read.fortran:function:utils:file, format, ..., as.is=TRUE, colClasses=NA
+read.fwf:function:utils:file, widths, header=FALSE, sep="	", skip=0, row.names, col.names, n=c("-", "1"), buffersize=2000, ...
+read.socket:function:utils:socket, maxlen=256, loop=FALSE
+read.table:function:utils:file, header=FALSE, sep="", quote=""'", dec=".", row.names, col.names, as.is=c("!", "stringsAsFactors"), na.strings="NA", colClasses=NA, nrows=c("-", "1"), skip=0, check.names=TRUE, fill=c("!", "blank.lines.skip"), strip.white=FALSE, blank.lines.skip=TRUE, comment.char="#", allowEscapes=FALSE, flush=FALSE, stringsAsFactors=default.stringsAsFactors, fileEncoding="", encoding="unknown"
+recover:function:utils:No arguments
+relist:function:utils:flesh, skeleton=c("attr", "flesh", "skeleton")
+remove.packages:function:utils:pkgs, lib
+Rprof:function:utils:filename="Rprof.out", append=FALSE, interval=0,02, memory.profiling=FALSE
+Rprofmem:function:utils:filename="Rprofmem.out", append=FALSE, threshold=0
+RShowDoc:function:utils:what, type=c("c", "pdf", "html", "txt"), package
+RSiteSearch:function:utils:string, restrict=c("c", "Rhelp08", "functions", "views"), format=c("c", "normal", "short"), sortby=c("c", "score", "date:late", "date:early", "subject", "subject:descending", "from", "from:descending", "size", "size:descending"), matchesPerPage=20
+rtags:function:utils:path=".", pattern="\.[RrSs]$", recursive=FALSE, src=c("list.files", "path", "pattern", "TRUE", "recursive"), keep.re=character(0), ofile="", append=FALSE, verbose=c("getOption", "verbose")
+Rtangle:function:utils:No arguments
+RtangleSetup:function:utils:file, syntax, output=character(0), annotate=TRUE, split=FALSE, prefix=TRUE, quiet=FALSE
+RtangleWritedoc:function:utils:object, chunk
+RweaveChunkPrefix:function:utils:options
+RweaveEvalWithOpt:function:utils:expr, options
+RweaveLatex:function:utils:No arguments
+RweaveLatexFinish:function:utils:object, error=FALSE
+RweaveLatexOptions:function:utils:options
+RweaveLatexSetup:function:utils:file, syntax, output=character(0), quiet=FALSE, debug=FALSE, stylepath, ...
+RweaveLatexWritedoc:function:utils:object, chunk
+RweaveTryStop:function:utils:err, options
+savehistory:function:utils:file=".Rhistory"
+select.list:function:utils:list, preselect=character(0), multiple=FALSE, title=character(0)
+sessionInfo:function:utils:package=character(0)
+setBreakpoint:function:utils:srcfile, line, nameonly=TRUE, envir=parent.frame, lastenv, verbose=TRUE, tracer, print=FALSE, ...
+setRepositories:function:utils:graphics=c("getOption", "menu.graphics"), ind=character(0)
+setTxtProgressBar:function:utils:pb, value, title=character(0), label=character(0)
+stack:function:utils:x, ...
+Stangle:function:utils:file, driver=Rtangle, syntax=c("getOption", "SweaveSyntax"), ...
+str:function:utils:Generic Method
+strOptions:function:utils:strict.width="no", digits.d=3, vec.len=4, formatNum=c("function", "list(x = , ... = )", "format(x, trim = TRUE, drop0trailing = TRUE, ...)", "NULL")
+summaryRprof:function:utils:filename="Rprof.out", chunksize=5000, memory=c("c", "none", "both", "tseries", "stats"), index=2, diff=TRUE, exclude=character(0)
+Sweave:function:utils:file, driver=RweaveLatex, syntax=c("getOption", "SweaveSyntax"), ...
+SweaveHooks:function:utils:options, run=FALSE, envir=.GlobalEnv
+SweaveSyntaxLatex:SweaveSyntax:utils:Not a function
+SweaveSyntaxLatex$doc:character:utils:Not a function
+SweaveSyntaxLatex$code:character:utils:Not a function
+SweaveSyntaxLatex$coderef:character:utils:Not a function
+SweaveSyntaxLatex$docopt:character:utils:Not a function
+SweaveSyntaxLatex$docexpr:character:utils:Not a function
+SweaveSyntaxLatex$extension:character:utils:Not a function
+SweaveSyntaxLatex$syntaxname:character:utils:Not a function
+SweaveSyntaxLatex$input:character:utils:Not a function
+SweaveSyntaxLatex$trans:list:utils:Not a function
+SweaveSyntaxNoweb:SweaveSyntax:utils:Not a function
+SweaveSyntaxNoweb$doc:character:utils:Not a function
+SweaveSyntaxNoweb$code:character:utils:Not a function
+SweaveSyntaxNoweb$coderef:character:utils:Not a function
+SweaveSyntaxNoweb$docopt:character:utils:Not a function
+SweaveSyntaxNoweb$docexpr:character:utils:Not a function
+SweaveSyntaxNoweb$extension:character:utils:Not a function
+SweaveSyntaxNoweb$syntaxname:character:utils:Not a function
+SweaveSyntaxNoweb$input:character:utils:Not a function
+SweaveSyntaxNoweb$trans:list:utils:Not a function
+SweaveSyntConv:function:utils:file, syntax, output=character(0)
+tail:function:utils:x, ...
+tail.matrix:function:utils:x, n=6, addrownums=TRUE, ...
+tar:function:utils:tarfile, files=character(0), compression=c("c", "none", "gzip", "bzip2", "xz"), compression_level=6
+timestamp:function:utils:stamp=date, prefix="##------ ", suffix=" ------##", quiet=FALSE
+toBibtex:function:utils:object, ...
+toLatex:function:utils:object, ...
+txtProgressBar:function:utils:min=0, max=1, initial=0, char="=", width=NA, title, label, style=1
+type.convert:function:utils:x, na.strings="NA", as.is=FALSE, dec="."
+unstack:function:utils:x, ...
+untar:function:utils:tarfile, files=character(0), list=FALSE, exdir=".", compressed=NA, extras=character(0), verbose=FALSE
+unzip:function:utils:zipfile, files=character(0), list=FALSE, overwrite=TRUE, junkpaths=FALSE, exdir="."
+update.packages:function:utils:lib.loc=character(0), repos=c("getOption", "repos"), contriburl=c("contrib.url", "repos", "type"), method, instlib=character(0), ask=TRUE, available=character(0), oldPkgs=character(0), ..., checkBuilt=FALSE, type=c("getOption", "pkgType")
+update.packageStatus:function:utils:object, lib.loc=c("levels", "object$inst$LibPath"), repositories=c("levels", "object$avail$Repository"), ...
+upgrade:function:utils:object, ...
+URLdecode:function:utils:URL
+URLencode:function:utils:URL, reserved=FALSE
+url.show:function:utils:url, title=url, file=tempfile, delete.file=TRUE, method, ...
+vi:function:utils:name=character(0), file=""
+View:function:utils:x, title
+vignette:function:utils:topic, package=character(0), lib.loc=character(0), all=TRUE
+write.csv:function:utils:...
+write.csv2:function:utils:...
+write.socket:function:utils:socket, string
+write.table:function:utils:x, file="", append=FALSE, quote=TRUE, sep=" ", eol="\n", na="NA", dec=".", row.names=TRUE, col.names=TRUE, qmethod=c("c", "escape", "double")
+wsbrowser:function:utils:IDS, IsRoot, IsContainer, ItemsPerContainer, ParentID, NAMES, TYPES, DIMS, expanded=TRUE, kind="HTML", main="R Workspace", properties=list, browser=c("getOption", "browser")
+xedit:function:utils:name=character(0), file=""
+xemacs:function:utils:name=character(0), file=""
+zip.file.extract:function:utils:file, zipname="R.zip", unzip=c("getOption", "unzip"), dir=tempdir
+ability.cov:list:datasets:Not a function
+ability.cov$cov:matrix:datasets:Not a function
+ability.cov$center:numeric:datasets:Not a function
+ability.cov$n.obs:numeric:datasets:Not a function
+airmiles:ts:datasets:Not a function
+AirPassengers:ts:datasets:Not a function
+airquality:data.frame:datasets:Not a function
+airquality$Ozone:integer:datasets:Not a function
+airquality$Solar.R:integer:datasets:Not a function
+airquality$Wind:numeric:datasets:Not a function
+airquality$Temp:integer:datasets:Not a function
+airquality$Month:integer:datasets:Not a function
+airquality$Day:integer:datasets:Not a function
+anscombe:data.frame:datasets:Not a function
+anscombe$x1:numeric:datasets:Not a function
+anscombe$x2:numeric:datasets:Not a function
+anscombe$x3:numeric:datasets:Not a function
+anscombe$x4:numeric:datasets:Not a function
+anscombe$y1:numeric:datasets:Not a function
+anscombe$y2:numeric:datasets:Not a function
+anscombe$y3:numeric:datasets:Not a function
+anscombe$y4:numeric:datasets:Not a function
+attenu:data.frame:datasets:Not a function
+attenu$event:numeric:datasets:Not a function
+attenu$mag:numeric:datasets:Not a function
+attenu$station:factor:datasets:Not a function
+attenu$dist:numeric:datasets:Not a function
+attenu$accel:numeric:datasets:Not a function
+attitude:data.frame:datasets:Not a function
+attitude$rating:numeric:datasets:Not a function
+attitude$complaints:numeric:datasets:Not a function
+attitude$privileges:numeric:datasets:Not a function
+attitude$learning:numeric:datasets:Not a function
+attitude$raises:numeric:datasets:Not a function
+attitude$critical:numeric:datasets:Not a function
+attitude$advance:numeric:datasets:Not a function
+austres:ts:datasets:Not a function
+beaver1:data.frame:datasets:Not a function
+beaver1$day:numeric:datasets:Not a function
+beaver1$time:numeric:datasets:Not a function
+beaver1$temp:numeric:datasets:Not a function
+beaver1$activ:numeric:datasets:Not a function
+beaver2:data.frame:datasets:Not a function
+beaver2$day:numeric:datasets:Not a function
+beaver2$time:numeric:datasets:Not a function
+beaver2$temp:numeric:datasets:Not a function
+beaver2$activ:numeric:datasets:Not a function
+BJsales:ts:datasets:Not a function
+BJsales.lead:ts:datasets:Not a function
+BOD:data.frame:datasets:Not a function
+BOD$Time:numeric:datasets:Not a function
+BOD$demand:numeric:datasets:Not a function
+cars:data.frame:datasets:Not a function
+cars$speed:numeric:datasets:Not a function
+cars$dist:numeric:datasets:Not a function
+ChickWeight:nfnGroupedData:datasets:Not a function
+ChickWeight$weight:numeric:datasets:Not a function
+ChickWeight$Time:numeric:datasets:Not a function
+ChickWeight$Chick:orderedfactor:datasets:Not a function
+ChickWeight$Diet:factor:datasets:Not a function
+chickwts:data.frame:datasets:Not a function
+chickwts$weight:numeric:datasets:Not a function
+chickwts$feed:factor:datasets:Not a function
+co2:ts:datasets:Not a function
+CO2:nfnGroupedData:datasets:Not a function
+CO2$Plant:orderedfactor:datasets:Not a function
+CO2$Type:factor:datasets:Not a function
+CO2$Treatment:factor:datasets:Not a function
+CO2$conc:numeric:datasets:Not a function
+CO2$uptake:numeric:datasets:Not a function
+crimtab:table:datasets:Not a function
+discoveries:ts:datasets:Not a function
+DNase:nfnGroupedData:datasets:Not a function
+DNase$Run:orderedfactor:datasets:Not a function
+DNase$conc:numeric:datasets:Not a function
+DNase$density:numeric:datasets:Not a function
+esoph:data.frame:datasets:Not a function
+esoph$agegp:orderedfactor:datasets:Not a function
+esoph$alcgp:orderedfactor:datasets:Not a function
+esoph$tobgp:orderedfactor:datasets:Not a function
+esoph$ncases:numeric:datasets:Not a function
+esoph$ncontrols:numeric:datasets:Not a function
+euro:numeric:datasets:Not a function
+euro.cross:matrix:datasets:Not a function
+eurodist:dist:datasets:Not a function
+EuStockMarkets:mts:datasets:Not a function
+faithful:data.frame:datasets:Not a function
+faithful$eruptions:numeric:datasets:Not a function
+faithful$waiting:numeric:datasets:Not a function
+fdeaths:ts:datasets:Not a function
+Formaldehyde:data.frame:datasets:Not a function
+Formaldehyde$carb:numeric:datasets:Not a function
+Formaldehyde$optden:numeric:datasets:Not a function
+freeny:data.frame:datasets:Not a function
+freeny$y:ts:datasets:Not a function
+freeny$lag.quarterly.revenue:numeric:datasets:Not a function
+freeny$price.index:numeric:datasets:Not a function
+freeny$income.level:numeric:datasets:Not a function
+freeny$market.potential:numeric:datasets:Not a function
+freeny.x:matrix:datasets:Not a function
+freeny.y:ts:datasets:Not a function
+HairEyeColor:table:datasets:Not a function
+Harman23.cor:list:datasets:Not a function
+Harman23.cor$cov:matrix:datasets:Not a function
+Harman23.cor$center:numeric:datasets:Not a function
+Harman23.cor$n.obs:numeric:datasets:Not a function
+Harman74.cor:list:datasets:Not a function
+Harman74.cor$cov:matrix:datasets:Not a function
+Harman74.cor$center:numeric:datasets:Not a function
+Harman74.cor$n.obs:numeric:datasets:Not a function
+Indometh:nfnGroupedData:datasets:Not a function
+Indometh$Subject:orderedfactor:datasets:Not a function
+Indometh$time:numeric:datasets:Not a function
+Indometh$conc:numeric:datasets:Not a function
+infert:data.frame:datasets:Not a function
+infert$education:factor:datasets:Not a function
+infert$age:numeric:datasets:Not a function
+infert$parity:numeric:datasets:Not a function
+infert$induced:numeric:datasets:Not a function
+infert$case:numeric:datasets:Not a function
+infert$spontaneous:numeric:datasets:Not a function
+infert$stratum:integer:datasets:Not a function
+infert$pooled.stratum:numeric:datasets:Not a function
+InsectSprays:data.frame:datasets:Not a function
+InsectSprays$count:numeric:datasets:Not a function
+InsectSprays$spray:factor:datasets:Not a function
+iris:data.frame:datasets:Not a function
+iris$Sepal.Length:numeric:datasets:Not a function
+iris$Sepal.Width:numeric:datasets:Not a function
+iris$Petal.Length:numeric:datasets:Not a function
+iris$Petal.Width:numeric:datasets:Not a function
+iris$Species:factor:datasets:Not a function
+iris3:array:datasets:Not a function
+islands:numeric:datasets:Not a function
+JohnsonJohnson:ts:datasets:Not a function
+LakeHuron:ts:datasets:Not a function
+ldeaths:ts:datasets:Not a function
+lh:ts:datasets:Not a function
+LifeCycleSavings:data.frame:datasets:Not a function
+LifeCycleSavings$sr:numeric:datasets:Not a function
+LifeCycleSavings$pop15:numeric:datasets:Not a function
+LifeCycleSavings$pop75:numeric:datasets:Not a function
+LifeCycleSavings$dpi:numeric:datasets:Not a function
+LifeCycleSavings$ddpi:numeric:datasets:Not a function
+Loblolly:nfnGroupedData:datasets:Not a function
+Loblolly$height:numeric:datasets:Not a function
+Loblolly$age:numeric:datasets:Not a function
+Loblolly$Seed:orderedfactor:datasets:Not a function
+longley:data.frame:datasets:Not a function
+longley$GNP.deflator:numeric:datasets:Not a function
+longley$GNP:numeric:datasets:Not a function
+longley$Unemployed:numeric:datasets:Not a function
+longley$Armed.Forces:numeric:datasets:Not a function
+longley$Population:numeric:datasets:Not a function
+longley$Year:integer:datasets:Not a function
+longley$Employed:numeric:datasets:Not a function
+lynx:ts:datasets:Not a function
+mdeaths:ts:datasets:Not a function
+morley:data.frame:datasets:Not a function
+morley$Expt:integer:datasets:Not a function
+morley$Run:integer:datasets:Not a function
+morley$Speed:integer:datasets:Not a function
+mtcars:data.frame:datasets:Not a function
+mtcars$mpg:numeric:datasets:Not a function
+mtcars$cyl:numeric:datasets:Not a function
+mtcars$disp:numeric:datasets:Not a function
+mtcars$hp:numeric:datasets:Not a function
+mtcars$drat:numeric:datasets:Not a function
+mtcars$wt:numeric:datasets:Not a function
+mtcars$qsec:numeric:datasets:Not a function
+mtcars$vs:numeric:datasets:Not a function
+mtcars$am:numeric:datasets:Not a function
+mtcars$gear:numeric:datasets:Not a function
+mtcars$carb:numeric:datasets:Not a function
+nhtemp:ts:datasets:Not a function
+Nile:ts:datasets:Not a function
+nottem:ts:datasets:Not a function
+occupationalStatus:table:datasets:Not a function
+Orange:nfnGroupedData:datasets:Not a function
+Orange$Tree:orderedfactor:datasets:Not a function
+Orange$age:numeric:datasets:Not a function
+Orange$circumference:numeric:datasets:Not a function
+OrchardSprays:data.frame:datasets:Not a function
+OrchardSprays$decrease:numeric:datasets:Not a function
+OrchardSprays$rowpos:numeric:datasets:Not a function
+OrchardSprays$colpos:numeric:datasets:Not a function
+OrchardSprays$treatment:factor:datasets:Not a function
+PlantGrowth:data.frame:datasets:Not a function
+PlantGrowth$weight:numeric:datasets:Not a function
+PlantGrowth$group:factor:datasets:Not a function
+precip:numeric:datasets:Not a function
+presidents:ts:datasets:Not a function
+pressure:data.frame:datasets:Not a function
+pressure$temperature:numeric:datasets:Not a function
+pressure$pressure:numeric:datasets:Not a function
+Puromycin:data.frame:datasets:Not a function
+Puromycin$conc:numeric:datasets:Not a function
+Puromycin$rate:numeric:datasets:Not a function
+Puromycin$state:factor:datasets:Not a function
+quakes:data.frame:datasets:Not a function
+quakes$lat:numeric:datasets:Not a function
+quakes$long:numeric:datasets:Not a function
+quakes$depth:integer:datasets:Not a function
+quakes$mag:numeric:datasets:Not a function
+quakes$stations:integer:datasets:Not a function
+randu:data.frame:datasets:Not a function
+randu$x:numeric:datasets:Not a function
+randu$y:numeric:datasets:Not a function
+randu$z:numeric:datasets:Not a function
+rivers:numeric:datasets:Not a function
+rock:data.frame:datasets:Not a function
+rock$area:integer:datasets:Not a function
+rock$peri:numeric:datasets:Not a function
+rock$shape:numeric:datasets:Not a function
+rock$perm:numeric:datasets:Not a function
+Seatbelts:mts:datasets:Not a function
+sleep:data.frame:datasets:Not a function
+sleep$extra:numeric:datasets:Not a function
+sleep$group:factor:datasets:Not a function
+stackloss:data.frame:datasets:Not a function
+stackloss$Air.Flow:numeric:datasets:Not a function
+stackloss$Water.Temp:numeric:datasets:Not a function
+stackloss$Acid.Conc.:numeric:datasets:Not a function
+stackloss$stack.loss:numeric:datasets:Not a function
+stack.loss:numeric:datasets:Not a function
+stack.x:matrix:datasets:Not a function
+state.abb:character:datasets:Not a function
+state.area:numeric:datasets:Not a function
+state.center:list:datasets:Not a function
+state.center$x:numeric:datasets:Not a function
+state.center$y:numeric:datasets:Not a function
+state.division:factor:datasets:Not a function
+state.name:character:datasets:Not a function
+state.region:factor:datasets:Not a function
+state.x77:matrix:datasets:Not a function
+sunspot.month:ts:datasets:Not a function
+sunspots:ts:datasets:Not a function
+sunspot.year:ts:datasets:Not a function
+swiss:data.frame:datasets:Not a function
+swiss$Fertility:numeric:datasets:Not a function
+swiss$Agriculture:numeric:datasets:Not a function
+swiss$Examination:integer:datasets:Not a function
+swiss$Education:integer:datasets:Not a function
+swiss$Catholic:numeric:datasets:Not a function
+swiss$Infant.Mortality:numeric:datasets:Not a function
+Theoph:nfnGroupedData:datasets:Not a function
+Theoph$Subject:orderedfactor:datasets:Not a function
+Theoph$Wt:numeric:datasets:Not a function
+Theoph$Dose:numeric:datasets:Not a function
+Theoph$Time:numeric:datasets:Not a function
+Theoph$conc:numeric:datasets:Not a function
+Titanic:table:datasets:Not a function
+ToothGrowth:data.frame:datasets:Not a function
+ToothGrowth$len:numeric:datasets:Not a function
+ToothGrowth$supp:factor:datasets:Not a function
+ToothGrowth$dose:numeric:datasets:Not a function
+treering:ts:datasets:Not a function
+trees:data.frame:datasets:Not a function
+trees$Girth:numeric:datasets:Not a function
+trees$Height:numeric:datasets:Not a function
+trees$Volume:numeric:datasets:Not a function
+UCBAdmissions:table:datasets:Not a function
+UKDriverDeaths:ts:datasets:Not a function
+UKgas:ts:datasets:Not a function
+USAccDeaths:ts:datasets:Not a function
+USArrests:data.frame:datasets:Not a function
+USArrests$Murder:numeric:datasets:Not a function
+USArrests$Assault:integer:datasets:Not a function
+USArrests$UrbanPop:integer:datasets:Not a function
+USArrests$Rape:numeric:datasets:Not a function
+USJudgeRatings:data.frame:datasets:Not a function
+USJudgeRatings$CONT:numeric:datasets:Not a function
+USJudgeRatings$INTG:numeric:datasets:Not a function
+USJudgeRatings$DMNR:numeric:datasets:Not a function
+USJudgeRatings$DILG:numeric:datasets:Not a function
+USJudgeRatings$CFMG:numeric:datasets:Not a function
+USJudgeRatings$DECI:numeric:datasets:Not a function
+USJudgeRatings$PREP:numeric:datasets:Not a function
+USJudgeRatings$FAMI:numeric:datasets:Not a function
+USJudgeRatings$ORAL:numeric:datasets:Not a function
+USJudgeRatings$WRIT:numeric:datasets:Not a function
+USJudgeRatings$PHYS:numeric:datasets:Not a function
+USJudgeRatings$RTEN:numeric:datasets:Not a function
+USPersonalExpenditure:matrix:datasets:Not a function
+uspop:ts:datasets:Not a function
+VADeaths:matrix:datasets:Not a function
+volcano:matrix:datasets:Not a function
+warpbreaks:data.frame:datasets:Not a function
+warpbreaks$breaks:numeric:datasets:Not a function
+warpbreaks$wool:factor:datasets:Not a function
+warpbreaks$tension:factor:datasets:Not a function
+women:data.frame:datasets:Not a function
+women$height:numeric:datasets:Not a function
+women$weight:numeric:datasets:Not a function
+WorldPhones:matrix:datasets:Not a function
+WWWusage:ts:datasets:Not a function
+@<-:unknowClass:methods:object, name, value
+addNextMethod:standardGeneric:methods:method, f="<unknown>", mlist, optional=FALSE, envir
+allGenerics:function:methods:...
+allNames:function:methods:x
+Arith:groupGenericFunction:methods:e1, e2
+as:function:methods:object, Class, strict=TRUE, ext=c("possibleExtends", "thisClass", "Class")
+as<-:unknowClass:methods:object, Class, value
+asMethodDefinition:function:methods:def, signature=list, sealed=FALSE, fdef=def
+assignClassDef:function:methods:Class, def, where=.GlobalEnv, force=FALSE
+assignMethodsMetaData:function:methods:f, value, fdef, where, deflt=c("finalDefaultMethod", "value")
+balanceMethodsList:function:methods:mlist, args, check=TRUE
+body<-:unknowClass:methods:fun, envir=c("environment", "fun"), value
+cacheGenericsMetaData:function:methods:f, fdef, attach=TRUE, where=c("topenv", "parent.frame()"), package, methods
+cacheMetaData:function:methods:where, attach=TRUE, searchWhere=c("as.environment", "where"), doCheck=TRUE
+cacheMethod:function:methods:f, sig, def, args=c("names", "sig"), fdef, inherited=FALSE
+callGeneric:function:methods:...
+callNextMethod:function:methods:...
+canCoerce:function:methods:object, Class
+cbind2:standardGeneric:methods:x, y
+checkSlotAssignment:function:methods:obj, name, value
+classesToAM:function:methods:classes, includeSubclasses=FALSE, abbreviate=2
+classMetaName:function:methods:name
+coerce:nonstandardGenericFunction:methods:from, to, strict=TRUE
+coerce<-:unknowClass:methods:from, to, value
+Compare:groupGenericFunction:methods:e1, e2
+completeClassDefinition:function:methods:Class, ClassDef=c("getClassDef", "Class"), where, doExtends=TRUE
+completeExtends:function:methods:ClassDef, class2, extensionDef, where
+completeSubclasses:function:methods:classDef, class2, extensionDef, where, classDef2=c("getClassDef", "class2", "where")
+Complex:groupGenericFunction:methods:z
+conformMethod:function:methods:signature, mnames, fnames, f="<unspecified>", fdef, method
+defaultDumpName:function:methods:generic, signature
+defaultPrototype:function:methods:No arguments
+doPrimitiveMethod:function:methods:name, def, call=c("sys.call", "sys.parent()"), ev=c("sys.frame", "sys.parent(2)")
+dumpMethod:function:methods:f, signature=character, file=c("defaultDumpName", "f", "signature"), where=c("topenv", "parent.frame()"), def=c("getMethod", "f", "signature", "where", "TRUE")
+dumpMethods:function:methods:f, file="", signature=character, methods, where=c("topenv", "parent.frame()")
+el:function:methods:object, where
+el<-:unknowClass:methods:No arguments
+elNamed:function:methods:x, name, mustFind=FALSE
+elNamed<-:unknowClass:methods:x, name, value
+empty.dump:function:methods:No arguments
+emptyMethodsList:function:methods:mlist, thisClass="ANY", sublist=list
+existsFunction:function:methods:f, generic=TRUE, where=c("topenv", "parent.frame()")
+existsMethod:function:methods:f, signature=character, where=c("topenv", "parent.frame()")
+extends:function:methods:class1, class2, maybe=TRUE, fullInfo=FALSE
+finalDefaultMethod:function:methods:mlist, fname="NULL"
+findClass:function:methods:Class, where=c("topenv", "parent.frame()"), unique=""
+findFunction:function:methods:f, generic=TRUE, where=c("topenv", "parent.frame()")
+findMethod:function:methods:f, signature, where=c("topenv", "parent.frame()")
+findMethods:function:methods:f, where, classes=character, inherited=FALSE
+findMethodSignatures:function:methods:..., target=TRUE, methods=c("findMethods", "...")
+findUnique:function:methods:what, message, where=c("topenv", "parent.frame()")
+fixPre1.8:function:methods:names, where=c("topenv", "parent.frame()")
+formalArgs:function:methods:def
+functionBody:function:methods:fun=sys.function, fun=sys.parent()
+functionBody<-:unknowClass:methods:fun, envir=c("environment", "fun"), value
+generic.skeleton:function:methods:name, fdef, fdefault
+getAccess:function:methods:ClassDef
+getAllMethods:function:methods:f, fdef, where=c("topenv", "parent.frame()")
+getAllSuperClasses:function:methods:ClassDef, simpleOnly=TRUE
+getClass:function:methods:Class, .Force=FALSE, where=c(".classEnv", "Class", "topenv(parent.frame())", "FALSE")
+getClassDef:function:methods:Class, where=c("topenv", "parent.frame()"), package=c("packageSlot", "Class"), inherits=TRUE
+getClasses:function:methods:where=.externalCallerEnv, inherits=c("missing", "where")
+getClassName:function:methods:ClassDef
+getClassPackage:function:methods:ClassDef
+getDataPart:function:methods:object
+getExtends:function:methods:ClassDef
+getFunction:function:methods:name, generic=TRUE, mustFind=TRUE, where=c("topenv", "parent.frame()")
+getGeneric:function:methods:f, mustFind=FALSE, where, package=""
+getGenerics:function:methods:where, searchForm=FALSE
+getGroup:function:methods:fdef, recursive=FALSE, where=c("topenv", "parent.frame()")
+getGroupMembers:function:methods:group, recursive=FALSE, character=TRUE
+getMethod:function:methods:f, signature=character, where=c("topenv", "parent.frame()"), optional=FALSE, mlist, fdef
+getMethods:function:methods:f, where=c("topenv", "parent.frame()")
+getMethodsForDispatch:function:methods:fdef, inherited=FALSE
+getMethodsMetaData:function:methods:f, where=c("topenv", "parent.frame()")
+getPackageName:function:methods:where=c("topenv", "parent.frame()"), create=TRUE
+getProperties:function:methods:ClassDef
+getPrototype:function:methods:ClassDef
+getSlots:function:methods:x
+getSubclasses:function:methods:ClassDef
+getValidity:function:methods:ClassDef
+getVirtual:function:methods:ClassDef
+hasArg:function:methods:name
+hasMethod:function:methods:f, signature=character, where=c(".genEnv", "f", "topenv(parent.frame())")
+hasMethods:function:methods:f, where, package
+implicitGeneric:function:methods:name, where=c("topenv", "parent.frame()"), generic=c("getGeneric", "name", "where")
+inheritedSlotNames:function:methods:Class, where=c("topenv", "parent.frame()")
+initialize:nonstandardGenericFunction:methods:.Object, ...
+insertMethod:function:methods:mlist, signature, args, def, cacheOnly=FALSE
+is:function:methods:object, class2
+isClass:function:methods:Class, formal=TRUE, where=c("topenv", "parent.frame()")
+isClassDef:function:methods:object
+isClassUnion:function:methods:Class
+isGeneric:function:methods:f, where=c("topenv", "parent.frame()"), fdef=character(0), getName=FALSE
+isGrammarSymbol:function:methods:symbol
+isGroup:function:methods:f, where=c("topenv", "parent.frame()"), fdef=c("getGeneric", "f", "where")
+isSealedClass:function:methods:Class, where=c("topenv", "parent.frame()")
+isSealedMethod:function:methods:f, signature, fdef=c("getGeneric", "f", "FALSE", "where"), where=c("topenv", "parent.frame()")
+isVirtualClass:function:methods:Class, where=c("topenv", "parent.frame()")
+isXS3Class:function:methods:classDef
+languageEl:function:methods:object, which
+languageEl<-:unknowClass:methods:object, which, value
+linearizeMlist:function:methods:mlist, inherited=TRUE
+listFromMethods:function:methods:generic, where, table
+listFromMlist:function:methods:mlist, prefix=list, sigs.=TRUE, methods.=TRUE
+loadMethod:standardGeneric:methods:method, fname, envir
+Logic:groupGenericFunction:methods:e1, e2
+makeClassRepresentation:function:methods:name, slots=list, superClasses=character, prototype=character(0), package, validity=character(0), access=list, version=.newExternalptr, sealed=FALSE, virtual=NA, where
+makeExtends:function:methods:Class, to, coerce=character(0), test=character(0), replace=character(0), by=character, package, slots=c("getSlots", "classDef1"), classDef1=c("getClass", "Class"), classDef2
+makeGeneric:function:methods:f, fdef, fdefault=fdef, group=list, valueClass=character, package=c("getPackageName", "environment(fdef)"), signature=character(0), genericFunction=character(0), simpleInheritanceOnly=character(0)
+makeMethodsList:function:methods:object, level=1
+makePrototypeFromClassDef:function:methods:slots, ClassDef, extends, where
+makeStandardGeneric:function:methods:f, fdef
+matchSignature:function:methods:signature, fun, where=baseenv
+Math:groupGenericFunction:methods:Generic Method
+Math2:groupGenericFunction:methods:x, digits
+mergeMethods:function:methods:m1, m2, genericLabel=character
+metaNameUndo:function:methods:strings, prefix, searchForm=FALSE
+MethodAddCoerce:function:methods:method, argName, thisClass, methodClass
+methodSignatureMatrix:function:methods:object, sigSlots=c("c", "target", "defined")
+method.skeleton:function:methods:generic, signature, file, external=FALSE, where=c("topenv", "parent.frame()")
+MethodsList:function:methods:.ArgName, ...
+MethodsListSelect:function:methods:f, env, mlist=character(0), fEnv=c("if", "is(fdef, \"genericFunction\")", "environment(fdef)", "baseenv()"), finalDefault=c("finalDefaultMethod", "mlist", "f"), evalArgs=TRUE, useInherited=TRUE, fdef=c("getGeneric", "f", "env"), resetAllowed=TRUE
+methodsPackageMetaName:function:methods:prefix, name, package=""
+missingArg:function:methods:symbol, envir=parent.frame, eval=FALSE
+mlistMetaName:function:methods:name="", package=""
+new:function:methods:Class, ...
+newBasic:function:methods:Class, ...
+newClassRepresentation:function:methods:...
+newEmptyObject:function:methods:No arguments
+Ops:groupGenericFunction:methods:Generic Method
+packageSlot:function:methods:object
+packageSlot<-:unknowClass:methods:object, value
+possibleExtends:function:methods:class1, class2, ClassDef1=c("getClassDef", "class1"), ClassDef2=c("getClassDef", "class2", ".classEnv(ClassDef1)")
+prohibitGeneric:function:methods:name, where=c("topenv", "parent.frame()")
+promptClass:function:methods:clName, filename=character(0), type="class", keywords="classes", where=c("topenv", "parent.frame()")
+promptMethods:function:methods:f, filename=character(0), methods
+prototype:function:methods:...
+Quote:function:methods:No arguments
+rbind2:standardGeneric:methods:x, y
+reconcilePropertiesAndPrototype:function:methods:name, properties, prototype, superClasses, where
+registerImplicitGenerics:function:methods:what=.ImplicitGenericsTable, where=where, what=topenv, where=parent.frame()
+rematchDefinition:function:methods:definition, generic, mnames, fnames, signature
+removeClass:function:methods:Class, where=c("topenv", "parent.frame()")
+removeGeneric:function:methods:f, where=c("topenv", "parent.frame()")
+removeMethod:function:methods:f, signature=character, where=c("topenv", "parent.frame()")
+removeMethods:function:methods:f, where=c("topenv", "parent.frame()"), all=c("missing", "where")
+removeMethodsObject:function:methods:f, where=c("topenv", "parent.frame()")
+representation:function:methods:...
+requireMethods:function:methods:functions, signature, message="", where=c("topenv", "parent.frame()")
+resetClass:function:methods:Class, classDef, where
+resetGeneric:function:methods:f, fdef=c("getGeneric", "f", "where"), mlist=c("getMethodsForDispatch", "fdef"), where=c("topenv", "parent.frame()"), deflt=c("finalDefaultMethod", "mlist")
+S3Class:function:methods:object
+S3Class<-:unknowClass:methods:object, value
+S3Part:function:methods:object, strictS3=FALSE, S3Class
+S3Part<-:unknowClass:methods:object, strictS3=FALSE, needClass=c(".S3Class", "object"), value
+sealClass:function:methods:Class, where=c("topenv", "parent.frame()")
+seemsS4Object:function:methods:object
+selectMethod:function:methods:f, signature, optional=FALSE, useInherited=TRUE, mlist=c("if", "!is.null(fdef)", "getMethodsForDispatch(fdef)"), fdef=c("getGeneric", "f", "!optional"), verbose=FALSE
+selectSuperClasses:function:methods:Class, dropVirtual=FALSE, namesOnly=TRUE, directOnly=TRUE, simpleOnly=directOnly, where=c("topenv", "parent.frame()")
+sessionData:function:methods:No arguments
+setAs:function:methods:from, to, def, replace=character(0), where=c("topenv", "parent.frame()")
+setClass:function:methods:Class, representation=list, prototype=character(0), contains=character, validity=character(0), access=list, where=c("topenv", "parent.frame()"), version=.newExternalptr, sealed=FALSE, package=c("getPackageName", "where"), S3methods=FALSE
+setClassUnion:function:methods:name, members=character, where=c("topenv", "parent.frame()")
+setDataPart:function:methods:object, value, check=TRUE
+setGeneric:function:methods:name, def=character(0), group=list, valueClass=character, where=c("topenv", "parent.frame()"), package=character(0), signature=character(0), useAsDefault=character(0), genericFunction=character(0), simpleInheritanceOnly=character(0)
+setGenericImplicit:function:methods:name, where=c("topenv", "parent.frame()"), restore=TRUE
+setGroupGeneric:function:methods:name, def=character(0), group=list, valueClass=character, knownMembers=list, package=c("getPackageName", "where"), where=c("topenv", "parent.frame()")
+setIs:function:methods:class1, class2, test=character(0), coerce=character(0), replace=character(0), by=character, where=c("topenv", "parent.frame()"), classDef=c("getClass", "class1", "TRUE", "where"), extensionObject=character(0), doComplete=TRUE
+setMethod:function:methods:f, signature=character, definition, where=c("topenv", "parent.frame()"), valueClass=character(0), sealed=FALSE
+setOldClass:function:methods:Classes, prototype=character(0), where=c("topenv", "parent.frame()"), test=FALSE, S4Class
+setPackageName:function:methods:pkg, env
+setPrimitiveMethods:function:methods:f, fdef, code, generic, mlist=c("get", ".Methods", "environment(generic)")
+setReplaceMethod:function:methods:f, ..., where=c("topenv", "parent.frame()")
+setValidity:function:methods:Class, method, where=c("topenv", "parent.frame()")
+show:standardGeneric:methods:object
+showClass:function:methods:Class, complete=TRUE, propertiesAreCalled="Slots"
+showDefault:function:methods:object, oldMethods=TRUE
+showExtends:function:methods:ext, printTo=stdout
+showMethods:function:methods:f=character, where=c("topenv", "parent.frame()"), classes=character(0), includeDefs=FALSE, inherited=c("!", "includeDefs"), showEmpty, printTo=stdout, fdef=c("getGeneric", "f", "where")
+showMlist:function:methods:mlist, includeDefs=TRUE, inherited=TRUE, classes=character(0), useArgNames=TRUE, printTo=stdout
+signature:function:methods:...
+SignatureMethod:function:methods:names, signature, definition
+sigToEnv:function:methods:signature, generic
+slot:function:methods:object, name
+slot<-:unknowClass:methods:object, name, check=TRUE, value
+slotNames:function:methods:x
+slotsFromS3:standardGeneric:methods:object
+substituteDirect:function:methods:object, frame=parent.frame, cleanFunction=TRUE
+substituteFunctionArgs:function:methods:def, newArgs, args=c("formalArgs", "def"), silent=FALSE, functionName="a function"
+Summary:groupGenericFunction:methods:Generic Method
+superClassDepth:function:methods:ClassDef, soFar=c("@", "ClassDef", "className"), simpleOnly=TRUE
+testInheritedMethods:function:methods:f, signatures, test=TRUE, virtual=FALSE, groupMethods=TRUE, where=.GlobalEnv
+testVirtual:function:methods:properties, extends, prototype, where
+traceOff:function:methods:what
+traceOn:function:methods:what, tracer=browseAll, exit=character(0)
+tryNew:function:methods:Class, where
+trySilent:function:methods:expr
+unRematchDefinition:function:methods:definition
+validObject:function:methods:object, test=FALSE, complete=FALSE
+validSlotNames:function:methods:names
+^:unknowClass:base:No arguments
+~:unknowClass:base:No arguments
+<:unknowClass:base:No arguments
+<<-:unknowClass:base:No arguments
+<=:unknowClass:base:No arguments
+<-:unknowClass:base:No arguments
+=:unknowClass:base:No arguments
+==:unknowClass:base:No arguments
+>:unknowClass:base:No arguments
+>=:unknowClass:base:No arguments
+|:unknowClass:base:Generic Method
+||:unknowClass:base:No arguments
+-:unknowClass:base:Generic Method
+::unknowClass:base:No arguments
+:::unknowClass:base:pkg, name
+::::unknowClass:base:pkg, name
+!:unknowClass:base:No arguments
+!=:unknowClass:base:No arguments
+/:unknowClass:base:Generic Method
+(:unknowClass:base:No arguments
+[:unknowClass:base:Generic Method
+[<-:unknowClass:base:Generic Method
+[[:unknowClass:base:Generic Method
+[[<-:unknowClass:base:Generic Method
+{:unknowClass:base:No arguments
+@:unknowClass:base:No arguments
+$:unknowClass:base:No arguments
+$<-:unknowClass:base:No arguments
+*:unknowClass:base:Generic Method
+&:unknowClass:base:No arguments
+&&:unknowClass:base:No arguments
+%/%:unknowClass:base:No arguments
+%*%:unknowClass:base:No arguments
+%%:unknowClass:base:No arguments
++:unknowClass:base:Generic Method
+abbreviate:function:base:names.arg, minlength=4, use.classes=TRUE, dot=FALSE, strict=FALSE, method=c("c", "left.kept", "both.sides")
+abs:function:base:No arguments
+acos:function:base:No arguments
+acosh:function:base:No arguments
+addNA:function:base:x, ifany=FALSE
+addTaskCallback:function:base:f, data=character(0), name=c("character", "0")
+agrep:function:base:pattern, x, ignore.case=FALSE, value=FALSE, max.distance=0,1, useBytes=FALSE
+alist:function:base:...
+all:function:base:No arguments
+all.equal:function:base:target, current, ...
+all.equal.character:function:base:target, current, check.attributes=TRUE, ...
+all.equal.default:function:base:target, current, ...
+all.equal.factor:function:base:target, current, check.attributes=TRUE, ...
+all.equal.formula:function:base:target, current, ...
+all.equal.language:function:base:target, current, ...
+all.equal.list:function:base:target, current, check.attributes=TRUE, ...
+all.equal.numeric:function:base:target, current, tolerance=c("^", ".Machine$double.eps", "0.5"), scale=character(0), check.attributes=TRUE, ...
+all.equal.POSIXct:function:base:target, current, ..., scale=1
+all.equal.raw:function:base:target, current, check.attributes=TRUE, ...
+all.names:function:base:expr, functions=TRUE, max.names=c("-", "1"), unique=FALSE
+all.vars:function:base:expr, functions=FALSE, max.names=c("-", "1"), unique=TRUE
+any:function:base:No arguments
+anyDuplicated:function:base:x, incomparables=FALSE, ...
+anyDuplicated.array:function:base:x, incomparables=FALSE, MARGIN=1, fromLast=FALSE, ...
+anyDuplicated.data.frame:function:base:x, incomparables=FALSE, fromLast=FALSE, ...
+anyDuplicated.default:function:base:x, incomparables=FALSE, fromLast=FALSE, ...
+anyDuplicated.matrix:function:base:x, incomparables=FALSE, MARGIN=1, fromLast=FALSE, ...
+aperm:function:base:a, perm, resize=TRUE
+append:function:base:x, values, after=c("length", "x")
+apply:function:base:X, MARGIN, FUN, ...
+Arg:function:base:No arguments
+args:function:base:name
+array:function:base:data=NA, dim=c("length", "data"), dimnames=character(0)
+as.array:function:base:x, ...
+as.array.default:function:base:x, ...
+as.call:function:base:No arguments
+as.character:function:base:Generic Method
+as.character.condition:function:base:x, ...
+as.character.Date:function:base:x, ...
+as.character.default:function:base:x, ...
+as.character.error:function:base:x, ...
+as.character.factor:function:base:x, ...
+as.character.hexmode:function:base:x, upper.case=FALSE, ...
+as.character.numeric_version:function:base:x, ...
+as.character.octmode:function:base:x, ...
+as.character.POSIXt:function:base:x, ...
+as.character.srcref:function:base:x, useSource=TRUE, ...
+as.complex:function:base:No arguments
+as.data.frame:function:base:Generic Method
+as.data.frame.array:function:base:x, row.names=character(0), optional=FALSE, ...
+as.data.frame.AsIs:function:base:x, row.names=character(0), optional=FALSE, ...
+as.data.frame.character:function:base:x, ..., stringsAsFactors=default.stringsAsFactors
+as.data.frame.complex:function:base:x, row.names=character(0), optional=FALSE, ..., nm=c("paste", "deparse(substitute(x), width.cutoff = 500)", " ")
+as.data.frame.data.frame:function:base:x, row.names=character(0), ...
+as.data.frame.Date:function:base:x, row.names=character(0), optional=FALSE, ..., nm=c("paste", "deparse(substitute(x), width.cutoff = 500)", " ")
+as.data.frame.default:function:base:x, ...
+as.data.frame.difftime:function:base:x, row.names=character(0), optional=FALSE, ..., nm=c("paste", "deparse(substitute(x), width.cutoff = 500)", " ")
+as.data.frame.factor:function:base:x, row.names=character(0), optional=FALSE, ..., nm=c("paste", "deparse(substitute(x), width.cutoff = 500)", " ")
+as.data.frame.integer:function:base:x, row.names=character(0), optional=FALSE, ..., nm=c("paste", "deparse(substitute(x), width.cutoff = 500)", " ")
+as.data.frame.list:function:base:x, row.names=character(0), optional=FALSE, ..., stringsAsFactors=default.stringsAsFactors
+as.data.frame.logical:function:base:x, row.names=character(0), optional=FALSE, ..., nm=c("paste", "deparse(substitute(x), width.cutoff = 500)", " ")
+as.data.frame.matrix:function:base:x, row.names=character(0), optional=FALSE, ..., stringsAsFactors=default.stringsAsFactors
+as.data.frame.model.matrix:function:base:x, row.names=character(0), optional=FALSE, ...
+as.data.frame.numeric:function:base:x, row.names=character(0), optional=FALSE, ..., nm=c("paste", "deparse(substitute(x), width.cutoff = 500)", " ")
+as.data.frame.numeric_version:function:base:x, row.names=character(0), optional=FALSE, ..., nm=c("paste", "deparse(substitute(x), width.cutoff = 500)", " ")
+as.data.frame.ordered:function:base:x, row.names=character(0), optional=FALSE, ..., nm=c("paste", "deparse(substitute(x), width.cutoff = 500)", " ")
+as.data.frame.POSIXct:function:base:x, row.names=character(0), optional=FALSE, ..., nm=c("paste", "deparse(substitute(x), width.cutoff = 500)", " ")
+as.data.frame.POSIXlt:function:base:x, row.names=character(0), optional=FALSE, ...
+as.data.frame.raw:function:base:x, row.names=character(0), optional=FALSE, ..., nm=c("paste", "deparse(substitute(x), width.cutoff = 500)", " ")
+as.data.frame.table:function:base:x, row.names=character(0), ..., responseName="Freq", stringsAsFactors=TRUE
+as.data.frame.ts:function:base:x, ...
+as.data.frame.vector:function:base:x, row.names=character(0), optional=FALSE, ..., nm=c("paste", "deparse(substitute(x), width.cutoff = 500)", " ")
+as.Date:function:base:x, ...
+as.Date.character:function:base:x, format="", ...
+as.Date.date:function:base:x, ...
+as.Date.dates:function:base:x, ...
+as.Date.default:function:base:x, ...
+as.Date.factor:function:base:x, ...
+as.Date.numeric:function:base:x, origin, ...
+as.Date.POSIXct:function:base:x, ...
+as.Date.POSIXlt:function:base:x, ...
+as.difftime:function:base:tim, format="%X", units="auto"
+as.double:function:base:Generic Method
+as.double.difftime:function:base:x, units="auto", ...
+as.double.POSIXlt:function:base:x, ...
+as.environment:function:base:No arguments
+as.expression:function:base:x, ...
+as.expression.default:function:base:x, ...
+as.factor:function:base:x
+as.function:function:base:x, ...
+as.function.default:function:base:x, envir=parent.frame, ...
+as.hexmode:function:base:x
+asin:function:base:No arguments
+asinh:function:base:No arguments
+as.integer:function:base:No arguments
+[.AsIs:unknowClass:base:x, i, ...
+as.list:function:base:x, ...
+as.list.data.frame:function:base:x, ...
+as.list.default:function:base:x, ...
+as.list.environment:function:base:x, all.names=FALSE, ...
+as.list.factor:function:base:x, ...
+as.list.function:function:base:x, ...
+as.list.numeric_version:function:base:x, ...
+as.logical:function:base:No arguments
+as.matrix:function:base:Generic Method
+as.matrix.data.frame:function:base:x, rownames.force=NA, ...
+as.matrix.default:function:base:x, ...
+as.matrix.noquote:function:base:x, ...
+as.matrix.POSIXlt:function:base:x, ...
+as.name:function:base:x
+asNamespace:function:base:ns, base.OK=TRUE
+as.null:function:base:x, ...
+as.null.default:function:base:x, ...
+as.numeric:function:base:No arguments
+as.numeric_version:function:base:x
+as.octmode:function:base:x
+as.ordered:function:base:x
+as.package_version:function:base:x
+as.pairlist:function:base:x
+as.POSIXct:function:base:x, tz="", ...
+as.POSIXct.date:function:base:x, ...
+as.POSIXct.Date:function:base:x, ...
+as.POSIXct.dates:function:base:x, ...
+as.POSIXct.default:function:base:x, tz="", ...
+as.POSIXct.numeric:function:base:x, tz="", origin, ...
+as.POSIXct.POSIXlt:function:base:x, tz="", ...
+as.POSIXlt:function:base:x, tz="", ...
+as.POSIXlt.character:function:base:x, tz="", format, ...
+as.POSIXlt.date:function:base:x, ...
+as.POSIXlt.Date:function:base:x, ...
+as.POSIXlt.dates:function:base:x, ...
+as.POSIXlt.default:function:base:x, tz="", ...
+as.POSIXlt.factor:function:base:x, ...
+as.POSIXlt.numeric:function:base:x, tz="", origin, ...
+as.POSIXlt.POSIXct:function:base:x, tz="", ...
+as.qr:function:base:x
+as.raw:function:base:No arguments
+as.real:function:base:No arguments
+asS4:function:base:object, flag=TRUE, complete=TRUE
+assign:function:base:x, value, pos=c("-", "1"), envir=c("as.environment", "pos"), inherits=FALSE, immediate=TRUE
+as.single:function:base:x, ...
+as.single.default:function:base:x, ...
+as.symbol:function:base:x
+as.table:function:base:x, ...
+as.table.default:function:base:x, ...
+as.vector:function:base:Generic Method
+as.vector.factor:function:base:x, mode="any"
+atan:function:base:No arguments
+atan2:function:base:y, x
+atanh:function:base:No arguments
+attach:function:base:what, pos=2, name=c("deparse", "substitute(what)"), warn.conflicts=TRUE
+attachNamespace:function:base:ns, pos=2, dataPath=character(0)
+attr:function:base:No arguments
+attr<-:unknowClass:base:No arguments
+attr.all.equal:function:base:target, current, check.attributes=TRUE, check.names=TRUE, ...
+attributes:function:base:No arguments
+attributes<-:unknowClass:base:No arguments
+autoload:function:base:name, package, reset=FALSE, ...
+autoloader:function:base:name, package, ...
+backsolve:function:base:r, x, k=c("ncol", "r"), upper.tri=TRUE, transpose=FALSE
+baseenv:function:base:No arguments
+basename:function:base:path
+besselI:function:base:x, nu, expon.scaled=FALSE
+besselJ:function:base:x, nu
+besselK:function:base:x, nu, expon.scaled=FALSE
+besselY:function:base:x, nu
+beta:function:base:a, b
+bindingIsActive:function:base:sym, env
+bindingIsLocked:function:base:sym, env
+bindtextdomain:function:base:domain, dirname=character(0)
+body:function:base:fun=sys.function, fun=sys.parent()
+body<-:unknowClass:base:fun, envir=c("environment", "fun"), value
+bquote:function:base:expr, where=parent.frame
+break:flow-control:base:No arguments
+browser:function:base:No arguments
+browserCondition:function:base:n=1
+browserSetDebug:function:base:n=1
+browserText:function:base:n=1
+builtins:function:base:internal=FALSE
+by:function:base:data, INDICES, FUN, ..., simplify=TRUE
+by.data.frame:function:base:data, INDICES, FUN, ..., simplify=TRUE
+by.default:function:base:data, INDICES, FUN, ..., simplify=TRUE
+bzfile:function:base:description, open="", encoding=c("getOption", "encoding"), compression=9
+c:function:base:Generic Method
+call:function:base:No arguments
+callCC:function:base:fun
+capabilities:function:base:what=character(0)
+casefold:function:base:x, upper=FALSE
+cat:function:base:..., file="", sep=" ", fill=FALSE, labels=character(0), append=FALSE
+category:function:base:...
+cbind:function:base:Generic Method
+cbind.data.frame:function:base:..., deparse.level=1
+c.Date:function:base:..., recursive=FALSE
+ceiling:function:base:No arguments
+character:function:base:length=0
+char.expand:function:base:input, target, nomatch=c("stop", "no match")
+charmatch:function:base:x, table, nomatch=NA
+charToRaw:function:base:x
+chartr:function:base:old, new, x
+check_tzones:unknowClass:base:...
+chol:function:base:x, ...
+chol2inv:function:base:x, size=c("NCOL", "x"), LINPACK=FALSE
+chol.default:function:base:x, pivot=FALSE, LINPACK=pivot, ...
+choose:function:base:n, k
+class:function:base:No arguments
+class<-:unknowClass:base:No arguments
+close:function:base:con, ...
+closeAllConnections:function:base:No arguments
+close.connection:function:base:con, type="rw", ...
+close.srcfile:function:base:con, ...
+c.noquote:function:base:..., recursive=FALSE
+c.numeric_version:function:base:..., recursive=FALSE
+codes:function:base:x, ...
+codes<-:unknowClass:base:x, ..., value
+codes.factor:function:base:x, ...
+codes.ordered:function:base:x, ...
+col:function:base:x, as.factor=FALSE
+colMeans:function:base:x, na.rm=FALSE, dims=1
+colnames:function:base:x, do.NULL=TRUE, prefix="col"
+colnames<-:unknowClass:base:x, value
+colSums:function:base:x, na.rm=FALSE, dims=1
+commandArgs:function:base:trailingOnly=FALSE
+comment:function:base:x
+comment<-:unknowClass:base:x, value
+complex:function:base:length.out=0, real=numeric, imaginary=numeric, modulus=1, argument=0
+computeRestarts:function:base:cond=character(0)
+conditionCall:function:base:c
+conditionCall.condition:function:base:c
+conditionMessage:function:base:c
+conditionMessage.condition:function:base:c
+conflicts:function:base:where=search, detail=FALSE
+Conj:function:base:No arguments
+contributors:function:base:No arguments
+cos:function:base:No arguments
+cosh:function:base:No arguments
+c.POSIXct:function:base:..., recursive=FALSE
+c.POSIXlt:function:base:..., recursive=FALSE
+crossprod:function:base:x, y=character(0)
+Cstack_info:unknowClass:base:No arguments
+cummax:function:base:No arguments
+cummin:function:base:No arguments
+cumprod:function:base:No arguments
+cumsum:function:base:No arguments
+cut:function:base:x, ...
+cut.Date:function:base:x, breaks, labels=character(0), start.on.monday=TRUE, right=FALSE, ...
+cut.default:function:base:x, breaks, labels=character(0), include.lowest=FALSE, right=TRUE, dig.lab=3, ordered_result=FALSE, ...
+cut.POSIXt:function:base:x, breaks, labels=character(0), start.on.monday=TRUE, right=FALSE, ...
+data.class:function:base:x
+[<-.data.frame:unknowClass:base:x, i, j, value
+[.data.frame:unknowClass:base:x, i, j, drop=c("if", "missing(i)", "TRUE", "length(cols) == 1")
+[[<-.data.frame:unknowClass:base:x, i, j, value
+[[.data.frame:unknowClass:base:x, ..., exact=TRUE
+$<-.data.frame:unknowClass:base:x, name, value
+data.frame:function:base:..., row.names=character(0), check.rows=FALSE, check.names=TRUE, stringsAsFactors=default.stringsAsFactors
+data.matrix:function:base:frame, rownames.force=NA
+date:function:base:No arguments
+-.Date:unknowClass:base:e1, e2
+[<-.Date:unknowClass:base:x, ..., value
+[.Date:unknowClass:base:x, ..., drop=TRUE
+[[.Date:unknowClass:base:x, ..., drop=TRUE
++.Date:unknowClass:base:e1, e2
+debug:function:base:fun, text="", condition=character(0)
+debugonce:function:base:fun, text="", condition=character(0)
+default.stringsAsFactors:function:base:No arguments
+delay:function:base:x, env=.GlobalEnv
+delayedAssign:function:base:x, value, eval.env=c("parent.frame", "1"), assign.env=c("parent.frame", "1")
+deparse:function:base:expr, width.cutoff=60, backtick=c("%in%", "mode(expr)", "c(\"call\", \"expression\", \"(\", \"function\")"), control=c("c", "keepInteger", "showAttributes", "keepNA"), nlines=c("-", "1")
+det:function:base:x, ...
+detach:function:base:name, pos=2, unload=FALSE, character.only=FALSE
+determinant:function:base:x, logarithm=TRUE, ...
+determinant.matrix:function:base:x, logarithm=TRUE, ...
+dget:function:base:file
+diag:function:base:x=1, nrow, ncol
+diag<-:unknowClass:base:x, value
+diff:function:base:x, ...
+diff.Date:function:base:x, lag=1, differences=1, ...
+diff.default:function:base:x, lag=1, differences=1, ...
+diff.POSIXt:function:base:x, lag=1, differences=1, ...
+difftime:function:base:time1, time2, tz="", units=c("c", "auto", "secs", "mins", "hours", "days", "weeks")
+/.difftime:unknowClass:base:e1, e2
+[.difftime:unknowClass:base:x, ..., drop=TRUE
+*.difftime:unknowClass:base:e1, e2
+digamma:function:base:No arguments
+dim:function:base:Generic Method
+dim<-:unknowClass:base:No arguments
+dim.data.frame:function:base:x
+dimnames:function:base:Generic Method
+dimnames<-:unknowClass:base:Generic Method
+dimnames<-.data.frame:unknowClass:base:x, value
+dimnames.data.frame:function:base:x
+dir:function:base:path=".", pattern=character(0), all.files=FALSE, full.names=FALSE, recursive=FALSE, ignore.case=FALSE
+dir.create:function:base:path, showWarnings=TRUE, recursive=FALSE, mode="0777"
+dirname:function:base:path
+$.DLLInfo:unknowClass:base:x, name
+do.call:function:base:what, args, quote=FALSE, envir=parent.frame
+double:function:base:length=0
+dput:function:base:x, file="", control=c("c", "keepNA", "keepInteger", "showAttributes")
+dQuote:function:base:x
+drop:function:base:x
+dump:function:base:list, file="dumpdata.R", append=FALSE, control="all", envir=parent.frame, evaluate=TRUE
+duplicated:function:base:x, incomparables=FALSE, ...
+duplicated.array:function:base:x, incomparables=FALSE, MARGIN=1, fromLast=FALSE, ...
+duplicated.data.frame:function:base:x, incomparables=FALSE, fromLast=FALSE, ...
+duplicated.default:function:base:x, incomparables=FALSE, fromLast=FALSE, ...
+duplicated.matrix:function:base:x, incomparables=FALSE, MARGIN=1, fromLast=FALSE, ...
+duplicated.numeric_version:function:base:x, incomparables=FALSE, ...
+duplicated.POSIXlt:function:base:x, incomparables=FALSE, ...
+dyn.load:function:base:x, local=TRUE, now=TRUE, ...
+dyn.unload:function:base:x
+eapply:function:base:env, FUN, ..., all.names=FALSE, USE.NAMES=TRUE
+eigen:function:base:x, symmetric, only.values=FALSE, EISPACK=FALSE
+emptyenv:function:base:No arguments
+encodeString:function:base:x, width=0, quote="", na.encode=TRUE, justify=c("c", "left", "right", "centre", "none")
+Encoding:function:base:x
+Encoding<-:unknowClass:base:x, value
+environment:function:base:fun=character(0)
+environment<-:unknowClass:base:No arguments
+environmentIsLocked:function:base:env
+environmentName:function:base:env
+env.profile:function:base:env
+eval:function:base:expr, envir=parent.frame, enclos=c("if", "is.list(envir) || is.pairlist(envir)", "parent.frame()", "baseenv()")
+eval.parent:function:base:expr, n=1
+evalq:function:base:expr, envir=parent.frame, enclos=c("if", "is.list(envir) || is.pairlist(envir)", "parent.frame()", "baseenv()")
+exists:function:base:x, where=c("-", "1"), envir=c("if", "missing(frame)", "as.environment(where)", "sys.frame(frame)"), frame, mode="any", inherits=TRUE
+exp:function:base:No arguments
+expand.grid:function:base:..., KEEP.OUT.ATTRS=TRUE, stringsAsFactors=TRUE
+expm1:function:base:No arguments
+expression:function:base:No arguments
+F:logical:base:Not a function
+factor:function:base:x=character, levels, labels=levels, exclude=NA, ordered=c("is.ordered", "x")
+[<-.factor:unknowClass:base:x, ..., value
+[.factor:unknowClass:base:x, ..., drop=FALSE
+[[.factor:unknowClass:base:x, ...
+factorial:function:base:x
+fifo:function:base:description, open="", blocking=FALSE, encoding=c("getOption", "encoding")
+file:function:base:description="", open="", blocking=TRUE, encoding=c("getOption", "encoding")
+file.access:function:base:names, mode=0
+file.append:function:base:file1, file2
+file.choose:function:base:new=FALSE
+file.copy:function:base:from, to, overwrite=recursive, recursive=FALSE
+file.create:function:base:..., showWarnings=TRUE
+file.exists:function:base:...
+file.info:function:base:...
+file.path:function:base:..., fsep=c("$", ".Platform", "file.sep")
+file.remove:function:base:...
+file.rename:function:base:from, to
+file.show:function:base:..., header=c("rep", "", "nfiles"), title="R Information", delete.file=FALSE, pager=c("getOption", "pager"), encoding=""
+file.symlink:function:base:from, to
+Filter:function:base:f, x
+Find:function:base:f, x, right=FALSE, nomatch=character(0)
+findInterval:function:base:x, vec, rightmost.closed=FALSE, all.inside=FALSE
+findPackageEnv:function:base:info
+findRestart:function:base:name, cond=character(0)
+floor:function:base:No arguments
+flush:function:base:con
+flush.connection:function:base:con
+for:flow-control:base:No arguments
+force:function:base:x
+formals:function:base:fun=sys.function, fun=sys.parent()
+formals<-:unknowClass:base:fun, envir=c("environment", "fun"), value
+format:function:base:x, ...
+format.AsIs:function:base:x, width=12, ...
+formatC:function:base:x, digits=character(0), width=character(0), format=character(0), flag="", mode=character(0), big.mark="", big.interval=3, small.mark="", small.interval=5, decimal.mark=".", preserve.width="individual", zero.print=character(0), drop0trailing=FALSE
+format.char:function:base:x, width=character(0), flag="-"
+format.data.frame:function:base:x, ..., justify="none"
+format.Date:function:base:x, ...
+format.default:function:base:x, trim=FALSE, digits=character(0), nsmall=0, justify=c("c", "left", "right", "centre", "none"), width=character(0), na.encode=TRUE, scientific=NA, big.mark="", big.interval=3, small.mark="", small.interval=5, decimal.mark=".", zero.print=character(0), drop0trailing=FALSE, ...
+format.difftime:function:base:x, ...
+formatDL:function:base:x, y, style=c("c", "table", "list"), width=c("*", "0.9", "getOption(\"width\")"), indent=character(0)
+format.factor:function:base:x, ...
+format.hexmode:function:base:x, upper.case=FALSE, ...
+format.info:function:base:x, digits=character(0), nsmall=0
+format.octmode:function:base:x, ...
+format.POSIXct:function:base:x, format="", tz="", usetz=FALSE, ...
+format.POSIXlt:function:base:x, format="", usetz=FALSE, ...
+format.pval:function:base:pv, digits=c("max", "1", "getOption(\"digits\") - 2"), eps=c("$", ".Machine", "double.eps"), na.form="NA"
+forwardsolve:function:base:l, x, k=c("ncol", "l"), upper.tri=FALSE, transpose=FALSE
+function:flow-control:base:No arguments
+gamma:function:base:No arguments
+gammaCody:function:base:x
+gc:function:base:verbose=c("getOption", "verbose"), reset=FALSE
+gcinfo:function:base:verbose
+gc.time:function:base:No arguments
+gctorture:function:base:on=TRUE
+get:function:base:x, pos=c("-", "1"), envir=c("as.environment", "pos"), mode="any", inherits=TRUE
+getAllConnections:function:base:No arguments
+getCallingDLL:function:base:f=c("sys.function", "-1"), doStop=FALSE
+getCallingDLLe:function:base:e
+getCConverterDescriptions:function:base:No arguments
+getCConverterStatus:function:base:No arguments
+getConnection:function:base:what
+getDLLRegisteredRoutines:function:base:dll, addNames=TRUE
+getDLLRegisteredRoutines.character:function:base:dll, addNames=TRUE
+getDLLRegisteredRoutines.DLLInfo:function:base:dll, addNames=TRUE
+getenv:function:base:...
+geterrmessage:function:base:No arguments
+getExportedValue:function:base:ns, name
+getHook:function:base:hookName
+getLoadedDLLs:function:base:No arguments
+getNamespace:function:base:name
+getNamespaceExports:function:base:ns
+getNamespaceImports:function:base:ns
+getNamespaceInfo:function:base:ns, which
+getNamespaceName:function:base:ns
+getNamespaceUsers:function:base:ns
+getNamespaceVersion:function:base:ns
+getNativeSymbolInfo:function:base:name, PACKAGE, unlist=TRUE, withRegistrationInfo=FALSE
+getNumCConverters:function:base:No arguments
+getOption:function:base:x, default=character(0)
+getRversion:function:base:No arguments
+getSrcLines:function:base:srcfile, first, last
+getTaskCallbackNames:function:base:No arguments
+gettext:function:base:..., domain=character(0)
+gettextf:function:base:fmt, ..., domain=character(0)
+getwd:function:base:No arguments
+gl:function:base:n, k, length=c("*", "n", "k"), labels=c(":", "1", "n"), ordered=FALSE
+globalenv:function:base:No arguments
+gregexpr:function:base:pattern, text, ignore.case=FALSE, extended=TRUE, perl=FALSE, fixed=FALSE, useBytes=FALSE
+grep:function:base:pattern, x, ignore.case=FALSE, extended=TRUE, perl=FALSE, value=FALSE, fixed=FALSE, useBytes=FALSE, invert=FALSE
+grepl:function:base:pattern, x, ignore.case=FALSE, extended=TRUE, perl=FALSE, fixed=FALSE, useBytes=FALSE
+gsub:function:base:pattern, replacement, x, ignore.case=FALSE, extended=TRUE, perl=FALSE, fixed=FALSE, useBytes=FALSE
+gzcon:function:base:con, level=6, allowNonCompressed=TRUE
+gzfile:function:base:description, open="", encoding=c("getOption", "encoding"), compression=6
+[.hexmode:unknowClass:base:x, i
+httpclient:function:base:url, port=80, error.is.fatal=TRUE, check.MIME.type=TRUE, file=tempfile, drop.ctrl.z=TRUE
+I:function:base:x
+iconv:function:base:x, from="", to="", sub=NA, mark=TRUE
+iconvlist:function:base:No arguments
+icuSetCollate:function:base:...
+identical:function:base:x, y, num.eq=TRUE, single.NA=TRUE, attrib.as.set=TRUE
+identity:function:base:x
+if:flow-control:base:No arguments
+ifelse:function:base:test, yes, no
+Im:function:base:No arguments
+importIntoEnv:function:base:impenv, impnames, expenv, expnames
+%in%:unknowClass:base:x, table
+inherits:function:base:x, what, which=FALSE
+integer:function:base:length=0
+interaction:function:base:..., drop=FALSE, sep=".", lex.order=FALSE
+interactive:function:base:No arguments
+intersect:function:base:x, y
+intToBits:function:base:x
+intToUtf8:function:base:x, multiple=FALSE
+inverse.rle:function:base:x, ...
+invisible:function:base:No arguments
+invokeRestart:function:base:r, ...
+invokeRestartInteractively:function:base:r
+is.array:function:base:No arguments
+is.atomic:function:base:No arguments
+isBaseNamespace:function:base:ns
+is.call:function:base:No arguments
+is.character:function:base:No arguments
+is.complex:function:base:No arguments
+is.data.frame:function:base:x
+isdebugged:function:base:fun
+is.double:function:base:No arguments
+is.element:function:base:el, set
+is.environment:function:base:No arguments
+is.expression:function:base:No arguments
+is.factor:function:base:x
+is.finite:function:base:No arguments
+is.function:function:base:No arguments
+isIncomplete:function:base:con
+is.infinite:function:base:No arguments
+is.integer:function:base:No arguments
+is.language:function:base:No arguments
+is.list:function:base:No arguments
+is.loaded:function:base:symbol, PACKAGE="", type=""
+is.logical:function:base:No arguments
+is.matrix:function:base:No arguments
+is.na:function:base:Generic Method
+is.na<-:unknowClass:base:x, value
+is.na.data.frame:function:base:x
+is.na<-.default:unknowClass:base:x, value
+is.na<-.factor:unknowClass:base:x, value
+is.name:function:base:No arguments
+isNamespace:function:base:ns
+is.nan:function:base:No arguments
+is.na.numeric_version:function:base:x
+is.na.POSIXlt:function:base:x
+is.null:function:base:No arguments
+is.numeric:function:base:Generic Method
+is.numeric.Date:function:base:x
+is.numeric.POSIXt:function:base:x
+is.numeric_version:function:base:x
+is.object:function:base:No arguments
+ISOdate:function:base:year, month, day, hour=12, min=0, sec=0, tz="GMT"
+ISOdatetime:function:base:year, month, day, hour, min, sec, tz=""
+isOpen:function:base:con, rw=""
+is.ordered:function:base:x
+is.package_version:function:base:x
+is.pairlist:function:base:No arguments
+is.primitive:function:base:x
+is.qr:function:base:x
+is.R:function:base:No arguments
+is.raw:function:base:No arguments
+is.real:function:base:No arguments
+is.recursive:function:base:No arguments
+isRestart:function:base:x
+isS4:function:base:object
+isSeekable:function:base:con
+is.single:function:base:No arguments
+is.symbol:function:base:No arguments
+isSymmetric:function:base:object, ...
+isSymmetric.matrix:function:base:object, tol=c("*", "100", ".Machine$double.eps"), ...
+is.table:function:base:x
+isTRUE:function:base:x
+is.unsorted:function:base:x, na.rm=FALSE, strictly=FALSE
+is.vector:function:base:x, mode="any"
+jitter:function:base:x, factor=1, amount=character(0)
+julian:function:base:x, ...
+julian.Date:function:base:x, origin=c("as.Date", "1970-01-01"), ...
+julian.POSIXt:function:base:x, origin=c("as.POSIXct", "1970-01-01", "GMT"), ...
+kappa:function:base:z, ...
+kappa.default:function:base:z, exact=FALSE, norm=character(0), method=c("c", "qr", "direct"), ...
+kappa.lm:function:base:z, ...
+kappa.qr:function:base:z, ...
+kappa.tri:function:base:z, exact=FALSE, LINPACK=TRUE, norm=character(0), ...
+kronecker:function:base:X, Y, FUN="*", make.dimnames=FALSE, ...
+l10n_info:unknowClass:base:No arguments
+labels:function:base:Generic Method
+labels.default:function:base:object, ...
+La.chol:function:base:x
+La.chol2inv:function:base:x, size=c("ncol", "x")
+La.eigen:function:base:x, symmetric, only.values=FALSE, method=c("c", "dsyevr", "dsyev")
+lapply:function:base:X, FUN, ...
+La.svd:function:base:x, nu=c("min", "n", "p"), nv=c("min", "n", "p")
+lazyLoad:function:base:filebase, envir=parent.frame, filter
+lazyLoadDBfetch:function:base:No arguments
+lbeta:function:base:a, b
+lchoose:function:base:n, k
+length:function:base:No arguments
+length<-:unknowClass:base:Generic Method
+length<-.factor:unknowClass:base:x, value
+letters:character:base:Not a function
+LETTERS:character:base:Not a function
+levels:function:base:x
+levels<-:unknowClass:base:Generic Method
+levels.default:function:base:x
+levels<-.factor:unknowClass:base:x, value
+lfactorial:function:base:x
+lgamma:function:base:No arguments
+library:function:base:package, help, pos=2, lib.loc=character(0), character.only=FALSE, logical.return=FALSE, warn.conflicts=TRUE, keep.source=c("getOption", "keep.source.pkgs"), verbose=c("getOption", "verbose")
+library.dynam:function:base:chname, package=character(0), lib.loc=character(0), verbose=c("getOption", "verbose"), file.ext=c("$", ".Platform", "dynlib.ext"), ...
+library.dynam.unload:function:base:chname, libpath, verbose=c("getOption", "verbose"), file.ext=c("$", ".Platform", "dynlib.ext")
+licence:function:base:No arguments
+license:function:base:No arguments
+list:function:base:No arguments
+list.files:function:base:path=".", pattern=character(0), all.files=FALSE, full.names=FALSE, recursive=FALSE, ignore.case=FALSE
+[.listof:unknowClass:base:x, i, ...
+load:function:base:file, envir=parent.frame
+loadedNamespaces:function:base:No arguments
+loadingNamespaceInfo:function:base:No arguments
+loadNamespace:function:base:package, lib.loc=character(0), keep.source=c("getOption", "keep.source.pkgs"), partial=FALSE, declarativeOnly=FALSE
+loadURL:function:base:url, envir=parent.frame, quiet=TRUE, ...
+local:function:base:expr, envir=new.env
+lockBinding:function:base:sym, env
+lockEnvironment:function:base:env, bindings=FALSE
+log:function:base:No arguments
+log10:function:base:No arguments
+log1p:function:base:No arguments
+log2:function:base:No arguments
+logb:function:base:x, base=c("exp", "1")
+logical:function:base:length=0
+lower.tri:function:base:x, diag=FALSE
+ls:function:base:name, pos=c("-", "1"), envir=c("as.environment", "pos"), all.names=FALSE, pattern
+machine:function:base:No arguments
+Machine:function:base:No arguments
+makeActiveBinding:function:base:sym, fun, env
+make.names:function:base:names, unique=FALSE, allow_=TRUE
+make.unique:function:base:names, sep="."
+manglePackageName:function:base:pkgName, pkgVersion
+Map:function:base:f, ...
+mapply:function:base:FUN, ..., MoreArgs=character(0), SIMPLIFY=TRUE, USE.NAMES=TRUE
+margin.table:function:base:x, margin=character(0)
+match:function:base:x, table, nomatch=NA, incomparables=character(0)
+match.arg:function:base:arg, choices, several.ok=FALSE
+match.call:function:base:definition=character(0), call=c("sys.call", "sys.parent()"), expand.dots=TRUE
+match.fun:function:base:FUN, descend=TRUE
+Math.data.frame:function:base:x, ...
+Math.Date:function:base:x, ...
+Math.difftime:function:base:x, ...
+Math.factor:function:base:x, ...
+Math.POSIXt:function:base:x, ...
+mat.or.vec:function:base:nr, nc
+matrix:function:base:data=NA, nrow=1, ncol=1, byrow=FALSE, dimnames=character(0)
+max:function:base:No arguments
+max.col:function:base:m, ties.method=c("c", "random", "first", "last")
+mean:function:base:x, ...
+mean.data.frame:function:base:x, ...
+mean.Date:function:base:x, ...
+mean.default:function:base:x, trim=0, na.rm=FALSE, ...
+mean.difftime:function:base:x, ..., na.rm=FALSE
+mean.POSIXct:function:base:x, ...
+mean.POSIXlt:function:base:x, ...
+memCompress:function:base:from, type=c("c", "gzip", "bzip2", "xz", "none")
+memDecompress:function:base:from, type=c("c", "unknown", "gzip", "bzip2", "xz", "none"), asChar=FALSE
+mem.limits:function:base:nsize=NA, vsize=NA
+memory.profile:function:base:No arguments
+merge:function:base:x, y, ...
+merge.data.frame:function:base:x, y, by=c("intersect", "names(x)", "names(y)"), by.x=by, by.y=by, all=FALSE, all.x=all, all.y=all, sort=TRUE, suffixes=c("c", ".x", ".y"), incomparables=character(0), ...
+merge.default:function:base:x, y, ...
+message:function:base:..., domain=character(0), appendLF=TRUE
+mget:function:base:x, envir, mode="any", ifnotfound=c("list", "function(x) stop(paste(\"value for '\", x, \"' not found\", sep = \"\"), call. = FALSE)"), inherits=FALSE
+min:function:base:No arguments
+missing:function:base:No arguments
+Mod:function:base:No arguments
+mode:function:base:x
+mode<-:unknowClass:base:x, value
+month.abb:character:base:Not a function
+month.name:character:base:Not a function
+months:function:base:x, abbreviate
+months.Date:function:base:x, abbreviate=FALSE
+months.POSIXt:function:base:x, abbreviate=FALSE
+mostattributes<-:unknowClass:base:obj, value
+names:function:base:No arguments
+names<-:unknowClass:base:No arguments
+namespaceExport:function:base:ns, vars
+namespaceImport:function:base:self, ...
+namespaceImportClasses:function:base:self, ns, vars
+namespaceImportFrom:function:base:self, ns, vars, generics, packages
+namespaceImportMethods:function:base:self, ns, vars
+nargs:function:base:No arguments
+nchar:function:base:x, type="chars", allowNA=FALSE
+ncol:function:base:x
+NCOL:function:base:x
+Negate:function:base:f
+new.env:function:base:hash=FALSE, parent=parent.frame, size=29
+NextMethod:function:base:generic=character(0), object=character(0), ...
+ngettext:function:base:n, msg1, msg2, domain=character(0)
+nlevels:function:base:x
+noquote:function:base:obj
+[.noquote:unknowClass:base:x, ...
+nrow:function:base:x
+NROW:function:base:x
+numeric:function:base:length=0
+[.numeric_version:unknowClass:base:x, i, j
+[[<-.numeric_version:unknowClass:base:x, ..., value
+[[.numeric_version:unknowClass:base:x, ..., exact=NA
+numeric_version:unknowClass:base:x, strict=TRUE
+nzchar:function:base:No arguments
+%o%:unknowClass:base:X, Y
+objects:function:base:name, pos=c("-", "1"), envir=c("as.environment", "pos"), all.names=FALSE, pattern
+[.octmode:unknowClass:base:x, i
+oldClass:function:base:No arguments
+oldClass<-:unknowClass:base:No arguments
+on.exit:function:base:No arguments
+open:function:base:con, ...
+open.connection:function:base:con, open="r", blocking=TRUE, ...
+open.srcfile:function:base:con, line, ...
+open.srcfilecopy:function:base:con, line, ...
+Ops.data.frame:function:base:e1, e2=character(0)
+Ops.Date:function:base:e1, e2
+Ops.difftime:function:base:e1, e2
+Ops.factor:function:base:e1, e2
+Ops.numeric_version:function:base:e1, e2
+Ops.ordered:function:base:e1, e2
+Ops.POSIXt:function:base:e1, e2
+options:function:base:...
+order:function:base:..., na.last=TRUE, decreasing=FALSE
+ordered:function:base:x, ...
+outer:function:base:X, Y, FUN="*", ...
+package.description:function:base:pkg, lib.loc=character(0), fields=character(0)
+packageEvent:function:base:pkgname, event=c("c", "onLoad", "attach", "detach", "onUnload")
+packageHasNamespace:function:base:package, package.lib
+packageStartupMessage:function:base:..., domain=character(0), appendLF=TRUE
+$.package_version:unknowClass:base:x, name
+package_version:unknowClass:base:x, strict=TRUE
+packBits:function:base:x, type=c("c", "raw", "integer")
+pairlist:function:base:...
+parent.env:function:base:env
+parent.env<-:unknowClass:base:env, value
+parent.frame:function:base:n=1
+parse:function:base:file="", n=character(0), text=character(0), prompt="?", srcfile=character(0), encoding="unknown"
+parse.dcf:function:base:text=character(0), file="", fields=character(0), versionfix=FALSE
+parseNamespaceFile:function:base:package, package.lib, mustExist=TRUE
+paste:function:base:..., sep=" ", collapse=character(0)
+path.expand:function:base:path
+pentagamma:function:base:x
+pi:numeric:base:Not a function
+pipe:function:base:description, open="", encoding=c("getOption", "encoding")
+Platform:function:base:No arguments
+pmatch:function:base:x, table, nomatch=NA, duplicates.ok=FALSE
+pmax:function:base:..., na.rm=FALSE
+pmax.int:function:base:..., na.rm=FALSE
+pmin:function:base:..., na.rm=FALSE
+pmin.int:function:base:..., na.rm=FALSE
+polyroot:function:base:z
+Position:function:base:f, x, right=FALSE, nomatch=NA
+[<-.POSIXct:unknowClass:base:x, ..., value
+[.POSIXct:unknowClass:base:x, ..., drop=TRUE
+[[.POSIXct:unknowClass:base:x, ..., drop=TRUE
+[<-.POSIXlt:unknowClass:base:x, i, value
+[.POSIXlt:unknowClass:base:x, ..., drop=TRUE
+-.POSIXt:unknowClass:base:e1, e2
++.POSIXt:unknowClass:base:e1, e2
+pos.to.env:function:base:No arguments
+pretty:function:base:x, n=5, min.n=c("%/%", "n", "3"), shrink.sml=0,75, high.u.bias=1,5, u5.bias=c("+", "0.5", "1.5 * high.u.bias"), eps.correct=0
+prettyNum:function:base:x, big.mark="", big.interval=3, small.mark="", small.interval=5, decimal.mark=".", preserve.width=c("c", "common", "individual", "none"), zero.print=character(0), drop0trailing=FALSE, is.cmplx=NA, ...
+print:function:base:Generic Method
+print.AsIs:function:base:x, ...
+print.by:function:base:x, ..., vsep
+print.condition:function:base:x, ...
+print.connection:function:base:x, ...
+print.data.frame:function:base:x, ..., digits=character(0), quote=FALSE, right=TRUE, row.names=TRUE
+print.Date:function:base:x, ...
+print.default:function:base:x, digits=character(0), quote=TRUE, na.print=character(0), print.gap=character(0), right=FALSE, max=character(0), useSource=TRUE, ...
+print.difftime:function:base:x, digits=c("getOption", "digits"), ...
+print.DLLInfo:function:base:x, ...
+print.DLLInfoList:function:base:x, ...
+print.DLLRegisteredRoutines:function:base:x, ...
+print.factor:function:base:x, quote=FALSE, max.levels=character(0), width=c("getOption", "width"), ...
+print.function:function:base:x, useSource=TRUE, ...
+print.hexmode:function:base:x, ...
+print.libraryIQR:function:base:x, ...
+print.listof:function:base:x, ...
+print.NativeRoutineList:function:base:x, ...
+printNoClass:function:base:x, digits=character(0), quote=TRUE, na.print=character(0), print.gap=character(0), right=FALSE, ...
+print.noquote:function:base:x, ...
+print.numeric_version:function:base:x, ...
+print.octmode:function:base:x, ...
+print.packageInfo:function:base:x, ...
+print.POSIXct:function:base:x, ...
+print.POSIXlt:function:base:x, ...
+print.proc_time:function:base:x, ...
+print.restart:function:base:x, ...
+print.rle:function:base:x, digits=c("getOption", "digits"), ...
+print.simple.list:function:base:x, ...
+print.srcfile:function:base:x, ...
+print.srcref:function:base:x, useSource=TRUE, ...
+print.summary.table:function:base:x, digits=c("max", "1", "getOption(\"digits\") - 3"), ...
+print.table:function:base:x, digits=c("getOption", "digits"), quote=FALSE, na.print="", zero.print="0", justify="none", ...
+print.warnings:function:base:x, ...
+prmatrix:function:base:x, rowlab=c("[[", "dn", "1"), collab=c("[[", "dn", "2"), quote=TRUE, right=FALSE, na.print=character(0), ...
+proc.time:function:base:No arguments
+prod:function:base:No arguments
+prop.table:function:base:x, margin=character(0)
+provide:function:base:package
+psigamma:function:base:x, deriv=0
+pushBack:function:base:data, connection, newLine=TRUE
+pushBackLength:function:base:connection
+q:function:base:save="default", status=0, runLast=TRUE
+qr:function:base:x, ...
+qr.coef:function:base:qr, y
+qr.default:function:base:x, tol=1e-07, LAPACK=FALSE, ...
+qr.fitted:function:base:qr, y, k=c("$", "qr", "rank")
+qr.Q:function:base:qr, complete=FALSE, Dvec=c("rep.int", "if (cmplx) 1 + (0+0i) else 1", "if (complete) dqr[1] else min(dqr)")
+qr.qty:function:base:qr, y
+qr.qy:function:base:qr, y
+qr.R:function:base:qr, complete=FALSE
+qr.resid:function:base:qr, y
+qr.solve:function:base:a, b, tol=1e-07
+qr.X:function:base:qr, complete=FALSE, ncol=c("if", "complete", "nrow(R)", "min(dim(R))")
+quarters:function:base:x, abbreviate
+quarters.Date:function:base:x, ...
+quarters.POSIXt:function:base:x, ...
+quit:function:base:save="default", status=0, runLast=TRUE
+quote:function:base:No arguments
+range:function:base:Generic Method
+range.default:function:base:..., na.rm=FALSE, finite=FALSE
+rank:function:base:x, na.last=TRUE, ties.method=c("c", "average", "first", "random", "max", "min")
+rapply:function:base:object, f, classes="ANY", deflt=character(0), how=c("c", "unlist", "replace", "list"), ...
+raw:function:base:length=0
+rawConnection:function:base:object, open="r"
+rawConnectionValue:function:base:con
+rawShift:function:base:x, n
+rawToBits:function:base:x
+rawToChar:function:base:x, multiple=FALSE
+rbind:function:base:Generic Method
+rbind.data.frame:function:base:..., deparse.level=1
+rcond:function:base:x, norm=c("c", "O", "I", "1"), triangular=FALSE, ...
+Re:function:base:No arguments
+readBin:function:base:con, what, n=1, size=NA, signed=TRUE, endian=c("$", ".Platform", "endian")
+readChar:function:base:con, nchars, useBytes=FALSE
+read.dcf:function:base:file, fields=character(0), all=FALSE
+readline:function:base:prompt=""
+readLines:function:base:con=stdin, n=c("-", "1"), ok=TRUE, warn=TRUE, encoding="unknown"
+read.table.url:function:base:url, method, ...
+real:function:base:length=0
+Recall:function:base:...
+Reduce:function:base:f, x, init, right=FALSE, accumulate=FALSE
+regexpr:function:base:pattern, text, ignore.case=FALSE, extended=TRUE, perl=FALSE, fixed=FALSE, useBytes=FALSE
+reg.finalizer:function:base:e, f, onexit=FALSE
+registerS3method:function:base:genname, class, method, envir=parent.frame
+registerS3methods:function:base:info, package, env
+remove:function:base:..., list=c("character", "0"), pos=c("-", "1"), envir=c("as.environment", "pos"), inherits=FALSE
+removeCConverter:function:base:id
+removeTaskCallback:function:base:id
+rep:function:base:Generic Method
+rep.Date:function:base:x, ...
+repeat:flow-control:base:No arguments
+rep.factor:function:base:x, ...
+rep.int:function:base:x, times
+replace:function:base:x, list, values
+replicate:function:base:n, expr, simplify=TRUE
+rep.numeric_version:function:base:x, ...
+rep.POSIXct:function:base:x, ...
+rep.POSIXlt:function:base:x, ...
+require:function:base:package, lib.loc=character(0), quietly=FALSE, warn.conflicts=TRUE, keep.source=c("getOption", "keep.source.pkgs"), character.only=FALSE, save=TRUE
+restart:function:base:No arguments
+restartDescription:function:base:r
+restartFormals:function:base:r
+retracemem:function:base:No arguments
+return:function:base:No arguments
+rev:function:base:x
+rev.default:function:base:x
+R.home:function:base:component="home"
+rle:function:base:x
+rm:function:base:..., list=c("character", "0"), pos=c("-", "1"), envir=c("as.environment", "pos"), inherits=FALSE
+RNGkind:function:base:kind=character(0), normal.kind=character(0)
+RNGversion:function:base:vstr
+round:function:base:Generic Method
+round.Date:function:base:x, ...
+round.POSIXt:function:base:x, units=c("c", "secs", "mins", "hours", "days")
+row:function:base:x, as.factor=FALSE
+rowMeans:function:base:x, na.rm=FALSE, dims=1
+rownames:function:base:x, do.NULL=TRUE, prefix="row"
+row.names:function:base:x
+row.names<-:unknowClass:base:x, value
+rownames<-:unknowClass:base:x, value
+row.names<-.data.frame:unknowClass:base:x, value
+row.names.data.frame:function:base:x
+row.names<-.default:unknowClass:base:x, value
+row.names.default:function:base:x
+rowsum:function:base:x, group, reorder=TRUE, ...
+rowsum.data.frame:function:base:x, group, reorder=TRUE, na.rm=FALSE, ...
+rowsum.default:function:base:x, group, reorder=TRUE, na.rm=FALSE, ...
+rowSums:function:base:x, na.rm=FALSE, dims=1
+R_system_version:unknowClass:base:x, strict=TRUE
+R.version:simple.list:base:Not a function
+R.version$platform:character:base:Not a function
+R.version$arch:character:base:Not a function
+R.version$os:character:base:Not a function
+R.version$system:character:base:Not a function
+R.version$status:character:base:Not a function
+R.version$major:character:base:Not a function
+R.version$minor:character:base:Not a function
+R.version$year:character:base:Not a function
+R.version$month:character:base:Not a function
+R.version$day:character:base:Not a function
+R.version$svn rev:character:base:Not a function
+R.version$language:character:base:Not a function
+R.version$version.string:character:base:Not a function
+R.Version:function:base:No arguments
+R.version.string:character:base:Not a function
+sample:function:base:x, size, replace=FALSE, prob=character(0)
+sample.int:function:base:n, size, replace=FALSE, prob=character(0)
+sapply:function:base:X, FUN, ..., simplify=TRUE, USE.NAMES=TRUE
+save:function:base:..., list=c("character", "0"), file=c("stop", "'file' must be specified"), ascii=FALSE, version=character(0), envir=parent.frame, compress=c("!", "ascii"), compression_level, eval.promises=TRUE, precheck=TRUE
+save.image:function:base:file=".RData", version=character(0), ascii=FALSE, compress=c("!", "ascii"), safe=TRUE
+saveNamespaceImage:function:base:package, rdafile, lib.loc=character(0), keep.source=c("getOption", "keep.source.pkgs"), compress=TRUE
+scale:function:base:x, center=TRUE, scale=TRUE
+scale.default:function:base:x, center=TRUE, scale=TRUE
+scan:function:base:file="", what=c("double", "0"), nmax=c("-", "1"), n=c("-", "1"), sep="", quote=c("if", "identical(sep, \"\\n\")", "", "'\""), dec=".", skip=0, nlines=0, na.strings="NA", flush=FALSE, fill=FALSE, strip.white=FALSE, quiet=FALSE, blank.lines.skip=TRUE, multi.line=TRUE, comment.char="", allowEscapes=FALSE, encoding="unknown"
+scan.url:function:base:url, file=tempfile, method, ...
+search:function:base:No arguments
+searchpaths:function:base:No arguments
+seek:function:base:con, ...
+seek.connection:function:base:con, where=NA, origin="start", rw="", ...
+seq:function:base:Generic Method
+seq_along:unknowClass:base:No arguments
+seq.Date:function:base:from, to, by, length.out=character(0), along.with=character(0), ...
+seq.default:function:base:from=1, to=1, by=c("(", "(to - from)/(length.out - 1)"), length.out=character(0), along.with=character(0), ...
+seq.int:function:base:No arguments
+seq_len:unknowClass:base:No arguments
+seq.POSIXt:function:base:from, to, by, length.out=character(0), along.with=character(0), ...
+sequence:function:base:nvec
+serialize:function:base:object, connection, ascii=FALSE, refhook=character(0)
+setCConverterStatus:function:base:id, status
+setdiff:function:base:x, y
+setequal:function:base:x, y
+setHook:function:base:hookName, value, action=c("c", "append", "prepend", "replace")
+setNamespaceInfo:function:base:ns, which, val
+set.seed:function:base:seed, kind=character(0), normal.kind=character(0)
+setSessionTimeLimit:function:base:cpu=Inf, elapsed=Inf
+setTimeLimit:function:base:cpu=Inf, elapsed=Inf, transient=FALSE
+setwd:function:base:dir
+showConnections:function:base:all=FALSE
+shQuote:function:base:string, type=c("c", "sh", "csh", "cmd")
+sign:function:base:No arguments
+signalCondition:function:base:cond
+signif:function:base:No arguments
+simpleCondition:function:base:message, call=character(0)
+simpleError:function:base:message, call=character(0)
+[.simple.list:unknowClass:base:x, i, ...
+simpleMessage:function:base:message, call=character(0)
+simpleWarning:function:base:message, call=character(0)
+sin:function:base:No arguments
+single:function:base:length=0
+sinh:function:base:No arguments
+sink:function:base:file=character(0), append=FALSE, type=c("c", "output", "message"), split=FALSE
+sink.number:function:base:type=c, type=output, type=message
+slice.index:function:base:x, MARGIN
+socketConnection:function:base:host="localhost", port, server=FALSE, blocking=FALSE, open="a+", encoding=c("getOption", "encoding")
+socketSelect:function:base:socklist, write=FALSE, timeout=character(0)
+solve:function:base:Generic Method
+solve.default:function:base:a, b, tol=c("ifelse", "LINPACK", "1e-07", ".Machine$double.eps"), LINPACK=FALSE, ...
+solve.qr:function:base:a, b, ...
+sort:function:base:x, decreasing=FALSE, ...
+sort.default:function:base:x, decreasing=FALSE, na.last=NA, ...
+sort.int:function:base:x, partial=character(0), na.last=NA, decreasing=FALSE, method=c("c", "shell", "quick"), index.return=FALSE
+sort.list:function:base:x, partial=character(0), na.last=TRUE, decreasing=FALSE, method=c("c", "shell", "quick", "radix")
+sort.POSIXlt:function:base:x, decreasing=FALSE, na.last=NA, ...
+source:function:base:file, local=FALSE, echo=verbose, print.eval=echo, verbose=c("getOption", "verbose"), prompt.echo=c("getOption", "prompt"), max.deparse.length=150, chdir=FALSE, encoding=c("getOption", "encoding"), continue.echo=c("getOption", "continue"), skip.echo=0, keep.source=c("getOption", "keep.source")
+source.url:function:base:url, file=tempfile, method, ...
+split:function:base:x, f, drop=FALSE, ...
+split<-:unknowClass:base:x, f, drop=FALSE, ..., value
+split<-.data.frame:unknowClass:base:x, f, drop=FALSE, ..., value
+split.data.frame:function:base:x, f, drop=FALSE, ...
+split.Date:function:base:x, f, drop=FALSE, ...
+split<-.default:unknowClass:base:x, f, drop=FALSE, ..., value
+split.default:function:base:x, f, drop=FALSE, ...
+split.POSIXct:function:base:x, f, drop=FALSE, ...
+sprintf:function:base:fmt, ...
+sqrt:function:base:No arguments
+sQuote:function:base:x
+srcfile:function:base:filename, encoding=c("getOption", "encoding")
+srcfilecopy:function:base:filename, lines
+srcref:function:base:srcfile, lloc
+standardGeneric:function:base:No arguments
+stderr:function:base:No arguments
+stdin:function:base:No arguments
+stdout:function:base:No arguments
+stop:function:base:..., call.=TRUE, domain=character(0)
+stopifnot:function:base:...
+storage.mode:function:base:x
+storage.mode<-:unknowClass:base:No arguments
+strftime:function:base:x, format="", tz="", usetz=FALSE, ...
+strptime:function:base:x, format, tz=""
+strsplit:function:base:x, split, extended=TRUE, fixed=FALSE, perl=FALSE, useBytes=FALSE
+strtrim:function:base:x, width
+structure:function:base:.Data, ...
+strwrap:function:base:x, width=c("*", "0.9", "getOption(\"width\")"), indent=0, exdent=0, prefix="", simplify=TRUE, initial=prefix
+sub:function:base:pattern, replacement, x, ignore.case=FALSE, extended=TRUE, perl=FALSE, fixed=FALSE, useBytes=FALSE
+subset:function:base:x, ...
+subset.data.frame:function:base:x, subset, select, drop=FALSE, ...
+subset.default:function:base:x, subset, ...
+subset.matrix:function:base:x, subset, select, drop=FALSE, ...
+substitute:function:base:No arguments
+substr:function:base:x, start, stop
+substr<-:unknowClass:base:x, start, stop, value
+substring:function:base:text, first, last=1000000
+substring<-:unknowClass:base:text, first, last=1000000, value
+sum:function:base:No arguments
+summary:function:base:Generic Method
+summary.connection:function:base:object, ...
+summary.data.frame:function:base:object, maxsum=7, digits=c("max", "3", "getOption(\"digits\") - 3"), ...
+Summary.data.frame:function:base:..., na.rm
+summary.Date:function:base:object, digits=12, ...
+Summary.Date:function:base:..., na.rm
+summary.default:function:base:object, ..., digits=c("max", "3", "getOption(\"digits\") - 3")
+Summary.difftime:function:base:..., na.rm
+summary.factor:function:base:object, maxsum=100, ...
+Summary.factor:function:base:..., na.rm
+summary.matrix:function:base:object, ...
+Summary.numeric_version:function:base:..., na.rm
+summary.POSIXct:function:base:object, digits=15, ...
+Summary.POSIXct:function:base:..., na.rm
+summary.POSIXlt:function:base:object, digits=15, ...
+Summary.POSIXlt:function:base:..., na.rm
+summary.table:function:base:object, ...
+suppressMessages:function:base:expr
+suppressPackageStartupMessages:function:base:expr
+suppressWarnings:function:base:expr
+svd:function:base:x, nu=c("min", "n", "p"), nv=c("min", "n", "p"), LINPACK=FALSE
+sweep:function:base:x, MARGIN, STATS, FUN="-", check.margin=TRUE, ...
+switch:function:base:EXPR, ...
+symbol.C:function:base:name
+symbol.For:function:base:name
+sys.call:function:base:which=0
+sys.calls:function:base:No arguments
+Sys.chmod:function:base:paths, mode="0777"
+Sys.Date:function:base:No arguments
+sys.frame:function:base:which=0
+sys.frames:function:base:No arguments
+sys.function:function:base:which=0
+Sys.getenv:function:base:x=character(0), unset=""
+Sys.getlocale:function:base:category="LC_ALL"
+Sys.getpid:function:base:No arguments
+Sys.glob:function:base:paths, dirmark=FALSE
+Sys.info:function:base:No arguments
+sys.load.image:function:base:name, quiet
+Sys.localeconv:function:base:No arguments
+sys.nframe:function:base:No arguments
+sys.on.exit:function:base:No arguments
+sys.parent:function:base:n=1
+sys.parents:function:base:No arguments
+Sys.putenv:function:base:...
+Sys.readlink:function:base:paths
+sys.save.image:function:base:name
+Sys.setenv:function:base:...
+Sys.setlocale:function:base:category="LC_ALL", locale=""
+Sys.sleep:function:base:time
+sys.source:function:base:file, envir=baseenv, chdir=FALSE, keep.source=c("getOption", "keep.source.pkgs")
+sys.status:function:base:No arguments
+system:function:base:command, intern=FALSE, ignore.stderr=FALSE, wait=TRUE, input=character(0), show.output.on.console=TRUE, minimized=FALSE, invisible=TRUE
+system.file:function:base:..., package="base", lib.loc=character(0)
+system.time:function:base:expr, gcFirst=TRUE
+Sys.time:function:base:No arguments
+Sys.timezone:function:base:No arguments
+Sys.umask:function:base:mode="0000"
+Sys.unsetenv:function:base:x
+Sys.which:function:base:names
+t:function:base:Generic Method
+T:logical:base:Not a function
+table:function:base:..., exclude=c("if", "useNA == \"no\"", "c(NA, NaN)"), useNA=c("c", "no", "ifany", "always"), dnn=c("list.names", "..."), deparse.level=1
+tabulate:function:base:bin, nbins=c("max", "1", "bin", "TRUE")
+tan:function:base:No arguments
+tanh:function:base:No arguments
+tapply:function:base:X, INDEX, FUN=character(0), ..., simplify=TRUE
+taskCallbackManager:function:base:handlers=list, registered=FALSE, verbose=FALSE
+tcrossprod:function:base:x, y=character(0)
+t.data.frame:function:base:x
+t.default:function:base:x
+tempdir:function:base:No arguments
+tempfile:function:base:pattern="file", tmpdir=tempdir
+testPlatformEquivalence:function:base:built, run
+tetragamma:function:base:x
+textConnection:function:base:object, open="r", local=FALSE, encoding=c("c", "", "bytes", "UTF-8")
+textConnectionValue:function:base:con
+tolower:function:base:x
+topenv:function:base:envir=parent.frame, matchThisEnv=c("getOption", "topLevelEnvironment")
+toString:function:base:x, ...
+toString.default:function:base:x, width=character(0), ...
+toupper:function:base:x
+trace:function:base:what, tracer, exit, at, print, signature, where=c("topenv", "parent.frame()"), edit=FALSE
+traceback:function:base:x=character(0), max.lines=c("getOption", "deparse.max.lines")
+tracemem:function:base:No arguments
+tracingState:function:base:on=character(0)
+transform:function:base:_data, ...
+transform.data.frame:function:base:_data, ...
+transform.default:function:base:_data, ...
+trigamma:function:base:No arguments
+trunc:function:base:Generic Method
+truncate:function:base:con, ...
+truncate.connection:function:base:con, ...
+trunc.Date:function:base:x, ...
+trunc.POSIXt:function:base:x, units=c("c", "secs", "mins", "hours", "days"), ...
+try:function:base:expr, silent=FALSE
+tryCatch:function:base:expr, ..., finally
+typeof:function:base:x
+unclass:function:base:No arguments
+undebug:function:base:fun
+union:function:base:x, y
+unique:function:base:x, incomparables=FALSE, ...
+unique.array:function:base:x, incomparables=FALSE, MARGIN=1, fromLast=FALSE, ...
+unique.data.frame:function:base:x, incomparables=FALSE, fromLast=FALSE, ...
+unique.default:function:base:x, incomparables=FALSE, fromLast=FALSE, ...
+unique.matrix:function:base:x, incomparables=FALSE, MARGIN=1, fromLast=FALSE, ...
+unique.numeric_version:function:base:x, incomparables=FALSE, ...
+unique.POSIXlt:function:base:x, incomparables=FALSE, ...
+units:function:base:x
+units<-:unknowClass:base:x, value
+units<-.difftime:unknowClass:base:x, value
+units.difftime:function:base:x
+unix:function:base:call, intern=FALSE
+unix.time:function:base:expr, gcFirst=TRUE
+unlink:function:base:x, recursive=FALSE
+unlist:function:base:Generic Method
+unloadNamespace:function:base:ns
+unlockBinding:function:base:sym, env
+unname:function:base:obj, force=FALSE
+unserialize:function:base:connection, refhook=character(0)
+unsplit:function:base:value, f, drop=FALSE
+untrace:function:base:what, signature=character(0), where=c("topenv", "parent.frame()")
+untracemem:function:base:No arguments
+unz:function:base:description, filename, open="", encoding=c("getOption", "encoding")
+upper.tri:function:base:x, diag=FALSE
+url:function:base:description, open="", blocking=TRUE, encoding=c("getOption", "encoding")
+UseMethod:function:base:No arguments
+utf8ToInt:function:base:x
+vector:function:base:mode="logical", length=0
+Vectorize:function:base:FUN, vectorize.args=arg.names, SIMPLIFY=TRUE, USE.NAMES=TRUE
+version:simple.list:base:Not a function
+version$platform:character:base:Not a function
+version$arch:character:base:Not a function
+version$os:character:base:Not a function
+version$system:character:base:Not a function
+version$status:character:base:Not a function
+version$major:character:base:Not a function
+version$minor:character:base:Not a function
+version$year:character:base:Not a function
+version$month:character:base:Not a function
+version$day:character:base:Not a function
+version$svn rev:character:base:Not a function
+version$language:character:base:Not a function
+version$version.string:character:base:Not a function
+Version:function:base:No arguments
+warning:function:base:..., call.=TRUE, immediate.=FALSE, domain=character(0)
+warnings:function:base:...
+weekdays:function:base:x, abbreviate
+weekdays.Date:function:base:x, abbreviate=FALSE
+weekdays.POSIXt:function:base:x, abbreviate=FALSE
+which:function:base:x, arr.ind=FALSE
+which.max:function:base:x
+which.min:function:base:x
+while:flow-control:base:No arguments
+with:function:base:data, expr, ...
+withCallingHandlers:function:base:expr, ...
+with.default:function:base:data, expr, ...
+within:function:base:data, expr, ...
+within.data.frame:function:base:data, expr, ...
+within.list:function:base:data, expr, ...
+withRestarts:function:base:expr, ...
+withVisible:function:base:x
+write:function:base:x, file="data", ncolumns=c("if", "is.character(x)", "1", "5"), append=FALSE, sep=" "
+writeBin:function:base:object, con, size=NA, endian=c("$", ".Platform", "endian"), useBytes=FALSE
+writeChar:function:base:object, con, nchars=c("nchar", "object", "chars"), eos="", useBytes=FALSE
+write.dcf:function:base:x, file="", append=FALSE, indent=c("*", "0.1", "getOption(\"width\")"), width=c("*", "0.9", "getOption(\"width\")")
+writeLines:function:base:text, con=stdout, sep="\n", useBytes=FALSE
+write.table0:function:base:x, file="", append=FALSE, quote=TRUE, sep=" ", eol="\n", na="NA", dec=".", row.names=TRUE, col.names=TRUE, qmethod=c("c", "escape", "double")
+%x%:unknowClass:base:X, Y
+xor:function:base:x, y
+xpdrows.data.frame:function:base:x, old.rows, new.rows
+xtfrm:function:base:x
+xtfrm.Date:function:base:x
+xtfrm.default:function:base:x
+xtfrm.factor:function:base:x
+xtfrm.numeric_version:function:base:x
+xtfrm.POSIXct:function:base:x
+xtfrm.POSIXlt:function:base:x
+xtfrm.Surv:function:base:x
+xzfile:function:base:description, open="", encoding=c("getOption", "encoding"), compression=6
+zapsmall:function:base:x, digits=c("getOption", "digits")

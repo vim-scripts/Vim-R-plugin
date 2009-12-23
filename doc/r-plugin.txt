@@ -6,7 +6,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          José Cláudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 091016
+Version: 091223
 
 For Vim version 7.2 and above
 
@@ -19,7 +19,7 @@ For Vim version 7.2 and above
  7. Options                                     |r-plugin-options|
  8. Custom key bindings                         |r-plugin-custom-key-bindings|
  9. Files                                       |r-plugin-files|
-10. FAQ                                         |r-plugin-faq|
+10. FAQ and tips                                |r-plugin-faq|
 11. News                                        |r-plugin-news|
 
 
@@ -48,10 +48,12 @@ you would like to see in future releases.
 ------------------------------------------------------------------------------
 2. Main features~
                                                            *r-plugin-features*
+
 2.1. Linux/Unix only:~
 
   * Integrated communication with R;
   * Omni completion for R objects.
+
 
 2.2. All platforms:~
 
@@ -62,6 +64,7 @@ you would like to see in future releases.
 ------------------------------------------------------------------------------
 3. Installation~
                                                        *r-plugin-installation*
+
 3.1. Dependencies~
 
 This plugin requires users to install two external dependencies. Before using
@@ -86,12 +89,10 @@ You need to activate plugins and indentation according to 'filetype' in your
 >
   filetype plugin indent on
 <
-
 Create your ~/.vim directory if you do not have it yet:
 >
   mkdir -p ~/.vim
 <
-
 Make a backup of your ~/.vim directory because existing files will be
 replaced. Please, look at |r-plugin-files| to see the list of files.
 
@@ -99,27 +100,30 @@ Uncompress the archive:
 >
   tar -xvzf vim-r-plugin2-*.tar.gz -C ~/.vim
 <
-
 Start Vim and build the tags file for this document (and others that eventually
 are in at the same directory):
 >
   :helptags ~/.vim/doc
 <
+Update the list of objects for omni completion and syntax highlight (see
+|:RUpdateObjList| for details).
 
-3.3. Optional steps~
+
+3.3. Optional step~
 
 Edit Vim's toolbar and remove the buttons that you never use. The plugin adds
 some buttons to the tool bar, but you may not see them because gvim has too
-many buttons by default. Please see:
+many buttons by default. Please see the page below to know how to hide buttons
+on the toolbar:
 
-   http://vim.wikia.com/wiki/Hide_specific_ToolBar_buttons
+   http://vim.wikia.com/wiki/Hide_toolbar_or_menus_to_see_more_text
 
 
 ------------------------------------------------------------------------------
 4. Use~
                                                                 *r-plugin-use*
 
-Key bindings~
+4.1 Key bindings~
 
 This plugin has many key bindings, which correspond with menu entries and, in
 some cases, toolbar buttons. In the list below, the backslash represents the
@@ -205,6 +209,27 @@ bindings without editing the plugin directly, and |g:vimrplugin_underscore| to
 to disable underscore replacement.
 
 
+4.2 Syntax highlight and omni completion~
+                                                             *:RUpdateObjList*
+The plugin adds some features to the default syntax highlight of R code. One
+of such features is the highlight of R functions. However, only functions that
+R loads by default are highlighted. To add functions of other libraries, you
+should do the following:
+
+  1. Start R from within Vim.
+  2. Use R's library() to load the libraries whose functions you want
+     highlighted.
+  3. Run the following command in Vim's normal mode:
+     :RUpdateObjList
+
+The command :RUpdateObjList in addition to creating a list of function names
+to be highlighted also creates a tags file for omni completion including all
+objects currently in R workspace, with the exception of the .GlobalEnv
+objects. These two lists are stored permanently in the ~/.vim/tools directory.
+If you prefer do not have the functions highlighted, delete the file
+~/.vim/tools/rfunctions.
+
+
 ------------------------------------------------------------------------------
 5. How the plugin works~
                                                         *r-plugin-functioning*
@@ -223,21 +248,18 @@ name clash is possible if a single user starts more than one Vim buffer at the
 same second. To change the default behavior and force all Vim buffers to use
 different R processes see |g:vimrplugin_single_r|.
 
+
 5.2. Omni completion~
 
-To start |omni-completion|, type <C-X><C-O>. Since it can be uncomfortable to
-type such a combination of keys, you might want to map an easier combination 
-for omni completion in your |vimrc|. For example:
->
-  imap <C-Space> <C-X><C-O>
-<
-Omni completion shows the name of the object, its class and its
-environment (most frequently, its package name). 
+To start |omni-completion|, type <C-X><C-O>. See 'completeopt' to know how to
+customize the |omni-completion|.
+Omni completion shows in a pop up menu the name of the object, its class and its
+environment (most frequently, its package name). If the object is a function,
+its arguments are shown in separate window.
 
-You can build/rebuild the tags file at any time, but Vim will automatically 
-build it the first time you use the omni completion feature. Remember, 
-you must rebuild the tags file manually to add the names of other objects
-created after building the tags file.
+You can build/rebuild the tags file at any time. Remember, you must rebuild
+the tags file manually to add the names of other objects created after
+building the tags file.
 
 If a data.frame is found, while building the tags file, the columns in the
 data.frame are added to the list of objects. When you try to use omni
@@ -245,21 +267,21 @@ completion to complete the name of a data.frame, the columns are not shown.
 But when the data.frame name is already complete, and you have inserted the 
 '$' symbol, omni completion will show the column names.
 
-When you send a line of code containing the string "library" to the R process,
-Vim will turn on the flag indicating the need to rebuild the tags file. This
-will force omni completion to rebuild the tags file the next time omni
-completion is used. However, if you send the entire file to R, Vim will not
-recognize the "library" string and will not order omni completion to rebuild
-the tags file. 
+The tags file used for omni completion is built by the R function contained in
+the script ~/.vim/tools/rtags.R. This function is sourced by R, which causes R
+to create the tags file used by Vim.
 
-The tags file used for omni completion is built by the R function contained
-in the script ~/.vim/tools/rtags. This function is sourced by R, which causes
-R to create the tags file used by Vim.
+Vim uses two tags files: one for the objects of .GlobalEnv and the other for
+all other objects. The .GlobalEnv tags file is stored in the /tmp directory
+and, thus, is deleted after each reboot. The other tags file is stored in
+~/.vim/tools and remains available until you manually rebuild it with the
+command: |:RUpdateObjList|.
 
 
 ------------------------------------------------------------------------------
 6. Known bugs and workarounds~
                                                          *r-plugin-known-bugs*
+
 6.1. R session is detached when GVim is closed~
 
 If you launch GVim through a custom keyboard shortcut, the problem may be
@@ -289,12 +311,27 @@ Correctly written code might be wrongly indented. Examples:
    }}                                        }}
 
 
+6.3 R's source() issues~
+
+The R's source() function prints an extra new line between commands if the
+option echo = TRUE, and error messages are printed only after the function has
+finished, which make it more difficult to find errors in the code sent to R.
+
+
+6.4 GVim's tool bar buttons, menu and title bar blink during omni completion~
+
+The plugin unmakes the R menu and the related tool bar buttons when Vim leaves
+the R buffer. During omni completion, Vim leaves the R buffer and goes to the
+scratch window and, consequently, the plugin unmakes the tool bar buttons and
+R related menu items. 
+
+
 ------------------------------------------------------------------------------
 7. Options~
                                                             *r-plugin-options*
 
-7.1. Terminal emulator~
                                                            *g:vimrplugin_term*
+7.1. Terminal emulator~
 
 The plugin uses the first terminal emulator that it finds in the following
 list:
@@ -337,6 +374,7 @@ call less) by putting in your ~/.Rprofile:
 This script can be easily modified to use your favorite terminal emulator. The
 script contains options for several popular emulators such as gnome-terminal
 and konsole but defaults to xterm.
+
 
 7.4. Html help~
                                                          *g:vimrplugin_hstart*
@@ -396,6 +434,7 @@ command. Moreover, you will have to manually switch from one screen region to
 another and kill them.
 
 A sample detachable session could be:
+
   - Start vim through screen:
       screen vim theScript.R
   - Use Vim to start an R session:
@@ -409,6 +448,7 @@ A sample detachable session could be:
     quit the screen session.
 
 Here are several useful screen shortcuts:
+
   <c-a><tab>        go from Vim to R and vice-versa
   <c-a>:resize N    set the height of the current window to N lines
   <c-a>n            switch to the next screen session
@@ -437,7 +477,6 @@ the following into |vimrc|:
 >
   let g:vimrplugin_map_r = 1
 <
-
 You may want to add the following three lines to your |vimrc| which were in 
 the original plugin and will increase compatibility with code edited with
 Emacs:
@@ -449,7 +488,8 @@ Emacs:
 
 7.9. maxdeparse~
                                                      *g:vimrplugin_maxdeparse*
-You can set the argument maxdeparse to be passed to R's source() function. Example:
+You can set the argument maxdeparse to be passed to R's source() function.
+Example:
 >
   let g:vimrplugin_maxdeparse = 300
 <
@@ -569,7 +609,7 @@ directory after the installation:
 
 
 ------------------------------------------------------------------------------
-10. FAQ~
+10. FAQ and tips~
                                                                 *r-plugin-faq*
 
 10.1. How can I make the plugin active for all file types?~
@@ -590,7 +630,7 @@ directory after the installation:
   To make it easier to remember where blocks begin and end, we recommended 
   that you use the showmarks plugin available at:
 
-http://www.vim.org/scripts/script.php?script_id=152
+  http://www.vim.org/scripts/script.php?script_id=152
   
   This plugin makes it possible to visually manage your marks. You may want 
   to add the following two lines to your |vimrc| to customize showmarks 
@@ -604,9 +644,45 @@ http://www.vim.org/scripts/script.php?script_id=152
   Sorry, it is not possible. You have to press ^C into R's terminal emulator.
 
 
+10.4. Easier key bindings for most used commands~
+  The most used commands from vim-r-plugin probably are "Send line" and "Send
+  selection". You may find it a good idea to map them to the space bar in your
+  |vimrc| (suggestion made by Iago Mosqueira):
+>
+  vmap <Space> <Plug>RDSendSelection
+  nmap <Space> <Plug>RDSendLine
+<
+
+10.5 Use "," as local map leader~
+  People writing Rnoweb documents may find it better to use a comma as local
+  leader instead of the default backslash:
+>
+  let maplocalleader = ","
+<
+
+10.6 Run your Makefile from within R~
+  Do you have many Rnoweb files included in a master tex or Rnoweb file and
+  uses a Makefile to build the pdf? You may consider it useful to put the
+  following line in your |vimrc|:
+>
+  nmap <LocalLeader>sm :update<CR>:call SendCmdToScreen('system("make")')<CR>
+<
+
+10.7 Group windows with compiz~
+  It may be easier to work with the plugin if the various related windows
+  (editor, terminal, and graphics window) are grouped because they will be
+  raised together when one of them receives the focus. You may need
+  CompizConfig Settings Manager installed to enable this feature (look at the
+  "Window Management" section for "Group and Tab Windows").
+
+
 ------------------------------------------------------------------------------
 11. News~
                                                                *r-plugin-news*                                                      
+* Syntax highlight for R functions.
+* Added "info" field to omni completion (thanks to Ben Kujala for writing the
+  original code).
+
 091016 (2009-10-16)
 * The plugin now can run together with screen.vim, thanks to Eric Van
   Dewoestine, the author of screen.vim, who added script integration to

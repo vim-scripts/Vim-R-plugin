@@ -6,7 +6,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: 2009/10/16
+" Last Change: 2009/10/17
 "
 " Please see doc/r-plugin.txt for usage details.
 "==========================================================================
@@ -24,7 +24,27 @@ endif
 " Don't load another plugin for this buffer
 let b:did_ftplugin = 1
 
+" Control the menu R
 let b:hasrmenu = 0
+
+" Automatically rebuild the 'tags' file for omni completion if the user press
+" <C-X><C-O> and we know that the file either was not created yet or is
+" outdated.
+let b:needsnewtags = 1
+
+" Keeps the libraries tag list in memory to avoid the need of reading the file
+" repeatedly:
+let fname1 = expand("~") . "/.vim/tools/rtags"
+let b:flines1 = readfile(fname1)
+
+" Special screenrc file
+let b:scrfile = " "
+
+" Automatically source the script tools/rargs.R the first time <S-F1> is pressed:
+let b:needsrargs = 1
+
+" List of marks that the plugin seeks to find the block to be sent to R
+let s:all_marks = "abcdefghijklmnopqrstuvwxyz"
 
 " From changelog.vim
 let userlogin = system('whoami')
@@ -37,10 +57,11 @@ else
   endif
 endif
 
-" Automatically rebuild the 'tags' file for omni completion if the user press
-" <C-X><C-O> and we know that the file either was not created yet or is
-" outdated.
-let b:needsnewtags = 1
+" Make the file name of files to be sourced
+let b:rsource = printf("/tmp/.Rsource-%s", userlogin)
+
+" Make the R 'tags' file name
+let b:rtagsfile = printf("/tmp/.Rtags-%s", userlogin)
 
 " Automatically call R's function help.start() the first time <C-H> is pressed:
 let b:needshstart = 0
@@ -79,9 +100,6 @@ if !executable('screen')
   finish
 endif
 
-" Special screenrc file
-let b:scrfile = " "
-
 " Choose a terminal (code adapted from screen.vim)
 let s:terminals = ['gnome-terminal', 'konsole', 'xfce4-terminal', 'Eterm', 'rxvt', 'aterm', 'xterm' ]
 if !exists("g:vimrplugin_term")
@@ -101,7 +119,7 @@ endif
 
 if g:vimrplugin_term == "gnome-terminal" || g:vimrplugin_term == "xfce4-terminal"
   " Cannot set icon: http://bugzilla.gnome.org/show_bug.cgi?id=126081
-  let b:term_cmd = g:vimrplugin_term . " --working-directory='" . expand("%:p:h") . "' -e"
+  let b:term_cmd = g:vimrplugin_term . " --working-directory='" . expand("%:p:h") . "'"
 endif
 
 if g:vimrplugin_term == "konsole"
@@ -125,15 +143,6 @@ if exists("g:vimrplugin_term_cmd")
   let b:term_cmd = g:vimrplugin_term_cmd
 endif
 
-" Automatically source the script tools/rargs.R the first time <S-F1> is pressed:
-let b:needsrargs = 1
-
-" Make the file name of files to be sourced
-let b:rsource = printf("/tmp/.Rsource-%s", userlogin)
-
-" Make the R 'tags' file name
-let b:rtagsfile = printf("/tmp/.Rtags-%s", userlogin)
-
 if exists("g:vimrplugin_nosingler")
   " Make a random name for the screen session
   let b:screensname = printf("vimrplugin-%s-%s", userlogin, localtime())
@@ -147,29 +156,12 @@ if exists('&ofu')
   setlocal ofu=rcomplete#CompleteR
 endif
 
-function! SendCmdToScreen(cmd)
-  if a:cmd =~ "library"
-    let b:needsnewtags = 1
-  endif
-  if &filetype == "rnoweb"
-    let line = getline(".")
-    if line =~ "^@$"
-      return 1
-    endif
-  endif
-  if b:usescreenplugin
-    call g:ScreenShellSend(a:cmd)
-    return 1
-  end
-  let str = substitute(a:cmd, "'", "'\\\\''", "g")
-  let scmd = 'screen -S ' . b:screensname . " -X stuff '" . str . "\<C-M>'"
-  let rlog = system(scmd)
-  if v:shell_error
-    let rlog = substitute(rlog, '\n', '', 'g')
-    call RWarningMsg(rlog)
-    return 0
-  endif
-  return 1
+" Count braces
+function! CountBraces(line)
+  let line2 = substitute(a:line, "{", "", "g")
+  let line3 = substitute(a:line, "}", "", "g")
+  let result = strlen(line3) - strlen(line2)
+  return result
 endfunction
 
 " Get first non blank character
@@ -208,81 +200,194 @@ function! GoDown()
   endwhile
 endfunction
 
-" Send current line to R. Don't go down if called by <S-Enter>.
-function! SendLineToR(godown)
-  echon
-  let line = getline(".")
-  let ok = SendCmdToScreen(line)
-  if ok && a:godown =~ "down"
-    call GoDown()
+function! ReplaceUnderS()
+  let j = col(".")
+  let s = getline(".")
+  if j > 3 && s[j-3] == "<" && s[j-2] == "-" && s[j-1] == " "
+    execute "normal! 3h3xr_"
+    return
   endif
-endfunction
-
-" Send paragraph to R
-function! SendParagraphToR(e, m)
-  let i = line(".")
-  let c = col(".")
-  let max = line("$")
-  let j = i
-  let gotempty = 0
-  while j < max
-    let j = j + 1
-    let line = getline(j)
-    if line =~ "^\s*$"
-      break
+  let isString = 0
+  let i = 0
+  while i < j
+    if s[i] == '"'
+      if isString == 0
+	let isString = 1
+      else
+	let isString = 0
+      endif
     endif
+    let i += 1
   endwhile
-  let lines = getline(i, j)
-  let ok = RSourceLines(lines, a:e)
-  if ok == 0
-    return
-  endif
-  if j < max
-    call cursor(j, 1)
+  if isString == 0
+    execute "normal! a <- "
   else
-    call cursor(max, 1)
+    execute "normal! a_"
   endif
-  if a:m == "down"
-    call GoDown()
-  else
-    call cursor(i, c)
-  endif
-  echon
 endfunction
 
-" Send selected lines.
-function! SendSelectionToR(e, m)
-  echon
-  if line("'<") == line("'>")
-    let i = col("'<") - 1
-    let j = col("'>") - i
-    let l = getline("'<")
-    let line = strpart(l, i, j)
-    let ok = SendCmdToScreen(line)
-    if ok && a:m =~ "down"
-      call GoDown()
+" Replace 'underline' with '<-'
+if b:replace_us
+  imap <buffer> _ <Esc>:call ReplaceUnderS()<CR>a
+endif
+
+function! RWriteScreenRC()
+  let b:scrfile = "/tmp/." . b:screensname . ".screenrc"
+  if exists("g:vimrplugin_nosingler")
+    let scrtitle = 'hardstatus string "' . expand("%:t") . '"'
+  else
+    let scrtitle = "hardstatus string R"
+  endif
+  let scrtxt = ["msgwait 1", "hardstatus lastline", scrtitle,
+	\ "caption splitonly", 'caption string "Vim-R-plugin"',
+	\ "termcapinfo xterm* 'ti@:te@'", 'vbell off']
+  call writefile(scrtxt, b:scrfile)
+  let scrrc = "-c " . b:scrfile
+  return scrrc
+endfunction
+
+" Start R
+function! StartR(whatr)
+  if a:whatr =~ "vanilla"
+    let rcmd = "R --vanilla"
+  else
+    if a:whatr =~ "R"
+      let rcmd = "R"
+    else
+      if a:whatr =~ "custom"
+        call inputsave()
+        let rargs = input('Enter parameters for R: ')
+        call inputrestore()
+        let rcmd = "R " . rargs
+      endif
     endif
-    return
   endif
-  let lines = getline("'<", "'>")
-  let ok = RSourceLines(lines, a:e)
-  if ok == 0
-    return
+  if !exists("g:vimrplugin_hstart")
+    let b:needshstart = 0
   endif
-  if a:m == "down"
-    call GoDown()
+  if exists("g:vimrplugin_hstart")
+    if g:vimrplugin_hstart == 1
+      let b:needshstart = 1
+    else
+      let b:needshstart = 0
+    endif
+  endif
+  let b:needsrargs = 1
+  if b:usescreenplugin
+    exec 'ScreenShell ' . rcmd
   else
-    normal! gv
+    if exists("g:vimrplugin_noscreenrc")
+      let scrrc = " "
+    else
+      let scrrc = RWriteScreenRC()
+    endif
+    " Some terminals want quotes (see screen.vim)
+    if b:term_cmd =~ "gnome-terminal" || b:term_cmd =~ "xfce4-terminal"
+      let opencmd = printf("%s -t R -e 'screen %s -d -RR -S %s %s' &", b:term_cmd, scrrc, b:screensname, rcmd)
+    else
+      let opencmd = printf("%s screen %s -d -RR -S %s %s &", b:term_cmd, scrrc, b:screensname, rcmd)
+    endif
+    " Change to buffer's directory, run R, and go back to original directory:
+    lcd %:p:h
+    let rlog = system(opencmd)
+    lcd -
+    if v:shell_error
+      call RWarningMsg(rlog)
+      return
+    endif
+  endif
+  echon
+endfunction
+
+" Quit R
+function! RQuit(how)
+  if a:how == "save"
+    call SendCmdToScreen('quit(save = "yes")')
+  else
+    call SendCmdToScreen('quit(save = "no")')
+  endif
+  if b:usescreenplugin && exists(':ScreenQuit')
+      ScreenQuit
+  endif
+  echon
+endfunction
+
+" Function to send commands
+function! SendCmdToScreen(cmd)
+  if b:usescreenplugin
+    call g:ScreenShellSend(a:cmd)
+    return 1
+  end
+  let str = substitute(a:cmd, "'", "'\\\\''", "g")
+  let scmd = 'screen -S ' . b:screensname . " -X stuff '" . str . "\<C-M>'"
+  let rlog = system(scmd)
+  if v:shell_error
+    let rlog = substitute(rlog, '\n', '', 'g')
+    call RWarningMsg(rlog)
+    return 0
+  endif
+  return 1
+endfunction
+
+" Get word under cursor
+function! RGetKeyWord()
+  " Go back some columns if character under cursor is not valid
+  let curline = line(".")
+  let line = getline(curline)
+  " line index starts in 0; cursor index starts in 1:
+  let i = col(".") - 1
+  while i > 0 && (line[i] == ' ' || line[i] == '(')
+    let i -= 1
+  endwhile
+  " Go back until the begining of the word:
+  let wentback = 0
+  while i >= 0 && line[i] != ' ' && line[i] != '(' && line[i] != '[' && line[i] != '{' && line[i] != ','
+    let i -= 1
+    let wentback = 1
+  endwhile
+  let llen = strlen(line)
+  if wentback == 1
+    let i += 1
+  endif
+  let kstart = i
+  while i < llen && line[i] != ' ' && line[i] != '(' && line[i] != '[' && line[i] != '{' && line[i] != ','
+    let i += 1
+  endwhile
+  if (line[i-1] == ' ' || line[i-1] == ')' || line[i-1] == ']' || line[i-1] == '}' || line[i-1] == ',')
+    let i -= 1
+  endif
+  let rkeyword = strpart(line, kstart, i - kstart)
+  return rkeyword
+endfunction
+
+" Call R funtions for the word under cursor
+function! RAction(rcmd)
+  echon
+  let rkeyword = RGetKeyWord()
+  if strlen(rkeyword) > 0
+    if a:rcmd == "help"
+      if b:needshstart == 1
+        let b:needshstart = 0
+        let ok = SendCmdToScreen("help.start()")
+        if ok == 0
+          return
+        endif
+        let wt = g:vimrplugin_browser_time
+        while wt > 0
+          sleep
+          let wt -= 1
+        endwhile
+      endif
+    endif
+    let raction = a:rcmd . "(" . rkeyword . ")"
+    let ok = SendCmdToScreen(raction)
+    if ok == 0
+      return
+    endif
   endif
 endfunction
 
-function! CountBraces(line)
-  let line2 = substitute(a:line, "{", "", "g")
-  let line3 = substitute(a:line, "}", "", "g")
-  let result = strlen(line3) - strlen(line2)
-  return result
-endfunction
-
+" Send sources to R
 function! RSourceLines(lines, e)
   call writefile(a:lines, b:rsource)
   if a:e == "echo"
@@ -298,6 +403,54 @@ function! RSourceLines(lines, e)
   return ok
 endfunction
 
+" Send file to R
+function! SendFileToR(e)
+  echon
+  let lines = getline("1", line("$"))
+  let ok = RSourceLines(lines, a:e)
+  if  ok == 0
+    return
+  endif
+endfunction
+
+" Send block to R
+" Adapted of the plugin marksbrowser
+" Function to get the marks which the cursor is between
+function! SendMBlockToR(e, m)
+  let curline = line(".")
+  let lineA = -1
+  let lineB = line("$") + 1
+  let maxmarks = strlen(s:all_marks)
+  let n = 0
+  while n < maxmarks
+    let c = strpart(s:all_marks, n, 1)
+    let lnum = line("'" . c)
+    if lnum != 0
+      if lnum <= curline && lnum > lineA
+        let lineA = lnum
+      elseif lnum > curline && lnum < lineB
+        let lineB = lnum
+      endif
+    endif
+    let n = n + 1
+  endwhile
+  if lineA == -1 || lineB == (line("$") + 1)
+    call RWarningMsg("The cursor is not between two marks!")
+    return
+  endif
+  let lines = getline(lineA, lineB)
+  let ok = RSourceLines(lines, a:e)
+  if ok == 0
+    return
+  endif
+  if a:m == "down" && lineB != line("$")
+    call cursor(lineB, 1)
+    call GoDown()
+  endif  
+  echon
+endfunction
+
+" Send functions to R
 function! SendFunctionToR(e, m)
   echon
   let line = getline(".")
@@ -350,196 +503,81 @@ function! SendFunctionToR(e, m)
   echon
 endfunction
 
-function! SendFileToR(e)
+" Send selection to R
+function! SendSelectionToR(e, m)
   echon
-  let lines = getline("1", line("$"))
-  let ok = RSourceLines(lines, a:e)
-  if  ok == 0
+  if line("'<") == line("'>")
+    let i = col("'<") - 1
+    let j = col("'>") - i
+    let l = getline("'<")
+    let line = strpart(l, i, j)
+    let ok = SendCmdToScreen(line)
+    if ok && a:m =~ "down"
+      call GoDown()
+    endif
     return
   endif
-endfunction
-
-" Call R funtions for the word under cursor
-function! RAction(rcmd)
-  echon
-  " Go back some columns if character under cursor is not valid
-  let curline = line(".")
-  let line = getline(curline)
-  " line index starts in 0; cursor index starts in 1:
-  let i = col(".") - 1
-  while i > 0 && (line[i] == ' ' || line[i] == '(')
-    let i -= 1
-  endwhile
-  " Go back until the begining of the word:
-  let wentback = 0
-  while i >= 0 && line[i] != ' ' && line[i] != '(' && line[i] != '[' && line[i] != '{' && line[i] != ','
-    let i -= 1
-    let wentback = 1
-  endwhile
-  let llen = strlen(line)
-  if wentback == 1
-    let i += 1
-  endif
-  let kstart = i
-  while i < llen && line[i] != ' ' && line[i] != '(' && line[i] != '[' && line[i] != '{' && line[i] != ','
-    let i += 1
-  endwhile
-  if (line[i-1] == ' ' || line[i-1] == ')' || line[i-1] == ']' || line[i-1] == '}' || line[i-1] == ',')
-    let i -= 1
-  endif
-  let rkeyword = strpart(line, kstart, i - kstart)
-  if strlen(rkeyword) > 0
-    if a:rcmd == "help"
-      if b:needshstart == 1
-        let b:needshstart = 0
-        let ok = SendCmdToScreen("help.start()")
-        if ok == 0
-          return
-        endif
-        let wt = g:vimrplugin_browser_time
-        while wt > 0
-          sleep
-          let wt -= 1
-        endwhile
-      endif
-    endif
-    let raction = a:rcmd . "(" . rkeyword . ")"
-    let ok = SendCmdToScreen(raction)
-    if ok == 0
-      return
-    endif
-  endif
-endfunction
-
-" Tell R to create a 'tags' file (/tmp/.Rtags-user-time) listing all currently
-" available objects in its environment. The file is necessary omni completion.
-function! BuildRTags()
-  let tagscmd = printf(".vimtagsfile <- \"%s\"", b:rtagsfile)
-  let ok = SendCmdToScreen(tagscmd)
+  let lines = getline("'<", "'>")
+  let ok = RSourceLines(lines, a:e)
   if ok == 0
     return
   endif
-  let tagscmd = "source(\"~/.vim/tools/rtags.R\")"
-  let b:needsnewtags = 0
-  call SendCmdToScreen(tagscmd)
-  " Wait while R is writing the tags file
-  sleep
-  let i = 1
-  while 1
-    if filereadable(b:rtagsfile)
-      " the tags file may not finished yet
-      sleep
-      break
-    endif
-    let i += 1
-    sleep
-    if i == 10
+  if a:m == "down"
+    call GoDown()
+  else
+    normal! gv
+  endif
+endfunction
+
+" Send paragraph to R
+function! SendParagraphToR(e, m)
+  let i = line(".")
+  let c = col(".")
+  let max = line("$")
+  let j = i
+  let gotempty = 0
+  while j < max
+    let j = j + 1
+    let line = getline(j)
+    if line =~ "^\s*$"
       break
     endif
   endwhile
-  echon
-endfunction
-
-function! StartR(whatr)
-  if a:whatr =~ "vanilla"
-    let rcmd = "R --vanilla"
-  else
-    if a:whatr =~ "R"
-      let rcmd = "R"
-    else
-      if a:whatr =~ "custom"
-        call inputsave()
-        let rargs = input('Enter parameters for R: ')
-        call inputrestore()
-        let rcmd = "R " . rargs
-      endif
-    endif
-  endif
-  if !exists("g:vimrplugin_hstart")
-    let b:needshstart = 0
-  endif
-  if exists("g:vimrplugin_hstart")
-    if g:vimrplugin_hstart == 1
-      let b:needshstart = 1
-    else
-      let b:needshstart = 0
-    endif
-  endif
-  let b:needsrargs = 1
-  if b:usescreenplugin
-    exec 'ScreenShell ' . rcmd
-  else
-    if exists("g:vimrplugin_noscreenrc")
-      let scrrc = " "
-    else
-      let b:scrfile = "/tmp/." . b:screensname . ".screenrc"
-      if exists("g:vimrplugin_nosingler")
-        let scrtitle = 'hardstatus string "' . expand("%:t") . '"'
-      else
-        let scrtitle = "hardstatus string R"
-      endif
-      let scrtxt = ["msgwait 1", "hardstatus lastline", scrtitle,
-            \ "caption splitonly", 'caption string "Vim-R-plugin"',
-            \ "termcapinfo xterm* 'ti@:te@'", 'vbell off']
-      call writefile(scrtxt, b:scrfile)
-      let scrrc = "-c " . b:scrfile
-    endif
-    " Some terminals want quotes (see screen.vim)
-    if b:term_cmd =~ "gnome-terminal" || b:term_cmd =~ "xfce4-terminal"
-      let opencmd = printf("%s 'screen %s -d -RR -S %s %s' &", b:term_cmd, scrrc, b:screensname, rcmd)
-    else
-      let opencmd = printf("%s screen %s -d -RR -S %s %s &", b:term_cmd, scrrc, b:screensname, rcmd)
-    endif
-    " Change to buffer's directory, run R, and go back to original directory:
-    lcd %:p:h
-    let rlog = system(opencmd)
-    lcd -
-    if v:shell_error
-      call RWarningMsg(rlog)
-      return
-    endif
-  endif
-  echon
-endfunction
-
-function! RQuit(how)
-  if a:how == "save"
-    call SendCmdToScreen('quit(save = "yes")')
-  else
-    call SendCmdToScreen('quit(save = "no")')
-  endif
-  if b:usescreenplugin && exists(':ScreenQuit')
-      ScreenQuit
-  endif
-  echon
-endfunction
-
-function! ReplaceUnderS()
-  let j = col(".")
-  let s = getline(".")
-  if j > 3 && s[j-3] == "<" && s[j-2] == "-" && s[j-1] == " "
-    execute "normal! 3h3xr_"
+  let lines = getline(i, j)
+  let ok = RSourceLines(lines, a:e)
+  if ok == 0
     return
   endif
-  let isString = 0
-  let i = 0
-  while i < j
-    if s[i] == '"'
-      if isString == 0
-	let isString = 1
-      else
-	let isString = 0
-      endif
-    endif
-    let i += 1
-  endwhile
-  if isString == 0
-    execute "normal! a <- "
+  if j < max
+    call cursor(j, 1)
   else
-    execute "normal! a_"
+    call cursor(max, 1)
+  endif
+  if a:m == "down"
+    call GoDown()
+  else
+    call cursor(i, c)
+  endif
+  echon
+endfunction
+
+" Send current line to R. Don't go down if called by <S-Enter>.
+function! SendLineToR(godown)
+  echon
+  let line = getline(".")
+  if &filetype == "rnoweb" && line =~ "^@$"
+    if a:godown =~ "down"
+      call GoDown()
+    endif
+    return
+  endif
+  let ok = SendCmdToScreen(line)
+  if ok && a:godown =~ "down"
+    call GoDown()
   endif
 endfunction
 
+" Clear the console screen
 function! RClearAll()
   let ok = SendCmdToScreen("rm(list=ls())")
   sleep 500m
@@ -548,6 +586,7 @@ function! RClearAll()
   endif
 endfunction
 
+"Set working directory to the path of current buffer
 function! RSetWD()
   let ok = SendCmdToScreen('setwd("' . expand("%:p:h") . '")')
   if ok == 0
@@ -556,6 +595,15 @@ function! RSetWD()
   echon
 endfunction
 
+" Sweave the current buffer content
+function! RSweave()
+  update
+  call RSetWD()
+  call SendCmdToScreen('Sweave("' . expand("%:t") . '")')
+  echon
+endfunction
+
+" Sweave and compile the current buffer content
 function! RMakePDF()
   update
   call RSetWD()
@@ -578,55 +626,115 @@ function! RMakePDF()
   echon
 endfunction  
 
-function! RSweave()
-  update
-  call RSetWD()
-  call SendCmdToScreen('Sweave("' . expand("%:t") . '")')
-  echon
-endfunction
-
-" List of marks that the plugin seeks to find the block to be sent to R
-let s:all_marks = "abcdefghijklmnopqrstuvwxyz"
-
-" Adapted of the plugin marksbrowser
-" Function to get the marks which the cursor is between
-function! SendMBlockToR(e, m)
-  let curline = line(".")
-  let lineA = -1
-  let lineB = line("$") + 1
-  let maxmarks = strlen(s:all_marks)
-  let n = 0
-  while n < maxmarks
-    let c = strpart(s:all_marks, n, 1)
-    let lnum = line("'" . c)
-    if lnum != 0
-      if lnum <= curline && lnum > lineA
-        let lineA = lnum
-      elseif lnum > curline && lnum < lineB
-        let lineB = lnum
-      endif
-    endif
-    let n = n + 1
-  endwhile
-  if lineA == -1 || lineB == (line("$") + 1)
-    call RWarningMsg("The cursor is not between two marks!")
-    return
+" Tell R to create a 'tags' file (/tmp/.Rtags-user-time) listing all currently
+" available objects in its environment. The file is necessary omni completion.
+function! BuildRTags(globalenv)
+  if a:globalenv =~ "GlobalEnv"
+    let rtf = b:rtagsfile
+    let b:needsnewtags = 0
+  else
+    let rtf = expand("~") . "/.vim/tools/rtags"
   endif
-  let lines = getline(lineA, lineB)
-  let ok = RSourceLines(lines, a:e)
+  let locktagsfile = rtf . ".locked"
+  call writefile(["Wait!"], locktagsfile)
+  let tagscmd = printf(".vimtagsfile <- \"%s\"", rtf)
+  let ok = SendCmdToScreen(tagscmd)
   if ok == 0
     return
   endif
-  if a:m == "down" && lineB != line("$")
-    call cursor(lineB, 1)
-    call GoDown()
-  endif  
+  let tagscmd = "source(\"~/.vim/tools/rtags.R\")"
+  call SendCmdToScreen(tagscmd)
+  " Wait while R is writing the tags file
+  sleep 70m
+  let i = 0 
+  let s = 0
+  while filereadable(locktagsfile)
+    let s = s + 1
+    if s == 4 && a:globalenv !~ "GlobalEnv"
+      let s = 0
+      let i = i + 1
+      let k = 30 - i
+      let themsg = "\rPlease, wait! [" . i . ":" . k . "]"
+      echon themsg
+    endif
+    sleep 250m
+    if i == 30
+      call delete(locktagsfile)
+      call RWarningMsg("Thirty seconds is too much: no longer waiting.")
+      return
+    endif
+  endwhile
+  if i > 2
+    echon "\rFinished in " . i . " seconds."
+  endif
 endfunction
 
-" Replace 'underline' with '<-'
-if b:replace_us
-  imap <buffer> _ <Esc>:call ReplaceUnderS()<CR>a
-endif
+function! RBuildSyntaxFile()
+  call BuildRTags("libraries")
+  sleep 1
+  let fname1 = expand("~") . "/.vim/tools/rtags"
+  let syncmd = "grep ':function:\\|:standardGeneric:' " . fname1 . " | awk -F ':' '{print $1}' | fmt -66 | sed -e 's/^\\(.*\\)$/syn keyword rFunction \\1/' > ~/.vim/tools/rfunctions"
+  let rlog = system(syncmd)
+  if v:shell_error
+    call RWarningMsg(rlog)
+    return
+  endif
+  call RWarningMsg("The syntax will be updated next time you load an R file.")
+endfunction
+
+" Integration with Norm Matloff's edtdbg package.
+function! RStartDebug()
+  if exists("g:vimrplugin_isdebugging") && g:vimrplugin_isdebugging == 1
+    "call SendCmdToScreen("editclose()")
+    let g:vimrplugin_isdebugging = 0
+  endif
+  let fname = RGetKeyWord()
+  if strlen(fname) == 0
+    call RWarningMsg("No valid name under cursor.")
+    return
+  endif
+  if exists("g:vimrplugin_noscreenrc")
+    let scrrc = " "
+  else
+    let scrrc = RWriteScreenRC()
+  endif
+  if b:term_cmd =~ "gnome-terminal" || b:term_cmd =~ "xfce4-terminal"
+    let opencmd = b:term_cmd . " -t RDebug -e 'screen " . scrrc . " -d -RR -S VimRdebug R' &"
+  else
+    let opencmd = b:term_cmd . " screen " . scrrc . " -d -RR -S VimRdebug R &"
+  endif
+  let rlog = system(opencmd)
+  if v:shell_error
+    call RWarningMsg(rlog)
+    return
+  endif
+  call SendCmdToScreen('source("~/.vim/tools/Clnt.r")')
+  let curline = line(".")
+  let scmd = "screen -S VimRdebug -X stuff 'source(\"~/.vim/tools/Srvr.r\") ; editsrvr(vimserver=\"" . v:servername . "\") ; quit(\"no\")" . "\<C-M>'"
+  sleep 3
+  let rlog = system(scmd)
+  if v:shell_error
+    let rlog = substitute(rlog, '\n', '', 'g')
+    call RWarningMsg(rlog)
+    return
+  endif
+  "call SendCmdToScreen('editclnt(firstline=' . curline . ')')
+  call SendCmdToScreen('editclnt()')
+  call SendCmdToScreen('debug(' . fname . ')')
+  " Detach the VimRdebug screen session to run the R server in the background:
+"  sleep 1
+"  let rlog = system('screen -d -S VimRdebug')
+"  if v:shell_error
+"    let rlog = substitute(rlog, '\n', '', 'g')
+"    call RWarningMsg(rlog)
+"    return
+"  endif
+  let g:vimrplugin_isdebugging = 1
+endfunction
+
+command! RUpdateObjList :call RBuildSyntaxFile()
+
+
 
 " For each noremap we need a vnoremap including <Esc> before the :call,
 " otherwise vim will call the function as many times as the number of selected
@@ -687,8 +795,8 @@ call s:RCreateMaps("nvi", '<Plug>RSaveClose',    'rw', ":call RQuit('save')")
 "----------------------------------------------------------------------------
 " File
 "-------------------------------------
-call s:RCreateMaps("nvi", '<Plug>RSendFile',      'aa', ':call SendFileToR("silent")')
-call s:RCreateMaps("nvi", '<Plug>RESendFile',     'ae', ':call SendFileToR("echo")')
+call s:RCreateMaps("ni", '<Plug>RSendFile',      'aa', ':call SendFileToR("silent")')
+call s:RCreateMaps("ni", '<Plug>RESendFile',     'ae', ':call SendFileToR("echo")')
 
 " Block
 "-------------------------------------
@@ -718,9 +826,6 @@ call s:RCreateMaps("ni", '<Plug>RESendParagraph',  'pe', ':call SendParagraphToR
 call s:RCreateMaps("ni", '<Plug>RDSendParagraph',  'pd', ':call SendParagraphToR("silent", "down")')
 call s:RCreateMaps("ni", '<Plug>REDSendParagraph', 'pa', ':call SendParagraphToR("echo", "down")')
 
-" 'Send line' must become before 'Send selection' because they share the same
-" shortcut. Otherwise, 'Send selection' will send the selection as many times as
-" are the number of selected lines.
 " *Line*
 "-------------------------------------
 call s:RCreateMaps("ni0", '<Plug>RSendLine', 'l', ':call SendLineToR("stay")')
@@ -776,7 +881,15 @@ call s:RCreateMaps("nvi", '<Plug>RMakePDF',      'sp', ':call RMakePDF()')
 
 " Build tags file for omni completion
 "-------------------------------------
-call s:RCreateMaps("nvi", '<Plug>RBuildTags',    'ro', ':call BuildRTags()')
+call s:RCreateMaps("nvi", '<Plug>RBuildTags',    'ro', ':call BuildRTags("GlobalEnv")')
+
+"----------------------------------------------------------------------------
+" ***Debug***
+"----------------------------------------------------------------------------
+" Start debugging
+"-------------------------------------
+"call s:RCreateMaps("nvi", '<Plug>RDebug', 'dd', ':call RStartDebug()')
+
 
 function! s:RCreateMenuItem(type, label, plug, combo, target)
   if a:type =~ '0'
@@ -814,6 +927,7 @@ function! MakeRMenu()
   if b:hasrmenu == 1
     return
   endif
+
   "----------------------------------------------------------------------------
   " Start/Close
   "----------------------------------------------------------------------------
@@ -828,8 +942,8 @@ function! MakeRMenu()
   "----------------------------------------------------------------------------
   " Send
   "----------------------------------------------------------------------------
-  call s:RCreateMenuItem("nvi", 'Send.File', '<Plug>RSendFile', 'aa', ':call SendFileToR("silent")')
-  call s:RCreateMenuItem("nvi", 'Send.File\ (echo)', '<Plug>RESendFile', 'ae', ':call SendFileToR("echo")')
+  call s:RCreateMenuItem("ni", 'Send.File', '<Plug>RSendFile', 'aa', ':call SendFileToR("silent")')
+  call s:RCreateMenuItem("ni", 'Send.File\ (echo)', '<Plug>RESendFile', 'ae', ':call SendFileToR("echo")')
   "-------------------------------
   menu R.Send.-Sep1- <nul>
   call s:RCreateMenuItem("ni", 'Send.Block\ (cur)', '<Plug>RSendMBlock', 'bb', ':call SendMBlockToR("silent", "stay")')
@@ -896,9 +1010,10 @@ function! MakeRMenu()
   call s:RCreateMenuItem("nvi", 'Control.Sweave\ and\ PDF\ (cur\ file)', '<Plug>RMakePDF', 'sp', ':call RMakePDF()')
   "-------------------------------
   menu R.Control.-Sep6- <nul>
-  call s:RCreateMenuItem("nvi", 'Control.Rebuild\ list\ of\ objects', '<Plug>RBuildTags', 'ro', ':call BuildRTags()')
+  call s:RCreateMenuItem("nvi", 'Control.Rebuild\ list\ of\ objects', '<Plug>RBuildTags', 'ro', ':call BuildRTags("GlobalEnv")')
   "-------------------------------
   menu R.-Sep7- <nul>
+
   "----------------------------------------------------------------------------
   " About
   "----------------------------------------------------------------------------
@@ -967,10 +1082,9 @@ endfunction
 call MakeRMenu()
 
 augroup VimRPlugin
+  au FileType * if (&filetype == "r" || &filetype == "rnoweb" || &filetype == "rhelp") | call MakeRMenu() | endif
   au BufEnter * if (&filetype == "r" || &filetype == "rnoweb" || &filetype == "rhelp") | call MakeRMenu() | endif
   au BufLeave * if (&filetype == "r" || &filetype == "rnoweb" || &filetype == "rhelp") | call UnMakeRMenu() | endif
-  au VimLeave * if (&filetype == "r" || &filetype == "rnoweb" || &filetype == "rhelp") | call DeleteScreenRC() | endif
-  au FileType * if (&filetype == "r" || &filetype == "rnoweb" || &filetype == "rhelp") | call MakeRMenu() | endif
 augroup END
 
 "==========================================================================
@@ -1002,3 +1116,14 @@ augroup END
 " * Changes in key binding for Send functions.
 "
 " * New function RCreateMenuItem()
+"
+" * New function RBuildSyntaxFile and new command RUpdateObjList
+" 
+" * Send commands to R even when the line is '^@$' in Rnoweb file. Send line
+" is the only exception.
+" 
+" * Added 'info' field to omni completion. Thanks to Ben Kujala for writing
+" the original code!
+"
+" * New function: RStartDebug(): integration with Norm Matloff's edtdbg package.
+
