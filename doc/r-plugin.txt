@@ -6,7 +6,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          José Cláudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 091223
+Version: 100512
 
 For Vim version 7.2 and above
 
@@ -31,7 +31,8 @@ This plugin improves Vim's support for editing R code and makes it possible to
 integrate Vim with R.
 
 It uses some ideas and code from Johannes Ranke's (vim-r-plugin), Eric Van
-Dewoestine's (screen plugin) and some ideas from Tinn-R (Windows only) project.
+Dewoestine's (screen plugin) and some ideas from the Tinn-R (Windows only)
+project.
 
 Please understand that this plugin is developing and changing rapidly! 
 Future releases may change default behavior and key bindings. 
@@ -52,7 +53,7 @@ you would like to see in future releases.
 2.1. Linux/Unix only:~
 
   * Integrated communication with R;
-  * Omni completion for R objects.
+  * Omni completion (auto-completion) for R objects.
 
 
 2.2. All platforms:~
@@ -77,7 +78,7 @@ This software is already packaged for most GNU/Linux distributions and other
 Unix variants. In fact, screen is installed by default on many Linux 
 distributions.
 
-Unfortunately, installation instructions for these dependencies varies widely
+Unfortunately, installation instructions for these dependencies vary widely
 and are beyond the scope of this documentation. Please review the installation
 instructions for your operating system for these external dependencies.
 
@@ -112,7 +113,7 @@ Update the list of objects for omni completion and syntax highlight (see
 3.3. Optional step~
 
 Edit Vim's toolbar and remove the buttons that you never use. The plugin adds
-some buttons to the tool bar, but you may not see them because gvim has too
+some buttons to the toolbar, but you may not see them because gvim has too
 many buttons by default. Please see the page below to know how to hide buttons
 on the toolbar:
 
@@ -212,7 +213,7 @@ to disable underscore replacement.
 4.2 Syntax highlight and omni completion~
                                                              *:RUpdateObjList*
 The plugin adds some features to the default syntax highlight of R code. One
-of such features is the highlight of R functions. However, only functions that
+such feature is the highlight of R functions. However, only functions that
 R loads by default are highlighted. To add functions of other libraries, you
 should do the following:
 
@@ -224,9 +225,9 @@ should do the following:
 
 The command :RUpdateObjList in addition to creating a list of function names
 to be highlighted also creates a tags file for omni completion including all
-objects currently in R workspace, with the exception of the .GlobalEnv
+objects currently in R's workspace, with the exception of the .GlobalEnv
 objects. These two lists are stored permanently in the ~/.vim/tools directory.
-If you prefer do not have the functions highlighted, delete the file
+If you prefer to not have the functions highlighted, delete the file
 ~/.vim/tools/rfunctions.
 
 
@@ -234,10 +235,15 @@ If you prefer do not have the functions highlighted, delete the file
 5. How the plugin works~
                                                         *r-plugin-functioning*
 
+Vim and R run as independent processes. The main disadvantage is that we have
+limited communication between the two applications: Vim can send strings to R
+through screen and R can write files to be read by Vim. That's all.  The main
+advantage is that Vim's or the plugin's bugs will not affect R.
+
 5.1. Communication through screen~
 
 The r-plugin uses screen to communicate with R. First, the plugin initiates a
-new screen session and  uses this to start new R process. The plugin's menu
+new screen session and  uses this to start a new R process. The plugin's menu
 options, toolbar buttons and key bindings can then be used to communicate with
 the newly started R process. The plugin sends commands to R through screen. By
 default, all Vim buffers share the same R process, but it is also possible to
@@ -251,11 +257,12 @@ different R processes see |g:vimrplugin_single_r|.
 
 5.2. Omni completion~
 
-To start |omni-completion|, type <C-X><C-O>. See 'completeopt' to know how to
-customize the |omni-completion|.
-Omni completion shows in a pop up menu the name of the object, its class and its
-environment (most frequently, its package name). If the object is a function,
-its arguments are shown in separate window.
+Vim can automatically complete the names of R objects when CTRL-X CTRL-O is
+pressed in insert mode (see |omni-completion| for details and 'completeopt' to
+know how to customize the |omni-completion|).  Omni completion shows in a pop
+up menu the name of the object, its class and its environment (most
+frequently, its package name). If the object is a function, its arguments are
+shown in a separate window.
 
 You can build/rebuild the tags file at any time. Remember, you must rebuild
 the tags file manually to add the names of other objects created after
@@ -318,11 +325,11 @@ option echo = TRUE, and error messages are printed only after the function has
 finished, which make it more difficult to find errors in the code sent to R.
 
 
-6.4 GVim's tool bar buttons, menu and title bar blink during omni completion~
+6.4 GVim's toolbar buttons, menu and title bar blink during omni completion~
 
-The plugin unmakes the R menu and the related tool bar buttons when Vim leaves
+The plugin unmakes the R menu and the related toolbar buttons when Vim leaves
 the R buffer. During omni completion, Vim leaves the R buffer and goes to the
-scratch window and, consequently, the plugin unmakes the tool bar buttons and
+scratch window and, consequently, the plugin unmakes the toolbar buttons and
 R related menu items. 
 
 
@@ -358,7 +365,8 @@ your |vimrc| the variable g:vimrplugin_term_cmd, as in the example below:
 
 7.2. Underscore~
                                                      *g:vimrplugin_underscore*
-To disable the underscore replacement with " <- " put in your |vimrc|:
+To disable the underscore replacement with " <- " put the following in your
+|vimrc|:
 >
   let g:vimrplugin_underscore = 1
 <
@@ -379,7 +387,7 @@ and konsole but defaults to xterm.
 7.4. Html help~
                                                          *g:vimrplugin_hstart*
 The plugin can call R's function help.start() the first time that you press
-<C-H>. If you want this behavior, you should put in your |vimrc|:
+CTRL-H. If you want this behavior, you should put in your |vimrc|:
 >
   let g:vimrplugin_hstart = 1
 <
@@ -394,11 +402,29 @@ your |vimrc|:
 
 7.5. Number of R processes~
                                                        *g:vimrplugin_nosingler*
+                                                 *g:vimrplugin_by_vim_instance*
 If you prefer that each Vim buffer uses its own R process, put the following
 option in your |vimrc|:
 >
   let g:vimrplugin_nosingler = 1
 <
+If you prefer that each Vim instance calls its own R process and all of the
+instance's buffers send code to this R process while other Vim instances send
+code to other R processes then put the following in your |vimrc|:
+>
+  let g:vimrplugin_by_vim_instance = 1
+>
+This is the default behavior when using Vim with the screen.vim plugin, and,
+thus, there is no need to use this option if already running Vim with the
+option |g:vimrplugin_screenplugin|(see below). The
+|g:vimrplugin_by_vim_instance| option requires that vim is acting as a command
+server because the variable |v:servername| is used to make the name of the
+screen session which will run R. By default, GVim runs as server, but Vim does
+not. Hence, if you are using Vim you have either to start Vim with the
+argument --servername or use the screen.vim plugin which tries to restart Vim
+with the --servername argument. If you want to use more than nine GVim
+instances you will have to use the --servername argument because screen will
+not differentiate between the names "GVIM1" and "GVIM10".
 
 7.6. Screen configuration~
                                                      *g:vimrplugin_noscreenrc*
@@ -410,9 +436,9 @@ your own ~/.screenrc, put in your |vimrc|:
 
 7.7. Integration with screen.vim~
                                                    *g:vimrplugin_screenplugin*
-By default, the r-plugin does not use screen.vim plugin, written by Eric Van
-Dewoestine. If you prefer to use both plugins at the same time, download and
-install the screen.vim (version 0.8 or above) from:
+By default, the r-plugin does not use the screen.vim plugin, written by Eric
+Van Dewoestine. If you prefer to use both plugins at the same time, download
+and install the screen.vim (version 0.8 or above) from:
 
   http://www.vim.org/scripts/script.php?script_id=2711
 
@@ -519,7 +545,7 @@ To customize a key binding you should put in your |vimrc| something like:
 <
 The above example shows how you can increase compatibility with old versions
 of the r-plugin, by changing the key binding used to start R from
-<LocalLeader>rf to the old default value, <F2>.
+<LocalLeader>rf to the old default value, F2.
 
 Custom key bindings are not shown in Vim's menu, but you can type |:map| to 
 see the list of current mappings, and below is the list of the names for 
@@ -678,7 +704,22 @@ directory after the installation:
 
 ------------------------------------------------------------------------------
 11. News~
-                                                               *r-plugin-news*                                                      
+                                                              *r-plugin-news*
+
+100512 (2010-05-12)
+
+* Thanks to Tortonesi Mauro who wrote a patch to make the plugin work with
+  pathogen.vim.
+* Added simple syntax hightlight for .Rout files.
+* Increased the time limit of RUpdateObjList to two minutes.
+* Improvement in the syntax highlight based on code written by Zhuojun Chen.
+* Thanks to Scott Kostyshak who helped to improve the documentation.
+* Iago Mosqueira suggested that the plugin should be able to run one R process
+  for each Vim instance, and his suggestion was implemented with the option
+  g:vimrplugin_by_vim_instance.
+
+091223 (2009-12-23)
+
 * Syntax highlight for R functions.
 * Added "info" field to omni completion (thanks to Ben Kujala for writing the
   original code).
@@ -711,7 +752,7 @@ directory after the installation:
   funnel.pl are solved.
 * Deleted key binding for R-devel.
 * Automatically detect available terminal emulators and choose one of them.
-* By default, no longer calls help.start() the first time that <C-H> is
+* By default, no longer calls help.start() the first time that CTRL-H is
   pressed.
 
 090810 (2009-08-10)
@@ -719,8 +760,8 @@ directory after the installation:
 * Removed the script open-gvim-here. You may use Vim's option autochdir.
 * Added option g:vimrplugin_term.
 * Improved indentation script.
-* Changed key binding from <S-Enter>, which doesn't work in any terminal, to
-  <M-Enter>, which at least works in xterm.
+* Changed key binding from Shift-Enter, which doesn't work in any terminal, to
+  Alt-Enter, which at least works in xterm.
 
 090610 (2009-06-11)
 * The options expandtab, shiftwidth and tabstop are no longer set by the plugin.
@@ -733,13 +774,13 @@ directory after the installation:
 
 090523 (2009-05-23)
 * Key bindings now are customizable.
-* Default key binding for calling R's args() changed to <S-F1>.
+* Default key binding for calling R's args() changed to Shift-F1.
 * New R script rargs.R gives better results for generic functions than R's
   args() called directly.
 
 090519 (2009-05-20)
 * Don't send large blocks of code to R to avoid xterm freezing.
-* Automatically call help.start() after <C-H> is pressed for the first time,
+* Automatically call help.start() after CTRL-H is pressed for the first time,
   and wait 4 seconds for the browser start before calling R's help(). These
   features are customizable.
 * Fixed tags file script.

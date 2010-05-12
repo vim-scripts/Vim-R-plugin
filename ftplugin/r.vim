@@ -6,7 +6,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: 2009/10/17
+" Last Change: 2010/05/12
 "
 " Please see doc/r-plugin.txt for usage details.
 "==========================================================================
@@ -32,10 +32,13 @@ let b:hasrmenu = 0
 " outdated.
 let b:needsnewtags = 1
 
+" Save r plugin home - necessary to make vim-r-plugin2 work with pathogen
+let b:r_plugin_home = expand("<sfile>:h:h")
+
 " Keeps the libraries tag list in memory to avoid the need of reading the file
 " repeatedly:
-let fname1 = expand("~") . "/.vim/tools/rtags"
-let b:flines1 = readfile(fname1)
+let b:local_rtags_filename = b:r_plugin_home . "/tools/rtags"
+let b:flines1 = readfile(b:local_rtags_filename)
 
 " Special screenrc file
 let b:scrfile = " "
@@ -90,7 +93,7 @@ endif
 
 function! RWarningMsg(wmsg)
   echohl WarningMsg
-  echo a:wmsg
+  echomsg a:wmsg
   echohl Normal
 endfunction
 
@@ -127,7 +130,7 @@ if g:vimrplugin_term == "konsole"
 endif
 
 if g:vimrplugin_term == "Eterm"
-  let b:term_cmd = "Eterm --icon ~/.vim/bitmaps/ricon.png -e"
+  let b:term_cmd = "Eterm --icon " . b:r_plugin_home . "/bitmaps/ricon.png -e"
 endif
 
 if g:vimrplugin_term == "rxvt" || g:vimrplugin_term == "aterm"
@@ -135,7 +138,7 @@ if g:vimrplugin_term == "rxvt" || g:vimrplugin_term == "aterm"
 endif
 
 if g:vimrplugin_term == "xterm" || g:vimrplugin_term == "uxterm"
-  let b:term_cmd = g:vimrplugin_term . " -xrm '*iconPixmap: " . expand("~") . "/.vim/bitmaps/ricon.xbm' -e"
+  let b:term_cmd = g:vimrplugin_term . " -xrm '*iconPixmap: " . b:r_plugin_home . "/bitmaps/ricon.xbm' -e"
 endif
 
 " Override default settings:
@@ -149,6 +152,19 @@ if exists("g:vimrplugin_nosingler")
 else
   " Make a unique name for the screen session
   let b:screensname = printf("vimrplugin-%s", userlogin)
+endif
+
+" Make a unique name for the screen process for each Vim instance:
+if exists("g:vimrplugin_by_vim_instance")
+  let sname = substitute(v:servername, " ", "-", "g")
+  if sname == ""
+    call RWarningMsg("The option vimrplugin_by_vim_instance requires a servername. Please read the documentation.")
+    sleep 2
+  else
+    " For screen GVIM and GVIM1 are the same string.
+    let sname = substitute(sname, "GVIM$", "GVIM0", "g")
+    let b:screensname = "vimrplugin-" . userlogin . "-" . sname
+  endif
 endif
 
 " Set completion with CTRL-X CTRL-O to autoloaded function.
@@ -565,6 +581,9 @@ endfunction
 function! SendLineToR(godown)
   echon
   let line = getline(".")
+  if line =~ "<-"
+    let b:needsnewtags = 1
+  endif
   if &filetype == "rnoweb" && line =~ "^@$"
     if a:godown =~ "down"
       call GoDown()
@@ -633,7 +652,7 @@ function! BuildRTags(globalenv)
     let rtf = b:rtagsfile
     let b:needsnewtags = 0
   else
-    let rtf = expand("~") . "/.vim/tools/rtags"
+    let rtf = b:local_rtags_filename
   endif
   let locktagsfile = rtf . ".locked"
   call writefile(["Wait!"], locktagsfile)
@@ -642,7 +661,7 @@ function! BuildRTags(globalenv)
   if ok == 0
     return
   endif
-  let tagscmd = "source(\"~/.vim/tools/rtags.R\")"
+  let tagscmd = "source(\"" . b:r_plugin_home . "/tools/rtags.R\")"
   call SendCmdToScreen(tagscmd)
   " Wait while R is writing the tags file
   sleep 70m
@@ -653,14 +672,14 @@ function! BuildRTags(globalenv)
     if s == 4 && a:globalenv !~ "GlobalEnv"
       let s = 0
       let i = i + 1
-      let k = 30 - i
+      let k = 120 - i
       let themsg = "\rPlease, wait! [" . i . ":" . k . "]"
       echon themsg
     endif
     sleep 250m
-    if i == 30
+    if i == 120
       call delete(locktagsfile)
-      call RWarningMsg("Thirty seconds is too much: no longer waiting.")
+      call RWarningMsg("Two minutes is too much: no longer waiting.")
       return
     endif
   endwhile
@@ -672,8 +691,7 @@ endfunction
 function! RBuildSyntaxFile()
   call BuildRTags("libraries")
   sleep 1
-  let fname1 = expand("~") . "/.vim/tools/rtags"
-  let syncmd = "grep ':function:\\|:standardGeneric:' " . fname1 . " | awk -F ':' '{print $1}' | fmt -66 | sed -e 's/^\\(.*\\)$/syn keyword rFunction \\1/' > ~/.vim/tools/rfunctions"
+  let syncmd = "grep ':function:\\|:standardGeneric:' " . b:local_rtags_filename . " | awk -F ':' '{print $1}' | fmt -66 | sed -e 's/^\\(.*\\)$/syn keyword rFunction \\1/' > " . b:r_plugin_home . "/tools/rfunctions"
   let rlog = system(syncmd)
   if v:shell_error
     call RWarningMsg(rlog)
@@ -708,9 +726,9 @@ function! RStartDebug()
     call RWarningMsg(rlog)
     return
   endif
-  call SendCmdToScreen('source("~/.vim/tools/Clnt.r")')
+  call SendCmdToScreen('source("' . b:r_plugin_home . '/tools/Clnt.r")')
   let curline = line(".")
-  let scmd = "screen -S VimRdebug -X stuff 'source(\"~/.vim/tools/Srvr.r\") ; editsrvr(vimserver=\"" . v:servername . "\") ; quit(\"no\")" . "\<C-M>'"
+  let scmd = "screen -S VimRdebug -X stuff 'source(\"" . b:r_plugin_home . "/tools/Srvr.r\") ; editsrvr(vimserver=\"" . v:servername . "\") ; quit(\"no\")" . "\<C-M>'"
   sleep 3
   let rlog = system(scmd)
   if v:shell_error
@@ -1126,4 +1144,7 @@ augroup END
 " the original code!
 "
 " * New function: RStartDebug(): integration with Norm Matloff's edtdbg package.
+"
+" * Added option g:vimrplugin_by_vim_instance
+"
 

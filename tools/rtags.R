@@ -53,6 +53,13 @@
   }
 }
 
+grepl <- function(pattern, x){
+  res <- grep(pattern, x)
+  if(length(res) == 0)
+    return(FALSE)
+  else
+    return(TRUE)
+}
 
 .vim.rtags <- function() {
   unlink(.vimtagsfile)
