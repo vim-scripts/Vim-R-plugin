@@ -6,7 +6,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          José Cláudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 100512
+Version: 100521
 
 For Vim version 7.2 and above
 
@@ -33,9 +33,6 @@ integrate Vim with R.
 It uses some ideas and code from Johannes Ranke's (vim-r-plugin), Eric Van
 Dewoestine's (screen plugin) and some ideas from the Tinn-R (Windows only)
 project.
-
-Please understand that this plugin is developing and changing rapidly! 
-Future releases may change default behavior and key bindings. 
 
 The latest version of this plugin is available at:
 
@@ -705,6 +702,9 @@ directory after the installation:
 ------------------------------------------------------------------------------
 11. News~
                                                               *r-plugin-news*
+100521 (2010-05-12)
+
+* Replaced "-t" with "--title" to make xfce4-terminal work again.
 
 100512 (2010-05-12)
 

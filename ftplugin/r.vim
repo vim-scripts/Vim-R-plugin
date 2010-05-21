@@ -122,7 +122,7 @@ endif
 
 if g:vimrplugin_term == "gnome-terminal" || g:vimrplugin_term == "xfce4-terminal"
   " Cannot set icon: http://bugzilla.gnome.org/show_bug.cgi?id=126081
-  let b:term_cmd = g:vimrplugin_term . " --working-directory='" . expand("%:p:h") . "'"
+  let b:term_cmd = g:vimrplugin_term . " --working-directory='" . expand("%:p:h") . "' --title R -e"
 endif
 
 if g:vimrplugin_term == "konsole"
@@ -299,7 +299,7 @@ function! StartR(whatr)
     endif
     " Some terminals want quotes (see screen.vim)
     if b:term_cmd =~ "gnome-terminal" || b:term_cmd =~ "xfce4-terminal"
-      let opencmd = printf("%s -t R -e 'screen %s -d -RR -S %s %s' &", b:term_cmd, scrrc, b:screensname, rcmd)
+      let opencmd = printf("%s 'screen %s -d -RR -S %s %s' &", b:term_cmd, scrrc, b:screensname, rcmd)
     else
       let opencmd = printf("%s screen %s -d -RR -S %s %s &", b:term_cmd, scrrc, b:screensname, rcmd)
     endif
@@ -717,7 +717,7 @@ function! RStartDebug()
     let scrrc = RWriteScreenRC()
   endif
   if b:term_cmd =~ "gnome-terminal" || b:term_cmd =~ "xfce4-terminal"
-    let opencmd = b:term_cmd . " -t RDebug -e 'screen " . scrrc . " -d -RR -S VimRdebug R' &"
+    let opencmd = b:term_cmd . " 'screen " . scrrc . " -d -RR -S VimRdebug R' &"
   else
     let opencmd = b:term_cmd . " screen " . scrrc . " -d -RR -S VimRdebug R &"
   endif
