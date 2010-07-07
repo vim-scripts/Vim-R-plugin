@@ -24,8 +24,10 @@ endif
 " Don't load another plugin for this buffer
 let b:did_ftplugin = 1
 
-" Control the menu R
-let b:hasrmenu = 0
+" Control the menu 'R' and the tool bar buttons
+if !exists("g:hasrmenu")
+  let g:hasrmenu = 0
+endif
 
 " Automatically rebuild the 'tags' file for omni completion if the user press
 " <C-X><C-O> and we know that the file either was not created yet or is
@@ -942,7 +944,7 @@ endfunction
 
 " Menu R
 function! MakeRMenu()
-  if b:hasrmenu == 1
+  if g:hasrmenu == 1
     return
   endif
 
@@ -1067,7 +1069,7 @@ function! MakeRMenu()
   tmenu ToolBar.RListSpace List objects
   tmenu ToolBar.RClear Clear the console screen
   tmenu ToolBar.RClearAll Remove objects from workspace and clear the console screen
-  let b:hasrmenu = 1
+  let g:hasrmenu = 1
 endfunction
 
 function! DeleteScreenRC()
@@ -1078,7 +1080,13 @@ endfunction
 
 function! UnMakeRMenu()
   call DeleteScreenRC()
-  if b:hasrmenu == 0
+  if exists("g:hasrmenu") && g:hasrmenu == 0
+    return
+  endif
+  if exists("g:vimrplugin_never_unmake_menu") && g:vimrplugin_never_unmake_menu == 1
+    return
+  endif
+  if &previewwindow			" don't do this in the preview window
     return
   endif
   aunmenu R
@@ -1093,7 +1101,7 @@ function! UnMakeRMenu()
   aunmenu ToolBar.RSendFile
   aunmenu ToolBar.RClose
   aunmenu ToolBar.RStart
-  let b:hasrmenu = 0
+  let g:hasrmenu = 0
 endfunction
 
 " Activate the menu and toolbar buttons if the user sets the file type as 'r':
@@ -1104,47 +1112,4 @@ augroup VimRPlugin
   au BufEnter * if (&filetype == "r" || &filetype == "rnoweb" || &filetype == "rhelp") | call MakeRMenu() | endif
   au BufLeave * if (&filetype == "r" || &filetype == "rnoweb" || &filetype == "rhelp") | call UnMakeRMenu() | endif
 augroup END
-
-"==========================================================================
-" CHANGELOG FOR DEVELOPERS
-"==========================================================================
-"
-" CHANGES SINCE 091004 (2009 OCT 04)
-"-----------------------------------
-" * RAction() now receives the name of the function to call. The quotes were
-"   eliminated since they were not strictly necessary and, now, the user can
-"   create key bindings to call any R function.
-" 
-" * Replaced <Leader> with <LocalLeader> because Vim documentation recommends
-"   the use of LocalLeader in file type plugins.
-" 
-" * Removed argument "t" from SendSelectionToR() because it was no longer used.
-" 
-" * Rnoweb related key bindings activated by default to allow the use of the
-"   plugin as a global plugin (through the creation of a symbolic link to
-"   ftplugin/r.vim in the plugin directory).
-"
-" * Syntax highlight: recognition of special characters inside character
-"   strings.
-"
-" * Integration with screen.vim
-"
-" * New function: RCreateMaps()
-"
-" * Changes in key binding for Send functions.
-"
-" * New function RCreateMenuItem()
-"
-" * New function RBuildSyntaxFile and new command RUpdateObjList
-" 
-" * Send commands to R even when the line is '^@$' in Rnoweb file. Send line
-" is the only exception.
-" 
-" * Added 'info' field to omni completion. Thanks to Ben Kujala for writing
-" the original code!
-"
-" * New function: RStartDebug(): integration with Norm Matloff's edtdbg package.
-"
-" * Added option g:vimrplugin_by_vim_instance
-"
 

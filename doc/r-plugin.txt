@@ -4,9 +4,9 @@
                             Plugin to work with R~
 
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
-         José Cláudio Faria <joseclaudio.faria@gmail.com>
+         José Cláudio Faria
 
-Version: 100521
+Version: 100707
 
 For Vim version 7.2 and above
 
@@ -326,8 +326,11 @@ finished, which make it more difficult to find errors in the code sent to R.
 
 The plugin unmakes the R menu and the related toolbar buttons when Vim leaves
 the R buffer. During omni completion, Vim leaves the R buffer and goes to the
-scratch window and, consequently, the plugin unmakes the toolbar buttons and
-R related menu items. 
+scratch window which is not recognized as an R file type. Consequently, the
+plugin unmakes the toolbar buttons and R related menu items. If you prefer,
+you can can use the option |g:vimrplugin_never_unmake_menu| but, then, the
+menu and tool bar buttons will never be deleted, even if you change from one
+file type to another.
 
 
 ------------------------------------------------------------------------------
@@ -357,8 +360,11 @@ If your terminal emulator is not listed above, or if you are not satisfied
 with the way your terminal emulator is called by the plugin, you may define in
 your |vimrc| the variable g:vimrplugin_term_cmd, as in the example below:
 >
-  let g:vimrplugin_term_cmd = "gnome-terminal -t R -e"
+  let g:vimrplugin_term_cmd = "gnome-terminal --title R -e"
 <
+Please, look at the manual of your terminal emulator to know how to call it.
+The last argument must be the one which precedes the command to be executed.
+
 
 7.2. Underscore~
                                                      *g:vimrplugin_underscore*
@@ -526,6 +532,15 @@ to change this behavior. Example:
   let g:vimrplugin_latexcmd = "latex"
 <
 
+7.11 Never unmake the R menu and tool bar buttons~
+                                              *g:vimrplugin_never_unmake_menu*
+Use this option if you want that the menu item R and the R related tool bar
+buttons are not deleted when you change from one buffer to another, for
+example, when go from an .R file to a .txt one:
+>
+   let g:vimrplugin_never_unmake_menu = 1
+<
+
 ------------------------------------------------------------------------------
 8. Custom key bindings~
                                                 *r-plugin-custom-key-bindings*
@@ -595,7 +610,6 @@ directory after the installation:
 
    .vim
    |-- after
-   |   |-- filetype.vim
    |   `-- syntax
    |       `-- r.vim
    |
@@ -616,6 +630,9 @@ directory after the installation:
    |
    |-- doc
    |   `-- r-plugin.txt
+   |
+   |-- ftdetect
+   |   `-- filetype.vim
    |
    |-- ftplugin
    |   |-- r.vim
@@ -702,96 +719,100 @@ directory after the installation:
 ------------------------------------------------------------------------------
 11. News~
                                                               *r-plugin-news*
-100521 (2010-05-12)
+100707 (2010-07-07)
+ * Fixed 'E329: No menu "R"' when more than one file were loaded simultaneously
+   by calling vim with either -p or -o parameters. Thanks to Peng Yu for
+   reporting the bug.
+ * Correctly recognize a newly created file with extension ".R" as an R script
+   file.
 
-* Replaced "-t" with "--title" to make xfce4-terminal work again.
+100521 (2010-05-12)
+ * Replaced "-t" with "--title" to make xfce4-terminal work again.
 
 100512 (2010-05-12)
-
-* Thanks to Tortonesi Mauro who wrote a patch to make the plugin work with
-  pathogen.vim.
-* Added simple syntax hightlight for .Rout files.
-* Increased the time limit of RUpdateObjList to two minutes.
-* Improvement in the syntax highlight based on code written by Zhuojun Chen.
-* Thanks to Scott Kostyshak who helped to improve the documentation.
-* Iago Mosqueira suggested that the plugin should be able to run one R process
-  for each Vim instance, and his suggestion was implemented with the option
-  g:vimrplugin_by_vim_instance.
+ * Thanks to Tortonesi Mauro who wrote a patch to make the plugin work with
+   pathogen.vim.
+ * Added simple syntax hightlight for .Rout files.
+ * Increased the time limit of RUpdateObjList to two minutes.
+ * Improvement in the syntax highlight based on code written by Zhuojun Chen.
+ * Thanks to Scott Kostyshak who helped to improve the documentation.
+ * Iago Mosqueira suggested that the plugin should be able to run one R process
+   for each Vim instance, and his suggestion was implemented with the option
+   g:vimrplugin_by_vim_instance.
 
 091223 (2009-12-23)
-
-* Syntax highlight for R functions.
-* Added "info" field to omni completion (thanks to Ben Kujala for writing the
-  original code).
+ * Syntax highlight for R functions.
+ * Added "info" field to omni completion (thanks to Ben Kujala for writing the
+   original code).
 
 091016 (2009-10-16)
-* The plugin now can run together with screen.vim, thanks to Eric Van
-  Dewoestine, the author of screen.vim, who added script integration to
-  screen.vim.
-* Andy Choens has made many improvements on the documentation.
-* Added the possibility of custom key binding creation to call any R function
-  with the word under cursor as argument.
-* The key bindings related with Sweave are activated even if the file type is
-  not rnoweb.
-* Replaced <Leader> with <LocalLeader> in the key bindings.
-* Added "Send Paragraph" commands.
+ * The plugin now can run together with screen.vim, thanks to Eric Van
+   Dewoestine, the author of screen.vim, who added script integration to
+   screen.vim.
+ * Andy Choens has made many improvements on the documentation.
+ * Added the possibility of custom key binding creation to call any R function
+   with the word under cursor as argument.
+ * The key bindings related with Sweave are activated even if the file type is
+   not rnoweb.
+ * Replaced <Leader> with <LocalLeader> in the key bindings.
+ * Added "Send Paragraph" commands.
 
 091004 (2009-10-04)
-* José Cláudio Faria has began to work in the project as co-author.
-* Some ideas from Tinn-R project were ported to the plugin.
-* The main menu has new items and the toolbar new icons.
-* Documentation improvements.
+ * José Cláudio Faria has began to work in the project as co-author.
+ * Some ideas from Tinn-R project were ported to the plugin.
+ * The main menu has new items and the toolbar new icons.
+ * Documentation improvements.
 
 090828 (2009-08-28)
-* Faster startup.
-* Better support for Rnoweb files: the cursor goes to '^<<' if the sent line
-  is '^@$'.
+ * Faster startup.
+ * Better support for Rnoweb files: the cursor goes to '^<<' if the sent line
+   is '^@$'.
 
 090811 (2009-08-12)
-* Now use screen instead of funnel.pl. The bugs and limitations related with
-  funnel.pl are solved.
-* Deleted key binding for R-devel.
-* Automatically detect available terminal emulators and choose one of them.
-* By default, no longer calls help.start() the first time that CTRL-H is
-  pressed.
+ * Now use screen instead of funnel.pl. The bugs and limitations related with
+   funnel.pl are solved.
+ * Deleted key binding for R-devel.
+ * Automatically detect available terminal emulators and choose one of them.
+ * By default, no longer calls help.start() the first time that CTRL-H is
+   pressed.
 
 090810 (2009-08-10)
-* Added R icons for some terminal emulators.
-* Removed the script open-gvim-here. You may use Vim's option autochdir.
-* Added option g:vimrplugin_term.
-* Improved indentation script.
-* Changed key binding from Shift-Enter, which doesn't work in any terminal, to
-  Alt-Enter, which at least works in xterm.
+ * Added R icons for some terminal emulators.
+ * Removed the script open-gvim-here. You may use Vim's option autochdir.
+ * Added option g:vimrplugin_term.
+ * Improved indentation script.
+ * Changed key binding from Shift-Enter, which doesn't work in any terminal, to
+   Alt-Enter, which at least works in xterm.
 
 090610 (2009-06-11)
-* The options expandtab, shiftwidth and tabstop are no longer set by the plugin.
-* Better word detection before calling R's help().
-* Fixed bug in underscore replacement.
-* Fixed small bug in code indentation.
-* Added scipt rpager.sh.
-* Added two new plugin options: no underscore replacement and fixed name for
-  the pipe file instead of random one.
+ * The options expandtab, shiftwidth and tabstop are no longer set by the plugin.
+ * Better word detection before calling R's help().
+ * Fixed bug in underscore replacement.
+ * Fixed small bug in code indentation.
+ * Added scipt rpager.sh.
+ * Added two new plugin options: no underscore replacement and fixed name for
+   the pipe file instead of random one.
 
 090523 (2009-05-23)
-* Key bindings now are customizable.
-* Default key binding for calling R's args() changed to Shift-F1.
-* New R script rargs.R gives better results for generic functions than R's
-  args() called directly.
+ * Key bindings now are customizable.
+ * Default key binding for calling R's args() changed to Shift-F1.
+ * New R script rargs.R gives better results for generic functions than R's
+   args() called directly.
 
 090519 (2009-05-20)
-* Don't send large blocks of code to R to avoid xterm freezing.
-* Automatically call help.start() after CTRL-H is pressed for the first time,
-  and wait 4 seconds for the browser start before calling R's help(). These
-  features are customizable.
-* Fixed tags file script.
+ * Don't send large blocks of code to R to avoid xterm freezing.
+ * Automatically call help.start() after CTRL-H is pressed for the first time,
+   and wait 4 seconds for the browser start before calling R's help(). These
+   features are customizable.
+ * Fixed tags file script.
 
 090516 (2009-05-16)
-* Added documentation.
-* Added ability to send function to R, revert the automatic conversion of "_"
-  into "<-" and call R's help().
-* Added archive with some files to ease desktop integration, if desired.
+ * Added documentation.
+ * Added ability to send function to R, revert the automatic conversion of "_"
+   into "<-" and call R's help().
+ * Added archive with some files to ease desktop integration, if desired.
 
 090507 (2009-05-08)
-* Initial upload
+ * Initial upload
 
 vim:tw=78:ts=8:ft=help:norl:
