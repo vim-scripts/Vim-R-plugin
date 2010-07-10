@@ -101,14 +101,16 @@ grepl <- function(pattern, x){
 	  cat(obj.list[j], ":", obj.class[1], ":", env, ":", .vim.list.args2(obj.list[j]), "\n", sep="")
 	else
 	  cat(obj.list[j], ":", obj.class[1], ":", env, ":", "Not a function", "\n", sep="")
-        if(islist){
-          obj <- eval(parse(text=obj.list[j]))
-          obj.names <- names(obj)
-          obj.len <- length(obj)
-          for(k in 1:obj.len){
-            cat(obj.list[j], "$", obj.names[k], ":", class(obj[[k]]), ":", env, ":", "Not a function", "\n", sep="")
-          }
-        }
+	if(islist){
+	  obj <- eval(parse(text=obj.list[j]))
+	  obj.names <- names(obj)
+	  obj.len <- length(obj)
+	  if(obj.len > 0){
+	    for(k in 1:obj.len){
+	      cat(obj.list[j], "$", obj.names[k], ":", class(obj[[k]]), ":", env, ":", "Not a function", "\n", sep="")
+	    }
+	  }
+	}
       }
     }
   }

@@ -6,7 +6,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          José Cláudio Faria
 
-Version: 100707
+Version: 100710
 
 For Vim version 7.2 and above
 
@@ -719,6 +719,9 @@ directory after the installation:
 ------------------------------------------------------------------------------
 11. News~
                                                               *r-plugin-news*
+100710 (2010-07-10)
+ * Fixed :RUpdateObjList bug when list had length 0.
+
 100707 (2010-07-07)
  * Fixed 'E329: No menu "R"' when more than one file were loaded simultaneously
    by calling vim with either -p or -o parameters. Thanks to Peng Yu for
