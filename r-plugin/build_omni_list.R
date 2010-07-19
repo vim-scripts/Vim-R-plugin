@@ -1,3 +1,19 @@
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  A copy of the GNU General Public License is available at
+#  http://www.r-project.org/Licenses/
+
+### Jakson Alves de Aquino
+### Sat, July 17, 2010
+
 
 # Bugs converting arguments of strOptions(), heatmap(), and some other
 # functions with complex arguments.
@@ -53,7 +69,9 @@
   }
 }
 
-grepl <- function(pattern, x){
+# Only recent versions of R have the grepl() function. We can replace
+# .vim.grepl() with grepl() in the near future.
+.vim.grepl <- function(pattern, x){
   res <- grep(pattern, x)
   if(length(res) == 0)
     return(FALSE)
@@ -61,25 +79,25 @@ grepl <- function(pattern, x){
     return(TRUE)
 }
 
-.vim.rtags <- function() {
-  unlink(.vimtagsfile)
-  cat("Building 'tags' file for vim omni completion.\n")
+.vim.build.omni.list <- function() {
+  unlink(.vimomnilistfile)
+  cat("Building file with list of objects for vim omni completion.\n")
   envnames <- search()
-  sink(.vimtagsfile)
+  sink(.vimomnilistfile)
   for(curenv in envnames){
-    noGlobalEnv <- grepl("vim/tools/rtags", .vimtagsfile)
+    noGlobalEnv <- .vim.grepl("vim/r-plugin/omnilist", .vimomnilistfile)
     if((curenv == ".GlobalEnv" && noGlobalEnv) | (curenv != ".GlobalEnv" && noGlobalEnv == FALSE)) next
     obj.list <- objects(curenv)
     env <- sub("package:", "", curenv)
     l <- length(obj.list)
     if(l > 0){
       for(j in 1:l){
-        haspunct <- grepl("[[:punct:]]", obj.list[j])
+        haspunct <- .vim.grepl("[[:punct:]]", obj.list[j])
         if(haspunct[1]){
-          ok <- grepl("[[:alnum:]]\\.[[:alnum:]]", obj.list[j])
+          ok <- .vim.grepl("[[:alnum:]]\\.[[:alnum:]]", obj.list[j])
           if(ok[1]){
             haspunct  <- FALSE
-            haspp <- grepl("[[:punct:]][[:punct:]]", obj.list[j])
+            haspp <- .vim.grepl("[[:punct:]][[:punct:]]", obj.list[j])
             if(haspp[1])
               haspunct <- TRUE
           }
@@ -117,6 +135,6 @@ grepl <- function(pattern, x){
   sink()
 }
 
-.vim.rtags()
-unlink(paste(.vimtagsfile, ".locked", sep = ""))
+.vim.build.omni.list()
+unlink(paste(.vimomnilistfile, ".locked", sep = ""))
 

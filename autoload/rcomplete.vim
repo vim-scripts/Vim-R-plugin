@@ -1,7 +1,7 @@
 " Vim completion script
-" Language:	R
-" Maintainer:	Jakson Alves de Aquino <jalvesaq@gmail.com>
-" Last Change:	2009 May 01
+" Language:    R
+" Maintainer:  Jakson Alves de Aquino <jalvesaq@gmail.com>
+" Last Change: Sun Jul 18, 2010  12:52AM
 "
 
 fun! rcomplete#CompleteR(findstart, base)
@@ -14,15 +14,19 @@ fun! rcomplete#CompleteR(findstart, base)
     endwhile
     return start
   else
-    if b:needsnewtags == 1
-      call BuildRTags("GlobalEnv")
+    if b:needsnewomnilist == 1
+      call BuildROmniList("GlobalEnv")
     endif
     let res = []
     if strlen(a:base) == 0
       return res
     endif
-    let flines2 = readfile(b:rtagsfile)
-    let flines = b:flines1 + flines2
+    if has("gui_win32")
+      let flines = b:flines1
+    else
+      let flines2 = readfile(b:romnilistfile)
+      let flines = b:flines1 + flines2
+    endif
     " The char '$' at the end of 'a:base' is treated as end of line, and
     " the pattern is never found in 'line'.
     let newbase = '^' . substitute(a:base, "\\$$", "", "")

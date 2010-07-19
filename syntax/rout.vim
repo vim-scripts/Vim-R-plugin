@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:    R output Files
 " Maintainer:  Jakson Aquino <jalvesaq@gmail.com>
-" Last Change: 2010 Mar 14
+" Last Change: 2010 Jul 16
 "
 
 " Version Clears: {{{1
@@ -15,6 +15,17 @@ endif
 
 syn case match
 
+" Strings
+syn region routString start=/"/ skip=/\\\\\|\\"/ end=/"/
+" Numbers
+syn match routNumber /\<\d\+\>/
+" floating point number with integer and fractional parts and optional exponent
+syn match routFloat /\<\d\+\.\d*\([Ee][-+]\=\d\+\)\=\>/
+" floating point number with no integer part and optional exponent
+syn match routFloat /\<\.\d\+\([Ee][-+]\=\d\+\)\=\>/
+" floating point number with no fractional part and optional exponent
+syn match routFloat /\<\d\+[Ee][-+]\=\d\+\>/
+syn match routIndex /^\s*\[\d\+\]/
 " Comment
 syn match routComment /^> .*/
 syn match routComment /^+ .*/
@@ -29,7 +40,11 @@ if version >= 508 || !exists("did_r_syn_inits")
   else
     command -nargs=+ HiLink hi def link <args>
   endif
-  HiLink routComment     Comment
+  HiLink routComment	Comment
+  HiLink routNumber	Number
+  HiLink routFloat	Float
+  HiLink routString	String
+  HiLink routIndex	Special
   delcommand HiLink
 endif
 
