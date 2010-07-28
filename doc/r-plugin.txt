@@ -6,7 +6,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          José Cláudio Faria
 
-Version: 100719
+Version: 100728
 
 For Vim version 7.2 and above
 
@@ -421,7 +421,7 @@ code to other R processes then put the following in your |vimrc|:
 >
 This is the default behavior when using Vim with the screen.vim plugin, and,
 thus, there is no need to use this option if already running Vim with the
-option |vimrplugin_screenplugin|(see below). The
+option |vimrplugin_screenplugin| (see below). The
 |vimrplugin_by_vim_instance| option requires that vim is acting as a command
 server because the variable |v:servername| is used to make the name of the
 screen session which will run R. By default, GVim runs as server, but Vim does
@@ -514,7 +514,7 @@ Then, follow the instructions below to activate the new functions.
 The R function args() list the arguments of a function, but not the arguments
 of its methods. If you want that the plugin calls the function
 .vim.list.args() after <LocalLeader>ra, in addition to editing your
-~/.Rprofile as explained above, you have to add to your |.vimrc|:
+~/.Rprofile as explained above, you have to add to your |vimrc|:
 >
    let vimrplugin_listmethods = 1
 <
@@ -524,7 +524,7 @@ of its methods. If you want that the plugin calls the function
 By default, R makes a scatterplot of numeric vectors. The function .vim.plot()
 do both a histogram and a boxplot. The function can be called by the plugin
 after <LocalLeader>rg if you edit your ~/.Rprofile as explained above and put
-the following line in your |.vimrc|:
+the following line in your |vimrc|:
 >
    let vimrplugin_specialplot = 1
 <
@@ -641,45 +641,34 @@ You should replace <Leader>rk with the key binding that you want to use and
 The following files are part of the plugin and should be in your ~/.vim
 directory after the installation:
 
-   .vim
-   |-- after
-   |   `-- syntax
-   |       `-- r.vim
-   |-- autoload
-   |   `-- rcomplete.vim
-   |-- bitmaps
-   |   |-- r-close.xpm
-   |   |-- r-control-clearall.png
-   |   |-- r-control-clear.png
-   |   |-- r-control-listspace.png
-   |   |-- ricon.png
-   |   |-- ricon.xbm
-   |   |-- r-send-block.png
-   |   |-- r-send-file.png
-   |   |-- r-send-function.png
-   |   |-- r-send-line.png
-   |   |-- r-send-paragraph.png
-   |   |-- r-send-selection.png
-   |   `-- r-start.xpm
-   |-- doc
-   |   `-- r-plugin.txt
-   |-- ftdetect
-   |   `-- r.vim
-   |-- ftplugin
-   |   |-- rhelp.vim -> r.vim
-   |   |-- rnoweb.vim -> r.vim
-   |   `-- r.vim
-   |-- indent
-   |   `-- r.vim
-   |-- r-plugin
-   |   |-- build_omni_list.R
-   |   |-- functions.vim
-   |   |-- omnilist
-   |   |-- rpager.sh
-   |   `-- specialfuns.R
-   `-- syntax
-       `-- rout.vim
-
+   after/syntax/r.vim
+   autoload/rcomplete.vim
+   bitmaps/r-close.xpm
+   bitmaps/r-control-clear.png
+   bitmaps/r-control-clearall.png
+   bitmaps/r-control-listspace.png
+   bitmaps/r-send-block.png
+   bitmaps/r-send-file.png
+   bitmaps/r-send-function.png
+   bitmaps/r-send-line.png
+   bitmaps/r-send-paragraph.png
+   bitmaps/r-send-selection.png
+   bitmaps/r-start.xpm
+   bitmaps/ricon.png
+   bitmaps/ricon.xbm
+   doc/r-plugin.txt
+   ftdetect/r.vim
+   ftplugin/r.vim
+   ftplugin/rhelp.vim
+   ftplugin/rnoweb.vim
+   indent/r.vim
+   r-plugin/build_omni_list.R
+   r-plugin/etags2ctags.R
+   r-plugin/functions.vim
+   r-plugin/omnilist
+   r-plugin/rpager.sh
+   r-plugin/specialfuns.R
+   syntax/rout.vim
 
 ------------------------------------------------------------------------------
 10. FAQ and tips~
@@ -696,9 +685,9 @@ directory after the installation:
 <
 
 10.2. How do marked blocks work?~
-  Vim allows several marks (bookmarks). The most commonly used marks are |a..z|.
-  If the cursor is between any two marks, the plugin will send all of the 
-  lines between them to R.
+  Vim allows several marks (bookmarks). The most commonly used marks are the
+  lowercase alphabet letters.  If the cursor is between any two marks, the
+  plugin will send all of the lines between them to R.
   
   To make it easier to remember where blocks begin and end, we recommended 
   that you use the showmarks plugin available at:
@@ -763,6 +752,9 @@ directory after the installation:
 ------------------------------------------------------------------------------
 11. News~
                                                               *r-plugin-news*
+100728 (2010-07-28)
+ * Adapted the plugin to allow the creation of a Debian package.
+
 100719 (2010-07-19)
  * Added options vimrplugin_listmethods and vimrplugin_specialplot.
  * Improved syntax highlight of R batch output (.Rout files).
@@ -868,4 +860,4 @@ directory after the installation:
 090507 (2009-05-08)
  * Initial upload
 
-vim:tw=78:ts=8:ft=help:norl:fenc=utf-8
+vim:tw=78:ts=8:ft=help:norl

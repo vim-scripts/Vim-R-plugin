@@ -19,7 +19,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Sun Jul 18, 2010  12:29PM
+" Last Change: Wed Jul 28, 2010  09:36AM
 "
 " Please see doc/r-plugin.txt for usage details.
 "==========================================================================
@@ -84,9 +84,27 @@ endif
 " Save r plugin home - necessary to make vim-r-plugin2 work with pathogen
 let b:r_plugin_home = expand("<sfile>:h:h")
 
+" Save user_vimfiles
+let b:user_vimfiles = split(&runtimepath, ",")[0]
+
+
+" Create r-plugin directory if it doesn't exist yet:
+if !isdirectory(b:user_vimfiles . "/r-plugin")
+  call mkdir(b:user_vimfiles . "/r-plugin", "p")
+  " Find omnilist and rfunctions.vim and copy them
+  if filereadable(b:r_plugin_home . "/r-plugin/omnilist")
+    let x = readfile(b:r_plugin_home . "/r-plugin/omnilist")
+    call writefile(x, b:user_vimfiles . "/r-plugin/omnilist")
+  endif
+  if filereadable(b:r_plugin_home . "/r-plugin/functions.vim")
+    let x = readfile(b:r_plugin_home . "/r-plugin/omnilist")
+    call writefile(x, b:user_vimfiles . "/r-plugin/functions.vim")
+  endif
+endif
+
 " Keeps the libraries object list in memory to avoid the need of reading the file
 " repeatedly:
-let b:local_omni_filename = b:r_plugin_home . "/r-plugin/omnilist"
+let b:local_omni_filename = b:user_vimfiles . "/r-plugin/omnilist"
 let b:flines1 = readfile(b:local_omni_filename)
 
 
@@ -718,7 +736,7 @@ function! RBuildSyntaxFile()
       call add(res, line)
     endif
   endfor
-  call writefile(res, b:r_plugin_home . "/r-plugin/functions.vim")
+  call writefile(res, b:user_vimfiles . "/r-plugin/functions.vim")
   call RWarningMsg("The syntax will be updated next time you load an R file.")
 endfunction
 
@@ -748,9 +766,9 @@ function! RStartDebug()
     call RWarningMsg(rlog)
     return
   endif
-  call SendCmdToScreen('source("' . b:r_plugin_home . '/r-plugin/Clnt.r")')
+  call SendCmdToScreen('source("' . b:user_vimfiles . '/r-plugin/Clnt.r")')
   let curline = line(".")
-  let scmd = "screen -S VimRdebug -X stuff 'source(\"" . b:r_plugin_home . "/r-plugin/Srvr.r\") ; editsrvr(vimserver=\"" . v:servername . "\") ; quit(\"no\")" . "\<C-M>'"
+  let scmd = "screen -S VimRdebug -X stuff 'source(\"" . b:user_vimfiles . "/r-plugin/Srvr.r\") ; editsrvr(vimserver=\"" . v:servername . "\") ; quit(\"no\")" . "\<C-M>'"
   sleep 3
   let rlog = system(scmd)
   if v:shell_error

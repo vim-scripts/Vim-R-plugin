@@ -15,9 +15,9 @@ syn match   rOperator    /[\*\!\%\&\+\-\<\>\=\^\|\~\`/:@]/
 syn match   rOperator    /%o%\|%x%\|xor\|isTRUE/
 syn match rDollar /\$/
 " Load functions file
-let g:rfunfile = expand("<sfile>:h:h:h") . "/r-plugin/functions.vim"
-if filereadable(g:rfunfile)
-  exe "source " . g:rfunfile
+let s:rfunfile = b:user_vimfiles . "/r-plugin/functions.vim"
+if filereadable(s:rfunfile)
+  exe "source " . s:rfunfile
 endif
 syn keyword rPreProc     library require
 
