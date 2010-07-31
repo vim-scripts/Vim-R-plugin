@@ -15,10 +15,11 @@ syn match   rOperator    /[\*\!\%\&\+\-\<\>\=\^\|\~\`/:@]/
 syn match   rOperator    /%o%\|%x%\|xor\|isTRUE/
 syn match rDollar /\$/
 " Load functions file
-let s:rfunfile = b:user_vimfiles . "/r-plugin/functions.vim"
-if filereadable(s:rfunfile)
-  exe "source " . s:rfunfile
-endif
+"let s:rfunfile = b:user_vimfiles . "/r-plugin/functions.vim"
+"if filereadable(s:rfunfile)
+"  exe "source " . s:rfunfile
+"endif
+exe "runtime r-plugin/functions.vim"
 syn keyword rPreProc     library require
 
 hi def link rDollar SpecialChar
