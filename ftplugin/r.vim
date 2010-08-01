@@ -19,7 +19,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Fri Jul 30, 2010  07:25PM
+" Last Change: Sun Aug 01, 2010  08:54AM
 "
 " Please see doc/r-plugin.txt for usage details.
 "==========================================================================
@@ -92,7 +92,10 @@ let b:user_vimfiles = split(&runtimepath, ",")[0]
 " Create r-plugin directory if it doesn't exist yet:
 if !isdirectory(b:user_vimfiles . "/r-plugin")
   call mkdir(b:user_vimfiles . "/r-plugin", "p")
-  " Find rfunctions.vim and copy it
+endif
+
+" If there is no functions.vim, copy the default one
+if !filereadable(b:user_vimfiles . "/r-plugin/functions.vim")
   if filereadable("/usr/share/vim/addons/r-plugin/functions.vim")
     let x = readfile("/usr/share/vim/addons/r-plugin/functions.vim")
     call writefile(x, b:user_vimfiles . "/r-plugin/functions.vim")
@@ -113,12 +116,22 @@ endif
 let b:local_omni_filename = b:user_vimfiles . "/r-plugin/omnilist"
 let b:flines1 = readfile(b:local_omni_filename)
 
+if exists("g:vimrplugin_screenplugin") && !has('gui_running')
+  let b:usescreenplugin = 1
+else
+  let b:usescreenplugin = 0
+endif
+
+" Automatically rebuild the file listing .GlobalEnv objects for omni
+" completion if the user press <C-X><C-O> and we know that the file either was
+" not created yet or is outdated.
+let b:needsnewomnilist = 1
 
 "==========================================================================
 " The remaining of the script needs screen which doesn't work on MS Windows
 "==========================================================================
 if has("gui_win32")
-  " Avoid trying to build the omni list
+  let b:usescreenplugin = 0
   let b:needsnewomnilist = 0
   finish
 endif
@@ -127,16 +140,10 @@ endif
 "==========================================================================
 
 
-
 " Control the menu 'R' and the tool bar buttons
 if !exists("g:hasrmenu")
   let g:hasrmenu = 0
 endif
-
-" Automatically rebuild the file listing objects for omni completion if the
-" user press <C-X><C-O> and we know that the file either was not created yet
-" or is outdated.
-let b:needsnewomnilist = 1
 
 " Special screenrc file
 let b:scrfile = " "
@@ -155,32 +162,18 @@ else
   endif
 endif
 
+" Make the R list of objects file name
+let b:romnilistfile = "/tmp/.R-omnilist-" . userlogin
+
+" Create an empty file to avoid errors if the users do Ctrl-X Ctrl-O before
+" starting R:
+call writefile([], b:romnilistfile)
+
 " Make the file name of files to be sourced
 let b:bname = expand("%:r")
 let b:bname = substitute(b:bname, " ", "",  "g")
 let b:rsource = "/tmp/.Rsource-" . userlogin . "-" . getpid() . "-" . b:bname
 unlet b:bname
-
-" Make the R list of objects file name
-let b:romnilistfile = "/tmp/.R-omnilist-" . userlogin
-
-" Automatically call R's function help.start() the first time <C-H> is pressed:
-let b:needshstart = 0
-if exists("g:vimrplugin_hstart")
-  if g:vimrplugin_hstart == 1
-    let b:needshstart = 1
-  endif
-endif
-
-if exists("g:vimrplugin_browser_time") == 0
-  let g:vimrplugin_browser_time = 4
-endif
-
-if exists("g:vimrplugin_screenplugin") && !has('gui_running')
-  let b:usescreenplugin = 1
-else
-  let b:usescreenplugin = 0
-endif
 
 if !executable('screen')
   call RWarningMsg("Please, install 'screen' to run vim-r-plugin")
@@ -327,16 +320,6 @@ function! StartR(whatr)
       endif
     endif
   endif
-  if !exists("g:vimrplugin_hstart")
-    let b:needshstart = 0
-  endif
-  if exists("g:vimrplugin_hstart")
-    if g:vimrplugin_hstart == 1
-      let b:needshstart = 1
-    else
-      let b:needshstart = 0
-    endif
-  endif
   if b:usescreenplugin
     exec 'ScreenShell ' . rcmd
   else
@@ -425,18 +408,8 @@ function! RAction(rcmd)
   let rkeyword = RGetKeyWord()
   if strlen(rkeyword) > 0
     if a:rcmd == "help"
-      if b:needshstart == 1
-        let b:needshstart = 0
-        let ok = SendCmdToScreen("help.start()")
-        if ok == 0
-          return
-        endif
-        let wt = g:vimrplugin_browser_time
-        while wt > 0
-          sleep
-          let wt -= 1
-        endwhile
-      endif
+      call SendCmdToScreen("help(" . rkeyword . ")")
+      return
     endif
     let rfun = a:rcmd
     if a:rcmd == "args" && exists('g:vimrplugin_listmethods') && g:vimrplugin_listmethods == 1
@@ -704,13 +677,13 @@ function! BuildROmniList(globalenv)
   else
     let rtf = b:local_omni_filename
   endif
-  let lockomnilistfile = rtf . ".locked"
-  call writefile(["Wait!"], lockomnilistfile)
   let omnilistcmd = printf(".vimomnilistfile <- \"%s\"", rtf)
   let ok = SendCmdToScreen(omnilistcmd)
   if ok == 0
     return
   endif
+  let lockomnilistfile = rtf . ".locked"
+  call writefile(["Wait!"], lockomnilistfile)
   let omnilistcmd = "source(\"" . b:r_plugin_home . "/r-plugin/build_omni_list.R\")"
   call SendCmdToScreen(omnilistcmd)
   " Wait while R is writing the list of object into the file
@@ -757,7 +730,12 @@ endfunction
 " Run R CMD BATCH on current file and load the resulting .Rout in a split
 " window
 function! ShowRout()
-  update
+  let routfile = expand("%:r") . ".Rout"
+  if bufloaded(routfile)
+    exe "bunload " . routfile
+  endif
+  " if not silent, the user will have to type <Enter>
+  silent update
   let rcmd = "R CMD BATCH '" . expand("%") . "'"
   echo "Please wait for: " . rcmd
   let rlog = system(rcmd)
@@ -766,9 +744,9 @@ function! ShowRout()
     return
   endif
   if exists("g:vimrplugin_routnotab") && g:vimrplugin_routnotab == 1
-    exe "split " . expand("%:r") . ".Rout"
+    exe "split " . routfile
   else
-    exe "tabnew " . expand("%:r") . ".Rout"
+    exe "tabnew " . routfile
   endif
 endfunction
 
@@ -873,7 +851,7 @@ endfunction
 " Start
 "-------------------------------------
 call s:RCreateMaps("nvi", '<Plug>RStart',        'rf', ':call StartR("R")')
-call s:RCreateMaps("nvi", '<Plug>RvanillaStart', 'rv', ':call StartR("vanilla")')
+call s:RCreateMaps("nvi", '<Plug>RVanillaStart', 'rv', ':call StartR("vanilla")')
 call s:RCreateMaps("nvi", '<Plug>RCustomStart',  'rc', ':call StartR("custom")')
 
 " Close
@@ -982,13 +960,67 @@ call s:RCreateMaps("nvi", '<Plug>RBuildOmniList',    'ro', ':call BuildROmniList
 "-------------------------------------
 "call s:RCreateMaps("nvi", '<Plug>RDebug', 'dd', ':call RStartDebug()')
 
+redir => b:kblist
+silent imap
+silent vmap
+silent nmap
+redir END
+let b:kblist2 = split(b:kblist, "\n")
+unlet b:kblist
+let b:imaplist = []
+let b:vmaplist = []
+let b:nmaplist = []
+for i in b:kblist2
+  if i =~ "<Plug>R"
+    let si = split(i)
+    if len(si) == 3
+      if si[0] =~ "v"
+	call add(b:vmaplist, si)
+      endif
+      if si[0] =~ "i"
+	call add(b:imaplist, si)
+      endif
+      if si[0] =~ "n"
+	call add(b:nmaplist, si)
+      endif
+    else
+      if len(si) == 2
+	call add(b:nmaplist, si)
+      endif
+    endif
+  endif
+endfor
+unlet b:kblist2
+
+function! RNMapCmd(plug)
+  for [el1, el2] in b:nmaplist
+    if el2 == a:plug
+      return el1
+    endif
+  endfor
+endfunction
+
+function! RIMapCmd(plug)
+  for [el1, el2, el3] in b:imaplist
+    if el3 == a:plug
+      return el2
+    endif
+  endfor
+endfunction
+
+function! RVMapCmd(plug)
+  for [el1, el2, el3] in b:vmaplist
+    if el3 == a:plug
+      return el2
+    endif
+  endfor
+endfunction
 
 if exists('g:maplocalleader')
   let b:tll = '<Tab>' . g:maplocalleader
 else
   let b:tll = '<Tab>\\'
 endif
-
 
 function! s:RCreateMenuItem(type, label, plug, combo, target)
   if a:type =~ '0'
@@ -1000,21 +1032,24 @@ function! s:RCreateMenuItem(type, label, plug, combo, target)
   endif
   if a:type =~ "n"
     if hasmapto(a:plug, "n")
-      exec 'nmenu &R.' . a:label . ' ' . tg
+      let boundkey = RNMapCmd(a:plug)
+      exec 'nmenu &R.' . a:label . '<Tab>' . boundkey . ' ' . tg
     else
       exec 'nmenu &R.' . a:label . b:tll . a:combo . ' ' . tg
     endif
   endif
   if a:type =~ "v"
     if hasmapto(a:plug, "v")
-      exec 'vmenu &R.' . a:label . ' ' . tg
+      let boundkey = RVMapCmd(a:plug)
+      exec 'vmenu &R.' . a:label . '<Tab>' . boundkey . ' ' . tg
     else
       exec 'vmenu &R.' . a:label . b:tll . a:combo . ' ' . '<Esc>' . tg
     endif
   endif
   if a:type =~ "i"
     if hasmapto(a:plug, "i")
-      exec 'imenu &R.' . a:label . ' ' . tg . il
+      let boundkey = RIMapCmd(a:plug)
+      exec 'imenu &R.' . a:label . '<Tab>' . boundkey . ' ' . tg
     else
       exec 'imenu &R.' . a:label . b:tll . a:combo . ' ' . '<Esc>' . tg . il
     endif
@@ -1031,7 +1066,7 @@ function! MakeRMenu()
   " Start/Close
   "----------------------------------------------------------------------------
   call s:RCreateMenuItem("nvi", 'Start/Close.Start\ R\ (default)', '<Plug>RStart', 'rf', ':call StartR("R")')
-  call s:RCreateMenuItem("nvi", 'Start/Close.Start\ R\ --vanilla', '<Plug>RvanillaStart', 'rv', ':call StartR("vanilla")')
+  call s:RCreateMenuItem("nvi", 'Start/Close.Start\ R\ --vanilla', '<Plug>RVanillaStart', 'rv', ':call StartR("vanilla")')
   call s:RCreateMenuItem("nvi", 'Start/Close.Start\ R\ (custom)', '<Plug>RCustomStart', 'rc', ':call StartR("custom")')
   "-------------------------------
   menu R.Start/Close.-Sep1- <nul>
@@ -1115,9 +1150,10 @@ function! MakeRMenu()
   menu R.-Sep7- <nul>
 
   "----------------------------------------------------------------------------
-  " About
+  " Help
   "----------------------------------------------------------------------------
-  amenu R.About\ the\ plugin :help vim-r-plugin<CR>
+  amenu R.r-plugin\ Help :help vim-r-plugin<CR>
+  amenu R.R\ Help :call SendCmdToScreen("help.start()")<CR>
 
   "----------------------------------------------------------------------------
   " ToolBar
