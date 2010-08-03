@@ -4,9 +4,9 @@
 			    Plugin to work with R~
 
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
-         Jose© Ca√°udio Faria
+         Jose Claudio Faria
 
-Version: 100801
+Version: 100803
 
 For Vim version 7.2 and above
 
@@ -757,6 +757,9 @@ and konsole but defaults to xterm.
 ------------------------------------------------------------------------------
 11. News~
 							       *r-plugin-news*
+100803 (2010-08-03)
+ * Fixed bug in .Rsource name making in some systems.
+
 100801 (2010-08-01)
  * Dropped options vimrplugin_hstart and vimrplugin_browser_time.
  * If ~/.vim/r-plugin/functions.vim is not found, try to copy it from

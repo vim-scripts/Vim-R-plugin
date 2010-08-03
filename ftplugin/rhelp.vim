@@ -19,7 +19,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Sun Aug 01, 2010  08:54AM
+" Last Change: Mon Aug 02, 2010  09:36PM
 "
 " Please see doc/r-plugin.txt for usage details.
 "==========================================================================
@@ -170,7 +170,7 @@ let b:romnilistfile = "/tmp/.R-omnilist-" . userlogin
 call writefile([], b:romnilistfile)
 
 " Make the file name of files to be sourced
-let b:bname = expand("%:r")
+let b:bname = expand("%:t")
 let b:bname = substitute(b:bname, " ", "",  "g")
 let b:rsource = "/tmp/.Rsource-" . userlogin . "-" . getpid() . "-" . b:bname
 unlet b:bname
