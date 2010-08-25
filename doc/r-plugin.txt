@@ -6,7 +6,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria
 
-Version: 100803
+Version: 100825
 
 For Vim version 7.2 and above
 
@@ -238,6 +238,10 @@ completion including all objects currently in R's workspace, with the
 exception of the .GlobalEnv objects. These two lists are stored permanently in
 the ~/.vim/r-plugin directory.
 
+The command  :RUpdateObjList  waits 120 seconds to R finish building the list.
+If this time isn't enough to your system, please, set a different value of
+|vimrplugin_buildwait|.
+
 
 ------------------------------------------------------------------------------
 5. How the plugin works~
@@ -409,7 +413,26 @@ with the --servername argument. If you want to use more than nine GVim
 instances you will have to use the --servername argument because screen will
 not differentiate between the names "GVIM1" and "GVIM10".
 
-7.4. How to automatically open the .Rout file~
+
+7.4. R path~
+							   *vimrplugin_r_path*
+By default, Vim does not call R with its complete path and, thus, the first R
+executable in the path will be ran, but you can set the complete R path in
+your |vimrc| as in the example below:
+>
+  let vimrplugin_r_path = "/path/2/my/preferred/R/version/bin/R"
+>
+
+7.5. Time necessary to build list of objects for omni completion~
+							*vimrplugin_buildwait*
+If your system needs more than 120 seconds to build the list objects for omni
+completion after you do the command |:RUpdateObjList|, then you should set the
+value of |vimrplugin_buildwait| to a higher value. Example:
+>
+   let vimrplugin_buildwait = 240
+>
+
+7.6. How to automatically open the .Rout file~
 							*vimrplugin_routnotab*
 After the command \ao, vim will save the current buffer if it has any pending
 changes, run R CMD BATCH on the current file and show the resulting .Rout file
@@ -418,7 +441,7 @@ in your |vimrc|:
 >
   let vimrplugin_notab = 1
 <
-7.5. Screen configuration~
+7.7. Screen configuration~
 						       *vimrplugin_noscreenrc*
 Vim runs screen with a special configuration file. If you want to use
 your own ~/.screenrc, put in your |vimrc|:
@@ -426,7 +449,7 @@ your own ~/.screenrc, put in your |vimrc|:
   let vimrplugin_noscreenrc = 1
 <
 
-7.6. Integration with screen.vim~
+7.8. Integration with screen.vim~
 						     *vimrplugin_screenplugin*
 By default, the r-plugin does not use the screen.vim plugin, written by Eric
 Van Dewoestine. If you prefer to use both plugins at the same time, download
@@ -485,7 +508,7 @@ may consider as a starting point to create your own:
   term screen-256color
 <
 
-7.7. Special R functions~
+7.9. Special R functions~
 						      *vimrplugin_listmethods*
 						      *vimrplugin_specialplot*
 The plugin includes the file ~/.vim/r-plugin/specialfuns.R which may wrap the
@@ -497,7 +520,7 @@ to edit your ~/.Rprofile and add the following line:
 Then, follow the instructions below to activate the new functions.
 
 
-7.7.1. List methods arguments~
+7.9.1. List methods arguments~
 
 The R function args() list the arguments of a function, but not the arguments
 of its methods. If you want that the plugin calls the function
@@ -507,7 +530,7 @@ of its methods. If you want that the plugin calls the function
    let vimrplugin_listmethods = 1
 <
 
-7.7.2. Change plot of numeric vectors~
+7.9.2. Change plot of numeric vectors~
 By default, R makes a scatterplot of numeric vectors. The function .vim.plot()
 do both a histogram and a boxplot. The function can be called by the plugin
 after <LocalLeader>rg if you edit your ~/.Rprofile as explained above and put
@@ -516,7 +539,7 @@ the following line in your |vimrc|:
    let vimrplugin_specialplot = 1
 <
 
-7.8. maxdeparse~
+7.10. maxdeparse~
 						       *vimrplugin_maxdeparse*
 You can set the argument maxdeparse to be passed to R's source() function.
 Example:
@@ -524,7 +547,7 @@ Example:
   let vimrplugin_maxdeparse = 300
 <
 
-7.9. LaTeX command~
+7.11. LaTeX command~
 							 *vimrplugin_latexcmd*
 By default, Vim calls pdflatex to produce a pdf document from the .tex file
 produced by the R Sweave command. You can use the option vimrplugin_latexcmd
@@ -533,7 +556,7 @@ to change this behavior. Example:
   let vimrplugin_latexcmd = "latex"
 <
 
-7.10. Never unmake the R menu and tool bar buttons~
+7.12. Never unmake the R menu and tool bar buttons~
 						*vimrplugin_never_unmake_menu*
 Use this option if you want that the menu item R and the R related tool bar
 buttons are not deleted when you change from one buffer to another, for
@@ -542,7 +565,7 @@ example, when go from an .R file to a .txt one:
    let vimrplugin_never_unmake_menu = 1
 <
 
-7.11. Map 'r'~
+7.13. Map 'r'~
 							    *vimrplugin_map_r*
 Some users may already be familiar with the key bindings from earlier releases
 of the r-plugin. If the variable |vimrplugin_map_r| exists, the plugin will 
@@ -628,7 +651,6 @@ and "levels" with the R function that you want to call.
 The following files are part of the plugin and should be in your ~/.vim
 directory after the installation:
 
-   after/syntax/r.vim
    autoload/rcomplete.vim
    bitmaps/r-close.xpm
    bitmaps/r-control-clear.png
@@ -655,6 +677,7 @@ directory after the installation:
    r-plugin/omnilist
    r-plugin/rpager.sh
    r-plugin/specialfuns.R
+   syntax/r.vim
    syntax/rout.vim
 
 ------------------------------------------------------------------------------
@@ -757,6 +780,11 @@ and konsole but defaults to xterm.
 ------------------------------------------------------------------------------
 11. News~
 							       *r-plugin-news*
+100825 (2010-08-25)
+ * Minor improvements in syntax highlighting.
+ * New option: vimrplugin_buildwait.
+ * New option: vimrplugin_r_path (thanks to Asis Hallab).
+
 100803 (2010-08-03)
  * Fixed bug in .Rsource name making in some systems.
 

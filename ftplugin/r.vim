@@ -19,7 +19,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Mon Aug 02, 2010  09:36PM
+" Last Change: Tue Aug 24, 2010  01:25PM
 "
 " Please see doc/r-plugin.txt for usage details.
 "==========================================================================
@@ -99,7 +99,6 @@ if !filereadable(b:user_vimfiles . "/r-plugin/functions.vim")
   if filereadable("/usr/share/vim/addons/r-plugin/functions.vim")
     let x = readfile("/usr/share/vim/addons/r-plugin/functions.vim")
     call writefile(x, b:user_vimfiles . "/r-plugin/functions.vim")
-    exe "runtime after/syntax/r.vim"
   endif
 endif
 
@@ -122,6 +121,12 @@ else
   let b:usescreenplugin = 0
 endif
 
+if exists("g:vimrplugin_r_path")
+  let b:rpath = g:vimrplugin_r_path
+else
+  let b:rpath = "R"
+endif
+
 " Automatically rebuild the file listing .GlobalEnv objects for omni
 " completion if the user press <C-X><C-O> and we know that the file either was
 " not created yet or is outdated.
@@ -139,6 +144,11 @@ endif
 " This is the end for Windows users.
 "==========================================================================
 
+
+" How much time must wait for R to build the list of objects:
+if !exists("g:vimrplugin_buildwait")
+  let g:vimrplugin_buildwait = 120
+endif
 
 " Control the menu 'R' and the tool bar buttons
 if !exists("g:hasrmenu")
@@ -307,16 +317,16 @@ endfunction
 " Start R
 function! StartR(whatr)
   if a:whatr =~ "vanilla"
-    let rcmd = "R --vanilla"
+    let rcmd = b:rpath . " --vanilla"
   else
     if a:whatr =~ "R"
-      let rcmd = "R"
+      let rcmd = b:rpath
     else
       if a:whatr =~ "custom"
         call inputsave()
         let rargs = input('Enter parameters for R: ')
         call inputrestore()
-        let rcmd = "R " . rargs
+        let rcmd = b:rpath . " " . rargs
       endif
     endif
   endif
@@ -670,8 +680,8 @@ endfunction
 
 " Tell R to create a list of objects file (/tmp/.R-omnilist-user-time) listing all currently
 " available objects in its environment. The file is necessary for omni completion.
-function! BuildROmniList(globalenv)
-  if a:globalenv =~ "GlobalEnv"
+function! BuildROmniList(env)
+  if a:env =~ "GlobalEnv"
     let rtf = b:romnilistfile
     let b:needsnewomnilist = 0
   else
@@ -692,17 +702,17 @@ function! BuildROmniList(globalenv)
   let s = 0
   while filereadable(lockomnilistfile)
     let s = s + 1
-    if s == 4 && a:globalenv !~ "GlobalEnv"
+    if s == 4 && a:env !~ "GlobalEnv"
       let s = 0
       let i = i + 1
-      let k = 120 - i
+      let k = g:vimrplugin_buildwait - i
       let themsg = "\rPlease, wait! [" . i . ":" . k . "]"
       echon themsg
     endif
     sleep 250m
-    if i == 120
+    if i == g:vimrplugin_buildwait
       call delete(lockomnilistfile)
-      call RWarningMsg("Two minutes is too much: no longer waiting.")
+      call RWarningMsg("No longer waiting. See  :h vimrplugin_buildwait  for details.")
       return
     endif
   endwhile
@@ -714,9 +724,9 @@ endfunction
 function! RBuildSyntaxFile()
   call BuildROmniList("libraries")
   sleep 1
-  let omnilines = readfile(b:local_omni_filename)
+  let b:flines1 = readfile(b:local_omni_filename)
   let res = []
-  for line in omnilines
+  for line in b:flines1
     if line =~ ':function:\|:standardGeneric:'
       let line = substitute(line, ':.*', "", "")
       let line = "syn keyword rFunction " . line
@@ -724,7 +734,8 @@ function! RBuildSyntaxFile()
     endif
   endfor
   call writefile(res, b:user_vimfiles . "/r-plugin/functions.vim")
-  exe "runtime after/syntax/r.vim"
+  unlet b:current_syntax
+  exe "runtime syntax/r.vim"
 endfunction
 
 " Run R CMD BATCH on current file and load the resulting .Rout in a split
@@ -736,7 +747,7 @@ function! ShowRout()
   endif
   " if not silent, the user will have to type <Enter>
   silent update
-  let rcmd = "R CMD BATCH '" . expand("%") . "'"
+  let rcmd = b:rpath " CMD BATCH '" . expand("%") . "'"
   echo "Please wait for: " . rcmd
   let rlog = system(rcmd)
   if v:shell_error
@@ -768,9 +779,9 @@ function! RStartDebug()
     let scrrc = RWriteScreenRC()
   endif
   if b:term_cmd =~ "gnome-terminal" || b:term_cmd =~ "xfce4-terminal"
-    let opencmd = b:term_cmd . " 'screen " . scrrc . " -d -RR -S VimRdebug R' &"
+    let opencmd = b:term_cmd . " 'screen " . scrrc . " -d -RR -S VimRdebug " . b:rpath . "' &"
   else
-    let opencmd = b:term_cmd . " screen " . scrrc . " -d -RR -S VimRdebug R &"
+    let opencmd = b:term_cmd . " screen " . scrrc . " -d -RR -S VimRdebug " . b:rpath . " &"
   endif
   let rlog = system(opencmd)
   if v:shell_error
