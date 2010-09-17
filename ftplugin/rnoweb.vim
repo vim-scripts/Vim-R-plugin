@@ -15,11 +15,11 @@
 " ftplugin for R files
 "
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
-"          José Cláudio Faria
+"          Jose Claudio Faria
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Tue Aug 24, 2010  01:25PM
+" Last Change: Fri Sep 17, 2010  06:46PM
 "
 " Please see doc/r-plugin.txt for usage details.
 "==========================================================================
@@ -50,42 +50,126 @@ if exists('&ofu')
   setlocal ofu=rcomplete#CompleteR
 endif
 
-function! ReplaceUnderS()
-  let j = col(".")
-  let s = getline(".")
-  if j > 3 && s[j-3] == "<" && s[j-2] == "-" && s[j-1] == " "
-    execute "normal! 3h3xr_"
-    return
-  endif
-  let isString = 0
-  let i = 0
-  while i < j
-    if s[i] == '"'
-      if isString == 0
-	let isString = 1
-      else
-	let isString = 0
-      endif
-    endif
-    let i += 1
-  endwhile
-  if isString == 0
-    execute "normal! a <- "
-  else
-    execute "normal! a_"
-  endif
-endfunction
-
 " Replace 'underline' with '<-'
 if b:replace_us
   imap <buffer> _ <Esc>:call ReplaceUnderS()<CR>a
 endif
 
-" Save r plugin home - necessary to make vim-r-plugin2 work with pathogen
+
+" b:user_vimfiles should be the directory where the user put
+" personal stuff: plugins, colorschemes etc... By default, it is ~/.vim or
+" ~/vimfiles and this is the first directory of runtimepath.
+let b:user_vimfiles = split(&runtimepath, ",")[0]
+
+" b:r_plugin_home should be the directory where the r-plugin files are.  For
+" users following the installation instructions it will be at ~/.vim or
+" ~/vimfiles, that is, the same value of b:user_vimfiles. However the
+" variables will have different values if the plugin is installed somewhere
+" else in the runtimepath.
 let b:r_plugin_home = expand("<sfile>:h:h")
 
-" Save user_vimfiles
-let b:user_vimfiles = split(&runtimepath, ",")[0]
+if exists("g:vimrplugin_conqueplugin")
+  let b:useconqueplugin = 1
+else
+  let b:useconqueplugin = 0
+endif
+
+if exists("g:vimrplugin_screenplugin") && !has('gui_running')
+  let b:usescreenplugin = 1
+  let b:useconqueplugin = 0
+else
+  let b:usescreenplugin = 0
+endif
+
+
+" Automatically rebuild the file listing .GlobalEnv objects for omni
+" completion if the user press <C-X><C-O> and we know that the file either was
+" not created yet or is outdated.
+let b:needsnewomnilist = 1
+
+" From changelog.vim
+let userlogin = system('whoami')
+if v:shell_error
+  let userlogin = 'unknown'
+else
+  let newline = stridx(userlogin, "\n")
+  if newline != -1
+    let userlogin = strpart(userlogin, 0, newline)
+  endif
+endif
+
+" Make the file name of files to be sourced
+let b:bname = expand("%:t")
+let b:bname = substitute(b:bname, " ", "",  "g")
+if has("gui_win32")
+  let b:vimjspath = b:r_plugin_home . "\\r-plugin\\vimActivate.js"
+  let b:r_plugin_home = substitute(b:r_plugin_home, "\\", "/", "g")
+  let b:user_vimfiles = substitute(b:user_vimfiles, "\\", "/", "g")
+  if !has("python")
+    call RWarningMsg("Python interface must be enabled to run Vim-R-Plugin.")
+    call RWarningMsg("Please do  ':h r-plugin-installation'  for details.")
+    call input("Press ENTER to continue.")
+    let b:needsnewomnilist = 0
+    finish
+  endif
+  exe "source " . b:r_plugin_home . "/r-plugin/rpython.vim"
+  if !exists("g:vimrplugin_rpathadded")
+    if exists("g:vimrplugin_r_path")
+      let $PATH = g:vimrplugin_r_path . ";" . $PATH
+      let b:Rgui = g:vimrplugin_r_path . "\\Rgui.exe"
+    else
+      let b:rinstallpath = GetRPathPy()
+      if b:rinstallpath == "Not found"
+	call RWarningMsg('Could not find R path in Windows Registry.')
+	sleep 1
+	finish
+      endif
+      let $PATH = b:rinstallpath . '\bin;' . $PATH
+      let b:Rgui = b:rinstallpath . "\\bin\\Rgui.exe"
+    endif
+    let g:vimrplugin_rpathadded = 1
+  endif
+  let b:R = "Rgui.exe"
+  let g:vimrplugin_term_cmd = "none"
+  let g:vimrplugin_term = "none"
+  let g:vimrplugin_noscreenrc = 1
+  let b:rsource = b:user_vimfiles . "/r-plugin/R-source"
+  let b:globalenvlistfile = b:user_vimfiles . "/r-plugin/R-GlobalEnv"
+  let b:usescreenplugin = 0
+  if !exists("g:vimrplugin_r_args")
+    let g:vimrplugin_r_args = "--sdi"
+  endif
+  if !exists("g:vimrplugin_sleeptime")
+    let g:vimrplugin_sleeptime = 0.02
+  endif
+else
+  if !executable('screen')
+    call RWarningMsg("Please, install 'screen' to enable the vim-r-plugin")
+    sleep 2
+    finish
+  endif
+  if !exists("g:vimrplugin_rpathadded")
+    if exists("g:vimrplugin_r_path")
+      let $PATH = g:vimrplugin_r_path . ":" . $PATH
+    endif
+    let g:vimrplugin_rpathadded = 1
+  endif
+  " Make the R list of objects file name
+  let b:globalenvlistfile = "/tmp/.R-omnilist-" . userlogin
+  if exists("*getpid") " getpid() was introduced in Vim 7.1.142
+    let b:rsource = "/tmp/.Rsource-" . userlogin . "-" . getpid() . "-" . b:bname
+  else
+    let b:randnbr = system("echo $RANDOM")
+    let b:randnbr = substitute(b:randnbr, "\n", "", "")
+    if strlen(b:randnbr) == 0
+      let b:randnbr = "NoRandom"
+    endif
+    let b:rsource = "/tmp/.Rsource-" . userlogin . "-" . b:randnbr . "-" . b:bname
+    unlet b:randnbr
+  endif
+  let b:R = "R"
+endif
+unlet b:bname
 
 
 " Are we in a Debian package? Is the plugin being running for the first time?
@@ -107,42 +191,20 @@ if !filereadable(b:user_vimfiles . "/r-plugin/omnilist")
   if filereadable("/usr/share/vim/addons/r-plugin/omnilist")
     let x = readfile("/usr/share/vim/addons/r-plugin/omnilist")
     call writefile(x, b:user_vimfiles . "/r-plugin/omnilist")
+  else
+    if filereadable(b:r_plugin_home . "/r-plugin/omnilist")
+      let x = readfile(b:r_plugin_home . "/r-plugin/omnilist")
+      call writefile(x, b:user_vimfiles . "/r-plugin/omnilist")
+    else
+      call writefile([], b:user_vimfiles . "/r-plugin/omnilist")
+    endif
   endif
 endif
 
 " Keeps the libraries object list in memory to avoid the need of reading the file
 " repeatedly:
-let b:local_omni_filename = b:user_vimfiles . "/r-plugin/omnilist"
-let b:flines1 = readfile(b:local_omni_filename)
-
-if exists("g:vimrplugin_screenplugin") && !has('gui_running')
-  let b:usescreenplugin = 1
-else
-  let b:usescreenplugin = 0
-endif
-
-if exists("g:vimrplugin_r_path")
-  let b:rpath = g:vimrplugin_r_path
-else
-  let b:rpath = "R"
-endif
-
-" Automatically rebuild the file listing .GlobalEnv objects for omni
-" completion if the user press <C-X><C-O> and we know that the file either was
-" not created yet or is outdated.
-let b:needsnewomnilist = 1
-
-"==========================================================================
-" The remaining of the script needs screen which doesn't work on MS Windows
-"==========================================================================
-if has("gui_win32")
-  let b:usescreenplugin = 0
-  let b:needsnewomnilist = 0
-  finish
-endif
-"==========================================================================
-" This is the end for Windows users.
-"==========================================================================
+let b:libs_omni_filename = b:user_vimfiles . "/r-plugin/omnilist"
+let b:flines1 = readfile(b:libs_omni_filename)
 
 
 " How much time must wait for R to build the list of objects:
@@ -161,45 +223,24 @@ let b:scrfile = " "
 " List of marks that the plugin seeks to find the block to be sent to R
 let s:all_marks = "abcdefghijklmnopqrstuvwxyz"
 
-" From changelog.vim
-let userlogin = system('whoami')
-if v:shell_error
-  let userlogin = 'unknown'
-else
-  let newline = stridx(userlogin, "\n")
-  if newline != -1
-    let userlogin = strpart(userlogin, 0, newline)
-  endif
-endif
-
-" Make the R list of objects file name
-let b:romnilistfile = "/tmp/.R-omnilist-" . userlogin
-
 " Create an empty file to avoid errors if the users do Ctrl-X Ctrl-O before
 " starting R:
-call writefile([], b:romnilistfile)
-
-" Make the file name of files to be sourced
-let b:bname = expand("%:t")
-let b:bname = substitute(b:bname, " ", "",  "g")
-let b:rsource = "/tmp/.Rsource-" . userlogin . "-" . getpid() . "-" . b:bname
-unlet b:bname
-
-if !executable('screen')
-  call RWarningMsg("Please, install 'screen' to run vim-r-plugin")
-  sleep 2
-  finish
-endif
+call writefile([], b:globalenvlistfile)
 
 " Choose a terminal (code adapted from screen.vim)
-let s:terminals = ['gnome-terminal', 'konsole', 'xfce4-terminal', 'Eterm', 'rxvt', 'aterm', 'xterm' ]
-if !exists("g:vimrplugin_term")
-  for term in s:terminals
-    if executable(term)
-      let g:vimrplugin_term = term
-      break
-    endif
-  endfor
+if has("gui_win32")
+  let g:vimrplugin_term = "xterm"
+else
+  let s:terminals = ['gnome-terminal', 'konsole', 'xfce4-terminal', 'iterm', 'Eterm', 'rxvt', 'aterm', 'xterm' ]
+  if !exists("g:vimrplugin_term")
+    for term in s:terminals
+      if executable(term)
+	let g:vimrplugin_term = term
+	break
+      endif
+    endfor
+  endif
+  unlet s:terminals
 endif
 
 if !exists("g:vimrplugin_term") && !exists("g:vimrplugin_term_cmd")
@@ -214,7 +255,7 @@ if g:vimrplugin_term == "gnome-terminal" || g:vimrplugin_term == "xfce4-terminal
 endif
 
 if g:vimrplugin_term == "konsole"
-  let b:term_cmd = "konsole --workdir '" . expand("%:p:h") . "' --icon ~/.vim/bitmaps/ricon.png -e"
+  let b:term_cmd = "konsole --workdir '" . expand("%:p:h") . "' --icon " . b:r_plugin_home . "/bitmaps/ricon.png -e"
 endif
 
 if g:vimrplugin_term == "Eterm"
@@ -254,6 +295,32 @@ if exists("g:vimrplugin_by_vim_instance")
     let b:screensname = "vimrplugin-" . userlogin . "-" . sname
   endif
 endif
+
+function! ReplaceUnderS()
+  let j = col(".")
+  let s = getline(".")
+  if j > 3 && s[j-3] == "<" && s[j-2] == "-" && s[j-1] == " "
+    execute "normal! 3h3xr_"
+    return
+  endif
+  let isString = 0
+  let i = 0
+  while i < j
+    if s[i] == '"'
+      if isString == 0
+	let isString = 1
+      else
+	let isString = 0
+      endif
+    endif
+    let i += 1
+  endwhile
+  if isString == 0
+    execute "normal! a <- "
+  else
+    execute "normal! a_"
+  endif
+endfunction
 
 " Count braces
 function! CountBraces(line)
@@ -317,21 +384,41 @@ endfunction
 " Start R
 function! StartR(whatr)
   if a:whatr =~ "vanilla"
-    let rcmd = b:rpath . " --vanilla"
+    let b:r_args = "--vanilla"
   else
-    if a:whatr =~ "R"
-      let rcmd = b:rpath
+    if a:whatr =~ "custom"
+      call inputsave()
+      let b:r_args = input('Enter parameters for R: ')
+      call inputrestore()
     else
-      if a:whatr =~ "custom"
-        call inputsave()
-        let rargs = input('Enter parameters for R: ')
-        call inputrestore()
-        let rcmd = b:rpath . " " . rargs
+      if exists("g:vimrplugin_r_args")
+	let b:r_args = g:vimrplugin_r_args
+      else
+	let b:r_args = " "
       endif
     endif
   endif
+
+  if has("gui_win32")
+    call StartRPy()
+    return
+  endif
+
+  if b:r_args == " "
+    let rcmd = b:R
+  else
+    let rcmd = b:R . " " . b:r_args
+  endif
+
   if b:usescreenplugin
     exec 'ScreenShell ' . rcmd
+  elseif b:useconqueplugin
+    if exists("g:vimrplugin_conquevsplit")
+      exec 'ConqueTermVSplit ' . rcmd
+    else
+      exec 'ConqueTermSplit ' . rcmd
+    endif
+    execute "setlocal syntax=rout"
   else
     if exists("g:vimrplugin_noscreenrc")
       let scrrc = " "
@@ -339,7 +426,7 @@ function! StartR(whatr)
       let scrrc = RWriteScreenRC()
     endif
     " Some terminals want quotes (see screen.vim)
-    if b:term_cmd =~ "gnome-terminal" || b:term_cmd =~ "xfce4-terminal"
+    if b:term_cmd =~ "gnome-terminal" || b:term_cmd =~ "xfce4-terminal" || b:term_cmd =~ "iterm"
       let opencmd = printf("%s 'screen %s -d -RR -S %s %s' &", b:term_cmd, scrrc, b:screensname, rcmd)
     else
       let opencmd = printf("%s screen %s -d -RR -S %s %s &", b:term_cmd, scrrc, b:screensname, rcmd)
@@ -358,6 +445,12 @@ endfunction
 
 " Function to send commands
 function! SendCmdToScreen(cmd)
+  if has("gui_win32")
+    call SendToRPy(a:cmd . "\n")
+    silent exe '!start WScript "' . b:vimjspath . '" "' . expand("%") . '"'
+    " call RestoreClipboardPy()
+    return 1
+  endif
   if b:usescreenplugin
     if !exists("g:ScreenShellSend")
       call RWarningMsg("Did you already start R?")
@@ -365,7 +458,28 @@ function! SendCmdToScreen(cmd)
     endif
     call g:ScreenShellSend(a:cmd)
     return 1
-  end
+  elseif b:useconqueplugin
+    " Code provided by Nico Raffo
+    " use an agressive sb option
+    set switchbuf=usetab
+
+    " current buffer name
+    let current_buffer = bufname("%")
+
+    " dump current line into a vim variable in global namespace
+    let g:LineToConque = a:cmd . "\n"
+
+    " jump to terminal buffer
+    sil exe ":sb " . g:ConqueTerm_BufName
+
+    " write variable content to terminal
+    sil execute "python " . g:ConqueTerm_Var . '.write(vim.eval("g:LineToConque"))'
+    sil exe 'python ' . g:ConqueTerm_Var .  '.read(100)'
+
+    " jump back to code buffer
+    sil exe ":sb " . current_buffer
+    return 1
+  endif
   let str = substitute(a:cmd, "'", "'\\\\''", "g")
   let scmd = 'screen -S ' . b:screensname . " -X stuff '" . str . "\<C-M>'"
   let rlog = system(scmd)
@@ -387,6 +501,8 @@ function! RQuit(how)
   endif
   if b:usescreenplugin && exists(':ScreenQuit')
       ScreenQuit
+  elseif b:useconqueplugin
+    execute 'bwipeout ' . g:ConqueTerm_Idx
   endif
   echon
 endfunction
@@ -441,12 +557,12 @@ function! RSourceLines(lines, e)
   call writefile(a:lines, b:rsource)
   if a:e == "echo"
     if exists("g:vimrplugin_maxdeparse")
-      let rcmd = "source('" . b:rsource . "', echo=TRUE, max.deparse=" . g:vimrplugin_maxdeparse .")"
+      let rcmd = 'source("' . b:rsource . '", echo=TRUE, max.deparse=' . g:vimrplugin_maxdeparse . ')'
     else
-      let rcmd = "source('" . b:rsource . "', echo=TRUE)"
+      let rcmd = 'source("' . b:rsource . '", echo=TRUE)'
     endif
   else
-    let rcmd = "source('" . b:rsource . "')"
+    let rcmd = 'source("' . b:rsource . '")'
   endif
   let ok = SendCmdToScreen(rcmd)
   return ok
@@ -630,17 +746,29 @@ function! SendLineToR(godown)
 endfunction
 
 " Clear the console screen
-function! RClearAll()
-  let ok = SendCmdToScreen("rm(list=ls())")
-  sleep 500m
-  if ok
+function! RClearConsole()
+  if has("gui_win32")
+    call RClearConsolePy()
+    silent exe '!start WScript "' . b:vimjspath . '" "' . expand("%") . '"'
+  else
     call SendCmdToScreen("")
   endif
 endfunction
 
+" Remove all objects
+function! RClearAll()
+  let ok = SendCmdToScreen("rm(list=ls())")
+  sleep 500m
+  call RClearConsole()
+endfunction
+
 "Set working directory to the path of current buffer
 function! RSetWD()
-  let ok = SendCmdToScreen('setwd("' . expand("%:p:h") . '")')
+  let wdcmd = 'setwd("' . expand("%:p:h") . '")'
+  if has("gui_win32")
+    let wdcmd = substitute(wdcmd, "\\", "/", "g")
+  endif
+  let ok = SendCmdToScreen(wdcmd)
   if ok == 0
     return
   endif
@@ -682,10 +810,10 @@ endfunction
 " available objects in its environment. The file is necessary for omni completion.
 function! BuildROmniList(env)
   if a:env =~ "GlobalEnv"
-    let rtf = b:romnilistfile
+    let rtf = b:globalenvlistfile
     let b:needsnewomnilist = 0
   else
-    let rtf = b:local_omni_filename
+    let rtf = b:libs_omni_filename
   endif
   let omnilistcmd = printf(".vimomnilistfile <- \"%s\"", rtf)
   let ok = SendCmdToScreen(omnilistcmd)
@@ -694,7 +822,7 @@ function! BuildROmniList(env)
   endif
   let lockomnilistfile = rtf . ".locked"
   call writefile(["Wait!"], lockomnilistfile)
-  let omnilistcmd = "source(\"" . b:r_plugin_home . "/r-plugin/build_omni_list.R\")"
+  let omnilistcmd = 'source("' . b:r_plugin_home . '/r-plugin/build_omni_list.R")'
   call SendCmdToScreen(omnilistcmd)
   " Wait while R is writing the list of object into the file
   sleep 70m
@@ -724,7 +852,7 @@ endfunction
 function! RBuildSyntaxFile()
   call BuildROmniList("libraries")
   sleep 1
-  let b:flines1 = readfile(b:local_omni_filename)
+  let b:flines1 = readfile(b:libs_omni_filename)
   let res = []
   for line in b:flines1
     if line =~ ':function:\|:standardGeneric:'
@@ -745,19 +873,26 @@ function! ShowRout()
   if bufloaded(routfile)
     exe "bunload " . routfile
   endif
+  call delete(routfile)
   " if not silent, the user will have to type <Enter>
   silent update
-  let rcmd = b:rpath " CMD BATCH '" . expand("%") . "'"
+  if has("gui_win32")
+    let rcmd = 'Rcmd.exe BATCH "' . expand("%") . '"'
+  else
+    let rcmd = b:R . " CMD BATCH '" . expand("%") . "'"
+  endif
   echo "Please wait for: " . rcmd
   let rlog = system(rcmd)
   if v:shell_error
-    call RWarningMsg(rlog)
-    return
+    call RWarningMsg('Error: "' . rlog . '"')
+    sleep 1
   endif
-  if exists("g:vimrplugin_routnotab") && g:vimrplugin_routnotab == 1
-    exe "split " . routfile
-  else
-    exe "tabnew " . routfile
+  if filereadable(routfile)
+    if exists("g:vimrplugin_routnotab") && g:vimrplugin_routnotab == 1
+      exe "split " . routfile
+    else
+      exe "tabnew " . routfile
+    endif
   endif
 endfunction
 
@@ -779,9 +914,9 @@ function! RStartDebug()
     let scrrc = RWriteScreenRC()
   endif
   if b:term_cmd =~ "gnome-terminal" || b:term_cmd =~ "xfce4-terminal"
-    let opencmd = b:term_cmd . " 'screen " . scrrc . " -d -RR -S VimRdebug " . b:rpath . "' &"
+    let opencmd = b:term_cmd . " 'screen " . scrrc . " -d -RR -S VimRdebug " . b:R . "' &"
   else
-    let opencmd = b:term_cmd . " screen " . scrrc . " -d -RR -S VimRdebug " . b:rpath . " &"
+    let opencmd = b:term_cmd . " screen " . scrrc . " -d -RR -S VimRdebug " . b:R . " &"
   endif
   let rlog = system(opencmd)
   if v:shell_error
@@ -930,7 +1065,7 @@ endif
 " List space, clear console, clear all
 "-------------------------------------
 call s:RCreateMaps("nvi", '<Plug>RListSpace',    'rl', ':call SendCmdToScreen("ls()")<CR>:echon')
-call s:RCreateMaps("nvi", '<Plug>RClearConsole', 'rr', ':call SendCmdToScreen("")<CR>:echon')
+call s:RCreateMaps("nvi", '<Plug>RClearConsole', 'rr', ':call RClearConsole()')
 call s:RCreateMaps("nvi", '<Plug>RClearAll',     'rm', ':call RClearAll()')
 
 " Print, names, structure
@@ -1130,7 +1265,7 @@ function! MakeRMenu()
   " Control
   "----------------------------------------------------------------------------
   call s:RCreateMenuItem("nvi", 'Control.List\ space', '<Plug>RListSpace', 'rl', ':call SendCmdToScreen("ls()")')
-  call s:RCreateMenuItem("nvi", 'Control.Clear\ console\ screen', '<Plug>RClearConsole', 'rr', ':call SendCmdToScreen("")')
+  call s:RCreateMenuItem("nvi", 'Control.Clear\ console\ screen', '<Plug>RClearConsole', 'rr', ':call RClearConsole()')
   call s:RCreateMenuItem("nvi", 'Control.Clear\ all', '<Plug>RClearAll', 'rm', ':call RClearAll()')
   "-------------------------------
   menu R.Control.-Sep1- <nul>
@@ -1170,19 +1305,19 @@ function! MakeRMenu()
   " ToolBar
   "----------------------------------------------------------------------------
   " Buttons
-  amenu icon=r-start ToolBar.RStart :call StartR("R")<CR>
-  amenu icon=r-close ToolBar.RClose :call SendCmdToScreen('quit(save = "no")')<CR>
+  amenu ToolBar.RStart :call StartR("R")<CR>
+  amenu ToolBar.RClose :call SendCmdToScreen('quit(save = "no")')<CR>
   "---------------------------
-  amenu icon=r-send-file ToolBar.RSendFile :call SendFileToR("echo")<CR>
-  amenu icon=r-send-block ToolBar.RSendBlock :call SendMBlockToR("echo", "down")<CR>
-  amenu icon=r-send-function ToolBar.RSendFunction :call SendFunctionToR("echo", "down")<CR>
-  vmenu icon=r-send-selection ToolBar.RSendSelection <ESC>:call SendSelectionToR("echo", "down")<CR>
-  amenu icon=r-send-paragraph ToolBar.RSendParagraph <ESC>:call SendParagraphToR("echo", "down")<CR>
-  amenu icon=r-send-line ToolBar.RSendLine :call SendLineToR("down")<CR>
+  amenu ToolBar.RSendFile :call SendFileToR("echo")<CR>
+  amenu ToolBar.RSendBlock :call SendMBlockToR("echo", "down")<CR>
+  amenu ToolBar.RSendFunction :call SendFunctionToR("echo", "down")<CR>
+  vmenu ToolBar.RSendSelection <ESC>:call SendSelectionToR("echo", "down")<CR>
+  amenu ToolBar.RSendParagraph <ESC>:call SendParagraphToR("echo", "down")<CR>
+  amenu ToolBar.RSendLine :call SendLineToR("down")<CR>
   "---------------------------
-  amenu icon=r-control-listspace ToolBar.RListSpace :call SendCmdToScreen("ls()")<CR>
-  amenu icon=r-control-clear ToolBar.RClear :call SendCmdToScreen("")<CR>
-  amenu icon=r-control-clearall ToolBar.RClearAll :call RClearAll()<CR>
+  amenu ToolBar.RListSpace :call SendCmdToScreen("ls()")<CR>
+  amenu ToolBar.RClear :call RClearConsole()<CR>
+  amenu ToolBar.RClearAll :call RClearAll()<CR>
 
   " Hints
   tmenu ToolBar.RStart Start R (default)

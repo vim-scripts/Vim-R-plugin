@@ -85,7 +85,7 @@
   envnames <- search()
   sink(.vimomnilistfile)
   for(curenv in envnames){
-    noGlobalEnv <- .vim.grepl("vim/r-plugin/omnilist", .vimomnilistfile)
+    noGlobalEnv <- .vim.grepl("/r-plugin/omnilist", .vimomnilistfile)
     if((curenv == ".GlobalEnv" && noGlobalEnv) | (curenv != ".GlobalEnv" && noGlobalEnv == FALSE)) next
     obj.list <- objects(curenv)
     env <- sub("package:", "", curenv)

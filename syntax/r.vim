@@ -3,7 +3,7 @@
 " Maintainer:	      Jakson Aquino <jalvesaq@gmail.com>
 " Former Maintainers: Vaidotas Zemlys <zemlys@gmail.com>
 " 		      Tom Payne <tom@tompayne.org>
-" Last Change:	      Sun Aug 22, 2010  08:45AM
+" Last Change:	      Tue Sep 14, 2010  09:45PM
 " Filenames:	      *.R *.r *.Rhistory *.Rt
 " 
 " NOTE: The highlighting of R functions is defined in the
@@ -24,9 +24,11 @@ syn case match
 syn match rComment contains=@Spell "\#.*"
 
 " string enclosed in double quotes
-syn region rString contains=rSpecial,@Spell start=/"/ skip=/\\\\\|\\"/ end=/"/
+syn region rString contains=rSpecial,rStrError,@Spell start=/"/ skip=/\\\\\|\\"/ end=/"/
 " string enclosed in single quotes
-syn region rString contains=rSpecial,@Spell start=/'/ skip=/\\\\\|\\'/ end=/'/
+syn region rString contains=rSpecial,rStrError,@Spell start=/'/ skip=/\\\\\|\\'/ end=/'/
+
+syn match rStrError display contained "\\."
 
 " New line, carriage return, tab, backspace, bell, feed, vertical tab, backslash
 syn match rSpecial display contained "\\\(n\|r\|t\|b\|a\|f\|v\|'\|\"\)\|\\\\"
@@ -55,7 +57,7 @@ syn keyword rConstant R.version.string
 " Constant
 syn keyword rConstant NULL
 syn keyword rBoolean  FALSE TRUE
-syn keyword rNumber   NA
+syn keyword rNumber   NA NA_integer_ NA_real_ NA_complex_ NA_character_ 
 syn keyword rNumber   Inf NaN 
 
 " integer
@@ -85,6 +87,7 @@ syn match rFloat "\<\.\d\+\([Ee][-+]\=\d\+\)\="
 syn match rFloat "\<\d\+[Ee][-+]\=\d\+"
 
 syn match rArrow "<\{1,2}-"
+syn match rArrow "->\{1,2}"
 
 " Special
 syn match rDelimiter "[,;:]"
@@ -98,16 +101,13 @@ syn match rBraceError "[)}]" contained
 syn match rCurlyError "[)\]]" contained
 syn match rParenError "[\]}]" contained
 
-
-
 runtime r-plugin/functions.vim
 
-" Reclassifying 'library' and 'require'
-syn keyword rPreProc     library require
+" Reclassifying functions that may add new functions and objects:
+syn keyword rPreProc     library require attach detach source
 
 " Type
 syn keyword rType array category character complex double function integer list logical matrix numeric vector data.frame 
-
 
 " Define the default highlighting.
 hi def link rArrow       Statement	
@@ -132,6 +132,7 @@ hi def link rRepeat      Repeat
 hi def link rSpecial     SpecialChar
 hi def link rStatement   Statement
 hi def link rString      String
+hi def link rStrError    Error
 hi def link rType        Type
 
 let b:current_syntax="r"

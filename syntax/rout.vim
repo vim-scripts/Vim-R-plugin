@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:    R output Files
 " Maintainer:  Jakson Aquino <jalvesaq@gmail.com>
-" Last Change: 2010 Jul 16
+" Last Change: Tue Sep 14, 2010  09:22PM
 "
 
 " Version Clears: {{{1
@@ -30,22 +30,53 @@ syn match routIndex /^\s*\[\d\+\]/
 syn match routComment /^> .*/
 syn match routComment /^+ .*/
 
-" Define the default highlighting.
-" For version 5.7 and earlier: only when not done already
-" For version 5.8 and later: only when an item doesn't have highlighting yet
-if version >= 508 || !exists("did_r_syn_inits")
-  if version < 508
-    let did_r_syn_inits = 1
-    command -nargs=+ HiLink hi link <args>
-  else
-    command -nargs=+ HiLink hi def link <args>
-  endif
-  HiLink routComment	Comment
-  HiLink routNumber	Number
-  HiLink routFloat	Float
-  HiLink routString	String
-  HiLink routIndex	Special
-  delcommand HiLink
+" Errors and warnings
+syn match routError "^Error.*"
+syn match routWarn "^Warning.*"
+
+if v:lang =~ "^de"
+  syn match routError	"^Fehler.*"
+  syn match routWarn	"^Warnung.*"
 endif
+
+if v:lang =~ "^es"
+  syn match routError	"^Error.*"
+  syn match routWarn	"^Aviso.*"
+endif
+
+if v:lang =~ "^fr"
+  syn match routError	"^Erreur.*"
+  syn match routWarn	"^Avis.*"
+endif
+
+if v:lang =~ "^it"
+  syn match routError	"^Errore.*"
+  syn match routWarn	"^Avviso.*"
+endif
+
+if v:lang =~ "^nn"
+  syn match routError	"^Feil.*"
+  syn match routWarn	"^Åtvaring.*"
+endif
+
+if v:lang =~ "^pt_BR"
+  syn match routError	"^Erro.*"
+  syn match routWarn	"^Aviso.*"
+endif
+
+if v:lang =~ "^ru"
+  syn match routError	"^Ошибка.*"
+  syn match routWarn	"^Предупреждение.*"
+endif
+
+
+" Define the default highlighting.
+hi def link routComment	Comment
+hi def link routNumber	Number
+hi def link routFloat	Float
+hi def link routString	String
+hi def link routError   Error
+hi def link routWarn    WarningMsg
+hi def link routIndex	Special
 
 let   b:current_syntax = "rout"

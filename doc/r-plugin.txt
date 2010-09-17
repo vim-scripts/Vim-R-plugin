@@ -6,7 +6,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria
 
-Version: 100825
+Version: 100917
 
 For Vim version 7.2 and above
 
@@ -19,7 +19,7 @@ For Vim version 7.2 and above
  7. Options                                     |r-plugin-options|
  8. Custom key bindings                         |r-plugin-custom-key-bindings|
  9. Files                                       |r-plugin-files|
-10. FAQ and tips                                |r-plugin-faq|
+10. FAQ and tips                                |r-plugin-tips|
 11. News                                        |r-plugin-news|
 
 
@@ -50,16 +50,10 @@ to deal with.
 2. Main features~
 							   *r-plugin-features*
 
-2.1. All platforms:~
-
   * Syntax highlighting for R syntax.
   * Smart indentation for R syntax.
-  * Omni completion for objects loaded with R --vanilla command.
-
-2.2. Linux/Unix (including OS X) only:~
-
   * Integrated communication with R.
-  * Omni completion (auto-completion) for all R objects.
+  * Omni completion (auto-completion) for R objects.
   * Ability to update the list of objects for omni completion and syntax
     highlighting to include all R packages loaded by the user.
 
@@ -68,12 +62,27 @@ to deal with.
 3. Installation~
 						       *r-plugin-installation*
 
-3.1. Dependencies~
+3.1. General instructions I~
+
+You need to activate plugins and indentation according to 'filetype'. You
+should have at least the following options in your |vimrc|:
+>
+  set nocompatible
+  syntax enable
+  filetype plugin on
+  filetype indent on
+<
+Make a backup of your ~/.vim directory because existing files will be
+replaced. Please, look at |r-plugin-files| to see the list of files.
+
+3.2. Operating system specific instructions~
+
+3.2.1. Linux/Unix~
 
 This plugin requires users to install two external dependencies:
 
-    * screen - http://www.gnu.org/software/screen/
-    * R-Project - http://www.r-project.org/
+    * R-Project: http://www.r-project.org
+    * screen: http://www.gnu.org/software/screen
 
 This software is already packaged for most GNU/Linux distributions and other
 Unix variants. In fact, screen is installed by default on many Linux 
@@ -83,24 +92,9 @@ Unfortunately, installation instructions for these dependencies vary widely
 and are beyond the scope of this documentation. Please review the installation
 instructions for your operating system for these external dependencies.
 
-
-3.2. General instructions~
-
-You need to activate plugins and indentation according to 'filetype'. You
-should have at least the following options in in your |vimrc|:
->
-  set nocompatible
-  syntax enable
-  filetype plugin on
-  filetype indent on
-
-<
 Create your ~/.vim directory if you do not have it yet:
 >
   mkdir -p ~/.vim
-<
-Make a backup of your ~/.vim directory because existing files will be
-replaced. Please, look at |r-plugin-files| to see the list of files.
 
 Uncompress the archive:
 >
@@ -111,11 +105,57 @@ are in at the same directory):
 >
   :helptags ~/.vim/doc
 <
-Update the list of objects for omni completion and syntax highlight (see
-|:RUpdateObjList| for details).
+You may be interested in integrating the vim-r-plugin with either screen.vim
+plugin or Conque Shell plugin. See |vimrplugin_screenplugin| and
+|vimrplugin_conqueplugin| for details.
 
 
-3.3. Optional step~
+3.2.2. Windows~
+
+This plugin requires users to install several external dependencies:
+
+    * Vim's version must be >= 7.3
+
+    * R-Project: http://www.r-project.org
+
+    * Python: http://www.python.org/download/
+      Note: Be careful to download the correct Python version because Vim
+      needs a specific version of Python DLL. For example, the official Vim
+      7.3 for Windows needs python 2.7. If you are using another Vim version,
+      look for -lpython.. at the link section of the |:version| output to
+      discover what is the correct python version.
+
+    * pywin32: http://sourceforge.net/projects/pywin32/
+      Note: The default download may not match the python version Vim was
+      linked with. You have to "View all files" on the download page to find
+      the correct version.
+
+Create your |vimfiles| directory if you do not have it yet. Its path will be
+similar to one of the following:
+>
+  C:\Documents and Settings\yourlogin\vimfiles
+  C:\Users\yourlogin\vimfiles
+
+Uncompress the archive. Right click on the plugin's zip file and choose
+"Extract all". Then choose ~/vimfiles as the destination directory.
+
+Start Vim and build the tags file for this document (and others that eventually
+are in the same directory):
+>
+  :helptags ~\vimfiles\doc
+<
+Start R and try to send some lines from GVim to R Console. You may have to
+adjust the value of |vimrplugin_sleeptime|.
+
+
+3.3. General instructions II (optional steps)~
+
+update list of objects~
+
+Start R and update the list of objects for omni completion and syntax
+highlight (see |:RUpdateObjList| for details).
+
+hide unused buttons~
 
 Edit Vim's toolbar and remove the buttons that you never use. The plugin adds
 some buttons to the toolbar, but you may not see them because gvim has too
@@ -123,6 +163,16 @@ many buttons by default. Please see the page below to know how to hide buttons
 on the toolbar:
 
    http://vim.wikia.com/wiki/Hide_toolbar_or_menus_to_see_more_text
+
+install additional plugins~
+
+You may be interested in installing additional plugins, such as showmarks and
+taglist. Please read |r-plugin-tips| for details.
+
+mandatory step~
+
+Read the plugin's documentation (this text), especially the section
+|r-plugin-options|.
 
 
 ------------------------------------------------------------------------------
@@ -199,8 +249,8 @@ Control
   . Rebuild (list of objects)              \ro
  
 
-The command \ao, File (open .Rout), silently writes the current buffer to its
-file if it was modified.
+Note: The command \ao, File (open .Rout), silently writes the current buffer
+to its file if it was modified and deletes the .Rout file if it exists.
 
 The key bindings \sw and \sp are useful only if the file type is rnoweb
 (.Rnw). When the cursor is over the @ character that finishes an R chunk, the
@@ -216,7 +266,7 @@ is enabled by default.
 
 Please see |r-plugin-custom-key-bindings| to learn how to customize the key
 bindings without editing the plugin directly, and |vimrplugin_underscore| to
-to disable underscore replacement.
+disable underscore replacement.
 
 
 4.2. Syntax highlight and omni completion~
@@ -247,27 +297,7 @@ If this time isn't enough to your system, please, set a different value of
 5. How the plugin works~
 							*r-plugin-functioning*
 
-Vim and R run as independent processes. The main disadvantage is that we have
-limited communication between the two applications: Vim can send strings to R
-through screen and R can write files to be read by Vim. That's all.  The main
-advantage is that Vim's or the plugin's bugs will not affect R.
-
-5.1. Communication through screen~
-
-The r-plugin uses screen to communicate with R. First, the plugin initiates a
-new screen session and  uses this to start a new R process. The plugin's menu
-options, toolbar buttons and key bindings can then be used to communicate with
-the newly started R process. The plugin sends commands to R through screen. By
-default, all Vim buffers share the same R process, but it is also possible to
-configure Vim so that each buffer runs its own instance of R in a separate
-terminal emulator. In this case, the screen sessions have unique names. The
-names are made using the user name and the seconds of localtime(). Hence, a
-name clash is possible if a single user starts more than one Vim buffer at the
-same second. To change the default behavior and force all Vim buffers to use
-different R processes see |vimrplugin_single_r|.
-
-
-5.2. Omni completion~
+5.1. Omni completion~
 
 Vim can automatically complete the names of R objects when CTRL-X CTRL-O is
 pressed in insert mode (see |omni-completion| for details and 'completeopt' to
@@ -297,12 +327,32 @@ remains available until you manually rebuild it with the command:
 |:RUpdateObjList|.
 
 
+5.2. Communication through screen (Linux/Unix only)~
+
+Vim and R run as independent processes. The main disadvantage is that we have
+limited communication between the two applications: Vim can send strings to R
+through screen and R can write files to be read by Vim. That's all.  The main
+advantage is that Vim's or the plugin's bugs will not affect R.
+
+The r-plugin uses screen to communicate with R. First, the plugin initiates a
+new screen session and  uses this to start a new R process. The plugin's menu
+options, toolbar buttons and key bindings can then be used to communicate with
+the newly started R process. The plugin sends commands to R through screen. By
+default, all Vim buffers share the same R process, but it is also possible to
+configure Vim so that each buffer runs its own instance of R in a separate
+terminal emulator. In this case, the screen sessions have unique names. The
+names are made using the user name and the seconds of localtime(). Hence, a
+name clash is possible if a single user starts more than one Vim buffer at the
+same second. To change the default behavior and force all Vim buffers to use
+different R processes see |vimrplugin_single_r|.
+
+
 ------------------------------------------------------------------------------
 6. Known bugs and workarounds~
 							 *r-plugin-known-bugs*
 6.1. Indentation~
 
-Correctly written code might be wrongly indented. Examples:
+Correctly written code might be wrongly indented. Example:
 
    this code                               is indented as:~
    if(T)                                   if(T)
@@ -310,15 +360,34 @@ Correctly written code might be wrongly indented. Examples:
      {                                     {
        cat(i, "\n")                          cat(i, "\n")
      }                                     }
-                                           
-   if(T){                                  if(T){
-     if(T)                                   if(T)
-     {                                       {
-       cat("something\n")                      cat("something\n")
-   }}                                        }}
 
 
-6.2. R session is detached when GVim is closed~
+6.2. R's source() issues~
+
+The R's source() function prints an extra new line between commands if the
+option echo = TRUE, and error messages and warning are printed only after the
+entire code is sourced, which makes it more difficult to find errors in the
+code sent to R. As a workaround to second problem you may wan to put in your
+Rprofile:
+>
+   options(warn = 1)
+>
+The side effect of "warn = 1" is that there will be no limit to the number of
+warnings printed.
+
+
+6.3. GVim's toolbar buttons, menu and title bar blink during omni completion~
+
+The plugin unmakes the R menu and the related toolbar buttons when Vim leaves
+the R buffer. During omni completion, Vim leaves the R buffer and goes to the
+scratch window which is not recognized as an R file type. Consequently, the
+plugin unmakes the toolbar buttons and R related menu items. If you prefer,
+you can use the option |vimrplugin_never_unmake_menu| but, then, the menu and
+tool bar buttons will never be deleted, even if you change from one file type
+to another.
+
+
+6.4. R session is detached when GVim is closed (Linux/Unix only)~
 
 If you launch GVim through a custom keyboard shortcut, the problem may be
 solved if you add -f as parameter to GVim. The R session will also be detached
@@ -329,39 +398,37 @@ the R session, open a new terminal window and type:
   screen -r
 <
 
-6.3. R's source() issues~
+6.5. The clipboard's content is lost (Windows only)~
 
-The R's source() function prints an extra new line between commands if the
-option echo = TRUE, and error messages are printed only after the function has
-finished, which make it more difficult to find errors in the code sent to R.
+On Windows, the plugin copies the command that will be sent to R into the
+clipboard.  Thus, if you have anything in the clipboard it will be lost while
+using the plugin.
 
 
-6.4. GVim's toolbar buttons, menu and title bar blink during omni completion~
+6.6. The buffer name must be in the window title (Windows only)~
 
-The plugin unmakes the R menu and the related toolbar buttons when Vim leaves
-the R buffer. During omni completion, Vim leaves the R buffer and goes to the
-scratch window which is not recognized as an R file type. Consequently, the
-plugin unmakes the toolbar buttons and R related menu items. If you prefer,
-you can can use the option |vimrplugin_never_unmake_menu| but, then, the
-menu and tool bar buttons will never be deleted, even if you change from one
-file type to another.
+On Windows, the plugin tries to activate the "R Console" window, paste the
+command that is being sent to R, and, then, activate the GVim window. To
+activate the GVim window the plugin requires that the name of the file being
+edited be in the Windows title. This is the default on Vim if you have not set
+the option 'titlestring'.
 
 
 ------------------------------------------------------------------------------
 7. Options~
 							    *r-plugin-options*
-
-7.1. Terminal emulator~
+7.1. Terminal emulator (Linux/Unix only)~
 							     *vimrplugin_term*
 The plugin uses the first terminal emulator that it finds in the following
 list:
     1. gnome-terminal, 
     2. konsole, 
     3. xfce4-terminal, 
-    4. Eterm, 
-    5. rxvt, 
-    6. aterm, 
-    7. xterm.
+    4. iterm
+    5. Eterm, 
+    6. rxvt, 
+    7. aterm, 
+    8. xterm.
 
 If Vim does not select your favorite terminal emulator, you may define it in 
 your |vimrc| by setting the variable vimrplugin_term, as shown below:
@@ -387,7 +454,7 @@ To disable the underscore replacement with " <- " put the following in your
   let vimrplugin_underscore = 1
 <
 
-7.3. Number of R processes~
+7.3. Number of R processes (Linux/Unix only)~
 							*vimrplugin_nosingler*
 						  *vimrplugin_by_vim_instance*
 If you prefer that each Vim buffer uses its own R process, put the following
@@ -416,23 +483,37 @@ not differentiate between the names "GVIM1" and "GVIM10".
 
 7.4. R path~
 							   *vimrplugin_r_path*
-By default, Vim does not call R with its complete path and, thus, the first R
-executable in the path will be ran, but you can set the complete R path in
-your |vimrc| as in the example below:
+Vim will ran the first R executable in the path. You can set an alternative R
+path in your |vimrc| as in the examples:
 >
-  let vimrplugin_r_path = "/path/2/my/preferred/R/version/bin/R"
+  let vimrplugin_r_path = "/path/2/my/preferred/R/version/bin"
+  let vimrplugin_r_path = "C:\\Program Files\\R\\R-2.11.1\\bin"
 >
+On Windows, Vim will try to find the R install path in the Windows Registry.
 
-7.5. Time necessary to build list of objects for omni completion~
+
+7.5. Arguments to R~
+							   *vimrplugin_r_args*
+Set this option in your |vimrc| if you want to pass command line arguments to
+R at the startup. Example:
+>
+   let vimrplugin_r_args = "--sdi --no-save --quiet"
+<
+On Linux, there is no default value for |vimrplugin_r_args|. On Windows, the
+default value is "--sdi", but you may change it to "--mdi" if do not like the
+SDI style of the graphical user interface.
+
+
+7.6. Time necessary to build list of objects for omni completion~
 							*vimrplugin_buildwait*
-If your system needs more than 120 seconds to build the list objects for omni
-completion after you do the command |:RUpdateObjList|, then you should set the
-value of |vimrplugin_buildwait| to a higher value. Example:
+If your system needs more than 120 seconds to build the list of objects for
+omni completion after you do the command |:RUpdateObjList|, then you should
+set the value of |vimrplugin_buildwait| to a higher value. Example:
 >
    let vimrplugin_buildwait = 240
 >
 
-7.6. How to automatically open the .Rout file~
+7.7. How to automatically open the .Rout file~
 							*vimrplugin_routnotab*
 After the command \ao, vim will save the current buffer if it has any pending
 changes, run R CMD BATCH on the current file and show the resulting .Rout file
@@ -441,7 +522,16 @@ in your |vimrc|:
 >
   let vimrplugin_notab = 1
 <
-7.7. Screen configuration~
+7.8. Sleep time (Windows only)~
+							*vimrplugin_sleeptime*
+The plugin gives to R a small amount of time to process the paste command.
+The default value is 0.2 second, but you should experiment different values.
+The example show how to adjust the value of sleeptime in your |vimrc|:
+>
+   let vimrplugin_sleeptime = 0.1
+<
+
+7.8. Screen configuration (Linux/Unix only)~
 						       *vimrplugin_noscreenrc*
 Vim runs screen with a special configuration file. If you want to use
 your own ~/.screenrc, put in your |vimrc|:
@@ -449,7 +539,7 @@ your own ~/.screenrc, put in your |vimrc|:
   let vimrplugin_noscreenrc = 1
 <
 
-7.8. Integration with screen.vim~
+7.9. Integration with screen.vim (Linux/Unix only)~
 						     *vimrplugin_screenplugin*
 By default, the r-plugin does not use the screen.vim plugin, written by Eric
 Van Dewoestine. If you prefer to use both plugins at the same time, download
@@ -458,21 +548,23 @@ and install the screen.vim (version 0.8 or above) from:
   http://www.vim.org/scripts/script.php?script_id=2711
 
 Using both plugins at the same time is especially useful for users who may
-prefer to use Vim and R from the command-line, rather than using the graphical
-interface provided by GVim.
+prefer to use Vim and R in a terminal emulator, rather than using the
+graphical interface provided by GVim.
 
 To integrate the r-plugin with screen.vim you will need to add the following 
 to your |vimrc|:
 >
   let vimrplugin_screenplugin = 1
 <
-Note: Read the screen.vim description at plugin/screen.vim, especially the
-section "Gotchas" (the E325 is caused by the presence of 'swapfile'). This
-problem will not happen if you start Vim from within a screen session, as in
-the example below. However, when starting Vim from within screen you will not
-be able to start a new R session after closing the first one with the \rq
-command. Moreover, you will have to manually switch from one screen region to
-another and kill them.
+The screen.vim plugin also supports tmux, which allows you to split the
+terminal vertically. Look at |screen-intro| for details.
+
+Note: Read the screen's documentation, especially the section |screen-gotchas|
+(the E325 is caused by the presence of 'swapfile'). This problem will not
+happen if you start Vim from within a screen session, as in the example below.
+However, when starting Vim from within screen you will not be able to start a
+new R session after closing the first one with the \rq command. Moreover, you
+will have to manually switch from one screen region to another and kill them.
 
 A sample detachable session could be:
 
@@ -508,7 +600,28 @@ may consider as a starting point to create your own:
   term screen-256color
 <
 
-7.9. Special R functions~
+7.10. Integration with Conque Shell plugin (Linux/Unix only)~
+						     *vimrplugin_conqueplugin*
+						     *vimrplugin_conquevsplit*
+Note: The support to Conque Shell plugin is unfinished. Use these options if
+you want to help with its development.
+
+The plugin will use the Conque Shell plugin, written by Nico Raffo, if you put
+the folowing line in your |vimrc|:
+>
+   let vimrplugin_conqueplugin = 1
+<
+The Conque Shell plugin is available at:
+
+   http://www.vim.org/scripts/script.php?script_id=2771
+
+By default, Conque Shell will split the window horizontally. Put the following
+in your |vimrc| if you prefer to split the window vertically:
+>
+  let vimrplugin_conquevsplit = 1
+<
+
+7.11. Special R functions~
 						      *vimrplugin_listmethods*
 						      *vimrplugin_specialplot*
 The plugin includes the file ~/.vim/r-plugin/specialfuns.R which may wrap the
@@ -520,7 +633,7 @@ to edit your ~/.Rprofile and add the following line:
 Then, follow the instructions below to activate the new functions.
 
 
-7.9.1. List methods arguments~
+7.11.1. List methods arguments~
 
 The R function args() list the arguments of a function, but not the arguments
 of its methods. If you want that the plugin calls the function
@@ -530,7 +643,7 @@ of its methods. If you want that the plugin calls the function
    let vimrplugin_listmethods = 1
 <
 
-7.9.2. Change plot of numeric vectors~
+7.11.2. Change plot of numeric vectors~
 By default, R makes a scatterplot of numeric vectors. The function .vim.plot()
 do both a histogram and a boxplot. The function can be called by the plugin
 after <LocalLeader>rg if you edit your ~/.Rprofile as explained above and put
@@ -539,7 +652,7 @@ the following line in your |vimrc|:
    let vimrplugin_specialplot = 1
 <
 
-7.10. maxdeparse~
+7.12. maxdeparse~
 						       *vimrplugin_maxdeparse*
 You can set the argument maxdeparse to be passed to R's source() function.
 Example:
@@ -547,7 +660,7 @@ Example:
   let vimrplugin_maxdeparse = 300
 <
 
-7.11. LaTeX command~
+7.13. LaTeX command~
 							 *vimrplugin_latexcmd*
 By default, Vim calls pdflatex to produce a pdf document from the .tex file
 produced by the R Sweave command. You can use the option vimrplugin_latexcmd
@@ -556,7 +669,7 @@ to change this behavior. Example:
   let vimrplugin_latexcmd = "latex"
 <
 
-7.12. Never unmake the R menu and tool bar buttons~
+7.14. Never unmake the R menu and tool bar buttons~
 						*vimrplugin_never_unmake_menu*
 Use this option if you want that the menu item R and the R related tool bar
 buttons are not deleted when you change from one buffer to another, for
@@ -565,7 +678,7 @@ example, when go from an .R file to a .txt one:
    let vimrplugin_never_unmake_menu = 1
 <
 
-7.13. Map 'r'~
+7.15. Map 'r'~
 							    *vimrplugin_map_r*
 Some users may already be familiar with the key bindings from earlier releases
 of the r-plugin. If the variable |vimrplugin_map_r| exists, the plugin will 
@@ -651,38 +764,55 @@ and "levels" with the R function that you want to call.
 The following files are part of the plugin and should be in your ~/.vim
 directory after the installation:
 
-   autoload/rcomplete.vim
-   bitmaps/r-close.xpm
-   bitmaps/r-control-clear.png
-   bitmaps/r-control-clearall.png
-   bitmaps/r-control-listspace.png
-   bitmaps/r-send-block.png
-   bitmaps/r-send-file.png
-   bitmaps/r-send-function.png
-   bitmaps/r-send-line.png
-   bitmaps/r-send-paragraph.png
-   bitmaps/r-send-selection.png
-   bitmaps/r-start.xpm
-   bitmaps/ricon.png
-   bitmaps/ricon.xbm
-   doc/r-plugin.txt
-   ftdetect/r.vim
-   ftplugin/r.vim
-   ftplugin/rhelp.vim
-   ftplugin/rnoweb.vim
-   indent/r.vim
-   r-plugin/build_omni_list.R
-   r-plugin/etags2ctags.R
-   r-plugin/functions.vim
-   r-plugin/omnilist
-   r-plugin/rpager.sh
-   r-plugin/specialfuns.R
-   syntax/r.vim
-   syntax/rout.vim
+  
+  autoload/rcomplete.vim
+  bitmaps/RClearAll.bmp
+  bitmaps/RClearAll.png
+  bitmaps/RClear.bmp
+  bitmaps/RClear.png
+  bitmaps/RClose.bmp
+  bitmaps/RClose.png
+  bitmaps/ricon.png
+  bitmaps/ricon.xbm
+  bitmaps/RListSpace.bmp
+  bitmaps/RListSpace.png
+  bitmaps/RSendBlock.bmp
+  bitmaps/RSendBlock.png
+  bitmaps/RSendFile.bmp
+  bitmaps/RSendFile.png
+  bitmaps/RSendFunction.bmp
+  bitmaps/RSendFunction.png
+  bitmaps/RSendLine.bmp
+  bitmaps/RSendLine.png
+  bitmaps/RSendParagraph.bmp
+  bitmaps/RSendParagraph.png
+  bitmaps/RSendSelection.bmp
+  bitmaps/RSendSelection.png
+  bitmaps/RStart.bmp
+  bitmaps/RStart.png
+  doc/r-plugin.txt
+  ftdetect/r.vim
+  ftplugin/rhelp.vim
+  ftplugin/rnoweb.vim
+  ftplugin/r.vim
+  indent/r.vim
+  r-plugin/build_omni_list.R
+  r-plugin/etags2ctags.R
+  r-plugin/functions.vim
+  r-plugin/omnilist
+  r-plugin/rpager.sh
+  r-plugin/rperl.vim
+  r-plugin/rpython.vim
+  r-plugin/specialfuns.R
+  r-plugin/vimActivate.js
+  syntax/rout.vim
+  syntax/r.vim
+
+8 directories, 39 files
 
 ------------------------------------------------------------------------------
 10. FAQ and tips~
-								*r-plugin-faq*
+							       *r-plugin-tips*
 
 10.1. Is it possible to stop R from within Vim?~
   Sorry, it is not possible. You have to press ^C into R's terminal emulator.
@@ -770,16 +900,29 @@ and konsole but defaults to xterm.
 <
 
 10.9. Group windows with compiz~
-  It may be easier to work with the plugin if the various related windows
-  (editor, terminal, and graphics window) are grouped because they will be
-  raised together when one of them receives the focus. You may need
-  CompizConfig Settings Manager installed to enable this feature (look at the
-  "Window Management" section for "Group and Tab Windows").
+  If you are using Compiz, it may be easier to work with the plugin if the
+  various related windows (editor, terminal, and graphics window) are grouped
+  because they will be raised together when one of them receives the focus.
+  You may need CompizConfig Settings Manager installed to enable this feature
+  (look at the "Window Management" section for "Group and Tab Windows").
 
 
 ------------------------------------------------------------------------------
 11. News~
 							       *r-plugin-news*
+100917 (2010-09-17)
+ * Changed the use of vimrplugin_r_path: now the option includes only the
+   directory part of the path.
+ * Initial support to Conque Shell plugin. Thanks to "il_principe orange" for
+   suggesting the use of Conque Shell, "ZyX-I" for writing the initial code to
+   use Conque Shell, and Nico Raffo for writing the plugin and additional code
+   to integrate both plugins.
+ * New options: vimrplugin_conqueplugin and vimrplugin_conquevsplit.
+ * New option: vimrplugin_r_args.
+ * Fixed bug when the plugin was installed in a directory other than ~/.vim
+   (thanks to Tom Link).
+ * Initial support for Vim-R communication on Windows using Python.
+
 100825 (2010-08-25)
  * Minor improvements in syntax highlighting.
  * New option: vimrplugin_buildwait.
@@ -851,7 +994,7 @@ and konsole but defaults to xterm.
  * Added "Send Paragraph" commands.
 
 091004 (2009-10-04)
- * Jose Cla¡udio Faria has began to work in the project as co-author.
+ * Jose Claudio Faria has begun to work in the project as co-author.
  * Some ideas from Tinn-R project were ported to the plugin.
  * The main menu has new items and the toolbar new icons.
  * Documentation improvements.
