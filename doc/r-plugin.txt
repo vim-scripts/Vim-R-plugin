@@ -6,7 +6,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria
 
-Version: 100917
+Version: 100923
 
 For Vim version 7.2 and above
 
@@ -413,6 +413,12 @@ activate the GVim window the plugin requires that the name of the file being
 edited be in the Windows title. This is the default on Vim if you have not set
 the option 'titlestring'.
 
+6.7. The menu may not reflect some of your custom key bindings~
+
+If you have created a custom key binding for the r-plugin, the menu in GVim
+will not always reflect the correct key binding if it is not the same for
+normal, visual and insert modes.
+
 
 ------------------------------------------------------------------------------
 7. Options~
@@ -452,6 +458,46 @@ To disable the underscore replacement with " <- " put the following in your
 |vimrc|:
 >
   let vimrplugin_underscore = 1
+<
+
+7.3. Vim as pager for R help (Linux/Unix only)~
+							 *vimrplugin_vimpager*
+							  *vimrplugin_docfile*
+							 *vimrplugin_editor_w*
+You can see R's help documents in Vim if you set vimrplugin_vimpager. The
+plugin key bindings will remain active in the documentation buffer, and, thus,
+you will be able to send commands to R as you do while editing an R script.
+You can, for example, use <LocalLeader>rh to jump to another R help document.
+
+R formats the help text with 72 columns and, thus, the plugin will always try
+to create windows with at least this number of columns. The valid values of
+vimrplugin_vimpager are:
+   
+   "vertical"  : Split the window vertically.
+   "horizontal": Split the window horizontally.
+   "smart"     : Split the window vertically if the editor width is large
+		 enough; otherwise, split the window horizontally and attempt
+		 to set the window height to at least 20 lines.
+   "tab"       : Show the help document in a new tab.
+   "no"        : Do not show R documentation in Vim. This is the default.
+
+The window will be considered large enough if its number of columns is larger
+than 72 + vimrplugin_editor_w. The default value of vimrplugin_editor_w is 66.
+To use Vim as pager for R, you have to edit your .Rprofile and add the
+following lines:
+>
+   options(help_type = "text")
+   options(pager = "cat > /path/to/R-doc-file")
+<
+With the above value for "pager", R will save the documentation file in the
+specified path. Vim will try to read vimrplugin_docfile which has
+"~/.vim/r-plugin/Rdoc" as default value. Then you have to set the values of
+vimrplugin_vimpager and, optionally, vimrplugin_docfile and
+vimrplugin_editor_w in your |vimrc|. Example:
+>
+   let vimrplugin_docfile = "/path/to/R-doc-file"
+   let vimrplugin_vimpager = "smart"
+   let vimrplugin_editor_w = 66
 <
 
 7.3. Number of R processes (Linux/Unix only)~
@@ -910,6 +956,14 @@ and konsole but defaults to xterm.
 ------------------------------------------------------------------------------
 11. News~
 							       *r-plugin-news*
+100923 (2010-09-23)
+ * New option: vimrplugin_vimpager.
+ * Do not let Vim translate "File" in R menu.
+ * Fixed bug when the option vimrplugin_r_path was used (thanks to Asis Hallab
+   for reporting the bug),
+ * Fixed bug (E687) when user created custom key binding (thanks to Philippe
+   Glaziou for reporting the bug).
+
 100917 (2010-09-17)
  * Changed the use of vimrplugin_r_path: now the option includes only the
    directory part of the path.
