@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:    R output Files
 " Maintainer:  Jakson Aquino <jalvesaq@gmail.com>
-" Last Change: Tue Sep 14, 2010  09:22PM
+" Last Change: Fri Oct 01, 2010  09:24PM
 "
 
 " Version Clears: {{{1
@@ -16,7 +16,7 @@ endif
 syn case match
 
 " Strings
-syn region routString start=/"/ skip=/\\\\\|\\"/ end=/"/
+syn region routString start=/"/ skip=/\\\\\|\\"/ end=/"/ end=/$/
 " Numbers
 syn match routNumber /\<\d\+\>/
 " floating point number with integer and fractional parts and optional exponent

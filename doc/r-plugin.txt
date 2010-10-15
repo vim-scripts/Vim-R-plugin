@@ -6,7 +6,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria
 
-Version: 100923
+Version: 101015
 
 For Vim version 7.2 and above
 
@@ -56,6 +56,12 @@ to deal with.
   * Omni completion (auto-completion) for R objects.
   * Ability to update the list of objects for omni completion and syntax
     highlighting to include all R packages loaded by the user.
+  * Object browser (must be updated manually)
+
+  Linux/Unix only~
+  * Ability to see R's documentation in a Vim's buffer.
+    Note: This feature wasn't implemented on Windows because it lacks an
+          application like "cat".
 
 
 ------------------------------------------------------------------------------
@@ -67,10 +73,10 @@ to deal with.
 You need to activate plugins and indentation according to 'filetype'. You
 should have at least the following options in your |vimrc|:
 >
-  set nocompatible
-  syntax enable
-  filetype plugin on
-  filetype indent on
+   set nocompatible
+   syntax enable
+   filetype plugin on
+   filetype indent on
 <
 Make a backup of your ~/.vim directory because existing files will be
 replaced. Please, look at |r-plugin-files| to see the list of files.
@@ -94,11 +100,11 @@ instructions for your operating system for these external dependencies.
 
 Create your ~/.vim directory if you do not have it yet:
 >
-  mkdir -p ~/.vim
+   mkdir -p ~/.vim
 
 Uncompress the archive:
 >
-  unzip vim-r-plugin2-*.zip -d ~/.vim
+   unzip vim-r-plugin2-*.zip -d ~/.vim
 <
 Start Vim and build the tags file for this document (and others that eventually
 are in at the same directory):
@@ -148,7 +154,27 @@ Start R and try to send some lines from GVim to R Console. You may have to
 adjust the value of |vimrplugin_sleeptime|.
 
 
-3.3. General instructions II (optional steps)~
+3.3. Troubleshooting (if the plugin doesn't work)~
+
+The plugin is a |file-type| plugin. It will be active only if you are editing
+a .R or .Rnw file. The menu items and tool bar buttons will not be visible and
+the key bindings will not be active while editing either unnamed files or
+files with name extensions other than .R or .Rnw.
+
+Look at the ~/.vim (Linux, Unix, Os X) or ~/vimfiles (Windows) directory. Is
+there a subdirectory named "r-plugin"? If not, then you unpacked the plugin in
+the wrong place.
+
+Did you see warning messages but they disappeared before you have had time to
+read them? Type the command |:messages| in Normal mode to see them again.
+
+Are you using Debian, Ubuntu or other Debian based Linux distribution? If yes,
+you may prefer to install the Debian package available at:
+
+   https://sites.google.com/site/jalvesaq/vimrplugin
+
+
+3.4. General instructions II (optional steps)~
 
 update list of objects~
 
@@ -246,7 +272,7 @@ Control
   . Sweave (cur file)                      \sw
   . Sweave and PDF (cur file)              \sp
   --------------------------------------------
-  . Rebuild (list of objects)              \ro
+  . Update object browser                  \ro
  
 
 Note: The command \ao, File (open .Rout), silently writes the current buffer
@@ -263,6 +289,13 @@ unless you are typing inside a string. If necessary, it is possible to insert
 an actual underscore into your file by typing a second underscore.  This
 behavior is similar to the EMACS ESS mode some users may be familiar with and
 is enabled by default.
+
+You have to do \ro to either start or updated the object browser. If an object
+has the attribute "label", it will be displayed in the object browser. The
+options |vimrplugin_open_df| and |vimrplugin_open_list| control whether the
+elements of data.frames and lists are shown. In the object browser window, you
+can either press <Enter> or double click (GVim only) over a data.frame or list
+to show/hide its elements.
 
 Please see |r-plugin-custom-key-bindings| to learn how to customize the key
 bindings without editing the plugin directly, and |vimrplugin_underscore| to
@@ -367,13 +400,7 @@ Correctly written code might be wrongly indented. Example:
 The R's source() function prints an extra new line between commands if the
 option echo = TRUE, and error messages and warning are printed only after the
 entire code is sourced, which makes it more difficult to find errors in the
-code sent to R. As a workaround to second problem you may wan to put in your
-Rprofile:
->
-   options(warn = 1)
->
-The side effect of "warn = 1" is that there will be no limit to the number of
-warnings printed.
+code sent to R.
 
 
 6.3. GVim's toolbar buttons, menu and title bar blink during omni completion~
@@ -395,7 +422,7 @@ when GVim is closed if you launch GVim by the command line in a terminal
 emulator, and, then, close the terminal-emulator. In any case, to reattach to 
 the R session, open a new terminal window and type:
 >
-  screen -r
+   screen -r
 <
 
 6.5. The clipboard's content is lost (Windows only)~
@@ -410,8 +437,9 @@ using the plugin.
 On Windows, the plugin tries to activate the "R Console" window, paste the
 command that is being sent to R, and, then, activate the GVim window. To
 activate the GVim window the plugin requires that the name of the file being
-edited be in the Windows title. This is the default on Vim if you have not set
-the option 'titlestring'.
+edited be in the GVim windows title. This is the default on Vim if you have
+not set the option 'titlestring'.
+
 
 6.7. The menu may not reflect some of your custom key bindings~
 
@@ -439,14 +467,14 @@ list:
 If Vim does not select your favorite terminal emulator, you may define it in 
 your |vimrc| by setting the variable vimrplugin_term, as shown below:
 >
-  let vimrplugin_term = "xterm"
+   let vimrplugin_term = "xterm"
 <
 							 *vimrplugin_term_cmd*
 If your terminal emulator is not listed above, or if you are not satisfied
 with the way your terminal emulator is called by the plugin, you may define in
 your |vimrc| the variable vimrplugin_term_cmd, as in the example below:
 >
-  let vimrplugin_term_cmd = "gnome-terminal --title R -e"
+   let vimrplugin_term_cmd = "gnome-terminal --title R -e"
 <
 Please, look at the manual of your terminal emulator to know how to call it.
 The last argument must be the one which precedes the command to be executed.
@@ -457,62 +485,61 @@ The last argument must be the one which precedes the command to be executed.
 To disable the underscore replacement with " <- " put the following in your
 |vimrc|:
 >
-  let vimrplugin_underscore = 1
+   let vimrplugin_underscore = 1
 <
 
 7.3. Vim as pager for R help (Linux/Unix only)~
 							 *vimrplugin_vimpager*
-							  *vimrplugin_docfile*
 							 *vimrplugin_editor_w*
-You can see R's help documents in Vim if you set vimrplugin_vimpager. The
-plugin key bindings will remain active in the documentation buffer, and, thus,
-you will be able to send commands to R as you do while editing an R script.
-You can, for example, use <LocalLeader>rh to jump to another R help document.
+							   *vimrplugin_help_w*
+7.3.1. Quick setup~
 
-R formats the help text with 72 columns and, thus, the plugin will always try
-to create windows with at least this number of columns. The valid values of
-vimrplugin_vimpager are:
+To see R documentation in a Vim's buffer, put in your |vimrc|:
+>
+   let vimrplugin_vimpager = "vertical"
+<
+The plugin key bindings will remain active in the documentation buffer, and,
+thus, you will be able to send commands to R as you do while editing an R
+script.  You can, for example, use <LocalLeader>rh to jump to another R help
+document.
+
+7.3.2. Details and other options:~
+
+The valid values of vimrplugin_vimpager are:
    
-   "vertical"  : Split the window vertically.
    "horizontal": Split the window horizontally.
-   "smart"     : Split the window vertically if the editor width is large
+   "vertical"  : Split the window vertically if the editor width is large
 		 enough; otherwise, split the window horizontally and attempt
 		 to set the window height to at least 20 lines.
-   "tab"       : Show the help document in a new tab.
+   "tab"       : Show the help document in a new tab. If there is already a
+                 tab with an R help document, use it.
+   "tabnew"    : Show the help document in a new tab.
    "no"        : Do not show R documentation in Vim. This is the default.
 
-The window will be considered large enough if its number of columns is larger
-than 72 + vimrplugin_editor_w. The default value of vimrplugin_editor_w is 66.
-To use Vim as pager for R, you have to edit your .Rprofile and add the
-following lines:
+The window will be considered large enough if it has more columns than
+vimrplugin_editor_w + vimrplugin_help_w. These variables control the minimum
+width of the editor window and the help window, and their default values are,
+respectively, 66 and 46.  Thus, if you want to have more control over Vim's
+behavior while opening R's documentations, you will want to set different
+values to some variables in your |vimrc|, as in the example:
 >
-   options(help_type = "text")
-   options(pager = "cat > /path/to/R-doc-file")
-<
-With the above value for "pager", R will save the documentation file in the
-specified path. Vim will try to read vimrplugin_docfile which has
-"~/.vim/r-plugin/Rdoc" as default value. Then you have to set the values of
-vimrplugin_vimpager and, optionally, vimrplugin_docfile and
-vimrplugin_editor_w in your |vimrc|. Example:
->
-   let vimrplugin_docfile = "/path/to/R-doc-file"
-   let vimrplugin_vimpager = "smart"
-   let vimrplugin_editor_w = 66
+   let vimrplugin_editor_w = 80
+   let vimrplugin_editor_h = 60
 <
 
-7.3. Number of R processes (Linux/Unix only)~
+7.4. Number of R processes (Linux/Unix only)~
 							*vimrplugin_nosingler*
 						  *vimrplugin_by_vim_instance*
 If you prefer that each Vim buffer uses its own R process, put the following
 option in your |vimrc|:
 >
-  let vimrplugin_nosingler = 1
+   let vimrplugin_nosingler = 1
 <
 If you prefer that each Vim instance calls its own R process and all of the
 instance's buffers send code to this R process while other Vim instances send
 code to other R processes then put the following in your |vimrc|:
 >
-  let vimrplugin_by_vim_instance = 1
+   let vimrplugin_by_vim_instance = 1
 >
 This is the default behavior when using Vim with the screen.vim plugin, and,
 thus, there is no need to use this option if already running Vim with the
@@ -527,18 +554,18 @@ instances you will have to use the --servername argument because screen will
 not differentiate between the names "GVIM1" and "GVIM10".
 
 
-7.4. R path~
+7.5. R path~
 							   *vimrplugin_r_path*
-Vim will ran the first R executable in the path. You can set an alternative R
+Vim will run the first R executable in the path. You can set an alternative R
 path in your |vimrc| as in the examples:
 >
-  let vimrplugin_r_path = "/path/2/my/preferred/R/version/bin"
-  let vimrplugin_r_path = "C:\\Program Files\\R\\R-2.11.1\\bin"
+   let vimrplugin_r_path = "/path/2/my/preferred/R/version/bin"
+   let vimrplugin_r_path = "C:\\Program Files\\R\\R-2.11.1\\bin"
 >
 On Windows, Vim will try to find the R install path in the Windows Registry.
 
 
-7.5. Arguments to R~
+7.6. Arguments to R~
 							   *vimrplugin_r_args*
 Set this option in your |vimrc| if you want to pass command line arguments to
 R at the startup. Example:
@@ -550,7 +577,7 @@ default value is "--sdi", but you may change it to "--mdi" if do not like the
 SDI style of the graphical user interface.
 
 
-7.6. Time necessary to build list of objects for omni completion~
+7.7. Time necessary to build list of objects for omni completion~
 							*vimrplugin_buildwait*
 If your system needs more than 120 seconds to build the list of objects for
 omni completion after you do the command |:RUpdateObjList|, then you should
@@ -559,16 +586,16 @@ set the value of |vimrplugin_buildwait| to a higher value. Example:
    let vimrplugin_buildwait = 240
 >
 
-7.7. How to automatically open the .Rout file~
+7.8. How to automatically open the .Rout file~
 							*vimrplugin_routnotab*
 After the command \ao, vim will save the current buffer if it has any pending
 changes, run R CMD BATCH on the current file and show the resulting .Rout file
 in a new tab. If you prefer that the file is open in a new split window, put
 in your |vimrc|:
 >
-  let vimrplugin_notab = 1
+   let vimrplugin_notab = 1
 <
-7.8. Sleep time (Windows only)~
+7.9. Sleep time (Windows only)~
 							*vimrplugin_sleeptime*
 The plugin gives to R a small amount of time to process the paste command.
 The default value is 0.2 second, but you should experiment different values.
@@ -577,30 +604,32 @@ The example show how to adjust the value of sleeptime in your |vimrc|:
    let vimrplugin_sleeptime = 0.1
 <
 
-7.8. Screen configuration (Linux/Unix only)~
+7.10. Screen configuration (Linux/Unix only)~
 						       *vimrplugin_noscreenrc*
 Vim runs screen with a special configuration file. If you want to use
 your own ~/.screenrc, put in your |vimrc|:
 >
-  let vimrplugin_noscreenrc = 1
+   let vimrplugin_noscreenrc = 1
 <
 
-7.9. Integration with screen.vim (Linux/Unix only)~
+7.11. Integration with screen.vim (Linux/Unix only)~
 						     *vimrplugin_screenplugin*
-By default, the r-plugin does not use the screen.vim plugin, written by Eric
-Van Dewoestine. If you prefer to use both plugins at the same time, download
-and install the screen.vim (version 0.8 or above) from:
+By default, r-plugin will use the screen.vim plugin if it is installed.  If
+you prefer to use both plugins at the same time, download and install the
+screen.vim (version 0.8 or above) from:
 
-  http://www.vim.org/scripts/script.php?script_id=2711
+   http://www.vim.org/scripts/script.php?script_id=2711
+
+Note: If the Conque Shell plugin is also installed it will be used by default.
 
 Using both plugins at the same time is especially useful for users who may
 prefer to use Vim and R in a terminal emulator, rather than using the
 graphical interface provided by GVim.
 
-To integrate the r-plugin with screen.vim you will need to add the following 
-to your |vimrc|:
+If you prefer do not integrate the screen.vim plugin with the r-plugin you
+will need to add the following to your |vimrc|:
 >
-  let vimrplugin_screenplugin = 1
+   let vimrplugin_screenplugin = 0
 <
 The screen.vim plugin also supports tmux, which allows you to split the
 terminal vertically. Look at |screen-intro| for details.
@@ -640,34 +669,47 @@ other default options may not be what you want. Please read screen
 documentation to know how to configure it. Below is a sample ~/.screenrc you
 may consider as a starting point to create your own:
 >
-  msgwait 0
-  termcapinfo xterm* 'ti@:te@'
-  vbell off
-  term screen-256color
+   msgwait 0
+   termcapinfo xterm* 'ti@:te@'
+   vbell off
+   term screen-256color
 <
 
-7.10. Integration with Conque Shell plugin (Linux/Unix only)~
+7.12. Integration with Conque Shell plugin (Linux/Unix only)~
 						     *vimrplugin_conqueplugin*
 						     *vimrplugin_conquevsplit*
-Note: The support to Conque Shell plugin is unfinished. Use these options if
-you want to help with its development.
+Note: Nico Raffo's Conque Shell plugin is unfinished, but its use already has
+some advantages: the ability to edit R's output, and the syntax highlighting
+of the output.
 
-The plugin will use the Conque Shell plugin, written by Nico Raffo, if you put
-the folowing line in your |vimrc|:
+By default, the Conque Shell plugin will be used if installed.  If you
+installed the Conque Shell but don't want to use it with the Vim-R-plugin, you
+should put in your |vimrc|:
 >
-   let vimrplugin_conqueplugin = 1
+   let vimrplugin_conqueplugin = 0
 <
 The Conque Shell plugin is available at:
 
    http://www.vim.org/scripts/script.php?script_id=2771
 
-By default, Conque Shell will split the window horizontally. Put the following
-in your |vimrc| if you prefer to split the window vertically:
+By default, the window will be split horizontally. Put the following in your
+|vimrc| if you prefer to split the window vertically:
 >
-  let vimrplugin_conquevsplit = 1
+   let vimrplugin_conquevsplit = 1
 <
 
-7.11. Special R functions~
+7.13 Show list elements in object browser~
+							  *vimrplugin_open_df*
+							*vimrplugin_open_list*
+By default, the elements of data.frames are shown in the object browser, but
+not the elements of other types of lists. You can put the following in your
+|vimrc| to change this behavior:
+>
+   let vimrplugin_open_df = 0
+   let vimrplugin_open_list = 1
+<
+
+7.14. Special R functions~
 						      *vimrplugin_listmethods*
 						      *vimrplugin_specialplot*
 The plugin includes the file ~/.vim/r-plugin/specialfuns.R which may wrap the
@@ -679,7 +721,7 @@ to edit your ~/.Rprofile and add the following line:
 Then, follow the instructions below to activate the new functions.
 
 
-7.11.1. List methods arguments~
+7.14.1. List methods arguments~
 
 The R function args() list the arguments of a function, but not the arguments
 of its methods. If you want that the plugin calls the function
@@ -689,7 +731,7 @@ of its methods. If you want that the plugin calls the function
    let vimrplugin_listmethods = 1
 <
 
-7.11.2. Change plot of numeric vectors~
+7.14.2. Change plot of numeric vectors~
 By default, R makes a scatterplot of numeric vectors. The function .vim.plot()
 do both a histogram and a boxplot. The function can be called by the plugin
 after <LocalLeader>rg if you edit your ~/.Rprofile as explained above and put
@@ -698,24 +740,24 @@ the following line in your |vimrc|:
    let vimrplugin_specialplot = 1
 <
 
-7.12. maxdeparse~
+7.15. maxdeparse~
 						       *vimrplugin_maxdeparse*
 You can set the argument maxdeparse to be passed to R's source() function.
 Example:
 >
-  let vimrplugin_maxdeparse = 300
+   let vimrplugin_maxdeparse = 300
 <
 
-7.13. LaTeX command~
+7.16. LaTeX command~
 							 *vimrplugin_latexcmd*
 By default, Vim calls pdflatex to produce a pdf document from the .tex file
 produced by the R Sweave command. You can use the option vimrplugin_latexcmd
 to change this behavior. Example:
 >
-  let vimrplugin_latexcmd = "latex"
+   let vimrplugin_latexcmd = "latex"
 <
 
-7.14. Never unmake the R menu and tool bar buttons~
+7.17. Never unmake the R menu and tool bar buttons~
 						*vimrplugin_never_unmake_menu*
 Use this option if you want that the menu item R and the R related tool bar
 buttons are not deleted when you change from one buffer to another, for
@@ -724,7 +766,7 @@ example, when go from an .R file to a .txt one:
    let vimrplugin_never_unmake_menu = 1
 <
 
-7.15. Map 'r'~
+7.18. Map 'r'~
 							    *vimrplugin_map_r*
 Some users may already be familiar with the key bindings from earlier releases
 of the r-plugin. If the variable |vimrplugin_map_r| exists, the plugin will 
@@ -732,15 +774,15 @@ map the letter 'r' to send lines to R when there are visually selected lines,
 for compatibility with the original plugin. To activate this option, insert 
 the following into |vimrc|:
 >
-  let vimrplugin_map_r = 1
+   let vimrplugin_map_r = 1
 <
 You may want to add the following three lines to your |vimrc| which were in 
 the original plugin and will increase compatibility with code edited with
 Emacs:
 >
-  set expandtab
-  set shiftwidth=4
-  set tabstop=8
+   set expandtab
+   set shiftwidth=4
+   set tabstop=8
 <
 
 ------------------------------------------------------------------------------
@@ -753,9 +795,9 @@ insert mode, and visual mode.
 
 To customize a key binding you should put in your |vimrc| something like:
 >
-  nmap <F2> <Plug>RStart
-  imap <F2> <Plug>RStart
-  vmap <F2> <Plug>RStart
+   nmap <F2> <Plug>RStart
+   imap <F2> <Plug>RStart
+   vmap <F2> <Plug>RStart
 <
 The above example shows how you can increase compatibility with old versions
 of the r-plugin, by changing the key binding used to start R from
@@ -765,18 +807,21 @@ Only the custom key bindings for Normal mode are shown in Vim's menu, but you
 can type |:map| to see the complete list of current mappings, and below is the
 list of the names for custom key bindings:
 >
-  RBuildTags             RESendSelection           RSendLine
-  RClearAll              RHelp                     RSendMBlock
-  RClearConsole          RListSpace                RSendSelection
-  RClose                 RMakePDF                  RSetwd
-  RCustomStart           RObjectNames              RShowArgs
-  RDSendFunction         RObjectPr                 RShowEx
-  RDSendLine             RObjectStr                RSPlot
-  RDSendSelection        RPlot                     RStart
-  REDSendMBlock          RSaveClose                RStop
-  REDSendSelection       RSendFile                 RSummary
-  RESendFile             RSendFunction             RSweave
-  RESendMBlock           RSendLAndOpenNewOne       RVanillaStart
+   RClearAll                  RESendMBlock                RSendLine
+   RClearConsole              RESendParagraph             RSendMBlock
+   RClose                     RESendSelection             RSendParagraph
+   RCustomStart               RHelp                       RSendSelection
+   RDSendFunction             RListSpace                  RSetwd
+   RDSendLine                 RMakePDF                    RShowArgs
+   RDSendMBlock               RObjectNames                RShowEx
+   RDSendParagraph            RObjectPr                   RShowRout
+   RDSendSelection            RObjectStr                  RStart
+   REDSendFunction            RPlot                       RSummary
+   REDSendMBlock              RSPlot                      RSweave
+   REDSendParagraph           RSaveClose                  RUpdateObjBrowser
+   REDSendSelection           RSendFile                   RVanillaStart
+   RESendFile                 RSendFunction
+   RESendFunction             RSendLAndOpenNewOne
 <
 The plugin also contains a function called RAction which allows you to build
 ad-hoc commands to R. This function takes the name of an R function such as
@@ -793,12 +838,12 @@ binding that would allow you to rapidly get the levels of the object under
 your cursor. Add the following to your |vimrc| to have an easy way to pass R
 the levels command.
 >
-  map <LocalLeader>rk :call RAction("levels")<CR>
+   map <LocalLeader>rk :call RAction("levels")<CR>
 <
 then (assuming that the leader key is "\") if you type \rk R will receive the
 command
 >
-  levels(myObject)
+   levels(myObject)
 <
 You should replace <LocalLeader>rk with the key binding that you want to use
 and "levels" with the R function that you want to call.
@@ -811,48 +856,52 @@ The following files are part of the plugin and should be in your ~/.vim
 directory after the installation:
 
   
-  autoload/rcomplete.vim
-  bitmaps/RClearAll.bmp
-  bitmaps/RClearAll.png
-  bitmaps/RClear.bmp
-  bitmaps/RClear.png
-  bitmaps/RClose.bmp
-  bitmaps/RClose.png
-  bitmaps/ricon.png
-  bitmaps/ricon.xbm
-  bitmaps/RListSpace.bmp
-  bitmaps/RListSpace.png
-  bitmaps/RSendBlock.bmp
-  bitmaps/RSendBlock.png
-  bitmaps/RSendFile.bmp
-  bitmaps/RSendFile.png
-  bitmaps/RSendFunction.bmp
-  bitmaps/RSendFunction.png
-  bitmaps/RSendLine.bmp
-  bitmaps/RSendLine.png
-  bitmaps/RSendParagraph.bmp
-  bitmaps/RSendParagraph.png
-  bitmaps/RSendSelection.bmp
-  bitmaps/RSendSelection.png
-  bitmaps/RStart.bmp
-  bitmaps/RStart.png
-  doc/r-plugin.txt
-  ftdetect/r.vim
-  ftplugin/rhelp.vim
-  ftplugin/rnoweb.vim
-  ftplugin/r.vim
-  indent/r.vim
-  r-plugin/build_omni_list.R
-  r-plugin/etags2ctags.R
-  r-plugin/functions.vim
-  r-plugin/omnilist
-  r-plugin/rpager.sh
-  r-plugin/rperl.vim
-  r-plugin/rpython.vim
-  r-plugin/specialfuns.R
-  r-plugin/vimActivate.js
-  syntax/rout.vim
-  syntax/r.vim
+   autoload/rcomplete.vim
+   autoload/rplugin.vim
+   bitmaps/RClearAll.bmp
+   bitmaps/RClearAll.png
+   bitmaps/RClear.bmp
+   bitmaps/RClear.png
+   bitmaps/RClose.bmp
+   bitmaps/RClose.png
+   bitmaps/ricon.png
+   bitmaps/ricon.xbm
+   bitmaps/RListSpace.bmp
+   bitmaps/RListSpace.png
+   bitmaps/RSendBlock.bmp
+   bitmaps/RSendBlock.png
+   bitmaps/RSendFile.bmp
+   bitmaps/RSendFile.png
+   bitmaps/RSendFunction.bmp
+   bitmaps/RSendFunction.png
+   bitmaps/RSendLine.bmp
+   bitmaps/RSendLine.png
+   bitmaps/RSendParagraph.bmp
+   bitmaps/RSendParagraph.png
+   bitmaps/RSendSelection.bmp
+   bitmaps/RSendSelection.png
+   bitmaps/RStart.bmp
+   bitmaps/RStart.png
+   doc/r-plugin.txt
+   ftdetect/r.vim
+   ftplugin/rhelp.vim
+   ftplugin/rnoweb.vim
+   ftplugin/r.vim
+   ftplugin/rbrowser.vim
+   indent/r.vim
+   r-plugin/build_omni_list.R
+   r-plugin/etags2ctags.R
+   r-plugin/functions.vim
+   r-plugin/omnilist
+   r-plugin/vimbrowser.R
+   r-plugin/rpager.sh
+   r-plugin/rperl.vim
+   r-plugin/rpython.vim
+   r-plugin/specialfuns.R
+   r-plugin/vimActivate.js
+   syntax/rbrowser.vim
+   syntax/rout.vim
+   syntax/r.vim
 
 8 directories, 39 files
 
@@ -861,21 +910,21 @@ directory after the installation:
 							       *r-plugin-tips*
 
 10.1. Is it possible to stop R from within Vim?~
-  Sorry, it is not possible. You have to press ^C into R's terminal emulator.
+Sorry, it is not possible. You have to press ^C into R's terminal emulator.
 
 
 10.2. Html help and custom pager~
 
 If you prefer to see help pages in a html browser, put in your ~/.Rprofile:
 >
-  options(help_type = "html")
+   options(help_type = "html")
 <
 If you don't want to use a html browser, you may want to use less in a
 separate terminal emulator as the default pager for R's help. You can use the
 script ~/.vim/r-plugin/rpager.sh (which will call less) by putting in your
 ~/.Rprofile:
 >
-  options(pager="~/.vim/r-plugin/rpager.sh")
+   options(pager="~/.vim/r-plugin/rpager.sh")
 
 This script can be easily modified to use your favorite terminal emulator. The
 script contains options for several popular emulators such as gnome-terminal
@@ -883,79 +932,84 @@ and konsole but defaults to xterm.
 
 
 10.3. How can I make the plugin active for all file types?~
-  If you want to make most of the plugin functions available for any file
-  type, create a symbolic link to ftplugin/r.vim in the plugin directory. For
-  example, if you installed the plugin in your home directory do the following
-  commands in a terminal emulator:
+If you want to make most of the plugin functions available for any file type,
+create a symbolic link to ftplugin/r.vim in the plugin directory. For example,
+if you installed the plugin in your home directory do the following commands
+in a terminal emulator:
 >
-  cd ~/.vim/plugin
-  ln -s ../ftplugin/r.vim
+   cd ~/.vim/plugin
+   ln -s ../ftplugin/r.vim
 <
 
 10.4. How do marked blocks work?~
-  Vim allows several marks (bookmarks). The most commonly used marks are the
-  lowercase alphabet letters.  If the cursor is between any two marks, the
-  plugin will send all of the lines between them to R.
+Vim allows several marks (bookmarks). The most commonly used marks are the
+lowercase alphabet letters.  If the cursor is between any two marks, the
+plugin will send all of the lines between them to R.
   
-  To make it easier to remember where blocks begin and end, we recommended 
-  that you use the showmarks plugin available at:
+To make it easier to remember where blocks begin and end, we recommended that
+you use the showmarks plugin available at:
 
-  http://www.vim.org/scripts/script.php?script_id=152
+   http://www.vim.org/scripts/script.php?script_id=152
   
-  This plugin makes it possible to visually manage your marks. You may want 
-  to add the following two lines to your |vimrc| to customize showmarks 
-  behavior:
+This plugin makes it possible to visually manage your marks. You may want to
+add the following two lines to your |vimrc| to customize showmarks behavior:
 >
-  let marksCloseWhenSelected = 0
-  let showmarks_include = "abcdefghijklmnopqrstuvwxyz"
+   let marksCloseWhenSelected = 0
+   let showmarks_include = "abcdefghijklmnopqrstuvwxyz"
 <
 
 10.5. Easier key bindings for most used commands~
-  The most used commands from vim-r-plugin probably are "Send line" and "Send
-  selection". You may find it a good idea to map them to the space bar in your
-  |vimrc| (suggestion made by Iago Mosqueira):
+The most used commands from vim-r-plugin probably are "Send line" and "Send
+selection". You may find it a good idea to map them to the space bar in your
+|vimrc| (suggestion made by Iago Mosqueira):
 >
-  vmap <Space> <Plug>RDSendSelection
-  nmap <Space> <Plug>RDSendLine
+   vmap <Space> <Plug>RDSendSelection
+   nmap <Space> <Plug>RDSendLine
 <
 
 10.6. Use "," as local map leader~
-  People writing Rnoweb documents may find it better to use a comma as local
-  leader instead of the default backslash:
+People writing Rnoweb documents may find it better to use a comma as local
+leader instead of the default backslash:
 >
-  let maplocalleader = ","
+   let maplocalleader = ","
 <
 
 10.7. Use a tags file to jump to function definitions~
-  Vim can jump to a function definition if it finds a "tags" file with the
-  information about the place where the function is defined.  To generate the
-  tags file, use the R function rtags(), which will build an Emacs tags file.
-  If Vim was compiled with the feature |emacs_tags|, it will be able to read
-  the tags file. Otherwise, you can use the function etags2ctags() from the
-  script located at ~/.vim/r-plugin/etags2ctags.R to convert the Emacs tags
-  file into a Vim's one. To jump to a function definition, put the cursor over
-  the function name and hit CTRL-]. Please, read |tagsrch.txt| for details on
-  how to use tags files, specially the section |tags-option|.
+Vim can jump to a function definition if it finds a "tags" file with the
+information about the place where the function is defined.  To generate the
+tags file, use the R function rtags(), which will build an Emacs tags file.
+If Vim was compiled with the feature |emacs_tags|, it will be able to read the
+tags file. Otherwise, you can use the function etags2ctags() from the script
+located at ~/.vim/r-plugin/etags2ctags.R to convert the Emacs tags file into a
+Vim's one. To jump to a function definition, put the cursor over the function
+name and hit CTRL-]. Please, read |tagsrch.txt| for details on how to use tags
+files, specially the section |tags-option|.
 
 10.8. Run your Makefile from within R~
-  Do you have many Rnoweb files included in a master tex or Rnoweb file and
-  use a Makefile to build the pdf? You may consider it useful to put the
-  following line in your |vimrc|:
+Do you have many Rnoweb files included in a master tex or Rnoweb file and use
+a Makefile to build the pdf? You may consider it useful to put the following
+line in your |vimrc|:
 >
-  nmap <LocalLeader>sm :update<CR>:call SendCmdToScreen('system("make")')<CR>
+   nmap <LocalLeader>sm :update<CR>:call SendCmdToScreen('system("make")')<CR>
 <
 
 10.9. Group windows with compiz~
-  If you are using Compiz, it may be easier to work with the plugin if the
-  various related windows (editor, terminal, and graphics window) are grouped
-  because they will be raised together when one of them receives the focus.
-  You may need CompizConfig Settings Manager installed to enable this feature
-  (look at the "Window Management" section for "Group and Tab Windows").
+If you are using Compiz, it may be easier to work with the plugin if the
+various related windows (editor, terminal, and graphics window) are grouped
+because they will be raised together when one of them receives the focus.  You
+may need CompizConfig Settings Manager installed to enable this feature (look
+at the "Window Management" section for "Group and Tab Windows").
 
 
 ------------------------------------------------------------------------------
 11. News~
 							       *r-plugin-news*
+101015 (2010-10-15)
+ * New feature: Object browser.
+ * Conque Shell will be used if installed unless explicitly told otherwise in
+   the vimrc.
+ * New valid value for vimrplugin_vimpager: "tabnew"
+
 100923 (2010-09-23)
  * New option: vimrplugin_vimpager.
  * Do not let Vim translate "File" in R menu.
