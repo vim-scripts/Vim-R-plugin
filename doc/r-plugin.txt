@@ -6,7 +6,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria
 
-Version: 101015
+Version: 101016
 
 For Vim version 7.2 and above
 
@@ -293,9 +293,11 @@ is enabled by default.
 You have to do \ro to either start or updated the object browser. If an object
 has the attribute "label", it will be displayed in the object browser. The
 options |vimrplugin_open_df| and |vimrplugin_open_list| control whether the
-elements of data.frames and lists are shown. In the object browser window, you
-can either press <Enter> or double click (GVim only) over a data.frame or list
-to show/hide its elements.
+elements of data.frames and lists are shown. In the object browser window,
+while in Normal mode, you can either press <Enter> or double click (GVim only)
+over a data.frame or list to show/hide its elements. Note: Ascii characters
+are used to draw lines if the v:lang variable does not include the substring
+"UTF-8" (Microsoft Windows doesn't use UTF-8 as its locale).
 
 Please see |r-plugin-custom-key-bindings| to learn how to customize the key
 bindings without editing the plugin directly, and |vimrplugin_underscore| to
@@ -697,6 +699,13 @@ By default, the window will be split horizontally. Put the following in your
 >
    let vimrplugin_conquevsplit = 1
 <
+You may also want to put the following Conque options in your |vimrc| (look at
+the Conque Shell documentations for details):
+>
+   let ConqueTerm_ReadUnfocused = 1
+   let ConqueTerm_CWInsert = 1
+   let ConqueTerm_Color = 0
+<
 
 7.13 Show list elements in object browser~
 							  *vimrplugin_open_df*
@@ -1004,6 +1013,9 @@ at the "Window Management" section for "Group and Tab Windows").
 ------------------------------------------------------------------------------
 11. News~
 							       *r-plugin-news*
+101016 (2010-10-16)
+ * Minor bug fixes in the object browser.
+
 101015 (2010-10-15)
  * New feature: Object browser.
  * Conque Shell will be used if installed unless explicitly told otherwise in

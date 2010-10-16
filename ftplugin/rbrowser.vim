@@ -16,7 +16,7 @@
 "
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          
-" Last Change: Tue Oct 12, 2010  02:26PM
+" Last Change: Sat Oct 16, 2010  01:28PM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -64,7 +64,7 @@ function! RBrowserMakeLine(key, prefix)
   elseif cls == "logical"
     let line = a:prefix . '%' . a:key . '	'
   else
-    let line = a:prefix . a:key . '	'
+    let line = a:prefix . ' ' . a:key . '	'
   endif
 
   " If the object's label exists, then append it to the end of the line
@@ -162,5 +162,5 @@ function! RBrowserToogleValue()
   echon
 endfunction
 
-map <buffer> <CR> :call RBrowserToogleValue()<CR>
-map <buffer> <2-LeftMouse> :call RBrowserToogleValue()<CR>
+nmap <buffer> <CR> :call RBrowserToogleValue()<CR>
+nmap <buffer> <2-LeftMouse> :call RBrowserToogleValue()<CR>

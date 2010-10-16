@@ -20,7 +20,12 @@
     .vim.browser.curlist <<- paste(.vim.browser.curlist, x.name, sep = "-")
     cat(", 'items': {", sep = "")
     x.names <- names(x)
-    len <- length(x)
+
+    # Don't include elements of lists with duplicated names
+    x.names.dup <- duplicated(x.names)
+    if(sum(x.names.dup) > 0) x.names <- x.names[!x.names.dup]
+
+    len <- length(x.names)
     newlistnames <- paste('"', paste(x.names, collapse = '", "'), '"', sep = "")
 
     .vim.browser.order <<- paste(.vim.browser.order, "'", .vim.browser.curlist, "': [", newlistnames, "], ", sep = "")
@@ -47,3 +52,4 @@ cat("let b:list_order = {", .vim.browser.order, "}\n", sep = "")
 sink()
 rm(.i, .vim.browser.curlist, .vim.browser.order, .vim.browserline)
 unlink(paste(Sys.getenv("VIMRPLUGIN_TMPDIR"), "/objbrowserlock", sep = ""))
+

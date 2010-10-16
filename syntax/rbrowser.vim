@@ -1,7 +1,13 @@
 " Vim syntax file
 " Language:	Object browser of Vim-R-plugin
 " Maintainer:	Jakson Alves de Aquino (jalvesaq@gmail.com)
-" Last Change:	Tue Oct 12, 2010  08:59AM
+" Last Change:	Sat Oct 16, 2010  10:24AM
+
+if exists("b:current_syntax")
+  finish
+endif
+
+setlocal iskeyword=@,48-57,_,.
 
 syn match rbrowserNumeric	"{.*	" contains=rbrowserDelim,rbrowserTab
 syn match rbrowserCharacter	/".*	/ contains=rbrowserDelim,rbrowserTab
