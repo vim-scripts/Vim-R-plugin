@@ -49,7 +49,11 @@ for(.i in ls()){
 cat("}\n")
 .vim.browser.order <- sub(", $", "", .vim.browser.order)
 cat("let b:list_order = {", .vim.browser.order, "}\n", sep = "")
+.vim.liblist <- search()
+.vim.liblist <- .vim.liblist[grep("package:", .vim.liblist)]
+.vim.liblist <- sub("package:", "", .vim.liblist)
+cat("let b:liblist = ['", paste(.vim.liblist, collapse = "', '"), "']\n", sep = "") 
 sink()
-rm(.i, .vim.browser.curlist, .vim.browser.order, .vim.browserline)
+rm(.i, .vim.browser.curlist, .vim.liblist, .vim.browser.order, .vim.browserline)
 unlink(paste(Sys.getenv("VIMRPLUGIN_TMPDIR"), "/objbrowserlock", sep = ""))
 

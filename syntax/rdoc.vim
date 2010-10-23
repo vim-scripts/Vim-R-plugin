@@ -1,11 +1,19 @@
 " Vim syntax file
 " Language:	Test version of R documentation
 " Maintainer:	Jakson A. Aquino <jalvesaq@gmail.com>
-" Last Change:	Sun Sep 19, 2010  09:57PM
+" Last Change:	Wed Oct 20, 2010  01:04PM
 
 if exists("b:current_syntax")
   finish
 endif
+
+if !exists("rdoc_minlines")
+  let rdoc_minlines = 200
+endif
+if !exists("rdoc_maxlines")
+  let rdoc_maxlines = 2 * rdoc_minlines
+endif
+exec "syn sync minlines=" . rdoc_minlines . " maxlines=" . rdoc_maxlines
 
 syn match  rdocTitle	      "^[A-Z].*:"
 syn match  rdocTitle "^\S.*R Documentation$"

@@ -1,7 +1,7 @@
 " Vim completion script
 " Language:    R
 " Maintainer:  Jakson Alves de Aquino <jalvesaq@gmail.com>
-" Last Change: Tue Sep 28, 2010  10:11PM
+" Last Change: Fri Oct 22, 2010  06:01PM
 "
 
 fun! rcomplete#CompleteR(findstart, base)
@@ -21,7 +21,7 @@ fun! rcomplete#CompleteR(findstart, base)
     if strlen(a:base) == 0
       return res
     endif
-    let flines = b:flines1 + g:rplugin_globalenvlines
+    let flines = g:rplugin_liblist + g:rplugin_globalenvlines
     " The char '$' at the end of 'a:base' is treated as end of line, and
     " the pattern is never found in 'line'.
     let newbase = '^' . substitute(a:base, "\\$$", "", "")
@@ -31,9 +31,7 @@ fun! rcomplete#CompleteR(findstart, base)
         if a:base !~ '\$' && line =~ '\$'
           continue
         endif
-	"let tmp1 = split(line)
-	"let tmp2 = {'word': tmp1[0], 'menu': tmp1[1] . ' ' . tmp1[2]}
-	let tmp1 = split(line,':')
+	let tmp1 = split(line, ':')
 	let tmp2 = {'word': tmp1[0], 'menu': tmp1[1] . ' ' . tmp1[2], 'info': tmp1[3]}
 	call add(res, tmp2)
       endif

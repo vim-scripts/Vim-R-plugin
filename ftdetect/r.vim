@@ -1,4 +1,8 @@
 
+if exists("disable_r_ftplugin")
+  finish
+endif
+
 autocmd BufNewFile,BufRead *.Rprofile set ft=r
 autocmd BufRead *.Rhistory set ft=r
 autocmd BufNewFile,BufRead *.r set ft=r

@@ -19,18 +19,18 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Thu Oct 14, 2010  10:23PM
+" Last Change: Sat Oct 23, 2010  04:25PM
 "
 " Please see doc/r-plugin.txt for usage details.
 "==========================================================================
 
 " Only do this when not yet done for this buffer
-if exists("b:did_ftplugin")
+if exists("b:did_r_ftplugin") || exists("disable_r_ftplugin")
   finish
 endif
 
 " Don't load another plugin for this buffer
-let b:did_ftplugin = 1
+let b:did_r_ftplugin = 1
 
 function! RWarningMsg(wmsg)
   echohl WarningMsg
@@ -49,18 +49,19 @@ endif
 " ~/vimfiles and this is the first directory of runtimepath.
 let b:user_vimfiles = split(&runtimepath, ",")[0]
 
-" b:r_plugin_home should be the directory where the r-plugin files are.  For
+" g:r_plugin_home should be the directory where the r-plugin files are.  For
 " users following the installation instructions it will be at ~/.vim or
 " ~/vimfiles, that is, the same value of b:user_vimfiles. However the
 " variables will have different values if the plugin is installed somewhere
 " else in the runtimepath.
-let b:r_plugin_home = expand("<sfile>:h:h")
+let g:r_plugin_home = expand("<sfile>:h:h")
 
 
 " Automatically rebuild the file listing .GlobalEnv objects for omni
 " completion if the user press <C-X><C-O> and we know that the file either was
 " not created yet or is outdated.
-let b:needsnewomnilist = 1
+let b:needsnewomnilist = 0
+let g:rplugin_globalenvlines = []
 
 " From changelog.vim
 let s:userlogin = system('whoami')
@@ -74,17 +75,16 @@ else
 endif
 
 if has("gui_win32")
-  let b:vimjspath = b:r_plugin_home . "\\r-plugin\\vimActivate.js"
-  let b:r_plugin_home = substitute(b:r_plugin_home, "\\", "/", "g")
+  let g:rplugin_jspath = g:r_plugin_home . "\\r-plugin\\vimActivate.js"
+  let g:r_plugin_home = substitute(g:r_plugin_home, "\\", "/", "g")
   let b:user_vimfiles = substitute(b:user_vimfiles, "\\", "/", "g")
   if !has("python")
     call RWarningMsg("Python interface must be enabled to run Vim-R-Plugin.")
     call RWarningMsg("Please do  ':h r-plugin-installation'  for details.")
     call input("Press <Enter> to continue. ")
-    let b:needsnewomnilist = 0
     finish
   endif
-  exe "source " . b:r_plugin_home . "/r-plugin/rpython.vim"
+  exe "source " . g:r_plugin_home . "/r-plugin/rpython.vim"
   if !exists("g:rplugin_rpathadded")
     if exists("g:vimrplugin_r_path")
       let $PATH = g:vimrplugin_r_path . ";" . $PATH
@@ -111,7 +111,6 @@ if has("gui_win32")
   if !exists("g:vimrplugin_sleeptime")
     let g:vimrplugin_sleeptime = 0.02
   endif
-  let g:vimrplugin_vimpager = "no"
 else
   if !executable('screen') && !exists("g:ConqueTerm_Version")
     if has("python")
@@ -152,11 +151,13 @@ call RSetDefaultValue("g:vimrplugin_noscreenrc",   0)
 call RSetDefaultValue("g:vimrplugin_routnotab",    0) 
 call RSetDefaultValue("g:vimrplugin_editor_w",    66)
 call RSetDefaultValue("g:vimrplugin_help_w",      46)
+call RSetDefaultValue("g:vimrplugin_objbr_w",     40)
 call RSetDefaultValue("g:vimrplugin_buildwait",  120)
 call RSetDefaultValue("g:vimrplugin_by_vim_instance", 0)
 call RSetDefaultValue("g:vimrplugin_never_unmake_menu", 0)
-call RSetDefaultValue("g:vimrplugin_vimpager",       "'no'")
+call RSetDefaultValue("g:vimrplugin_vimpager",       "'vertical'")
 call RSetDefaultValue("g:vimrplugin_latexcmd", "'pdflatex'")
+call RSetDefaultValue("g:vimrplugin_objbr_place", "'console,right'")
 
 if isdirectory("/tmp")
   let $VIMRPLUGIN_TMPDIR = "/tmp/r-plugin-" . s:userlogin
@@ -263,8 +264,8 @@ if !filereadable(b:libs_omni_filename)
     let x = readfile("/usr/share/vim/addons/r-plugin/omnilist")
     call writefile(x, b:libs_omni_filename)
   else
-    if filereadable(b:r_plugin_home . "/r-plugin/omnilist")
-      let x = readfile(b:r_plugin_home . "/r-plugin/omnilist")
+    if filereadable(g:r_plugin_home . "/r-plugin/omnilist")
+      let x = readfile(g:r_plugin_home . "/r-plugin/omnilist")
       call writefile(x, b:libs_omni_filename)
     else
       call writefile([], b:libs_omni_filename)
@@ -272,9 +273,14 @@ if !filereadable(b:libs_omni_filename)
   endif
 endif
 
+" Minimum width for the object browser
+if g:vimrplugin_objbr_w < 9
+ let g:vimrplugin_objbr_w = 9
+endif
+
 " Keeps the libraries object list in memory to avoid the need of reading the file
 " repeatedly:
-let b:flines1 = readfile(b:libs_omni_filename)
+let g:rplugin_liblist = readfile(b:libs_omni_filename)
 
 
 " Control the menu 'R' and the tool bar buttons
@@ -298,10 +304,14 @@ endif
 call writefile([], b:globalenvlistfile)
 
 " Choose a terminal (code adapted from screen.vim)
-if has("gui_win32")
+if has("gui_win32") || g:vimrplugin_conqueplugin == 1
+  " No external terminal emulator will be called, so any value is good
   let g:vimrplugin_term = "xterm"
 else
-  let s:terminals = ['gnome-terminal', 'konsole', 'xfce4-terminal', 'iterm', 'Eterm', 'rxvt', 'aterm', 'xterm' ]
+  let s:terminals = ['gnome-terminal', 'konsole', 'xfce4-terminal', 'Eterm', 'rxvt', 'aterm', 'xterm']
+  if has('mac')
+    let s:terminals = ['iTerm', 'Terminal.app'] + s:terminals
+  endif
   if !exists("g:vimrplugin_term")
     for term in s:terminals
       if executable(term)
@@ -326,11 +336,11 @@ if g:vimrplugin_term == "gnome-terminal" || g:vimrplugin_term == "xfce4-terminal
 endif
 
 if g:vimrplugin_term == "konsole"
-  let b:term_cmd = "konsole --workdir '" . expand("%:p:h") . "' --icon " . b:r_plugin_home . "/bitmaps/ricon.png -e"
+  let b:term_cmd = "konsole --workdir '" . expand("%:p:h") . "' --icon " . g:r_plugin_home . "/bitmaps/ricon.png -e"
 endif
 
 if g:vimrplugin_term == "Eterm"
-  let b:term_cmd = "Eterm --icon " . b:r_plugin_home . "/bitmaps/ricon.png -e"
+  let b:term_cmd = "Eterm --icon " . g:r_plugin_home . "/bitmaps/ricon.png -e"
 endif
 
 if g:vimrplugin_term == "rxvt" || g:vimrplugin_term == "aterm"
@@ -338,7 +348,7 @@ if g:vimrplugin_term == "rxvt" || g:vimrplugin_term == "aterm"
 endif
 
 if g:vimrplugin_term == "xterm" || g:vimrplugin_term == "uxterm"
-  let b:term_cmd = g:vimrplugin_term . " -xrm '*iconPixmap: " . b:r_plugin_home . "/bitmaps/ricon.xbm' -e"
+  let b:term_cmd = g:vimrplugin_term . " -xrm '*iconPixmap: " . g:r_plugin_home . "/bitmaps/ricon.xbm' -e"
 endif
 
 " Override default settings:
@@ -371,7 +381,7 @@ function! ReplaceUnderS()
   let j = col(".")
   let s = getline(".")
   if j > 3 && s[j-3] == "<" && s[j-2] == "-" && s[j-1] == " "
-    execute "normal! 3h3xr_"
+    exe "normal! 3h3xr_"
     return
   endif
   let isString = 0
@@ -387,9 +397,9 @@ function! ReplaceUnderS()
     let i += 1
   endwhile
   if isString == 0
-    execute "normal! a <- "
+    exe "normal! a <- "
   else
-    execute "normal! a_"
+    exe "normal! a_"
   endif
 endfunction
 
@@ -458,8 +468,12 @@ function! StartR(whatr)
   endif
 
   if has("gui_win32")
-    call StartRPy()
-    return
+    if g:vimrplugin_conqueplugin == 0
+      call StartRPy()
+      return
+    else
+      let b:R = "Rterm.exe"
+    endif
   endif
 
   if b:r_args == " "
@@ -476,15 +490,14 @@ function! StartR(whatr)
     if g:vimrplugin_conquevsplit == 1
       let l:sr = &splitright
       set splitright
-      " exec 'ConqueTermVSplit ' . rcmd
-      let g:conquebuff = conque_term#open(rcmd, ['vsplit'], 0)
+      let g:conquebuff = conque_term#open(rcmd, ['vsplit'], 1)
       let &splitright = l:sr
     else
-      " exec 'ConqueTermSplit ' . rcmd
-     let g:conquebuff = conque_term#open(rcmd, ['belowright split'], 0)
+     let g:conquebuff = conque_term#open(rcmd, ['belowright split'], 1)
     endif
-    execute "setlocal syntax=rout"
-    exe "sb " . g:rplugin_curbuf
+    exe "sil noautocmd sb " . g:ConqueTerm_BufName
+    exe "setlocal syntax=rout"
+    exe "sil noautocmd sb " . g:rplugin_curbuf
     exe "set switchbuf=" . savesb
   else
     if g:vimrplugin_noscreenrc == 1
@@ -522,10 +535,12 @@ function! RObjBrowser()
     endif
   endif
 
+  let g:rplugin_curscriptbuf = bufname("%")
+
   " R builds the Object_Browser contents.
   let lockfile = $VIMRPLUGIN_TMPDIR . "/objbrowser" . "lock"
   call writefile(["Wait!"], lockfile)
-  call SendCmdToScreen("source('" . b:r_plugin_home . "/r-plugin/vimbrowser.R')", 1)
+  call SendCmdToScreen("source('" . g:r_plugin_home . "/r-plugin/vimbrowser.R')", 1)
   sleep 50m
   let i = 0 
   while filereadable(lockfile)
@@ -550,10 +565,21 @@ function! RObjBrowser()
     exe "sb Object_Browser"
   else
     let l:sr = &splitright
-    set splitright
-    40vsplit Object_Browser
+    if g:vimrplugin_objbr_place =~ "right"
+      set splitright
+    else
+      set nosplitright
+    endif
+    let g:tmp_screensname = b:screensname
+    if g:vimrplugin_conqueplugin == 1 && g:vimrplugin_objbr_place =~ "console"
+      exe "sil noautocmd sb " . g:ConqueTerm_BufName
+      normal! G
+    endif
+    exe g:vimrplugin_objbr_w . "vsplit Object_Browser"
     let &splitright = l:sr
     set ft=rbrowser
+    let b:screensname = g:tmp_screensname
+    unlet g:tmp_screensname
   endif
 
   let objbr = $VIMRPLUGIN_TMPDIR . "/objbrowser"
@@ -564,10 +590,14 @@ function! RObjBrowser()
       return
     endif
   endwhile
+  setlocal modifiable
   let curline = line(".")
   let curcol = col(".")
   normal! ggdG
   exe "source " . objbr
+  if exists("b:libdict")
+    unlet b:libdict
+  endif
   call RBrowserFill()
   setlocal nomodified
   call cursor(curline, curcol)
@@ -604,9 +634,9 @@ endfunction
 
 " Function to send commands
 function! SendCmdToScreen(cmd, quiet)
-  if has("gui_win32")
+  if has("gui_win32") && g:vimrplugin_conqueplugin == 0
     call SendToRPy(a:cmd . "\n")
-    silent exe '!start WScript "' . b:vimjspath . '" "' . expand("%") . '"'
+    silent exe '!start WScript "' . g:rplugin_jspath . '" "' . expand("%") . '"'
     " call RestoreClipboardPy()
     return 1
   endif
@@ -674,6 +704,9 @@ function! RQuit(how)
     " jump back to code buffer
     exe "sil noautocmd sb " . g:rplugin_curbuf
     exe "set switchbuf=" . savesb
+  endif
+  if bufloaded("Object_Browser")
+    bunload! Object_Browser
   endif
   echon
 endfunction
@@ -897,9 +930,9 @@ endfunction
 
 " Clear the console screen
 function! RClearConsole()
-  if has("gui_win32")
+  if has("gui_win32") && g:vimrplugin_conqueplugin == 0
     call RClearConsolePy()
-    silent exe '!start WScript "' . b:vimjspath . '" "' . expand("%") . '"'
+    silent exe '!start WScript "' . g:rplugin_jspath . '" "' . expand("%") . '"'
   else
     call SendCmdToScreen("", 0)
   endif
@@ -966,7 +999,7 @@ function! BuildROmniList(env)
   endif
   let lockfile = rtf . ".locked"
   call writefile(["Wait!"], lockfile)
-  let omnilistcmd = 'source("' . b:r_plugin_home . '/r-plugin/build_omni_list.R")'
+  let omnilistcmd = 'source("' . g:r_plugin_home . '/r-plugin/build_omni_list.R")'
   call SendCmdToScreen(omnilistcmd, 1)
   " Wait while R is writing the list of objects into the file
   sleep 50m
@@ -1000,9 +1033,9 @@ endfunction
 function! RBuildSyntaxFile()
   call BuildROmniList("libraries")
   sleep 1
-  let b:flines1 = readfile(b:libs_omni_filename)
+  let g:rplugin_liblist = readfile(b:libs_omni_filename)
   let res = []
-  for line in b:flines1
+  for line in g:rplugin_liblist
     if line =~ ':function:\|:standardGeneric:'
       let line = substitute(line, ':.*', "", "")
       let line = "syn keyword rFunction " . line
@@ -1046,101 +1079,61 @@ endfunction
 
 command! RUpdateObjList :call RBuildSyntaxFile()
 
-" For each noremap we need a vnoremap including <Esc> before the :call,
-" otherwise vim will call the function as many times as the number of selected
-" lines. If we put the <Esc> in the noremap, vim will bell.
-" RCreateMaps Args:
-"   type : modes to which create maps (normal, visual and insert) and whether
-"          the cursor have to go the beginning of the line
-"   plug : the <Plug>Name
-"   combo: the combination of letter that make the shortcut
-"   target: the command or function to be called
-function! s:RCreateMaps(type, plug, combo, target)
-  if a:type =~ '0'
-    let tg = a:target . '<CR>0'
-    let il = 'i'
-  else
-    let tg = a:target . '<CR>'
-    let il = 'a'
-  endif
-  if a:type =~ "n"
-    if hasmapto(a:plug, "n")
-      exec 'noremap <buffer> ' . a:plug . ' ' . tg
-    else
-      exec 'noremap <buffer> <LocalLeader>' . a:combo . ' ' . tg
-    endif
-  endif
-  if a:type =~ "v"
-    if hasmapto(a:plug, "v")
-      exec 'vnoremap <buffer> ' . a:plug . ' <Esc>' . tg
-    else
-      exec 'vnoremap <buffer> <LocalLeader>' . a:combo . ' <Esc>' . tg
-    endif
-  endif
-  if a:type =~ "i"
-    if hasmapto(a:plug, "i")
-      exec 'inoremap <buffer> ' . a:plug . ' <Esc>' . tg . il
-    else
-      exec 'inoremap <buffer> <LocalLeader>' . a:combo . ' <Esc>' . tg . il
-    endif
-  endif
-endfunction
-
 "----------------------------------------------------------------------------
 " ***Start/Close***
 "----------------------------------------------------------------------------
 " Start
 "-------------------------------------
-call s:RCreateMaps("nvi", '<Plug>RStart',        'rf', ':call StartR("R")')
-call s:RCreateMaps("nvi", '<Plug>RVanillaStart', 'rv', ':call StartR("vanilla")')
-call s:RCreateMaps("nvi", '<Plug>RCustomStart',  'rc', ':call StartR("custom")')
+call rplugin#RCreateMaps("nvi", '<Plug>RStart',        'rf', ':call StartR("R")')
+call rplugin#RCreateMaps("nvi", '<Plug>RVanillaStart', 'rv', ':call StartR("vanilla")')
+call rplugin#RCreateMaps("nvi", '<Plug>RCustomStart',  'rc', ':call StartR("custom")')
 
 " Close
 "-------------------------------------
-call s:RCreateMaps("nvi", '<Plug>RClose',        'rq', ":call RQuit('nosave')")
-call s:RCreateMaps("nvi", '<Plug>RSaveClose',    'rw', ":call RQuit('save')")
+call rplugin#RCreateMaps("nvi", '<Plug>RClose',        'rq', ":call RQuit('nosave')")
+call rplugin#RCreateMaps("nvi", '<Plug>RSaveClose',    'rw', ":call RQuit('save')")
 
 "----------------------------------------------------------------------------
 " ***Send*** (e=echo, d=down, a=all)
 "----------------------------------------------------------------------------
 " File
 "-------------------------------------
-call s:RCreateMaps("ni", '<Plug>RSendFile',      'aa', ':call SendFileToR("silent")')
-call s:RCreateMaps("ni", '<Plug>RESendFile',     'ae', ':call SendFileToR("echo")')
-call s:RCreateMaps("ni", '<Plug>RShowRout',     'ao', ':call ShowRout()')
+call rplugin#RCreateMaps("ni", '<Plug>RSendFile',      'aa', ':call SendFileToR("silent")')
+call rplugin#RCreateMaps("ni", '<Plug>RESendFile',     'ae', ':call SendFileToR("echo")')
+call rplugin#RCreateMaps("ni", '<Plug>RShowRout',     'ao', ':call ShowRout()')
 
 " Block
 "-------------------------------------
-call s:RCreateMaps("ni", '<Plug>RSendMBlock',     'bb', ':call SendMBlockToR("silent", "stay")')
-call s:RCreateMaps("ni", '<Plug>RESendMBlock',    'be', ':call SendMBlockToR("echo", "stay")')
-call s:RCreateMaps("ni", '<Plug>RDSendMBlock',    'bd', ':call SendMBlockToR("silent", "down")')
-call s:RCreateMaps("ni", '<Plug>REDSendMBlock',   'ba', ':call SendMBlockToR("echo", "down")')
+call rplugin#RCreateMaps("ni", '<Plug>RSendMBlock',     'bb', ':call SendMBlockToR("silent", "stay")')
+call rplugin#RCreateMaps("ni", '<Plug>RESendMBlock',    'be', ':call SendMBlockToR("echo", "stay")')
+call rplugin#RCreateMaps("ni", '<Plug>RDSendMBlock',    'bd', ':call SendMBlockToR("silent", "down")')
+call rplugin#RCreateMaps("ni", '<Plug>REDSendMBlock',   'ba', ':call SendMBlockToR("echo", "down")')
 
 " Function
 "-------------------------------------
-call s:RCreateMaps("nvi", '<Plug>RSendFunction',  'ff', ':call SendFunctionToR("silent", "stay")')
-call s:RCreateMaps("nvi", '<Plug>RDSendFunction', 'fe', ':call SendFunctionToR("echo", "stay")')
-call s:RCreateMaps("nvi", '<Plug>RDSendFunction', 'fd', ':call SendFunctionToR("silent", "down")')
-call s:RCreateMaps("nvi", '<Plug>RDSendFunction', 'fa', ':call SendFunctionToR("echo", "down")')
+call rplugin#RCreateMaps("nvi", '<Plug>RSendFunction',  'ff', ':call SendFunctionToR("silent", "stay")')
+call rplugin#RCreateMaps("nvi", '<Plug>RDSendFunction', 'fe', ':call SendFunctionToR("echo", "stay")')
+call rplugin#RCreateMaps("nvi", '<Plug>RDSendFunction', 'fd', ':call SendFunctionToR("silent", "down")')
+call rplugin#RCreateMaps("nvi", '<Plug>RDSendFunction', 'fa', ':call SendFunctionToR("echo", "down")')
 
 " Selection
 "-------------------------------------
-call s:RCreateMaps("v0", '<Plug>RSendSelection',   'ss', ':call SendSelectionToR("silent", "stay")')
-call s:RCreateMaps("v0", '<Plug>RESendSelection',  'se', ':call SendSelectionToR("echo", "stay")')
-call s:RCreateMaps("v0", '<Plug>RDSendSelection',  'sd', ':call SendSelectionToR("silent", "down")')
-call s:RCreateMaps("v0", '<Plug>REDSendSelection', 'sa', ':call SendSelectionToR("echo", "down")')
+call rplugin#RCreateMaps("v0", '<Plug>RSendSelection',   'ss', ':call SendSelectionToR("silent", "stay")')
+call rplugin#RCreateMaps("v0", '<Plug>RESendSelection',  'se', ':call SendSelectionToR("echo", "stay")')
+call rplugin#RCreateMaps("v0", '<Plug>RDSendSelection',  'sd', ':call SendSelectionToR("silent", "down")')
+call rplugin#RCreateMaps("v0", '<Plug>REDSendSelection', 'sa', ':call SendSelectionToR("echo", "down")')
 
 " Paragraph
 "-------------------------------------
-call s:RCreateMaps("ni", '<Plug>RSendParagraph',   'pp', ':call SendParagraphToR("silent", "stay")')
-call s:RCreateMaps("ni", '<Plug>RESendParagraph',  'pe', ':call SendParagraphToR("echo", "stay")')
-call s:RCreateMaps("ni", '<Plug>RDSendParagraph',  'pd', ':call SendParagraphToR("silent", "down")')
-call s:RCreateMaps("ni", '<Plug>REDSendParagraph', 'pa', ':call SendParagraphToR("echo", "down")')
+call rplugin#RCreateMaps("ni", '<Plug>RSendParagraph',   'pp', ':call SendParagraphToR("silent", "stay")')
+call rplugin#RCreateMaps("ni", '<Plug>RESendParagraph',  'pe', ':call SendParagraphToR("echo", "stay")')
+call rplugin#RCreateMaps("ni", '<Plug>RDSendParagraph',  'pd', ':call SendParagraphToR("silent", "down")')
+call rplugin#RCreateMaps("ni", '<Plug>REDSendParagraph', 'pa', ':call SendParagraphToR("echo", "down")')
 
 " *Line*
 "-------------------------------------
-call s:RCreateMaps("ni0", '<Plug>RSendLine', 'l', ':call SendLineToR("stay")')
-call s:RCreateMaps('ni0', '<Plug>RDSendLine', 'd', ':call SendLineToR("down")')
+call rplugin#RCreateMaps("ni0", '<Plug>RSendLine', 'l', ':call SendLineToR("stay")')
+call rplugin#RCreateMaps('ni0', '<Plug>RDSendLine', 'd', ':call SendLineToR("down")')
 
 " We can't call RCreateMaps because of the 'o' command at the end of the map:
 if hasmapto('<Plug>RSendLAndOpenNewOne', 'i')
@@ -1159,153 +1152,47 @@ endif
 "----------------------------------------------------------------------------
 " List space, clear console, clear all
 "-------------------------------------
-call s:RCreateMaps("nvi", '<Plug>RListSpace',    'rl', ':call SendCmdToScreen("ls()", 0)<CR>:echon')
-call s:RCreateMaps("nvi", '<Plug>RClearConsole', 'rr', ':call RClearConsole()')
-call s:RCreateMaps("nvi", '<Plug>RClearAll',     'rm', ':call RClearAll()')
+call rplugin#RCreateMaps("nvi", '<Plug>RListSpace',    'rl', ':call SendCmdToScreen("ls()", 0)<CR>:echon')
+call rplugin#RCreateMaps("nvi", '<Plug>RClearConsole', 'rr', ':call RClearConsole()')
+call rplugin#RCreateMaps("nvi", '<Plug>RClearAll',     'rm', ':call RClearAll()')
 
 " Print, names, structure
 "-------------------------------------
-call s:RCreateMaps("nvi", '<Plug>RObjectPr',     'rp', ':call rplugin#RAction("print")')
-call s:RCreateMaps("nvi", '<Plug>RObjectNames',  'rn', ':call rplugin#RAction("names")')
-call s:RCreateMaps("nvi", '<Plug>RObjectStr',    'rt', ':call rplugin#RAction("str")')
+call rplugin#RCreateMaps("nvi", '<Plug>RObjectPr',     'rp', ':call rplugin#RAction("print")')
+call rplugin#RCreateMaps("nvi", '<Plug>RObjectNames',  'rn', ':call rplugin#RAction("names")')
+call rplugin#RCreateMaps("nvi", '<Plug>RObjectStr',    'rt', ':call rplugin#RAction("str")')
 
 " Arguments, example, help
 "-------------------------------------
-call s:RCreateMaps("nvi", '<Plug>RShowArgs',     'ra', ':call rplugin#RAction("args")')
-call s:RCreateMaps("nvi", '<Plug>RShowEx',       're', ':call rplugin#RAction("example")')
-call s:RCreateMaps("nvi", '<Plug>RHelp',         'rh', ':call rplugin#RAction("help")')
+call rplugin#RCreateMaps("nvi", '<Plug>RShowArgs',     'ra', ':call rplugin#RAction("args")')
+call rplugin#RCreateMaps("nvi", '<Plug>RShowEx',       're', ':call rplugin#RAction("example")')
+call rplugin#RCreateMaps("nvi", '<Plug>RHelp',         'rh', ':call rplugin#RAction("help")')
 
 " Summary, plot, both
 "-------------------------------------
-call s:RCreateMaps("nvi", '<Plug>RSummary',      'rs', ':call rplugin#RAction("summary")')
-call s:RCreateMaps("nvi", '<Plug>RPlot',         'rg', ':call rplugin#RAction("plot")')
-call s:RCreateMaps("nvi", '<Plug>RSPlot',        'rb', ':call rplugin#RAction("plot")<CR>:call rplugin#RAction("summary")')
+call rplugin#RCreateMaps("nvi", '<Plug>RSummary',      'rs', ':call rplugin#RAction("summary")')
+call rplugin#RCreateMaps("nvi", '<Plug>RPlot',         'rg', ':call rplugin#RAction("plot")')
+call rplugin#RCreateMaps("nvi", '<Plug>RSPlot',        'rb', ':call rplugin#RAction("plot")<CR>:call rplugin#RAction("summary")')
 
 " Set working directory
 "-------------------------------------
-call s:RCreateMaps("nvi", '<Plug>RSetwd',        'rd', ':call RSetWD()')
+call rplugin#RCreateMaps("nvi", '<Plug>RSetwd',        'rd', ':call RSetWD()')
 
 " Sweave (cur file)
 "-------------------------------------
-call s:RCreateMaps("nvi", '<Plug>RSweave',       'sw', ':call RSweave()')
-call s:RCreateMaps("nvi", '<Plug>RMakePDF',      'sp', ':call RMakePDF()')
+call rplugin#RCreateMaps("nvi", '<Plug>RSweave',       'sw', ':call RSweave()')
+call rplugin#RCreateMaps("nvi", '<Plug>RMakePDF',      'sp', ':call RMakePDF()')
 
 " Build list of objects for omni completion
 "-------------------------------------
-call s:RCreateMaps("nvi", '<Plug>RUpdateObjBrowser',    'ro', ':call RObjBrowser()')
+call rplugin#RCreateMaps("nvi", '<Plug>RUpdateObjBrowser',    'ro', ':call RObjBrowser()')
 
 "----------------------------------------------------------------------------
 " ***Debug***
 "----------------------------------------------------------------------------
 " Start debugging
 "-------------------------------------
-"call s:RCreateMaps("nvi", '<Plug>RDebug', 'dd', ':call RStartDebug()')
-
-redir => b:ikblist
-silent imap
-redir END
-redir => b:nkblist
-silent nmap
-redir END
-redir => b:vkblist
-silent vmap
-redir END
-let b:iskblist = split(b:ikblist, "\n")
-let b:nskblist = split(b:nkblist, "\n")
-let b:vskblist = split(b:vkblist, "\n")
-let b:imaplist = []
-let b:vmaplist = []
-let b:nmaplist = []
-for i in b:iskblist
-  let si = split(i)
-  if len(si) == 3 && si[2] =~ "<Plug>R"
-      call add(b:imaplist, [si[1], si[2]])
-  endif
-endfor
-for i in b:nskblist
-  let si = split(i)
-  if len(si) == 3 && si[2] =~ "<Plug>R"
-      call add(b:nmaplist, [si[1], si[2]])
-  endif
-endfor
-for i in b:vskblist
-  let si = split(i)
-  if len(si) == 3 && si[2] =~ "<Plug>R"
-      call add(b:vmaplist, [si[1], si[2]])
-  endif
-endfor
-unlet b:ikblist
-unlet b:nkblist
-unlet b:vkblist
-unlet b:iskblist
-unlet b:nskblist
-unlet b:vskblist
-unlet i
-unlet si
-
-function! RNMapCmd(plug)
-  for [el1, el2] in b:nmaplist
-    if el2 == a:plug
-      return el1
-    endif
-  endfor
-endfunction
-
-function! RIMapCmd(plug)
-  for [el1, el2] in b:imaplist
-    if el2 == a:plug
-      return el1
-    endif
-  endfor
-endfunction
-
-function! RVMapCmd(plug)
-  for [el1, el2] in b:vmaplist
-    if el2 == a:plug
-      return el1
-    endif
-  endfor
-endfunction
-
-if exists('g:maplocalleader')
-  let b:tll = '<Tab>' . g:maplocalleader
-else
-  let b:tll = '<Tab>\\'
-endif
-
-function! s:RCreateMenuItem(type, label, plug, combo, target)
-  if a:type =~ '0'
-    let tg = a:target . '<CR>0'
-    let il = 'i'
-  else
-    let tg = a:target . '<CR>'
-    let il = 'a'
-  endif
-  if a:type =~ "n"
-    if hasmapto(a:plug, "n")
-      let boundkey = RNMapCmd(a:plug)
-      exec 'nmenu &R.' . a:label . '<Tab>' . boundkey . ' ' . tg
-    else
-      exec 'nmenu &R.' . a:label . b:tll . a:combo . ' ' . tg
-    endif
-  endif
-  if a:type =~ "v"
-    if hasmapto(a:plug, "v")
-      let boundkey = RVMapCmd(a:plug)
-      exec 'vmenu &R.' . a:label . '<Tab>' . boundkey . ' ' . tg
-    else
-      exec 'vmenu &R.' . a:label . b:tll . a:combo . ' ' . '<Esc>' . tg
-    endif
-  endif
-  if a:type =~ "i"
-    if hasmapto(a:plug, "i")
-      let boundkey = RIMapCmd(a:plug)
-      exec 'imenu &R.' . a:label . '<Tab>' . boundkey . ' ' . tg
-    else
-      exec 'imenu &R.' . a:label . b:tll . a:combo . ' ' . '<Esc>' . tg . il
-    endif
-  endif
-endfunction
+"call rplugin#RCreateMaps("nvi", '<Plug>RDebug', 'dd', ':call RStartDebug()')
 
 " Menu R
 function! MakeRMenu()
@@ -1318,87 +1205,75 @@ function! MakeRMenu()
   "----------------------------------------------------------------------------
   " Start/Close
   "----------------------------------------------------------------------------
-  call s:RCreateMenuItem("nvi", 'Start/Close.Start\ R\ (default)', '<Plug>RStart', 'rf', ':call StartR("R")')
-  call s:RCreateMenuItem("nvi", 'Start/Close.Start\ R\ --vanilla', '<Plug>RVanillaStart', 'rv', ':call StartR("vanilla")')
-  call s:RCreateMenuItem("nvi", 'Start/Close.Start\ R\ (custom)', '<Plug>RCustomStart', 'rc', ':call StartR("custom")')
+  call rplugin#RCreateMenuItem("nvi", 'Start/Close.Start\ R\ (default)', '<Plug>RStart', 'rf', ':call StartR("R")')
+  call rplugin#RCreateMenuItem("nvi", 'Start/Close.Start\ R\ --vanilla', '<Plug>RVanillaStart', 'rv', ':call StartR("vanilla")')
+  call rplugin#RCreateMenuItem("nvi", 'Start/Close.Start\ R\ (custom)', '<Plug>RCustomStart', 'rc', ':call StartR("custom")')
   "-------------------------------
   menu R.Start/Close.-Sep1- <nul>
-  call s:RCreateMenuItem("nvi", 'Start/Close.Close\ R\ (no\ save)', '<Plug>RClose', 'rq', ":call SendCmdToScreen('quit(save = \"no\")', 0)")
-  call s:RCreateMenuItem("nvi", 'Start/Close.Close\ R\ (save\ workspace)', '<Plug>RSaveClose', 'rw', ":call SendCmdToScreen('quit(save = \"yes\")', 0)")
+  call rplugin#RCreateMenuItem("nvi", 'Start/Close.Close\ R\ (no\ save)', '<Plug>RClose', 'rq', ":call SendCmdToScreen('quit(save = \"no\")', 0)")
+  call rplugin#RCreateMenuItem("nvi", 'Start/Close.Close\ R\ (save\ workspace)', '<Plug>RSaveClose', 'rw', ":call SendCmdToScreen('quit(save = \"yes\")', 0)")
 
   "----------------------------------------------------------------------------
   " Send
   "----------------------------------------------------------------------------
-  call s:RCreateMenuItem("ni", 'Send.File', '<Plug>RSendFile', 'aa', ':call SendFileToR("silent")')
-  call s:RCreateMenuItem("ni", 'Send.File\ (echo)', '<Plug>RESendFile', 'ae', ':call SendFileToR("echo")')
-  call s:RCreateMenuItem("ni", 'Send.File\ (open\ \.Rout)', '<Plug>RShowRout', 'ao', ':call ShowRout()')
+  call rplugin#RCreateMenuItem("ni", 'Send.File', '<Plug>RSendFile', 'aa', ':call SendFileToR("silent")')
+  call rplugin#RCreateMenuItem("ni", 'Send.File\ (echo)', '<Plug>RESendFile', 'ae', ':call SendFileToR("echo")')
+  call rplugin#RCreateMenuItem("ni", 'Send.File\ (open\ \.Rout)', '<Plug>RShowRout', 'ao', ':call ShowRout()')
   "-------------------------------
   menu R.Send.-Sep1- <nul>
-  call s:RCreateMenuItem("ni", 'Send.Block\ (cur)', '<Plug>RSendMBlock', 'bb', ':call SendMBlockToR("silent", "stay")')
-  call s:RCreateMenuItem("ni", 'Send.Block\ (cur,\ echo)', '<Plug>RESendMBlock', 'be', ':call SendMBlockToR("echo", "stay")')
-  call s:RCreateMenuItem("ni", 'Send.Block\ (cur,\ down)', '<Plug>RDSendMBlock', 'bd', ':call SendMBlockToR("silent", "down")')
-  call s:RCreateMenuItem("ni", 'Send.Block\ (cur,\ echo\ and\ down)', '<Plug>REDSendMBlock', 'ba', ':call SendMBlockToR("echo", "down")')
+  call rplugin#RCreateMenuItem("ni", 'Send.Block\ (cur)', '<Plug>RSendMBlock', 'bb', ':call SendMBlockToR("silent", "stay")')
+  call rplugin#RCreateMenuItem("ni", 'Send.Block\ (cur,\ echo)', '<Plug>RESendMBlock', 'be', ':call SendMBlockToR("echo", "stay")')
+  call rplugin#RCreateMenuItem("ni", 'Send.Block\ (cur,\ down)', '<Plug>RDSendMBlock', 'bd', ':call SendMBlockToR("silent", "down")')
+  call rplugin#RCreateMenuItem("ni", 'Send.Block\ (cur,\ echo\ and\ down)', '<Plug>REDSendMBlock', 'ba', ':call SendMBlockToR("echo", "down")')
   "-------------------------------
   menu R.Send.-Sep2- <nul>
-  call s:RCreateMenuItem("ni", 'Send.Function\ (cur)', '<Plug>RSendFunction', 'ff', ':call SendFunctionToR("silent", "stay")')
-  call s:RCreateMenuItem("ni", 'Send.Function\ (cur,\ echo)', '<Plug>RESendFunction', 'fe', ':call SendFunctionToR("echo", "stay")')
-  call s:RCreateMenuItem("ni", 'Send.Function\ (cur\ and\ down)', '<Plug>RDSendFunction', 'fd', ':call SendFunctionToR("silent", "down")')
-  call s:RCreateMenuItem("ni", 'Send.Function\ (cur,\ echo\ and\ down)', '<Plug>REDSendFunction', 'fa', ':call SendFunctionToR("echo", "down")')
+  call rplugin#RCreateMenuItem("ni", 'Send.Function\ (cur)', '<Plug>RSendFunction', 'ff', ':call SendFunctionToR("silent", "stay")')
+  call rplugin#RCreateMenuItem("ni", 'Send.Function\ (cur,\ echo)', '<Plug>RESendFunction', 'fe', ':call SendFunctionToR("echo", "stay")')
+  call rplugin#RCreateMenuItem("ni", 'Send.Function\ (cur\ and\ down)', '<Plug>RDSendFunction', 'fd', ':call SendFunctionToR("silent", "down")')
+  call rplugin#RCreateMenuItem("ni", 'Send.Function\ (cur,\ echo\ and\ down)', '<Plug>REDSendFunction', 'fa', ':call SendFunctionToR("echo", "down")')
   "-------------------------------
   menu R.Send.-Sep3- <nul>
-  call s:RCreateMenuItem("v0", 'Send.Selection', '<Plug>RSendSelection', 'ss', ':call SendSelectionToR("silent", "stay")')
-  call s:RCreateMenuItem("v0", 'Send.Selection\ (echo)', '<Plug>RESendSelection', 'se', ':call SendSelectionToR("echo", "stay")')
-  call s:RCreateMenuItem("v0", 'Send.Selection\ (and\ down)', '<Plug>RDSendSelection', 'sd', ':call SendSelectionToR("silent", "down")')
-  call s:RCreateMenuItem("v0", 'Send.Selection\ (echo\ and\ down)', '<Plug>REDSendSelection', 'sa', ':call SendSelectionToR("echo", "down")')
+  call rplugin#RCreateMenuItem("v0", 'Send.Selection', '<Plug>RSendSelection', 'ss', ':call SendSelectionToR("silent", "stay")')
+  call rplugin#RCreateMenuItem("v0", 'Send.Selection\ (echo)', '<Plug>RESendSelection', 'se', ':call SendSelectionToR("echo", "stay")')
+  call rplugin#RCreateMenuItem("v0", 'Send.Selection\ (and\ down)', '<Plug>RDSendSelection', 'sd', ':call SendSelectionToR("silent", "down")')
+  call rplugin#RCreateMenuItem("v0", 'Send.Selection\ (echo\ and\ down)', '<Plug>REDSendSelection', 'sa', ':call SendSelectionToR("echo", "down")')
   "-------------------------------
   menu R.Send.-Sep4- <nul>
-  call s:RCreateMenuItem("ni", 'Send.Paragraph', '<Plug>RSendParagraph', 'pp', ':call SendParagraphToR("silent", "stay")')
-  call s:RCreateMenuItem("ni", 'Send.Paragraph\ (echo)', '<Plug>RESendParagraph', 'pe', ':call SendParagraphToR("echo", "stay")')
-  call s:RCreateMenuItem("ni", 'Send.Paragraph\ (and\ down)', '<Plug>RDSendParagraph', 'pd', ':call SendParagraphToR("silent", "down")')
-  call s:RCreateMenuItem("ni", 'Send.Paragraph\ (echo\ and\ down)', '<Plug>REDSendParagraph', 'pa', ':call SendParagraphToR("echo", "down")')
+  call rplugin#RCreateMenuItem("ni", 'Send.Paragraph', '<Plug>RSendParagraph', 'pp', ':call SendParagraphToR("silent", "stay")')
+  call rplugin#RCreateMenuItem("ni", 'Send.Paragraph\ (echo)', '<Plug>RESendParagraph', 'pe', ':call SendParagraphToR("echo", "stay")')
+  call rplugin#RCreateMenuItem("ni", 'Send.Paragraph\ (and\ down)', '<Plug>RDSendParagraph', 'pd', ':call SendParagraphToR("silent", "down")')
+  call rplugin#RCreateMenuItem("ni", 'Send.Paragraph\ (echo\ and\ down)', '<Plug>REDSendParagraph', 'pa', ':call SendParagraphToR("echo", "down")')
   "-------------------------------
   menu R.Send.-Sep5- <nul>
-  call s:RCreateMenuItem("ni0", 'Send.Line', '<Plug>RSendLine', 'l', ':call SendLineToR("stay")')
-  call s:RCreateMenuItem("ni0", 'Send.Line\ (and\ down)', '<Plug>RDSendLine', 'd', ':call SendLineToR("down")')
+  call rplugin#RCreateMenuItem("ni0", 'Send.Line', '<Plug>RSendLine', 'l', ':call SendLineToR("stay")')
+  call rplugin#RCreateMenuItem("ni0", 'Send.Line\ (and\ down)', '<Plug>RDSendLine', 'd', ':call SendLineToR("down")')
 
   " We can't call RCreateMenuItem because of the 'o' command at the end of the map:
   if hasmapto('<Plug>RSendLAndOpenNewOne')
     imenu R.Send.Line\ (and\ new\ one) <Plug>RSendLAndOpenNewOne <Esc>:call SendLineToR("stay")<CR>o
   else
-    exe "imenu R.Send.Line\\ (and\\ new\\ one)" . b:tll . 'q <Esc>:call SendLineToR("stay")<CR>o'
+if exists('g:maplocalleader')
+    exe "imenu R.Send.Line\\ (and\\ new\\ one)<Tab>". g:maplocalleader . 'q <Esc>:call SendLineToR("stay")<CR>o'
+else
+    exe 'imenu R.Send.Line\ (and\ new\ one)<Tab>\\q <Esc>:call SendLineToR("stay")<CR>o'
+endif
+
   endif
 
   "----------------------------------------------------------------------------
   " Control
   "----------------------------------------------------------------------------
-  call s:RCreateMenuItem("nvi", 'Control.List\ space', '<Plug>RListSpace', 'rl', ':call SendCmdToScreen("ls()", 0)')
-  call s:RCreateMenuItem("nvi", 'Control.Clear\ console\ screen', '<Plug>RClearConsole', 'rr', ':call RClearConsole()')
-  call s:RCreateMenuItem("nvi", 'Control.Clear\ all', '<Plug>RClearAll', 'rm', ':call RClearAll()')
-  "-------------------------------
-  menu R.Control.-Sep1- <nul>
-  call s:RCreateMenuItem("nvi", 'Control.Object\ (print)', '<Plug>RObjectPr', 'rp', ':call rplugin#RAction("print")')
-  call s:RCreateMenuItem("nvi", 'Control.Object\ (names)', '<Plug>RObjectNames', 'rn', ':call rplugin#RAction("names")')
-  call s:RCreateMenuItem("nvi", 'Control.Object\ (str)', '<Plug>RObjectStr', 'rt', ':call rplugin#RAction("str")')
-  "-------------------------------
-  menu R.Control.-Sep2- <nul>
-  call s:RCreateMenuItem("nvi", 'Control.Arguments\ (cur)', '<Plug>RShowArgs', 'ra', ':call rplugin#RAction("args")')
-  call s:RCreateMenuItem("nvi", 'Control.Example\ (cur)', '<Plug>RShowEx', 're', ':call rplugin#RAction("example")')
-  call s:RCreateMenuItem("nvi", 'Control.Help\ (cur)', '<Plug>RHelp', 'rh', ':call rplugin#RAction("help")')
-  "-------------------------------
-  menu R.Control.-Sep3- <nul>
-  call s:RCreateMenuItem("nvi", 'Control.Summary\ (cur)', '<Plug>RSummary', 'rs', ':call rplugin#RAction("summary")')
-  call s:RCreateMenuItem("nvi", 'Control.Plot\ (cur)', '<Plug>RPlot', 'rg', ':call rplugin#RAction("plot")')
-  call s:RCreateMenuItem("nvi", 'Control.Plot\ and\ summary\ (cur)', '<Plug>RSPlot', 'rb', ':call rplugin#RAction("plot")<CR>:call rplugin#RAction("summary")')
+  call rplugin#ControlMenu()
   "-------------------------------
   menu R.Control.-Sep4- <nul>
-  call s:RCreateMenuItem("nvi", 'Control.Set\ working\ directory\ (cur\ file\ path)', '<Plug>RSetwd', 'rd', ':call RSetWD()')
+  call rplugin#RCreateMenuItem("nvi", 'Control.Set\ working\ directory\ (cur\ file\ path)', '<Plug>RSetwd', 'rd', ':call RSetWD()')
   "-------------------------------
   menu R.Control.-Sep5- <nul>
-  call s:RCreateMenuItem("nvi", 'Control.Sweave\ (cur\ file)', '<Plug>RSweave', 'sw', ':call RSweave()')
-  call s:RCreateMenuItem("nvi", 'Control.Sweave\ and\ PDF\ (cur\ file)', '<Plug>RMakePDF', 'sp', ':call RMakePDF()')
+  call rplugin#RCreateMenuItem("nvi", 'Control.Sweave\ (cur\ file)', '<Plug>RSweave', 'sw', ':call RSweave()')
+  call rplugin#RCreateMenuItem("nvi", 'Control.Sweave\ and\ PDF\ (cur\ file)', '<Plug>RMakePDF', 'sp', ':call RMakePDF()')
   "-------------------------------
   menu R.Control.-Sep6- <nul>
-  call s:RCreateMenuItem("nvi", 'Control.Update\ object\ browser', '<Plug>RUpdateObjBrowser', 'ro', ':call RObjBrowser()')
+  call rplugin#RCreateMenuItem("nvi", 'Control.Update\ object\ browser', '<Plug>RUpdateObjBrowser', 'ro', ':call RObjBrowser()')
   "-------------------------------
   menu R.-Sep7- <nul>
 
@@ -1415,16 +1290,24 @@ function! MakeRMenu()
   amenu ToolBar.RStart :call StartR("R")<CR>
   amenu ToolBar.RClose :call SendCmdToScreen('quit(save = "no")', 0)<CR>
   "---------------------------
-  amenu ToolBar.RSendFile :call SendFileToR("echo")<CR>
-  amenu ToolBar.RSendBlock :call SendMBlockToR("echo", "down")<CR>
-  amenu ToolBar.RSendFunction :call SendFunctionToR("echo", "down")<CR>
+  nmenu ToolBar.RSendFile :call SendFileToR("echo")<CR>
+  imenu ToolBar.RSendFile <Esc>:call SendFileToR("echo")<CR>
+  nmenu ToolBar.RSendBlock :call SendMBlockToR("echo", "down")<CR>
+  imenu ToolBar.RSendBlock <Esc>:call SendMBlockToR("echo", "down")<CR>
+  nmenu ToolBar.RSendFunction :call SendFunctionToR("echo", "down")<CR>
+  imenu ToolBar.RSendFunction <Esc>:call SendFunctionToR("echo", "down")<CR>
   vmenu ToolBar.RSendSelection <ESC>:call SendSelectionToR("echo", "down")<CR>
-  amenu ToolBar.RSendParagraph <ESC>:call SendParagraphToR("echo", "down")<CR>
-  amenu ToolBar.RSendLine :call SendLineToR("down")<CR>
+  nmenu ToolBar.RSendParagraph :call SendParagraphToR("echo", "down")<CR>
+  imenu ToolBar.RSendParagraph <Esc>:call SendParagraphToR("echo", "down")<CR>
+  nmenu ToolBar.RSendLine :call SendLineToR("down")<CR>
+  imenu ToolBar.RSendLine <Esc>:call SendLineToR("down")<CR>
   "---------------------------
-  amenu ToolBar.RListSpace :call SendCmdToScreen("ls()", 0)<CR>
-  amenu ToolBar.RClear :call RClearConsole()<CR>
-  amenu ToolBar.RClearAll :call RClearAll()<CR>
+  nmenu ToolBar.RListSpace :call SendCmdToScreen("ls()", 0)<CR>
+  imenu ToolBar.RListSpace <Esc>:call SendCmdToScreen("ls()", 0)<CR>
+  nmenu ToolBar.RClear :call RClearConsole()<CR>
+  imenu ToolBar.RClear <Esc>:call RClearConsole()<CR>
+  nmenu ToolBar.RClearAll :call RClearAll()<CR>
+  imenu ToolBar.RClearAll <Esc>:call RClearAll()<CR>
 
   " Hints
   tmenu ToolBar.RStart Start R (default)
@@ -1441,14 +1324,7 @@ function! MakeRMenu()
   let g:rplugin_hasmenu = 1
 endfunction
 
-function! DeleteScreenRC()
-  if filereadable(b:scrfile)
-    call delete(b:scrfile)
-  endif
-endfunction
-
 function! UnMakeRMenu()
-  call DeleteScreenRC()
   if exists("g:rplugin_hasmenu") && g:rplugin_hasmenu == 0
     return
   endif
@@ -1476,9 +1352,39 @@ endfunction
 " Activate the menu and toolbar buttons if the user sets the file type as 'r':
 call MakeRMenu()
 
+function! ROpenGraphicsDevice()
+  call SendCmdToScreen('x11(title = "Vim-R-plugin Graphics", width = 3.5, height = 3.5, pointsize = 9, xpos = -1, ypos = 0)', 1)
+  let g:rplugin_curbuf = bufname("%")
+  let savesb = &switchbuf
+  set switchbuf=useopen,usetab
+  let l:sr = &splitright
+  set splitright
+  37vsplit Space_for_Graphics
+  set nomodifiable
+  setlocal noswapfile
+  set buftype=nofile
+  set nowrap
+  set winfixwidth
+  exe "sb " . g:rplugin_curbuf
+  let &splitright = l:sr
+  exe "set switchbuf=" . savesb
+endfunction
+
+function! RBufEnter()
+  if has("gui")
+    call MakeRMenu()
+  endif
+endfunction
+
+function! RBufLeave()
+  if has("gui")
+    call UnMakeRMenu()
+  endif
+endfunction
+
 augroup VimRPlugin
   au FileType * if &filetype == "r" || &filetype == "rnoweb" || &filetype == "rhelp" | call MakeRMenu() | endif
-  au BufEnter * if &filetype == "r" || &filetype == "rnoweb" || &filetype == "rhelp" | call MakeRMenu() | endif
-  au BufLeave * if &filetype == "r" || &filetype == "rnoweb" || &filetype == "rhelp" | call UnMakeRMenu() | endif
+  au BufEnter * if &filetype == "r" || &filetype == "rnoweb" || &filetype == "rhelp" | call RBufEnter() | endif
+  au BufLeave * if &filetype == "r" || &filetype == "rnoweb" || &filetype == "rhelp" | call RBufLeave() | endif
 augroup END
 

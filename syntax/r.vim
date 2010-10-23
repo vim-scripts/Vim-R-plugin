@@ -3,7 +3,7 @@
 " Maintainer:	      Jakson Aquino <jalvesaq@gmail.com>
 " Former Maintainers: Vaidotas Zemlys <zemlys@gmail.com>
 " 		      Tom Payne <tom@tompayne.org>
-" Last Change:	      Wed Sep 29, 2010  09:50AM
+" Last Change:	      Thu Oct 21, 2010  08:00AM
 " Filenames:	      *.R *.r *.Rhistory *.Rt
 " 
 " NOTE: The highlighting of R functions is defined in the
@@ -111,6 +111,9 @@ syn keyword rPreProc     library require attach detach source
 " Type
 syn keyword rType array category character complex double function integer list logical matrix numeric vector data.frame 
 
+" Name of object with spaces
+syn region rNameWSpace start="`" end="`"
+
 " Define the default highlighting.
 hi def link rArrow       Statement	
 hi def link rBoolean     Boolean
@@ -126,6 +129,7 @@ hi def link rError       Error
 hi def link rFloat       Float
 hi def link rFunction    Function
 hi def link rInteger     Number
+hi def link rNameWSpace  Normal
 hi def link rNumber      Number
 hi def link rOperator    Operator
 hi def link rParenError  Error
