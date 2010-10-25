@@ -16,7 +16,7 @@
 "
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          
-" Last Change: Sat Oct 23, 2010  02:33PM
+" Last Change: Sun Oct 24, 2010  06:25PM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -31,6 +31,11 @@ setlocal noswapfile
 set buftype=nofile
 set nowrap
 set winfixwidth
+
+" Popup menu
+if !exists("g:rplugin_hasbrowsermenu")
+  let g:rplugin_hasbrowsermenu = 0
+endif
 
 " Current cursor position in the object browser and in the library browser
 let g:rplugin_curbline = 1
@@ -201,7 +206,7 @@ function! RBrowserShowGE(fromother)
   endif
   sil normal! ggdG
   if g:vimrplugin_objbr_w > 25
-    call setline(1, ".GlobalEnv# | #libraries")
+    call setline(1, ".GlobalEnv #|# libraries")
   else
     call setline(1, ".GlobalEnv")
   endif
@@ -228,7 +233,7 @@ function! RBrowserShowLibs(fromother)
   endif
   sil normal! ggdG
   if g:vimrplugin_objbr_w > 17
-    call setline(1, "libraries# | #.GlobalEnv")
+    call setline(1, "libraries #|# .GlobalEnv")
   else
     call setline(1, "Libraries")
   endif
@@ -293,6 +298,29 @@ function! RBrowserDoubleClick()
     endif
   endfor
   echon
+endfunction
+
+function! RBrowserRightClick()
+  if line(".") == 1
+    return
+  endif
+
+  let key = RBrowserGetName()
+  if key != ""
+    if g:rplugin_hasbrowsermenu == 1
+      aunmenu ]RBrowser
+    endif
+    exe 'amenu ]RBrowser.args('. key . ') :call rplugin#RAction("args")<CR>'
+    exe 'amenu ]RBrowser.example('. key . ') :call rplugin#RAction("example")<CR>'
+    exe 'amenu ]RBrowser.help('. key . ') :call rplugin#RAction("help")<CR>'
+    exe 'amenu ]RBrowser.names('. key . ') :call rplugin#RAction("names")<CR>'
+    exe 'amenu ]RBrowser.plot('. key . ') :call rplugin#RAction("plot")<CR>'
+    exe 'amenu ]RBrowser.print(' . key . ') :call rplugin#RAction("print")<CR>'
+    exe 'amenu ]RBrowser.str('. key . ') :call rplugin#RAction("str")<CR>'
+    exe 'amenu ]RBrowser.summary('. key . ') :call rplugin#RAction("summary")<CR>'
+    popup ]RBrowser
+    let g:rplugin_hasbrowsermenu = 1
+  endif
 endfunction
 
 function! RBrowserFindParent(word, curline, curpos)
@@ -396,6 +424,8 @@ endfunction
 
 nmap <buffer> <CR> :call RBrowserDoubleClick()<CR>
 nmap <buffer> <2-LeftMouse> :call RBrowserDoubleClick()<CR>
+nmap <buffer> <RightMouse> :call RBrowserRightClick()<CR>
+
 "----------------------------------------------------------------------------
 " ***Control***
 "----------------------------------------------------------------------------

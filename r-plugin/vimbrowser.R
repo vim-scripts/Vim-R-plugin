@@ -30,7 +30,7 @@
 
     .vim.browser.order <<- paste(.vim.browser.order, "'", .vim.browser.curlist, "': [", newlistnames, "], ", sep = "")
 
-    if(len > 1){
+    if(len > 0){
       for(i in 1:len){
 	.vim.browserline(x.names[i], x[[i]])
       }

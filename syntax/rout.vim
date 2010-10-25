@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:    R output Files
 " Maintainer:  Jakson Aquino <jalvesaq@gmail.com>
-" Last Change: Fri Oct 01, 2010  09:24PM
+" Last Change: Sun Oct 24, 2010  06:42PM
 "
 
 " Version Clears: {{{1
@@ -26,9 +26,20 @@ syn match routFloat /\<\.\d\+\([Ee][-+]\=\d\+\)\=\>/
 " floating point number with no fractional part and optional exponent
 syn match routFloat /\<\d\+[Ee][-+]\=\d\+\>/
 syn match routIndex /^\s*\[\d\+\]/
-" Comment
-syn match routComment /^> .*/
-syn match routComment /^+ .*/
+
+if !exists("g:vimrplugin_routmorecolors")
+  let g:vimrplugin_routmorecolors = 0
+endif
+
+if g:vimrplugin_routmorecolors == 1
+  syn include @routR syntax/r.vim
+  syn region routColoredR start="^> " end='$' contains=@routR keepend
+  syn region routColoredR start="^+ " end='$' contains=@routR keepend
+else
+  " Comment
+  syn match routComment /^> .*/
+  syn match routComment /^+ .*/
+endif
 
 " Errors and warnings
 syn match routError "^Error.*"
@@ -71,7 +82,9 @@ endif
 
 
 " Define the default highlighting.
-hi def link routComment	Comment
+if g:vimrplugin_routmorecolors == 0
+  hi def link routComment	Comment
+endif
 hi def link routNumber	Number
 hi def link routFloat	Float
 hi def link routString	String

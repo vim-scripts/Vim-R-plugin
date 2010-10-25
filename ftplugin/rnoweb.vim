@@ -19,7 +19,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Sat Oct 23, 2010  04:25PM
+" Last Change: Mon Oct 25, 2010  08:18AM
 "
 " Please see doc/r-plugin.txt for usage details.
 "==========================================================================
@@ -44,18 +44,20 @@ if exists('&ofu')
 endif
 
 
-" b:user_vimfiles should be the directory where the user put
-" personal stuff: plugins, colorschemes etc... By default, it is ~/.vim or
-" ~/vimfiles and this is the first directory of runtimepath.
-let b:user_vimfiles = split(&runtimepath, ",")[0]
-
-" g:r_plugin_home should be the directory where the r-plugin files are.  For
+" g:rplugin_home should be the directory where the r-plugin files are.  For
 " users following the installation instructions it will be at ~/.vim or
 " ~/vimfiles, that is, the same value of b:user_vimfiles. However the
 " variables will have different values if the plugin is installed somewhere
 " else in the runtimepath.
-let g:r_plugin_home = expand("<sfile>:h:h")
+let g:rplugin_home = expand("<sfile>:h:h")
 
+" b:user_vimfiles must be a writable directory. It will be g:rplugin_home
+" unless it's not writable. Then it wil be ~/.vim or ~/vimfiles.
+if filewritable(g:rplugin_home) == 2
+  let b:user_vimfiles = g:rplugin_home
+else
+  let b:user_vimfiles = split(&runtimepath, ",")[0]
+endif
 
 " Automatically rebuild the file listing .GlobalEnv objects for omni
 " completion if the user press <C-X><C-O> and we know that the file either was
@@ -75,8 +77,8 @@ else
 endif
 
 if has("gui_win32")
-  let g:rplugin_jspath = g:r_plugin_home . "\\r-plugin\\vimActivate.js"
-  let g:r_plugin_home = substitute(g:r_plugin_home, "\\", "/", "g")
+  let g:rplugin_jspath = g:rplugin_home . "\\r-plugin\\vimActivate.js"
+  let g:rplugin_home = substitute(g:rplugin_home, "\\", "/", "g")
   let b:user_vimfiles = substitute(b:user_vimfiles, "\\", "/", "g")
   if !has("python")
     call RWarningMsg("Python interface must be enabled to run Vim-R-Plugin.")
@@ -84,7 +86,7 @@ if has("gui_win32")
     call input("Press <Enter> to continue. ")
     finish
   endif
-  exe "source " . g:r_plugin_home . "/r-plugin/rpython.vim"
+  exe "source " . g:rplugin_home . "/r-plugin/rpython.vim"
   if !exists("g:rplugin_rpathadded")
     if exists("g:vimrplugin_r_path")
       let $PATH = g:vimrplugin_r_path . ";" . $PATH
@@ -243,32 +245,36 @@ if g:vimrplugin_underscore == 1
   imap <buffer> _ <Esc>:call ReplaceUnderS()<CR>a
 endif
 
+set commentstring=#%s
+
 " Are we in a Debian package? Is the plugin being running for the first time?
-" Create r-plugin directory if it doesn't exist yet:
-if !isdirectory(b:user_vimfiles . "/r-plugin")
-  call mkdir(b:user_vimfiles . "/r-plugin", "p")
-endif
-
-" If there is no functions.vim, copy the default one
-if !filereadable(b:user_vimfiles . "/r-plugin/functions.vim")
-  if filereadable("/usr/share/vim/addons/r-plugin/functions.vim")
-    let x = readfile("/usr/share/vim/addons/r-plugin/functions.vim")
-    call writefile(x, b:user_vimfiles . "/r-plugin/functions.vim")
-  endif
-endif
-
-" If there is no omnilist, copy the default one
 let b:libs_omni_filename = b:user_vimfiles . "/r-plugin/omnilist"
-if !filereadable(b:libs_omni_filename)
-  if filereadable("/usr/share/vim/addons/r-plugin/omnilist")
-    let x = readfile("/usr/share/vim/addons/r-plugin/omnilist")
-    call writefile(x, b:libs_omni_filename)
-  else
-    if filereadable(g:r_plugin_home . "/r-plugin/omnilist")
-      let x = readfile(g:r_plugin_home . "/r-plugin/omnilist")
+if g:rplugin_home != b:user_vimfiles
+  " Create r-plugin directory if it doesn't exist yet:
+  if !isdirectory(b:user_vimfiles . "/r-plugin")
+    call mkdir(b:user_vimfiles . "/r-plugin", "p")
+  endif
+
+  " If there is no functions.vim, copy the default one
+  if !filereadable(b:user_vimfiles . "/r-plugin/functions.vim")
+    if filereadable("/usr/share/vim/addons/r-plugin/functions.vim")
+      let x = readfile("/usr/share/vim/addons/r-plugin/functions.vim")
+      call writefile(x, b:user_vimfiles . "/r-plugin/functions.vim")
+    endif
+  endif
+
+  " If there is no omnilist, copy the default one
+  if !filereadable(b:libs_omni_filename)
+    if filereadable("/usr/share/vim/addons/r-plugin/omnilist")
+      let x = readfile("/usr/share/vim/addons/r-plugin/omnilist")
       call writefile(x, b:libs_omni_filename)
     else
-      call writefile([], b:libs_omni_filename)
+      if filereadable(g:rplugin_home . "/r-plugin/omnilist")
+	let x = readfile(g:rplugin_home . "/r-plugin/omnilist")
+	call writefile(x, b:libs_omni_filename)
+      else
+	call writefile([], b:libs_omni_filename)
+      endif
     endif
   endif
 endif
@@ -336,11 +342,11 @@ if g:vimrplugin_term == "gnome-terminal" || g:vimrplugin_term == "xfce4-terminal
 endif
 
 if g:vimrplugin_term == "konsole"
-  let b:term_cmd = "konsole --workdir '" . expand("%:p:h") . "' --icon " . g:r_plugin_home . "/bitmaps/ricon.png -e"
+  let b:term_cmd = "konsole --workdir '" . expand("%:p:h") . "' --icon " . g:rplugin_home . "/bitmaps/ricon.png -e"
 endif
 
 if g:vimrplugin_term == "Eterm"
-  let b:term_cmd = "Eterm --icon " . g:r_plugin_home . "/bitmaps/ricon.png -e"
+  let b:term_cmd = "Eterm --icon " . g:rplugin_home . "/bitmaps/ricon.png -e"
 endif
 
 if g:vimrplugin_term == "rxvt" || g:vimrplugin_term == "aterm"
@@ -348,7 +354,7 @@ if g:vimrplugin_term == "rxvt" || g:vimrplugin_term == "aterm"
 endif
 
 if g:vimrplugin_term == "xterm" || g:vimrplugin_term == "uxterm"
-  let b:term_cmd = g:vimrplugin_term . " -xrm '*iconPixmap: " . g:r_plugin_home . "/bitmaps/ricon.xbm' -e"
+  let b:term_cmd = g:vimrplugin_term . " -xrm '*iconPixmap: " . g:rplugin_home . "/bitmaps/ricon.xbm' -e"
 endif
 
 " Override default settings:
@@ -540,7 +546,7 @@ function! RObjBrowser()
   " R builds the Object_Browser contents.
   let lockfile = $VIMRPLUGIN_TMPDIR . "/objbrowser" . "lock"
   call writefile(["Wait!"], lockfile)
-  call SendCmdToScreen("source('" . g:r_plugin_home . "/r-plugin/vimbrowser.R')", 1)
+  call SendCmdToScreen("source('" . g:rplugin_home . "/r-plugin/vimbrowser.R')", 1)
   sleep 50m
   let i = 0 
   while filereadable(lockfile)
@@ -665,6 +671,7 @@ function! SendCmdToScreen(cmd, quiet)
     else
       call g:conquebuff.read(100, 1)
     endif
+    normal! G0
 
     " jump back to code buffer
     exe "sil noautocmd sb " . g:rplugin_curbuf
@@ -999,7 +1006,7 @@ function! BuildROmniList(env)
   endif
   let lockfile = rtf . ".locked"
   call writefile(["Wait!"], lockfile)
-  let omnilistcmd = 'source("' . g:r_plugin_home . '/r-plugin/build_omni_list.R")'
+  let omnilistcmd = 'source("' . g:rplugin_home . '/r-plugin/build_omni_list.R")'
   call SendCmdToScreen(omnilistcmd, 1)
   " Wait while R is writing the list of objects into the file
   sleep 50m

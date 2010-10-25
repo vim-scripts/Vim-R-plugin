@@ -6,7 +6,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria
 
-Version: 101023
+Version: 101025
 
 For Vim version 7.2 and above
 
@@ -50,14 +50,34 @@ to deal with.
 2. Main features~
 							   *r-plugin-features*
 
-  * Syntax highlighting for R syntax.
+  * Syntax highlighting for R syntax, including:
+      - Special characters in strings.
+      - Functions of all installed packages (must be updated manually).
+      - Special highlighting for R output (.Rout files).
   * Smart indentation for R syntax.
-  * Integrated communication with R.
-  * Omni completion (auto-completion) for R objects.
-  * Ability to update the list of objects for omni completion and syntax
-    highlighting to include all R packages loaded by the user.
-  * Object browser (must be updated manually)
-  * Ability to see R's documentation in a Vim's buffer.
+  * Integrated communication with R:
+      - Start/Close R.
+      - Send lines, selection, paragraphs, functions, blocks, entire file.
+      - Send commands with the object under cursor as argument: help, args,
+	plot, print, str, summary, example, names.
+      - Send to R the Sweave and pdflatex commands.
+      - Run R inside a Vim's buffer (with Conque Shell plugin; currently
+	available only on Unix -- Linux or OS X).
+  * Omni completion (auto-completion) for R objects (.GlobalEnv and installed
+    packages. The list of installed packages must be updated manually.
+  * Ability to see R's documentation in a Vim's buffer:
+      - Automatic calculation of the best layout of the R documentation buffer
+	(split the window either horizontally or vertically according to the
+	available room).
+      - Automatic formating of the text to fit the panel width.
+      - Send code and commands to R (useful to run examples).
+      - Jump to another R documentation.
+      - Syntax highlighting of R documentation.
+  * Object browser (.GlobalEnv and loaded packages; must be updated manually):
+      - Send commands with object under cursor as argument.
+      - Call R's help() with object under cursor as argument.
+      - Syntax highlighting of the object browser.
+  * Most of the plugin's behavior is customizable.
 
 
 ------------------------------------------------------------------------------
@@ -507,18 +527,18 @@ your |vimrc|, as in the examples below:
 <
 The minimum width of the object browser windows is 9 columns.
 
-7.3. Vim as pager for R help (Linux/Unix only)~
+7.4. Vim as pager for R help (Linux/Unix only)~
 							 *vimrplugin_vimpager*
 							 *vimrplugin_editor_w*
 							   *vimrplugin_help_w*
-7.3.1. Quick setup~
+7.4.1. Quick setup~
 
 If you do not want to see R documentation in a Vim's buffer, put in your
 |vimrc|:
 >
    let vimrplugin_vimpager = "no"
 <
-7.3.2. Details and other options:~
+7.4.2. Details and other options:~
 
 The plugin key bindings will remain active in the documentation buffer, and,
 thus, you will be able to send commands to R as you do while editing an R
@@ -548,7 +568,7 @@ values to some variables in your |vimrc|, as in the example:
    let vimrplugin_editor_h = 60
 <
 
-7.4. Number of R processes (Linux/Unix only)~
+7.5. Number of R processes (Linux/Unix only)~
 							*vimrplugin_nosingler*
 						  *vimrplugin_by_vim_instance*
 If you prefer that each Vim buffer uses its own R process, put the following
@@ -575,7 +595,7 @@ instances you will have to use the --servername argument because screen will
 not differentiate between the names "GVIM1" and "GVIM10".
 
 
-7.5. R path~
+7.6. R path~
 							   *vimrplugin_r_path*
 Vim will run the first R executable in the path. You can set an alternative R
 path in your |vimrc| as in the examples:
@@ -586,7 +606,7 @@ path in your |vimrc| as in the examples:
 On Windows, Vim will try to find the R install path in the Windows Registry.
 
 
-7.6. Arguments to R~
+7.7. Arguments to R~
 							   *vimrplugin_r_args*
 Set this option in your |vimrc| if you want to pass command line arguments to
 R at the startup. Example:
@@ -598,7 +618,7 @@ default value is "--sdi", but you may change it to "--mdi" if do not like the
 SDI style of the graphical user interface.
 
 
-7.7. Time necessary to build list of objects for omni completion~
+7.8. Time necessary to build list of objects for omni completion~
 							*vimrplugin_buildwait*
 If your system needs more than 120 seconds to build the list of objects for
 omni completion after you do the command |:RUpdateObjList|, then you should
@@ -607,7 +627,27 @@ set the value of |vimrplugin_buildwait| to a higher value. Example:
    let vimrplugin_buildwait = 240
 >
 
-7.8. How to automatically open the .Rout file~
+7.9. More colorful syntax highlight of .Rout files~
+						   *vimrplugin_routmorecolors*
+By default, the R commands in .Rout files are highlighted with the color of
+comments, and only the output of commands has some of its elements highlighted
+(numbers, strings, index of vectors, warnings and errors). The same
+highlighting scheme is applied to the R Console when using the Conque Shell
+plugin to run R inside a Vim's buffer. For one hand, we do not need to
+highlight R commands in the Console if they were sent by the plugin from an R
+script buffer since we have the code highlighted in the script buffer and in
+the Console we want to pay attention to the output. A too colorful
+highlighting scheme would be distracting. On the other hand, if we were typing
+commands directly in the Console it would be beneficial to have the R syntax
+highlighted.
+
+If you prefer that R commands in the R output are highlighted as they are in R
+scripts, put the following in your |vimrc|:
+>
+   let vimrplugin_routmorecolors = 1
+<
+
+7.10. How to automatically open the .Rout file~
 							*vimrplugin_routnotab*
 After the command \ao, vim will save the current buffer if it has any pending
 changes, run R CMD BATCH on the current file and show the resulting .Rout file
@@ -616,7 +656,8 @@ in your |vimrc|:
 >
    let vimrplugin_notab = 1
 <
-7.9. Sleep time (Windows only)~
+
+7.11. Sleep time (Windows only)~
 							*vimrplugin_sleeptime*
 The plugin gives to R a small amount of time to process the paste command.
 The default value is 0.2 second, but you should experiment different values.
@@ -625,7 +666,7 @@ The example show how to adjust the value of sleeptime in your |vimrc|:
    let vimrplugin_sleeptime = 0.1
 <
 
-7.10. Screen configuration (Linux/Unix only)~
+7.12. Screen configuration (Linux/Unix only)~
 						       *vimrplugin_noscreenrc*
 Vim runs screen with a special configuration file. If you want to use
 your own ~/.screenrc, put in your |vimrc|:
@@ -633,7 +674,7 @@ your own ~/.screenrc, put in your |vimrc|:
    let vimrplugin_noscreenrc = 1
 <
 
-7.11. Integration with screen.vim (Linux/Unix only)~
+7.13. Integration with screen.vim (Linux/Unix only)~
 						     *vimrplugin_screenplugin*
 By default, r-plugin will use the screen.vim plugin if it is installed.  If
 you prefer to use both plugins at the same time, download and install the
@@ -696,7 +737,7 @@ may consider as a starting point to create your own:
    term screen-256color
 <
 
-7.12. Integration with Conque Shell plugin (Linux/Unix only)~
+7.14. Integration with Conque Shell plugin (Linux/Unix only)~
 						     *vimrplugin_conqueplugin*
 						     *vimrplugin_conquevsplit*
 Note: Nico Raffo's Conque Shell plugin is unfinished, but its use already has
@@ -726,7 +767,7 @@ the Conque Shell documentations for details):
    let ConqueTerm_Color = 0
 <
 
-7.13 Show list elements in object browser~
+7.15 Show list elements in object browser~
 							  *vimrplugin_open_df*
 							*vimrplugin_open_list*
 By default, the elements of data.frames are shown in the object browser, but
@@ -737,7 +778,7 @@ not the elements of other types of lists. You can put the following in your
    let vimrplugin_open_list = 1
 <
 
-7.14. Special R functions~
+7.16. Special R functions~
 						      *vimrplugin_listmethods*
 						      *vimrplugin_specialplot*
 The plugin includes the file ~/.vim/r-plugin/specialfuns.R which may wrap the
@@ -749,7 +790,7 @@ to edit your ~/.Rprofile and add the following line:
 Then, follow the instructions below to activate the new functions.
 
 
-7.14.1. List methods arguments~
+7.16.1. List methods arguments~
 
 The R function args() list the arguments of a function, but not the arguments
 of its methods. If you want that the plugin calls the function
@@ -759,7 +800,7 @@ of its methods. If you want that the plugin calls the function
    let vimrplugin_listmethods = 1
 <
 
-7.14.2. Change plot of numeric vectors~
+7.16.2. Change plot of numeric vectors~
 By default, R makes a scatterplot of numeric vectors. The function .vim.plot()
 do both a histogram and a boxplot. The function can be called by the plugin
 after <LocalLeader>rg if you edit your ~/.Rprofile as explained above and put
@@ -768,7 +809,7 @@ the following line in your |vimrc|:
    let vimrplugin_specialplot = 1
 <
 
-7.15. maxdeparse~
+7.17. maxdeparse~
 						       *vimrplugin_maxdeparse*
 You can set the argument maxdeparse to be passed to R's source() function.
 Example:
@@ -776,7 +817,7 @@ Example:
    let vimrplugin_maxdeparse = 300
 <
 
-7.16. LaTeX command~
+7.18. LaTeX command~
 							 *vimrplugin_latexcmd*
 By default, Vim calls pdflatex to produce a pdf document from the .tex file
 produced by the R Sweave command. You can use the option vimrplugin_latexcmd
@@ -785,7 +826,7 @@ to change this behavior. Example:
    let vimrplugin_latexcmd = "latex"
 <
 
-7.17. Never unmake the R menu and tool bar buttons~
+7.19. Never unmake the R menu and tool bar buttons~
 						*vimrplugin_never_unmake_menu*
 Use this option if you want that the menu item R and the R related tool bar
 buttons are not deleted when you change from one buffer to another, for
@@ -794,7 +835,7 @@ example, when go from an .R file to a .txt one:
    let vimrplugin_never_unmake_menu = 1
 <
 
-7.18. Map 'r'~
+7.20. Map 'r'~
 							    *vimrplugin_map_r*
 Some users may already be familiar with the key bindings from earlier releases
 of the r-plugin. If the variable |vimrplugin_map_r| exists, the plugin will 
@@ -1011,7 +1052,26 @@ name and hit CTRL-]. Please, read |tagsrch.txt| for details on how to use tags
 files, specially the section |tags-option|.
 
 
-10.8. Run your Makefile from within R~
+10.8. Fold setup~
+
+Vim has several methods of folding text (see |fold-methods| and
+|fold-commands|). One possibility is the use of the indent method. For
+example, you could put in your |vimrc|:
+>
+   autocmd FileType r set foldmethod=indent
+<
+
+10.9. Automatically comment/uncomment code~
+
+There are several plugins that make it easy to comment and uncomment code
+(respectively, put and remove the '#' symbol from the begin of lines). One of
+them is the EnhancedCommentify which allows us to comment/uncomment a line or
+a block of lines with the command <Leader>x:
+
+   http://www.vim.org/scripts/script.php?script_id=23
+
+
+10.9. Run your Makefile from within R~
 
 Do you have many Rnoweb files included in a master tex or Rnoweb file and use
 a Makefile to build the pdf? You may consider it useful to put the following
@@ -1020,7 +1080,7 @@ line in your |vimrc|:
    nmap <LocalLeader>sm :update<CR>:call SendCmdToScreen('system("make")')<CR>
 <
 
-10.9. Group windows with compiz~
+10.10. Group windows with compiz~
 
 If you are using Compiz, it may be easier to work with the plugin if the
 various related windows (editor, terminal, and graphics window) are grouped
@@ -1029,7 +1089,7 @@ may need CompizConfig Settings Manager installed to enable this feature (look
 at the "Window Management" section for "Group and Tab Windows").
 
 
-10.10. Why I have to updated the Object Browser manually?~
+10.11. Why I have to updated the Object Browser manually?~
 
 It is because Vim and R run as separate processes and, thus, it is not
 possible to Vim to know whether R is busy or not. If R was running as part of
@@ -1041,9 +1101,26 @@ Vim-R-plugin did this, the use of Vim would be blocked until R finished its
 processing. 
 
 
+10.12. Why there is repeated code in the plugin?~
+
+In the ftplugin directory, rdoc.vim, rhelp.vim and rnoweb.vim are symbolic
+links to r.vim. They become real files when the zip package is created, and I
+use zip format because for Windows users zip files are easier to unpack than
+tar.gz ones. Windows does not support symbolic links at the same extent as
+Unix does.
+
+
 ------------------------------------------------------------------------------
 11. News~
 							       *r-plugin-news*
+101025 (2010-10-25)
+ * New option: vimrplugin_routmorecolors.
+ * Fixed bug in the object browser when a data.frame or list had just one
+   element (thanks to Jan Larres for reporting the bug).
+ * Do not copy omnilist and functions.vim to ~/.vim/r-plugin if the directory
+   where the plugin is installed is writable (thanks to Jan Larres for the
+   suggestion).
+
 101023 (2010-10-23)
  * New options: vimrplugin_objbr_place and vimrplugin_objbr_w.
  * New default value: vimrplugin_vimpager = "vertical"

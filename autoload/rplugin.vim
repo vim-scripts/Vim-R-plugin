@@ -19,7 +19,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Sat Oct 23, 2010  12:32PM
+" Last Change: Mon Oct 25, 2010  08:18AM
 "
 " Please see doc/r-plugin.txt for usage details.
 "==========================================================================
@@ -100,7 +100,7 @@ function! rplugin#ShowRDoc(rkeyword)
   call s:SetRTextWidth()
 
   call writefile(['Wait...'], g:rplugin_docfile . "lock")
-  call SendCmdToScreen("source('" . g:r_plugin_home . "/r-plugin/vimhelp.R') ; .vim.help('" . a:rkeyword . "', " . g:rplugin_htw . "L)", 0)
+  call SendCmdToScreen("source('" . g:rplugin_home . "/r-plugin/vimhelp.R') ; .vim.help('" . a:rkeyword . "', " . g:rplugin_htw . "L)", 0)
   sleep 50m
 
   let i = 0
