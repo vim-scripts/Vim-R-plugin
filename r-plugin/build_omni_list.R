@@ -79,62 +79,107 @@
     return(TRUE)
 }
 
+.vim.omni.line <- function(x, env, curlevel){
+  x.clean <- gsub("$", "", x, fixed = TRUE)
+  x.clean <- gsub("_", "", x.clean, fixed = TRUE)
+  haspunct <- .vim.grepl("[[:punct:]]", x.clean)
+  if(haspunct[1]){
+    ok <- .vim.grepl("[[:alnum:]]\\.[[:alnum:]]", x.clean)
+    if(ok[1]){
+      haspunct  <- FALSE
+      haspp <- .vim.grepl("[[:punct:]][[:punct:]]", x.clean)
+      if(haspp[1]) haspunct <- TRUE
+    }
+  }
+
+  # No support for names with spaces
+  if(.vim.grepl(" ", x.clean)){
+    haspunct <- TRUE
+  }
+
+  xx <- NULL
+  if(haspunct[1]){
+    obj.class <- "unknownClass"
+  } else {
+    if(x == "break" || x == "next" || x == "for" || x == "if" || x == "repeat" || x == "while"){
+      obj.class <- "flow-control"
+      x.group <- "flow-control"
+    } else {
+      if(x == "function"){
+	obj.class <- "function"
+	x.group <- "function"
+      } else {
+	xx <- try(eval(parse(text=x)), silent = TRUE)
+	if(class(xx)[1] == "try-error"){
+	  xx <- NULL
+	  obj.class <- "unknownClass"
+	  x.group <- "unknownClass"
+	} else {
+	  obj.class <- class(xx)
+	}
+      }
+    }
+  }
+
+  x.group <- "unknownClass"
+  if(!is.null(xx)){
+    if(is.numeric(xx)) x.group <- "numeric"
+    else if(is.factor(xx)) x.group <- "factor"
+    else if(is.character(xx)) x.group <- "character"
+    else if(is.logical(xx)) x.group <- "logical"
+    else if(is.list(xx)) x.group <- "list"
+  }
+
+  if(is.function(xx)){
+    if(curlevel == 0){
+      cat(x, ":", "function:function", ":", env, ":", .vim.list.args2(x), "\n", sep="")
+    } else {
+      # some libraries have function as list elements
+      cat(x, ":", "function:function", ":", env, ":", "Unknow arguments", "\n", sep="")
+    }
+  } else {
+    if(is.list(xx) && curlevel > 0){
+      cat(x, ":", "islist:islist", ":", env, ":", "Not a function", "\n", sep="")
+    } else {
+      cat(x, ":", obj.class[1], ":", x.group, ":", env, ":", "Not a function", "\n", sep="")
+    }
+  }
+
+
+  if(is.list(xx)){
+    obj.names <- names(xx)
+    obj.len <- length(xx)
+    curlevel <- curlevel + 1
+    if(obj.len > 0 && curlevel < 2){
+      for(k in 1:obj.len){
+	.vim.omni.line(paste(x, "$", obj.names[k], sep=""), env, 1)
+      }
+    }
+  }
+}
+
 .vim.build.omni.list <- function() {
-  unlink(.vimomnilistfile)
   cat("Building file with list of objects for vim omni completion.\n")
   envnames <- search()
-  sink(.vimomnilistfile)
+  sink(.vimomnilistfile, append = FALSE)
   for(curenv in envnames){
-    noGlobalEnv <- .vim.grepl("/r-plugin/omnilist", .vimomnilistfile)
+    noGlobalEnv <- .vim.grepl("/r-plugin/omni_list", .vimomnilistfile)
     if((curenv == ".GlobalEnv" && noGlobalEnv) | (curenv != ".GlobalEnv" && noGlobalEnv == FALSE)) next
     obj.list <- objects(curenv)
     env <- sub("package:", "", curenv)
     l <- length(obj.list)
     if(l > 0){
       for(j in 1:l){
-        haspunct <- .vim.grepl("[[:punct:]]", obj.list[j])
-        if(haspunct[1]){
-          ok <- .vim.grepl("[[:alnum:]]\\.[[:alnum:]]", obj.list[j])
-          if(ok[1]){
-            haspunct  <- FALSE
-            haspp <- .vim.grepl("[[:punct:]][[:punct:]]", obj.list[j])
-            if(haspp[1])
-              haspunct <- TRUE
-          }
-        }
-	islist <- FALSE
-        if(haspunct[1]){
-          obj.class <- "unknowClass"
-        } else {
-          if(obj.list[j] == "break" || obj.list[j] == "for" ||
-            obj.list[j] == "function" || obj.list[j] == "if" ||
-            obj.list[j] == "repeat" || obj.list[j] == "while"){
-            obj.class <- "flow-control"
-          } else {
-            obj.class <- class(eval(parse(text=obj.list[j])))
-            islist <- is.list(eval(parse(text=obj.list[j])))
-          }
-        }
-	if(is.function(get(obj.list[j])))
-	  cat(obj.list[j], ":", obj.class[1], ":", env, ":", .vim.list.args2(obj.list[j]), "\n", sep="")
-	else
-	  cat(obj.list[j], ":", obj.class[1], ":", env, ":", "Not a function", "\n", sep="")
-	if(islist){
-	  obj <- eval(parse(text=obj.list[j]))
-	  obj.names <- names(obj)
-	  obj.len <- length(obj)
-	  if(obj.len > 0){
-	    for(k in 1:obj.len){
-	      cat(obj.list[j], "$", obj.names[k], ":", class(obj[[k]]), ":", env, ":", "Not a function", "\n", sep="")
-	    }
-	  }
-	}
+	.vim.omni.line(obj.list[j], env, 0)
       }
     }
   }
   sink()
 }
 
+.vim.OutDec <- options("OutDec")[[1]]
+options(OutDec = ".")
 .vim.build.omni.list()
+options(OutDec = .vim.OutDec)
 unlink(paste(.vimomnilistfile, ".locked", sep = ""))
 

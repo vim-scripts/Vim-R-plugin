@@ -6,11 +6,12 @@ Screenshots and Debian package: http://sites.google.com/site/jalvesaq/vimrplugin
 
 MAIN FEATURES:
 
-
   * Syntax highlighting for R syntax, including:
       - Special characters in strings.
       - Functions of all installed packages (must be updated manually).
       - Special highlighting for R output (.Rout files).
+      - Spell check only strings and comments.
+      - Fold code when foldmethod=syntax.
   * Smart indentation for R syntax.
   * Integrated communication with R:
       - Start/Close R.
@@ -18,24 +19,26 @@ MAIN FEATURES:
       - Send commands with the object under cursor as argument: help, args, plot, print, str, summary, example, names.
       - Send to R the Sweave and pdflatex commands.
       - Run R inside a Vim's buffer (with Conque Shell plugin; currently available only on Unix -- Linux or OS X).
-  * Omni completion (auto-completion) for R objects (.GlobalEnv and installed packages. The list of installed packages must be updated manually.
+  * Omni completion (auto-completion) for R objects (.GlobalEnv and installed
+    packages. The list of installed packages must be updated manually.
   * Ability to see R's documentation in a Vim's buffer:
-      - Automatic calculation of the best layout of the R documentation buffer (split the window either horizontally or vertically according to the available room).
+      - Automatic calculation of the best layout of the R documentation buffer (split the window either horizontally
+        or vertically according to the available room).
       - Automatic formating of the text to fit the panel width.
       - Send code and commands to R (useful to run examples).
       - Jump to another R documentation.
       - Syntax highlighting of R documentation.
   * Object browser (.GlobalEnv and loaded packages; must be updated manually):
-      - Send commands with object under cursor as argument.
-      - Call R's help() with object under cursor as argument.
+      - Send commands with the object under cursor as argument.
+      - Call R's help() with the object under cursor as argument.
       - Syntax highlighting of the object browser.
   * Most of the plugin's behavior is customizable.
-
 
 
 USE: Please, read the plugin's documentation.
 
 FILES:
+
    autoload/rcomplete.vim
    autoload/rplugin.vim
    bitmaps/RClearAll.bmp
@@ -69,19 +72,21 @@ FILES:
    ftplugin/r.vim
    ftplugin/rbrowser.vim
    indent/r.vim
+   indent/rnoweb.vim
    r-plugin/build_omni_list.R
    r-plugin/etags2ctags.R
    r-plugin/functions.vim
-   r-plugin/omnilist
+   r-plugin/omni_list
    r-plugin/vimbrowser.R
    r-plugin/vimhelp.R
+   r-plugin/r.snippets
    r-plugin/rpager.sh
-   r-plugin/rperl.vim
    r-plugin/rpython.vim
+   r-plugin/rsyntax.vim
    r-plugin/specialfuns.R
+   r-plugin/tex_indent.vim
    r-plugin/vimActivate.js
    syntax/rbrowser.vim
-   syntax/rdoc.vim
    syntax/rout.vim
    syntax/r.vim
 

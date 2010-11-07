@@ -88,6 +88,25 @@ if kHandle:
 EOL
 endfunction
 
+function! RIsWin64Py()
+python << EOL
+import win32api
+import win32con
+import vim
+
+keyName = 'SOFTWARE\Wow6432Node\R-core\R'
+try:
+    kHandle = win32api.RegOpenKeyEx(win32con.HKEY_LOCAL_MACHINE, keyName, 0, win32con.KEY_READ)
+except:
+    kHandle = None
+
+if kHandle:
+    vim.command("return 1")
+else:
+    vim.command("return 0")
+EOL
+endfunction
+
 function! StartRPy()
 python << EOL
 import win32api

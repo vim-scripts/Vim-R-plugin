@@ -1,7 +1,7 @@
 " Vim completion script
 " Language:    R
 " Maintainer:  Jakson Alves de Aquino <jalvesaq@gmail.com>
-" Last Change: Fri Oct 22, 2010  06:01PM
+" Last Change: Fri Nov 05, 2010  06:29AM
 "
 
 fun! rcomplete#CompleteR(findstart, base)
@@ -32,7 +32,18 @@ fun! rcomplete#CompleteR(findstart, base)
           continue
         endif
 	let tmp1 = split(line, ':')
-	let tmp2 = {'word': tmp1[0], 'menu': tmp1[1] . ' ' . tmp1[2], 'info': tmp1[3]}
+	if len(tmp1) == 5
+	  let info = tmp1[4]
+	else
+	  let tlen = len(tmp1)
+	  let info = tmp1[4]
+	  let i = 5
+	  while i < tlen
+	    let info = info . ':' . tmp1[i]
+	    let i += 1
+	  endwhile
+	endif
+	let tmp2 = {'word': tmp1[0], 'menu': tmp1[1] . ' ' . tmp1[3], 'info': info}
 	call add(res, tmp2)
       endif
     endfor

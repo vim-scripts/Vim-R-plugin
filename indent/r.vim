@@ -2,24 +2,20 @@
 " Language:	R
 " Author:	Jakson Alves de Aquino <jalvesaq@gmail.com>
 " URL:		http://www.vim.org/scripts/script.php?script_id=2628
-" Last Change:	Sun Sep 05, 2010  09:08AM
+" Last Change:	Sat Oct 30, 2010  04:07PM
 
 
 " Only load this indent file when no other was loaded.
-if exists("b:did_indent")
+if exists("b:did_r_indent")
   finish
 endif
-let b:did_indent = 1
+let b:did_r_indent = 1
 
+setlocal indentkeys=0{,0},:,!^F,o,O,e
 setlocal indentexpr=GetRIndent()
 
 " Only define the function once.
 if exists("*GetRIndent")
-  finish
-endif
-
-" Quit if the buffer is rnoweb:
-if &filetype == "rnoweb"
   finish
 endif
 

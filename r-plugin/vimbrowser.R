@@ -1,8 +1,7 @@
 
 .vim.browser.order <- character()
-.vim.browser.curlist <- character()
 
-.vim.browserline <- function(x.name, x)
+.vim.browserline <- function(x.name, x, curlist)
 {
   if(is.numeric(x)) x.class <- "numeric"
   else if(is.factor(x)) x.class <- "factor"
@@ -17,7 +16,7 @@
   x.label <- attr(x, "label")
   if(!is.null(x.label)) cat(", 'label': \"", x.label, '"', sep = "")
   if(is.list(x)){
-    .vim.browser.curlist <<- paste(.vim.browser.curlist, x.name, sep = "-")
+    curlist <- paste(curlist, x.name, sep = "-")
     cat(", 'items': {", sep = "")
     x.names <- names(x)
 
@@ -25,14 +24,13 @@
     x.names.dup <- duplicated(x.names)
     if(sum(x.names.dup) > 0) x.names <- x.names[!x.names.dup]
 
-    len <- length(x.names)
     newlistnames <- paste('"', paste(x.names, collapse = '", "'), '"', sep = "")
+    .vim.browser.order <<- paste(.vim.browser.order, "'", curlist, "': [", newlistnames, "], ", sep = "")
 
-    .vim.browser.order <<- paste(.vim.browser.order, "'", .vim.browser.curlist, "': [", newlistnames, "], ", sep = "")
-
+    len <- length(x.names)
     if(len > 0){
       for(i in 1:len){
-	.vim.browserline(x.names[i], x[[i]])
+	.vim.browserline(x.names[i], x[[i]], curlist)
       }
     }
     cat("}")
@@ -43,8 +41,7 @@
 sink(paste(Sys.getenv("VIMRPLUGIN_TMPDIR"), "/objbrowser", sep = ""))
 cat("let b:workspace = {")
 for(.i in ls()){
-  .vim.browser.curlist <- ""
-  .vim.browserline(.i, get(.i))
+  .vim.browserline(.i, get(.i), "")
 }
 cat("}\n")
 .vim.browser.order <- sub(", $", "", .vim.browser.order)
@@ -54,6 +51,6 @@ cat("let b:list_order = {", .vim.browser.order, "}\n", sep = "")
 .vim.liblist <- sub("package:", "", .vim.liblist)
 cat("let b:liblist = ['", paste(.vim.liblist, collapse = "', '"), "']\n", sep = "") 
 sink()
-rm(.i, .vim.browser.curlist, .vim.liblist, .vim.browser.order, .vim.browserline)
+rm(.i, .vim.liblist, .vim.browser.order, .vim.browserline)
 unlink(paste(Sys.getenv("VIMRPLUGIN_TMPDIR"), "/objbrowserlock", sep = ""))
 

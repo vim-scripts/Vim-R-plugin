@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:    R output Files
 " Maintainer:  Jakson Aquino <jalvesaq@gmail.com>
-" Last Change: Sun Oct 24, 2010  06:42PM
+" Last Change: Mon Oct 25, 2010  07:20PM
 "
 
 " Version Clears: {{{1
@@ -17,15 +17,9 @@ syn case match
 
 " Strings
 syn region routString start=/"/ skip=/\\\\\|\\"/ end=/"/ end=/$/
-" Numbers
-syn match routNumber /\<\d\+\>/
-" floating point number with integer and fractional parts and optional exponent
-syn match routFloat /\<\d\+\.\d*\([Ee][-+]\=\d\+\)\=\>/
-" floating point number with no integer part and optional exponent
-syn match routFloat /\<\.\d\+\([Ee][-+]\=\d\+\)\=\>/
-" floating point number with no fractional part and optional exponent
-syn match routFloat /\<\d\+[Ee][-+]\=\d\+\>/
-syn match routIndex /^\s*\[\d\+\]/
+
+" Common elements to r and rout file types
+runtime r-plugin/rsyntax.vim
 
 if !exists("g:vimrplugin_routmorecolors")
   let g:vimrplugin_routmorecolors = 0
@@ -40,6 +34,9 @@ else
   syn match routComment /^> .*/
   syn match routComment /^+ .*/
 endif
+
+" Index of vectors
+syn match routIndex /^\s*\[\d\+\]/
 
 " Errors and warnings
 syn match routError "^Error.*"
@@ -85,11 +82,15 @@ endif
 if g:vimrplugin_routmorecolors == 0
   hi def link routComment	Comment
 endif
-hi def link routNumber	Number
-hi def link routFloat	Float
+hi def link rNumber	Number
+hi def link rComplex	Number
+hi def link rInteger	Number
+hi def link rBoolean	Boolean
+hi def link rConstant	Constant
+hi def link rFloat	Float
 hi def link routString	String
-hi def link routError   Error
-hi def link routWarn    WarningMsg
+hi def link routError	Error
+hi def link routWarn	WarningMsg
 hi def link routIndex	Special
 
 let   b:current_syntax = "rout"

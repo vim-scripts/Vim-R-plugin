@@ -151,6 +151,7 @@ syn keyword rFunction friedman.test
 syn keyword rFunction ftable
 syn keyword rFunction Gamma
 syn keyword rFunction gaussian
+syn keyword rFunction get_all_vars
 syn keyword rFunction getInitial
 syn keyword rFunction glm
 syn keyword rFunction glm.control
@@ -429,7 +430,17 @@ syn keyword rFunction spectrum
 syn keyword rFunction spline
 syn keyword rFunction splinefun
 syn keyword rFunction splinefunH
+syn keyword rFunction SSasymp
+syn keyword rFunction SSasympOff
+syn keyword rFunction SSasympOrig
+syn keyword rFunction SSbiexp
 syn keyword rFunction SSD
+syn keyword rFunction SSfol
+syn keyword rFunction SSfpl
+syn keyword rFunction SSgompertz
+syn keyword rFunction SSlogis
+syn keyword rFunction SSmicmen
+syn keyword rFunction SSweibull
 syn keyword rFunction start
 syn keyword rFunction stat.anova
 syn keyword rFunction step
@@ -573,6 +584,8 @@ syn keyword rFunction as.raster
 syn keyword rFunction bitmap
 syn keyword rFunction bmp
 syn keyword rFunction boxplot.stats
+syn keyword rFunction cairo_pdf
+syn keyword rFunction cairo_ps
 syn keyword rFunction check.options
 syn keyword rFunction chull
 syn keyword rFunction CIDFont
@@ -667,6 +680,9 @@ syn keyword rFunction alarm
 syn keyword rFunction apropos
 syn keyword rFunction argsAnywhere
 syn keyword rFunction aspell
+syn keyword rFunction aspell_package_Rd_files
+syn keyword rFunction aspell_package_vignettes
+syn keyword rFunction aspell_write_personal_dictionary_file
 syn keyword rFunction as.person
 syn keyword rFunction as.personList
 syn keyword rFunction as.relistable
@@ -708,6 +724,7 @@ syn keyword rFunction edit
 syn keyword rFunction emacs
 syn keyword rFunction example
 syn keyword rFunction file.edit
+syn keyword rFunction file_test
 syn keyword rFunction find
 syn keyword rFunction findLineNum
 syn keyword rFunction fix
@@ -842,6 +859,7 @@ syn keyword rFunction zip.file.extract
 syn keyword rFunction addNextMethod
 syn keyword rFunction allGenerics
 syn keyword rFunction allNames
+syn keyword rFunction Arith
 syn keyword rFunction as
 syn keyword rFunction asMethodDefinition
 syn keyword rFunction assignClassDef
@@ -857,9 +875,12 @@ syn keyword rFunction cbind2
 syn keyword rFunction checkSlotAssignment
 syn keyword rFunction classesToAM
 syn keyword rFunction classMetaName
+syn keyword rFunction coerce
+syn keyword rFunction Compare
 syn keyword rFunction completeClassDefinition
 syn keyword rFunction completeExtends
 syn keyword rFunction completeSubclasses
+syn keyword rFunction Complex
 syn keyword rFunction conformMethod
 syn keyword rFunction defaultDumpName
 syn keyword rFunction defaultPrototype
@@ -918,6 +939,7 @@ syn keyword rFunction hasMethods
 syn keyword rFunction implicitGeneric
 syn keyword rFunction inheritedSlotNames
 syn keyword rFunction initFieldArgs
+syn keyword rFunction initialize
 syn keyword rFunction insertMethod
 syn keyword rFunction insertSource
 syn keyword rFunction is
@@ -936,6 +958,7 @@ syn keyword rFunction linearizeMlist
 syn keyword rFunction listFromMethods
 syn keyword rFunction listFromMlist
 syn keyword rFunction loadMethod
+syn keyword rFunction Logic
 syn keyword rFunction makeClassRepresentation
 syn keyword rFunction makeExtends
 syn keyword rFunction makeGeneric
@@ -943,6 +966,8 @@ syn keyword rFunction makeMethodsList
 syn keyword rFunction makePrototypeFromClassDef
 syn keyword rFunction makeStandardGeneric
 syn keyword rFunction matchSignature
+syn keyword rFunction Math
+syn keyword rFunction Math2
 syn keyword rFunction mergeMethods
 syn keyword rFunction metaNameUndo
 syn keyword rFunction MethodAddCoerce
@@ -957,6 +982,7 @@ syn keyword rFunction new
 syn keyword rFunction newBasic
 syn keyword rFunction newClassRepresentation
 syn keyword rFunction newEmptyObject
+syn keyword rFunction Ops
 syn keyword rFunction packageSlot
 syn keyword rFunction possibleExtends
 syn keyword rFunction prohibitGeneric
@@ -1013,6 +1039,7 @@ syn keyword rFunction slotNames
 syn keyword rFunction slotsFromS3
 syn keyword rFunction substituteDirect
 syn keyword rFunction substituteFunctionArgs
+syn keyword rFunction Summary
 syn keyword rFunction superClassDepth
 syn keyword rFunction testInheritedMethods
 syn keyword rFunction testVirtual
@@ -1222,6 +1249,7 @@ syn keyword rFunction char.expand
 syn keyword rFunction charmatch
 syn keyword rFunction charToRaw
 syn keyword rFunction chartr
+syn keyword rFunction check_tzones
 syn keyword rFunction chol
 syn keyword rFunction chol2inv
 syn keyword rFunction chol.default
@@ -1256,6 +1284,7 @@ syn keyword rFunction cosh
 syn keyword rFunction c.POSIXct
 syn keyword rFunction c.POSIXlt
 syn keyword rFunction crossprod
+syn keyword rFunction Cstack_info
 syn keyword rFunction cummax
 syn keyword rFunction cummin
 syn keyword rFunction cumprod
@@ -1375,6 +1404,7 @@ syn keyword rFunction format.POSIXct
 syn keyword rFunction format.POSIXlt
 syn keyword rFunction format.pval
 syn keyword rFunction forwardsolve
+syn keyword rFunction function
 syn keyword rFunction gamma
 syn keyword rFunction gammaCody
 syn keyword rFunction gc
@@ -1512,6 +1542,7 @@ syn keyword rFunction kappa.lm
 syn keyword rFunction kappa.qr
 syn keyword rFunction kappa.tri
 syn keyword rFunction kronecker
+syn keyword rFunction l10n_info
 syn keyword rFunction labels
 syn keyword rFunction labels.default
 syn keyword rFunction La.chol
@@ -1618,6 +1649,7 @@ syn keyword rFunction norm
 syn keyword rFunction nrow
 syn keyword rFunction NROW
 syn keyword rFunction numeric
+syn keyword rFunction numeric_version
 syn keyword rFunction nzchar
 syn keyword rFunction objects
 syn keyword rFunction oldClass
@@ -1641,6 +1673,7 @@ syn keyword rFunction package.description
 syn keyword rFunction packageEvent
 syn keyword rFunction packageHasNamespace
 syn keyword rFunction packageStartupMessage
+syn keyword rFunction package_version
 syn keyword rFunction packBits
 syn keyword rFunction pairlist
 syn keyword rFunction parent.env
@@ -1790,6 +1823,7 @@ syn keyword rFunction rowsum
 syn keyword rFunction rowsum.data.frame
 syn keyword rFunction rowsum.default
 syn keyword rFunction rowSums
+syn keyword rFunction R_system_version
 syn keyword rFunction R.Version
 syn keyword rFunction sample
 syn keyword rFunction sample.int
@@ -1805,9 +1839,11 @@ syn keyword rFunction searchpaths
 syn keyword rFunction seek
 syn keyword rFunction seek.connection
 syn keyword rFunction seq
+syn keyword rFunction seq_along
 syn keyword rFunction seq.Date
 syn keyword rFunction seq.default
 syn keyword rFunction seq.int
+syn keyword rFunction seq_len
 syn keyword rFunction seq.POSIXt
 syn keyword rFunction sequence
 syn keyword rFunction serialize

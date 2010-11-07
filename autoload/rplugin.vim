@@ -19,7 +19,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Mon Oct 25, 2010  08:18AM
+" Last Change: Sun Nov 07, 2010  08:21AM
 "
 " Please see doc/r-plugin.txt for usage details.
 "==========================================================================
@@ -84,17 +84,23 @@ function! rplugin#ShowRDoc(rkeyword)
     call delete(g:rplugin_docfile)
   endif
 
-  if bufname("%") == "Object_Browser"
+  if bufname("%") =~ "Object_Browser"
     let savesb = &switchbuf
     set switchbuf=useopen,usetab
-    exe "sb " . g:rplugin_curscriptbuf
+    exe "sb " . b:rscript_buffer
     exe "set switchbuf=" . savesb
   endif
 
   if g:vimrplugin_vimpager == "tabnew"
     let s:rdoctitle = a:rkeyword . "\\ -\\ help" 
   else
-    let s:rdoctitle = "R_doc"
+    let s:tnr = tabpagenr()
+    if g:vimrplugin_vimpager != "tab" && s:tnr > 1
+      let s:rdoctitle = "R_doc" . s:tnr
+    else
+      let s:rdoctitle = "R_doc"
+    endif
+    unlet s:tnr
   endif
 
   call s:SetRTextWidth()
@@ -113,6 +119,14 @@ function! rplugin#ShowRDoc(rkeyword)
     echomsg "Waited too much time..."
     echohl Normal
     return
+  endif
+
+  " Local variables that must be inherited by the rdoc buffer
+  let g:tmp_screensname = b:screensname
+  let g:tmp_objbrtitle = b:objbrtitle
+  if g:vimrplugin_conqueplugin == 1
+    let g:tmp_conqueshell = b:conqueshell
+    let g:tmp_conque_bufname = b:conque_bufname
   endif
 
   if bufloaded(s:rdoctitle)
@@ -145,19 +159,31 @@ function! rplugin#ShowRDoc(rkeyword)
   set buftype=nofile
   autocmd VimResized <buffer> let g:vimrplugin_newsize = 1
   setlocal modifiable
+  set filetype=rdoc
+  let g:rplugin_curbuf = bufname("%")
+
+  " Inheritance of local variables from the script buffer
+  let b:objbrtitle = g:tmp_objbrtitle
+  let b:screensname = g:tmp_screensname
+  unlet g:tmp_objbrtitle
+  if g:vimrplugin_conqueplugin == 1
+    let b:conqueshell = g:tmp_conqueshell
+    let b:conque_bufname = g:tmp_conque_bufname
+    unlet g:tmp_conqueshell
+    unlet g:tmp_conque_bufname
+  endif
+
   normal! ggdG
   exe "silent read " . g:rplugin_docfile
   exe "silent %s/_//g"
   let has_ex = search("^Examples:$")
   if has_ex
     let lnr = line("$") + 1
-    call setline(lnr, "###")
-    let lnr = lnr + 1
-    call setline(lnr, "")
+    call setline(lnr, '###')
   endif
-  setlocal nomodified
-  set filetype=rdoc
   normal! ggdd
+  setlocal nomodified
+  setlocal nomodifiable
 
 endfunction
 
@@ -318,6 +344,40 @@ function! rplugin#ControlMenu()
   call rplugin#RCreateMenuItem("nvi", 'Control.Summary\ (cur)', '<Plug>RSummary', 'rs', ':call rplugin#RAction("summary")')
   call rplugin#RCreateMenuItem("nvi", 'Control.Plot\ (cur)', '<Plug>RPlot', 'rg', ':call rplugin#RAction("plot")')
   call rplugin#RCreateMenuItem("nvi", 'Control.Plot\ and\ summary\ (cur)', '<Plug>RSPlot', 'rb', ':call rplugin#RAction("plot")<CR>:call rplugin#RAction("summary")')
+  "-------------------------------
+  menu R.Control.-Sep4- <nul>
+  call rplugin#RCreateMenuItem("nvi", 'Control.Update\ object\ browser', '<Plug>RUpdateObjBrowser', 'ro', ':call RObjBrowser()')
+  let g:rplugin_hasmenu = 1
+endfunction
+
+function! rplugin#ControlMaps()
+  " List space, clear console, clear all
+  "-------------------------------------
+  call rplugin#RCreateMaps("nvi", '<Plug>RListSpace',    'rl', ':call SendCmdToScreen("ls()", 0)<CR>:echon')
+  call rplugin#RCreateMaps("nvi", '<Plug>RClearConsole', 'rr', ':call RClearConsole()')
+  call rplugin#RCreateMaps("nvi", '<Plug>RClearAll',     'rm', ':call RClearAll()')
+
+  " Print, names, structure
+  "-------------------------------------
+  call rplugin#RCreateMaps("nvi", '<Plug>RObjectPr',     'rp', ':call rplugin#RAction("print")')
+  call rplugin#RCreateMaps("nvi", '<Plug>RObjectNames',  'rn', ':call rplugin#RAction("names")')
+  call rplugin#RCreateMaps("nvi", '<Plug>RObjectStr',    'rt', ':call rplugin#RAction("str")')
+
+  " Arguments, example, help
+  "-------------------------------------
+  call rplugin#RCreateMaps("nvi", '<Plug>RShowArgs',     'ra', ':call rplugin#RAction("args")')
+  call rplugin#RCreateMaps("nvi", '<Plug>RShowEx',       're', ':call rplugin#RAction("example")')
+  call rplugin#RCreateMaps("nvi", '<Plug>RHelp',         'rh', ':call rplugin#RAction("help")')
+
+  " Summary, plot, both
+  "-------------------------------------
+  call rplugin#RCreateMaps("nvi", '<Plug>RSummary',      'rs', ':call rplugin#RAction("summary")')
+  call rplugin#RCreateMaps("nvi", '<Plug>RPlot',         'rg', ':call rplugin#RAction("plot")')
+  call rplugin#RCreateMaps("nvi", '<Plug>RSPlot',        'rb', ':call rplugin#RAction("plot")<CR>:call rplugin#RAction("summary")')
+
+  " Build list of objects for omni completion
+  "-------------------------------------
+  call rplugin#RCreateMaps("nvi", '<Plug>RUpdateObjBrowser',    'ro', ':call RObjBrowser()')
 endfunction
 
 

@@ -19,7 +19,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Mon Oct 25, 2010  08:18AM
+" Last Change: Sun Nov 07, 2010  11:52AM
 "
 " Please see doc/r-plugin.txt for usage details.
 "==========================================================================
@@ -46,17 +46,17 @@ endif
 
 " g:rplugin_home should be the directory where the r-plugin files are.  For
 " users following the installation instructions it will be at ~/.vim or
-" ~/vimfiles, that is, the same value of b:user_vimfiles. However the
+" ~/vimfiles, that is, the same value of g:rplugin_uservimfiles. However the
 " variables will have different values if the plugin is installed somewhere
 " else in the runtimepath.
 let g:rplugin_home = expand("<sfile>:h:h")
 
-" b:user_vimfiles must be a writable directory. It will be g:rplugin_home
+" g:rplugin_uservimfiles must be a writable directory. It will be g:rplugin_home
 " unless it's not writable. Then it wil be ~/.vim or ~/vimfiles.
 if filewritable(g:rplugin_home) == 2
-  let b:user_vimfiles = g:rplugin_home
+  let g:rplugin_uservimfiles = g:rplugin_home
 else
-  let b:user_vimfiles = split(&runtimepath, ",")[0]
+  let g:rplugin_uservimfiles = split(&runtimepath, ",")[0]
 endif
 
 " Automatically rebuild the file listing .GlobalEnv objects for omni
@@ -70,16 +70,17 @@ let s:userlogin = system('whoami')
 if v:shell_error
   let s:userlogin = 'unknown'
 else
-  let newline = stridx(s:userlogin, "\n")
-  if newline != -1
-    let s:userlogin = strpart(s:userlogin, 0, newline)
+  let newuline = stridx(s:userlogin, "\n")
+  if newuline != -1
+    let s:userlogin = strpart(s:userlogin, 0, newuline)
   endif
+  unlet newuline
 endif
 
 if has("gui_win32")
   let g:rplugin_jspath = g:rplugin_home . "\\r-plugin\\vimActivate.js"
   let g:rplugin_home = substitute(g:rplugin_home, "\\", "/", "g")
-  let b:user_vimfiles = substitute(b:user_vimfiles, "\\", "/", "g")
+  let g:rplugin_uservimfiles = substitute(g:rplugin_uservimfiles, "\\", "/", "g")
   if !has("python")
     call RWarningMsg("Python interface must be enabled to run Vim-R-Plugin.")
     call RWarningMsg("Please do  ':h r-plugin-installation'  for details.")
@@ -98,8 +99,24 @@ if has("gui_win32")
 	call input("Press <Enter> to continue. ")
 	finish
       endif
-      let $PATH = b:rinstallpath . '\bin;' . $PATH
-      let b:Rgui = b:rinstallpath . "\\bin\\Rgui.exe"
+      if isdirectory(b:rinstallpath . '\bin\i386')
+	if !exists("g:vimrplugin_i386")
+	  let g:vimrplugin_i386 = 0
+	endif
+	if !isdirectory(b:rinstallpath . '\bin\x64')
+	  let g:vimrplugin_i386 = 1
+	endif
+	if g:vimrplugin_i386
+	  let $PATH = b:rinstallpath . '\bin\i386;' . $PATH
+	  let b:Rgui = b:rinstallpath . '\bin\i386\Rgui.exe'
+	else
+	  let $PATH = b:rinstallpath . '\bin\x64;' . $PATH
+	  let b:Rgui = b:rinstallpath . '\bin\x64\Rgui.exe'
+	endif
+      else
+	let $PATH = b:rinstallpath . '\bin;' . $PATH
+	let b:Rgui = b:rinstallpath . '\bin\Rgui.exe'
+      endif
     endif
     let g:rplugin_rpathadded = 1
   endif
@@ -145,6 +162,8 @@ call RSetDefaultValue("g:vimrplugin_map_r",        0)
 call RSetDefaultValue("g:vimrplugin_open_df",      1)
 call RSetDefaultValue("g:vimrplugin_open_list",    0)
 call RSetDefaultValue("g:vimrplugin_underscore",   1)
+call RSetDefaultValue("g:vimrplugin_rnowebchunk",  1)
+call RSetDefaultValue("g:vimrplugin_screenvsplit", 0)
 call RSetDefaultValue("g:vimrplugin_conquevsplit", 0)
 call RSetDefaultValue("g:vimrplugin_listmethods",  0)
 call RSetDefaultValue("g:vimrplugin_specialplot",  0)
@@ -164,7 +183,7 @@ call RSetDefaultValue("g:vimrplugin_objbr_place", "'console,right'")
 if isdirectory("/tmp")
   let $VIMRPLUGIN_TMPDIR = "/tmp/r-plugin-" . s:userlogin
 else
-  let $VIMRPLUGIN_TMPDIR = b:user_vimfiles . "/r-plugin"
+  let $VIMRPLUGIN_TMPDIR = g:rplugin_uservimfiles . "/r-plugin"
 endif
 
 if !isdirectory($VIMRPLUGIN_TMPDIR)
@@ -204,8 +223,21 @@ if g:vimrplugin_conqueplugin == 1
   let g:vimrplugin_screenplugin = 0
 endif
 
-if !exists("g:vimrplugin_screenplugin") && exists("g:ScreenImpl")
-  let g:vimrplugin_screenplugin = 1
+if !exists("g:vimrplugin_screenplugin")
+  if exists("g:ScreenVersion")
+    let g:vimrplugin_screenplugin = 1
+  else
+    let g:vimrplugin_screenplugin = 0
+  endif
+endif
+
+if !exists("g:ScreenVersion")
+  " g:ScreenVersion was introduced in screen plugin 1.3
+  if g:vimrplugin_screenplugin == 1
+    call RWarningMsg("Vim-R-plugin requires Screen plugin >= 1.3")
+    call input("Press <Enter> to continue. ")
+  endif
+  let g:vimrplugin_screenplugin = 0
 endif
 
 " The screen.vim plugin only works on terminal emulators
@@ -222,6 +254,25 @@ if !has("gui_win32") && g:vimrplugin_conqueplugin == 0 && g:vimrplugin_screenplu
   endif
   call input("Press <Enter> to continue. ")
   finish
+endif
+
+let s:tnr = tabpagenr()
+if !exists("b:objbrtitle")
+  if s:tnr == 1
+    let b:objbrtitle = "Object_Browser"
+  else
+    let b:objbrtitle = "Object_Browser" . s:tnr
+  endif
+  unlet s:tnr
+endif
+
+" Initialize some local variables if Conque shell was already started
+if (vimrplugin_by_vim_instance || vimrplugin_nosingler == 0) && exists("g:the_objbrtitle")
+  if g:vimrplugin_conqueplugin
+    let b:conqueshell = g:the_conqueshell
+    let b:conque_bufname = g:the_conque_bufname
+  endif
+  let b:objbrtitle = g:the_objbrtitle
 endif
 
 " Make the file name of files to be sourced
@@ -245,37 +296,48 @@ if g:vimrplugin_underscore == 1
   imap <buffer> _ <Esc>:call ReplaceUnderS()<CR>a
 endif
 
+if &filetype == "rnoweb"
+  nmap <buffer> gn :call RnwNextChunk()<CR>
+  nmap <buffer> gN :call RnwPreviousChunk()<CR>
+
+  if g:vimrplugin_rnowebchunk == 1
+    " Write code chunck in rnoweb files
+    imap <buffer> < <Esc>:call RWriteChunk()<CR>a
+  endif
+endif
+
 set commentstring=#%s
 
 " Are we in a Debian package? Is the plugin being running for the first time?
-let b:libs_omni_filename = b:user_vimfiles . "/r-plugin/omnilist"
-if g:rplugin_home != b:user_vimfiles
+let g:rplugin_omnifname = g:rplugin_uservimfiles . "/r-plugin/omni_list"
+if g:rplugin_home != g:rplugin_uservimfiles
   " Create r-plugin directory if it doesn't exist yet:
-  if !isdirectory(b:user_vimfiles . "/r-plugin")
-    call mkdir(b:user_vimfiles . "/r-plugin", "p")
+  if !isdirectory(g:rplugin_uservimfiles . "/r-plugin")
+    call mkdir(g:rplugin_uservimfiles . "/r-plugin", "p")
   endif
 
   " If there is no functions.vim, copy the default one
-  if !filereadable(b:user_vimfiles . "/r-plugin/functions.vim")
+  if !filereadable(g:rplugin_uservimfiles . "/r-plugin/functions.vim")
     if filereadable("/usr/share/vim/addons/r-plugin/functions.vim")
-      let x = readfile("/usr/share/vim/addons/r-plugin/functions.vim")
-      call writefile(x, b:user_vimfiles . "/r-plugin/functions.vim")
+      let ffile = readfile("/usr/share/vim/addons/r-plugin/functions.vim")
+      call writefile(ffile, g:rplugin_uservimfiles . "/r-plugin/functions.vim")
+      unlet ffile
     endif
   endif
 
-  " If there is no omnilist, copy the default one
-  if !filereadable(b:libs_omni_filename)
-    if filereadable("/usr/share/vim/addons/r-plugin/omnilist")
-      let x = readfile("/usr/share/vim/addons/r-plugin/omnilist")
-      call writefile(x, b:libs_omni_filename)
+  " If there is no omni_list, copy the default one
+  if !filereadable(g:rplugin_omnifname)
+    if filereadable("/usr/share/vim/addons/r-plugin/omni_list")
+      let omnilines = readfile("/usr/share/vim/addons/r-plugin/omni_list")
     else
-      if filereadable(g:rplugin_home . "/r-plugin/omnilist")
-	let x = readfile(g:rplugin_home . "/r-plugin/omnilist")
-	call writefile(x, b:libs_omni_filename)
+      if filereadable(g:rplugin_home . "/r-plugin/omni_list")
+	let omnilines = readfile(g:rplugin_home . "/r-plugin/omni_list")
       else
-	call writefile([], b:libs_omni_filename)
+	let omnilines = []
       endif
     endif
+    call writefile(omnilines, g:rplugin_omnifname)
+    unlet omnilines
   endif
 endif
 
@@ -286,7 +348,7 @@ endif
 
 " Keeps the libraries object list in memory to avoid the need of reading the file
 " repeatedly:
-let g:rplugin_liblist = readfile(b:libs_omni_filename)
+let g:rplugin_liblist = readfile(g:rplugin_omnifname)
 
 
 " Control the menu 'R' and the tool bar buttons
@@ -299,11 +361,6 @@ let b:scrfile = " "
 
 " List of marks that the plugin seeks to find the block to be sent to R
 let s:all_marks = "abcdefghijklmnopqrstuvwxyz"
-
-" The current buffer number
-if !exists("g:rplugin_curbuf") && (&filetype == "r" || &filetype == "rnoweb")
-  let g:rplugin_curbuf = bufname("%")
-endif
 
 " Create an empty file to avoid errors if the user do Ctrl-X Ctrl-O before
 " starting R:
@@ -372,36 +429,64 @@ endif
 
 " Make a unique name for the screen process for each Vim instance:
 if g:vimrplugin_by_vim_instance == 1
-  let sname = substitute(v:servername, " ", "-", "g")
-  if sname == ""
+  let s:sname = substitute(v:servername, " ", "-", "g")
+  if s:sname == ""
     call RWarningMsg("The option vimrplugin_by_vim_instance requires a servername. Please read the documentation.")
+    let g:vimrplugin_by_vim_instance = 0
     sleep 2
   else
     " For screen GVIM and GVIM1 are the same string.
-    let sname = substitute(sname, "GVIM$", "GVIM0", "g")
-    let b:screensname = "vimrplugin-" . s:userlogin . "-" . sname
+    let s:sname = substitute(s:sname, "GVIM$", "GVIM0", "g")
+    let b:screensname = "vimrplugin-" . s:userlogin . "-" . s:sname
   endif
+  unlet s:sname
 endif
 
-function! ReplaceUnderS()
-  let j = col(".")
-  let s = getline(".")
-  if j > 3 && s[j-3] == "<" && s[j-2] == "-" && s[j-1] == " "
-    exe "normal! 3h3xr_"
-    return
+function! RnwIsInRCode()
+  let chunkline = search("^<<", "bncW")
+  let docline = search("^@", "bncW")
+  if chunkline > docline
+    return 1
+  else
+    return 0
   endif
-  let isString = 0
-  let i = 0
-  while i < j
-    if s[i] == '"'
-      if isString == 0
-	let isString = 1
-      else
-	let isString = 0
-      endif
+endif
+endfunction
+
+function! RWriteChunk()
+  let line = getline(".")
+  if line == "" && RnwIsInRCode() == 0
+    exe "normal! i<<>>="
+    exe "normal! o@"
+    exe "normal! 0kl"
+  else
+    exe "normal! a<"
+  endif
+endfunction
+
+function! ReplaceUnderS()
+  if &filetype == "rnoweb" && RnwIsInRCode() == 0
+    let isString = 1
+  else
+    let j = col(".")
+    let s = getline(".")
+    if j > 3 && s[j-3] == "<" && s[j-2] == "-" && s[j-1] == " "
+      exe "normal! 3h3xr_"
+      return
     endif
-    let i += 1
-  endwhile
+    let isString = 0
+    let i = 0
+    while i < j
+      if s[i] == '"'
+	if isString == 0
+	  let isString = 1
+	else
+	  let isString = 0
+	endif
+      endif
+      let i += 1
+    endwhile
+  endif
   if isString == 0
     exe "normal! a <- "
   else
@@ -417,25 +502,67 @@ function! CountBraces(line)
   return result
 endfunction
 
+function! RnwPreviousChunk()
+  echon
+  let curline = line(".")
+  if RnwIsInRCode()
+    let i = search("^<<.*$", "bnW")
+    if i != 0
+      call cursor(i-1, 1)
+    endif
+  endif
+
+  let i = search("^<<.*$", "bnW")
+  if i == 0
+    call cursor(curline, 1)
+    call RWarningMsg("There is no previous R code chunk to go.")
+  else
+    call cursor(i+1, 1)
+  endif
+  return
+endfunction
+
+function! RnwNextChunk()
+  echon
+  let i = search("^<<.*$", "nW")
+  if i == 0
+    call RWarningMsg("There is no next R code chunk to go.")
+  else
+    call cursor(i+1, 1)
+  endif
+  return
+endfunction
+
+function! RnwOldNextChunk()
+  let i = line(".")
+  let lastLine = line("$")
+  let curline = getline(".")
+  while i < lastLine && curline !~ "^<<.*$"
+    let i = i + 1
+    let curline = getline(i)
+  endwhile
+  if i == lastLine
+    call RWarningMsg("There is no next R code chunk to go.")
+  else
+    call cursor(i, 1)
+  endif
+endfunction
+
 " Skip empty lines and lines whose first non blank char is '#'
 function! GoDown()
-  let lastLine = line("$")
   if &filetype == "rnoweb"
-    let i = line(".")
     let curline = getline(".")
     let fc = curline[0]
     if fc == '@'
-      while i < lastLine && curline !~ "^<<.*$"
-        let i = i + 1
-        call cursor(i, 1)
-        let curline = getline(i)
-      endwhile
+      call RnwNextChunk()
     endif
   endif
+
   let i = line(".") + 1
   call cursor(i, 1)
   let curline = substitute(getline("."), '^\s*', "", "")
   let fc = curline[0]
+  let lastLine = line("$")
   while i < lastLine && (fc == '#' || strlen(curline) == 0)
     let i = i + 1
     call cursor(i, 1)
@@ -489,19 +616,69 @@ function! StartR(whatr)
   endif
 
   if g:vimrplugin_screenplugin
-    exec 'ScreenShell ' . rcmd
+    if g:vimrplugin_screenvsplit
+      if exists(":ScreenShellVertical") == 2
+	exec 'ScreenShellVertical ' . rcmd
+      else
+	call RWarningMsg("The screen plugin version >= 1.1 is required to split the window vertically.")
+	call input("Press <Enter> to continue. ")
+	exec 'ScreenShell ' . rcmd
+      endif
+    else
+      exec 'ScreenShell ' . rcmd
+    endif
   elseif g:vimrplugin_conqueplugin
+    if exists("b:conque_bufname")
+      if bufloaded(substitute(b:conque_bufname, "\\", "", "g"))
+        call RWarningMsg("This buffer already has a Conque Shell.")
+        return
+      endif
+    endif
+
+    if g:vimrplugin_by_vim_instance == 1 && exists("g:ConqueTerm_BufName") && bufloaded(substitute(g:ConqueTerm_BufName, "\\", "", "g"))
+      call RWarningMsg("This Vim instance already has a Conque Shell.")
+      return
+    endif
+
     let savesb = &switchbuf
     set switchbuf=useopen,usetab
     if g:vimrplugin_conquevsplit == 1
       let l:sr = &splitright
       set splitright
-      let g:conquebuff = conque_term#open(rcmd, ['vsplit'], 1)
+      let b:conqueshell = conque_term#open(rcmd, ['vsplit'], 1)
       let &splitright = l:sr
     else
-     let g:conquebuff = conque_term#open(rcmd, ['belowright split'], 1)
+     let b:conqueshell = conque_term#open(rcmd, ['belowright split'], 1)
     endif
-    exe "sil noautocmd sb " . g:ConqueTerm_BufName
+    if b:conqueshell['idx'] == 1
+      let b:objbrtitle = "Object_Browser"
+    else
+      let b:objbrtitle = "Object_Browser" . b:conqueshell['idx']
+    endif
+    let b:conque_bufname = g:ConqueTerm_BufName
+
+    " Copy the values of some local variables that will be inherited
+    let g:tmp_conqueshell = b:conqueshell
+    let g:tmp_conque_bufname = b:conque_bufname
+    let g:tmp_objbrtitle = b:objbrtitle
+
+    exe "sil noautocmd sb " . b:conque_bufname
+
+    " Inheritance of some local variables
+    let b:conqueshell = g:tmp_conqueshell
+    let b:conque_bufname = g:tmp_conque_bufname
+    let b:objbrtitle = g:tmp_objbrtitle
+
+    if g:vimrplugin_by_vim_instance == 1
+      let g:the_conqueshell = b:conqueshell
+      let g:the_conque_bufname = b:conque_bufname
+      let g:the_objbrtitle = b:objbrtitle
+    endif
+
+    unlet g:tmp_conqueshell
+    unlet g:tmp_conque_bufname
+    unlet g:tmp_objbrtitle
+
     exe "setlocal syntax=rout"
     exe "sil noautocmd sb " . g:rplugin_curbuf
     exe "set switchbuf=" . savesb
@@ -535,15 +712,11 @@ function! RObjBrowser()
   if g:vimrplugin_screenplugin && !exists("g:ScreenShellSend")
     return
   endif
-  if g:vimrplugin_conqueplugin
-    if !exists("g:ConqueTerm_BufName")
-      return
-    endif
+  if g:vimrplugin_conqueplugin && !exists("b:conque_bufname")
+    return
   endif
 
-  let g:rplugin_curscriptbuf = bufname("%")
-
-  " R builds the Object_Browser contents.
+  " R builds the Object Browser contents.
   let lockfile = $VIMRPLUGIN_TMPDIR . "/objbrowser" . "lock"
   call writefile(["Wait!"], lockfile)
   call SendCmdToScreen("source('" . g:rplugin_home . "/r-plugin/vimbrowser.R')", 1)
@@ -554,7 +727,7 @@ function! RObjBrowser()
     sleep 50m
     if i == 40
       call delete(lockfile)
-      call RWarningMsg("No longer waiting for Object_Browser to finish...")
+      call RWarningMsg("No longer waiting for Object Browser to finish...")
       if exists("g:rplugin_r_ouput")
 	echo g:rplugin_r_ouput
       endif
@@ -563,36 +736,67 @@ function! RObjBrowser()
     endif
   endwhile
 
+  let g:rplugin_origbuf = bufname("%")
+
   " Either load or reload the object browser
-  let g:rplugin_curbuf = bufname("%")
   let savesb = &switchbuf
   set switchbuf=useopen,usetab
-  if bufloaded("Object_Browser")
-    exe "sb Object_Browser"
+  if bufloaded(b:objbrtitle)
+    exe "sb " . b:objbrtitle
   else
+    " Copy the values of some local variables that will be inherited
+    let g:tmp_objbrtitle = b:objbrtitle
+    let g:tmp_screensname = b:screensname
+    let g:tmp_curbufname = bufname("%")
+
+    if g:vimrplugin_conqueplugin == 1
+      " Copy the values of some local variables that will be inherited
+      let g:tmp_conqueshell = b:conqueshell
+      let g:tmp_conque_bufname = b:conque_bufname
+
+      if g:vimrplugin_objbr_place =~ "console"
+	exe "sil sb " . b:conque_bufname
+	normal! G0
+      endif
+    endif
+
     let l:sr = &splitright
     if g:vimrplugin_objbr_place =~ "right"
       set splitright
     else
       set nosplitright
     endif
-    let g:tmp_screensname = b:screensname
-    if g:vimrplugin_conqueplugin == 1 && g:vimrplugin_objbr_place =~ "console"
-      exe "sil noautocmd sb " . g:ConqueTerm_BufName
-      normal! G
-    endif
-    exe g:vimrplugin_objbr_w . "vsplit Object_Browser"
+    exe "vsplit " . b:objbrtitle
     let &splitright = l:sr
+    exe "vertical resize " . g:vimrplugin_objbr_w
+    setlocal winfixwidth
+
     set ft=rbrowser
+
+    " Inheritance of some local variables
+    if g:vimrplugin_conqueplugin == 1
+      let b:conqueshell = g:tmp_conqueshell
+      let b:conque_bufname = g:tmp_conque_bufname
+      unlet g:tmp_conqueshell
+      unlet g:tmp_conque_bufname
+    endif
     let b:screensname = g:tmp_screensname
+    let b:objbrtitle = g:tmp_objbrtitle
+    let b:rscript_buffer = g:tmp_curbufname
+    unlet g:tmp_objbrtitle
     unlet g:tmp_screensname
+    unlet g:tmp_curbufname
+
   endif
+
 
   let objbr = $VIMRPLUGIN_TMPDIR . "/objbrowser"
   let i = 1
   while !filereadable(objbr)
     sleep 100m
     if i == 20
+      exe "sb " . g:rplugin_origbuf
+      exe "set switchbuf=" . savesb
       return
     endif
   endwhile
@@ -604,17 +808,17 @@ function! RObjBrowser()
   if exists("b:libdict")
     unlet b:libdict
   endif
-  call RBrowserFill()
+  call RBrowserFill(0)
   setlocal nomodified
   call cursor(curline, curcol)
   redraw
-  exe "sb " . g:rplugin_curbuf
+  exe "sb " . g:rplugin_origbuf
   exe "set switchbuf=" . savesb
 endfunction
 
 function! RObjBrowserClose()
-  if bufloaded("Object_Browser")
-    bunload Object_Browser
+  if bufloaded(b:objbrtitle)
+    exe "bunload " . b:objbrtitle
   endif
 endfunction
 
@@ -624,21 +828,22 @@ function! RScrollTerm()
   if &ft != "r" && &ft != "rnoweb" && &ft != "rhelp" && &ft != "rdoc"
     return
   endif
-  if !exists("g:ConqueTerm_BufName")
+  if !exists("b:conque_bufname")
     return
   endif
 
   let savesb = &switchbuf
   set switchbuf=useopen,usetab
-  exe "sil noautocmd sb " . g:ConqueTerm_BufName
+  exe "sil noautocmd sb " . b:conque_bufname
 
-  normal! G
+  normal! G0
 
   exe "sil noautocmd sb " . g:rplugin_curbuf
   exe "set switchbuf=" . savesb
 endfunction
 
 " Function to send commands
+" return 0 on failure and 1 on success
 function! SendCmdToScreen(cmd, quiet)
   if has("gui_win32") && g:vimrplugin_conqueplugin == 0
     call SendToRPy(a:cmd . "\n")
@@ -646,6 +851,7 @@ function! SendCmdToScreen(cmd, quiet)
     " call RestoreClipboardPy()
     return 1
   endif
+
   if g:vimrplugin_screenplugin
     if !exists("g:ScreenShellSend")
       call RWarningMsg("Did you already start R?")
@@ -654,22 +860,34 @@ function! SendCmdToScreen(cmd, quiet)
     call g:ScreenShellSend(a:cmd)
     return 1
   elseif g:vimrplugin_conqueplugin
-    let g:rplugin_curbuf = bufname("%")
 
     " Code provided by Nico Raffo
-    " use an agressive sb option
+    " use an aggressive sb option
     let savesb = &switchbuf
     set switchbuf=useopen,usetab
 
+    " Is the Conque buffer hidden?
+    if !bufloaded(substitute(b:conque_bufname, "\\", "", "g"))
+      exe "set switchbuf=" . savesb
+      call RWarningMsg("Could not find Conque Shell buffer.")
+      return 0
+    endif
+      
     " jump to terminal buffer
-    exe "sil noautocmd sb " . g:ConqueTerm_BufName
+    if bufwinnr(substitute(b:conque_bufname, "\\", "", "g")) < 0
+      " The buffer either was hidden by the user with the  :q  command or is
+      " in another tab
+      exe "sil noautocmd belowright split " . b:conque_bufname
+    else
+      exe "sil noautocmd sb " . b:conque_bufname
+    endif
 
     " write variable content to terminal
-    call g:conquebuff.writeln(a:cmd)
+    call b:conqueshell.writeln(a:cmd)
     if a:quiet
-      let g:rplugin_r_ouput = g:conquebuff.read(100, 0)
+      let g:rplugin_r_ouput = b:conqueshell.read(100, 0)
     else
-      call g:conquebuff.read(100, 1)
+      call b:conqueshell.read(100, 1)
     endif
     normal! G0
 
@@ -700,20 +918,13 @@ function! RQuit(how)
   if g:vimrplugin_screenplugin && exists(':ScreenQuit')
       ScreenQuit
   elseif g:vimrplugin_conqueplugin
-    sleep 100m
-    let savesb = &switchbuf
-    set switchbuf=useopen,usetab
-
-    " jump to terminal buffer
-    exe "sil noautocmd sb " . g:ConqueTerm_BufName
-
-    q
-    " jump back to code buffer
-    exe "sil noautocmd sb " . g:rplugin_curbuf
-    exe "set switchbuf=" . savesb
+    sleep 200m
+    exe "sil bdelete " . b:conque_bufname
+    unlet b:conque_bufname
+    unlet b:conqueshell
   endif
-  if bufloaded("Object_Browser")
-    bunload! Object_Browser
+  if bufloaded(b:objbrtitle)
+    exe "bunload! " . b:objbrtitle
   endif
   echon
 endfunction
@@ -770,6 +981,15 @@ endfunction
 " Adapted of the plugin marksbrowser
 " Function to get the marks which the cursor is between
 function! SendMBlockToR(e, m)
+  if &filetype == "rnoweb" && RnwIsInRCode() == 0
+    call RWarningMsg("Not inside a R code chunk.")
+    return
+  endif
+  if &filetype == "rdoc" && search("^Examples:$", "bncW") == 0
+    call RWarningMsg('Not in the "Examples" section.')
+    return
+  endif
+
   let b:needsnewomnilist = 1
   let curline = line(".")
   let lineA = -1
@@ -807,6 +1027,15 @@ endfunction
 " Send functions to R
 function! SendFunctionToR(e, m)
   echon
+  if &filetype == "rnoweb" && RnwIsInRCode() == 0
+    call RWarningMsg("Not inside a R code chunk.")
+    return
+  endif
+  if &filetype == "rdoc" && search("^Examples:$", "bncW") == 0
+    call RWarningMsg('Not in the "Examples" section.')
+    return
+  endif
+
   let b:needsnewomnilist = 1
   let line = getline(".")
   let i = line(".")
@@ -861,6 +1090,15 @@ endfunction
 " Send selection to R
 function! SendSelectionToR(e, m)
   echon
+  if &filetype == "rnoweb" && RnwIsInRCode() == 0
+    call RWarningMsg("Not inside a R code chunk.")
+    return
+  endif
+  if &filetype == "rdoc" && search("^Examples:$", "bncW") == 0
+    call RWarningMsg('Not in the "Examples" section.')
+    return
+  endif
+
   let b:needsnewomnilist = 1
   if line("'<") == line("'>")
     let i = col("'<") - 1
@@ -887,6 +1125,15 @@ endfunction
 
 " Send paragraph to R
 function! SendParagraphToR(e, m)
+  if &filetype == "rnoweb" && RnwIsInRCode() == 0
+    call RWarningMsg("Not inside a R code chunk.")
+    return
+  endif
+  if &filetype == "rdoc" && search("^Examples:$", "bncW") == 0
+    call RWarningMsg('Not in the "Examples" section.')
+    return
+  endif
+
   let b:needsnewomnilist = 1
   let i = line(".")
   let c = col(".")
@@ -896,7 +1143,7 @@ function! SendParagraphToR(e, m)
   while j < max
     let j = j + 1
     let line = getline(j)
-    if line =~ "^\s*$"
+    if line =~ '^\s*$'
       break
     endif
   endwhile
@@ -921,14 +1168,27 @@ endfunction
 " Send current line to R. Don't go down if called by <S-Enter>.
 function! SendLineToR(godown)
   echon
-  let b:needsnewomnilist = 1
   let line = getline(".")
-  if &filetype == "rnoweb" && line =~ "^@$"
-    if a:godown =~ "down"
-      call GoDown()
+
+  if &filetype == "rnoweb"
+    if line =~ "^@$"
+      if a:godown =~ "down"
+	call GoDown()
+      endif
+      return
     endif
+    if RnwIsInRCode() == 0
+      call RWarningMsg("Not inside a R code chunk.")
+      return
+    endif
+  endif
+
+  if &filetype == "rdoc" && search("^Examples:$", "bncW") == 0
+    call RWarningMsg('Not in the "Examples" section.')
     return
   endif
+
+  let b:needsnewomnilist = 1
   let ok = SendCmdToScreen(line, 0)
   if ok && a:godown =~ "down"
     call GoDown()
@@ -990,24 +1250,24 @@ function! RMakePDF()
   echon
 endfunction  
 
-" Tell R to create a list of objects file (/tmp/.R-omnilist-user-time) listing all currently
-" available objects in its environment. The file is necessary for omni completion.
+" Tell R to create a list of objects file listing all currently available
+" objects in its environment. The file is necessary for omni completion.
 function! BuildROmniList(env)
   if a:env =~ "GlobalEnv"
     let rtf = b:globalenvlistfile
     let b:needsnewomnilist = 0
   else
-    let rtf = b:libs_omni_filename
+    let rtf = g:rplugin_omnifname
   endif
   let omnilistcmd = printf(".vimomnilistfile <- \"%s\"", rtf)
+  let lockfile = rtf . ".locked"
+  call writefile(["Wait!"], lockfile)
+  let omnilistcmd = omnilistcmd . " ; " . 'source("' . g:rplugin_home . '/r-plugin/build_omni_list.R")'
   let ok = SendCmdToScreen(omnilistcmd, 1)
   if ok == 0
     return
   endif
-  let lockfile = rtf . ".locked"
-  call writefile(["Wait!"], lockfile)
-  let omnilistcmd = 'source("' . g:rplugin_home . '/r-plugin/build_omni_list.R")'
-  call SendCmdToScreen(omnilistcmd, 1)
+
   " Wait while R is writing the list of objects into the file
   sleep 50m
   let i = 0 
@@ -1040,7 +1300,7 @@ endfunction
 function! RBuildSyntaxFile()
   call BuildROmniList("libraries")
   sleep 1
-  let g:rplugin_liblist = readfile(b:libs_omni_filename)
+  let g:rplugin_liblist = readfile(g:rplugin_omnifname)
   let res = []
   for line in g:rplugin_liblist
     if line =~ ':function:\|:standardGeneric:'
@@ -1049,9 +1309,23 @@ function! RBuildSyntaxFile()
       call add(res, line)
     endif
   endfor
-  call writefile(res, b:user_vimfiles . "/r-plugin/functions.vim")
-  unlet b:current_syntax
-  exe "runtime syntax/r.vim"
+  call writefile(res, g:rplugin_uservimfiles . "/r-plugin/functions.vim")
+  if &filetype == "rbrowser"
+    let savesb = &switchbuf
+    set switchbuf=useopen,usetab
+    exe "sb " . b:rscript_buffer
+    unlet b:current_syntax
+    exe "runtime syntax/r.vim"
+    exe "sb " . b:objbrtitle
+    exe "set switchbuf=" . savesb
+    if g:rplugin_curview == "libraries"
+      unlet b:libdict
+      call RBrowserShowLibs(0)
+    endif
+  else
+    unlet b:current_syntax
+    exe "runtime syntax/r.vim"
+  endif
 endfunction
 
 " Run R CMD BATCH on current file and load the resulting .Rout in a split
@@ -1060,54 +1334,63 @@ function! ShowRout()
   let routfile = expand("%:r") . ".Rout"
   if bufloaded(routfile)
     exe "bunload " . routfile
+    call delete(routfile)
   endif
-  call delete(routfile)
+
   " if not silent, the user will have to type <Enter>
   silent update
   if has("gui_win32")
-    let rcmd = 'Rcmd.exe BATCH "' . expand("%") . '"'
+    let rcmd = 'Rcmd.exe BATCH --no-restore --no-save "' . expand("%") . '" "' . routfile . '"'
   else
-    let rcmd = b:R . " CMD BATCH '" . expand("%") . "'"
+    let rcmd = b:R . " CMD BATCH --no-restore --no-save '" . expand("%") . "' '" . routfile . "'"
   endif
   echo "Please wait for: " . rcmd
   let rlog = system(rcmd)
-  if v:shell_error
+  if v:shell_error && rlog != ""
     call RWarningMsg('Error: "' . rlog . '"')
     sleep 1
   endif
+
   if filereadable(routfile)
     if g:vimrplugin_routnotab == 1
       exe "split " . routfile
     else
       exe "tabnew " . routfile
     endif
+  else
+    call RWarningMsg("The file '" . routfile . "' is not readable.")
   endif
 endfunction
 
 command! RUpdateObjList :call RBuildSyntaxFile()
+command! RBuildTags :call SendCmdToScreen('rtags(ofile = "TAGS")', 0)
 
 "----------------------------------------------------------------------------
 " ***Start/Close***
 "----------------------------------------------------------------------------
-" Start
-"-------------------------------------
-call rplugin#RCreateMaps("nvi", '<Plug>RStart',        'rf', ':call StartR("R")')
-call rplugin#RCreateMaps("nvi", '<Plug>RVanillaStart', 'rv', ':call StartR("vanilla")')
-call rplugin#RCreateMaps("nvi", '<Plug>RCustomStart',  'rc', ':call StartR("custom")')
+if &filetype != "rdoc"
+  " Start
+  "-------------------------------------
+  call rplugin#RCreateMaps("nvi", '<Plug>RStart',        'rf', ':call StartR("R")')
+  call rplugin#RCreateMaps("nvi", '<Plug>RVanillaStart', 'rv', ':call StartR("vanilla")')
+  call rplugin#RCreateMaps("nvi", '<Plug>RCustomStart',  'rc', ':call StartR("custom")')
 
-" Close
-"-------------------------------------
-call rplugin#RCreateMaps("nvi", '<Plug>RClose',        'rq', ":call RQuit('nosave')")
-call rplugin#RCreateMaps("nvi", '<Plug>RSaveClose',    'rw', ":call RQuit('save')")
+  " Close
+  "-------------------------------------
+  call rplugin#RCreateMaps("nvi", '<Plug>RClose',        'rq', ":call RQuit('nosave')")
+  call rplugin#RCreateMaps("nvi", '<Plug>RSaveClose',    'rw', ":call RQuit('save')")
+endif
 
 "----------------------------------------------------------------------------
 " ***Send*** (e=echo, d=down, a=all)
 "----------------------------------------------------------------------------
 " File
 "-------------------------------------
-call rplugin#RCreateMaps("ni", '<Plug>RSendFile',      'aa', ':call SendFileToR("silent")')
-call rplugin#RCreateMaps("ni", '<Plug>RESendFile',     'ae', ':call SendFileToR("echo")')
-call rplugin#RCreateMaps("ni", '<Plug>RShowRout',     'ao', ':call ShowRout()')
+if &filetype == "r"
+  call rplugin#RCreateMaps("ni", '<Plug>RSendFile',     'aa', ':call SendFileToR("silent")')
+  call rplugin#RCreateMaps("ni", '<Plug>RESendFile',    'ae', ':call SendFileToR("echo")')
+  call rplugin#RCreateMaps("ni", '<Plug>RShowRout',     'ao', ':call ShowRout()')
+endif
 
 " Block
 "-------------------------------------
@@ -1157,29 +1440,7 @@ endif
 "----------------------------------------------------------------------------
 " ***Control***
 "----------------------------------------------------------------------------
-" List space, clear console, clear all
-"-------------------------------------
-call rplugin#RCreateMaps("nvi", '<Plug>RListSpace',    'rl', ':call SendCmdToScreen("ls()", 0)<CR>:echon')
-call rplugin#RCreateMaps("nvi", '<Plug>RClearConsole', 'rr', ':call RClearConsole()')
-call rplugin#RCreateMaps("nvi", '<Plug>RClearAll',     'rm', ':call RClearAll()')
-
-" Print, names, structure
-"-------------------------------------
-call rplugin#RCreateMaps("nvi", '<Plug>RObjectPr',     'rp', ':call rplugin#RAction("print")')
-call rplugin#RCreateMaps("nvi", '<Plug>RObjectNames',  'rn', ':call rplugin#RAction("names")')
-call rplugin#RCreateMaps("nvi", '<Plug>RObjectStr',    'rt', ':call rplugin#RAction("str")')
-
-" Arguments, example, help
-"-------------------------------------
-call rplugin#RCreateMaps("nvi", '<Plug>RShowArgs',     'ra', ':call rplugin#RAction("args")')
-call rplugin#RCreateMaps("nvi", '<Plug>RShowEx',       're', ':call rplugin#RAction("example")')
-call rplugin#RCreateMaps("nvi", '<Plug>RHelp',         'rh', ':call rplugin#RAction("help")')
-
-" Summary, plot, both
-"-------------------------------------
-call rplugin#RCreateMaps("nvi", '<Plug>RSummary',      'rs', ':call rplugin#RAction("summary")')
-call rplugin#RCreateMaps("nvi", '<Plug>RPlot',         'rg', ':call rplugin#RAction("plot")')
-call rplugin#RCreateMaps("nvi", '<Plug>RSPlot',        'rb', ':call rplugin#RAction("plot")<CR>:call rplugin#RAction("summary")')
+call rplugin#ControlMaps()
 
 " Set working directory
 "-------------------------------------
@@ -1187,12 +1448,11 @@ call rplugin#RCreateMaps("nvi", '<Plug>RSetwd',        'rd', ':call RSetWD()')
 
 " Sweave (cur file)
 "-------------------------------------
-call rplugin#RCreateMaps("nvi", '<Plug>RSweave',       'sw', ':call RSweave()')
-call rplugin#RCreateMaps("nvi", '<Plug>RMakePDF',      'sp', ':call RMakePDF()')
-
-" Build list of objects for omni completion
-"-------------------------------------
-call rplugin#RCreateMaps("nvi", '<Plug>RUpdateObjBrowser',    'ro', ':call RObjBrowser()')
+if &filetype == "rnoweb"
+  call rplugin#RCreateMaps("nvi", '<Plug>RSweave',      'sw', ':call RSweave()')
+  call rplugin#RCreateMaps("nvi", '<Plug>RMakePDF',     'sp', ':call RMakePDF()')
+  call rplugin#RCreateMaps("nvi", '<Plug>RIndent',      'si', ':call RnwToggleIndentSty()')
+endif
 
 "----------------------------------------------------------------------------
 " ***Debug***
@@ -1203,29 +1463,34 @@ call rplugin#RCreateMaps("nvi", '<Plug>RUpdateObjBrowser',    'ro', ':call RObjB
 
 " Menu R
 function! MakeRMenu()
-  if g:rplugin_hasmenu == 1
+  if g:rplugin_hasmenu == 1 || !has("gui_running")
     return
   endif
+
   " Do not translate "File":
   menutranslate clear
 
   "----------------------------------------------------------------------------
   " Start/Close
   "----------------------------------------------------------------------------
-  call rplugin#RCreateMenuItem("nvi", 'Start/Close.Start\ R\ (default)', '<Plug>RStart', 'rf', ':call StartR("R")')
-  call rplugin#RCreateMenuItem("nvi", 'Start/Close.Start\ R\ --vanilla', '<Plug>RVanillaStart', 'rv', ':call StartR("vanilla")')
-  call rplugin#RCreateMenuItem("nvi", 'Start/Close.Start\ R\ (custom)', '<Plug>RCustomStart', 'rc', ':call StartR("custom")')
-  "-------------------------------
-  menu R.Start/Close.-Sep1- <nul>
-  call rplugin#RCreateMenuItem("nvi", 'Start/Close.Close\ R\ (no\ save)', '<Plug>RClose', 'rq', ":call SendCmdToScreen('quit(save = \"no\")', 0)")
-  call rplugin#RCreateMenuItem("nvi", 'Start/Close.Close\ R\ (save\ workspace)', '<Plug>RSaveClose', 'rw', ":call SendCmdToScreen('quit(save = \"yes\")', 0)")
+  if &filetype != "rdoc"
+    call rplugin#RCreateMenuItem("nvi", 'Start/Close.Start\ R\ (default)', '<Plug>RStart', 'rf', ':call StartR("R")')
+    call rplugin#RCreateMenuItem("nvi", 'Start/Close.Start\ R\ --vanilla', '<Plug>RVanillaStart', 'rv', ':call StartR("vanilla")')
+    call rplugin#RCreateMenuItem("nvi", 'Start/Close.Start\ R\ (custom)', '<Plug>RCustomStart', 'rc', ':call StartR("custom")')
+    "-------------------------------
+    menu R.Start/Close.-Sep1- <nul>
+    call rplugin#RCreateMenuItem("nvi", 'Start/Close.Close\ R\ (no\ save)', '<Plug>RClose', 'rq', ":call SendCmdToScreen('quit(save = \"no\")', 0)")
+    call rplugin#RCreateMenuItem("nvi", 'Start/Close.Close\ R\ (save\ workspace)', '<Plug>RSaveClose', 'rw', ":call SendCmdToScreen('quit(save = \"yes\")', 0)")
+  endif
 
   "----------------------------------------------------------------------------
   " Send
   "----------------------------------------------------------------------------
-  call rplugin#RCreateMenuItem("ni", 'Send.File', '<Plug>RSendFile', 'aa', ':call SendFileToR("silent")')
-  call rplugin#RCreateMenuItem("ni", 'Send.File\ (echo)', '<Plug>RESendFile', 'ae', ':call SendFileToR("echo")')
-  call rplugin#RCreateMenuItem("ni", 'Send.File\ (open\ \.Rout)', '<Plug>RShowRout', 'ao', ':call ShowRout()')
+  if &filetype == "r" || g:vimrplugin_never_unmake_menu
+    call rplugin#RCreateMenuItem("ni", 'Send.File', '<Plug>RSendFile', 'aa', ':call SendFileToR("silent")')
+    call rplugin#RCreateMenuItem("ni", 'Send.File\ (echo)', '<Plug>RESendFile', 'ae', ':call SendFileToR("echo")')
+    call rplugin#RCreateMenuItem("ni", 'Send.File\ (open\ \.Rout)', '<Plug>RShowRout', 'ao', ':call ShowRout()')
+  endif
   "-------------------------------
   menu R.Send.-Sep1- <nul>
   call rplugin#RCreateMenuItem("ni", 'Send.Block\ (cur)', '<Plug>RSendMBlock', 'bb', ':call SendMBlockToR("silent", "stay")')
@@ -1259,12 +1524,11 @@ function! MakeRMenu()
   if hasmapto('<Plug>RSendLAndOpenNewOne')
     imenu R.Send.Line\ (and\ new\ one) <Plug>RSendLAndOpenNewOne <Esc>:call SendLineToR("stay")<CR>o
   else
-if exists('g:maplocalleader')
-    exe "imenu R.Send.Line\\ (and\\ new\\ one)<Tab>". g:maplocalleader . 'q <Esc>:call SendLineToR("stay")<CR>o'
-else
-    exe 'imenu R.Send.Line\ (and\ new\ one)<Tab>\\q <Esc>:call SendLineToR("stay")<CR>o'
-endif
-
+    if exists('g:maplocalleader')
+      exe "imenu R.Send.Line\\ (and\\ new\\ one)<Tab>". g:maplocalleader . 'q <Esc>:call SendLineToR("stay")<CR>o'
+    else
+      exe 'imenu R.Send.Line\ (and\ new\ one)<Tab>\\q <Esc>:call SendLineToR("stay")<CR>o'
+    endif
   endif
 
   "----------------------------------------------------------------------------
@@ -1272,15 +1536,21 @@ endif
   "----------------------------------------------------------------------------
   call rplugin#ControlMenu()
   "-------------------------------
-  menu R.Control.-Sep4- <nul>
-  call rplugin#RCreateMenuItem("nvi", 'Control.Set\ working\ directory\ (cur\ file\ path)', '<Plug>RSetwd', 'rd', ':call RSetWD()')
-  "-------------------------------
   menu R.Control.-Sep5- <nul>
-  call rplugin#RCreateMenuItem("nvi", 'Control.Sweave\ (cur\ file)', '<Plug>RSweave', 'sw', ':call RSweave()')
-  call rplugin#RCreateMenuItem("nvi", 'Control.Sweave\ and\ PDF\ (cur\ file)', '<Plug>RMakePDF', 'sp', ':call RMakePDF()')
+  call rplugin#RCreateMenuItem("nvi", 'Control.Set\ working\ directory\ (cur\ file\ path)', '<Plug>RSetwd', 'rd', ':call RSetWD()')
+  if &filetype == "r" || &filetype == "rnoweb" || g:vimrplugin_never_unmake_menu
+    nmenu R.Control.Build\ R\ tags\ file<Tab>:RBuildTags :call SendCmdToScreen('rtags(ofile = "TAGS")', 0)<CR>
+    imenu R.Control.Build\ R\ tags\ file<Tab>:RBuildTags <Esc>:call SendCmdToScreen('rtags(ofile = "TAGS")', 0)<CR>
+  endif
   "-------------------------------
-  menu R.Control.-Sep6- <nul>
-  call rplugin#RCreateMenuItem("nvi", 'Control.Update\ object\ browser', '<Plug>RUpdateObjBrowser', 'ro', ':call RObjBrowser()')
+  if &filetype == "rnoweb" || g:vimrplugin_never_unmake_menu
+    menu R.Control.-Sep6- <nul>
+    call rplugin#RCreateMenuItem("nvi", 'Control.Sweave\ (cur\ file)', '<Plug>RSweave', 'sw', ':call RSweave()')
+    call rplugin#RCreateMenuItem("nvi", 'Control.Sweave\ and\ PDF\ (cur\ file)', '<Plug>RMakePDF', 'sp', ':call RMakePDF()')
+    " call rplugin#RCreateMenuItem("ni", 'Control.Toggle\ indent\ style\ (R/LaTeX)', '<Plug>RIndent', 'si', ':call RnwToggleIndentSty()')
+    nmenu R.Control.Go\ to\ next\ R\ chunk<Tab>gn :call RnwNextChunk()<CR>
+    nmenu R.Control.Go\ to\ previous\ R\ chunk<Tab>gN :call RnwPreviousChunk()<CR>
+  endif
   "-------------------------------
   menu R.-Sep7- <nul>
 
@@ -1294,11 +1564,15 @@ endif
   " ToolBar
   "----------------------------------------------------------------------------
   " Buttons
-  amenu ToolBar.RStart :call StartR("R")<CR>
-  amenu ToolBar.RClose :call SendCmdToScreen('quit(save = "no")', 0)<CR>
+  if &filetype != "rdoc"
+    amenu ToolBar.RStart :call StartR("R")<CR>
+    amenu ToolBar.RClose :call SendCmdToScreen('quit(save = "no")', 0)<CR>
+  endif
   "---------------------------
-  nmenu ToolBar.RSendFile :call SendFileToR("echo")<CR>
-  imenu ToolBar.RSendFile <Esc>:call SendFileToR("echo")<CR>
+  if &filetype == "r" || g:vimrplugin_never_unmake_menu
+    nmenu ToolBar.RSendFile :call SendFileToR("echo")<CR>
+    imenu ToolBar.RSendFile <Esc>:call SendFileToR("echo")<CR>
+  endif
   nmenu ToolBar.RSendBlock :call SendMBlockToR("echo", "down")<CR>
   imenu ToolBar.RSendBlock <Esc>:call SendMBlockToR("echo", "down")<CR>
   nmenu ToolBar.RSendFunction :call SendFunctionToR("echo", "down")<CR>
@@ -1317,9 +1591,13 @@ endif
   imenu ToolBar.RClearAll <Esc>:call RClearAll()<CR>
 
   " Hints
-  tmenu ToolBar.RStart Start R (default)
-  tmenu ToolBar.RClose Close R (no save)
-  tmenu ToolBar.RSendFile Send file (echo)
+  if &filetype != "rdoc"
+    tmenu ToolBar.RStart Start R (default)
+    tmenu ToolBar.RClose Close R (no save)
+  endif
+  if &filetype == "r" || g:vimrplugin_never_unmake_menu
+    tmenu ToolBar.RSendFile Send file (echo)
+  endif
   tmenu ToolBar.RSendBlock Send block (cur, echo and down)
   tmenu ToolBar.RSendFunction Send function (cur, echo and down)
   tmenu ToolBar.RSendSelection Send selection (cur, echo and down)
@@ -1332,13 +1610,7 @@ endif
 endfunction
 
 function! UnMakeRMenu()
-  if exists("g:rplugin_hasmenu") && g:rplugin_hasmenu == 0
-    return
-  endif
-  if g:vimrplugin_never_unmake_menu == 1
-    return
-  endif
-  if &previewwindow			" don't do this in the preview window
+  if !has("gui_running") || g:rplugin_hasmenu == 0 || g:vimrplugin_never_unmake_menu == 1 || &previewwindow
     return
   endif
   aunmenu R
@@ -1350,18 +1622,20 @@ function! UnMakeRMenu()
   aunmenu ToolBar.RSendParagraph
   aunmenu ToolBar.RSendFunction
   aunmenu ToolBar.RSendBlock
-  aunmenu ToolBar.RSendFile
-  aunmenu ToolBar.RClose
-  aunmenu ToolBar.RStart
+  if &filetype == "r"
+    aunmenu ToolBar.RSendFile
+  endif
+  if &filetype != "rdoc"
+    aunmenu ToolBar.RClose
+    aunmenu ToolBar.RStart
+  endif
   let g:rplugin_hasmenu = 0
 endfunction
 
-" Activate the menu and toolbar buttons if the user sets the file type as 'r':
 call MakeRMenu()
 
 function! ROpenGraphicsDevice()
   call SendCmdToScreen('x11(title = "Vim-R-plugin Graphics", width = 3.5, height = 3.5, pointsize = 9, xpos = -1, ypos = 0)', 1)
-  let g:rplugin_curbuf = bufname("%")
   let savesb = &switchbuf
   set switchbuf=useopen,usetab
   let l:sr = &splitright
@@ -1378,20 +1652,17 @@ function! ROpenGraphicsDevice()
 endfunction
 
 function! RBufEnter()
-  if has("gui")
-    call MakeRMenu()
-  endif
+  call MakeRMenu()
+  let g:rplugin_curbuf = bufname("%")
 endfunction
 
 function! RBufLeave()
-  if has("gui")
-    call UnMakeRMenu()
-  endif
+  call UnMakeRMenu()
 endfunction
 
 augroup VimRPlugin
-  au FileType * if &filetype == "r" || &filetype == "rnoweb" || &filetype == "rhelp" | call MakeRMenu() | endif
-  au BufEnter * if &filetype == "r" || &filetype == "rnoweb" || &filetype == "rhelp" | call RBufEnter() | endif
-  au BufLeave * if &filetype == "r" || &filetype == "rnoweb" || &filetype == "rhelp" | call RBufLeave() | endif
+  au FileType * if &filetype == "r" || &filetype == "rdoc" || &filetype == "rnoweb" || &filetype == "rhelp" | call MakeRMenu() | endif
+  au BufEnter * if &filetype == "r" || &filetype == "rdoc" || &filetype == "rnoweb" || &filetype == "rhelp" | call RBufEnter() | endif
+  au BufLeave * if &filetype == "r" || &filetype == "rdoc" || &filetype == "rnoweb" || &filetype == "rhelp" | call RBufLeave() | endif
 augroup END
 
