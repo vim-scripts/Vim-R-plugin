@@ -2,7 +2,7 @@
 " Language:	R
 " Author:	Jakson Alves de Aquino <jalvesaq@gmail.com>
 " URL:		http://www.vim.org/scripts/script.php?script_id=2628
-" Last Change:	Sat Oct 30, 2010  04:07PM
+" Last Change:	Mon Nov 15, 2010  01:01PM
 
 
 " Only load this indent file when no other was loaded.
@@ -62,6 +62,25 @@ function! s:Get_paren_balance(line, o, c)
   return openp - closep
 endfunction
 
+function! s:Get_paren_balances(line, cline)
+  let pb = s:Get_paren_balance(a:line, '(', ')')
+  let pb += s:Get_paren_balance(a:line, '[', ']')
+  let pb += s:Get_paren_balance(a:line, '{', '')
+  let pb += s:Get_paren_balance(a:cline, '', '}')
+  return pb
+endfunction
+
+function! s:Get_matching_brace(linenr, o, c)
+  let line = getline(a:linenr)
+  let pb = s:Get_paren_balance(line, a:o, a:c)
+  let i = a:linenr
+  while pb != 0 && i > 1
+    let i -= 1
+    let pb += s:Get_paren_balance(s:SanitizeRLine(getline(i)), a:o, a:c)
+  endwhile
+  return i
+endfunction
+
 " Get previous relevant line. Search back until getting a line that isn't
 " comment or blank
 function s:Get_prev_line( lineno )
@@ -110,6 +129,14 @@ endfunction
 function GetRIndent()
 
   let clnum = line(".")    " current line
+  let cline = s:SanitizeRLine(getline(clnum))
+
+  if cline =~ ".*}$"
+    let indline = s:Get_matching_brace(clnum, '{', '}')
+    if indline > 0
+      return indent(indline)
+    endif
+  endif
 
   " Find the first non blank line above the current line
   let lnum = s:Get_prev_line(clnum)
@@ -117,17 +144,31 @@ function GetRIndent()
   if lnum == 0
     return 0
   endif
+  let line = s:SanitizeRLine(getline(lnum))
 
   " Find the first non blank line above previous line
-  let plnum = s:Get_prev_line(lnum)
-  let pplnum = s:Get_prev_line(plnum)
+  if line =~ ".*}$"
+    let plnum = s:Get_matching_brace(lnum, '{', '}')
+  else
+    let plnum = s:Get_prev_line(lnum)
+  endif
+  if plnum > 0
+    let pline = s:SanitizeRLine(getline(plnum))
+  endif
 
-  let cline = s:SanitizeRLine(getline(clnum))
-  let line = s:SanitizeRLine(getline(lnum))
-  let pline = s:SanitizeRLine(getline(plnum))
-  let ppline = s:SanitizeRLine(getline(pplnum))
+  if plnum > 0
+    " Find the line previous to the previous line
+    if pline =~ '.*}$'
+      let pplnum = s:Get_matching_brace(plnum, '{', '}')
+    else
+      let pplnum = s:Get_prev_line(plnum)
+    endif
+    if pplnum > 0
+      let ppline = s:SanitizeRLine(getline(pplnum))
+    endif
+  endif
 
-  while pplnum > 0 && ppline =~ '^\s*\(if\|while\|for\)\s*(.*)\s*$' && s:CountGroups(line) == 1
+  while pplnum > 0 && ((ppline =~ '^\s*\(if\|while\|for\)\s*(.*)\s*$' && s:CountGroups(ppline) == 1) || ppline =~ '\s*{\s*$') && pline !~ '.*{\s*$'
     let plnum = pplnum
     let pline = ppline
     let pplnum = s:Get_prev_line(pplnum)
@@ -135,26 +176,8 @@ function GetRIndent()
   endwhile
 
   let ind = indent(lnum)
-
-  let pb = s:Get_paren_balance(line, '(', ')')
-  if pb != 0
-    let ind += (pb * &sw)
-  endif
-
-  let pb = s:Get_paren_balance(line, '[', ']')
-  if pb != 0
-    let ind = ind + (pb * &sw)
-  endif
-
-  let pb = s:Get_paren_balance(line, '{', '')
-  if pb != 0
-    let ind = ind + (pb * &sw)
-  endif
-
-  let pb = s:Get_paren_balance(cline, '', '}')
-  if pb != 0
-    let ind = ind + (pb * &sw)
-  endif
+  let pb = s:Get_paren_balances(line, cline)
+  let ind += pb * &sw
 
 
   " 'if', 'for', 'while' or 'else' without '{'
@@ -163,9 +186,12 @@ function GetRIndent()
     if cline =~ '^\s*{'
       let ind = ind - &sw
     endif
+    return ind
   endif
   if plnum > 0 && ((pline =~ '^\s*\(if\|while\|for\)\s*(.*)\s*$' && s:CountGroups(pline) == 1) || pline =~ '^\s*else\s*$') && line !~ '.*{\s*$'
     let ind = indent(plnum)
+    let pb = s:Get_paren_balances(line, cline)
+    let ind += pb * &sw
   endif
 
   " If you set this option in your .vimrc, the plugin will try to align the

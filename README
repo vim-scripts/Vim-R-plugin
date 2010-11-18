@@ -1,6 +1,6 @@
 This is a mirror of http://www.vim.org/scripts/script.php?script_id=2628
 
-This plugin improves Vim's support for editing R code and makes it possible to integrate Vim with R. The functionality is similar to what you can find in Tinn-R and ess mode of emacs. This filetype plugin uses either screen or Conque Shell plugin (Linux, OS X, or other Unix) or python (Microsoft Windows) to communicate with R. 
+This plugin improves Vim's support for editing R code and makes it possible to integrate Vim with R. The functionality is similar to what you can find in Tinn-R and ess mode of emacs. This filetype plugin uses either screen (Linux, OS X, or other Unix, optionally with the Screen plugin, vimscript #2711) or Python (Microsoft Windows) or Conque Shell plugin (all platforms, vimscript #2771) to communicate with R. 
 
 Screenshots and Debian package: http://sites.google.com/site/jalvesaq/vimrplugin
 
@@ -16,22 +16,24 @@ MAIN FEATURES:
   * Integrated communication with R:
       - Start/Close R.
       - Send lines, selection, paragraphs, functions, blocks, entire file.
-      - Send commands with the object under cursor as argument: help, args, plot, print, str, summary, example, names.
+      - Send commands with the object under cursor as argument: help, args,
+	plot, print, str, summary, example, names.
       - Send to R the Sweave and pdflatex commands.
-      - Run R inside a Vim's buffer (with Conque Shell plugin; currently available only on Unix -- Linux or OS X).
+      - Run R inside a Vim's buffer.
   * Omni completion (auto-completion) for R objects (.GlobalEnv and installed
     packages. The list of installed packages must be updated manually.
   * Ability to see R's documentation in a Vim's buffer:
-      - Automatic calculation of the best layout of the R documentation buffer (split the window either horizontally
-        or vertically according to the available room).
+      - Automatic calculation of the best layout of the R documentation buffer
+	(split the window either horizontally or vertically according to the
+	available room).
       - Automatic formating of the text to fit the panel width.
       - Send code and commands to R (useful to run examples).
       - Jump to another R documentation.
       - Syntax highlighting of R documentation.
-  * Object browser (.GlobalEnv and loaded packages; must be updated manually):
+  * Object Browser (.GlobalEnv and loaded packages; must be updated manually):
       - Send commands with the object under cursor as argument.
       - Call R's help() with the object under cursor as argument.
-      - Syntax highlighting of the object browser.
+      - Syntax highlighting of the Object Browser.
   * Most of the plugin's behavior is customizable.
 
 
@@ -40,7 +42,6 @@ USE: Please, read the plugin's documentation.
 FILES:
 
    autoload/rcomplete.vim
-   autoload/rplugin.vim
    bitmaps/RClearAll.bmp
    bitmaps/RClearAll.png
    bitmaps/RClear.bmp
@@ -73,19 +74,21 @@ FILES:
    ftplugin/rbrowser.vim
    indent/r.vim
    indent/rnoweb.vim
-   r-plugin/build_omni_list.R
+   r-plugin/build_omniList.R
+   r-plugin/common_buffer.vim
+   r-plugin/common_global.vim
    r-plugin/etags2ctags.R
    r-plugin/functions.vim
-   r-plugin/omni_list
+   r-plugin/omniList
    r-plugin/vimbrowser.R
    r-plugin/vimhelp.R
    r-plugin/r.snippets
    r-plugin/rpager.sh
-   r-plugin/rpython.vim
    r-plugin/rsyntax.vim
    r-plugin/specialfuns.R
    r-plugin/tex_indent.vim
    r-plugin/vimActivate.js
+   r-plugin/windows.py
    syntax/rbrowser.vim
    syntax/rout.vim
    syntax/r.vim

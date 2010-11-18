@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria
 
-Version: 101107
+Version: 101118
 For Vim version 7.3
 
  1. Overview                                    |r-plugin-overview|
@@ -15,13 +15,13 @@ For Vim version 7.3
  5. How the plugin works                        |r-plugin-functioning|
  6. Known bugs and workarounds                  |r-plugin-known-bugs|
  7. Options                                     |r-plugin-options|
- 8. Custom key bindings                         |r-plugin-custom-key-bindings|
+ 8. Custom key bindings                         |r-plugin-key-bindings|
  9. Files                                       |r-plugin-files|
 10. FAQ and tips                                |r-plugin-tips|
 11. News                                        |r-plugin-news|
 
 
-------------------------------------------------------------------------------
+==============================================================================
 1. Overview~
 							   *r-plugin-overview*
 
@@ -44,7 +44,7 @@ The plugin should emit useful warnings if you do things it was not programmed
 to deal with.
 
 
-------------------------------------------------------------------------------
+==============================================================================
 2. Main features~
 							   *r-plugin-features*
 
@@ -61,8 +61,7 @@ to deal with.
       - Send commands with the object under cursor as argument: help, args,
 	plot, print, str, summary, example, names.
       - Send to R the Sweave and pdflatex commands.
-      - Run R inside a Vim's buffer (with Conque Shell plugin; currently
-	available only on Unix -- Linux or OS X).
+      - Run R inside a Vim's buffer.
   * Omni completion (auto-completion) for R objects (.GlobalEnv and installed
     packages. The list of installed packages must be updated manually.
   * Ability to see R's documentation in a Vim's buffer:
@@ -73,14 +72,14 @@ to deal with.
       - Send code and commands to R (useful to run examples).
       - Jump to another R documentation.
       - Syntax highlighting of R documentation.
-  * Object browser (.GlobalEnv and loaded packages; must be updated manually):
+  * Object Browser (.GlobalEnv and loaded packages; must be updated manually):
       - Send commands with the object under cursor as argument.
       - Call R's help() with the object under cursor as argument.
-      - Syntax highlighting of the object browser.
+      - Syntax highlighting of the Object Browser.
   * Most of the plugin's behavior is customizable.
 
 
-------------------------------------------------------------------------------
+==============================================================================
 3. Installation~
 						       *r-plugin-installation*
 
@@ -137,12 +136,13 @@ to install several external dependencies:
     * Python: http://www.python.org/download/
       Note: Be careful to download the correct Python version because Vim
       needs a specific version of Python DLL. For example, the official Vim
-      7.3 for Windows needs python 2.7.
+      7.3 for Windows needs either Python 2.7 or 3.1. Note: the official Vim
+      is 32 bit and, thus, Python must be 32 bit too.
 
     * pywin32: http://sourceforge.net/projects/pywin32/
-      Note: The default download may not match the python version Vim was
+      Note: The default download may not match the Python version Vim was
       linked with. You have to "View all files" on the download page to find
-      the correct version.
+      the file that matches the version of Python that you installed.
 
 Create your |vimfiles| directory if you do not have it yet. Its path will be
 similar to one of the following:
@@ -214,7 +214,7 @@ EnhancedCommentify are particularly interesting. Please read |r-plugin-tips|
 for details.
 
 
-------------------------------------------------------------------------------
+==============================================================================
 4. Use~
 								*r-plugin-use*
 
@@ -293,12 +293,12 @@ Control
   . Go to next R chunk                      gn
   . Go to previous R chunk                  gN
   --------------------------------------------
-  . Update object browser                  \ro
+  . Update Object Browser                  \ro
  
 
-Please see |r-plugin-custom-key-bindings| to learn how to customize the key
-bindings without editing the plugin directly, and |vimrplugin_underscore| to
-disable underscore replacement.
+Please see |r-plugin-key-bindings| to learn how to customize the key bindings
+without editing the plugin directly, and |vimrplugin_underscore| to disable
+underscore replacement.
 
 After the command \ao, Vim will save the current buffer if it has any pending
 changes, run "R CMD BATCH --no-restore --no-save" on the current file and show
@@ -327,8 +327,9 @@ mode:
    gN : go to the previous chunk of R code
 
 
-4.3. Syntax highlight and omni completion~
+4.3. Omni completion and the highlighting of functions~
 							     *:RUpdateObjList*
+							  *:RUpdateObjListAll*
 The plugin adds some features to the default syntax highlight of R code. One
 such feature is the highlight of R functions. However, only functions that
 R loads by default are highlighted. To add functions of other libraries, you
@@ -344,7 +345,7 @@ The command :RUpdateObjList in addition to creating a list of function names
 to be highlighted also creates a file containing a list of objects for omni
 completion (|compl-omni|) including all objects currently in R's workspace,
 with the exception of the .GlobalEnv objects. These two lists are stored
-permanently in the ~/.vim/r-plugin directory and one of them, "omni_list", is
+permanently in the ~/.vim/r-plugin directory and one of them, "omniList", is
 also used by the Object Browser to show the contents of libraries.
 
 The command  :RUpdateObjList  waits 120 seconds to R finish building the list.
@@ -354,32 +355,35 @@ If this time is not enough to your system, please, set a different value of
 You should run  :RUpdateObjList  whenever you upgrade R since some functions
 are removed and new ones are added at each new R version.
 
+The command  :RUpdateObjListAll  will tell R to load all installed packages
+and, then, build the "omniList".
+
 
 4.4. The Object Browser~
 
-You have to do \ro to either start or updated the object browser. The object
-browser has two views: .GlobalEnv and Libraries. If you either press <Enter>
-or double click on the first line of the object browser it will toggle the
+You have to do \ro to either start or updated the Object Browser. The Object
+Browser has two views: .GlobalEnv and Libraries. If you either press <Enter>
+or double click on the first line of the Object Browser it will toggle the
 view between the objects in .GlobalEnv and the currently loaded libraries (but
 only libraries loaded when |:RUpdateObjList| was run will be shown).
 
 In the .GlobalEnv view, if an object has the attribute "label", it will be
-displayed in the object browser. The options |vimrplugin_open_df| and
+displayed in the Object Browser. The options |vimrplugin_open_df| and
 |vimrplugin_open_list| control whether the elements of data.frames and lists
-are shown. In the object browser window, while in Normal mode, you can either
+are shown. In the Object Browser window, while in Normal mode, you can either
 press <Enter> or double click (GVim only) over a data.frame or list to
 show/hide its elements (not if viewing the content of loaded libraries). If
 you are running (G)Vim in an UTF-8 locale, unicode line drawing characters
-will be used to draw lines in the object browser. This is the case of most
+will be used to draw lines in the Object Browser. This is the case of most
 Linux distributions. If you are using Windows, ascii characters will be used,
 unless you have set the 'encoding' to utf-8 in your |vimrc| (on Windows, some
 fonts that support Unicode are "Courier_New", "Lucida_Console", "Consolas",
 and "Lucida_Sans_Typewriter").
 
 In the Libraries view, you can either double click or press <Enter> over a
-library to see its objects. The object browser goes down only one level in
+library to see its objects. The Object Browser goes down only one level in
 lists. Thus, if a list has a sublist among its elements, the sublist elements
-will not be shown. In the object browser, the libraries have the color defined
+will not be shown. In the Object Browser, the libraries have the color defined
 by the PreProc highlighting group, and the other objects have their colors
 defined by the return value of some R functions. Each line in the table below
 shows a highlighting group and the corresponding R function (if any) used to
@@ -405,7 +409,7 @@ referencing source code located in other directories, including the entire R
 source code.
 
 
-------------------------------------------------------------------------------
+==============================================================================
 5. How the plugin works~
 							*r-plugin-functioning*
 
@@ -418,10 +422,6 @@ up menu the name of the object, its class and its environment (most
 frequently, its package name). If the object is a function, its arguments are
 shown in a separate window.
 
-You can build/rebuild the list of objects at any time. Remember, you may need
-to rebuild the file with the list of objects manually to add the names of
-objects created after building the file.
-
 If a data.frame is found, while building the list of objects, the columns in
 the data.frame are added to the list. When you try to use omni completion to
 complete the name of a data.frame, the columns are not shown.  But when the
@@ -429,17 +429,17 @@ data.frame name is already complete, and you have inserted the '$' symbol,
 omni completion will show the column names.
 
 The file containing the list of objects used for omni completion is built by
-the R function contained in the script ~/.vim/r-plugin/buil_omni_list.R. This
+the R function contained in the script ~/.vim/r-plugin/buil_omniList.R. This
 function is sourced by R, which causes R to create the list used by Vim.
 
 Vim uses two files: one for the objects of .GlobalEnv and the other for all
-other objects. The .GlobalEnv list is stored in the /tmp directory and, thus,
-is deleted after each reboot. The other file is stored in ~/.vim/r-plugin and
-remains available until you manually rebuild it with the command:
-|:RUpdateObjList|.
+other objects. The .GlobalEnv list is stored in the /tmp/r-plugin-yourlogin
+directory and, thus, is deleted after each reboot. The other file is stored in
+~/.vim/r-plugin and remains available until you manually rebuild it with the
+command: |:RUpdateObjList|.
 
 
-5.2. Communication through screen (Linux/Unix only)~
+5.2. Communication through screen, without the screen plugin (Linux/Unix only)~
 
 Vim and R run as independent processes. The main disadvantage is that we have
 limited communication between the two applications: Vim can send strings to R
@@ -459,7 +459,7 @@ same second. To change the default behavior and force all Vim buffers to use
 different R processes see |vimrplugin_single_r|.
 
 
-------------------------------------------------------------------------------
+==============================================================================
 6. Known bugs and workarounds~
 							 *r-plugin-known-bugs*
 6.1. Indentation~
@@ -469,9 +469,10 @@ Correctly written code might be wrongly indented. Example:
    this code                               is indented as:~
    if(T)                                   if(T)
      for(i in 1:2)                           for(i in 1:2)
-     {                                     {
-       cat(i, "\n")                          cat(i, "\n")
-     }                                     }
+     {                                       {
+       cat(i, "\n")                            cat(i, "\n")
+     }                                       }
+   x                                         x
 
 
 6.2. R's source() issues~
@@ -507,17 +508,17 @@ the R session, open a new terminal window and type:
 6.5. The clipboard's content is lost (Windows only)~
 
 On Windows, the plugin copies the command that will be sent to R into the
-clipboard.  Thus, if you have anything in the clipboard it will be lost while
-using the plugin.
+clipboard when not using the Conque Shell plugin.  Thus, if you have anything
+in the clipboard it will be lost while using the plugin.
 
 
 6.6. The buffer name must be in the window title (Windows only)~
 
-On Windows, the plugin tries to activate the "R Console" window, paste the
-command that is being sent to R, and, then, activate the GVim window. To
-activate the GVim window the plugin requires that the name of the file being
-edited be in the GVim windows title. This is the default on Vim if you have
-not set the option 'titlestring'.
+On Windows, when not using the Conque Shell plugin, the plugin tries to
+activate the "R Console" window, paste the command that is being sent to R,
+and, then, activate the GVim window. To activate the GVim window the plugin
+requires that the name of the file being edited be in the GVim windows title.
+This is the default on Vim if you have not set the option 'titlestring'.
 
 
 6.7. The menu may not reflect some of your custom key bindings~
@@ -527,15 +528,15 @@ GVim will not always reflect the correct key binding if it is not the same for
 Normal, Visual and Insert modes.
 
 
-------------------------------------------------------------------------------
+==============================================================================
 7. Options~
 							    *r-plugin-options*
 |vimrplugin_term|		External terminal to be used
 |vimrplugin_term_cmd|		Complete command to open an external terminal
 |vimrplugin_underscore|		Convert '_' into ' <- '
 |vimrplugin_rnowebchunk|	Convert '<' into '<<>>=\n@' in Rnoweb files
-|vimrplugin_objbr_place|	Placement of object browser
-|vimrplugin_objbr_w|		Initial width of object browser window
+|vimrplugin_objbr_place|	Placement of Object Browser
+|vimrplugin_objbr_w|		Initial width of Object Browser window
 |vimrplugin_vimpager|		Use Vim to see R documentation
 |vimrplugin_editor_w|		Minimum width of R script buffer
 |vimrplugin_help_w|		Desired width of R documentation buffer
@@ -553,8 +554,10 @@ Normal, Visual and Insert modes.
 |vimrplugin_screenvsplit|	Split the window vertically with screen plugin
 |vimrplugin_conqueplugin|	Use the Conque Shell plugin
 |vimrplugin_conquevsplit|	Split the window vertically for Conque Shell
-|vimrplugin_open_df|		Show data.frame elements in the object browser
-|vimrplugin_open_list|		Show list elements in the object browser
+|vimrplugin_conquesleep|	Time that Conque Shell will wait for output
+|vimrplugin_open_df|		Show data.frame elements in the Object Browser
+|vimrplugin_open_list|		Show list elements in the Object Browser
+|vimrplugin_allnames|		Show names which begin with a dot
 |vimrplugin_listmethods|	Do .vim.list.args() instead of args()
 |vimrplugin_specialplot|	Do .vim.plot() instead of plot()
 |vimrplugin_maxdeparse|		Argument to R args() function
@@ -606,26 +609,41 @@ put in your |vimrc|:
    let vimrplugin_rnowebchunk = 0
 <
 
-7.3. Object browser options~
+7.3. Object Browser options~
 						      *vimrplugin_objbr_place*
 							  *vimrplugin_objbr_w*
-The object browser may be created in four different places: at the right/left
+							  *vimrplugin_open_df*
+							*vimrplugin_open_list*
+							 *vimrplugin_allnames*
+The Object Browser may be created in four different places: at the right/left
 of the script windows or (if using Conque Shell) at the right/left of the R
 Console window (see |vimrplugin_conqueplugin| for details on the use of Conque
-Shell). By default, the object browser will be created with 40 columns at the
-right side of the R Console. If Conque Shell is not being used, the object
-browser will be at the right side of the script window. You can change the
-object browser's default width and placement by putting different values in
+Shell). By default, the Object Browser will be created with 40 columns at the
+right side of the R Console. If Conque Shell is not being used, the Object
+Browser will be at the right side of the script window. You can change the
+Object Browser's default width and placement by putting different values in
 your |vimrc|, as in the examples below:
 >
    let vimrplugin_objbr_place = "script,right"
    let vimrplugin_objbr_place = "console,left"
    let vimrplugin_objbr_w = 30
 <
-The minimum width of the object browser windows is 9 columns.
+The minimum width of the Object Browser windows is 9 columns.
 
+By default, the elements of data.frames are shown in the Object Browser, but
+not the elements of other types of lists. You can put the following in your
+|vimrc| to change this behavior:
+>
+   let vimrplugin_open_df = 0
+   let vimrplugin_open_list = 1
+<
+By default, names of objects which begin with a . are omitted. If you prefer
+to see them in the Object Browser, put in your |vimrc|:
+>
+   let vimrplugin_allnames = 1
+<
 
-7.4. Vim as pager for R help (Linux/Unix only)~
+7.4. Vim as pager for R help~
 							 *vimrplugin_vimpager*
 							 *vimrplugin_editor_w*
 							   *vimrplugin_help_w*
@@ -737,8 +755,8 @@ R at the startup. Example:
    let vimrplugin_r_args = "--sdi --no-save --quiet"
 <
 On Linux, there is no default value for |vimrplugin_r_args|. On Windows, the
-default value is "--sdi", but you may change it to "--mdi" if do not like the
-SDI style of the graphical user interface.
+default value is "--sdi", but you may change it to "--mdi" if you do not like
+the SDI style of the graphical user interface.
 
 
 7.9. Time necessary to build list of objects for omni completion~
@@ -782,9 +800,10 @@ a new split window, put in your |vimrc|:
 
 7.12. Sleep time (Windows only)~
 							*vimrplugin_sleeptime*
-The plugin gives to R a small amount of time to process the paste command.
-The default value is 0.2 second, but you should experiment different values.
-The example show how to adjust the value of sleeptime in your |vimrc|:
+The plugin gives to R a small amount of time to process the paste command when
+not using the Conque Shell plugin. The default value is 0.2 second, but you
+should experiment different values. The example show how to adjust the value
+of sleeptime in your |vimrc|:
 >
    let vimrplugin_sleeptime = 0.1
 <
@@ -872,20 +891,13 @@ may consider as a starting point to create your own:
    term screen-256color
 <
 
-7.15. Integration with Conque Shell plugin (Linux/Unix only)~
+7.15. Integration with Conque Shell plugin~
 						     *vimrplugin_conqueplugin*
 						     *vimrplugin_conquevsplit*
-Note: Nico Raffo's Conque Shell plugin is not perfect yet, but its use already
-has some advantages: the ability to edit R's output, and the syntax
-highlighting of the output. The two main problems of Conque Shell are due to
-two Vim limitations: the lack of a feature that may called InsertCharPre event
-and the impossibility of scrolling a buffer which is not being edited. As a
-consequence of the first limitation, Conque Shell sometimes gets confused
-while converting typed text to strings to be sent to the application running
-in a Vim buffer. In my experience, the most problematic keys are Home, End,
-and Delete. The second limitation has a more obvious consequence: sometimes
-the shell buffer does not scroll when there is new output but it is not the
-currently active buffer.
+						      *vimrplugin_conquesleep*
+The Conque Shell plugin is available at:
+
+   http://www.vim.org/scripts/script.php?script_id=2771
 
 By default, the Conque Shell plugin will be used if installed, unless you have
 vimrplugin_screenplugin = 1 in your |vimrc|.  If you installed the Conque
@@ -894,66 +906,75 @@ your |vimrc|:
 >
    let vimrplugin_conqueplugin = 0
 <
-The Conque Shell plugin is available at:
-
-   http://www.vim.org/scripts/script.php?script_id=2771
-
 By default, the window will be split horizontally. Put the following in your
 |vimrc| if you prefer to split the window vertically:
 >
    let vimrplugin_conquevsplit = 1
 <
+Note: Nico Raffo's Conque Shell plugin is not perfect yet, but its use already
+has some advantages: the ability to edit R's output, and the syntax
+highlighting of the output. The three main problems of Conque Shell are due to
+Vim limitations: the lack of a feature that may be called InsertCharPre event,
+the impossibility of scrolling a buffer which is not being edited, and the use
+of the same variable, 'updatetime', to do both save swap files and trigger
+|CursorHold| events.
+
+As a consequence of the first limitation, Conque Shell sometimes gets confused
+while converting typed text to strings to be sent to the application running
+in a Vim buffer. With the current version of Conque Shell (2.0), on Windows,
+only ascii characters can be either sent to or typed in the Conque Term. On
+Linux or other system whose encoding is UTF-8, characters of any encoding can
+be sent to the Conque Term, but only Latin-1 characters can be typed directly
+in the Conque Term.
+
+The second limitation has a more obvious consequence: the shell buffer does
+not scroll when there is new output but it is not the currently active buffer.
+After a command is sent to the Conque buffer, the Conque Shell plugin waits
+100 milliseconds (on Linux) or 200 milliseconds (on Windows) before reading
+R's output. Longer values for the waiting time will increase the chances that
+the output of R commands will be immediately shown in the R Console. To set a
+different waiting time, change the value of vimrplugin_conquesleep in your
+|vimrc| as in the example:
+>
+   let vimrplugin_conquesleep = 300
+<
+To manually scroll the R Console buffer, put the following in your |vimrc|
+(replace <F5> with your preferred key):
+>
+   nmap <F5> :call RScrollTerm()<CR>
+<
+Then, you will be able to scroll the R Console buffer at any time by pressing the
+<F5> key in Normal mode. Of course, you should replace <F5> with your
+preferred key.
+
 You may also want to put the following Conque options in your |vimrc| (look at
 the Conque Shell documentations for details):
 >
-   let ConqueTerm_ReadUnfocused = 1
    let ConqueTerm_CWInsert = 1
    let ConqueTerm_Color = 0
+   let ConqueTerm_ReadUnfocused = 1
 <
+Note: The use of |ConqueTerm_ReadUnfocused| will set the value of 'updatetime'
+to 1000 milliseconds.
 
-7.16 Show list elements in object browser~
-							  *vimrplugin_open_df*
-							*vimrplugin_open_list*
-By default, the elements of data.frames are shown in the object browser, but
-not the elements of other types of lists. You can put the following in your
-|vimrc| to change this behavior:
->
-   let vimrplugin_open_df = 0
-   let vimrplugin_open_list = 1
-<
 
-7.17. Special R functions~
+7.16. Special R functions~
 						      *vimrplugin_listmethods*
 						      *vimrplugin_specialplot*
-The plugin includes the file ~/.vim/r-plugin/specialfuns.R which may wrap the
-default R functions args() and plot(). To use the plugin's functions, you have
-to edit your ~/.Rprofile and add the following line:
->
-   source("~/.vim/r-plugin/specialfuns.R")
-<
-Then, follow the instructions below to activate the new functions.
-
-
-7.17.1. List methods arguments~
-
 The R function args() list the arguments of a function, but not the arguments
 of its methods. If you want that the plugin calls the function
-.vim.list.args() after <LocalLeader>ra, in addition to editing your
-~/.Rprofile as explained above, you have to add to your |vimrc|:
+.vim.list.args() after <LocalLeader>ra, you have to add to your |vimrc|:
 >
    let vimrplugin_listmethods = 1
 <
-
-7.17.2. Change plot of numeric vectors~
 By default, R makes a scatterplot of numeric vectors. The function .vim.plot()
 do both a histogram and a boxplot. The function can be called by the plugin
-after <LocalLeader>rg if you edit your ~/.Rprofile as explained above and put
-the following line in your |vimrc|:
+after <LocalLeader>rg if you put the following line in your |vimrc|:
 >
    let vimrplugin_specialplot = 1
 <
 
-7.18. maxdeparse~
+7.17. maxdeparse~
 						       *vimrplugin_maxdeparse*
 You can set the argument maxdeparse to be passed to R's source() function.
 Example:
@@ -961,7 +982,7 @@ Example:
    let vimrplugin_maxdeparse = 300
 <
 
-7.19. LaTeX command~
+7.18. LaTeX command~
 							 *vimrplugin_latexcmd*
 By default, Vim calls pdflatex to produce a pdf document from the .tex file
 produced by the R Sweave command. You can use the option vimrplugin_latexcmd
@@ -970,7 +991,7 @@ to change this behavior. Example:
    let vimrplugin_latexcmd = "latex"
 <
 
-7.20. Never unmake the R menu and tool bar buttons~
+7.19. Never unmake the R menu and tool bar buttons~
 						*vimrplugin_never_unmake_menu*
 Use this option if you want that the menu item R and the R related tool bar
 buttons are not deleted when you change from one buffer to another, for
@@ -982,7 +1003,7 @@ When this options is enabled all menu items are created regardless of the file
 type.
 
 
-7.21. Map 'r'~
+7.20. Map 'r'~
 							    *vimrplugin_map_r*
 Some users may already be familiar with the key bindings from earlier releases
 of the Vim-R-plugin. If the variable |vimrplugin_map_r| exists, the plugin
@@ -1001,9 +1022,9 @@ Emacs:
    set tabstop=8
 <
 
-------------------------------------------------------------------------------
+==============================================================================
 8. Custom key bindings~
-						*r-plugin-custom-key-bindings*
+						       *r-plugin-key-bindings*
 When creating custom key bindings for the Vim-R-plugin, it is necessary to
 create three maps for most functions because the way the function is called is
 different in each Vim mode. Thus, key bindings must be made for Normal mode,
@@ -1065,7 +1086,7 @@ You should replace <LocalLeader>rk with the key binding that you want to use
 and "levels" with the R function that you want to call.
 
 
-------------------------------------------------------------------------------
+==============================================================================
 9. Files~
 							      *r-plugin-files*
 The following files are part of the plugin and should be in your ~/.vim
@@ -1073,7 +1094,6 @@ directory after the installation:
 
   
    autoload/rcomplete.vim
-   autoload/rplugin.vim
    bitmaps/RClearAll.bmp
    bitmaps/RClearAll.png
    bitmaps/RClear.bmp
@@ -1106,26 +1126,28 @@ directory after the installation:
    ftplugin/rbrowser.vim
    indent/r.vim
    indent/rnoweb.vim
-   r-plugin/build_omni_list.R
+   r-plugin/build_omniList.R
+   r-plugin/common_buffer.vim
+   r-plugin/common_global.vim
    r-plugin/etags2ctags.R
    r-plugin/functions.vim
-   r-plugin/omni_list
+   r-plugin/omniList
    r-plugin/vimbrowser.R
    r-plugin/vimhelp.R
    r-plugin/r.snippets
    r-plugin/rpager.sh
-   r-plugin/rpython.vim
    r-plugin/rsyntax.vim
    r-plugin/specialfuns.R
    r-plugin/tex_indent.vim
    r-plugin/vimActivate.js
+   r-plugin/windows.py
    syntax/rbrowser.vim
    syntax/rout.vim
    syntax/r.vim
 
 8 directories, 39 files
 
-------------------------------------------------------------------------------
+==============================================================================
 10. FAQ and tips~
 							       *r-plugin-tips*
 
@@ -1280,30 +1302,53 @@ may need CompizConfig Settings Manager installed to enable this feature (look
 at the "Window Management" section for "Group and Tab Windows").
 
 
-10.11. Why I have to updated the Object Browser manually?~
+10.11. Why do I have to updated the Object Browser manually?~
 
 It is because Vim and R run as separate processes and, thus, it is not
 possible to Vim to know whether R is busy or not. If R was running as part of
 the text editor, as happens with JGR and RKward, which are linked to libR.so,
 it would be possible to wait for R to finish processing a command before
-sending to it a command to rebuild the list of objects for the object browser.
+sending to it a command to rebuild the list of objects for the Object Browser.
 This command should be sent after each line sent to R.  But if the
 Vim-R-plugin did this, the use of Vim would be blocked until R finished its
 processing. 
 
 
-10.12. Why there is repeated code in the plugin?~
+10.12. Edit your ~/.Rprofile~
 
-In the ftplugin directory, rdoc.vim, rhelp.vim and rnoweb.vim are symbolic
-links to r.vim. They become real files when the zip package is created, and I
-use zip format because for Windows users zip files are easier to unpack than
-tar.gz ones. Windows does not support symbolic links at the same extent as
-Unix does.
+You may want to edit your ~/.Rprofile. Two common options are the use of GVim
+as the text editor and the use of html help. Example for Linux:
+>
+   if (interactive()) {
+     local({
+       options(editor = 'gvim -f -c "set ft=r"')
+       options(help_type = "html")
+     })
+   }
+<
+and for Windows:
+>
+   if (interactive()) {
+     local({
+       options(editor = '"C:/Program Files (x86)/Vim/vim73/gvim.exe" "-c" "set filetype=r"')
+       options(help_type = "html")
+     })
+   }
+<
 
-
-------------------------------------------------------------------------------
+==============================================================================
 11. News~
 							       *r-plugin-news*
+101118 (2010-11-18)
+ * New command:  :RUpdateObjListAll.
+ * New option: vimrplugin_allnames.
+ * Allow the use of Python 3.1 on Windows.
+ * Minor improvements in indentation of R code.
+ * The file r-plugin/omni_list was renamed to r-plugin/omniList because its
+   field separator changed to ";".
+ * Fixed bug that was causing ^H to be exhibited in the R documentation in
+   some systems. (Thanks to Helge Liebert for reporting the problem).
+
 101107 (2010-11-07)
  * New feature: complete chunk block when '<' is pressed in rnoweb files.
  * New option: vimrplugin_rnowebchunk.
@@ -1323,7 +1368,7 @@ Unix does.
 
 101025 (2010-10-25)
  * New option: vimrplugin_routmorecolors.
- * Fixed bug in the object browser when a data.frame or list had just one
+ * Fixed bug in the Object Browser when a data.frame or list had just one
    element (thanks to Jan Larres for reporting the bug).
  * Do not copy omnilist and functions.vim to ~/.vim/r-plugin if the directory
    where the plugin is installed is writable (thanks to Jan Larres for the
@@ -1334,14 +1379,14 @@ Unix does.
  * New default value: vimrplugin_vimpager = "vertical"
  * The R help can now be seen in a Vim buffer on MS Windows.
  * Fix width of help text when R version >= 2.12.0.
- * Implemented actions in the object browser: summary, print, etc...
- * Browse libraries objects in object browser.
+ * Implemented actions in the Object Browser: summary, print, etc...
+ * Browse libraries objects in Object Browser.
 
 101016 (2010-10-16)
- * Minor bug fixes in the object browser.
+ * Minor bug fixes in the Object Browser.
 
 101015 (2010-10-15)
- * New feature: Object browser.
+ * New feature: Object Browser.
  * Conque Shell will be used if installed unless explicitly told otherwise in
    the vimrc.
  * New valid value for vimrplugin_vimpager: "tabnew"

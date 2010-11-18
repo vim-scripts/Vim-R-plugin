@@ -3,7 +3,7 @@
 " Maintainer:	      Jakson Aquino <jalvesaq@gmail.com>
 " Former Maintainers: Vaidotas Zemlys <zemlys@gmail.com>
 " 		      Tom Payne <tom@tompayne.org>
-" Last Change:	      Sat Oct 30, 2010  11:54AM
+" Last Change:	      Tue Nov 09, 2010  04:46PM
 " Filenames:	      *.R *.r *.Rhistory *.Rt
 " 
 " NOTE: The highlighting of R functions is defined in the
@@ -65,7 +65,7 @@ syn keyword rConstant R.version.string
 
 syn keyword rNumber   NA_integer_ NA_real_ NA_complex_ NA_character_ 
 
-" Common elements to r and rout file types
+" Common elements to both r and rout file types
 runtime r-plugin/rsyntax.vim
 
 syn match rOperator    "[\*\!\&\+\-\<\>\=\^\|\~\`/:@]"

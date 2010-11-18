@@ -1,2088 +1,307 @@
-syn keyword rFunction acf
-syn keyword rFunction acf2AR
-syn keyword rFunction add1
-syn keyword rFunction addmargins
-syn keyword rFunction add.scope
-syn keyword rFunction aggregate
-syn keyword rFunction aggregate.data.frame
-syn keyword rFunction aggregate.default
-syn keyword rFunction aggregate.ts
-syn keyword rFunction AIC
-syn keyword rFunction alias
-syn keyword rFunction anova
-syn keyword rFunction anova.glm
-syn keyword rFunction anova.glmlist
-syn keyword rFunction anovalist.lm
-syn keyword rFunction anova.lm
-syn keyword rFunction anova.lmlist
-syn keyword rFunction anova.mlm
-syn keyword rFunction ansari.test
-syn keyword rFunction aov
-syn keyword rFunction approx
-syn keyword rFunction approxfun
-syn keyword rFunction ar
-syn keyword rFunction ar.burg
-syn keyword rFunction arima
-syn keyword rFunction arima0
-syn keyword rFunction arima0.diag
-syn keyword rFunction arima.sim
-syn keyword rFunction ARMAacf
-syn keyword rFunction ARMAtoMA
-syn keyword rFunction ar.mle
-syn keyword rFunction ar.ols
-syn keyword rFunction ar.yw
-syn keyword rFunction as.dendrogram
-syn keyword rFunction as.dist
-syn keyword rFunction as.formula
-syn keyword rFunction as.hclust
-syn keyword rFunction asOneSidedFormula
-syn keyword rFunction as.stepfun
-syn keyword rFunction as.ts
-syn keyword rFunction ave
-syn keyword rFunction bandwidth.kernel
-syn keyword rFunction bartlett.test
-syn keyword rFunction binomial
-syn keyword rFunction binom.test
-syn keyword rFunction biplot
-syn keyword rFunction Box.test
-syn keyword rFunction bw.bcv
-syn keyword rFunction bw.nrd
-syn keyword rFunction bw.nrd0
-syn keyword rFunction bw.SJ
-syn keyword rFunction bw.ucv
-syn keyword rFunction C
-syn keyword rFunction cancor
-syn keyword rFunction case.names
-syn keyword rFunction ccf
-syn keyword rFunction chisq.test
-syn keyword rFunction clearNames
-syn keyword rFunction cmdscale
-syn keyword rFunction coef
-syn keyword rFunction coefficients
-syn keyword rFunction complete.cases
-syn keyword rFunction confint
-syn keyword rFunction confint.default
-syn keyword rFunction constrOptim
-syn keyword rFunction contrasts
-syn keyword rFunction contr.helmert
-syn keyword rFunction contr.poly
-syn keyword rFunction contr.SAS
-syn keyword rFunction contr.sum
-syn keyword rFunction contr.treatment
-syn keyword rFunction convolve
-syn keyword rFunction cooks.distance
-syn keyword rFunction cophenetic
-syn keyword rFunction cor
-syn keyword rFunction cor.test
-syn keyword rFunction cov
-syn keyword rFunction cov2cor
-syn keyword rFunction covratio
-syn keyword rFunction cov.wt
-syn keyword rFunction cpgram
-syn keyword rFunction cutree
-syn keyword rFunction cycle
-syn keyword rFunction D
-syn keyword rFunction dbeta
-syn keyword rFunction dbinom
-syn keyword rFunction dcauchy
-syn keyword rFunction dchisq
-syn keyword rFunction decompose
-syn keyword rFunction delete.response
-syn keyword rFunction deltat
-syn keyword rFunction dendrapply
-syn keyword rFunction density
-syn keyword rFunction density.default
-syn keyword rFunction deriv
-syn keyword rFunction deriv3
-syn keyword rFunction deriv3.default
-syn keyword rFunction deriv3.formula
-syn keyword rFunction deriv.default
-syn keyword rFunction deriv.formula
-syn keyword rFunction deviance
-syn keyword rFunction dexp
-syn keyword rFunction df
-syn keyword rFunction dfbeta
-syn keyword rFunction dfbetas
-syn keyword rFunction dffits
-syn keyword rFunction df.kernel
-syn keyword rFunction df.residual
-syn keyword rFunction dgamma
-syn keyword rFunction dgeom
-syn keyword rFunction dhyper
-syn keyword rFunction diffinv
-syn keyword rFunction diff.ts
-syn keyword rFunction dist
-syn keyword rFunction dlnorm
-syn keyword rFunction dlogis
-syn keyword rFunction dmultinom
-syn keyword rFunction dnbinom
-syn keyword rFunction dnorm
-syn keyword rFunction dpois
-syn keyword rFunction drop1
-syn keyword rFunction drop.scope
-syn keyword rFunction drop.terms
-syn keyword rFunction dsignrank
-syn keyword rFunction dt
-syn keyword rFunction dummy.coef
-syn keyword rFunction dunif
-syn keyword rFunction dweibull
-syn keyword rFunction dwilcox
-syn keyword rFunction ecdf
-syn keyword rFunction eff.aovlist
-syn keyword rFunction effects
-syn keyword rFunction embed
-syn keyword rFunction end
-syn keyword rFunction estVar
-syn keyword rFunction expand.model.frame
-syn keyword rFunction extractAIC
-syn keyword rFunction factanal
-syn keyword rFunction factor.scope
-syn keyword rFunction family
-syn keyword rFunction fft
-syn keyword rFunction filter
-syn keyword rFunction fisher.test
-syn keyword rFunction fitted
-syn keyword rFunction fitted.values
-syn keyword rFunction fivenum
-syn keyword rFunction fligner.test
-syn keyword rFunction formula
-syn keyword rFunction frequency
-syn keyword rFunction friedman.test
-syn keyword rFunction ftable
-syn keyword rFunction Gamma
-syn keyword rFunction gaussian
-syn keyword rFunction get_all_vars
-syn keyword rFunction getInitial
-syn keyword rFunction glm
-syn keyword rFunction glm.control
-syn keyword rFunction glm.fit
-syn keyword rFunction glm.fit.null
-syn keyword rFunction hasTsp
-syn keyword rFunction hat
-syn keyword rFunction hatvalues
-syn keyword rFunction hatvalues.lm
-syn keyword rFunction hclust
-syn keyword rFunction heatmap
-syn keyword rFunction HoltWinters
-syn keyword rFunction influence
-syn keyword rFunction influence.measures
-syn keyword rFunction integrate
-syn keyword rFunction interaction.plot
-syn keyword rFunction inverse.gaussian
-syn keyword rFunction IQR
-syn keyword rFunction is.empty.model
-syn keyword rFunction is.leaf
-syn keyword rFunction is.mts
-syn keyword rFunction isoreg
-syn keyword rFunction is.stepfun
-syn keyword rFunction is.ts
-syn keyword rFunction is.tskernel
-syn keyword rFunction KalmanForecast
-syn keyword rFunction KalmanLike
-syn keyword rFunction KalmanRun
-syn keyword rFunction KalmanSmooth
-syn keyword rFunction kernapply
-syn keyword rFunction kernel
-syn keyword rFunction kmeans
-syn keyword rFunction knots
-syn keyword rFunction kruskal.test
-syn keyword rFunction ksmooth
-syn keyword rFunction ks.test
-syn keyword rFunction lag
-syn keyword rFunction lag.plot
-syn keyword rFunction line
-syn keyword rFunction lines.ts
-syn keyword rFunction lm
-syn keyword rFunction lm.fit
-syn keyword rFunction lm.fit.null
-syn keyword rFunction lm.influence
-syn keyword rFunction lm.wfit
-syn keyword rFunction lm.wfit.null
-syn keyword rFunction loadings
-syn keyword rFunction loess
-syn keyword rFunction loess.control
-syn keyword rFunction loess.smooth
-syn keyword rFunction logLik
-syn keyword rFunction loglin
-syn keyword rFunction lowess
-syn keyword rFunction ls.diag
-syn keyword rFunction lsfit
-syn keyword rFunction ls.print
-syn keyword rFunction mad
-syn keyword rFunction mahalanobis
-syn keyword rFunction makeARIMA
-syn keyword rFunction make.link
-syn keyword rFunction makepredictcall
-syn keyword rFunction manova
-syn keyword rFunction mantelhaen.test
-syn keyword rFunction mauchley.test
-syn keyword rFunction mauchly.test
-syn keyword rFunction mcnemar.test
-syn keyword rFunction median
-syn keyword rFunction median.default
-syn keyword rFunction medpolish
-syn keyword rFunction model.extract
-syn keyword rFunction model.frame
-syn keyword rFunction model.frame.aovlist
-syn keyword rFunction model.frame.default
-syn keyword rFunction model.frame.glm
-syn keyword rFunction model.frame.lm
-syn keyword rFunction model.matrix
-syn keyword rFunction model.matrix.default
-syn keyword rFunction model.matrix.lm
-syn keyword rFunction model.offset
-syn keyword rFunction model.response
-syn keyword rFunction model.tables
-syn keyword rFunction model.weights
-syn keyword rFunction monthplot
-syn keyword rFunction mood.test
-syn keyword rFunction mvfft
-syn keyword rFunction na.action
-syn keyword rFunction na.contiguous
-syn keyword rFunction na.exclude
-syn keyword rFunction na.fail
-syn keyword rFunction na.omit
-syn keyword rFunction na.pass
-syn keyword rFunction napredict
-syn keyword rFunction naprint
-syn keyword rFunction naresid
-syn keyword rFunction nextn
-syn keyword rFunction nlm
-syn keyword rFunction nlminb
-syn keyword rFunction nls
-syn keyword rFunction nls.control
-syn keyword rFunction NLSstAsymptotic
-syn keyword rFunction NLSstClosestX
-syn keyword rFunction NLSstLfAsymptote
-syn keyword rFunction NLSstRtAsymptote
-syn keyword rFunction numericDeriv
-syn keyword rFunction offset
-syn keyword rFunction oneway.test
-syn keyword rFunction optim
-syn keyword rFunction optimise
-syn keyword rFunction optimize
-syn keyword rFunction order.dendrogram
-syn keyword rFunction pacf
-syn keyword rFunction p.adjust
-syn keyword rFunction pairwise.prop.test
-syn keyword rFunction pairwise.table
-syn keyword rFunction pairwise.t.test
-syn keyword rFunction pairwise.wilcox.test
-syn keyword rFunction pbeta
-syn keyword rFunction pbinom
-syn keyword rFunction pbirthday
-syn keyword rFunction pcauchy
-syn keyword rFunction pchisq
-syn keyword rFunction pexp
-syn keyword rFunction pf
-syn keyword rFunction pgamma
-syn keyword rFunction pgeom
-syn keyword rFunction phyper
-syn keyword rFunction plclust
-syn keyword rFunction plnorm
-syn keyword rFunction plogis
-syn keyword rFunction plot.density
-syn keyword rFunction plot.ecdf
-syn keyword rFunction plot.lm
-syn keyword rFunction plot.mlm
-syn keyword rFunction plot.spec
-syn keyword rFunction plot.spec.coherency
-syn keyword rFunction plot.spec.phase
-syn keyword rFunction plot.stepfun
-syn keyword rFunction plot.ts
-syn keyword rFunction plot.TukeyHSD
-syn keyword rFunction pnbinom
-syn keyword rFunction pnorm
-syn keyword rFunction poisson
-syn keyword rFunction poisson.test
-syn keyword rFunction poly
-syn keyword rFunction polym
-syn keyword rFunction power
-syn keyword rFunction power.anova.test
-syn keyword rFunction power.prop.test
-syn keyword rFunction power.t.test
-syn keyword rFunction ppoints
-syn keyword rFunction ppois
-syn keyword rFunction ppr
-syn keyword rFunction PP.test
-syn keyword rFunction prcomp
-syn keyword rFunction predict
-syn keyword rFunction predict.glm
-syn keyword rFunction predict.lm
-syn keyword rFunction predict.mlm
-syn keyword rFunction predict.poly
-syn keyword rFunction preplot
-syn keyword rFunction princomp
-syn keyword rFunction print.anova
-syn keyword rFunction print.coefmat
-syn keyword rFunction printCoefmat
-syn keyword rFunction print.density
-syn keyword rFunction print.family
-syn keyword rFunction print.formula
-syn keyword rFunction print.ftable
-syn keyword rFunction print.glm
-syn keyword rFunction print.infl
-syn keyword rFunction print.integrate
-syn keyword rFunction print.lm
-syn keyword rFunction print.logLik
-syn keyword rFunction print.terms
-syn keyword rFunction print.ts
-syn keyword rFunction profile
-syn keyword rFunction proj
-syn keyword rFunction promax
-syn keyword rFunction prop.test
-syn keyword rFunction prop.trend.test
-syn keyword rFunction psignrank
-syn keyword rFunction pt
-syn keyword rFunction ptukey
-syn keyword rFunction punif
-syn keyword rFunction pweibull
-syn keyword rFunction pwilcox
-syn keyword rFunction qbeta
-syn keyword rFunction qbinom
-syn keyword rFunction qbirthday
-syn keyword rFunction qcauchy
-syn keyword rFunction qchisq
-syn keyword rFunction qexp
-syn keyword rFunction qf
-syn keyword rFunction qgamma
-syn keyword rFunction qgeom
-syn keyword rFunction qhyper
-syn keyword rFunction qlnorm
-syn keyword rFunction qlogis
-syn keyword rFunction qnbinom
-syn keyword rFunction qnorm
-syn keyword rFunction qpois
-syn keyword rFunction qqline
-syn keyword rFunction qqnorm
-syn keyword rFunction qqnorm.default
-syn keyword rFunction qqplot
-syn keyword rFunction qsignrank
-syn keyword rFunction qt
-syn keyword rFunction qtukey
-syn keyword rFunction quade.test
-syn keyword rFunction quantile
-syn keyword rFunction quantile.default
-syn keyword rFunction quasi
-syn keyword rFunction quasibinomial
-syn keyword rFunction quasipoisson
-syn keyword rFunction qunif
-syn keyword rFunction qweibull
-syn keyword rFunction qwilcox
-syn keyword rFunction r2dtable
-syn keyword rFunction rbeta
-syn keyword rFunction rbinom
-syn keyword rFunction rcauchy
-syn keyword rFunction rchisq
-syn keyword rFunction read.ftable
-syn keyword rFunction rect.hclust
-syn keyword rFunction reformulate
-syn keyword rFunction relevel
-syn keyword rFunction reorder
-syn keyword rFunction replications
-syn keyword rFunction reshape
-syn keyword rFunction reshapeLong
-syn keyword rFunction reshapeWide
-syn keyword rFunction resid
-syn keyword rFunction residuals
-syn keyword rFunction residuals.default
-syn keyword rFunction residuals.glm
-syn keyword rFunction residuals.lm
-syn keyword rFunction rexp
-syn keyword rFunction rf
-syn keyword rFunction rgamma
-syn keyword rFunction rgeom
-syn keyword rFunction rhyper
-syn keyword rFunction rlnorm
-syn keyword rFunction rlogis
-syn keyword rFunction rmultinom
-syn keyword rFunction rnbinom
-syn keyword rFunction rnorm
-syn keyword rFunction rpois
-syn keyword rFunction rsignrank
-syn keyword rFunction rstandard
-syn keyword rFunction rstandard.glm
-syn keyword rFunction rstandard.lm
-syn keyword rFunction rstudent
-syn keyword rFunction rstudent.glm
-syn keyword rFunction rstudent.lm
-syn keyword rFunction rt
-syn keyword rFunction runif
-syn keyword rFunction runmed
-syn keyword rFunction rweibull
-syn keyword rFunction rwilcox
-syn keyword rFunction scatter.smooth
-syn keyword rFunction screeplot
-syn keyword rFunction sd
-syn keyword rFunction se.contrast
-syn keyword rFunction selfStart
-syn keyword rFunction setNames
-syn keyword rFunction shapiro.test
-syn keyword rFunction simulate
-syn keyword rFunction smooth
-syn keyword rFunction smoothEnds
-syn keyword rFunction smooth.spline
-syn keyword rFunction sortedXyData
-syn keyword rFunction spec.ar
-syn keyword rFunction spec.pgram
-syn keyword rFunction spec.taper
-syn keyword rFunction spectrum
-syn keyword rFunction spline
-syn keyword rFunction splinefun
-syn keyword rFunction splinefunH
-syn keyword rFunction SSasymp
-syn keyword rFunction SSasympOff
-syn keyword rFunction SSasympOrig
-syn keyword rFunction SSbiexp
-syn keyword rFunction SSD
-syn keyword rFunction SSfol
-syn keyword rFunction SSfpl
-syn keyword rFunction SSgompertz
-syn keyword rFunction SSlogis
-syn keyword rFunction SSmicmen
-syn keyword rFunction SSweibull
-syn keyword rFunction start
-syn keyword rFunction stat.anova
-syn keyword rFunction step
-syn keyword rFunction stepfun
-syn keyword rFunction stl
-syn keyword rFunction StructTS
-syn keyword rFunction summary.aov
-syn keyword rFunction summary.aovlist
-syn keyword rFunction summary.glm
-syn keyword rFunction summary.infl
-syn keyword rFunction summary.lm
-syn keyword rFunction summary.manova
-syn keyword rFunction summary.mlm
-syn keyword rFunction summary.stepfun
-syn keyword rFunction supsmu
-syn keyword rFunction symnum
-syn keyword rFunction termplot
-syn keyword rFunction terms
-syn keyword rFunction terms.aovlist
-syn keyword rFunction terms.default
-syn keyword rFunction terms.formula
-syn keyword rFunction terms.terms
-syn keyword rFunction time
-syn keyword rFunction toeplitz
-syn keyword rFunction ts
-syn keyword rFunction tsdiag
-syn keyword rFunction ts.intersect
-syn keyword rFunction tsp
-syn keyword rFunction ts.plot
-syn keyword rFunction tsSmooth
-syn keyword rFunction ts.union
-syn keyword rFunction t.test
-syn keyword rFunction TukeyHSD
-syn keyword rFunction TukeyHSD.aov
-syn keyword rFunction uniroot
-syn keyword rFunction update
-syn keyword rFunction update.default
-syn keyword rFunction update.formula
-syn keyword rFunction var
-syn keyword rFunction variable.names
-syn keyword rFunction varimax
-syn keyword rFunction var.test
-syn keyword rFunction vcov
-syn keyword rFunction weighted.mean
-syn keyword rFunction weighted.residuals
-syn keyword rFunction weights
-syn keyword rFunction wilcox.test
-syn keyword rFunction window
-syn keyword rFunction write.ftable
-syn keyword rFunction xtabs
-syn keyword rFunction abline
-syn keyword rFunction arrows
-syn keyword rFunction assocplot
-syn keyword rFunction axis
-syn keyword rFunction Axis
-syn keyword rFunction axis.Date
-syn keyword rFunction axis.POSIXct
-syn keyword rFunction axTicks
-syn keyword rFunction barplot
-syn keyword rFunction barplot.default
-syn keyword rFunction box
-syn keyword rFunction boxplot
-syn keyword rFunction boxplot.default
-syn keyword rFunction boxplot.matrix
-syn keyword rFunction bxp
-syn keyword rFunction cdplot
-syn keyword rFunction clip
-syn keyword rFunction close.screen
-syn keyword rFunction co.intervals
-syn keyword rFunction contour
-syn keyword rFunction contour.default
-syn keyword rFunction coplot
-syn keyword rFunction curve
-syn keyword rFunction dotchart
-syn keyword rFunction erase.screen
-syn keyword rFunction filled.contour
-syn keyword rFunction fourfoldplot
-syn keyword rFunction frame
-syn keyword rFunction grconvertX
-syn keyword rFunction grconvertY
-syn keyword rFunction grid
-syn keyword rFunction hist
-syn keyword rFunction hist.default
-syn keyword rFunction identify
-syn keyword rFunction image
-syn keyword rFunction image.default
-syn keyword rFunction layout
-syn keyword rFunction layout.show
-syn keyword rFunction lcm
-syn keyword rFunction legend
-syn keyword rFunction lines
-syn keyword rFunction lines.default
-syn keyword rFunction locator
-syn keyword rFunction matlines
-syn keyword rFunction matplot
-syn keyword rFunction matpoints
-syn keyword rFunction mosaicplot
-syn keyword rFunction mtext
-syn keyword rFunction pairs
-syn keyword rFunction pairs.default
-syn keyword rFunction panel.smooth
-syn keyword rFunction par
-syn keyword rFunction persp
-syn keyword rFunction pie
-syn keyword rFunction piechart
-syn keyword rFunction plot
-syn keyword rFunction plot.default
-syn keyword rFunction plot.design
-syn keyword rFunction plot.new
-syn keyword rFunction plot.window
-syn keyword rFunction plot.xy
-syn keyword rFunction points
-syn keyword rFunction points.default
-syn keyword rFunction polygon
-syn keyword rFunction polypath
-syn keyword rFunction rasterImage
-syn keyword rFunction rect
-syn keyword rFunction rug
-syn keyword rFunction screen
-syn keyword rFunction segments
-syn keyword rFunction smoothScatter
-syn keyword rFunction spineplot
-syn keyword rFunction split.screen
-syn keyword rFunction stars
-syn keyword rFunction stem
-syn keyword rFunction strheight
-syn keyword rFunction stripchart
-syn keyword rFunction strwidth
-syn keyword rFunction sunflowerplot
-syn keyword rFunction symbols
-syn keyword rFunction text
-syn keyword rFunction text.default
-syn keyword rFunction title
-syn keyword rFunction xinch
-syn keyword rFunction xspline
-syn keyword rFunction xyinch
-syn keyword rFunction yinch
-syn keyword rFunction adjustcolor
-syn keyword rFunction as.graphicsAnnot
-syn keyword rFunction as.raster
-syn keyword rFunction bitmap
-syn keyword rFunction bmp
-syn keyword rFunction boxplot.stats
-syn keyword rFunction cairo_pdf
-syn keyword rFunction cairo_ps
-syn keyword rFunction check.options
-syn keyword rFunction chull
-syn keyword rFunction CIDFont
-syn keyword rFunction cm
-syn keyword rFunction cm.colors
-syn keyword rFunction col2rgb
-syn keyword rFunction colorConverter
-syn keyword rFunction colorRamp
-syn keyword rFunction colorRampPalette
-syn keyword rFunction colors
-syn keyword rFunction colours
-syn keyword rFunction contourLines
-syn keyword rFunction convertColor
-syn keyword rFunction densCols
-syn keyword rFunction dev2bitmap
-syn keyword rFunction devAskNewPage
-syn keyword rFunction dev.control
-syn keyword rFunction dev.copy
-syn keyword rFunction dev.copy2eps
-syn keyword rFunction dev.copy2pdf
-syn keyword rFunction dev.cur
-syn keyword rFunction deviceIsInteractive
-syn keyword rFunction dev.interactive
-syn keyword rFunction dev.list
-syn keyword rFunction dev.new
-syn keyword rFunction dev.next
-syn keyword rFunction dev.off
-syn keyword rFunction dev.prev
-syn keyword rFunction dev.print
-syn keyword rFunction dev.set
-syn keyword rFunction dev.size
-syn keyword rFunction embedFonts
-syn keyword rFunction extendrange
-syn keyword rFunction getGraphicsEvent
-syn keyword rFunction getGraphicsEventEnv
-syn keyword rFunction graphics.off
-syn keyword rFunction gray
-syn keyword rFunction gray.colors
-syn keyword rFunction grey
-syn keyword rFunction grey.colors
-syn keyword rFunction hcl
-syn keyword rFunction heat.colors
-syn keyword rFunction hsv
-syn keyword rFunction is.raster
-syn keyword rFunction jpeg
-syn keyword rFunction make.rgb
-syn keyword rFunction n2mfrow
-syn keyword rFunction nclass.FD
-syn keyword rFunction nclass.scott
-syn keyword rFunction nclass.Sturges
-syn keyword rFunction palette
-syn keyword rFunction pdf
-syn keyword rFunction pdfFonts
-syn keyword rFunction pdf.options
-syn keyword rFunction pictex
-syn keyword rFunction png
-syn keyword rFunction postscript
-syn keyword rFunction postscriptFont
-syn keyword rFunction postscriptFonts
-syn keyword rFunction ps.options
-syn keyword rFunction quartz
-syn keyword rFunction quartzFont
-syn keyword rFunction quartzFonts
-syn keyword rFunction quartz.options
-syn keyword rFunction rainbow
-syn keyword rFunction recordGraphics
-syn keyword rFunction recordPlot
-syn keyword rFunction replayPlot
-syn keyword rFunction rgb
-syn keyword rFunction rgb2hsv
-syn keyword rFunction savePlot
-syn keyword rFunction setEPS
-syn keyword rFunction setGraphicsEventEnv
-syn keyword rFunction setGraphicsEventHandlers
-syn keyword rFunction setPS
-syn keyword rFunction svg
-syn keyword rFunction terrain.colors
-syn keyword rFunction tiff
-syn keyword rFunction topo.colors
-syn keyword rFunction trans3d
-syn keyword rFunction Type1Font
-syn keyword rFunction x11
-syn keyword rFunction X11
-syn keyword rFunction X11Font
-syn keyword rFunction X11Fonts
-syn keyword rFunction X11.options
-syn keyword rFunction xfig
-syn keyword rFunction xy.coords
-syn keyword rFunction xyTable
-syn keyword rFunction xyz.coords
-syn keyword rFunction alarm
-syn keyword rFunction apropos
-syn keyword rFunction argsAnywhere
-syn keyword rFunction aspell
-syn keyword rFunction aspell_package_Rd_files
-syn keyword rFunction aspell_package_vignettes
-syn keyword rFunction aspell_write_personal_dictionary_file
-syn keyword rFunction as.person
-syn keyword rFunction as.personList
-syn keyword rFunction as.relistable
-syn keyword rFunction as.roman
-syn keyword rFunction assignInNamespace
-syn keyword rFunction available.packages
-syn keyword rFunction bibentry
-syn keyword rFunction browseEnv
-syn keyword rFunction browseURL
-syn keyword rFunction browseVignettes
-syn keyword rFunction bug.report
-syn keyword rFunction capture.output
-syn keyword rFunction checkCRAN
-syn keyword rFunction chooseBioCmirror
-syn keyword rFunction chooseCRANmirror
-syn keyword rFunction citation
-syn keyword rFunction citEntry
-syn keyword rFunction citFooter
-syn keyword rFunction citHeader
-syn keyword rFunction close.socket
-syn keyword rFunction combn
-syn keyword rFunction compareVersion
-syn keyword rFunction contrib.url
-syn keyword rFunction count.fields
-syn keyword rFunction CRAN.packages
-syn keyword rFunction data
-syn keyword rFunction dataentry
-syn keyword rFunction data.entry
-syn keyword rFunction de
-syn keyword rFunction debugger
-syn keyword rFunction demo
-syn keyword rFunction de.ncols
-syn keyword rFunction de.restore
-syn keyword rFunction de.setup
-syn keyword rFunction download.file
-syn keyword rFunction download.packages
-syn keyword rFunction dump.frames
-syn keyword rFunction edit
-syn keyword rFunction emacs
-syn keyword rFunction example
-syn keyword rFunction file.edit
-syn keyword rFunction file_test
-syn keyword rFunction find
-syn keyword rFunction findLineNum
-syn keyword rFunction fix
-syn keyword rFunction fixInNamespace
-syn keyword rFunction flush.console
-syn keyword rFunction formatOL
-syn keyword rFunction formatUL
-syn keyword rFunction getAnywhere
-syn keyword rFunction getCRANmirrors
-syn keyword rFunction getFromNamespace
-syn keyword rFunction getS3method
-syn keyword rFunction getTxtProgressBar
-syn keyword rFunction glob2rx
-syn keyword rFunction head
-syn keyword rFunction head.matrix
-syn keyword rFunction help
-syn keyword rFunction help.request
-syn keyword rFunction help.search
-syn keyword rFunction help.start
-syn keyword rFunction history
-syn keyword rFunction installed.packages
-syn keyword rFunction install.packages
-syn keyword rFunction is.relistable
-syn keyword rFunction limitedLabels
-syn keyword rFunction loadhistory
-syn keyword rFunction localeToCharset
-syn keyword rFunction lsf.str
-syn keyword rFunction ls.str
-syn keyword rFunction maintainer
-syn keyword rFunction make.packages.html
-syn keyword rFunction makeRweaveLatexCodeRunner
-syn keyword rFunction make.socket
-syn keyword rFunction memory.limit
-syn keyword rFunction memory.size
-syn keyword rFunction menu
-syn keyword rFunction methods
-syn keyword rFunction mirror2html
-syn keyword rFunction modifyList
-syn keyword rFunction new.packages
-syn keyword rFunction news
-syn keyword rFunction normalizePath
-syn keyword rFunction nsl
-syn keyword rFunction object.size
-syn keyword rFunction old.packages
-syn keyword rFunction package.contents
-syn keyword rFunction packageDescription
-syn keyword rFunction package.skeleton
-syn keyword rFunction packageStatus
-syn keyword rFunction packageVersion
-syn keyword rFunction page
-syn keyword rFunction person
-syn keyword rFunction personList
-syn keyword rFunction pico
-syn keyword rFunction prompt
-syn keyword rFunction promptData
-syn keyword rFunction promptPackage
-syn keyword rFunction rc.getOption
-syn keyword rFunction rc.options
-syn keyword rFunction rc.settings
-syn keyword rFunction rc.status
-syn keyword rFunction readCitationFile
-syn keyword rFunction read.csv
-syn keyword rFunction read.csv2
-syn keyword rFunction read.delim
-syn keyword rFunction read.delim2
-syn keyword rFunction read.DIF
-syn keyword rFunction read.fortran
-syn keyword rFunction read.fwf
-syn keyword rFunction read.socket
-syn keyword rFunction read.table
-syn keyword rFunction recover
-syn keyword rFunction relist
-syn keyword rFunction remove.packages
-syn keyword rFunction Rprof
-syn keyword rFunction Rprofmem
-syn keyword rFunction RShowDoc
-syn keyword rFunction RSiteSearch
-syn keyword rFunction rtags
-syn keyword rFunction Rtangle
-syn keyword rFunction RtangleSetup
-syn keyword rFunction RtangleWritedoc
-syn keyword rFunction RweaveChunkPrefix
-syn keyword rFunction RweaveEvalWithOpt
-syn keyword rFunction RweaveLatex
-syn keyword rFunction RweaveLatexFinish
-syn keyword rFunction RweaveLatexOptions
-syn keyword rFunction RweaveLatexSetup
-syn keyword rFunction RweaveLatexWritedoc
-syn keyword rFunction RweaveTryStop
-syn keyword rFunction savehistory
-syn keyword rFunction select.list
-syn keyword rFunction sessionInfo
-syn keyword rFunction setBreakpoint
-syn keyword rFunction setRepositories
-syn keyword rFunction setTxtProgressBar
-syn keyword rFunction stack
-syn keyword rFunction Stangle
-syn keyword rFunction str
-syn keyword rFunction strOptions
-syn keyword rFunction summaryRprof
-syn keyword rFunction Sweave
-syn keyword rFunction SweaveHooks
-syn keyword rFunction SweaveSyntConv
-syn keyword rFunction tail
-syn keyword rFunction tail.matrix
-syn keyword rFunction tar
-syn keyword rFunction timestamp
-syn keyword rFunction toBibtex
-syn keyword rFunction toLatex
-syn keyword rFunction txtProgressBar
-syn keyword rFunction type.convert
-syn keyword rFunction unstack
-syn keyword rFunction untar
-syn keyword rFunction unzip
-syn keyword rFunction update.packages
-syn keyword rFunction update.packageStatus
-syn keyword rFunction upgrade
-syn keyword rFunction URLdecode
-syn keyword rFunction URLencode
-syn keyword rFunction url.show
-syn keyword rFunction vi
-syn keyword rFunction View
-syn keyword rFunction vignette
-syn keyword rFunction write.csv
-syn keyword rFunction write.csv2
-syn keyword rFunction write.socket
-syn keyword rFunction write.table
-syn keyword rFunction wsbrowser
-syn keyword rFunction xedit
-syn keyword rFunction xemacs
-syn keyword rFunction zip.file.extract
-syn keyword rFunction addNextMethod
-syn keyword rFunction allGenerics
-syn keyword rFunction allNames
-syn keyword rFunction Arith
-syn keyword rFunction as
-syn keyword rFunction asMethodDefinition
-syn keyword rFunction assignClassDef
-syn keyword rFunction assignMethodsMetaData
-syn keyword rFunction balanceMethodsList
-syn keyword rFunction cacheGenericsMetaData
-syn keyword rFunction cacheMetaData
-syn keyword rFunction cacheMethod
-syn keyword rFunction callGeneric
-syn keyword rFunction callNextMethod
-syn keyword rFunction canCoerce
-syn keyword rFunction cbind2
-syn keyword rFunction checkSlotAssignment
-syn keyword rFunction classesToAM
-syn keyword rFunction classMetaName
-syn keyword rFunction coerce
-syn keyword rFunction Compare
-syn keyword rFunction completeClassDefinition
-syn keyword rFunction completeExtends
-syn keyword rFunction completeSubclasses
-syn keyword rFunction Complex
-syn keyword rFunction conformMethod
-syn keyword rFunction defaultDumpName
-syn keyword rFunction defaultPrototype
-syn keyword rFunction doPrimitiveMethod
-syn keyword rFunction dumpMethod
-syn keyword rFunction dumpMethods
-syn keyword rFunction el
-syn keyword rFunction elNamed
-syn keyword rFunction empty.dump
-syn keyword rFunction emptyMethodsList
-syn keyword rFunction evalSource
-syn keyword rFunction existsFunction
-syn keyword rFunction existsMethod
-syn keyword rFunction extends
-syn keyword rFunction finalDefaultMethod
-syn keyword rFunction findClass
-syn keyword rFunction findFunction
-syn keyword rFunction findMethod
-syn keyword rFunction findMethods
-syn keyword rFunction findMethodSignatures
-syn keyword rFunction findUnique
-syn keyword rFunction fixPre1.8
-syn keyword rFunction formalArgs
-syn keyword rFunction functionBody
-syn keyword rFunction generic.skeleton
-syn keyword rFunction getAccess
-syn keyword rFunction getAllMethods
-syn keyword rFunction getAllSuperClasses
-syn keyword rFunction getClass
-syn keyword rFunction getClassDef
-syn keyword rFunction getClasses
-syn keyword rFunction getClassName
-syn keyword rFunction getClassPackage
-syn keyword rFunction getDataPart
-syn keyword rFunction getExtends
-syn keyword rFunction getFunction
-syn keyword rFunction getGeneric
-syn keyword rFunction getGenerics
-syn keyword rFunction getGroup
-syn keyword rFunction getGroupMembers
-syn keyword rFunction getMethod
-syn keyword rFunction getMethods
-syn keyword rFunction getMethodsForDispatch
-syn keyword rFunction getMethodsMetaData
-syn keyword rFunction getPackageName
-syn keyword rFunction getProperties
-syn keyword rFunction getPrototype
-syn keyword rFunction getRefClass
-syn keyword rFunction getSlots
-syn keyword rFunction getSubclasses
-syn keyword rFunction getValidity
-syn keyword rFunction getVirtual
-syn keyword rFunction hasArg
-syn keyword rFunction hasMethod
-syn keyword rFunction hasMethods
-syn keyword rFunction implicitGeneric
-syn keyword rFunction inheritedSlotNames
-syn keyword rFunction initFieldArgs
-syn keyword rFunction initialize
-syn keyword rFunction insertMethod
-syn keyword rFunction insertSource
-syn keyword rFunction is
-syn keyword rFunction isClass
-syn keyword rFunction isClassDef
-syn keyword rFunction isClassUnion
-syn keyword rFunction isGeneric
-syn keyword rFunction isGrammarSymbol
-syn keyword rFunction isGroup
-syn keyword rFunction isSealedClass
-syn keyword rFunction isSealedMethod
-syn keyword rFunction isVirtualClass
-syn keyword rFunction isXS3Class
-syn keyword rFunction languageEl
-syn keyword rFunction linearizeMlist
-syn keyword rFunction listFromMethods
-syn keyword rFunction listFromMlist
-syn keyword rFunction loadMethod
-syn keyword rFunction Logic
-syn keyword rFunction makeClassRepresentation
-syn keyword rFunction makeExtends
-syn keyword rFunction makeGeneric
-syn keyword rFunction makeMethodsList
-syn keyword rFunction makePrototypeFromClassDef
-syn keyword rFunction makeStandardGeneric
-syn keyword rFunction matchSignature
-syn keyword rFunction Math
-syn keyword rFunction Math2
-syn keyword rFunction mergeMethods
-syn keyword rFunction metaNameUndo
-syn keyword rFunction MethodAddCoerce
-syn keyword rFunction methodSignatureMatrix
-syn keyword rFunction method.skeleton
-syn keyword rFunction MethodsList
-syn keyword rFunction MethodsListSelect
-syn keyword rFunction methodsPackageMetaName
-syn keyword rFunction missingArg
-syn keyword rFunction mlistMetaName
-syn keyword rFunction new
-syn keyword rFunction newBasic
-syn keyword rFunction newClassRepresentation
-syn keyword rFunction newEmptyObject
-syn keyword rFunction Ops
-syn keyword rFunction packageSlot
-syn keyword rFunction possibleExtends
-syn keyword rFunction prohibitGeneric
-syn keyword rFunction promptClass
-syn keyword rFunction promptMethods
-syn keyword rFunction prototype
-syn keyword rFunction Quote
-syn keyword rFunction rbind2
-syn keyword rFunction reconcilePropertiesAndPrototype
-syn keyword rFunction registerImplicitGenerics
-syn keyword rFunction rematchDefinition
-syn keyword rFunction removeClass
-syn keyword rFunction removeGeneric
-syn keyword rFunction removeMethod
-syn keyword rFunction removeMethods
-syn keyword rFunction removeMethodsObject
-syn keyword rFunction representation
-syn keyword rFunction requireMethods
-syn keyword rFunction resetClass
-syn keyword rFunction resetGeneric
-syn keyword rFunction S3Class
-syn keyword rFunction S3Part
-syn keyword rFunction sealClass
-syn keyword rFunction seemsS4Object
-syn keyword rFunction selectMethod
-syn keyword rFunction selectSuperClasses
-syn keyword rFunction sessionData
-syn keyword rFunction setAs
-syn keyword rFunction setClass
-syn keyword rFunction setClassUnion
-syn keyword rFunction setDataPart
-syn keyword rFunction setGeneric
-syn keyword rFunction setGenericImplicit
-syn keyword rFunction setGroupGeneric
-syn keyword rFunction setIs
-syn keyword rFunction setMethod
-syn keyword rFunction setOldClass
-syn keyword rFunction setPackageName
-syn keyword rFunction setPrimitiveMethods
-syn keyword rFunction setRefClass
-syn keyword rFunction setReplaceMethod
-syn keyword rFunction setValidity
-syn keyword rFunction show
-syn keyword rFunction showClass
-syn keyword rFunction showDefault
-syn keyword rFunction showExtends
-syn keyword rFunction showMethods
-syn keyword rFunction showMlist
-syn keyword rFunction signature
-syn keyword rFunction SignatureMethod
-syn keyword rFunction sigToEnv
-syn keyword rFunction slot
-syn keyword rFunction slotNames
-syn keyword rFunction slotsFromS3
-syn keyword rFunction substituteDirect
-syn keyword rFunction substituteFunctionArgs
-syn keyword rFunction Summary
-syn keyword rFunction superClassDepth
-syn keyword rFunction testInheritedMethods
-syn keyword rFunction testVirtual
-syn keyword rFunction traceOff
-syn keyword rFunction traceOn
-syn keyword rFunction tryNew
-syn keyword rFunction trySilent
-syn keyword rFunction unRematchDefinition
-syn keyword rFunction validObject
-syn keyword rFunction validSlotNames
-syn keyword rFunction abbreviate
-syn keyword rFunction abs
-syn keyword rFunction acos
-syn keyword rFunction acosh
-syn keyword rFunction addNA
-syn keyword rFunction addTaskCallback
-syn keyword rFunction agrep
-syn keyword rFunction alist
-syn keyword rFunction all
-syn keyword rFunction all.equal
-syn keyword rFunction all.equal.character
-syn keyword rFunction all.equal.default
-syn keyword rFunction all.equal.factor
-syn keyword rFunction all.equal.formula
-syn keyword rFunction all.equal.language
-syn keyword rFunction all.equal.list
-syn keyword rFunction all.equal.numeric
-syn keyword rFunction all.equal.POSIXct
-syn keyword rFunction all.equal.raw
-syn keyword rFunction all.names
-syn keyword rFunction all.vars
-syn keyword rFunction any
-syn keyword rFunction anyDuplicated
-syn keyword rFunction anyDuplicated.array
-syn keyword rFunction anyDuplicated.data.frame
-syn keyword rFunction anyDuplicated.default
-syn keyword rFunction anyDuplicated.matrix
-syn keyword rFunction aperm
-syn keyword rFunction append
-syn keyword rFunction apply
-syn keyword rFunction Arg
-syn keyword rFunction args
-syn keyword rFunction array
-syn keyword rFunction arrayInd
-syn keyword rFunction as.array
-syn keyword rFunction as.array.default
-syn keyword rFunction as.call
-syn keyword rFunction as.character
-syn keyword rFunction as.character.condition
-syn keyword rFunction as.character.Date
-syn keyword rFunction as.character.default
-syn keyword rFunction as.character.error
-syn keyword rFunction as.character.factor
-syn keyword rFunction as.character.hexmode
-syn keyword rFunction as.character.numeric_version
-syn keyword rFunction as.character.octmode
-syn keyword rFunction as.character.POSIXt
-syn keyword rFunction as.character.srcref
-syn keyword rFunction as.complex
-syn keyword rFunction as.data.frame
-syn keyword rFunction as.data.frame.array
-syn keyword rFunction as.data.frame.AsIs
-syn keyword rFunction as.data.frame.character
-syn keyword rFunction as.data.frame.complex
-syn keyword rFunction as.data.frame.data.frame
-syn keyword rFunction as.data.frame.Date
-syn keyword rFunction as.data.frame.default
-syn keyword rFunction as.data.frame.difftime
-syn keyword rFunction as.data.frame.factor
-syn keyword rFunction as.data.frame.integer
-syn keyword rFunction as.data.frame.list
-syn keyword rFunction as.data.frame.logical
-syn keyword rFunction as.data.frame.matrix
-syn keyword rFunction as.data.frame.model.matrix
-syn keyword rFunction as.data.frame.numeric
-syn keyword rFunction as.data.frame.numeric_version
-syn keyword rFunction as.data.frame.ordered
-syn keyword rFunction as.data.frame.POSIXct
-syn keyword rFunction as.data.frame.POSIXlt
-syn keyword rFunction as.data.frame.raw
-syn keyword rFunction as.data.frame.table
-syn keyword rFunction as.data.frame.ts
-syn keyword rFunction as.data.frame.vector
-syn keyword rFunction as.Date
-syn keyword rFunction as.Date.character
-syn keyword rFunction as.Date.date
-syn keyword rFunction as.Date.dates
-syn keyword rFunction as.Date.default
-syn keyword rFunction as.Date.factor
-syn keyword rFunction as.Date.numeric
-syn keyword rFunction as.Date.POSIXct
-syn keyword rFunction as.Date.POSIXlt
-syn keyword rFunction as.difftime
-syn keyword rFunction as.double
-syn keyword rFunction as.double.difftime
-syn keyword rFunction as.double.POSIXlt
-syn keyword rFunction as.environment
-syn keyword rFunction as.expression
-syn keyword rFunction as.expression.default
-syn keyword rFunction as.factor
-syn keyword rFunction as.function
-syn keyword rFunction as.function.default
-syn keyword rFunction as.hexmode
-syn keyword rFunction asin
-syn keyword rFunction asinh
-syn keyword rFunction as.integer
-syn keyword rFunction as.list
-syn keyword rFunction as.list.data.frame
-syn keyword rFunction as.list.Date
-syn keyword rFunction as.list.default
-syn keyword rFunction as.list.environment
-syn keyword rFunction as.list.factor
-syn keyword rFunction as.list.function
-syn keyword rFunction as.list.numeric_version
-syn keyword rFunction as.list.POSIXct
-syn keyword rFunction as.logical
-syn keyword rFunction as.logical.factor
-syn keyword rFunction as.matrix
-syn keyword rFunction as.matrix.data.frame
-syn keyword rFunction as.matrix.default
-syn keyword rFunction as.matrix.noquote
-syn keyword rFunction as.matrix.POSIXlt
-syn keyword rFunction as.name
-syn keyword rFunction asNamespace
-syn keyword rFunction as.null
-syn keyword rFunction as.null.default
-syn keyword rFunction as.numeric
-syn keyword rFunction as.numeric_version
-syn keyword rFunction as.octmode
-syn keyword rFunction as.ordered
-syn keyword rFunction as.package_version
-syn keyword rFunction as.pairlist
-syn keyword rFunction as.POSIXct
-syn keyword rFunction as.POSIXct.date
-syn keyword rFunction as.POSIXct.Date
-syn keyword rFunction as.POSIXct.dates
-syn keyword rFunction as.POSIXct.default
-syn keyword rFunction as.POSIXct.numeric
-syn keyword rFunction as.POSIXct.POSIXlt
-syn keyword rFunction as.POSIXlt
-syn keyword rFunction as.POSIXlt.character
-syn keyword rFunction as.POSIXlt.date
-syn keyword rFunction as.POSIXlt.Date
-syn keyword rFunction as.POSIXlt.dates
-syn keyword rFunction as.POSIXlt.default
-syn keyword rFunction as.POSIXlt.factor
-syn keyword rFunction as.POSIXlt.numeric
-syn keyword rFunction as.POSIXlt.POSIXct
-syn keyword rFunction as.qr
-syn keyword rFunction as.raw
-syn keyword rFunction as.real
-syn keyword rFunction asS3
-syn keyword rFunction asS4
-syn keyword rFunction assign
-syn keyword rFunction as.single
-syn keyword rFunction as.single.default
-syn keyword rFunction as.symbol
-syn keyword rFunction as.table
-syn keyword rFunction as.table.default
-syn keyword rFunction as.vector
-syn keyword rFunction as.vector.factor
-syn keyword rFunction atan
-syn keyword rFunction atan2
-syn keyword rFunction atanh
-syn keyword rFunction attach
-syn keyword rFunction attachNamespace
-syn keyword rFunction attr
-syn keyword rFunction attr.all.equal
-syn keyword rFunction attributes
-syn keyword rFunction autoload
-syn keyword rFunction autoloader
-syn keyword rFunction backsolve
-syn keyword rFunction baseenv
-syn keyword rFunction basename
-syn keyword rFunction besselI
-syn keyword rFunction besselJ
-syn keyword rFunction besselK
-syn keyword rFunction besselY
-syn keyword rFunction beta
-syn keyword rFunction bindingIsActive
-syn keyword rFunction bindingIsLocked
-syn keyword rFunction bindtextdomain
-syn keyword rFunction body
-syn keyword rFunction bquote
-syn keyword rFunction browser
-syn keyword rFunction browserCondition
-syn keyword rFunction browserSetDebug
-syn keyword rFunction browserText
-syn keyword rFunction builtins
-syn keyword rFunction by
-syn keyword rFunction by.data.frame
-syn keyword rFunction by.default
-syn keyword rFunction bzfile
-syn keyword rFunction c
-syn keyword rFunction call
-syn keyword rFunction callCC
-syn keyword rFunction capabilities
-syn keyword rFunction casefold
-syn keyword rFunction cat
-syn keyword rFunction category
-syn keyword rFunction cbind
-syn keyword rFunction cbind.data.frame
-syn keyword rFunction c.Date
-syn keyword rFunction ceiling
-syn keyword rFunction character
-syn keyword rFunction char.expand
-syn keyword rFunction charmatch
-syn keyword rFunction charToRaw
-syn keyword rFunction chartr
-syn keyword rFunction check_tzones
-syn keyword rFunction chol
-syn keyword rFunction chol2inv
-syn keyword rFunction chol.default
-syn keyword rFunction choose
-syn keyword rFunction class
-syn keyword rFunction close
-syn keyword rFunction closeAllConnections
-syn keyword rFunction close.connection
-syn keyword rFunction close.srcfile
-syn keyword rFunction c.noquote
-syn keyword rFunction c.numeric_version
-syn keyword rFunction codes
-syn keyword rFunction codes.factor
-syn keyword rFunction codes.ordered
-syn keyword rFunction col
-syn keyword rFunction colMeans
-syn keyword rFunction colnames
-syn keyword rFunction colSums
-syn keyword rFunction commandArgs
-syn keyword rFunction comment
-syn keyword rFunction complex
-syn keyword rFunction computeRestarts
-syn keyword rFunction conditionCall
-syn keyword rFunction conditionCall.condition
-syn keyword rFunction conditionMessage
-syn keyword rFunction conditionMessage.condition
-syn keyword rFunction conflicts
-syn keyword rFunction Conj
-syn keyword rFunction contributors
-syn keyword rFunction cos
-syn keyword rFunction cosh
-syn keyword rFunction c.POSIXct
-syn keyword rFunction c.POSIXlt
-syn keyword rFunction crossprod
-syn keyword rFunction Cstack_info
-syn keyword rFunction cummax
-syn keyword rFunction cummin
-syn keyword rFunction cumprod
-syn keyword rFunction cumsum
-syn keyword rFunction cut
-syn keyword rFunction cut.Date
-syn keyword rFunction cut.default
-syn keyword rFunction cut.POSIXt
-syn keyword rFunction data.class
-syn keyword rFunction data.frame
-syn keyword rFunction data.matrix
-syn keyword rFunction date
-syn keyword rFunction debug
-syn keyword rFunction debugonce
-syn keyword rFunction default.stringsAsFactors
-syn keyword rFunction delay
-syn keyword rFunction delayedAssign
-syn keyword rFunction deparse
-syn keyword rFunction det
-syn keyword rFunction detach
-syn keyword rFunction determinant
-syn keyword rFunction determinant.matrix
-syn keyword rFunction dget
-syn keyword rFunction diag
-syn keyword rFunction diff
-syn keyword rFunction diff.Date
-syn keyword rFunction diff.default
-syn keyword rFunction diff.POSIXt
-syn keyword rFunction difftime
-syn keyword rFunction digamma
-syn keyword rFunction dim
-syn keyword rFunction dim.data.frame
-syn keyword rFunction dimnames
-syn keyword rFunction dimnames.data.frame
-syn keyword rFunction dir
-syn keyword rFunction dir.create
-syn keyword rFunction dirname
-syn keyword rFunction do.call
-syn keyword rFunction double
-syn keyword rFunction dput
-syn keyword rFunction dQuote
-syn keyword rFunction drop
-syn keyword rFunction droplevels
-syn keyword rFunction droplevels.data.frame
-syn keyword rFunction droplevels.factor
-syn keyword rFunction dump
-syn keyword rFunction duplicated
-syn keyword rFunction duplicated.array
-syn keyword rFunction duplicated.data.frame
-syn keyword rFunction duplicated.default
-syn keyword rFunction duplicated.matrix
-syn keyword rFunction duplicated.numeric_version
-syn keyword rFunction duplicated.POSIXlt
-syn keyword rFunction dyn.load
-syn keyword rFunction dyn.unload
-syn keyword rFunction eapply
-syn keyword rFunction eigen
-syn keyword rFunction emptyenv
-syn keyword rFunction enc2native
-syn keyword rFunction enc2utf8
-syn keyword rFunction encodeString
-syn keyword rFunction Encoding
-syn keyword rFunction enquote
-syn keyword rFunction environment
-syn keyword rFunction environmentIsLocked
-syn keyword rFunction environmentName
-syn keyword rFunction env.profile
-syn keyword rFunction eval
-syn keyword rFunction eval.parent
-syn keyword rFunction evalq
-syn keyword rFunction exists
-syn keyword rFunction exp
-syn keyword rFunction expand.grid
-syn keyword rFunction expm1
-syn keyword rFunction expression
-syn keyword rFunction factor
-syn keyword rFunction factorial
-syn keyword rFunction fifo
-syn keyword rFunction file
-syn keyword rFunction file.access
-syn keyword rFunction file.append
-syn keyword rFunction file.choose
-syn keyword rFunction file.copy
-syn keyword rFunction file.create
-syn keyword rFunction file.exists
-syn keyword rFunction file.info
-syn keyword rFunction file.path
-syn keyword rFunction file.remove
-syn keyword rFunction file.rename
-syn keyword rFunction file.show
-syn keyword rFunction file.symlink
-syn keyword rFunction Filter
-syn keyword rFunction Find
-syn keyword rFunction findInterval
-syn keyword rFunction findPackageEnv
-syn keyword rFunction findRestart
-syn keyword rFunction floor
-syn keyword rFunction flush
-syn keyword rFunction flush.connection
-syn keyword rFunction force
-syn keyword rFunction formals
-syn keyword rFunction format
-syn keyword rFunction format.AsIs
-syn keyword rFunction formatC
-syn keyword rFunction format.char
-syn keyword rFunction format.data.frame
-syn keyword rFunction format.Date
-syn keyword rFunction format.default
-syn keyword rFunction format.difftime
-syn keyword rFunction formatDL
-syn keyword rFunction format.factor
-syn keyword rFunction format.hexmode
-syn keyword rFunction format.info
-syn keyword rFunction format.numeric_version
-syn keyword rFunction format.octmode
-syn keyword rFunction format.POSIXct
-syn keyword rFunction format.POSIXlt
-syn keyword rFunction format.pval
-syn keyword rFunction forwardsolve
-syn keyword rFunction function
-syn keyword rFunction gamma
-syn keyword rFunction gammaCody
-syn keyword rFunction gc
-syn keyword rFunction gcinfo
-syn keyword rFunction gc.time
-syn keyword rFunction gctorture
-syn keyword rFunction get
-syn keyword rFunction getAllConnections
-syn keyword rFunction getCallingDLL
-syn keyword rFunction getCallingDLLe
-syn keyword rFunction getCConverterDescriptions
-syn keyword rFunction getCConverterStatus
-syn keyword rFunction getConnection
-syn keyword rFunction getDLLRegisteredRoutines
-syn keyword rFunction getDLLRegisteredRoutines.character
-syn keyword rFunction getDLLRegisteredRoutines.DLLInfo
-syn keyword rFunction getenv
-syn keyword rFunction geterrmessage
-syn keyword rFunction getExportedValue
-syn keyword rFunction getHook
-syn keyword rFunction getLoadedDLLs
-syn keyword rFunction getNamespace
-syn keyword rFunction getNamespaceExports
-syn keyword rFunction getNamespaceImports
-syn keyword rFunction getNamespaceInfo
-syn keyword rFunction getNamespaceName
-syn keyword rFunction getNamespaceUsers
-syn keyword rFunction getNamespaceVersion
-syn keyword rFunction getNativeSymbolInfo
-syn keyword rFunction getNumCConverters
-syn keyword rFunction getOption
-syn keyword rFunction getRversion
-syn keyword rFunction getSrcLines
-syn keyword rFunction getTaskCallbackNames
-syn keyword rFunction gettext
-syn keyword rFunction gettextf
-syn keyword rFunction getwd
-syn keyword rFunction gl
-syn keyword rFunction globalenv
-syn keyword rFunction gregexpr
-syn keyword rFunction grep
-syn keyword rFunction grepl
-syn keyword rFunction gsub
-syn keyword rFunction gzcon
-syn keyword rFunction gzfile
-syn keyword rFunction httpclient
-syn keyword rFunction I
-syn keyword rFunction iconv
-syn keyword rFunction iconvlist
-syn keyword rFunction icuSetCollate
-syn keyword rFunction identical
-syn keyword rFunction identity
-syn keyword rFunction ifelse
-syn keyword rFunction Im
-syn keyword rFunction importIntoEnv
-syn keyword rFunction inherits
-syn keyword rFunction integer
-syn keyword rFunction interaction
-syn keyword rFunction interactive
-syn keyword rFunction intersect
-syn keyword rFunction intToBits
-syn keyword rFunction intToUtf8
-syn keyword rFunction inverse.rle
-syn keyword rFunction invisible
-syn keyword rFunction invokeRestart
-syn keyword rFunction invokeRestartInteractively
-syn keyword rFunction is.array
-syn keyword rFunction is.atomic
-syn keyword rFunction isatty
-syn keyword rFunction isBaseNamespace
-syn keyword rFunction is.call
-syn keyword rFunction is.character
-syn keyword rFunction is.complex
-syn keyword rFunction is.data.frame
-syn keyword rFunction isdebugged
-syn keyword rFunction is.double
-syn keyword rFunction is.element
-syn keyword rFunction is.environment
-syn keyword rFunction is.expression
-syn keyword rFunction is.factor
-syn keyword rFunction is.finite
-syn keyword rFunction is.function
-syn keyword rFunction isIncomplete
-syn keyword rFunction is.infinite
-syn keyword rFunction is.integer
-syn keyword rFunction is.language
-syn keyword rFunction is.list
-syn keyword rFunction is.loaded
-syn keyword rFunction is.logical
-syn keyword rFunction is.matrix
-syn keyword rFunction is.na
-syn keyword rFunction is.na.data.frame
-syn keyword rFunction is.name
-syn keyword rFunction isNamespace
-syn keyword rFunction is.nan
-syn keyword rFunction is.na.numeric_version
-syn keyword rFunction is.na.POSIXlt
-syn keyword rFunction is.null
-syn keyword rFunction is.numeric
-syn keyword rFunction is.numeric.Date
-syn keyword rFunction is.numeric.difftime
-syn keyword rFunction is.numeric.POSIXt
-syn keyword rFunction is.numeric_version
-syn keyword rFunction is.object
-syn keyword rFunction ISOdate
-syn keyword rFunction ISOdatetime
-syn keyword rFunction isOpen
-syn keyword rFunction is.ordered
-syn keyword rFunction is.package_version
-syn keyword rFunction is.pairlist
-syn keyword rFunction is.primitive
-syn keyword rFunction is.qr
-syn keyword rFunction is.R
-syn keyword rFunction is.raw
-syn keyword rFunction is.real
-syn keyword rFunction is.recursive
-syn keyword rFunction isRestart
-syn keyword rFunction isS4
-syn keyword rFunction isSeekable
-syn keyword rFunction is.single
-syn keyword rFunction is.symbol
-syn keyword rFunction isSymmetric
-syn keyword rFunction isSymmetric.matrix
-syn keyword rFunction is.table
-syn keyword rFunction isTRUE
-syn keyword rFunction is.unsorted
-syn keyword rFunction is.vector
-syn keyword rFunction jitter
-syn keyword rFunction julian
-syn keyword rFunction julian.Date
-syn keyword rFunction julian.POSIXt
-syn keyword rFunction kappa
-syn keyword rFunction kappa.default
-syn keyword rFunction kappa.lm
-syn keyword rFunction kappa.qr
-syn keyword rFunction kappa.tri
-syn keyword rFunction kronecker
-syn keyword rFunction l10n_info
-syn keyword rFunction labels
-syn keyword rFunction labels.default
-syn keyword rFunction La.chol
-syn keyword rFunction La.chol2inv
-syn keyword rFunction La.eigen
-syn keyword rFunction lapply
-syn keyword rFunction La.svd
-syn keyword rFunction lazyLoad
-syn keyword rFunction lazyLoadDBfetch
-syn keyword rFunction lbeta
-syn keyword rFunction lchoose
-syn keyword rFunction length
-syn keyword rFunction length.POSIXlt
-syn keyword rFunction levels
-syn keyword rFunction levels.default
-syn keyword rFunction lfactorial
-syn keyword rFunction lgamma
-syn keyword rFunction library
-syn keyword rFunction library.dynam
-syn keyword rFunction library.dynam.unload
-syn keyword rFunction licence
-syn keyword rFunction license
-syn keyword rFunction list
-syn keyword rFunction list2env
-syn keyword rFunction list.files
-syn keyword rFunction load
-syn keyword rFunction loadedNamespaces
-syn keyword rFunction loadingNamespaceInfo
-syn keyword rFunction loadNamespace
-syn keyword rFunction loadURL
-syn keyword rFunction local
-syn keyword rFunction lockBinding
-syn keyword rFunction lockEnvironment
-syn keyword rFunction log
-syn keyword rFunction log10
-syn keyword rFunction log1p
-syn keyword rFunction log2
-syn keyword rFunction logb
-syn keyword rFunction logical
-syn keyword rFunction lower.tri
-syn keyword rFunction ls
-syn keyword rFunction machine
-syn keyword rFunction Machine
-syn keyword rFunction makeActiveBinding
-syn keyword rFunction make.names
-syn keyword rFunction make.unique
-syn keyword rFunction manglePackageName
-syn keyword rFunction Map
-syn keyword rFunction mapply
-syn keyword rFunction margin.table
-syn keyword rFunction match
-syn keyword rFunction match.arg
-syn keyword rFunction match.call
-syn keyword rFunction match.fun
-syn keyword rFunction Math.data.frame
-syn keyword rFunction Math.Date
-syn keyword rFunction Math.difftime
-syn keyword rFunction Math.factor
-syn keyword rFunction Math.POSIXt
-syn keyword rFunction mat.or.vec
-syn keyword rFunction matrix
-syn keyword rFunction max
-syn keyword rFunction max.col
-syn keyword rFunction mean
-syn keyword rFunction mean.data.frame
-syn keyword rFunction mean.Date
-syn keyword rFunction mean.default
-syn keyword rFunction mean.difftime
-syn keyword rFunction mean.POSIXct
-syn keyword rFunction mean.POSIXlt
-syn keyword rFunction memCompress
-syn keyword rFunction memDecompress
-syn keyword rFunction mem.limits
-syn keyword rFunction memory.profile
-syn keyword rFunction merge
-syn keyword rFunction merge.data.frame
-syn keyword rFunction merge.default
-syn keyword rFunction message
-syn keyword rFunction mget
-syn keyword rFunction min
-syn keyword rFunction missing
-syn keyword rFunction Mod
-syn keyword rFunction mode
-syn keyword rFunction months
-syn keyword rFunction months.Date
-syn keyword rFunction months.POSIXt
-syn keyword rFunction names
-syn keyword rFunction namespaceExport
-syn keyword rFunction namespaceImport
-syn keyword rFunction namespaceImportClasses
-syn keyword rFunction namespaceImportFrom
-syn keyword rFunction namespaceImportMethods
-syn keyword rFunction nargs
-syn keyword rFunction nchar
-syn keyword rFunction ncol
-syn keyword rFunction NCOL
-syn keyword rFunction Negate
-syn keyword rFunction new.env
-syn keyword rFunction NextMethod
-syn keyword rFunction ngettext
-syn keyword rFunction nlevels
-syn keyword rFunction noquote
-syn keyword rFunction norm
-syn keyword rFunction nrow
-syn keyword rFunction NROW
-syn keyword rFunction numeric
-syn keyword rFunction numeric_version
-syn keyword rFunction nzchar
-syn keyword rFunction objects
-syn keyword rFunction oldClass
-syn keyword rFunction on.exit
-syn keyword rFunction open
-syn keyword rFunction open.connection
-syn keyword rFunction open.srcfile
-syn keyword rFunction open.srcfilecopy
-syn keyword rFunction Ops.data.frame
-syn keyword rFunction Ops.Date
-syn keyword rFunction Ops.difftime
-syn keyword rFunction Ops.factor
-syn keyword rFunction Ops.numeric_version
-syn keyword rFunction Ops.ordered
-syn keyword rFunction Ops.POSIXt
-syn keyword rFunction options
-syn keyword rFunction order
-syn keyword rFunction ordered
-syn keyword rFunction outer
-syn keyword rFunction package.description
-syn keyword rFunction packageEvent
-syn keyword rFunction packageHasNamespace
-syn keyword rFunction packageStartupMessage
-syn keyword rFunction package_version
-syn keyword rFunction packBits
-syn keyword rFunction pairlist
-syn keyword rFunction parent.env
-syn keyword rFunction parent.frame
-syn keyword rFunction parse
-syn keyword rFunction parse.dcf
-syn keyword rFunction parseNamespaceFile
-syn keyword rFunction paste
-syn keyword rFunction path.expand
-syn keyword rFunction pentagamma
-syn keyword rFunction pipe
-syn keyword rFunction Platform
-syn keyword rFunction pmatch
-syn keyword rFunction pmax
-syn keyword rFunction pmax.int
-syn keyword rFunction pmin
-syn keyword rFunction pmin.int
-syn keyword rFunction polyroot
-syn keyword rFunction Position
-syn keyword rFunction pos.to.env
-syn keyword rFunction pretty
-syn keyword rFunction pretty.default
-syn keyword rFunction prettyNum
-syn keyword rFunction print
-syn keyword rFunction print.AsIs
-syn keyword rFunction print.by
-syn keyword rFunction print.condition
-syn keyword rFunction print.connection
-syn keyword rFunction print.data.frame
-syn keyword rFunction print.Date
-syn keyword rFunction print.default
-syn keyword rFunction print.difftime
-syn keyword rFunction print.DLLInfo
-syn keyword rFunction print.DLLInfoList
-syn keyword rFunction print.DLLRegisteredRoutines
-syn keyword rFunction print.factor
-syn keyword rFunction print.function
-syn keyword rFunction print.hexmode
-syn keyword rFunction print.libraryIQR
-syn keyword rFunction print.listof
-syn keyword rFunction print.NativeRoutineList
-syn keyword rFunction printNoClass
-syn keyword rFunction print.noquote
-syn keyword rFunction print.numeric_version
-syn keyword rFunction print.octmode
-syn keyword rFunction print.packageInfo
-syn keyword rFunction print.POSIXct
-syn keyword rFunction print.POSIXlt
-syn keyword rFunction print.proc_time
-syn keyword rFunction print.restart
-syn keyword rFunction print.rle
-syn keyword rFunction print.simple.list
-syn keyword rFunction print.srcfile
-syn keyword rFunction print.srcref
-syn keyword rFunction print.summaryDefault
-syn keyword rFunction print.summary.table
-syn keyword rFunction print.table
-syn keyword rFunction print.warnings
-syn keyword rFunction prmatrix
-syn keyword rFunction proc.time
-syn keyword rFunction prod
-syn keyword rFunction prop.table
-syn keyword rFunction provide
-syn keyword rFunction psigamma
-syn keyword rFunction pushBack
-syn keyword rFunction pushBackLength
-syn keyword rFunction q
-syn keyword rFunction qr
-syn keyword rFunction qr.coef
-syn keyword rFunction qr.default
-syn keyword rFunction qr.fitted
-syn keyword rFunction qr.Q
-syn keyword rFunction qr.qty
-syn keyword rFunction qr.qy
-syn keyword rFunction qr.R
-syn keyword rFunction qr.resid
-syn keyword rFunction qr.solve
-syn keyword rFunction qr.X
-syn keyword rFunction quarters
-syn keyword rFunction quarters.Date
-syn keyword rFunction quarters.POSIXt
-syn keyword rFunction quit
-syn keyword rFunction quote
-syn keyword rFunction range
-syn keyword rFunction range.default
-syn keyword rFunction rank
-syn keyword rFunction rapply
-syn keyword rFunction raw
-syn keyword rFunction rawConnection
-syn keyword rFunction rawConnectionValue
-syn keyword rFunction rawShift
-syn keyword rFunction rawToBits
-syn keyword rFunction rawToChar
-syn keyword rFunction rbind
-syn keyword rFunction rbind.data.frame
-syn keyword rFunction rcond
-syn keyword rFunction Re
-syn keyword rFunction readBin
-syn keyword rFunction readChar
-syn keyword rFunction read.dcf
-syn keyword rFunction readline
-syn keyword rFunction readLines
-syn keyword rFunction readRenviron
-syn keyword rFunction read.table.url
-syn keyword rFunction real
-syn keyword rFunction Recall
-syn keyword rFunction Reduce
-syn keyword rFunction regexpr
-syn keyword rFunction reg.finalizer
-syn keyword rFunction registerS3method
-syn keyword rFunction registerS3methods
-syn keyword rFunction remove
-syn keyword rFunction removeCConverter
-syn keyword rFunction removeTaskCallback
-syn keyword rFunction rep
-syn keyword rFunction rep.Date
-syn keyword rFunction rep.factor
-syn keyword rFunction rep.int
-syn keyword rFunction replace
-syn keyword rFunction replicate
-syn keyword rFunction rep.numeric_version
-syn keyword rFunction rep.POSIXct
-syn keyword rFunction rep.POSIXlt
-syn keyword rFunction require
-syn keyword rFunction restart
-syn keyword rFunction restartDescription
-syn keyword rFunction restartFormals
-syn keyword rFunction retracemem
-syn keyword rFunction return
-syn keyword rFunction rev
-syn keyword rFunction rev.default
-syn keyword rFunction R.home
-syn keyword rFunction rle
-syn keyword rFunction rm
-syn keyword rFunction RNGkind
-syn keyword rFunction RNGversion
-syn keyword rFunction round
-syn keyword rFunction round.Date
-syn keyword rFunction round.POSIXt
-syn keyword rFunction row
-syn keyword rFunction rowMeans
-syn keyword rFunction rownames
-syn keyword rFunction row.names
-syn keyword rFunction row.names.data.frame
-syn keyword rFunction row.names.default
-syn keyword rFunction rowsum
-syn keyword rFunction rowsum.data.frame
-syn keyword rFunction rowsum.default
-syn keyword rFunction rowSums
-syn keyword rFunction R_system_version
-syn keyword rFunction R.Version
-syn keyword rFunction sample
-syn keyword rFunction sample.int
-syn keyword rFunction sapply
-syn keyword rFunction save
-syn keyword rFunction save.image
-syn keyword rFunction scale
-syn keyword rFunction scale.default
-syn keyword rFunction scan
-syn keyword rFunction scan.url
-syn keyword rFunction search
-syn keyword rFunction searchpaths
-syn keyword rFunction seek
-syn keyword rFunction seek.connection
-syn keyword rFunction seq
-syn keyword rFunction seq_along
-syn keyword rFunction seq.Date
-syn keyword rFunction seq.default
-syn keyword rFunction seq.int
-syn keyword rFunction seq_len
-syn keyword rFunction seq.POSIXt
-syn keyword rFunction sequence
-syn keyword rFunction serialize
-syn keyword rFunction setCConverterStatus
-syn keyword rFunction setdiff
-syn keyword rFunction setequal
-syn keyword rFunction setHook
-syn keyword rFunction setNamespaceInfo
-syn keyword rFunction set.seed
-syn keyword rFunction setSessionTimeLimit
-syn keyword rFunction setTimeLimit
-syn keyword rFunction setwd
-syn keyword rFunction showConnections
-syn keyword rFunction shQuote
-syn keyword rFunction sign
-syn keyword rFunction signalCondition
-syn keyword rFunction signif
-syn keyword rFunction simpleCondition
-syn keyword rFunction simpleError
-syn keyword rFunction simpleMessage
-syn keyword rFunction simpleWarning
-syn keyword rFunction sin
-syn keyword rFunction single
-syn keyword rFunction sinh
-syn keyword rFunction sink
-syn keyword rFunction sink.number
-syn keyword rFunction slice.index
-syn keyword rFunction socketConnection
-syn keyword rFunction socketSelect
-syn keyword rFunction solve
-syn keyword rFunction solve.default
-syn keyword rFunction solve.qr
-syn keyword rFunction sort
-syn keyword rFunction sort.default
-syn keyword rFunction sort.int
-syn keyword rFunction sort.list
-syn keyword rFunction sort.POSIXlt
-syn keyword rFunction source
-syn keyword rFunction source.url
-syn keyword rFunction split
-syn keyword rFunction split.data.frame
-syn keyword rFunction split.Date
-syn keyword rFunction split.default
-syn keyword rFunction split.POSIXct
-syn keyword rFunction sprintf
-syn keyword rFunction sqrt
-syn keyword rFunction sQuote
-syn keyword rFunction srcfile
-syn keyword rFunction srcfilecopy
-syn keyword rFunction srcref
-syn keyword rFunction standardGeneric
-syn keyword rFunction stderr
-syn keyword rFunction stdin
-syn keyword rFunction stdout
-syn keyword rFunction stop
-syn keyword rFunction stopifnot
-syn keyword rFunction storage.mode
-syn keyword rFunction strftime
-syn keyword rFunction strptime
-syn keyword rFunction strsplit
-syn keyword rFunction strtoi
-syn keyword rFunction strtrim
-syn keyword rFunction structure
-syn keyword rFunction strwrap
-syn keyword rFunction sub
-syn keyword rFunction subset
-syn keyword rFunction subset.data.frame
-syn keyword rFunction subset.default
-syn keyword rFunction subset.matrix
-syn keyword rFunction substitute
-syn keyword rFunction substr
-syn keyword rFunction substring
-syn keyword rFunction sum
-syn keyword rFunction summary
-syn keyword rFunction summary.connection
-syn keyword rFunction summary.data.frame
-syn keyword rFunction Summary.data.frame
-syn keyword rFunction summary.Date
-syn keyword rFunction Summary.Date
-syn keyword rFunction summary.default
-syn keyword rFunction Summary.difftime
-syn keyword rFunction summary.factor
-syn keyword rFunction Summary.factor
-syn keyword rFunction summary.matrix
-syn keyword rFunction Summary.numeric_version
-syn keyword rFunction summary.POSIXct
-syn keyword rFunction Summary.POSIXct
-syn keyword rFunction summary.POSIXlt
-syn keyword rFunction Summary.POSIXlt
-syn keyword rFunction summary.srcfile
-syn keyword rFunction summary.srcref
-syn keyword rFunction summary.table
-syn keyword rFunction suppressMessages
-syn keyword rFunction suppressPackageStartupMessages
-syn keyword rFunction suppressWarnings
-syn keyword rFunction svd
-syn keyword rFunction sweep
-syn keyword rFunction switch
-syn keyword rFunction symbol.C
-syn keyword rFunction symbol.For
-syn keyword rFunction sys.call
-syn keyword rFunction sys.calls
-syn keyword rFunction Sys.chmod
-syn keyword rFunction Sys.Date
-syn keyword rFunction sys.frame
-syn keyword rFunction sys.frames
-syn keyword rFunction sys.function
-syn keyword rFunction Sys.getenv
-syn keyword rFunction Sys.getlocale
-syn keyword rFunction Sys.getpid
-syn keyword rFunction Sys.glob
-syn keyword rFunction Sys.info
-syn keyword rFunction sys.load.image
-syn keyword rFunction Sys.localeconv
-syn keyword rFunction sys.nframe
-syn keyword rFunction sys.on.exit
-syn keyword rFunction sys.parent
-syn keyword rFunction sys.parents
-syn keyword rFunction Sys.putenv
-syn keyword rFunction Sys.readlink
-syn keyword rFunction sys.save.image
-syn keyword rFunction Sys.setenv
-syn keyword rFunction Sys.setlocale
-syn keyword rFunction Sys.sleep
-syn keyword rFunction sys.source
-syn keyword rFunction sys.status
-syn keyword rFunction system
-syn keyword rFunction system2
-syn keyword rFunction system.file
-syn keyword rFunction system.time
-syn keyword rFunction Sys.time
-syn keyword rFunction Sys.timezone
-syn keyword rFunction Sys.umask
-syn keyword rFunction Sys.unsetenv
-syn keyword rFunction Sys.which
-syn keyword rFunction t
-syn keyword rFunction table
-syn keyword rFunction tabulate
-syn keyword rFunction tan
-syn keyword rFunction tanh
-syn keyword rFunction tapply
-syn keyword rFunction taskCallbackManager
-syn keyword rFunction tcrossprod
-syn keyword rFunction t.data.frame
-syn keyword rFunction t.default
-syn keyword rFunction tempdir
-syn keyword rFunction tempfile
-syn keyword rFunction testPlatformEquivalence
-syn keyword rFunction tetragamma
-syn keyword rFunction textConnection
-syn keyword rFunction textConnectionValue
-syn keyword rFunction tolower
-syn keyword rFunction topenv
-syn keyword rFunction toString
-syn keyword rFunction toString.default
-syn keyword rFunction toupper
-syn keyword rFunction trace
-syn keyword rFunction traceback
-syn keyword rFunction tracemem
-syn keyword rFunction tracingState
-syn keyword rFunction transform
-syn keyword rFunction transform.data.frame
-syn keyword rFunction transform.default
-syn keyword rFunction trigamma
-syn keyword rFunction trunc
-syn keyword rFunction truncate
-syn keyword rFunction truncate.connection
-syn keyword rFunction trunc.Date
-syn keyword rFunction trunc.POSIXt
-syn keyword rFunction try
-syn keyword rFunction tryCatch
-syn keyword rFunction typeof
-syn keyword rFunction unclass
-syn keyword rFunction undebug
-syn keyword rFunction union
-syn keyword rFunction unique
-syn keyword rFunction unique.array
-syn keyword rFunction unique.data.frame
-syn keyword rFunction unique.default
-syn keyword rFunction unique.matrix
-syn keyword rFunction unique.numeric_version
-syn keyword rFunction unique.POSIXlt
-syn keyword rFunction units
-syn keyword rFunction units.difftime
-syn keyword rFunction unix
-syn keyword rFunction unix.time
-syn keyword rFunction unlink
-syn keyword rFunction unlist
-syn keyword rFunction unloadNamespace
-syn keyword rFunction unlockBinding
-syn keyword rFunction unname
-syn keyword rFunction unserialize
-syn keyword rFunction unsplit
-syn keyword rFunction untrace
-syn keyword rFunction untracemem
-syn keyword rFunction unz
-syn keyword rFunction upper.tri
-syn keyword rFunction url
-syn keyword rFunction UseMethod
-syn keyword rFunction utf8ToInt
-syn keyword rFunction vapply
-syn keyword rFunction vector
-syn keyword rFunction Vectorize
-syn keyword rFunction Version
-syn keyword rFunction warning
-syn keyword rFunction warnings
-syn keyword rFunction weekdays
-syn keyword rFunction weekdays.Date
-syn keyword rFunction weekdays.POSIXt
-syn keyword rFunction which
-syn keyword rFunction which.max
-syn keyword rFunction which.min
-syn keyword rFunction with
-syn keyword rFunction withCallingHandlers
-syn keyword rFunction with.default
-syn keyword rFunction within
-syn keyword rFunction within.data.frame
-syn keyword rFunction within.list
-syn keyword rFunction withRestarts
-syn keyword rFunction withVisible
-syn keyword rFunction write
-syn keyword rFunction writeBin
-syn keyword rFunction writeChar
-syn keyword rFunction write.dcf
-syn keyword rFunction writeLines
-syn keyword rFunction write.table0
-syn keyword rFunction xor
-syn keyword rFunction xor.hexmode
-syn keyword rFunction xor.octmode
-syn keyword rFunction xpdrows.data.frame
-syn keyword rFunction xtfrm
-syn keyword rFunction xtfrm.AsIs
-syn keyword rFunction xtfrm.Date
-syn keyword rFunction xtfrm.default
-syn keyword rFunction xtfrm.difftime
-syn keyword rFunction xtfrm.factor
-syn keyword rFunction xtfrm.numeric_version
-syn keyword rFunction xtfrm.POSIXct
-syn keyword rFunction xtfrm.POSIXlt
-syn keyword rFunction xtfrm.Surv
-syn keyword rFunction xzfile
-syn keyword rFunction zapsmall
+syn keyword rFunction  acf acf2AR add1 addmargins add.scope aggregate aggregate.data.frame
+syn keyword rFunction  aggregate.default aggregate.ts AIC alias anova anova.glm anova.glmlist
+syn keyword rFunction  anovalist.lm anova.lm anova.lmlist anova.mlm ansari.test aov approx
+syn keyword rFunction  approxfun ar ar.burg arima arima0 arima0.diag arima.sim
+syn keyword rFunction  ARMAacf ARMAtoMA ar.mle ar.ols ar.yw as.dendrogram as.dist
+syn keyword rFunction  as.formula as.hclust asOneSidedFormula as.stepfun as.ts ave bandwidth.kernel
+syn keyword rFunction  bartlett.test binomial binom.test biplot Box.test bw.bcv bw.nrd
+syn keyword rFunction  bw.nrd0 bw.SJ bw.ucv C cancor case.names ccf
+syn keyword rFunction  .checkMFClasses chisq.test clearNames cmdscale coef coefficients complete.cases
+syn keyword rFunction  confint confint.default constrOptim contrasts contr.helmert contr.poly contr.SAS
+syn keyword rFunction  contr.sum contr.treatment convolve cooks.distance cophenetic cor cor.test
+syn keyword rFunction  cov cov2cor covratio cov.wt cpgram cutree cycle
+syn keyword rFunction  D dbeta dbinom dcauchy dchisq decompose delete.response
+syn keyword rFunction  deltat dendrapply density density.default deriv deriv3 deriv3.default
+syn keyword rFunction  deriv3.formula deriv.default deriv.formula deviance dexp df dfbeta
+syn keyword rFunction  dfbetas dffits df.kernel df.residual dgamma dgeom dhyper
+syn keyword rFunction  diffinv diff.ts dist dlnorm dlogis dmultinom dnbinom
+syn keyword rFunction  dnorm dpois drop1 drop.scope drop.terms dsignrank dt
+syn keyword rFunction  dummy.coef dunif dweibull dwilcox ecdf eff.aovlist effects
+syn keyword rFunction  embed end estVar expand.model.frame extractAIC factanal factor.scope
+syn keyword rFunction  family fft filter fisher.test fitted fitted.values fivenum
+syn keyword rFunction  fligner.test formula frequency friedman.test ftable Gamma gaussian
+syn keyword rFunction  getInitial .getXlevels glm glm.control glm.fit glm.fit.null hasTsp
+syn keyword rFunction  hat hatvalues hatvalues.lm hclust heatmap HoltWinters influence
+syn keyword rFunction  influence.measures integrate interaction.plot inverse.gaussian IQR is.empty.model is.leaf
+syn keyword rFunction  is.mts isoreg is.stepfun is.ts is.tskernel KalmanForecast KalmanLike
+syn keyword rFunction  KalmanRun KalmanSmooth kernapply kernel kmeans knots kruskal.test
+syn keyword rFunction  ksmooth ks.test lag lag.plot line lines.ts lm
+syn keyword rFunction  lm.fit lm.fit.null lm.influence lm.wfit lm.wfit.null loadings loess
+syn keyword rFunction  loess.control loess.smooth logLik loglin lowess ls.diag lsfit
+syn keyword rFunction  ls.print mad mahalanobis makeARIMA make.link makepredictcall manova
+syn keyword rFunction  mantelhaen.test mauchley.test mauchly.test mcnemar.test median median.default medpolish
+syn keyword rFunction  .MFclass model.extract model.frame model.frame.aovlist model.frame.default model.frame.glm model.frame.lm
+syn keyword rFunction  model.matrix model.matrix.default model.matrix.lm model.offset model.response model.tables model.weights
+syn keyword rFunction  monthplot mood.test mvfft na.action na.contiguous na.exclude na.fail
+syn keyword rFunction  na.omit na.pass napredict naprint naresid nextn nlm
+syn keyword rFunction  nlminb nls nls.control NLSstAsymptotic NLSstClosestX NLSstLfAsymptote NLSstRtAsymptote
+syn keyword rFunction  numericDeriv offset oneway.test optim optimise optimize order.dendrogram
+syn keyword rFunction  pacf p.adjust pairwise.prop.test pairwise.table pairwise.t.test pairwise.wilcox.test pbeta
+syn keyword rFunction  pbinom pbirthday pcauchy pchisq pexp pf pgamma
+syn keyword rFunction  pgeom phyper plclust plnorm plogis plot.density plot.ecdf
+syn keyword rFunction  plot.lm plot.mlm plot.spec plot.spec.coherency plot.spec.phase plot.stepfun plot.ts
+syn keyword rFunction  plot.TukeyHSD pnbinom pnorm poisson poisson.test poly polym
+syn keyword rFunction  power power.anova.test power.prop.test power.t.test ppoints ppois ppr
+syn keyword rFunction  PP.test prcomp predict predict.glm predict.lm predict.mlm predict.poly
+syn keyword rFunction  preplot princomp print.anova print.coefmat printCoefmat print.density print.family
+syn keyword rFunction  print.formula print.ftable print.glm print.infl print.integrate print.lm print.logLik
+syn keyword rFunction  print.terms print.ts profile proj promax prop.test prop.trend.test
+syn keyword rFunction  psignrank pt ptukey punif pweibull pwilcox qbeta
+syn keyword rFunction  qbinom qbirthday qcauchy qchisq qexp qf qgamma
+syn keyword rFunction  qgeom qhyper qlnorm qlogis qnbinom qnorm qpois
+syn keyword rFunction  qqline qqnorm qqnorm.default qqplot qsignrank qt qtukey
+syn keyword rFunction  quade.test quantile quantile.default quasi quasibinomial quasipoisson qunif
+syn keyword rFunction  qweibull qwilcox r2dtable rbeta rbinom rcauchy rchisq
+syn keyword rFunction  read.ftable rect.hclust reformulate relevel reorder replications reshape
+syn keyword rFunction  reshapeLong reshapeWide resid residuals residuals.default residuals.glm residuals.lm
+syn keyword rFunction  rexp rf rgamma rgeom rhyper rlnorm rlogis
+syn keyword rFunction  rmultinom rnbinom rnorm rpois rsignrank rstandard rstandard.glm
+syn keyword rFunction  rstandard.lm rstudent rstudent.glm rstudent.lm rt runif runmed
+syn keyword rFunction  rweibull rwilcox scatter.smooth screeplot sd se.contrast selfStart
+syn keyword rFunction  setNames shapiro.test simulate smooth smoothEnds smooth.spline sortedXyData
+syn keyword rFunction  spec.ar spec.pgram spec.taper spectrum spline splinefun splinefunH
+syn keyword rFunction  SSasymp SSasympOff SSasympOrig SSbiexp SSD SSfol SSfpl
+syn keyword rFunction  SSgompertz SSlogis SSmicmen SSweibull start stat.anova step
+syn keyword rFunction  stepfun stl StructTS summary.aov summary.aovlist summary.glm summary.infl
+syn keyword rFunction  summary.lm summary.manova summary.mlm summary.stepfun supsmu symnum termplot
+syn keyword rFunction  terms terms.aovlist terms.default terms.formula terms.terms time toeplitz
+syn keyword rFunction  ts tsdiag ts.intersect tsp ts.plot tsSmooth ts.union
+syn keyword rFunction  t.test TukeyHSD TukeyHSD.aov uniroot update update.default update.formula
+syn keyword rFunction  var variable.names varimax var.test vcov weighted.mean weighted.residuals
+syn keyword rFunction  weights wilcox.test window write.ftable xtabs abline arrows
+syn keyword rFunction  assocplot axis Axis axis.Date axis.POSIXct axTicks barplot
+syn keyword rFunction  barplot.default box boxplot boxplot.default boxplot.matrix bxp cdplot
+syn keyword rFunction  clip close.screen co.intervals contour contour.default coplot curve
+syn keyword rFunction  dotchart erase.screen filled.contour fourfoldplot frame grconvertX grconvertY
+syn keyword rFunction  grid hist hist.default identify image image.default layout
+syn keyword rFunction  layout.show lcm legend lines lines.default locator matlines
+syn keyword rFunction  matplot matpoints mosaicplot mtext pairs pairs.default panel.smooth
+syn keyword rFunction  par persp pie piechart plot plot.default plot.design
+syn keyword rFunction  plot.new plot.window plot.xy points points.default polygon polypath
+syn keyword rFunction  rasterImage rect rug screen segments smoothScatter spineplot
+syn keyword rFunction  split.screen stars stem strheight stripchart strwidth sunflowerplot
+syn keyword rFunction  symbols text text.default title xinch xspline xyinch
+syn keyword rFunction  yinch adjustcolor as.graphicsAnnot as.raster bitmap bmp boxplot.stats
+syn keyword rFunction  check.options chull CIDFont cm cm.colors col2rgb colorConverter
+syn keyword rFunction  colorRamp colorRampPalette colors colours contourLines convertColor densCols
+syn keyword rFunction  dev2bitmap devAskNewPage dev.control dev.copy dev.copy2eps dev.copy2pdf dev.cur
+syn keyword rFunction  deviceIsInteractive dev.interactive dev.list dev.new dev.next dev.off dev.prev
+syn keyword rFunction  dev.print dev.set dev.size embedFonts extendrange getGraphicsEvent getGraphicsEventEnv
+syn keyword rFunction  graphics.off gray gray.colors grey grey.colors hcl heat.colors
+syn keyword rFunction  hsv is.raster jpeg make.rgb n2mfrow nclass.FD nclass.scott
+syn keyword rFunction  nclass.Sturges palette pdf pdfFonts pdf.options pictex png
+syn keyword rFunction  postscript postscriptFont postscriptFonts ps.options quartz quartzFont quartzFonts
+syn keyword rFunction  quartz.options rainbow recordGraphics recordPlot replayPlot rgb rgb2hsv
+syn keyword rFunction  savePlot setEPS setGraphicsEventEnv setGraphicsEventHandlers setPS svg terrain.colors
+syn keyword rFunction  tiff topo.colors trans3d Type1Font x11 X11 X11Font
+syn keyword rFunction  X11Fonts X11.options xfig xy.coords xyTable xyz.coords alarm
+syn keyword rFunction  apropos argsAnywhere aspell as.person as.personList as.relistable as.roman
+syn keyword rFunction  assignInNamespace available.packages bibentry browseEnv browseURL browseVignettes bug.report
+syn keyword rFunction  capture.output checkCRAN chooseBioCmirror chooseCRANmirror citation citEntry citFooter
+syn keyword rFunction  citHeader close.socket combn compareVersion contrib.url count.fields CRAN.packages
+syn keyword rFunction  data dataentry data.entry de debugger demo de.ncols
+syn keyword rFunction  de.restore de.setup .DollarNames download.file download.packages dump.frames edit
+syn keyword rFunction  emacs example file.edit find findLineNum fix fixInNamespace
+syn keyword rFunction  flush.console formatOL formatUL getAnywhere getCRANmirrors getFromNamespace getS3method
+syn keyword rFunction  getTxtProgressBar glob2rx head head.matrix help help.request help.search
+syn keyword rFunction  help.start history installed.packages install.packages is.relistable limitedLabels loadhistory
+syn keyword rFunction  localeToCharset lsf.str ls.str maintainer make.packages.html makeRweaveLatexCodeRunner make.socket
+syn keyword rFunction  memory.limit memory.size menu methods mirror2html modifyList new.packages
+syn keyword rFunction  news normalizePath nsl object.size old.packages package.contents packageDescription
+syn keyword rFunction  package.skeleton packageStatus packageVersion page person personList pico
+syn keyword rFunction  prompt promptData promptPackage rc.getOption rc.options rc.settings rc.status
+syn keyword rFunction  readCitationFile read.csv read.csv2 read.delim read.delim2 read.DIF read.fortran
+syn keyword rFunction  read.fwf read.socket read.table recover relist remove.packages Rprof
+syn keyword rFunction  Rprofmem RShowDoc RSiteSearch rtags Rtangle RtangleSetup RtangleWritedoc
+syn keyword rFunction  RweaveChunkPrefix RweaveEvalWithOpt RweaveLatex RweaveLatexFinish RweaveLatexOptions RweaveLatexSetup RweaveLatexWritedoc
+syn keyword rFunction  RweaveTryStop savehistory select.list sessionInfo setBreakpoint setRepositories setTxtProgressBar
+syn keyword rFunction  stack Stangle str strOptions summaryRprof Sweave SweaveHooks
+syn keyword rFunction  SweaveSyntConv tail tail.matrix tar timestamp toBibtex toLatex
+syn keyword rFunction  txtProgressBar type.convert unstack untar unzip update.packages update.packageStatus
+syn keyword rFunction  upgrade URLdecode URLencode url.show vi View vignette
+syn keyword rFunction  write.csv write.csv2 write.socket write.table wsbrowser xedit xemacs
+syn keyword rFunction  zip.file.extract .First.lib addNextMethod allGenerics allNames Arith as
+syn keyword rFunction  asMethodDefinition assignClassDef assignMethodsMetaData balanceMethodsList cacheGenericsMetaData cacheMetaData cacheMethod
+syn keyword rFunction  callGeneric callNextMethod canCoerce cbind2 checkSlotAssignment classesToAM classMetaName
+syn keyword rFunction  coerce Compare completeClassDefinition completeExtends completeSubclasses Complex conformMethod
+syn keyword rFunction  defaultDumpName defaultPrototype doPrimitiveMethod .doTracePrint dumpMethod dumpMethods el
+syn keyword rFunction  elNamed empty.dump emptyMethodsList evalSource existsFunction existsMethod extends
+syn keyword rFunction  finalDefaultMethod findClass findFunction findMethod findMethods findMethodSignatures findUnique
+syn keyword rFunction  formalArgs functionBody generic.skeleton getAccess getAllMethods getAllSuperClasses getClass
+syn keyword rFunction  getClassDef getClasses getClassName getClassPackage getDataPart getExtends getFunction
+syn keyword rFunction  getGeneric getGenerics getGroup getGroupMembers getMethod getMethods getMethodsForDispatch
+syn keyword rFunction  getMethodsMetaData getPackageName getProperties getPrototype getRefClass getSlots getSubclasses
+syn keyword rFunction  getValidity getVirtual hasArg hasMethod hasMethods .hasSlot implicitGeneric
+syn keyword rFunction  inheritedSlotNames initFieldArgs initialize insertMethod insertSource is isClass
+syn keyword rFunction  isClassDef isClassUnion isGeneric isGrammarSymbol isGroup isSealedClass isSealedMethod
+syn keyword rFunction  isVirtualClass isXS3Class languageEl .Last.lib linearizeMlist listFromMethods listFromMlist
+syn keyword rFunction  loadMethod Logic makeClassRepresentation makeExtends makeGeneric makeMethodsList makePrototypeFromClassDef
+syn keyword rFunction  makeStandardGeneric matchSignature Math Math2 mergeMethods metaNameUndo MethodAddCoerce
+syn keyword rFunction  methodSignatureMatrix method.skeleton MethodsList MethodsListSelect methodsPackageMetaName missingArg mlistMetaName
+syn keyword rFunction  new newBasic newClassRepresentation newEmptyObject Ops packageSlot possibleExtends
+syn keyword rFunction  prohibitGeneric promptClass promptMethods prototype Quote rbind2 reconcilePropertiesAndPrototype
+syn keyword rFunction  registerImplicitGenerics rematchDefinition removeClass removeGeneric removeMethod removeMethods removeMethodsObject
+syn keyword rFunction  representation requireMethods resetClass resetGeneric S3Class S3Part sealClass
+syn keyword rFunction  seemsS4Object selectMethod selectSuperClasses .selectSuperClasses sessionData setAs setClass
+syn keyword rFunction  setClassUnion setDataPart setGeneric setGenericImplicit setGroupGeneric setIs setMethod
+syn keyword rFunction  setOldClass setPackageName setPrimitiveMethods setRefClass setReplaceMethod setValidity show
+syn keyword rFunction  showClass showDefault showExtends showMethods showMlist signature SignatureMethod
+syn keyword rFunction  sigToEnv slot slotNames .slotNames slotsFromS3 substituteDirect substituteFunctionArgs
+syn keyword rFunction  Summary superClassDepth testInheritedMethods testVirtual traceOff traceOn .TraceWithMethods
+syn keyword rFunction  tryNew trySilent unRematchDefinition .untracedFunction validObject validSlotNames .valueClassTest
+syn keyword rFunction  abbreviate abs acos acosh addNA addTaskCallback agrep
+syn keyword rFunction  .Alias alist all all.equal all.equal.character all.equal.default all.equal.factor
+syn keyword rFunction  all.equal.formula all.equal.language all.equal.list all.equal.numeric all.equal.POSIXct all.equal.raw all.names
+syn keyword rFunction  all.vars any anyDuplicated anyDuplicated.array anyDuplicated.data.frame anyDuplicated.default anyDuplicated.matrix
+syn keyword rFunction  aperm append apply Arg args array arrayInd
+syn keyword rFunction  as.array as.array.default as.call as.character as.character.condition as.character.Date as.character.default
+syn keyword rFunction  as.character.error as.character.factor as.character.hexmode as.character.numeric_version as.character.octmode as.character.POSIXt as.character.srcref
+syn keyword rFunction  as.complex as.data.frame as.data.frame.array as.data.frame.AsIs as.data.frame.character as.data.frame.complex as.data.frame.data.frame
+syn keyword rFunction  as.data.frame.Date as.data.frame.default as.data.frame.difftime as.data.frame.factor as.data.frame.integer as.data.frame.list as.data.frame.logical
+syn keyword rFunction  as.data.frame.matrix as.data.frame.model.matrix as.data.frame.numeric as.data.frame.numeric_version as.data.frame.ordered as.data.frame.POSIXct as.data.frame.POSIXlt
+syn keyword rFunction  as.data.frame.raw as.data.frame.table as.data.frame.ts as.data.frame.vector as.Date as.Date.character as.Date.date
+syn keyword rFunction  as.Date.dates as.Date.default as.Date.factor as.Date.numeric as.Date.POSIXct as.Date.POSIXlt as.difftime
+syn keyword rFunction  as.double as.double.difftime as.double.POSIXlt as.environment as.expression as.expression.default as.factor
+syn keyword rFunction  as.function as.function.default as.hexmode asin asinh as.integer as.list
+syn keyword rFunction  as.list.data.frame as.list.Date as.list.default as.list.environment as.list.factor as.list.function as.list.numeric_version
+syn keyword rFunction  as.list.POSIXct as.logical as.logical.factor as.matrix as.matrix.data.frame as.matrix.default as.matrix.noquote
+syn keyword rFunction  as.matrix.POSIXlt as.name asNamespace as.null as.null.default as.numeric as.numeric_version
+syn keyword rFunction  as.octmode as.ordered as.package_version as.pairlist as.POSIXct as.POSIXct.date as.POSIXct.Date
+syn keyword rFunction  as.POSIXct.dates as.POSIXct.default as.POSIXct.numeric as.POSIXct.POSIXlt as.POSIXlt as.POSIXlt.character as.POSIXlt.date
+syn keyword rFunction  as.POSIXlt.Date as.POSIXlt.dates as.POSIXlt.default as.POSIXlt.factor as.POSIXlt.numeric as.POSIXlt.POSIXct as.qr
+syn keyword rFunction  as.raw as.real asS3 asS4 assign as.single as.single.default
+syn keyword rFunction  as.symbol as.table as.table.default as.vector as.vector.factor atan atan2
+syn keyword rFunction  atanh attach attachNamespace attr attr.all.equal attributes autoload
+syn keyword rFunction  autoloader backsolve baseenv basename besselI besselJ besselK
+syn keyword rFunction  besselY beta bindingIsActive bindingIsLocked bindtextdomain body bquote
+syn keyword rFunction  browser browserCondition browserSetDebug browserText builtins by by.data.frame
+syn keyword rFunction  by.default bzfile c .C .cache_class call .Call
+syn keyword rFunction  callCC .Call.graphics capabilities casefold cat category cbind
+syn keyword rFunction  cbind.data.frame c.Date ceiling character char.expand charmatch charToRaw
+syn keyword rFunction  chartr chol chol2inv chol.default choose class close
+syn keyword rFunction  closeAllConnections close.connection close.srcfile c.noquote c.numeric_version codes codes.factor
+syn keyword rFunction  codes.ordered col colMeans colnames colSums commandArgs comment
+syn keyword rFunction  complex computeRestarts conditionCall conditionCall.condition conditionMessage conditionMessage.condition conflicts
+syn keyword rFunction  Conj contributors cos cosh c.POSIXct c.POSIXlt crossprod
+syn keyword rFunction  cummax cummin cumprod cumsum cut cut.Date cut.default
+syn keyword rFunction  cut.POSIXt data.class data.frame data.matrix date debug debugonce
+syn keyword rFunction  .decode_numeric_version default.stringsAsFactors .Defunct delay delayedAssign deparse .deparseOpts
+syn keyword rFunction  .Deprecated det detach determinant determinant.matrix dget diag
+syn keyword rFunction  diff diff.Date diff.default diff.POSIXt difftime .difftime digamma
+syn keyword rFunction  dim dim.data.frame dimnames dimnames.data.frame dir dir.create dirname
+syn keyword rFunction  do.call .doTrace double dput dQuote drop droplevels
+syn keyword rFunction  droplevels.data.frame droplevels.factor dump duplicated duplicated.array duplicated.data.frame duplicated.default
+syn keyword rFunction  duplicated.matrix duplicated.numeric_version duplicated.POSIXlt .dynLibs dyn.load dyn.unload eapply
+syn keyword rFunction  eigen emptyenv enc2native enc2utf8 .encode_numeric_version encodeString Encoding
+syn keyword rFunction  enquote environment environmentIsLocked environmentName env.profile eval eval.parent
+syn keyword rFunction  evalq exists exp expand.grid .expand_R_libs_env_var expm1 .Export
+syn keyword rFunction  expression .External .External.graphics factor factorial fifo file
+syn keyword rFunction  file.access file.append file.choose file.copy file.create file.exists file.info
+syn keyword rFunction  file.path file.remove file.rename file.show file.symlink Filter Find
+syn keyword rFunction  findInterval .find.package findPackageEnv findRestart .First.sys floor flush
+syn keyword rFunction  flush.connection force formals format format.AsIs formatC format.char
+syn keyword rFunction  format.data.frame format.Date format.default format.difftime formatDL format.factor format.hexmode
+syn keyword rFunction  format.info format.numeric_version format.octmode format.POSIXct format.POSIXlt format.pval .Fortran
+syn keyword rFunction  forwardsolve function gamma gammaCody gc gcinfo gc.time
+syn keyword rFunction  gctorture get getAllConnections getCallingDLL getCallingDLLe getCConverterDescriptions getCConverterStatus
+syn keyword rFunction  getConnection getDLLRegisteredRoutines getDLLRegisteredRoutines.character getDLLRegisteredRoutines.DLLInfo getenv geterrmessage getExportedValue
+syn keyword rFunction  getHook getLoadedDLLs getNamespace getNamespaceExports getNamespaceImports getNamespaceInfo getNamespaceName
+syn keyword rFunction  getNamespaceUsers getNamespaceVersion getNativeSymbolInfo getNumCConverters getOption .getRequiredPackages .getRequiredPackages2
+syn keyword rFunction  getRversion getSrcLines getTaskCallbackNames gettext gettextf getwd gl
+syn keyword rFunction  globalenv gregexpr grep grepl gsub .gt .gtn
+syn keyword rFunction  gzcon gzfile .handleSimpleError httpclient I iconv iconvlist
+syn keyword rFunction  icuSetCollate identical identity ifelse Im .Import .ImportFrom
+syn keyword rFunction  importIntoEnv inherits integer interaction interactive .Internal intersect
+syn keyword rFunction  intToBits intToUtf8 inverse.rle invisible invokeRestart invokeRestartInteractively is.array
+syn keyword rFunction  is.atomic isatty isBaseNamespace is.call is.character is.complex is.data.frame
+syn keyword rFunction  isdebugged is.double is.element is.environment is.expression is.factor is.finite
+syn keyword rFunction  is.function isIncomplete is.infinite is.integer is.language is.list is.loaded
+syn keyword rFunction  is.logical is.matrix .isMethodsDispatchOn is.na is.na.data.frame is.name isNamespace
+syn keyword rFunction  is.nan is.na.numeric_version is.na.POSIXlt is.null is.numeric is.numeric.Date is.numeric.difftime
+syn keyword rFunction  is.numeric.POSIXt is.numeric_version is.object ISOdate ISOdatetime isOpen .isOpen
+syn keyword rFunction  is.ordered is.package_version is.pairlist is.primitive is.qr is.R is.raw
+syn keyword rFunction  is.real is.recursive isRestart isS4 isSeekable is.single is.symbol
+syn keyword rFunction  isSymmetric isSymmetric.matrix is.table isTRUE is.unsorted is.vector jitter
+syn keyword rFunction  julian julian.Date julian.POSIXt kappa kappa.default kappa.lm kappa.qr
+syn keyword rFunction  kappa.tri kronecker labels labels.default La.chol La.chol2inv La.eigen
+syn keyword rFunction  lapply .Last.value$value La.svd lazyLoad lazyLoadDBfetch lbeta lchoose
+syn keyword rFunction  length length.POSIXlt levels levels.default lfactorial lgamma .libPaths
+syn keyword rFunction  library library.dynam library.dynam.unload licence license list list2env
+syn keyword rFunction  list.files load loadedNamespaces loadingNamespaceInfo loadNamespace loadURL local
+syn keyword rFunction  lockBinding lockEnvironment log log10 log1p log2 logb
+syn keyword rFunction  logical lower.tri ls machine Machine makeActiveBinding .makeMessage
+syn keyword rFunction  make.names .make_numeric_version make.unique manglePackageName Map mapply margin.table
+syn keyword rFunction  match match.arg match.call match.fun Math.data.frame Math.Date Math.difftime
+syn keyword rFunction  Math.factor Math.POSIXt mat.or.vec matrix max max.col mean
+syn keyword rFunction  mean.data.frame mean.Date mean.default mean.difftime mean.POSIXct mean.POSIXlt memCompress
+syn keyword rFunction  memDecompress mem.limits memory.profile merge merge.data.frame merge.default .mergeExportMethods
+syn keyword rFunction  .mergeImportMethods message mget min missing Mod mode
+syn keyword rFunction  months months.Date months.POSIXt names namespaceExport namespaceImport namespaceImportClasses
+syn keyword rFunction  namespaceImportFrom namespaceImportMethods nargs nchar ncol NCOL Negate
+syn keyword rFunction  new.env NextMethod ngettext nlevels noquote norm .NotYetImplemented
+syn keyword rFunction  .NotYetUsed nrow NROW numeric nzchar objects oldClass
+syn keyword rFunction  on.exit open open.connection open.srcfile open.srcfilecopy Ops.data.frame Ops.Date
+syn keyword rFunction  Ops.difftime Ops.factor Ops.numeric_version Ops.ordered Ops.POSIXt options .OptRequireMethods
+syn keyword rFunction  order ordered outer package.description packageEvent packageHasNamespace .packages
+syn keyword rFunction  packageStartupMessage .packageStartupMessage packBits pairlist parent.env parent.frame parse
+syn keyword rFunction  parse.dcf parseNamespaceFile paste path.expand .path.package pentagamma pipe
+syn keyword rFunction  Platform pmatch pmax pmax.int pmin pmin.int polyroot
+syn keyword rFunction  Position .POSIXct .POSIXlt pos.to.env pretty pretty.default prettyNum
+syn keyword rFunction  .Primitive .primTrace .primUntrace print print.AsIs print.by print.condition
+syn keyword rFunction  print.connection print.data.frame print.Date print.default print.difftime print.DLLInfo print.DLLInfoList
+syn keyword rFunction  print.DLLRegisteredRoutines print.factor print.function print.hexmode print.libraryIQR print.listof print.NativeRoutineList
+syn keyword rFunction  printNoClass print.noquote print.numeric_version print.octmode print.packageInfo print.POSIXct print.POSIXlt
+syn keyword rFunction  print.proc_time print.restart print.rle print.simple.list print.srcfile print.srcref print.summaryDefault
+syn keyword rFunction  print.summary.table print.table print.warnings prmatrix proc.time prod prop.table
+syn keyword rFunction  provide psigamma pushBack pushBackLength q qr qr.coef
+syn keyword rFunction  qr.default qr.fitted qr.Q qr.qty qr.qy qr.R qr.resid
+syn keyword rFunction  qr.solve qr.X quarters quarters.Date quarters.POSIXt quit quote
+syn keyword rFunction  range range.default rank rapply raw rawConnection rawConnectionValue
+syn keyword rFunction  rawShift rawToBits rawToChar rbind rbind.data.frame rcond Re
+syn keyword rFunction  readBin readChar read.dcf readline readLines .readRDS readRenviron
+syn keyword rFunction  read.table.url real Recall Reduce regexpr reg.finalizer registerS3method
+syn keyword rFunction  registerS3methods remove removeCConverter removeTaskCallback rep rep.Date rep.factor
+syn keyword rFunction  rep.int replace replicate rep.numeric_version rep.POSIXct rep.POSIXlt require
+syn keyword rFunction  restart restartDescription restartFormals retracemem return rev rev.default
+syn keyword rFunction  R.home rle rm RNGkind RNGversion round round.Date
+syn keyword rFunction  round.POSIXt row rowMeans rownames row.names row.names.data.frame row.names.default
+syn keyword rFunction  .row_names_info rowsum rowsum.data.frame rowsum.default rowSums R.Version .S3method
+syn keyword rFunction  sample sample.int sapply save save.image .saveRDS scale
+syn keyword rFunction  scale.default scan scan.url .Script search searchpaths seek
+syn keyword rFunction  seek.connection seq seq.Date seq.default seq.int seq.POSIXt sequence
+syn keyword rFunction  serialize setCConverterStatus setdiff setequal setHook setNamespaceInfo .set_row_names
+syn keyword rFunction  set.seed setSessionTimeLimit setTimeLimit setwd showConnections shQuote sign
+syn keyword rFunction  signalCondition .signalSimpleWarning signif simpleCondition simpleError simpleMessage simpleWarning
+syn keyword rFunction  sin single sinh sink sink.number slice.index socketConnection
+syn keyword rFunction  socketSelect solve solve.default solve.qr sort sort.default sort.int
+syn keyword rFunction  sort.list sort.POSIXlt source source.url split split.data.frame split.Date
+syn keyword rFunction  split.default split.POSIXct sprintf sqrt sQuote srcfile srcfilecopy
+syn keyword rFunction  srcref standardGeneric .standard_regexps stderr stdin stdout stop
+syn keyword rFunction  stopifnot storage.mode strftime strptime strsplit strtoi strtrim
+syn keyword rFunction  structure strwrap sub subset .subset .subset2 subset.data.frame
+syn keyword rFunction  subset.default subset.matrix substitute substr substring sum summary
+syn keyword rFunction  summary.connection summary.data.frame Summary.data.frame summary.Date Summary.Date summary.default Summary.difftime
+syn keyword rFunction  summary.factor Summary.factor summary.matrix Summary.numeric_version summary.POSIXct Summary.POSIXct summary.POSIXlt
+syn keyword rFunction  Summary.POSIXlt summary.srcfile summary.srcref summary.table suppressMessages suppressPackageStartupMessages suppressWarnings
+syn keyword rFunction  svd sweep switch symbol.C symbol.For sys.call sys.calls
+syn keyword rFunction  Sys.chmod Sys.Date sys.frame sys.frames sys.function Sys.getenv Sys.getlocale
+syn keyword rFunction  Sys.getpid Sys.glob Sys.info sys.load.image Sys.localeconv sys.nframe sys.on.exit
+syn keyword rFunction  sys.parent sys.parents Sys.putenv Sys.readlink sys.save.image Sys.setenv Sys.setlocale
+syn keyword rFunction  Sys.sleep sys.source sys.status system system2 system.file system.time
+syn keyword rFunction  Sys.time Sys.timezone Sys.umask Sys.unsetenv Sys.which t table
+syn keyword rFunction  tabulate tan tanh .TAOCP1997init tapply taskCallbackManager tcrossprod
+syn keyword rFunction  t.data.frame t.default tempdir tempfile testPlatformEquivalence tetragamma textConnection
+syn keyword rFunction  textConnectionValue tolower topenv toString toString.default toupper trace
+syn keyword rFunction  traceback tracemem tracingState transform transform.data.frame transform.default trigamma
+syn keyword rFunction  trunc truncate truncate.connection trunc.Date trunc.POSIXt try tryCatch
+syn keyword rFunction  typeof unclass undebug union unique unique.array unique.data.frame
+syn keyword rFunction  unique.default unique.matrix unique.numeric_version unique.POSIXlt units units.difftime unix
+syn keyword rFunction  unix.time unlink unlist unloadNamespace unlockBinding unname unserialize
+syn keyword rFunction  unsplit untrace untracemem unz upper.tri url UseMethod
+syn keyword rFunction  utf8ToInt vapply vector Vectorize Version warning warnings
+syn keyword rFunction  weekdays weekdays.Date weekdays.POSIXt which which.max which.min with
+syn keyword rFunction  withCallingHandlers with.default within within.data.frame within.list withRestarts withVisible
+syn keyword rFunction  write writeBin writeChar write.dcf writeLines write.table0 xor
+syn keyword rFunction  xor.hexmode xor.octmode xpdrows.data.frame xtfrm xtfrm.AsIs xtfrm.Date xtfrm.default
+syn keyword rFunction  xtfrm.difftime xtfrm.factor xtfrm.numeric_version xtfrm.POSIXct xtfrm.POSIXlt xtfrm.Surv xzfile
+syn keyword rFunction  zapsmall

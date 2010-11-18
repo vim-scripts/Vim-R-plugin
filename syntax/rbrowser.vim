@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:	Object browser of Vim-R-plugin
 " Maintainer:	Jakson Alves de Aquino (jalvesaq@gmail.com)
-" Last Change:	Sat Nov 06, 2010  09:34AM
+" Last Change:	Wed Nov 10, 2010  06:58PM
 
 if exists("b:current_syntax")
   finish
@@ -33,11 +33,9 @@ else
   syn match rbrowserRepeat	"!.*	" contains=rbrowserDelim,rbrowserTab
   syn match rbrowserUnknown	"=.*	" contains=rbrowserDelim,rbrowserTab
 endif
-syn match rbrowserEnv		"^.GlobalEnv$"
-syn match rbrowserEnv		"^Libraries$"
 syn match rbrowserEnv		"^.GlobalEnv "
-syn match rbrowserEnv		"^libraries "
-syn match rbrowserLink		" libraries$"
+syn match rbrowserEnv		"^Libraries "
+syn match rbrowserLink		" Libraries$"
 syn match rbrowserLink		" .GlobalEnv$"
 syn match rbrowserWarn		"^Warning:"
 syn match rbrowserWarn		"^The following"
@@ -45,7 +43,7 @@ syn match rbrowserWarn		"^library is loaded"
 syn match rbrowserWarn		"^but is not in the"
 syn match rbrowserWarn		"^libraries are loaded"
 syn match rbrowserWarn		"^but are not in the"
-syn match rbrowserWarn		"^omni_list:"
+syn match rbrowserWarn		"^omniList:"
 syn match rbrowserTreePart	"├─"
 syn match rbrowserTreePart	"└─"
 syn match rbrowserTreePart	"│" 

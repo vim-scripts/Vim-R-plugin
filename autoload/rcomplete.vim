@@ -1,7 +1,7 @@
 " Vim completion script
 " Language:    R
 " Maintainer:  Jakson Alves de Aquino <jalvesaq@gmail.com>
-" Last Change: Fri Nov 05, 2010  06:29AM
+" Last Change: Tue Nov 09, 2010  07:28AM
 "
 
 fun! rcomplete#CompleteR(findstart, base)
@@ -15,7 +15,7 @@ fun! rcomplete#CompleteR(findstart, base)
     return start
   else
     if b:needsnewomnilist == 1
-      call BuildROmniList("GlobalEnv")
+      call BuildROmniList("GlobalEnv", "none")
     endif
     let res = []
     if strlen(a:base) == 0
@@ -31,7 +31,7 @@ fun! rcomplete#CompleteR(findstart, base)
         if a:base !~ '\$' && line =~ '\$'
           continue
         endif
-	let tmp1 = split(line, ':')
+	let tmp1 = split(line, ';')
 	if len(tmp1) == 5
 	  let info = tmp1[4]
 	else
@@ -39,7 +39,7 @@ fun! rcomplete#CompleteR(findstart, base)
 	  let info = tmp1[4]
 	  let i = 5
 	  while i < tlen
-	    let info = info . ':' . tmp1[i]
+	    let info = info . ';' . tmp1[i]
 	    let i += 1
 	  endwhile
 	endif

@@ -16,7 +16,7 @@
 "
 " Author: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          
-" Last Change: Sat Nov 06, 2010  12:04PM
+" Last Change: Tue Nov 16, 2010  07:02PM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -73,7 +73,7 @@ function! RBrowserMakeLibDict()
   let nobjs = len(g:rplugin_liblist)
   let i = 0
   while i < nobjs
-    let obj = split(g:rplugin_liblist[i], ':')
+    let obj = split(g:rplugin_liblist[i], ';')
     let curlib = obj[3]
     let haslib = 0
     for lib in b:liblist
@@ -85,7 +85,7 @@ function! RBrowserMakeLibDict()
     if haslib
       let b:libdict[obj[3]] = {'class': "library", 'items': {}}
       while curlib == obj[3]
-	if obj[2] == "list"
+	if obj[2] == "list" || obj[2] == "data.frame"
 	  let b:libdict[obj[3]]['items'][obj[0]] = {'class': obj[2], 'items': {}}
 	  let curdf = obj[0]
 	  let lastdf = obj[0]
@@ -96,7 +96,7 @@ function! RBrowserMakeLibDict()
 	  if i == nobjs
 	    break
 	  endif
-	  let obj = split(g:rplugin_liblist[i], ':')
+	  let obj = split(g:rplugin_liblist[i], ';')
 	  while stridx(obj[0], "$") > 0
 	    let [lastdf, lastcol] = split(obj[0], '\$')
 	    let b:libdict[curlib]['items'][curdf]['items'][lastcol] = {'class': obj[2]}
@@ -106,7 +106,7 @@ function! RBrowserMakeLibDict()
 	    if i == nobjs
 	      break
 	    endif
-	    let obj = split(g:rplugin_liblist[i], ':')
+	    let obj = split(g:rplugin_liblist[i], ';')
 	  endwhile
 	else
 	  let b:libdict[obj[3]]['items'][obj[0]] = {'class': obj[2]}
@@ -115,7 +115,7 @@ function! RBrowserMakeLibDict()
 	    break
 	  endif
 	endif
-	let obj = split(g:rplugin_liblist[i], ':')
+	let obj = split(g:rplugin_liblist[i], ';')
       endwhile
     else
       while curlib == obj[3]
@@ -123,7 +123,7 @@ function! RBrowserMakeLibDict()
 	if i == nobjs
 	  break
 	endif
-	let obj = split(g:rplugin_liblist[i], ':')
+	let obj = split(g:rplugin_liblist[i], ';')
       endwhile
     endif
   endwhile
@@ -271,11 +271,7 @@ function! RBrowserShowGE(fromother)
 
   setlocal modifiable
   sil normal! ggdG
-  if g:vimrplugin_objbr_w > 25
-    call setline(1, ".GlobalEnv | libraries")
-  else
-    call setline(1, ".GlobalEnv")
-  endif
+  call setline(1, ".GlobalEnv | Libraries")
   call setline(2, "")
   let thekeys = sort(keys(b:workspace))
   for key in thekeys
@@ -301,11 +297,7 @@ function! RBrowserShowLibs(fromother)
 
   setlocal modifiable
   sil normal! ggdG
-  if g:vimrplugin_objbr_w > 17
-    call setline(1, "libraries | .GlobalEnv")
-  else
-    call setline(1, "Libraries")
-  endif
+  call setline(1, "Libraries | .GlobalEnv")
   call setline(2, "")
 
   " Fill the object browser
@@ -337,7 +329,7 @@ function! RBrowserShowLibs(fromother)
       call setline(line("$") + 1, "libraries are loaded")
       call setline(line("$") + 1, "but are not in the")
     endif
-    call setline(line("$") + 1, "omni_list:")
+    call setline(line("$") + 1, "omniList:")
     call setline(line("$") + 1, "")
     for lib in misslibs
       call setline(line("$") + 1, "   " . lib)
@@ -401,14 +393,14 @@ function! RBrowserRightClick()
     endif
     let key = substitute(key, '\.', '\\.', "g")
     let key = substitute(key, ' ', '\\ ', "g")
-    exe 'amenu ]RBrowser.args('. key . ') :call rplugin#RAction("args")<CR>'
-    exe 'amenu ]RBrowser.example('. key . ') :call rplugin#RAction("example")<CR>'
-    exe 'amenu ]RBrowser.help('. key . ') :call rplugin#RAction("help")<CR>'
-    exe 'amenu ]RBrowser.names('. key . ') :call rplugin#RAction("names")<CR>'
-    exe 'amenu ]RBrowser.plot('. key . ') :call rplugin#RAction("plot")<CR>'
-    exe 'amenu ]RBrowser.print(' . key . ') :call rplugin#RAction("print")<CR>'
-    exe 'amenu ]RBrowser.str('. key . ') :call rplugin#RAction("str")<CR>'
-    exe 'amenu ]RBrowser.summary('. key . ') :call rplugin#RAction("summary")<CR>'
+    exe 'amenu ]RBrowser.args('. key . ') :call RAction("args")<CR>'
+    exe 'amenu ]RBrowser.example('. key . ') :call RAction("example")<CR>'
+    exe 'amenu ]RBrowser.help('. key . ') :call RAction("help")<CR>'
+    exe 'amenu ]RBrowser.names('. key . ') :call RAction("names")<CR>'
+    exe 'amenu ]RBrowser.plot('. key . ') :call RAction("plot")<CR>'
+    exe 'amenu ]RBrowser.print(' . key . ') :call RAction("print")<CR>'
+    exe 'amenu ]RBrowser.str('. key . ') :call RAction("str")<CR>'
+    exe 'amenu ]RBrowser.summary('. key . ') :call RAction("summary")<CR>'
     popup ]RBrowser
     let g:rplugin_hasbrowsermenu = 1
   endif
@@ -505,7 +497,7 @@ function! MakeRBrowserMenu()
     return
   endif
   menutranslate clear
-  call rplugin#ControlMenu()
+  call RControlMenu()
 endfunction
 
 function! UnMakeRBrowserMenu()
@@ -527,11 +519,16 @@ nmap <buffer> <CR> :call RBrowserDoubleClick()<CR>
 nmap <buffer> <2-LeftMouse> :call RBrowserDoubleClick()<CR>
 nmap <buffer> <RightMouse> :call RBrowserRightClick()<CR>
 
-call rplugin#ControlMenu()
-call rplugin#ControlMaps()
+call RControlMenu()
+call RControlMaps()
 
-augroup VimRPluginObjBrowser
-  au BufEnter * if &filetype == "rbrowser" | call MakeRBrowserMenu() | endif
-  au BufLeave * if &filetype == "rbrowser" | call UnMakeRBrowserMenu() | endif
-augroup END
+setlocal winfixwidth
+setlocal bufhidden=wipe
+
+let s:thisbuffname = substitute(bufname("%"), '\.', '', "g")
+let s:thisbuffname = substitute(s:thisbuffname, ' ', '', "g")
+exe "augroup " . s:thisbuffname
+au BufEnter <buffer> call MakeRBrowserMenu()
+au BufLeave <buffer> call UnMakeRBrowserMenu()
+exe "augroup END"
 

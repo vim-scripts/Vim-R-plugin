@@ -19,6 +19,6 @@
   }
   unlink(paste(Sys.getenv("VIMRPLUGIN_TMPDIR"), "/Rdoclock", sep = ""))
   if(length(res) == 0)
-    stop("Error in .vim.help()")
+    stop("length(res) == 0")
 }
 
