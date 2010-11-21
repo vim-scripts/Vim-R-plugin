@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Thu Nov 18, 2010  06:19AM
+" Last Change: Sat Nov 20, 2010  09:23PM
 "
 " Purposes of this file: Create all functions and commands and Set the
 " value of all global variables  and some buffer variables.for r,
@@ -1687,8 +1687,11 @@ endif
 " Start with an empty list of objects in the workspace
 let g:rplugin_globalenvlines = []
 
-" From changelog.vim
-let g:rplugin_userlogin = system('whoami')
+" From changelog.vim, with bug fixed by "Si" ("i5ivem")
+" Windows logins can include domain, e.g: 'DOMAIN\Username', need to remove
+" the backslash from this as otherwise cause file path problems.
+let g:rplugin_userlogin = substitute(system('whoami'), "\\", "-", "")
+
 if v:shell_error
   let g:rplugin_userlogin = 'unknown'
 else

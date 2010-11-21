@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria
 
-Version: 101118
+Version: 101121
 For Vim version 7.3
 
  1. Overview                                    |r-plugin-overview|
@@ -230,71 +230,72 @@ some cases, toolbar buttons. In the list below, the backslash represents the
 enabled in all filetypes supported by the plugin (r, rnoweb, rhelp):
 
 Start/Close
-  . Start R (default)                      \rf
-  . Start R --vanilla                      \rv
-  . Start R (custom)                       \rc
-  --------------------------------------------
-  . Close R (no save)                      \rq
-  . Close R (save workspace)               \rw
------------------------------------------------
+  . Start R (default)                                    \rf
+  . Start R --vanilla                                    \rv
+  . Start R (custom)                                     \rc
+  ----------------------------------------------------------
+  . Close R (no save)                                    \rq
+  . Close R (save workspace)                             \rw
+-------------------------------------------------------------
 
 Send
-  . File                                   \aa
-  . File (echo)                            \ae
-  . File (open .Rout)                      \ao
-  --------------------------------------------
-  . Block (cur)                            \bb
-  . Block (cur, echo)                      \be
-  . Block (cur, down)                      \bd
-  . Block (cur, echo and down)             \ba
-  --------------------------------------------
-  . Function (cur)                         \ff
-  . Function (cur echo)                    \fe
-  . Function (cur and down)                \fd
-  . Function (cur, echo and down)          \fa
-  --------------------------------------------
-  . Paragraph                              \pp
-  . Paragraph (echo)                       \pe
-  . Paragraph (and down)                   \pd
-  . Paragraph (echo and down)              \pa
-  --------------------------------------------
-  . Selection                              \ss
-  . Selection (echo)                       \se
-  . Selection (and down)                   \sd
-  . Selection (echo and down)              \sa
-  --------------------------------------------
-  . Line                                    \l
-  . Line (and down)                         \d
-  . Line (and new one)                      \q
------------------------------------------------
+  . File                                               \aa
+  . File (echo)                                        \ae
+  . File (open .Rout)                                  \ao
+  --------------------------------------------------------
+  . Block (cur)                                        \bb
+  . Block (cur, echo)                                  \be
+  . Block (cur, down)                                  \bd
+  . Block (cur, echo and down)                         \ba
+  --------------------------------------------------------
+  . Function (cur)                                     \ff
+  . Function (cur, echo)                               \fe
+  . Function (cur and down)                            \fd
+  . Function (cur, echo and down)                      \fa
+  --------------------------------------------------------
+  . Selection                                          \ss
+  . Selection (echo)                                   \se
+  . Selection (and down)                               \sd
+  . Selection (echo and down)                          \sa
+  --------------------------------------------------------
+  . Paragraph                                          \pp
+  . Paragraph (echo)                                   \pe
+  . Paragraph (and down)                               \pd
+  . Paragraph (echo and down)                          \pa
+  --------------------------------------------------------
+  . Line                                                \l
+  . Line (and down)                                     \d
+  . Line (and new one)                                  \q
+-----------------------------------------------------------
 
 Control
-  . List space                             \rl
-  . Clear console                          \rr
-  . Clear all                              \rm
-  --------------------------------------------
-  . Object (print)                         \rp
-  . Object (names)                         \rn
-  . Object (str)                           \rt
-  --------------------------------------------
-  . Arguments (cur)                        \ra
-  . Example (cur)                          \re
-  . Help (cur)                             \rh
-  --------------------------------------------
-  . Summary (cur)                          \rs
-  . Plot (cur)                             \rg
-  . Plot and summary (cur)                 \rb
-  --------------------------------------------
-  . Set working directory (cur file path)  \rd
-  . Build R tags file              :RBuildTags
-  --------------------------------------------
-  . Sweave (cur file)                      \sw
-  . Sweave and PDF (cur file)              \sp
-  . Go to next R chunk                      gn
-  . Go to previous R chunk                  gN
-  --------------------------------------------
-  . Update Object Browser                  \ro
- 
+  . List space                                         \rl
+  . Clear console                                      \rr
+  . Clear all                                          \rm
+  --------------------------------------------------------
+  . Object (print)                                     \rp
+  . Object (names)                                     \rn
+  . Object (str)                                       \rt
+  --------------------------------------------------------
+  . Arguments (cur)                                    \ra
+  . Example (cur)                                      \re
+  . Help (cur)                                         \rh
+  --------------------------------------------------------
+  . Summary (cur)                                      \rs
+  . Plot (cur)                                         \rg
+  . Plot and summary (cur)                             \rb
+  --------------------------------------------------------
+  . Update Object Browser                              \ro
+  . Set working directory (cur file path)              \rd
+  . Build R tags file                   :RBuildTags
+  . Build omniList (loaded packages)    :RUpdateObjList
+  . Build omniList (installed packages) :RUpdateObjListAll
+  --------------------------------------------------------
+  . Sweave (cur file)                                  \sw
+  . Sweave and PDF (cur file)                          \sp
+  . Go to next R chunk                                  gn
+  . Go to previous R chunk                              gN
+  --------------------------------------------------------
 
 Please see |r-plugin-key-bindings| to learn how to customize the key bindings
 without editing the plugin directly, and |vimrplugin_underscore| to disable
@@ -654,6 +655,7 @@ If you do not want to see R documentation in a Vim's buffer, put in your
 >
    let vimrplugin_vimpager = "no"
 <
+
 7.4.2. Details and other options:~
 
 The plugin key bindings will remain active in the documentation buffer, and,
@@ -1339,6 +1341,10 @@ and for Windows:
 ==============================================================================
 11. News~
 							       *r-plugin-news*
+101121 (2010-11-21)
+ * Fix for when whoami returns domain name on Windows (thanks to "Si" for
+   fixing the bug).
+
 101118 (2010-11-18)
  * New command:  :RUpdateObjListAll.
  * New option: vimrplugin_allnames.

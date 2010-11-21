@@ -2,7 +2,7 @@
 " Language:	R
 " Author:	Jakson Alves de Aquino <jalvesaq@gmail.com>
 " URL:		http://www.vim.org/scripts/script.php?script_id=2628
-" Last Change:	Mon Nov 15, 2010  01:01PM
+" Last Change:	Thu Nov 18, 2010  01:14PM
 
 
 " Only load this indent file when no other was loaded.
