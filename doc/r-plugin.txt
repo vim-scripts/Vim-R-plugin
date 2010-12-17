@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria
 
-Version: 101121
+Version: 101217
 For Vim version 7.3
 
  1. Overview                                    |r-plugin-overview|
@@ -29,8 +29,8 @@ This plugin improves Vim's support for editing R code and makes it possible to
 integrate Vim with R.
 
 It uses some ideas and code from Johannes Ranke's (vim-r-plugin), Eric Van
-Dewoestine's (screen plugin) and some ideas from the Tinn-R (Windows only)
-project.
+Dewoestine's (screen plugin), Vincent Nijs (R.vim for Mac OS X) and some ideas
+from the Tinn-R (Windows only) project.
 
 The latest version of this plugin is available at:
 
@@ -528,6 +528,14 @@ If you have created a custom key binding for the Vim-R-plugin, the menu in
 GVim will not always reflect the correct key binding if it is not the same for
 Normal, Visual and Insert modes.
 
+6.7. quit(save = "yes") may not work properly~
+
+If you are using either the Conque Shell plugin or the Screen plugin (and are
+not running R in an external terminal), the R command quit(save = "yes") may
+not have time enough to save the workspace. Vim will sleep for 1 second after
+the command \rw before killing R but this time is not enough for big
+workspaces.
+
 
 ==============================================================================
 7. Options~
@@ -556,6 +564,7 @@ Normal, Visual and Insert modes.
 |vimrplugin_conqueplugin|	Use the Conque Shell plugin
 |vimrplugin_conquevsplit|	Split the window vertically for Conque Shell
 |vimrplugin_conquesleep|	Time that Conque Shell will wait for output
+|vimrplugin_applescript|		Use osascript in Mac OS X.
 |vimrplugin_open_df|		Show data.frame elements in the Object Browser
 |vimrplugin_open_list|		Show list elements in the Object Browser
 |vimrplugin_allnames|		Show names which begin with a dot
@@ -730,10 +739,10 @@ output.
 The option |vimrplugin_nosingler| is ignored.
 
 
-7.6. Use 32 bit version of R (Windows only)~
+7.6. Use 32 bit version of R (Windows and Mac OS X only)~
 							     *vimrplugin_i386*
-If you are using a 64 bit Windows, but prefer to run the 32 bit version of R,
-put in your |vimrc|:
+If you are using a 64 bit Windows or a 64 bit Mac OS X, but prefer to run the
+32 bit version of R, put in your |vimrc|:
 >
    let vimrplugin_i386 = 1
 <
@@ -960,7 +969,17 @@ Note: The use of |ConqueTerm_ReadUnfocused| will set the value of 'updatetime'
 to 1000 milliseconds.
 
 
-7.16. Special R functions~
+7.16. Integration with Apple Script (OS X only)~
+							*vimrplugin_applescript*
+In Mac OS X, the plugin will try to send commands to R gui using Apple Script
+if the Screen plugin and the Conque Shell plugin are not installed. If you
+prefer to have R running in an external terminal emulator, put in your
+|vimrc|:
+>
+   let vimrplugin_applescript = 0
+<
+
+7.17. Special R functions~
 						      *vimrplugin_listmethods*
 						      *vimrplugin_specialplot*
 The R function args() list the arguments of a function, but not the arguments
@@ -976,7 +995,7 @@ after <LocalLeader>rg if you put the following line in your |vimrc|:
    let vimrplugin_specialplot = 1
 <
 
-7.17. maxdeparse~
+7.18. maxdeparse~
 						       *vimrplugin_maxdeparse*
 You can set the argument maxdeparse to be passed to R's source() function.
 Example:
@@ -984,7 +1003,7 @@ Example:
    let vimrplugin_maxdeparse = 300
 <
 
-7.18. LaTeX command~
+7.19. LaTeX command~
 							 *vimrplugin_latexcmd*
 By default, Vim calls pdflatex to produce a pdf document from the .tex file
 produced by the R Sweave command. You can use the option vimrplugin_latexcmd
@@ -993,7 +1012,7 @@ to change this behavior. Example:
    let vimrplugin_latexcmd = "latex"
 <
 
-7.19. Never unmake the R menu and tool bar buttons~
+7.20. Never unmake the R menu and tool bar buttons~
 						*vimrplugin_never_unmake_menu*
 Use this option if you want that the menu item R and the R related tool bar
 buttons are not deleted when you change from one buffer to another, for
@@ -1005,7 +1024,7 @@ When this options is enabled all menu items are created regardless of the file
 type.
 
 
-7.20. Map 'r'~
+7.21. Map 'r'~
 							    *vimrplugin_map_r*
 Some users may already be familiar with the key bindings from earlier releases
 of the Vim-R-plugin. If the variable |vimrplugin_map_r| exists, the plugin
@@ -1292,7 +1311,7 @@ Do you have many Rnoweb files included in a master tex or Rnoweb file and use
 a Makefile to build the pdf? You may consider it useful to put the following
 line in your |vimrc|:
 >
-   nmap <LocalLeader>sm :update<CR>:call SendCmdToScreen('system("make")')<CR>
+   nmap <LocalLeader>sm :update<CR>:call SendCmdToR('system("make")')<CR>
 <
 
 10.10. Group windows with compiz~
@@ -1341,6 +1360,16 @@ and for Windows:
 ==============================================================================
 11. News~
 							       *r-plugin-news*
+101217 (2010-12-17)
+ * Renamed the function SendCmdToScreen to SendCmdToR.
+ * Clear the current line in the R console before sending a new line.
+ * Always starts R on the script's directory.
+ * Don't send "^@$" as part of a paragraph in rnoweb files (thanks to Fabio
+   Correa for reporting the bug).
+ * More useful warning message when PyWin32 isn't installed.
+ * Initial support to Apple Script on Mac OS X (thanks to Vincent Nijs for
+   writing and testing the code).
+
 101121 (2010-11-21)
  * Fix for when whoami returns domain name on Windows (thanks to "Si" for
    fixing the bug).

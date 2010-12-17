@@ -2,7 +2,7 @@
 " Language:	R
 " Author:	Jakson Alves de Aquino <jalvesaq@gmail.com>
 " URL:		http://www.vim.org/scripts/script.php?script_id=2628
-" Last Change:	Thu Nov 18, 2010  01:14PM
+" Last Change:	Sat Dec 11, 2010  10:21PM
 
 
 " Only load this indent file when no other was loaded.
@@ -19,7 +19,8 @@ if exists("*GetRIndent")
   finish
 endif
 
-function s:Delete_quotes(line)
+" This function is also used by r-plugin/common_global.vim
+function RDelete_quotes(line)
   let i = 0
   let j = 0
   let line1 = ""
@@ -121,7 +122,7 @@ endfunction
 
 " Delete from '#' to the end of the line, unless the '#' is inside a string.
 function s:SanitizeRLine(line)
-  let newline = s:Delete_quotes(a:line)
+  let newline = RDelete_quotes(a:line)
   let newline = substitute(newline, '#.*', "", "")
   return newline
 endfunction

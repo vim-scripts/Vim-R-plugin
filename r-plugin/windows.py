@@ -3,10 +3,19 @@ import os
 import string
 import time
 import vim
-import win32api
-import win32clipboard as w
-import win32com.client
-import win32con
+
+try:
+    import win32api
+    import win32clipboard as w
+    import win32com.client
+    import win32con
+except ImportError:
+    vim.command("call RWarningMsg('Did you install PyWin32?')")
+    import platform
+    myPyVersion = platform.python_version()
+    myArch = platform.architecture()
+    vim.command("call RWarningMsg('The Python version being used is: " + myPyVersion + " (" + myArch[0] + ")')")
+
 
 def SendToRPy(aString):
     # backup the clipboard content (if text)
@@ -63,7 +72,7 @@ def GetRPathPy():
         try:
             kHandle = win32api.RegOpenKeyEx(win32con.HKEY_CURRENT_USER, keyName, 0, win32con.KEY_READ)
         except:
-            vim.command("return 'Not found'")
+            vim.command("let s:rinstallpath =  'Not found'")
     if kHandle:
         (kname, rpath, vtype) = win32api.RegEnumValue(kHandle, 0)
         win32api.RegCloseKey(kHandle)

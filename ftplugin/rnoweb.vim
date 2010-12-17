@@ -17,7 +17,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Sun Nov 14, 2010  11:48PM
+" Last Change: Thu Nov 25, 2010  09:41PM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -117,7 +117,7 @@ function! RMakePDF()
     let pdfcmd = ".Sresult <- Sweave('" . expand("%:t") . "');"
   endif
   let pdfcmd =  pdfcmd . " if(exists('.Sresult')){system(paste('" . g:vimrplugin_latexcmd . "', .Sresult)); rm(.Sresult)}"
-  let ok = SendCmdToScreen(pdfcmd)
+  let ok = SendCmdToR(pdfcmd)
   if ok == 0
     return
   endif
@@ -128,7 +128,7 @@ endfunction
 function! RSweave()
   update
   call RSetWD()
-  call SendCmdToScreen('Sweave("' . expand("%:t") . '")')
+  call SendCmdToR('Sweave("' . expand("%:t") . '")')
   echon
 endfunction
 
