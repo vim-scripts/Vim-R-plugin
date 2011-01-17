@@ -17,7 +17,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Thu Nov 25, 2010  09:41PM
+" Last Change: Sun Jan 16, 2011  03:47PM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -40,9 +40,8 @@ runtime r-plugin/common_buffer.vim
 
 
 function! RWriteChunk()
-  let line = getline(".")
-  if line == "" && RnwIsInRCode() == 0
-    exe "normal! i<<>>="
+  if getline(".") =~ "^\\s*$" && RnwIsInRCode() == 0
+    call setline(line("."), "<<>>=")
     exe "normal! o@"
     exe "normal! 0kl"
   else
@@ -58,7 +57,6 @@ function! RnwIsInRCode()
   else
     return 0
   endif
-endif
 endfunction
 
 function! RnwPreviousChunk()
@@ -90,21 +88,6 @@ function! RnwNextChunk()
     call cursor(i+1, 1)
   endif
   return
-endfunction
-
-function! RnwOldNextChunk()
-  let i = line(".")
-  let lastLine = line("$")
-  let curline = getline(".")
-  while i < lastLine && curline !~ "^<<.*$"
-    let i = i + 1
-    let curline = getline(i)
-  endwhile
-  if i == lastLine
-    call RWarningMsg("There is no next R code chunk to go.")
-  else
-    call cursor(i, 1)
-  endif
 endfunction
 
 " Sweave and compile the current buffer content

@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria
 
-Version: 101217
+Version: 110117
 For Vim version 7.3
 
  1. Overview                                    |r-plugin-overview|
@@ -222,7 +222,7 @@ for details.
 
 To use the plugin, open a .R or .Rnw or .Rd file with Vim and type \rf
 (replace \ with the key used as <LocalLeader>). Then, you will be able to use
-plugin key bindings to send commands to R.
+the plugin key bindings to send commands to R.
 
 This plugin has many key bindings, which correspond with menu entries and, in
 some cases, toolbar buttons. In the list below, the backslash represents the
@@ -564,7 +564,7 @@ workspaces.
 |vimrplugin_conqueplugin|	Use the Conque Shell plugin
 |vimrplugin_conquevsplit|	Split the window vertically for Conque Shell
 |vimrplugin_conquesleep|	Time that Conque Shell will wait for output
-|vimrplugin_applescript|		Use osascript in Mac OS X.
+|vimrplugin_applescript|	Use osascript in Mac OS X.
 |vimrplugin_open_df|		Show data.frame elements in the Object Browser
 |vimrplugin_open_list|		Show list elements in the Object Browser
 |vimrplugin_allnames|		Show names which begin with a dot
@@ -597,9 +597,10 @@ your |vimrc| by setting the variable vimrplugin_term, as shown below:
 							 *vimrplugin_term_cmd*
 If your terminal emulator is not listed above, or if you are not satisfied
 with the way your terminal emulator is called by the plugin, you may define in
-your |vimrc| the variable vimrplugin_term_cmd, as in the example below:
+your |vimrc| the variable vimrplugin_term_cmd, as in the examples below:
 >
    let vimrplugin_term_cmd = "gnome-terminal --title R -e"
+   let vimrplugin_term_cmd = "/Applications/Utilities/iTerm.app/Contents/MacOS/iTerm -t R"
 <
 Please, look at the manual of your terminal emulator to know how to call it.
 The last argument must be the one which precedes the command to be executed.
@@ -1357,9 +1358,29 @@ and for Windows:
    }
 <
 
+10.12. Debugging R functions~
+
+The Vim-R-Plugin does not have debugging facilities, but you may want to use
+the R package "debug":
+>
+   install.packages("debug")
+   library(debug)
+<
+Once the library is installed and loaded, you should use mtrace(function_name)
+to enable debugging a function. Then, the next time that the function is
+called it will enter in debugging mode. Once debugging a function, you can hit
+<Enter> to evaluate the current line, go(n) to go to line n in the function
+and qqq() to quit the function (See debug's help for details).
+
+
 ==============================================================================
 11. News~
 							       *r-plugin-news*
+
+110117 (2011-01-17)
+ * Fixed indentation bug in Rnoweb files (thanks to Dan Kelley for reporting
+   the bug).
+
 101217 (2010-12-17)
  * Renamed the function SendCmdToScreen to SendCmdToR.
  * Clear the current line in the R console before sending a new line.

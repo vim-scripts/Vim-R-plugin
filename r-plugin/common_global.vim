@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Thu Dec 16, 2010  08:07AM
+" Last Change: Sat Jan 15, 2011  08:15AM
 "
 " Purposes of this file: Create all functions and commands and Set the
 " value of all global variables  and some buffer variables.for r,
@@ -114,28 +114,14 @@ endfunction
 
 function RnwNextChunk()
   echon
-  let i = search("^<<.*$", "nW")
-  if i == 0
+  let linenr = search("^<<.*", "nW")
+  if linenr == 0
     call RWarningMsg("There is no next R code chunk to go.")
   else
-    call cursor(i+1, 1)
+    let linenr += 1
+    call cursor(linenr, 1)
   endif
   return
-endfunction
-
-function RnwOldNextChunk()
-  let i = line(".")
-  let lastLine = line("$")
-  let curline = getline(".")
-  while i < lastLine && curline !~ "^<<.*$"
-    let i = i + 1
-    let curline = getline(i)
-  endwhile
-  if i == lastLine
-    call RWarningMsg("There is no next R code chunk to go.")
-  else
-    call cursor(i, 1)
-  endif
 endfunction
 
 " Skip empty lines and lines whose first non blank char is '#'
@@ -145,6 +131,7 @@ function GoDown()
     let fc = curline[0]
     if fc == '@'
       call RnwNextChunk()
+      return
     endif
   endif
 
@@ -859,6 +846,7 @@ function RQuit(how)
     sleep 1
   else
     call SendCmdToR('quit(save = "no")')
+    sleep 250m
   endif
   if g:vimrplugin_screenplugin && exists(':ScreenQuit')
       ScreenQuit
@@ -1978,7 +1966,7 @@ let s:all_marks = "abcdefghijklmnopqrstuvwxyz"
 call writefile([], g:rplugin_globalenvfname)
 
 " Choose a terminal (code adapted from screen.vim)
-if has("gui_win32") || g:vimrplugin_conqueplugin == 1
+if has("gui_win32")
   " No external terminal emulator will be called, so any value is good
   let g:vimrplugin_term = "xterm"
 else

@@ -4,7 +4,7 @@
 " Language:     LaTeX
 " Maintainer:   Johannes Tanzler <johannes.tanzler@aon.at>
 " Created:      Sat, 16 Feb 2002 16:50:19 +0100
-" Last Change:	Mit, 15 Jun 2005 01:04:35 +0200
+" Last Change:	Sun Jan 16, 2011  04:14PM
 " Last Update:  18th feb 2002, by LH :
 "               (*) better support for the option
 "               (*) use some regex instead of several '||'.
@@ -14,6 +14,8 @@
 "               (*) New variables:
 "                   g:tex_items, g:tex_itemize_env, g:tex_noindent_env
 " Version: 0.4
+
+" Changed by Jakson Aquino to deal with R code chunks in rnoweb files.
 
 " Options: {{{
 "
@@ -101,6 +103,14 @@ function GetTeXIndent()
 
   " Find a non-blank line above the current line.
   let lnum = prevnonblank(v:lnum - 1)
+
+  " Skip R code chunk if the file type is rnoweb
+  if &filetype == "rnoweb" && getline(lnum) =~ "^@$"
+    let lnum = search("^<<.*>>=$", "bnW") - 1
+    if lnum < 0
+      let lnum = 0
+    endif
+  endif
 
   " At the start of the file use zero indent.
   if lnum == 0 | return 0 
