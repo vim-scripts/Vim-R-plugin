@@ -2,7 +2,7 @@
 " Language:	Rnoweb
 " Author:	Jakson Alves de Aquino <jalvesaq@gmail.com>
 " URL:		http://www.vim.org/scripts/script.php?script_id=2628
-" Last Change:	Sun Jan 16, 2011  04:32PM
+" Last Change:	Tue Jan 25, 2011  07:26AM
 
 
 " Only load this indent file when no other was loaded.
@@ -14,15 +14,14 @@ let b:did_rnoweb_indent = 1
 
 
 runtime indent/r.vim
-
-if exists("g:rplugin_home")
-  exe "source " . g:rplugin_home . "/r-plugin/tex_indent.vim"
-else
-  runtime indent/tex.vim
-endif
+runtime r-plugin/tex_indent.vim
 
 setlocal indentkeys=0{,0},!^F,o,O,e,},=\bibitem,=\item
 setlocal indentexpr=GetRnowebIndent()
+
+if exists("*GetRnowebIndent")
+  finish
+endif
 
 function GetRnowebIndent()
   if getline(".") =~ "^<<.*>>=$"
@@ -31,6 +30,6 @@ function GetRnowebIndent()
   if search("^<<", "bncW") > search("^@", "bncW")
     return GetRIndent()
   else
-    return GetTeXIndent()
+    return GetTeXIndent2()
 endfunction
 

@@ -12,34 +12,11 @@
 #  http://www.r-project.org/Licenses/
 
 ### Jakson Alves de Aquino
-### Mon, November 08, 2010
+### Tue, January 18, 2011
 
 
 # Build Omni List
 .vim.bol <- function(omnilist, what = "loaded", allnames = FALSE) {
-
-  # Bugs converting arguments of strOptions(), heatmap(), and some other
-  # functions with complex arguments.
-  vim.formal2char <- function(x){
-    if(is.character(x))
-      return(paste('"', x, '"', sep = ""))
-    if(is.null(x))
-    return("NULL")
-    if(is.call(x)){
-      clist <- as.list(x)
-      n <- length(clist)
-      if(n > 1){
-	a  <- vector(mode = "character", length = n - 1)
-	for(i in 2:n)
-	  a[i-1] <- vim.formal2char(clist[[i]])[1]
-	a <- paste(a, collapse = ", ")
-	return(paste(as.character(clist[[1]]), "(", a, ")", sep = ""))
-      } else {
-	return(paste(as.character(clist[[1]]), "()", sep = ""))
-      }
-    }
-    return(as.character(x))
-  }
 
   vim.list.args2 <- function(ff){ 
     knownGenerics <- c(names(.knownS3Generics),
@@ -63,12 +40,14 @@
     if(is.null(ff.formals)){
       return("No arguments")
     } else {
-      ff.args <- names(ff.formals)
-      ff.defaults <- sapply(ff.formals, vim.formal2char)
-      ff.pretty.args <- sub('=$', '', paste(paste(ff.args, ff.defaults, sep="="), sep=", "))
-      ff.all.args <- paste(ff.pretty.args, collapse=", ")
-      ff.all.args <- gsub("\n", "\\\\\\n", ff.all.args)
-      return(ff.all.args)
+      ff.args <- capture.output(args(ff))
+      len <- length(ff.args) - 1
+      ff.args <- ff.args[1:len]
+      ff.args[1] <- sub("function \\(", "", ff.args[1])
+      ff.args[len] <- sub("\\) $", "", ff.args[len])
+      ff.args <- sub("^    ", "", ff.args)
+      ff.args <- paste(ff.args, collapse = "\t")
+      return(ff.args)
     }
   }
 

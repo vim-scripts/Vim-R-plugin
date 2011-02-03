@@ -1,7 +1,7 @@
 " Vim completion script
 " Language:    R
 " Maintainer:  Jakson Alves de Aquino <jalvesaq@gmail.com>
-" Last Change: Tue Nov 09, 2010  07:28AM
+" Last Change: Tue Jan 18, 2011  10:11AM
 "
 
 fun! rcomplete#CompleteR(findstart, base)
@@ -43,6 +43,7 @@ fun! rcomplete#CompleteR(findstart, base)
 	    let i += 1
 	  endwhile
 	endif
+	let info = substitute(info, "\t", "\n", "g")
 	let tmp2 = {'word': tmp1[0], 'menu': tmp1[1] . ' ' . tmp1[3], 'info': info}
 	call add(res, tmp2)
       endif

@@ -3,7 +3,7 @@
 " Maintainer:	      Jakson Aquino <jalvesaq@gmail.com>
 " Former Maintainers: Vaidotas Zemlys <zemlys@gmail.com>
 " 		      Tom Payne <tom@tompayne.org>
-" Last Change:	      Tue Nov 09, 2010  04:46PM
+" Last Change:	      Tue Feb 01, 2011  05:08PM
 " Filenames:	      *.R *.r *.Rhistory *.Rt
 " 
 " NOTE: The highlighting of R functions is defined in the
@@ -51,9 +51,6 @@ syn match rSpecial display contained "\\U\x\{1,8}"
 syn match rSpecial display contained "\\u{\x\{1,4}}"
 syn match rSpecial display contained "\\U{\x\{1,8}}"
 
-
-syn match rDollar "\$"
-
 " Statement
 syn keyword rStatement   break next return
 syn keyword rConditional if else
@@ -97,8 +94,18 @@ syn match rParenError "[\]}]" contained
 " http://www.vim.org/scripts/script.php?script_id=2628
 runtime r-plugin/functions.vim
 
+syn match rDollar display contained "\$"
+
+" List elements will not be highlighted as functions:
+syn match rLstElmt "\$[a-zA-Z0-9\\._]*" contains=rDollar
+
 " Functions that may add new objects
 syn keyword rPreProc     library require attach detach source
+
+if &filetype == "rhelp"
+    syn match rHelpIdent '\\method'
+    syn match rHelpIdent '\\S4method'
+endif
 
 " Type
 syn keyword rType array category character complex double function integer list logical matrix numeric vector data.frame 
@@ -120,7 +127,9 @@ hi def link rDollar      SpecialChar
 hi def link rError       Error
 hi def link rFloat       Float
 hi def link rFunction    Function
+hi def link rHelpIdent   Identifier
 hi def link rInteger     Number
+hi def link rLstElmt	 Normal
 hi def link rNameWSpace  Normal
 hi def link rNumber      Number
 hi def link rOperator    Operator

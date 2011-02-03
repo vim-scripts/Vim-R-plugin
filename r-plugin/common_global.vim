@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Sat Jan 15, 2011  08:15AM
+" Last Change: Sun Jan 30, 2011  08:09AM
 "
 " Purposes of this file: Create all functions and commands and Set the
 " value of all global variables  and some buffer variables.for r,
@@ -647,11 +647,11 @@ function SendFunctionToR(e, m)
   endif
 
   let b:needsnewomnilist = 1
-  let line = substitute(RDelete_quotes(getline(".")), '#.*', '', "")
+  let line = SanitizeRLine(getline("."))
   let i = line(".")
   while i > 0 && line !~ "function"
     let i -= 1
-    let line = substitute(RDelete_quotes(getline(i)), '#.*', '', "")
+    let line = SanitizeRLine(getline(i))
   endwhile
   if i == 0
     return
@@ -659,18 +659,18 @@ function SendFunctionToR(e, m)
   let functionline = i
   while i > 0 && line !~ "<-"
     let i -= 1
-    let line = substitute(RDelete_quotes(getline(i)), '#.*', '', "")
+    let line = SanitizeRLine(getline(i))
   endwhile
   if i == 0
     return
   endif
   let firstline = i
   let i = functionline
-  let line = substitute(RDelete_quotes(getline(i)), '#.*', '', "")
+  let line = SanitizeRLine(getline(i))
   let tt = line("$")
   while i < tt && line !~ "{"
     let i += 1
-    let line = substitute(RDelete_quotes(getline(i)), '#.*', '', "")
+    let line = SanitizeRLine(getline(i))
   endwhile
   if i == tt
     return
@@ -678,7 +678,7 @@ function SendFunctionToR(e, m)
   let nb = CountBraces(line)
   while i < tt && nb > 0
     let i += 1
-    let line = substitute(RDelete_quotes(getline(i)), '#.*', '', "")
+    let line = SanitizeRLine(getline(i))
     let nb += CountBraces(line)
   endwhile
   if nb != 0

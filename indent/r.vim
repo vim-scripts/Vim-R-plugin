@@ -2,12 +2,12 @@
 " Language:	R
 " Author:	Jakson Alves de Aquino <jalvesaq@gmail.com>
 " URL:		http://www.vim.org/scripts/script.php?script_id=2628
-" Last Change:	Sat Dec 11, 2010  10:21PM
+" Last Change:	Thu Feb 03, 2011  08:35PM
 
 
 " Only load this indent file when no other was loaded.
 if exists("b:did_r_indent")
-  finish
+    finish
 endif
 let b:did_r_indent = 1
 
@@ -16,196 +16,444 @@ setlocal indentexpr=GetRIndent()
 
 " Only define the function once.
 if exists("*GetRIndent")
-  finish
+    finish
 endif
 
-" This function is also used by r-plugin/common_global.vim
-function RDelete_quotes(line)
-  let i = 0
-  let j = 0
-  let line1 = ""
-  let llen = strlen(a:line)
-  while i < llen
-    if a:line[i] == '"'
-      let i += 1
-      while !(a:line[i] == '"' && ((i > 1 && a:line[i-1] == '\' && a:line[i-2] == '\') || a:line[i-1] != '\')) && i < llen
-	let i += 1
-      endwhile
-      if a:line[i] == '"'
-	let i += 1
-      endif
-    else
-      if a:line[i] == "'"
-	let i += 1
-	while !(a:line[i] == "'" && ((i > 1 && a:line[i-1] == '\' && a:line[i-2] == '\') || a:line[i-1] != '\')) && i < llen
-	  let i += 1
-	endwhile
-	if a:line[i] == "'"
-	  let i += 1
-	endif
-      endif
+" Options to make the indentation more similar to Emacs/ESS:
+if !exists("g:r_indent_align_args")
+    let g:r_indent_align_args = 1
+endif
+if !exists("g:r_indent_ess_comments")
+    let g:r_indent_ess_comments = 0
+endif
+if !exists("g:r_indent_comment_column")
+    let g:r_indent_comment_column = 40
+endif
+if ! exists("g:r_indent_ess_compatible")
+    let g:r_indent_ess_compatible = 0
+endif
+
+function s:RDelete_quotes(line)
+    let i = 0
+    let j = 0
+    let line1 = ""
+    let llen = strlen(a:line)
+    while i < llen
+        if a:line[i] == '"'
+            let i += 1
+            let line1 = line1 . 's'
+            while !(a:line[i] == '"' && ((i > 1 && a:line[i-1] == '\' && a:line[i-2] == '\') || a:line[i-1] != '\')) && i < llen
+                let i += 1
+            endwhile
+            if a:line[i] == '"'
+                let i += 1
+            endif
+        else
+            if a:line[i] == "'"
+                let i += 1
+                let line1 = line1 . 's'
+                while !(a:line[i] == "'" && ((i > 1 && a:line[i-1] == '\' && a:line[i-2] == '\') || a:line[i-1] != '\')) && i < llen
+                    let i += 1
+                endwhile
+                if a:line[i] == "'"
+                    let i += 1
+                endif
+            else
+                if a:line[i] == "`"
+                    let i += 1
+                    let line1 = line1 . 's'
+                    while a:line[i] != "`" && i < llen
+                        let i += 1
+                    endwhile
+                    if a:line[i] == "`"
+                        let i += 1
+                    endif
+                endif
+            endif
+        endif
+        if i == llen
+            break
+        endif
+        let line1 = line1 . a:line[i]
+        let j += 1
+        let i += 1
+    endwhile
+    return line1
+endfunction
+
+" Convert foo(bar()) int foo()
+function s:RDelete_parens(line)
+    if s:Get_paren_balance(a:line, "(", ")") != 0
+        return a:line
     endif
-    if i == llen
-      break
-    endif
-    let line1 = line1 . a:line[i]
-    let j += 1
-    let i += 1
-  endwhile
-  return line1
+    let i = 0
+    let j = 0
+    let line1 = ""
+    let llen = strlen(a:line)
+    while i < llen
+        let line1 = line1 . a:line[i]
+        if a:line[i] == '('
+            let nop = 1
+            while nop > 0 && i < llen
+                let i += 1
+                if a:line[i] == ')'
+                    let nop -= 1
+                else
+                    if a:line[i] == '('
+                        let nop += 1 
+                    endif
+                endif
+            endwhile
+            let line1 = line1 . a:line[i]
+        endif
+        let i += 1
+    endwhile
+    return line1
 endfunction
 
 function! s:Get_paren_balance(line, o, c)
-  let line2 = substitute(a:line, a:o, "", "g")
-  let openp = strlen(a:line) - strlen(line2)
-  let line3 = substitute(line2, a:c, "", "g")
-  let closep = strlen(line2) - strlen(line3)
-  return openp - closep
+    let line2 = substitute(a:line, a:o, "", "g")
+    let openp = strlen(a:line) - strlen(line2)
+    let line3 = substitute(line2, a:c, "", "g")
+    let closep = strlen(line2) - strlen(line3)
+    return openp - closep
 endfunction
 
-function! s:Get_paren_balances(line, cline)
-  let pb = s:Get_paren_balance(a:line, '(', ')')
-  let pb += s:Get_paren_balance(a:line, '[', ']')
-  let pb += s:Get_paren_balance(a:line, '{', '')
-  let pb += s:Get_paren_balance(a:cline, '', '}')
-  return pb
+function! s:Get_matching_brace(linenr, o, c, delbrace)
+    let line = SanitizeRLine(getline(a:linenr))
+    if a:delbrace == 1
+        let line = substitute(line, '{$', "", "")
+    endif
+    let pb = s:Get_paren_balance(line, a:o, a:c)
+    let i = a:linenr
+    while pb != 0 && i > 1
+        let i -= 1
+        let pb += s:Get_paren_balance(SanitizeRLine(getline(i)), a:o, a:c)
+    endwhile
+    return i
 endfunction
 
-function! s:Get_matching_brace(linenr, o, c)
-  let line = getline(a:linenr)
-  let pb = s:Get_paren_balance(line, a:o, a:c)
-  let i = a:linenr
-  while pb != 0 && i > 1
-    let i -= 1
-    let pb += s:Get_paren_balance(s:SanitizeRLine(getline(i)), a:o, a:c)
-  endwhile
-  return i
+" This function is buggy because there 'if's without 'else'
+" It must be rewritten relying more on indentation
+function! s:Get_matching_if(linenr, delif)
+"    let filenm = expand("%")
+"    call writefile([filenm], "/tmp/matching_if_" . a:linenr)
+    let line = SanitizeRLine(getline(a:linenr))
+    if a:delif
+        let line = substitute(line, "if", "", "g")
+    endif
+    let elsenr = 0
+    let i = a:linenr
+    let ifhere = 0
+    while i > 0
+        let line2 = substitute(line, '\<else\>', "xxx", "g")
+        let elsenr += strlen(line) - strlen(line2)
+        if line =~ '.*\s*if\s*()' || line =~ '.*\s*if\s*()'
+            let elsenr -= 1
+            if elsenr == 0
+                let ifhere = i
+                break
+            endif
+        endif
+        let i -= 1
+        let line = SanitizeRLine(getline(i))
+    endwhile
+    if ifhere
+        return ifhere
+    else
+        return a:linenr
+    endif
+endfunction
+
+function! s:Get_last_paren_idx(line, o, c, pb)
+    let blc = a:pb
+    let line = substitute(a:line, '\t', s:curtabstop, "g")
+    let theidx = -1
+    let llen = strlen(line)
+    let idx = 0
+    while idx < llen
+        if line[idx] == a:o
+            let blc -= 1
+            if blc == 0
+                let theidx = idx
+            endif
+        else
+            if line[idx] == a:c
+                let blc += 1
+            endif
+        endif
+        let idx += 1
+    endwhile
+    return theidx + 1
 endfunction
 
 " Get previous relevant line. Search back until getting a line that isn't
 " comment or blank
-function s:Get_prev_line( lineno )
-   let lnum = a:lineno - 1
-   let data = getline( lnum )
-   while lnum > 0 && (data =~ '^\s*#' || data =~ '^\s*$')
-      let lnum = lnum - 1
-      let data = getline( lnum )
-   endwhile
-   return lnum
+function s:Get_prev_line(lineno)
+    let lnum = a:lineno - 1
+    let data = getline( lnum )
+    while lnum > 0 && (data =~ '^\s*#' || data =~ '^\s*$')
+        let lnum = lnum - 1
+        let data = getline( lnum )
+    endwhile
+    return lnum
 endfunction
 
-" Count groups of () because the indetation should be different for
-" '  if(T)' and '  if(T) something()'
-function s:CountGroups(line)
-  let ngroups = 0
-  let i = 0
-  let llen = strlen(a:line)
-  while i < llen
-    if a:line[i] == '('
-      let ngroups += 1
-      let k = 1
-      let i += 1
-      while i < llen && k > 0
-        if a:line[i] == '('
-          let k += 1
-        endif
-        if a:line[i] == ')'
-          let k -= 1
-        endif
-        let i += 1
-      endwhile
-    endif
-    let i += 1
-  endwhile
-  return ngroups
-endfunction
-
+" This function is also used by r-plugin/common_global.vim
 " Delete from '#' to the end of the line, unless the '#' is inside a string.
-function s:SanitizeRLine(line)
-  let newline = RDelete_quotes(a:line)
-  let newline = substitute(newline, '#.*', "", "")
-  return newline
+function SanitizeRLine(line)
+    let newline = s:RDelete_quotes(a:line)
+    let newline = s:RDelete_parens(newline)
+    let newline = substitute(newline, '#.*', "", "")
+    let newline = substitute(newline, '\s*$', "", "")
+    return newline
 endfunction
 
 function GetRIndent()
 
-  let clnum = line(".")    " current line
-  let cline = s:SanitizeRLine(getline(clnum))
+    let clnum = line(".")    " current line
 
-  if cline =~ ".*}$"
-    let indline = s:Get_matching_brace(clnum, '{', '}')
-    if indline > 0
-      return indent(indline)
+    let cline = getline(clnum)
+    if cline =~ '^\s*#'
+        if g:r_indent_ess_comments == 1
+            if cline =~ '^\s*###'
+                return 0
+            endif
+            if cline !~ '^\s*##'
+                return g:r_indent_comment_column
+            endif
+        endif
     endif
-  endif
 
-  " Find the first non blank line above the current line
-  let lnum = s:Get_prev_line(clnum)
-  " Hit the start of the file, use zero indent.
-  if lnum == 0
-    return 0
-  endif
-  let line = s:SanitizeRLine(getline(lnum))
+    let cline = SanitizeRLine(cline)
 
-  " Find the first non blank line above previous line
-  if line =~ ".*}$"
-    let plnum = s:Get_matching_brace(lnum, '{', '}')
-  else
-    let plnum = s:Get_prev_line(lnum)
-  endif
-  if plnum > 0
-    let pline = s:SanitizeRLine(getline(plnum))
-  endif
-
-  if plnum > 0
-    " Find the line previous to the previous line
-    if pline =~ '.*}$'
-      let pplnum = s:Get_matching_brace(plnum, '{', '}')
-    else
-      let pplnum = s:Get_prev_line(plnum)
+    if cline =~ '^\s*}' || cline =~ '^\s*}\s*)$'
+        let indline = s:Get_matching_brace(clnum, '{', '}', 1)
+        if indline > 0 && indline != clnum
+            let iline = SanitizeRLine(getline(indline))
+            if s:Get_paren_balance(iline, "(", ")") == 0 || iline =~ '(\s*{$'
+                return indent(indline)
+            else
+                let indline = s:Get_matching_brace(indline, '(', ')', 1)
+                return indent(indline)
+            endif
+        endif
     endif
-    if pplnum > 0
-      let ppline = s:SanitizeRLine(getline(pplnum))
+
+    " Find the first non blank line above the current line
+    let lnum = s:Get_prev_line(clnum)
+    " Hit the start of the file, use zero indent.
+    if lnum == 0
+        return 0
     endif
-  endif
 
-  while pplnum > 0 && ((ppline =~ '^\s*\(if\|while\|for\)\s*(.*)\s*$' && s:CountGroups(ppline) == 1) || ppline =~ '\s*{\s*$') && pline !~ '.*{\s*$'
-    let plnum = pplnum
-    let pline = ppline
-    let pplnum = s:Get_prev_line(pplnum)
-    let ppline = s:SanitizeRLine(getline(pplnum))
-  endwhile
+    let line = SanitizeRLine(getline(lnum))
 
-  let ind = indent(lnum)
-  let pb = s:Get_paren_balances(line, cline)
-  let ind += pb * &sw
+    if &filetype == "rhelp"
+        if cline =~ '^\\dontshow{' || cline =~ '^\\dontrun{' || cline =~ '^\\donttest{' || cline =~ '^\\testonly{'
+            return 0
+        endif
+        if line =~ '^\\examples{' || line =~ '^\\usage{' || line =~ '^\\dontshow{' || line =~ '^\\dontrun{' || line =~ '^\\donttest{' || line =~ '^\\testonly{'
+            return 0
+        endif
+        if line =~ '^\\method{.*}{.*}(.*'
+            let line = substitute(line, '^\\method{\(.*\)}{.*}', '\1', "")
+        endif
+    endif
 
-
-  " 'if', 'for', 'while' or 'else' without '{'
-  if (line =~ '^\s*\(if\|while\|for\)\s*(.*)\s*$' && s:CountGroups(line) == 1) || line =~ '^\s*else\s*$'
-    let ind = ind + &sw
     if cline =~ '^\s*{'
-      let ind = ind - &sw
+        if g:r_indent_ess_compatible && line =~ ')$'
+            let nlnum = lnum
+            let nline = line
+            while s:Get_paren_balance(nline, '(', ')') < 0
+                let nlnum = s:Get_prev_line(nlnum)
+                let nline = SanitizeRLine(getline(nlnum)) . nline
+            endwhile
+            if nline =~ '^\s*function\s*(' && indent(nlnum) == &sw
+                return 0
+            endif
+        endif
+        if s:Get_paren_balance(line, "(", ")") == 0
+            return indent(lnum)
+        endif
     endif
+
+    " line is an incomplete command:
+    if line =~ '\<\(if\|while\|for\|function\)\s*()$' || line =~ '\<else$' || line =~ '<-$' || line =~ '^\s*else\s*if\s*()'
+        return indent(lnum) + &sw
+    endif
+
+    " Deal with () and []
+
+    let pb = s:Get_paren_balance(line, '(', ')')
+
+    if line =~ '^\s*{$' || line =~ '(\s*{' || (pb == 0 && (line =~ '{$' || line =~ '(\s*{$'))
+        return indent(lnum) + &sw
+    endif
+
+    let bb = s:Get_paren_balance(line, '[', ']')
+
+    let s:curtabstop = repeat(' ', &tabstop)
+    if g:r_indent_align_args == 1
+
+        if pb == 0 && bb == 0 && (line =~ '.*[,&|\-\*+<>]$' || cline =~ '^\s*[,&|\-\*+<>]')
+            return indent(lnum)
+        endif
+
+        if pb > 0
+            if &filetype == "rhelp"
+                let ind = s:Get_last_paren_idx(line, '(', ')', pb)
+            else
+                let ind = s:Get_last_paren_idx(getline(lnum), '(', ')', pb)
+            endif
+            return ind
+        endif
+
+        if pb < 0 && line =~ '.*[,&|\-\*+<>]$'
+            let lnum = s:Get_prev_line(lnum)
+            while pb < 1 && lnum > 0
+                let line = SanitizeRLine(getline(lnum))
+                let line = substitute(line, '\t', s:curtabstop, "g")
+                let ind = strlen(line)
+                while ind > 0
+                    if line[ind] == ')'
+                        let pb -= 1
+                    else
+                        if line[ind] == '('
+                            let pb += 1
+                        endif
+                    endif
+                    if pb == 1
+                        return ind + 1
+                    endif
+                    let ind -= 1
+                endwhile
+                let lnum -= 1
+            endwhile
+            return 0
+        endif
+
+        if bb > 0
+            let ind = s:Get_last_paren_idx(getline(lnum), '[', ']', bb)
+            return ind
+        endif
+    endif
+
+    let post_block = 0
+    if line =~ '}$'
+        let lnum = s:Get_matching_brace(lnum, '{', '}', 0)
+        let line = SanitizeRLine(getline(lnum))
+        if lnum > 0 && line =~ '^\s*{'
+            let lnum = s:Get_prev_line(lnum)
+            let line = SanitizeRLine(getline(lnum))
+        endif
+        let pb = s:Get_paren_balance(line, '(', ')')
+        let post_block = 1
+    endif
+
+    let post_fun = 0
+    if pb < 0 && line !~ ')\s*[,&|\-\*+<>]$'
+        let post_fun = 1
+        while pb < 0 && lnum > 0
+            let lnum -= 1
+            let linepiece = SanitizeRLine(getline(lnum))
+            let pb += s:Get_paren_balance(linepiece, "(", ")")
+            let line = linepiece . line
+        endwhile
+        if line =~ '{$' && post_block == 0
+            return indent(lnum) + &sw
+        endif
+
+        " Now we can do some tests again
+        if cline =~ '^\s*{'
+            return indent(lnum)
+        endif
+        if post_block == 0
+            let newl = SanitizeRLine(line)
+            if newl =~ '\<\(if\|while\|for\|function\)\s*()$' || newl =~ '\<else$' || newl =~ '<-$' || newl =~ '^\s*else\s*if\s*()'
+                return indent(lnum) + &sw
+            endif
+        endif
+    endif
+
+    if cline =~ '^\s*else'
+        if line =~ '<-\s*if\s*()'
+            return indent(lnum) + &sw
+        else
+            if line =~ '\<if\s*()'
+                return indent(lnum)
+            else
+                return indent(lnum) - &sw
+            endif
+        endif
+    endif
+
+    if bb < 0 && line =~ '.*]'
+        while bb < 0 && lnum > 0
+            let lnum -= 1
+            let linepiece = SanitizeRLine(getline(lnum))
+            let bb += s:Get_paren_balance(linepiece, "[", "]")
+            let line = linepiece . line
+        endwhile
+        let line = s:RDelete_parens(line)
+    endif
+
+    let plnum = s:Get_prev_line(lnum)
+    let ppost_else = 0
+    if plnum > 0
+        let pline = SanitizeRLine(getline(plnum))
+        let ppost_block = 0
+        if pline =~ '}$'
+            let ppost_block = 1
+            let plnum = s:Get_matching_brace(plnum, '{', '}', 0)
+            let pline = SanitizeRLine(getline(plnum))
+            if pline =~ '^\s*{$' && plnum > 0
+                let plnum = s:Get_prev_line(plnum)
+                let pline = SanitizeRLine(getline(plnum))
+            endif
+        endif
+
+        if pline =~ 'else$'
+            let ppost_else = 1
+            let plnum = s:Get_matching_if(plnum, 0)
+            let pline = SanitizeRLine(getline(plnum))
+        endif
+
+        let ppb = s:Get_paren_balance(pline, '(', ')')
+        if ppb < 0 && (pline =~ ')\s*{$' || pline =~ ')$')
+            while ppb < 0 && plnum > 0
+                let plnum -= 1
+                let linepiece = SanitizeRLine(getline(plnum))
+                let ppb += s:Get_paren_balance(linepiece, "(", ")")
+                let pline = linepiece . pline
+            endwhile
+            let pline = s:RDelete_parens(pline)
+        endif
+    endif
+
+    let ind = indent(lnum)
+    let pind = indent(plnum)
+
+    if ind == pind || (ind == (pind  + &sw) && pline =~ '{$' && ppost_else == 0)
+        return ind
+    endif
+
+    while pind < ind && plnum > 0
+        let ind = pind
+        let plnum = s:Get_prev_line(plnum)
+        let pline = getline(plnum)
+        while pline =~ '^\s*else'
+            let plnum = s:Get_matching_if(plnum, 1)
+            let pline = getline(plnum)
+        endwhile
+        let pind = indent(plnum)
+        if ind == (pind  + &sw) && pline =~ '{$'
+            return ind
+        endif
+    endwhile
+
     return ind
-  endif
-  if plnum > 0 && ((pline =~ '^\s*\(if\|while\|for\)\s*(.*)\s*$' && s:CountGroups(pline) == 1) || pline =~ '^\s*else\s*$') && line !~ '.*{\s*$'
-    let ind = indent(plnum)
-    let pb = s:Get_paren_balances(line, cline)
-    let ind += pb * &sw
-  endif
 
-  " If you set this option in your .vimrc, the plugin will try to align the
-  " arguments of a function that has too many arguments to fit in one line.
-  " However, you'll have to manually indent the first line after the parenthesis
-  " closing the list of arguments. This option isn't documented in the plugin
-  " documentation (~/.vim/doc/r-plugin.txt) because it's a buggy option.
-  if exists("g:vimrplugin_funcargsalign")
-    if line =~ '.*function\s*(.*$'
-      let ind = stridx(line, "(") + 1
-    endif
-  endif
-
-  return ind
 endfunction
 
+" vim: sw=4

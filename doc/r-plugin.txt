@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria
 
-Version: 110117
+Version: 110203
 For Vim version 7.3
 
  1. Overview                                    |r-plugin-overview|
@@ -54,7 +54,7 @@ to deal with.
       - Special highlighting for R output (.Rout files).
       - Spell check only strings and comments.
       - Fold code when foldmethod=syntax.
-  * Smart indentation for R syntax.
+  * Smart indentation for R and Rnoweb syntax.
   * Integrated communication with R:
       - Start/Close R.
       - Send lines, selection, paragraphs, functions, blocks, entire file.
@@ -193,7 +193,8 @@ highlight (see |:RUpdateObjList| for details).
 
 customize the plugin~
 
-Please, read the section |r-plugin-options|.
+Please, read the section |r-plugin-options|. Emacs/ESS users should read the
+section 10.8 of this document (Indenting setup).
 
 
 hide unused buttons~
@@ -463,20 +464,8 @@ different R processes see |vimrplugin_single_r|.
 ==============================================================================
 6. Known bugs and workarounds~
 							 *r-plugin-known-bugs*
-6.1. Indentation~
 
-Correctly written code might be wrongly indented. Example:
-
-   this code                               is indented as:~
-   if(T)                                   if(T)
-     for(i in 1:2)                           for(i in 1:2)
-     {                                       {
-       cat(i, "\n")                            cat(i, "\n")
-     }                                       }
-   x                                         x
-
-
-6.2. R's source() issues~
+6.1. R's source() issues~
 
 The R's source() function prints an extra new line between commands if the
 option echo = TRUE, and error messages and warning are printed only after the
@@ -484,7 +473,7 @@ entire code is sourced, which makes it more difficult to find errors in the
 code sent to R.
 
 
-6.3. GVim's toolbar buttons, menu and title bar blink during omni completion~
+6.2. GVim's toolbar buttons, menu and title bar blink during omni completion~
 
 The plugin unmakes the R menu and the related toolbar buttons when Vim leaves
 the R buffer. During omni completion, Vim leaves the R buffer and goes to the
@@ -495,7 +484,7 @@ tool bar buttons will never be deleted, even if you change from one file type
 to another.
 
 
-6.4. R session is detached when GVim is closed (Linux/Unix only)~
+6.3. R session is detached when GVim is closed (Linux/Unix only)~
 
 If you launch GVim through a custom keyboard shortcut, the problem may be
 solved if you add -f as parameter to GVim. The R session will also be detached
@@ -506,14 +495,14 @@ the R session, open a new terminal window and type:
    screen -r
 <
 
-6.5. The clipboard's content is lost (Windows only)~
+6.4. The clipboard's content is lost (Windows only)~
 
 On Windows, the plugin copies the command that will be sent to R into the
 clipboard when not using the Conque Shell plugin.  Thus, if you have anything
 in the clipboard it will be lost while using the plugin.
 
 
-6.6. The buffer name must be in the window title (Windows only)~
+6.5. The buffer name must be in the window title (Windows only)~
 
 On Windows, when not using the Conque Shell plugin, the plugin tries to
 activate the "R Console" window, paste the command that is being sent to R,
@@ -522,11 +511,12 @@ requires that the name of the file being edited be in the GVim windows title.
 This is the default on Vim if you have not set the option 'titlestring'.
 
 
-6.7. The menu may not reflect some of your custom key bindings~
+6.6. The menu may not reflect some of your custom key bindings~
 
 If you have created a custom key binding for the Vim-R-plugin, the menu in
 GVim will not always reflect the correct key binding if it is not the same for
 Normal, Visual and Insert modes.
+
 
 6.7. quit(save = "yes") may not work properly~
 
@@ -536,6 +526,29 @@ not have time enough to save the workspace. Vim will sleep for 1 second after
 the command \rw before killing R but this time is not enough for big
 workspaces.
 
+
+6.8. Syntactically correct code may be wrongly indented~
+
+If the Vim-R-plugin indents your code wrongly you may get the correct
+indentation by adding braces and line breaks to it. Example:
+>
+    # This code will be wrongly indented
+
+    levels(x) <- ## nl == nL or 1
+        if (nl == nL) as.character(labels)
+        else paste(labels, seq_along(levels), sep = "")
+    class(x) <- c(if(ordered) "ordered", "factor")
+
+
+    # But this one will be correctly indented
+
+    levels(x) <- ## nl == nL or 1
+	if (nl == nL)
+	    as.character(labels)
+	else
+	    paste(labels, seq_along(levels), sep = "")
+    class(x) <- c(if(ordered) "ordered", "factor")
+<
 
 ==============================================================================
 7. Options~
@@ -883,7 +896,8 @@ A sample detachable session could be:
   - When you have finished to use Vim and R close them and type exit to
     quit the screen session.
 
-Here are several useful screen shortcuts:
+Here are several useful screen shortcuts (please look at the screen man page
+for a complete list):
 
   <c-a><tab>        go from Vim to R and vice-versa
   <c-a>:resize N    set the height of the current window to N lines
@@ -891,6 +905,8 @@ Here are several useful screen shortcuts:
   <c-a>p            switch to the previous screen session
   <c-a>S            split the current region in two new ones
   <c-a>X            kill the current region
+  <c-a>Esc          Enter copy/scrollback mode
+  Esc               Quit the copy/scrollback mode
 
 By default, screen waits briefly after it receives external commands and
 other default options may not be what you want. Please read screen
@@ -1147,6 +1163,7 @@ directory after the installation:
    ftplugin/r.vim
    ftplugin/rbrowser.vim
    indent/r.vim
+   indent/rhelp.vim
    indent/rnoweb.vim
    r-plugin/build_omniList.R
    r-plugin/common_buffer.vim
@@ -1279,7 +1296,57 @@ Example on how to test whether your setup is ok:
    5. Press CTRL-] over "do_mapply" (Vim sould jump to "mapply.c").
 
 
-10.8. Fold setup~
+10.8. Indenting setup~
+
+Note: In Normal mode, type |==| to indent the current line and gg=G to format
+the entire buffer.
+
+The Vim-R-plugin includes a script to automatically indent R files. By
+default, the script aligns function arguments if they span for multiple lines.
+If you prefer do not have the arguments of functions aligned, put in your
+|vimrc|:
+>
+   let r_indent_align_args = 0
+<
+By default, all lines beginning with a comment character, #, get the same
+indentation level of the normal R code. Users of Emacs/ESS may be used to have
+lines beginning with a single # indented in the 40th column, ## indented as R
+code, and ### not indented. If you prefer that lines beginning with comment
+characters are aligned as they are by Emacs/ESS, put in your |vimrc|:
+>
+   let r_indent_ess_comments = 1
+<
+If you prefer that lines beginning with a single # are aligned at a column
+different from the 40th one, you should set a new value to the variable
+r_indent_comment_column, as in the example below:
+>
+   let r_indent_comment_column = 30
+<
+By default any code after a line that ends with "<-" is indented. Emacs/ESS
+does not indent the code if it is a top level function. If you prefer that the
+Vim-R-plugin behaves like Emacs/ESS in this regard, put in your |vimrc|:
+>
+   let r_indent_ess_compatible = 1
+<
+Below is an example of indentation with and without this option enabled:
+>
+   ### r_indent_ess_compatible = 1           ### r_indent_ess_compatible = 0
+   foo <-                                    foo <-
+       function(x)                               function(x)
+   {                                             {
+       paste(x)                                      paste(x)
+   }                                             }
+<
+Notes: (1) Not all code indented by Emacs/ESS will be indented by the
+	   Vim-R-plugin in the same way, and, in some circumstances it may be
+	   necessary to make changes in the code to get it properly indented
+	   by Vim (you may have to either put or remove braces and line
+	   breaks).
+       (2) Indenting is not a file type plugin option. It is a feature defined
+           in indent/r.vim. That is why it is documented in this section.
+
+
+10.9. Fold setup~
 
 Vim has several methods of folding text (see |fold-methods| and
 |fold-commands|). To enable the syntax method of folding for R files, put in
@@ -1296,7 +1363,7 @@ Notes: (1) Enabling folding may slow down Vim. (2) Folding is not a file type
 plugin option. It is a feature defined in syntax/r.vim.
 
 
-10.9. Automatically comment/uncomment code~
+10.10. Automatically comment/uncomment code~
 
 There are several plugins that make it easy to comment and uncomment code
 (respectively, put and remove the '#' symbol from the begin of lines). One of
@@ -1306,7 +1373,7 @@ a block of lines with the command <Leader>x:
    http://www.vim.org/scripts/script.php?script_id=23
 
 
-10.9. Run your Makefile from within R~
+10.11. Run your Makefile from within R~
 
 Do you have many Rnoweb files included in a master tex or Rnoweb file and use
 a Makefile to build the pdf? You may consider it useful to put the following
@@ -1315,7 +1382,7 @@ line in your |vimrc|:
    nmap <LocalLeader>sm :update<CR>:call SendCmdToR('system("make")')<CR>
 <
 
-10.10. Group windows with compiz~
+10.12. Group windows with compiz~
 
 If you are using Compiz, it may be easier to work with the plugin if the
 various related windows (editor, terminal, and graphics window) are grouped
@@ -1324,7 +1391,7 @@ may need CompizConfig Settings Manager installed to enable this feature (look
 at the "Window Management" section for "Group and Tab Windows").
 
 
-10.11. Why do I have to updated the Object Browser manually?~
+10.13. Why do I have to updated the Object Browser manually?~
 
 It is because Vim and R run as separate processes and, thus, it is not
 possible to Vim to know whether R is busy or not. If R was running as part of
@@ -1336,7 +1403,7 @@ Vim-R-plugin did this, the use of Vim would be blocked until R finished its
 processing. 
 
 
-10.12. Edit your ~/.Rprofile~
+10.14. Edit your ~/.Rprofile~
 
 You may want to edit your ~/.Rprofile. Two common options are the use of GVim
 as the text editor and the use of html help. Example for Linux:
@@ -1358,13 +1425,14 @@ and for Windows:
    }
 <
 
-10.12. Debugging R functions~
+10.15. Debugging R functions~
 
 The Vim-R-Plugin does not have debugging facilities, but you may want to use
 the R package "debug":
 >
    install.packages("debug")
    library(debug)
+   mtrace(function)
 <
 Once the library is installed and loaded, you should use mtrace(function_name)
 to enable debugging a function. Then, the next time that the function is
@@ -1376,6 +1444,15 @@ and qqq() to quit the function (See debug's help for details).
 ==============================================================================
 11. News~
 							       *r-plugin-news*
+
+110203 (2011-02-03)
+ * Fixed bug in  :RUpdateObjList  when the function arguments included S4
+   objects (thanks to Gerhard Schoefl for reporting the bug).
+ * Improvements in indentation of R code (thanks to Dan Kelley for finding and
+   reporting indentation bugs and testing many versions of indent/r.vim).
+ * New indentation options: r_indent_align_args, r_indent_ess_comments,
+   r_indent_comment_column, and r_indent_ess_compatible.
+ * New file: indent/rhelp.vim.
 
 110117 (2011-01-17)
  * Fixed indentation bug in Rnoweb files (thanks to Dan Kelley for reporting

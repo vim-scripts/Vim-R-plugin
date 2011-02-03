@@ -73,6 +73,7 @@ FILES:
    ftplugin/r.vim
    ftplugin/rbrowser.vim
    indent/r.vim
+   indent/rhelp.vim
    indent/rnoweb.vim
    r-plugin/build_omniList.R
    r-plugin/common_buffer.vim
