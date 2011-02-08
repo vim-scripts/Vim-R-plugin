@@ -3,7 +3,7 @@
 " Maintainer:	      Jakson Aquino <jalvesaq@gmail.com>
 " Former Maintainers: Vaidotas Zemlys <zemlys@gmail.com>
 " 		      Tom Payne <tom@tompayne.org>
-" Last Change:	      Tue Feb 01, 2011  05:08PM
+" Last Change:	      Sun Feb 06, 2011  06:59PM
 " Filenames:	      *.R *.r *.Rhistory *.Rt
 " 
 " NOTE: The highlighting of R functions is defined in the
@@ -37,7 +37,9 @@ syn region rString contains=rSpecial,rStrError,@Spell start=/"/ skip=/\\\\\|\\"/
 " string enclosed in single quotes
 syn region rString contains=rSpecial,rStrError,@Spell start=/'/ skip=/\\\\\|\\'/ end=/'/
 
-syn match rStrError display contained "\\."
+if &filetype != "rhelp"
+  syn match rStrError display contained "\\."
+endif
 
 " New line, carriage return, tab, backspace, bell, feed, vertical tab, backslash
 syn match rSpecial display contained "\\\(n\|r\|t\|b\|a\|f\|v\|'\|\"\)\|\\\\"

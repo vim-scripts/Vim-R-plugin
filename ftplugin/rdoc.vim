@@ -19,14 +19,14 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Sun Nov 14, 2010  03:53PM
+" Last Change: Sat Feb 05, 2011  08:08AM
 "
 " Please see doc/r-plugin.txt for usage details.
 "==========================================================================
 
 " Only do this when not yet done for this buffer
 if exists("b:did_rdoc_ftplugin") || exists("disable_r_ftplugin")
-  finish
+    finish
 endif
 
 " Don't load another plugin for this buffer

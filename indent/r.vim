@@ -2,7 +2,7 @@
 " Language:	R
 " Author:	Jakson Alves de Aquino <jalvesaq@gmail.com>
 " URL:		http://www.vim.org/scripts/script.php?script_id=2628
-" Last Change:	Thu Feb 03, 2011  08:35PM
+" Last Change:	Tue Feb 08, 2011  10:03AM
 
 
 " Only load this indent file when no other was loaded.
@@ -279,7 +279,7 @@ function GetRIndent()
     endif
 
     " line is an incomplete command:
-    if line =~ '\<\(if\|while\|for\|function\)\s*()$' || line =~ '\<else$' || line =~ '<-$' || line =~ '^\s*else\s*if\s*()'
+    if line =~ '\<\(if\|while\|for\|function\)\s*()$' || line =~ '\<else$' || line =~ '<-$'
         return indent(lnum) + &sw
     endif
 
@@ -370,7 +370,7 @@ function GetRIndent()
         endif
         if post_block == 0
             let newl = SanitizeRLine(line)
-            if newl =~ '\<\(if\|while\|for\|function\)\s*()$' || newl =~ '\<else$' || newl =~ '<-$' || newl =~ '^\s*else\s*if\s*()'
+            if newl =~ '\<\(if\|while\|for\|function\)\s*()$' || newl =~ '\<else$' || newl =~ '<-$'
                 return indent(lnum) + &sw
             endif
         endif
@@ -417,6 +417,23 @@ function GetRIndent()
             let ppost_else = 1
             let plnum = s:Get_matching_if(plnum, 0)
             let pline = SanitizeRLine(getline(plnum))
+        endif
+
+        if pline =~ '^\s*else\s*if\s*('
+            let pplnum = s:Get_prev_line(plnum)
+            let ppline = SanitizeRLine(getline(pplnum))
+            while ppline =~ '^\s*else\s*if\s*(' || ppline =~ '^\s*if\s*()\s*\S$'
+                let plnum = pplnum
+                let pline = ppline
+                let pplnum = s:Get_prev_line(plnum)
+                let ppline = SanitizeRLine(getline(pplnum))
+            endwhile
+            while ppline =~ '\<\(if\|while\|for\|function\)\s*()$' || ppline =~ '\<else$' || ppline =~ '<-$'
+                let plnum = pplnum
+                let pline = ppline
+                let pplnum = s:Get_prev_line(plnum)
+                let ppline = SanitizeRLine(getline(pplnum))
+            endwhile
         endif
 
         let ppb = s:Get_paren_balance(pline, '(', ')')

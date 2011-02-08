@@ -2,7 +2,7 @@
 " Language:	Rnoweb
 " Author:	Jakson Alves de Aquino <jalvesaq@gmail.com>
 " URL:		http://www.vim.org/scripts/script.php?script_id=2628
-" Last Change:	Tue Jan 25, 2011  07:26AM
+" Last Change:	Fri Feb 04, 2011  05:10PM
 
 
 " Only load this indent file when no other was loaded.
@@ -24,12 +24,13 @@ if exists("*GetRnowebIndent")
 endif
 
 function GetRnowebIndent()
-  if getline(".") =~ "^<<.*>>=$"
-    return 0
-  endif
-  if search("^<<", "bncW") > search("^@", "bncW")
-    return GetRIndent()
-  else
-    return GetTeXIndent2()
+    if getline(".") =~ "^<<.*>>=$"
+	return 0
+    endif
+    if search("^<<", "bncW") > search("^@", "bncW")
+	return GetRIndent()
+    else
+	return GetTeXIndent2()
+    endif
 endfunction
 

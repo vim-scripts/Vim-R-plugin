@@ -2,7 +2,7 @@
 " Language:	R Documentation (Help), *.Rd
 " Author:	Jakson Alves de Aquino <jalvesaq@gmail.com>
 " URL:		http://www.vim.org/scripts/script.php?script_id=2628
-" Last Change:	Tue Feb 01, 2011  11:26PM
+" Last Change:	Sun Feb 06, 2011  04:22PM
 
 
 " Only load this indent file when no other was loaded.
@@ -100,7 +100,6 @@ function GetRHelpIndent()
 endfunction
 
 function GetCorrectRHelpIndent()
-
     let lastsection = search('^\\[a-z]*{', "bncW")
     let secname = getline(lastsection)
     if secname =~ '^\\usage{' || secname =~ '^\\examples{' || secname =~ '^\\dontshow{' || secname =~ '^\\dontrun{' || secname =~ '^\\donttest{' || secname =~ '^\\testonly{' || secname =~ '^\\method{.*}{.*}('

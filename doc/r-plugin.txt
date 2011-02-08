@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria
 
-Version: 110203
+Version: 110208
 For Vim version 7.3
 
  1. Overview                                    |r-plugin-overview|
@@ -210,9 +210,8 @@ on the toolbar:
 install additional plugins~
 
 You may be interested in installing additional general plugins to get
-functionality not provided by this file type plugin. ShowMarks, snipMate, and
-EnhancedCommentify are particularly interesting. Please read |r-plugin-tips|
-for details.
+functionality not provided by this file type plugin. ShowMarks and snipMate
+are particularly interesting. Please read |r-plugin-tips| for details.
 
 
 ==============================================================================
@@ -274,9 +273,9 @@ Control
   . Clear console                                      \rr
   . Clear all                                          \rm
   --------------------------------------------------------
-  . Object (print)                                     \rp
-  . Object (names)                                     \rn
-  . Object (str)                                       \rt
+  . Print (cur)                                        \rp
+  . Names (cur)                                        \rn
+  . Structure (cur)                                    \rt
   --------------------------------------------------------
   . Arguments (cur)                                    \ra
   . Example (cur)                                      \re
@@ -294,8 +293,15 @@ Control
   --------------------------------------------------------
   . Sweave (cur file)                                  \sw
   . Sweave and PDF (cur file)                          \sp
-  . Go to next R chunk                                  gn
-  . Go to previous R chunk                              gN
+
+Edit
+  . Indent (line)                                       ==
+  . Indent (selected lines)                              =
+  . Indent (whole buffer)                             gg=G
+  . Comment/Uncomment (line, sel)                      \cc
+  . Add/Align right comment (line, sel)                 \;
+  . Go (next R chunk)                                   gn
+  . Go (previous R chunk)                               gN
   --------------------------------------------------------
 
 Please see |r-plugin-key-bindings| to learn how to customize the key bindings
@@ -400,7 +406,24 @@ classify the objects:
 	 Function	is.function()
 
 
-4.5. Build a tags file to jump to function definitions~
+4.5. Commenting and uncommenting lines~
+
+You can toogle the state of a line as either commented or uncommented by
+typing <LocalLeader>cc.
+
+You can also add comments to the right of a line with the <LocalLeader>;
+shortcut. By default, the comment starts at the 40th column, which can be
+changed by setting the valude of r_indent_comment_column, as below:
+>
+   let r_indent_comment_column = 20
+<
+If the line is longer than 38 characters, the comment will start two columns
+after the last character in the line. If you are running <LocalLeader>; over a
+selection of lines, the comments will be aligned according to the longest
+line.
+
+
+4.6. Build a tags file to jump to function definitions~
 								 *:RBuildTags*
 Vim can jump to functions defined in other files if you press CTRL-] over the
 name of a function, but it needs a tags file to be able to find the function
@@ -570,6 +593,7 @@ indentation by adding braces and line breaks to it. Example:
 |vimrplugin_buildwait|		Time to wait for :RUpdateObjList to finish
 |vimrplugin_routmorecolors|	More syntax highlighting in R output
 |vimrplugin_routnotab|		Show output of R CMD BATCH in new window
+|vimrplugin_indent_commented|	Indent lines commented with the \cc command
 |vimrplugin_sleeptime|		Delay while sending commands in MS Windows
 |vimrplugin_noscreenrc|		Do not write custom screenrc
 |vimrplugin_screenplugin|	Use the screen plugin
@@ -823,7 +847,27 @@ a new split window, put in your |vimrc|:
    let vimrplugin_routnotab = 1
 <
 
-7.12. Sleep time (Windows only)~
+7.12. Indent commented lines~
+						 *vimrplugin_indent_commented*
+You can type \cc (where "\" is the <LocalLeader>) to comment out a line or
+selected lines. If the line alredy starts with a comment string, it will be
+removed. After adding the comment string, the line will be reindented by
+default. To turn off the automatic indentation, put in your |vimrc|:
+>
+   let vimrplugin_indent_commented = 0
+<
+What string wil be added to the beginning of the line depends on the values of
+vimrplugin_indent_commented and r_indent_ess_comments (see section 10.8 of
+this document), according to the table below:
+>
+   vimrplugin_indent_commented   r_indent_ess_comments   string
+                 1                        0                #
+		 0                        1                #
+		 1                        1                ##
+		 0                        0                ###
+
+
+7.13. Sleep time (Windows only)~
 							*vimrplugin_sleeptime*
 The plugin gives to R a small amount of time to process the paste command when
 not using the Conque Shell plugin. The default value is 0.2 second, but you
@@ -833,7 +877,7 @@ of sleeptime in your |vimrc|:
    let vimrplugin_sleeptime = 0.1
 <
 
-7.13. Screen configuration (Linux/Unix only)~
+7.14. Screen configuration (Linux/Unix only)~
 						       *vimrplugin_noscreenrc*
 Vim runs screen with a special configuration file. If you want to use
 your own ~/.screenrc, put in your |vimrc|:
@@ -841,7 +885,7 @@ your own ~/.screenrc, put in your |vimrc|:
    let vimrplugin_noscreenrc = 1
 <
 
-7.14. Integration with screen.vim (Linux/Unix only)~
+7.15. Integration with screen.vim (Linux/Unix only)~
 						     *vimrplugin_screenplugin*
 						     *vimrplugin_screenvsplit*
 By default, Vim-R-plugin will use the screen.vim plugin if it is installed
@@ -919,7 +963,7 @@ may consider as a starting point to create your own:
    term screen-256color
 <
 
-7.15. Integration with Conque Shell plugin~
+7.16. Integration with Conque Shell plugin~
 						     *vimrplugin_conqueplugin*
 						     *vimrplugin_conquevsplit*
 						      *vimrplugin_conquesleep*
@@ -986,7 +1030,7 @@ Note: The use of |ConqueTerm_ReadUnfocused| will set the value of 'updatetime'
 to 1000 milliseconds.
 
 
-7.16. Integration with Apple Script (OS X only)~
+7.17. Integration with Apple Script (OS X only)~
 							*vimrplugin_applescript*
 In Mac OS X, the plugin will try to send commands to R gui using Apple Script
 if the Screen plugin and the Conque Shell plugin are not installed. If you
@@ -996,7 +1040,7 @@ prefer to have R running in an external terminal emulator, put in your
    let vimrplugin_applescript = 0
 <
 
-7.17. Special R functions~
+7.18. Special R functions~
 						      *vimrplugin_listmethods*
 						      *vimrplugin_specialplot*
 The R function args() list the arguments of a function, but not the arguments
@@ -1012,7 +1056,7 @@ after <LocalLeader>rg if you put the following line in your |vimrc|:
    let vimrplugin_specialplot = 1
 <
 
-7.18. maxdeparse~
+7.19. maxdeparse~
 						       *vimrplugin_maxdeparse*
 You can set the argument maxdeparse to be passed to R's source() function.
 Example:
@@ -1020,7 +1064,7 @@ Example:
    let vimrplugin_maxdeparse = 300
 <
 
-7.19. LaTeX command~
+7.20. LaTeX command~
 							 *vimrplugin_latexcmd*
 By default, Vim calls pdflatex to produce a pdf document from the .tex file
 produced by the R Sweave command. You can use the option vimrplugin_latexcmd
@@ -1029,7 +1073,7 @@ to change this behavior. Example:
    let vimrplugin_latexcmd = "latex"
 <
 
-7.20. Never unmake the R menu and tool bar buttons~
+7.21. Never unmake the R menu and tool bar buttons~
 						*vimrplugin_never_unmake_menu*
 Use this option if you want that the menu item R and the R related tool bar
 buttons are not deleted when you change from one buffer to another, for
@@ -1041,7 +1085,7 @@ When this options is enabled all menu items are created regardless of the file
 type.
 
 
-7.21. Map 'r'~
+7.22. Map 'r'~
 							    *vimrplugin_map_r*
 Some users may already be familiar with the key bindings from earlier releases
 of the Vim-R-plugin. If the variable |vimrplugin_map_r| exists, the plugin
@@ -1082,6 +1126,7 @@ Only the custom key bindings for Normal mode are shown in Vim's menu, but you
 can type |:map| to see the complete list of current mappings, and below is the
 list of the names for custom key bindings:
 >
+   RCommentLine               RESendFunction              RSendLAndOpenNewOne
    RClearAll                  RESendMBlock                RSendLine
    RClearConsole              RESendParagraph             RSendMBlock
    RClose                     RESendSelection             RSendParagraph
@@ -1096,7 +1141,6 @@ list of the names for custom key bindings:
    REDSendParagraph           RSaveClose                  RUpdateObjBrowser
    REDSendSelection           RSendFile                   RVanillaStart
    RESendFile                 RSendFunction
-   RESendFunction             RSendLAndOpenNewOne
 <
 The plugin also contains a function called RAction which allows you to build
 ad-hoc commands to R. This function takes the name of an R function such as
@@ -1115,8 +1159,8 @@ the levels command.
 >
    map <LocalLeader>rk :call RAction("levels")<CR>
 <
-then (assuming that the leader key is "\") if you type \rk R will receive the
-command
+then (assuming that the local leader key is "\") if you type \rk R will
+receive the command
 >
    levels(myObject)
 <
@@ -1299,7 +1343,8 @@ Example on how to test whether your setup is ok:
 10.8. Indenting setup~
 
 Note: In Normal mode, type |==| to indent the current line and gg=G to format
-the entire buffer.
+the entire buffer (see |gg|, |=| and |G| for details). These are Vim commands;
+they are not specific to R code.
 
 The Vim-R-plugin includes a script to automatically indent R files. By
 default, the script aligns function arguments if they span for multiple lines.
@@ -1346,7 +1391,7 @@ Notes: (1) Not all code indented by Emacs/ESS will be indented by the
            in indent/r.vim. That is why it is documented in this section.
 
 
-10.9. Fold setup~
+10.9. Folding setup~
 
 Vim has several methods of folding text (see |fold-methods| and
 |fold-commands|). To enable the syntax method of folding for R files, put in
@@ -1363,17 +1408,25 @@ Notes: (1) Enabling folding may slow down Vim. (2) Folding is not a file type
 plugin option. It is a feature defined in syntax/r.vim.
 
 
-10.10. Automatically comment/uncomment code~
+10.10. Automatically close parenthesis~
 
-There are several plugins that make it easy to comment and uncomment code
-(respectively, put and remove the '#' symbol from the begin of lines). One of
-them is the EnhancedCommentify which allows us to comment/uncomment a line or
-a block of lines with the command <Leader>x:
+Some people want Vim automatically inserting a closing parenthesis, bracket or
+brace when an open one has being typed. The page below explains how to achieve
+this goal:
 
-   http://www.vim.org/scripts/script.php?script_id=23
+   http://vim.wikia.com/wiki/Automatically_append_closing_characters
 
 
-10.11. Run your Makefile from within R~
+10.11. Automatic line breaks~
+
+By default, Vim breaks lines when you are typing if you reach the column
+defined by the 'textwidth' option. If you prefer that Vim does not break the R
+code automatically, breaking only comment lines, put in your |vimrc|:
+>
+   autocmd FileType r setlocal formatoptions=cq
+<
+
+10.12. Run your Makefile from within R~
 
 Do you have many Rnoweb files included in a master tex or Rnoweb file and use
 a Makefile to build the pdf? You may consider it useful to put the following
@@ -1382,7 +1435,7 @@ line in your |vimrc|:
    nmap <LocalLeader>sm :update<CR>:call SendCmdToR('system("make")')<CR>
 <
 
-10.12. Group windows with compiz~
+10.13. Group windows with compiz~
 
 If you are using Compiz, it may be easier to work with the plugin if the
 various related windows (editor, terminal, and graphics window) are grouped
@@ -1391,7 +1444,7 @@ may need CompizConfig Settings Manager installed to enable this feature (look
 at the "Window Management" section for "Group and Tab Windows").
 
 
-10.13. Why do I have to updated the Object Browser manually?~
+10.14. Why do I have to updated the Object Browser manually?~
 
 It is because Vim and R run as separate processes and, thus, it is not
 possible to Vim to know whether R is busy or not. If R was running as part of
@@ -1403,7 +1456,7 @@ Vim-R-plugin did this, the use of Vim would be blocked until R finished its
 processing. 
 
 
-10.14. Edit your ~/.Rprofile~
+10.15. Edit your ~/.Rprofile~
 
 You may want to edit your ~/.Rprofile. Two common options are the use of GVim
 as the text editor and the use of html help. Example for Linux:
@@ -1425,7 +1478,7 @@ and for Windows:
    }
 <
 
-10.15. Debugging R functions~
+10.16. Debugging R functions~
 
 The Vim-R-Plugin does not have debugging facilities, but you may want to use
 the R package "debug":
@@ -1444,6 +1497,11 @@ and qqq() to quit the function (See debug's help for details).
 ==============================================================================
 11. News~
 							       *r-plugin-news*
+
+110208 (2011-02-08)
+ * Fixed bug in "else if" constructions (thanks to Dan Kelley for reporting
+   the bug).
+ * Support for commenting/uncommenting lines.
 
 110203 (2011-02-03)
  * Fixed bug in  :RUpdateObjList  when the function arguments included S4

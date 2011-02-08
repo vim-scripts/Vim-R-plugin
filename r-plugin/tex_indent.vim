@@ -4,7 +4,7 @@
 " Language:     LaTeX
 " Maintainer:   Johannes Tanzler <johannes.tanzler@aon.at>
 " Created:      Sat, 16 Feb 2002 16:50:19 +0100
-" Last Change:	Mon Jan 24, 2011  10:40PM
+" Last Change:	Sun Feb 06, 2011  04:55PM
 " Last Update:  18th feb 2002, by LH :
 "               (*) better support for the option
 "               (*) use some regex instead of several '||'.
@@ -123,6 +123,16 @@ function GetTeXIndent2()
   let ind = indent(lnum)
   let line = getline(lnum)             " last line
   let cline = getline(v:lnum)          " current line
+
+  " Ignore comments
+  if cline =~ '^\s*%'
+      return ind
+  endif
+  while lnum > 0 && (line =~ '^\s*%' || line =~ '^\s*$')
+      let lnum -= 1
+      let line = getline(lnum)
+  endwhile
+
 
 
   " Add a 'shiftwidth' after beginning of environments.

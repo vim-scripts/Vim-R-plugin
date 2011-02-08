@@ -17,12 +17,12 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Sun Jan 16, 2011  03:47PM
+" Last Change: Sat Feb 05, 2011  08:08AM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
 if exists("b:did_rnoweb_ftplugin") || exists("disable_r_ftplugin")
-  finish
+    finish
 endif
 
 " Don't load another plugin for this buffer
@@ -31,7 +31,7 @@ let b:did_rnoweb_ftplugin = 1
 " Source scripts common to R, Rnoweb, Rhelp and rdoc files:
 runtime r-plugin/common_global.vim
 if exists("g:rplugin_failed")
-  finish
+    finish
 endif
 
 " Some buffer variables common to R, Rnoweb, Rhelp and rdoc file need be
@@ -40,90 +40,91 @@ runtime r-plugin/common_buffer.vim
 
 
 function! RWriteChunk()
-  if getline(".") =~ "^\\s*$" && RnwIsInRCode() == 0
-    call setline(line("."), "<<>>=")
-    exe "normal! o@"
-    exe "normal! 0kl"
-  else
-    exe "normal! a<"
-  endif
+    if getline(".") =~ "^\\s*$" && RnwIsInRCode() == 0
+        call setline(line("."), "<<>>=")
+        exe "normal! o@"
+        exe "normal! 0kl"
+    else
+        exe "normal! a<"
+    endif
 endfunction
 
 function! RnwIsInRCode()
-  let chunkline = search("^<<", "bncW")
-  let docline = search("^@", "bncW")
-  if chunkline > docline
-    return 1
-  else
-    return 0
-  endif
+    let chunkline = search("^<<", "bncW")
+    let docline = search("^@", "bncW")
+    if chunkline > docline
+        return 1
+    else
+        return 0
+    endif
 endfunction
 
 function! RnwPreviousChunk()
-  echon
-  let curline = line(".")
-  if RnwIsInRCode()
-    let i = search("^<<.*$", "bnW")
-    if i != 0
-      call cursor(i-1, 1)
+    echon
+    let curline = line(".")
+    if RnwIsInRCode()
+        let i = search("^<<.*$", "bnW")
+        if i != 0
+            call cursor(i-1, 1)
+        endif
     endif
-  endif
 
-  let i = search("^<<.*$", "bnW")
-  if i == 0
-    call cursor(curline, 1)
-    call RWarningMsg("There is no previous R code chunk to go.")
-  else
-    call cursor(i+1, 1)
-  endif
-  return
+    let i = search("^<<.*$", "bnW")
+    if i == 0
+        call cursor(curline, 1)
+        call RWarningMsg("There is no previous R code chunk to go.")
+    else
+        call cursor(i+1, 1)
+    endif
+    return
 endfunction
 
 function! RnwNextChunk()
-  echon
-  let i = search("^<<.*$", "nW")
-  if i == 0
-    call RWarningMsg("There is no next R code chunk to go.")
-  else
-    call cursor(i+1, 1)
-  endif
-  return
+    echon
+    let i = search("^<<.*$", "nW")
+    if i == 0
+        call RWarningMsg("There is no next R code chunk to go.")
+    else
+        call cursor(i+1, 1)
+    endif
+    return
 endfunction
 
 " Sweave and compile the current buffer content
 function! RMakePDF()
-  update
-  call RSetWD()
-  if exists("g:vimrplugin_sweaveargs")
-    let pdfcmd = ".Sresult <- Sweave('" . expand("%:t") . "', " . g:vimrplugin_sweaveargs . ");"
-  else
-    let pdfcmd = ".Sresult <- Sweave('" . expand("%:t") . "');"
-  endif
-  let pdfcmd =  pdfcmd . " if(exists('.Sresult')){system(paste('" . g:vimrplugin_latexcmd . "', .Sresult)); rm(.Sresult)}"
-  let ok = SendCmdToR(pdfcmd)
-  if ok == 0
-    return
-  endif
-  echon
+    update
+    call RSetWD()
+    if exists("g:vimrplugin_sweaveargs")
+        let pdfcmd = ".Sresult <- Sweave('" . expand("%:t") . "', " . g:vimrplugin_sweaveargs . ");"
+    else
+        let pdfcmd = ".Sresult <- Sweave('" . expand("%:t") . "');"
+    endif
+    let pdfcmd =  pdfcmd . " if(exists('.Sresult')){system(paste('" . g:vimrplugin_latexcmd . "', .Sresult)); rm(.Sresult)}"
+    let ok = SendCmdToR(pdfcmd)
+    if ok == 0
+        return
+    endif
+    echon
 endfunction  
 
 " Sweave the current buffer content
 function! RSweave()
-  update
-  call RSetWD()
-  call SendCmdToR('Sweave("' . expand("%:t") . '")')
-  echon
+    update
+    call RSetWD()
+    call SendCmdToR('Sweave("' . expand("%:t") . '")')
+    echon
 endfunction
 
 if g:vimrplugin_rnowebchunk == 1
-  " Write code chunck in rnoweb files
-  imap <buffer> < <Esc>:call RWriteChunk()<CR>a
+    " Write code chunck in rnoweb files
+    imap <buffer> < <Esc>:call RWriteChunk()<CR>a
 endif
 
 "==========================================================================
 " Key bindings and menu items
 
 call RCreateStartMaps()
+call RCreateEditMaps()
 call RCreateSendMaps()
 call RControlMaps()
 call RCreateMaps("nvi", '<Plug>RSetwd',        'rd', ':call RSetWD()')

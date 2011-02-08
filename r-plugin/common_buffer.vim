@@ -19,7 +19,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Mon Nov 15, 2010  06:02AM
+" Last Change: Mon Feb 07, 2011  08:07PM
 "
 " Please see doc/r-plugin.txt for usage details.
 "==========================================================================
@@ -98,17 +98,12 @@ if g:vimrplugin_by_vim_instance == 1
   unlet s:sname
 endif
 
-" Replace 'underline' with '<-'
-if g:vimrplugin_underscore == 1
-  imap <buffer> _ <Esc>:call ReplaceUnderS()<CR>a
-endif
-
 let s:thisbuffname = substitute(bufname("%"), '\.', '', "g")
 let s:thisbuffname = substitute(s:thisbuffname, ' ', '', "g")
 exe "augroup " . s:thisbuffname
   au FileType <buffer> call MakeRMenu()
   au BufEnter <buffer> call RBufEnter()
-  au BufLeave <buffer> call RBufLeave()
+  au BufLeave <buffer> call UnMakeRMenu()
 exe "augroup END"
 unlet s:thisbuffname
 
