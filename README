@@ -12,7 +12,9 @@ MAIN FEATURES:
       - Special highlighting for R output (.Rout files).
       - Spell check only strings and comments.
       - Fold code when foldmethod=syntax.
+  * Syntax highlighting for RHelp syntax.
   * Smart indentation for R syntax.
+  * Smart indentation for RHelp syntax.
   * Integrated communication with R:
       - Start/Close R.
       - Send lines, selection, paragraphs, functions, blocks, entire file.
@@ -85,12 +87,12 @@ FILES:
    r-plugin/vimhelp.R
    r-plugin/r.snippets
    r-plugin/rpager.sh
-   r-plugin/rsyntax.vim
    r-plugin/specialfuns.R
    r-plugin/tex_indent.vim
    r-plugin/vimActivate.js
    r-plugin/windows.py
    syntax/rbrowser.vim
+   syntax/rhelp.vim
    syntax/rout.vim
    syntax/r.vim
 

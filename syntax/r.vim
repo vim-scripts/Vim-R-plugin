@@ -3,7 +3,7 @@
 " Maintainer:	      Jakson Aquino <jalvesaq@gmail.com>
 " Former Maintainers: Vaidotas Zemlys <zemlys@gmail.com>
 " 		      Tom Payne <tom@tompayne.org>
-" Last Change:	      Sun Feb 06, 2011  06:59PM
+" Last Change:	      Sun Feb 20, 2011  12:06PM
 " Filenames:	      *.R *.r *.Rhistory *.Rt
 " 
 " NOTE: The highlighting of R functions is defined in the
@@ -32,14 +32,20 @@ syn case match
 " Comment
 syn match rComment contains=@Spell "\#.*"
 
-" string enclosed in double quotes
-syn region rString contains=rSpecial,rStrError,@Spell start=/"/ skip=/\\\\\|\\"/ end=/"/
-" string enclosed in single quotes
-syn region rString contains=rSpecial,rStrError,@Spell start=/'/ skip=/\\\\\|\\'/ end=/'/
-
-if &filetype != "rhelp"
-  syn match rStrError display contained "\\."
+if &filetype == "rhelp"
+  " string enclosed in double quotes
+  syn region rString contains=rSpecial,@Spell start=/"/ skip=/\\\\\|\\"/ end=/"/
+  " string enclosed in single quotes
+  syn region rString contains=rSpecial,@Spell start=/'/ skip=/\\\\\|\\'/ end=/'/
+else
+  " string enclosed in double quotes
+  syn region rString contains=rSpecial,rStrError,@Spell start=/"/ skip=/\\\\\|\\"/ end=/"/
+  " string enclosed in single quotes
+  syn region rString contains=rSpecial,rStrError,@Spell start=/'/ skip=/\\\\\|\\'/ end=/'/
 endif
+
+syn match rStrError display contained "\\."
+
 
 " New line, carriage return, tab, backspace, bell, feed, vertical tab, backslash
 syn match rSpecial display contained "\\\(n\|r\|t\|b\|a\|f\|v\|'\|\"\)\|\\\\"
@@ -64,11 +70,49 @@ syn keyword rConstant R.version.string
 
 syn keyword rNumber   NA_integer_ NA_real_ NA_complex_ NA_character_ 
 
-" Common elements to both r and rout file types
-runtime r-plugin/rsyntax.vim
+" Constants
+syn keyword rConstant NULL
+syn keyword rBoolean  FALSE TRUE
+syn keyword rNumber   NA Inf NaN 
 
-syn match rOperator    "[\*\!\&\+\-\<\>\=\^\|\~\`/:@]"
+" integer
+syn match rInteger "\<\d\+L"
+syn match rInteger "\<0x\([0-9]\|[a-f]\|[A-F]\)\+L"
+syn match rInteger "\<\d\+[Ee]+\=\d\+L"
+
+" number with no fractional part or exponent
+syn match rNumber "\<\d\+\>"
+" hexadecimal number 
+syn match rNumber "\<0x\([0-9]\|[a-f]\|[A-F]\)\+"
+
+" floating point number with integer and fractional parts and optional exponent
+syn match rFloat "\<\d\+\.\d*\([Ee][-+]\=\d\+\)\="
+" floating point number with no integer part and optional exponent
+syn match rFloat "\<\.\d\+\([Ee][-+]\=\d\+\)\="
+" floating point number with no fractional part and optional exponent
+syn match rFloat "\<\d\+[Ee][-+]\=\d\+"
+
+" complex number
+syn match rComplex "\<\d\+i"
+syn match rComplex "\<\d\++\d\+i"
+syn match rComplex "\<0x\([0-9]\|[a-f]\|[A-F]\)\+i"
+syn match rComplex "\<\d\+\.\d*\([Ee][-+]\=\d\+\)\=i"
+syn match rComplex "\<\.\d\+\([Ee][-+]\=\d\+\)\=i"
+syn match rComplex "\<\d\+[Ee][-+]\=\d\+i"
+
+syn match rOperator    "&"
+syn match rOperator    '-'
+syn match rOperator    '*'
+syn match rOperator    '+'
+syn match rOperator    '='
+syn match rOperator    "[|!<>^~`/:@]"
 syn match rOperator    "%\{2}\|%\*%\|%\/%\|%in%\|%o%\|%x%"
+syn match rOpError  '*\{3}'
+syn match rOpError  '//'
+syn match rOpError  '&&&'
+syn match rOpError  '|||'
+syn match rOpError  '<<'
+syn match rOpError  '>>'
 
 syn match rArrow "<\{1,2}-"
 syn match rArrow "->\{1,2}"
@@ -115,6 +159,12 @@ syn keyword rType array category character complex double function integer list 
 " Name of object with spaces
 syn region rNameWSpace start="`" end="`"
 
+if &filetype == "rhelp"
+  syn match rhPreProc "^#ifdef.*" 
+  syn match rhPreProc "^#endif.*" 
+  syn match rhSection "\\dontrun\>"
+endif
+
 " Define the default highlighting.
 hi def link rArrow       Statement	
 hi def link rBoolean     Boolean
@@ -130,11 +180,14 @@ hi def link rError       Error
 hi def link rFloat       Float
 hi def link rFunction    Function
 hi def link rHelpIdent   Identifier
+hi def link rhPreProc    PreProc
+hi def link rhSection    PreCondit
 hi def link rInteger     Number
 hi def link rLstElmt	 Normal
 hi def link rNameWSpace  Normal
 hi def link rNumber      Number
 hi def link rOperator    Operator
+hi def link rOpError     Error
 hi def link rParenError  Error
 hi def link rPreProc     PreProc
 hi def link rRepeat      Repeat

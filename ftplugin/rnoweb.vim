@@ -17,7 +17,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Sat Feb 05, 2011  08:08AM
+" Last Change: Thu Feb 17, 2011  11:02PM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -38,6 +38,7 @@ endif
 " defined after the global ones:
 runtime r-plugin/common_buffer.vim
 
+setlocal iskeyword=@,48-57,_,.
 
 function! RWriteChunk()
     if getline(".") =~ "^\\s*$" && RnwIsInRCode() == 0
@@ -91,15 +92,24 @@ function! RnwNextChunk()
 endfunction
 
 " Sweave and compile the current buffer content
-function! RMakePDF()
+function! RMakePDF(bibtex)
     update
     call RSetWD()
-    if exists("g:vimrplugin_sweaveargs")
-        let pdfcmd = ".Sresult <- Sweave('" . expand("%:t") . "', " . g:vimrplugin_sweaveargs . ");"
-    else
-        let pdfcmd = ".Sresult <- Sweave('" . expand("%:t") . "');"
+    let pdfcmd = "source('" . g:rplugin_home . "/r-plugin/vimSweave.R') ; .vim.Sweave('" . expand("%:t") . "'"
+
+    if g:vimrplugin_latexcmd != "pdflatex"
+        let pdfcmd = pdfcmd . ", latexcmd = '" . g:vimrplugin_latexcmd . "'"
     endif
-    let pdfcmd =  pdfcmd . " if(exists('.Sresult')){system(paste('" . g:vimrplugin_latexcmd . "', .Sresult)); rm(.Sresult)}"
+
+    if a:bibtex == "bibtex"
+        let pdfcmd = pdfcmd . ", bibtex = TRUE"
+    endif
+
+    if exists("g:vimrplugin_sweaveargs")
+        let pdfcmd = pdfcmd . ", " . g:vimrplugin_sweaveargs
+    endif
+
+    let pdfcmd = pdfcmd . ")"
     let ok = SendCmdToR(pdfcmd)
     if ok == 0
         return
@@ -131,7 +141,8 @@ call RCreateMaps("nvi", '<Plug>RSetwd',        'rd', ':call RSetWD()')
 
 " Only .Rnw files use these functions:
 call RCreateMaps("nvi", '<Plug>RSweave',      'sw', ':call RSweave()')
-call RCreateMaps("nvi", '<Plug>RMakePDF',     'sp', ':call RMakePDF()')
+call RCreateMaps("nvi", '<Plug>RMakePDF',     'sp', ':call RMakePDF("nobib")')
+call RCreateMaps("nvi", '<Plug>RBibTeX',      'sb', ':call RMakePDF("bibtex")')
 call RCreateMaps("nvi", '<Plug>RIndent',      'si', ':call RnwToggleIndentSty()')
 nmap <buffer> gn :call RnwNextChunk()<CR>
 nmap <buffer> gN :call RnwPreviousChunk()<CR>

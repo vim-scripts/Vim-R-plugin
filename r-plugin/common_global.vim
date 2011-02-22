@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Tue Feb 08, 2011  09:32AM
+" Last Change: Tue Feb 22, 2011  07:59PM
 "
 " Purposes of this file: Create all functions and commands and Set the
 " value of all global variables  and some buffer variables.for r,
@@ -65,17 +65,20 @@ function ReplaceUnderS()
             return
         endif
         let isString = 0
-        let i = 0
-        while i < j
-            if s[i] == '"'
-                if isString == 0
-                    let isString = 1
-                else
-                    let isString = 0
+        let synName = synIDattr(synID(line("."), j, 1), "name")
+        if synName == "rSpecial"
+            let isString = 1
+        else
+            if synName == "rString"
+                let isString = 1
+                if s[j-1] == '"' || s[j-1] == "'"
+                    let synName = synIDattr(synID(line("."), j-2, 1), "name")
+                    if synName == "rString" || synName == "rSpecial"
+                        let isString = 0
+                    endif
                 endif
             endif
-            let i += 1
-        endwhile
+        endif
     endif
     if isString
         exe "normal! a_"
@@ -575,6 +578,7 @@ function RObjBrowser()
     if exists("b:libdict")
         unlet b:libdict
     endif
+    call RBrowserFillCloseList()
     call RBrowserFill(0)
     setlocal nomodified
     call cursor(curline, curcol)
@@ -1313,7 +1317,7 @@ endfunction
 function RAction(rcmd)
     echon
     if &filetype == "rbrowser"
-        let rkeyword = RBrowserGetName()
+        let rkeyword = RBrowserGetName(1)
     else
         let rkeyword = RGetKeyWord()
     endif
@@ -1447,28 +1451,35 @@ function RCreateMenuItem(type, label, plug, combo, target)
     endif
 endfunction
 
+function RBrowserMenu()
+    call RCreateMenuItem("nvi", 'Object\ browser.Show/Update', '<Plug>RUpdateObjBrowser', 'ro', ':call RObjBrowser()')
+    call RCreateMenuItem("nvi", 'Object\ browser.Expand\ (all\ lists)', '<Plug>ROpenLists', 'r=', ':call RBrowserOpenCloseLists(1)')
+    call RCreateMenuItem("nvi", 'Object\ browser.Collapse\ (all\ lists)', '<Plug>RCloseLists', 'r-', ':call RBrowserOpenCloseLists(0)')
+    if &filetype == "rbrowser"
+        imenu R.Object\ browser.Toggle\ (cur)<Tab>Enter <Esc>:call RBrowserDoubleClick()<CR>
+        nmenu R.Object\ browser.Toggle\ (cur)<Tab>Enter :call RBrowserDoubleClick()<CR>
+    endif
+endfunction
+
 function RControlMenu()
-    call RCreateMenuItem("nvi", 'Control.List\ space', '<Plug>RListSpace', 'rl', ':call SendCmdToR("ls()")')
-    call RCreateMenuItem("nvi", 'Control.Clear\ console\ screen', '<Plug>RClearConsole', 'rr', ':call RClearConsole()')
-    call RCreateMenuItem("nvi", 'Control.Clear\ all', '<Plug>RClearAll', 'rm', ':call RClearAll()')
+    call RCreateMenuItem("nvi", 'Command.List\ space', '<Plug>RListSpace', 'rl', ':call SendCmdToR("ls()")')
+    call RCreateMenuItem("nvi", 'Command.Clear\ console\ screen', '<Plug>RClearConsole', 'rr', ':call RClearConsole()')
+    call RCreateMenuItem("nvi", 'Command.Clear\ all', '<Plug>RClearAll', 'rm', ':call RClearAll()')
     "-------------------------------
-    menu R.Control.-Sep1- <nul>
-    call RCreateMenuItem("nvi", 'Control.Print\ (cur)', '<Plug>RObjectPr', 'rp', ':call RAction("print")')
-    call RCreateMenuItem("nvi", 'Control.Names\ (cur)', '<Plug>RObjectNames', 'rn', ':call RAction("names")')
-    call RCreateMenuItem("nvi", 'Control.Structure\ (cur)', '<Plug>RObjectStr', 'rt', ':call RAction("str")')
+    menu R.Command.-Sep1- <nul>
+    call RCreateMenuItem("nvi", 'Command.Print\ (cur)', '<Plug>RObjectPr', 'rp', ':call RAction("print")')
+    call RCreateMenuItem("nvi", 'Command.Names\ (cur)', '<Plug>RObjectNames', 'rn', ':call RAction("names")')
+    call RCreateMenuItem("nvi", 'Command.Structure\ (cur)', '<Plug>RObjectStr', 'rt', ':call RAction("str")')
     "-------------------------------
-    menu R.Control.-Sep2- <nul>
-    call RCreateMenuItem("nvi", 'Control.Arguments\ (cur)', '<Plug>RShowArgs', 'ra', ':call RAction("args")')
-    call RCreateMenuItem("nvi", 'Control.Example\ (cur)', '<Plug>RShowEx', 're', ':call RAction("example")')
-    call RCreateMenuItem("nvi", 'Control.Help\ (cur)', '<Plug>RHelp', 'rh', ':call RAction("help")')
+    menu R.Command.-Sep2- <nul>
+    call RCreateMenuItem("nvi", 'Command.Arguments\ (cur)', '<Plug>RShowArgs', 'ra', ':call RAction("args")')
+    call RCreateMenuItem("nvi", 'Command.Example\ (cur)', '<Plug>RShowEx', 're', ':call RAction("example")')
+    call RCreateMenuItem("nvi", 'Command.Help\ (cur)', '<Plug>RHelp', 'rh', ':call RAction("help")')
     "-------------------------------
-    menu R.Control.-Sep3- <nul>
-    call RCreateMenuItem("nvi", 'Control.Summary\ (cur)', '<Plug>RSummary', 'rs', ':call RAction("summary")')
-    call RCreateMenuItem("nvi", 'Control.Plot\ (cur)', '<Plug>RPlot', 'rg', ':call RAction("plot")')
-    call RCreateMenuItem("nvi", 'Control.Plot\ and\ summary\ (cur)', '<Plug>RSPlot', 'rb', ':call RAction("plot")<CR>:call RAction("summary")')
-    "-------------------------------
-    menu R.Control.-Sep4- <nul>
-    call RCreateMenuItem("nvi", 'Control.Update\ Object\ Browser', '<Plug>RUpdateObjBrowser', 'ro', ':call RObjBrowser()')
+    menu R.Command.-Sep3- <nul>
+    call RCreateMenuItem("nvi", 'Command.Summary\ (cur)', '<Plug>RSummary', 'rs', ':call RAction("summary")')
+    call RCreateMenuItem("nvi", 'Command.Plot\ (cur)', '<Plug>RPlot', 'rg', ':call RAction("plot")')
+    call RCreateMenuItem("nvi", 'Command.Plot\ and\ summary\ (cur)', '<Plug>RSPlot', 'rb', ':call RAction("plot")<CR>:call RAction("summary")')
     let g:rplugin_hasmenu = 1
 endfunction
 
@@ -1499,7 +1510,9 @@ function RControlMaps()
 
     " Build list of objects for omni completion
     "-------------------------------------
-    call RCreateMaps("nvi", '<Plug>RUpdateObjBrowser',    'ro', ':call RObjBrowser()')
+    call RCreateMaps("nvi", '<Plug>RUpdateObjBrowser', 'ro', ':call RObjBrowser()')
+    call RCreateMaps("nvi", '<Plug>ROpenLists',        'r=', ':call RBrowserOpenCloseLists(1)')
+    call RCreateMaps("nvi", '<Plug>RCloseLists',       'r-', ':call RBrowserOpenCloseLists(0)')
 endfunction
 
 
@@ -1560,7 +1573,6 @@ function MakeRMenu()
     "-------------------------------
     menu R.Start/Close.-Sep1- <nul>
     call RCreateMenuItem("nvi", 'Start/Close.Close\ R\ (no\ save)', '<Plug>RClose', 'rq', ":call SendCmdToR('quit(save = \"no\")')")
-    call RCreateMenuItem("nvi", 'Start/Close.Close\ R\ (save\ workspace)', '<Plug>RSaveClose', 'rw', ":call SendCmdToR('quit(save = \"yes\")')")
 
     "----------------------------------------------------------------------------
     " Send
@@ -1605,25 +1617,24 @@ function MakeRMenu()
     "----------------------------------------------------------------------------
     call RControlMenu()
     "-------------------------------
-    menu R.Control.-Sep5- <nul>
+    menu R.Command.-Sep5- <nul>
     if &filetype != "rdoc"
-        call RCreateMenuItem("nvi", 'Control.Set\ working\ directory\ (cur\ file\ path)', '<Plug>RSetwd', 'rd', ':call RSetWD()')
+        call RCreateMenuItem("nvi", 'Command.Set\ working\ directory\ (cur\ file\ path)', '<Plug>RSetwd', 'rd', ':call RSetWD()')
     endif
-    if &filetype == "r" || &filetype == "rnoweb" || g:vimrplugin_never_unmake_menu
-        nmenu R.Control.Build\ R\ tags\ file<Tab>:RBuildTags :call SendCmdToR('rtags(ofile = "TAGS")')<CR>
-        imenu R.Control.Build\ R\ tags\ file<Tab>:RBuildTags <Esc>:call SendCmdToR('rtags(ofile = "TAGS")')<CR>a
-    endif
-    nmenu R.Control.Build\ omniList\ (loaded)<Tab>:RUpdateObjList :call RBuildSyntaxFile("loaded")<CR>
-    imenu R.Control.Build\ omniList\ (loaded)<Tab>:RUpdateObjList <Esc>:call RBuildSyntaxFile("loaded")<CR>a
-    nmenu R.Control.Build\ omniList\ (installed)<Tab>:RUpdateObjListAll :call RBuildSyntaxFile("installed")<CR>
-    imenu R.Control.Build\ omniList\ (installed)<Tab>:RUpdateObjListAll <Esc>:call RBuildSyntaxFile("installed")<CR>a
     "-------------------------------
     if &filetype == "rnoweb" || g:vimrplugin_never_unmake_menu
-        menu R.Control.-Sep6- <nul>
-        call RCreateMenuItem("nvi", 'Control.Sweave\ (cur\ file)', '<Plug>RSweave', 'sw', ':call RSweave()')
-        call RCreateMenuItem("nvi", 'Control.Sweave\ and\ PDF\ (cur\ file)', '<Plug>RMakePDF', 'sp', ':call RMakePDF()')
+        menu R.Command.-Sep6- <nul>
+        call RCreateMenuItem("nvi", 'Command.Sweave\ (cur\ file)', '<Plug>RSweave', 'sw', ':call RSweave()')
+        call RCreateMenuItem("nvi", 'Command.Sweave\ and\ PDF\ (cur\ file)', '<Plug>RMakePDF', 'sp', ':call RMakePDF("nobib")')
+        call RCreateMenuItem("nvi", 'Command.Sweave,\ BibTeX\ and\ PDF\ (cur\ file)', '<Plug>RMakePDF', 'sb', ':call RMakePDF("bibtex")')
     endif
     "-------------------------------
+    menu R.Command.-Sep6a- <nul>
+    if &filetype == "r" || &filetype == "rnoweb" || g:vimrplugin_never_unmake_menu
+        nmenu R.Command.Build\ tags\ file\ (cur\ dir)<Tab>:RBuildTags :call SendCmdToR('rtags(ofile = "TAGS")')<CR>
+        imenu R.Command.Build\ tags\ file\ (cur\ dir)<Tab>:RBuildTags <Esc>:call SendCmdToR('rtags(ofile = "TAGS")')<CR>a
+    endif
+
     menu R.-Sep7- <nul>
 
     "----------------------------------------------------------------------------
@@ -1647,49 +1658,73 @@ function MakeRMenu()
             nmenu R.Edit.Go\ (next\ R\ chunk)<Tab>gn :call RnwNextChunk()<CR>
             nmenu R.Edit.Go\ (previous\ R\ chunk)<Tab>gN :call RnwPreviousChunk()<CR>
         endif
-        menu R.-Sep8- <nul>
     endif
+
+    "----------------------------------------------------------------------------
+    " Object Browser
+    "----------------------------------------------------------------------------
+    call RBrowserMenu()
+
+    "----------------------------------------------------------------------------
+    " Syntax
+    "----------------------------------------------------------------------------
+    nmenu R.Syntax.Build\ omniList\ (loaded)<Tab>:RUpdateObjList :call RBuildSyntaxFile("loaded")<CR>
+    imenu R.Syntax.Build\ omniList\ (loaded)<Tab>:RUpdateObjList <Esc>:call RBuildSyntaxFile("loaded")<CR>a
+    nmenu R.Syntax.Build\ omniList\ (installed)<Tab>:RUpdateObjListAll :call RBuildSyntaxFile("installed")<CR>
+    imenu R.Syntax.Build\ omniList\ (installed)<Tab>:RUpdateObjListAll <Esc>:call RBuildSyntaxFile("installed")<CR>a
 
     "----------------------------------------------------------------------------
     " Help
     "----------------------------------------------------------------------------
-    amenu R.r-plugin\ Help.Overview :help r-plugin-overview<CR>
-    amenu R.r-plugin\ Help.Main\ features :help r-plugin-features<CR>
-    amenu R.r-plugin\ Help.Installation :help r-plugin-installation<CR>
-    amenu R.r-plugin\ Help.Use :help r-plugin-use<CR>
-    amenu R.r-plugin\ Help.How\ the\ plugin\ works :help r-plugin-functioning<CR>
-    amenu R.r-plugin\ Help.Known\ bugs\ and\ workarounds :help r-plugin-known-bugs<CR>
+    menu R.-Sep8- <nul>
+    amenu R.Help\ (plugin).Overview :help r-plugin-overview<CR>
+    amenu R.Help\ (plugin).Main\ features :help r-plugin-features<CR>
+    amenu R.Help\ (plugin).Installation :help r-plugin-installation<CR>
+    amenu R.Help\ (plugin).Use :help r-plugin-use<CR>
+    amenu R.Help\ (plugin).How\ the\ plugin\ works :help r-plugin-functioning<CR>
+    amenu R.Help\ (plugin).Known\ bugs\ and\ workarounds :help r-plugin-known-bugs<CR>
 
-    amenu R.r-plugin\ Help.Options.Underscore\ and\ Rnoweb\ code :help vimrplugin_underscore<CR>
-    amenu R.r-plugin\ Help.Options.Object\ Browser :help vimrplugin_objbr_place<CR>
+    amenu R.Help\ (plugin).Options.Underscore\ and\ Rnoweb\ code :help vimrplugin_underscore<CR>
+    amenu R.Help\ (plugin).Options.Object\ Browser :help vimrplugin_objbr_place<CR>
     if !has("gui_win32")
-        amenu R.r-plugin\ Help.Options.Terminal\ emulator :help vimrplugin_term<CR>
-        amenu R.r-plugin\ Help.Options.Vim\ as\ pager\ for\ R\ help :help vimrplugin_vimpager<CR>
-        amenu R.r-plugin\ Help.Options.Number\ of\ R\ processes :help vimrplugin_nosingler<CR>
-        amenu R.r-plugin\ Help.Options.Screen\ configuration :help vimrplugin_noscreenrc<CR>
-        amenu R.r-plugin\ Help.Options.Screen\ plugin :help vimrplugin_screenplugin<CR>
+        amenu R.Help\ (plugin).Options.Terminal\ emulator :help vimrplugin_term<CR>
+        amenu R.Help\ (plugin).Options.Vim\ as\ pager\ for\ R\ help :help vimrplugin_vimpager<CR>
+        amenu R.Help\ (plugin).Options.Number\ of\ R\ processes :help vimrplugin_nosingler<CR>
+        amenu R.Help\ (plugin).Options.Screen\ configuration :help vimrplugin_noscreenrc<CR>
+        amenu R.Help\ (plugin).Options.Screen\ plugin :help vimrplugin_screenplugin<CR>
     endif
-    amenu R.r-plugin\ Help.Options.Conque\ Shell\ plugin :help vimrplugin_conqueplugin<CR>
+    if !has("gui_macvim")
+        amenu R.Help\ (plugin).Options.Integration\ with\ Apple\ Script :help vimrplugin_applescript<CR>
+    endif
+    amenu R.Help\ (plugin).Options.Conque\ Shell\ plugin :help vimrplugin_conqueplugin<CR>
     if has("gui_win32")
-        amenu R.r-plugin\ Help.Options.Use\ 32\ bit\ version\ of\ R :help vimrplugin_i386<CR>
-        amenu R.r-plugin\ Help.Options.Sleep\ time :help vimrplugin_sleeptime<CR>
+        amenu R.Help\ (plugin).Options.Use\ 32\ bit\ version\ of\ R :help vimrplugin_i386<CR>
+        amenu R.Help\ (plugin).Options.Sleep\ time :help vimrplugin_sleeptime<CR>
     endif
-    amenu R.r-plugin\ Help.Options.R\ path :help vimrplugin_r_path<CR>
-    amenu R.r-plugin\ Help.Options.Arguments\ to\ R :help vimrplugin_r_args<CR>
-    amenu R.r-plugin\ Help.Options.Time\ building\ omniList :help vimrplugin_buildwait<CR>
-    amenu R.r-plugin\ Help.Options.Syntax\ highlighting\ of\ \.Rout\ files :help vimrplugin_routmorecolors<CR>
-    amenu R.r-plugin\ Help.Options.Automatically\ open\ the\ \.Rout\ file :help vimrplugin_routnotab<CR>
-    amenu R.r-plugin\ Help.Options.Special\ R\ functions :help vimrplugin_listmethods<CR>
-    amenu R.r-plugin\ Help.Options.maxdeparse :help vimrplugin_maxdeparse<CR>
-    amenu R.r-plugin\ Help.Options.LaTeX\ command :help vimrplugin_latexcmd<CR>
-    amenu R.r-plugin\ Help.Options.Never\ unmake\ the\ R\ menu :help vimrplugin_never_unmake_menu<CR>
+    amenu R.Help\ (plugin).Options.R\ path :help vimrplugin_r_path<CR>
+    amenu R.Help\ (plugin).Options.Arguments\ to\ R :help vimrplugin_r_args<CR>
+    amenu R.Help\ (plugin).Options.Time\ building\ omniList :help vimrplugin_buildwait<CR>
+    amenu R.Help\ (plugin).Options.Syntax\ highlighting\ of\ \.Rout\ files :help vimrplugin_routmorecolors<CR>
+    amenu R.Help\ (plugin).Options.Automatically\ open\ the\ \.Rout\ file :help vimrplugin_routnotab<CR>
+    amenu R.Help\ (plugin).Options.Special\ R\ functions :help vimrplugin_listmethods<CR>
+    amenu R.Help\ (plugin).Options.Indent\ commented\ lines :help vimrplugin_indent_commented<CR>
+    amenu R.Help\ (plugin).Options.maxdeparse :help vimrplugin_maxdeparse<CR>
+    amenu R.Help\ (plugin).Options.LaTeX\ command :help vimrplugin_latexcmd<CR>
+    amenu R.Help\ (plugin).Options.Never\ unmake\ the\ R\ menu :help vimrplugin_never_unmake_menu<CR>
 
-    amenu R.r-plugin\ Help.Custom\ key\ bindings :help r-plugin-key-bindings<CR>
-    amenu R.r-plugin\ Help.Files :help r-plugin-files<CR>
-    amenu R.r-plugin\ Help.FAQ\ and\ tips :help r-plugin-tips<CR>
-    amenu R.r-plugin\ Help.News :help r-plugin-news<CR>
+    amenu R.Help\ (plugin).Custom\ key\ bindings :help r-plugin-key-bindings<CR>
+    amenu R.Help\ (plugin).Files :help r-plugin-files<CR>
+    amenu R.Help\ (plugin).FAQ\ and\ tips.All\ tips :help r-plugin-tips<CR>
+    amenu R.Help\ (plugin).FAQ\ and\ tips.Indenting\ setup :help r-plugin-indenting<CR>
+    amenu R.Help\ (plugin).FAQ\ and\ tips.Folding\ setup :help r-plugin-folding<CR>
+    amenu R.Help\ (plugin).FAQ\ and\ tips.Remap\ LocalLeader :help r-plugin-localleader<CR>
+    amenu R.Help\ (plugin).FAQ\ and\ tips.Customize\ key\ bindings :help r-plugin-bindings<CR>
+    amenu R.Help\ (plugin).FAQ\ and\ tips.SnipMate :help r-plugin-snippets<CR>
+    amenu R.Help\ (plugin).FAQ\ and\ tips.Highlight\ marks :help r-plugin-showmarks<CR>
+    amenu R.Help\ (plugin).FAQ\ and\ tips.Jump\ to\ function\ definitions :help r-plugin-tagsfile<CR>
+    amenu R.Help\ (plugin).News :help r-plugin-news<CR>
 
-    amenu R.R\ Help :call SendCmdToR("help.start()")<CR>
+    amenu R.Help\ (R) :call SendCmdToR("help.start()")<CR>
 
     "----------------------------------------------------------------------------
     " ToolBar

@@ -16,12 +16,12 @@
 "
 " Author: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          
-" Last Change: Tue Nov 16, 2010  07:02PM
+" Last Change: Mon Feb 21, 2011  07:26PM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
 if exists("b:did_ftplugin")
-  finish
+    finish
 endif
 
 " Don't load another plugin for this buffer
@@ -32,12 +32,12 @@ set buftype=nofile
 setlocal nowrap
 
 if !exists("g:rplugin_hasmenu")
-  let g:rplugin_hasmenu = 0
+    let g:rplugin_hasmenu = 0
 endif
 
 " Popup menu
 if !exists("g:rplugin_hasbrowsermenu")
-  let g:rplugin_hasbrowsermenu = 0
+    let g:rplugin_hasbrowsermenu = 0
 endif
 
 " Current cursor position in the object browser and in the library browser
@@ -59,7 +59,7 @@ let b:workspace = {}
 " included in the dictionary with the flag 1, but other list objects are
 " inserted in the dictionary with the flag 0.
 if !exists("g:rplugin_opendict")
-  let g:rplugin_opendict = {}
+    let g:rplugin_opendict = {}
 endif
 
 " Dictionary storing the order of the elements in a list. This is necessary
@@ -69,450 +69,560 @@ let b:list_order = {}
 let b:liblist = []
 
 function! RBrowserMakeLibDict()
-  let b:libdict = {}
-  let nobjs = len(g:rplugin_liblist)
-  let i = 0
-  while i < nobjs
-    let obj = split(g:rplugin_liblist[i], ';')
-    let curlib = obj[3]
-    let haslib = 0
-    for lib in b:liblist
-      if lib == obj[3]
-	let haslib = 1
-	break
-      endif
-    endfor
-    if haslib
-      let b:libdict[obj[3]] = {'class': "library", 'items': {}}
-      while curlib == obj[3]
-	if obj[2] == "list" || obj[2] == "data.frame"
-	  let b:libdict[obj[3]]['items'][obj[0]] = {'class': obj[2], 'items': {}}
-	  let curdf = obj[0]
-	  let lastdf = obj[0]
-	  let lo_element = "-" . curlib . "-" . curdf
-	  let b:list_order[lo_element] = []
-	  let g:rplugin_opendict[curdf] = 0
-	  let i += 1
-	  if i == nobjs
-	    break
-	  endif
-	  let obj = split(g:rplugin_liblist[i], ';')
-	  while stridx(obj[0], "$") > 0
-	    let [lastdf, lastcol] = split(obj[0], '\$')
-	    let b:libdict[curlib]['items'][curdf]['items'][lastcol] = {'class': obj[2]}
-	    call add(b:list_order[lo_element], lastcol)
+    let b:libdict = {}
+    let nobjs = len(g:rplugin_liblist)
+    let i = 0
+    while i < nobjs
+        let obj = split(g:rplugin_liblist[i], ';')
+        let curlib = obj[3]
+        let haslib = 0
+        for lib in b:liblist
+            if lib == obj[3]
+                let haslib = 1
+                break
+            endif
+        endfor
+        if haslib
+            let b:libdict[obj[3]] = {'class': "library", 'items': {}}
+            while curlib == obj[3]
+                if obj[2] == "list" || obj[2] == "data.frame"
+                    let b:libdict[obj[3]]['items'][obj[0]] = {'class': obj[2], 'items': {}}
+                    let curdf = obj[0]
+                    let lastdf = obj[0]
+                    let lo_element = "-" . curlib . "-" . curdf
+                    let b:list_order[lo_element] = []
+                    let g:rplugin_opendict[curdf] = 0
+                    let i += 1
+                    if i == nobjs
+                        break
+                    endif
+                    let obj = split(g:rplugin_liblist[i], ';')
+                    while stridx(obj[0], "$") > 0
+                        let [lastdf, lastcol] = split(obj[0], '\$')
+                        let b:libdict[curlib]['items'][curdf]['items'][lastcol] = {'class': obj[2]}
+                        call add(b:list_order[lo_element], lastcol)
 
-	    let i += 1
-	    if i == nobjs
-	      break
-	    endif
-	    let obj = split(g:rplugin_liblist[i], ';')
-	  endwhile
-	else
-	  let b:libdict[obj[3]]['items'][obj[0]] = {'class': obj[2]}
-	  let i += 1
-	  if i == nobjs
-	    break
-	  endif
-	endif
-	let obj = split(g:rplugin_liblist[i], ';')
-      endwhile
-    else
-      while curlib == obj[3]
-	let i += 1
-	if i == nobjs
-	  break
-	endif
-	let obj = split(g:rplugin_liblist[i], ';')
-      endwhile
-    endif
-  endwhile
+                        let i += 1
+                        if i == nobjs
+                            break
+                        endif
+                        let obj = split(g:rplugin_liblist[i], ';')
+                    endwhile
+                else
+                    let b:libdict[obj[3]]['items'][obj[0]] = {'class': obj[2]}
+                    let i += 1
+                    if i == nobjs
+                        break
+                    endif
+                endif
+                let obj = split(g:rplugin_liblist[i], ';')
+            endwhile
+        else
+            while curlib == obj[3]
+                let i += 1
+                if i == nobjs
+                    break
+                endif
+                let obj = split(g:rplugin_liblist[i], ';')
+            endwhile
+        endif
+    endwhile
 endfunction
 
 function! RBrowserMakeLine(key, prefix, curlist)
-  exe "let curkey = g:rplugin_curdict['" . a:key . "']"
-  let cls = curkey['class']
-  if has("conceal")
-    if cls == "list" || cls == "data.frame"
-      let line = a:prefix . '[#' . a:key . '	'
-    elseif cls == "numeric"
-      let line = a:prefix . '{#' . a:key . '	'
-    elseif cls == "character"
-      let line = a:prefix . '"#' . a:key . '	'
-    elseif cls == "factor"
-      let line = a:prefix . "'#" . a:key . '	'
-    elseif cls == "function"
-      let line = a:prefix . '(#' . a:key . '	'
-    elseif cls == "logical"
-      let line = a:prefix . '%#' . a:key . '	'
-    elseif cls == "library"
-      let line = a:prefix . '##' . a:key . '	'
-    elseif cls == "flow-control"
-      let line = a:prefix . '!#' . a:key . '	'
-    else
-      let line = a:prefix . '=#' . a:key . '	'
-    endif
-  else
-    if cls == "list" || cls == "data.frame"
-      let line = a:prefix . '[' . a:key . '	'
-    elseif cls == "numeric"
-      let line = a:prefix . '{' . a:key . '	'
-    elseif cls == "character"
-      let line = a:prefix . '"' . a:key . '	'
-    elseif cls == "factor"
-      let line = a:prefix . "'" . a:key . '	'
-    elseif cls == "function"
-      let line = a:prefix . '(' . a:key . '	'
-    elseif cls == "logical"
-      let line = a:prefix . '%' . a:key . '	'
-    elseif cls == "library"
-      let line = a:prefix . '#' . a:key . '	'
-    elseif cls == "flow-control"
-      let line = a:prefix . '!' . a:key . '	'
-    else
-      let line = a:prefix . '=' . a:key . '	'
-    endif
-  endif
-
-  if has("conceal") && g:rplugin_curobjlevel == 0
-    let line = " " . line
-  endif
-
-  " If the object's label exists, then append it to the end of the line
-  let thekeys = keys(curkey)
-  for subkey in thekeys
-    if subkey == "label"
-      let line = line . curkey['label']
-    endif
-  endfor
-  let lnr = line("$") + 1
-  call setline(lnr, line)
-
-  " If the object is a data.frame, show its columns
-  if cls == "data.frame" || cls == "list" || cls == "library"
-    let whattodo = "addkey"
-    for i in keys(g:rplugin_opendict)
-      if i == a:key
-	if g:rplugin_opendict[a:key] == 0
-	  return
-	else
-	  let whattodo = "show elements"
-	  break
-	endif
-      endif
-    endfor
-    if whattodo == "addkey"
-      if cls == "data.frame"
-	let g:rplugin_opendict[a:key] = g:vimrplugin_open_df
-      else
-	if cls == "list"
-	  let g:rplugin_opendict[a:key] = g:vimrplugin_open_list
-	else
-	  let g:rplugin_opendict[a:key] = 0
-	endif
-      endif
-    endif
-    if g:rplugin_opendict[a:key] == 0
-      return
-    endif
-
-    if &encoding == "utf-8"
-      let strL = " └─"
-      let strT = " ├─"
-      let strI = " │ "
-    else
-      let strL = " `-"
-      let strT = " |-"
-      let strI = " | "
-    endif
-
+    exe "let curkey = g:rplugin_curdict['" . a:key . "']"
+    let cls = curkey['class']
     if has("conceal")
-      let strL = strL . " "
-      let strT = strT . " "
-      let strI = strI . " "
-      let g:rplugin_curobjlevel += 1
+        if cls == "list" || cls == "data.frame"
+            let line = a:prefix . '[#' . a:key . '	'
+        elseif cls == "numeric"
+            let line = a:prefix . '{#' . a:key . '	'
+        elseif cls == "character"
+            let line = a:prefix . '"#' . a:key . '	'
+        elseif cls == "factor"
+            let line = a:prefix . "'#" . a:key . '	'
+        elseif cls == "function"
+            let line = a:prefix . '(#' . a:key . '	'
+        elseif cls == "logical"
+            let line = a:prefix . '%#' . a:key . '	'
+        elseif cls == "library"
+            let line = a:prefix . '##' . a:key . '	'
+        elseif cls == "flow-control"
+            let line = a:prefix . '!#' . a:key . '	'
+        else
+            let line = a:prefix . '=#' . a:key . '	'
+        endif
+    else
+        if cls == "list" || cls == "data.frame"
+            let line = a:prefix . '[' . a:key . '	'
+        elseif cls == "numeric"
+            let line = a:prefix . '{' . a:key . '	'
+        elseif cls == "character"
+            let line = a:prefix . '"' . a:key . '	'
+        elseif cls == "factor"
+            let line = a:prefix . "'" . a:key . '	'
+        elseif cls == "function"
+            let line = a:prefix . '(' . a:key . '	'
+        elseif cls == "logical"
+            let line = a:prefix . '%' . a:key . '	'
+        elseif cls == "library"
+            let line = a:prefix . '#' . a:key . '	'
+        elseif cls == "flow-control"
+            let line = a:prefix . '!' . a:key . '	'
+        else
+            let line = a:prefix . '=' . a:key . '	'
+        endif
     endif
 
-    if a:prefix =~ strL
-      let newprefix = substitute(a:prefix, strL, "   ", "")
-    else
-      let newprefix = substitute(a:prefix, strT, strI, "") 
+    if has("conceal") && g:rplugin_curobjlevel == 0
+        let line = " " . line
     endif
-    let newprefix = newprefix . strT
-    let olddict = g:rplugin_curdict
-    let g:rplugin_curdict = curkey['items']
-    let curlist = a:curlist . "-" . a:key
-    if cls == "library"
-      let thesubkeys = sort(keys(g:rplugin_curdict))
-    else
-      let thesubkeys = b:list_order[curlist]
-    endif
-    let nkeys = len(thesubkeys)
-    let i = 0
-    for key in thesubkeys
-      let i += 1
-      if i < nkeys
-	call RBrowserMakeLine(key, newprefix, curlist)
-      else
-	let newprefix = substitute(newprefix, strT, strL, "")
-	call RBrowserMakeLine(key, newprefix, curlist)
-      endif
+
+    " If the object's label exists, then append it to the end of the line
+    let thekeys = keys(curkey)
+    for subkey in thekeys
+        if subkey == "label"
+            let line = line . curkey['label']
+        endif
     endfor
-    let g:rplugin_curdict = olddict
-  endif
+    let lnr = line("$") + 1
+    call setline(lnr, line)
+
+    " If the object is a data.frame, show its columns
+    if cls == "data.frame" || cls == "list" || cls == "library"
+        let whattodo = "addkey"
+        for i in keys(g:rplugin_opendict)
+            if i == a:key
+                if g:rplugin_opendict[a:key] == 0
+                    return
+                else
+                    let whattodo = "show elements"
+                    break
+                endif
+            endif
+        endfor
+        if whattodo == "addkey"
+            if cls == "data.frame" || cls == "list"
+                echoerr "rbrowser.vim: unregistered data.frame or list!"
+            else
+                let g:rplugin_opendict[a:key] = 0
+            endif
+        endif
+        if g:rplugin_opendict[a:key] == 0
+            return
+        endif
+
+        if &encoding == "utf-8"
+            let strL = " └─"
+            let strT = " ├─"
+            let strI = " │ "
+        else
+            let strL = " `-"
+            let strT = " |-"
+            let strI = " | "
+        endif
+
+        if has("conceal")
+            let strL = strL . " "
+            let strT = strT . " "
+            let strI = strI . " "
+            let g:rplugin_curobjlevel += 1
+        endif
+
+        if a:prefix =~ strL
+            let newprefix = substitute(a:prefix, strL, "   ", "")
+        else
+            let newprefix = substitute(a:prefix, strT, strI, "") 
+        endif
+        let newprefix = newprefix . strT
+        let olddict = g:rplugin_curdict
+        let g:rplugin_curdict = curkey['items']
+        let curlist = a:curlist . "-" . a:key
+        if cls == "library"
+            let thesubkeys = sort(keys(g:rplugin_curdict))
+        else
+            let thesubkeys = b:list_order[curlist]
+        endif
+        let nkeys = len(thesubkeys)
+        let i = 0
+        for key in thesubkeys
+            let i += 1
+            if i < nkeys
+                call RBrowserMakeLine(key, newprefix, curlist)
+            else
+                let newprefix = substitute(newprefix, strT, strL, "")
+                call RBrowserMakeLine(key, newprefix, curlist)
+            endif
+        endfor
+        let g:rplugin_curdict = olddict
+    endif
+endfunction
+
+function! RBrowserAddItemToList(key, curlist)
+    exe "let curkey = g:rplugin_curdict['" . a:key . "']"
+    let cls = curkey['class']
+
+    " If the object is a data.frame, show its columns
+    if cls == "data.frame" || cls == "list"
+        let whattodo = "addkey"
+        for i in keys(g:rplugin_opendict)
+            if i == a:key
+                let whattodo = "nothing"
+                break
+            endif
+        endfor
+        if whattodo == "addkey"
+            if cls == "data.frame"
+                let g:rplugin_opendict[a:key] = g:vimrplugin_open_df
+            else
+                if cls == "list"
+                    let g:rplugin_opendict[a:key] = g:vimrplugin_open_list
+                else
+                    let g:rplugin_opendict[a:key] = 0
+                endif
+            endif
+        endif
+
+        let olddict = g:rplugin_curdict
+        let g:rplugin_curdict = curkey['items']
+        let curlist = a:curlist . "-" . a:key
+        let thesubkeys = b:list_order[curlist]
+        let nkeys = len(thesubkeys)
+        let i = 0
+        for key in thesubkeys
+            let i += 1
+            if i < nkeys
+                call RBrowserAddItemToList(key, curlist)
+            else
+                call RBrowserAddItemToList(key, curlist)
+            endif
+        endfor
+        let g:rplugin_curdict = olddict
+    endif
+endfunction
+
+function RBrowserFillCloseList()
+    let thekeys = sort(keys(b:workspace))
+    for key in thekeys
+        let s:curlist = ""
+        let g:rplugin_curobjlevel = 0
+        let g:rplugin_curdict = b:workspace
+        call RBrowserAddItemToList(key, "")
+    endfor
 endfunction
 
 function! RBrowserShowGE(fromother)
-  let g:rplugin_curview = "GlobalEnv"
-  if a:fromother == 0
-    let g:rplugin_curbline = line(".")
-    let g:rplugin_curbcol = col(".")
-  endif
+    let g:rplugin_curview = "GlobalEnv"
+    if a:fromother == 0
+        let g:rplugin_curbline = line(".")
+        let g:rplugin_curbcol = col(".")
+    endif
 
-  setlocal modifiable
-  sil normal! ggdG
-  call setline(1, ".GlobalEnv | Libraries")
-  call setline(2, "")
-  let thekeys = sort(keys(b:workspace))
-  for key in thekeys
-    let s:curlist = ""
-    let g:rplugin_curobjlevel = 0
-    let g:rplugin_curdict = b:workspace
-    call RBrowserMakeLine(key, "  ", "")
-  endfor
-  call cursor(g:rplugin_curbline, g:rplugin_curbcol)
-  setlocal nomodifiable
+    setlocal modifiable
+    sil normal! ggdG
+    call setline(1, ".GlobalEnv | Libraries")
+    call setline(2, "")
+    let thekeys = sort(keys(b:workspace))
+    for key in thekeys
+        let s:curlist = ""
+        let g:rplugin_curobjlevel = 0
+        let g:rplugin_curdict = b:workspace
+        call RBrowserMakeLine(key, "  ", "")
+    endfor
+    call cursor(g:rplugin_curbline, g:rplugin_curbcol)
+    setlocal nomodifiable
 endfunction
 
 function! RBrowserShowLibs(fromother)
-  let g:rplugin_curview = "libraries"
-  if a:fromother == 0
-    let g:rplugin_curlline = line(".")
-    let g:rplugin_curlcol = col(".")
-  endif
-
-  if !exists("b:libdict")
-    call RBrowserMakeLibDict()
-  endif
-
-  setlocal modifiable
-  sil normal! ggdG
-  call setline(1, "Libraries | .GlobalEnv")
-  call setline(2, "")
-
-  " Fill the object browser
-  let thekeys = sort(keys(b:libdict))
-  for key in thekeys
-    let s:curlist = ""
-    let g:rplugin_curobjlevel = 0
-    let g:rplugin_curdict = b:libdict
-    call RBrowserMakeLine(key, "  ", "")
-  endfor
-
-  " Warn about libraries not present when :RUpdateObjList was run
-  let hasmissing = 0
-  let misslibs = []
-  for lib in b:liblist
-    if search('#' . lib, "wn") == 0
-      let hasmissing += 1
-      call add(misslibs, lib)
+    let g:rplugin_curview = "libraries"
+    if a:fromother == 0
+        let g:rplugin_curlline = line(".")
+        let g:rplugin_curlcol = col(".")
     endif
-  endfor
-  if hasmissing
-    call setline(line("$") + 1, "")
-    call setline(line("$") + 1, "Warning:")
-    call setline(line("$") + 1, "The following")
-    if hasmissing == 1
-      call setline(line("$") + 1, "library is loaded")
-      call setline(line("$") + 1, "but is not in the")
-    else
-      call setline(line("$") + 1, "libraries are loaded")
-      call setline(line("$") + 1, "but are not in the")
+
+    if !exists("b:libdict")
+        call RBrowserMakeLibDict()
     endif
-    call setline(line("$") + 1, "omniList:")
-    call setline(line("$") + 1, "")
-    for lib in misslibs
-      call setline(line("$") + 1, "   " . lib)
+
+    setlocal modifiable
+    sil normal! ggdG
+    call setline(1, "Libraries | .GlobalEnv")
+    call setline(2, "")
+
+    " Fill the object browser
+    let thekeys = sort(keys(b:libdict))
+    for key in thekeys
+        let s:curlist = ""
+        let g:rplugin_curobjlevel = 0
+        let g:rplugin_curdict = b:libdict
+        call RBrowserMakeLine(key, "  ", "")
     endfor
-    call setline(line("$") + 1, "")
-    call setline(line("$") + 1, "Please read the Vim-R-plugin")
-    call setline(line("$") + 1, "documentation:")
-    call setline(line("$") + 1, "")
-    call setline(line("$") + 1, "  :h :RUpdateObjList")
-    call setline(line("$") + 1, "")
-    call setline(line("$") + 1, "to know how to show all loaded")
-    call setline(line("$") + 1, "libraries in the Object Browser.")
-  endif
 
-  call cursor(g:rplugin_curlline, g:rplugin_curlcol)
-  setlocal nomodifiable
+    " Warn about libraries not present when :RUpdateObjList was run
+    let hasmissing = 0
+    let misslibs = []
+    for lib in b:liblist
+        if search('#' . lib, "wn") == 0
+            let hasmissing += 1
+            call add(misslibs, lib)
+        endif
+    endfor
+    if hasmissing
+        call setline(line("$") + 1, "")
+        call setline(line("$") + 1, "Warning:")
+        call setline(line("$") + 1, "The following")
+        if hasmissing == 1
+            call setline(line("$") + 1, "library is loaded")
+            call setline(line("$") + 1, "but is not in the")
+        else
+            call setline(line("$") + 1, "libraries are loaded")
+            call setline(line("$") + 1, "but are not in the")
+        endif
+        call setline(line("$") + 1, "omniList:")
+        call setline(line("$") + 1, "")
+        for lib in misslibs
+            call setline(line("$") + 1, "   " . lib)
+        endfor
+        call setline(line("$") + 1, "")
+        call setline(line("$") + 1, "Please read the Vim-R-plugin")
+        call setline(line("$") + 1, "documentation:")
+        call setline(line("$") + 1, "")
+        call setline(line("$") + 1, "  :h :RUpdateObjList")
+        call setline(line("$") + 1, "")
+        call setline(line("$") + 1, "to know how to show all loaded")
+        call setline(line("$") + 1, "libraries in the Object Browser.")
+    endif
+
+    call cursor(g:rplugin_curlline, g:rplugin_curlcol)
+    setlocal nomodifiable
 endfunction
 
 function! RBrowserFill(fromother)
-  if g:rplugin_curview == "libraries"
-    call RBrowserShowLibs(a:fromother)
-  else
-    call RBrowserShowGE(a:fromother)
-  endif
-  echon
+    if g:rplugin_curview == "libraries"
+        call RBrowserShowLibs(a:fromother)
+    else
+        call RBrowserShowGE(a:fromother)
+    endif
+    echon
 endfunction
 
 function! RBrowserDoubleClick()
-  echon
-  " Toggle view: Objects in the workspace X List of libraries
-  if line(".") == 1
-    if g:rplugin_curview == "libraries"
-      call RBrowserShowGE(1)
-    else
-      call RBrowserShowLibs(1)
+    echon
+    " Toggle view: Objects in the workspace X List of libraries
+    if line(".") == 1
+        if g:rplugin_curview == "libraries"
+            call RBrowserShowGE(1)
+        else
+            call RBrowserShowLibs(1)
+        endif
+        return
     endif
-    return
-  endif
 
-  " Toggle state of list or data.frame: open X closed
-  let key = expand("<cword>")
-  for i in keys(g:rplugin_opendict)
-    if i == key
-      let g:rplugin_opendict[key] = !g:rplugin_opendict[key]
-      call RBrowserFill(0)
-      break
+    " Toggle state of list or data.frame: open X closed
+    let key = RBrowserGetName(0)
+    for i in keys(g:rplugin_opendict)
+        if i == key
+            let g:rplugin_opendict[key] = !g:rplugin_opendict[key]
+            call RBrowserFill(0)
+            break
+        endif
+    endfor
+    echon
+endfunction
+
+function RBrowserOpenCloseLists(status)
+    if ! buflisted("Object_Browser")
+        call RWarningMsg('There is no "Object_Browser" buffer.')
+        return
     endif
-  endfor
-  echon
+
+    let switchedbuf = 0
+    if g:rplugin_curbuf != "Object_Browser"
+        let savesb = &switchbuf
+        set switchbuf=useopen,usetab
+        sil noautocmd sb Object_Browser
+        let switchedbuf = 1
+    endif
+
+    for key in keys(g:rplugin_opendict)
+        let g:rplugin_opendict[key] = a:status
+    endfor
+    call RBrowserFill(0)
+
+    if switchedbuf
+        exe "sil noautocmd sb " . g:rplugin_curbuf
+        exe "set switchbuf=" . savesb
+    endif
+    echon
 endfunction
 
 function! RBrowserRightClick()
-  if line(".") == 1
-    return
-  endif
-
-  let key = RBrowserGetName()
-  if key != ""
-    if g:rplugin_hasbrowsermenu == 1
-      aunmenu ]RBrowser
+    if line(".") == 1
+        return
     endif
-    let key = substitute(key, '\.', '\\.', "g")
-    let key = substitute(key, ' ', '\\ ', "g")
-    exe 'amenu ]RBrowser.args('. key . ') :call RAction("args")<CR>'
-    exe 'amenu ]RBrowser.example('. key . ') :call RAction("example")<CR>'
-    exe 'amenu ]RBrowser.help('. key . ') :call RAction("help")<CR>'
-    exe 'amenu ]RBrowser.names('. key . ') :call RAction("names")<CR>'
-    exe 'amenu ]RBrowser.plot('. key . ') :call RAction("plot")<CR>'
-    exe 'amenu ]RBrowser.print(' . key . ') :call RAction("print")<CR>'
-    exe 'amenu ]RBrowser.str('. key . ') :call RAction("str")<CR>'
-    exe 'amenu ]RBrowser.summary('. key . ') :call RAction("summary")<CR>'
-    popup ]RBrowser
-    let g:rplugin_hasbrowsermenu = 1
-  endif
+
+    let key = RBrowserGetName(1)
+
+    let line = getline(".")
+    let isfunction = 0
+    if has("conceal")
+        if line =~ "(#.*\t"
+            let isfunction = 1
+        endif
+    else
+        if line =~ "(.*\t"
+            let isfunction = 1
+        endif
+    endif
+
+    if key != ""
+        if g:rplugin_hasbrowsermenu == 1
+            aunmenu ]RBrowser
+        endif
+        let key = substitute(key, '\.', '\\.', "g")
+        let key = substitute(key, ' ', '\\ ', "g")
+        if isfunction
+            exe 'amenu ]RBrowser.args('. key . ') :call RAction("args")<CR>'
+            exe 'amenu ]RBrowser.example('. key . ') :call RAction("example")<CR>'
+            exe 'amenu ]RBrowser.help('. key . ') :call RAction("help")<CR>'
+        else
+            exe 'amenu ]RBrowser.names('. key . ') :call RAction("names")<CR>'
+            exe 'amenu ]RBrowser.plot('. key . ') :call RAction("plot")<CR>'
+            exe 'amenu ]RBrowser.print(' . key . ') :call RAction("print")<CR>'
+            exe 'amenu ]RBrowser.str('. key . ') :call RAction("str")<CR>'
+            exe 'amenu ]RBrowser.summary('. key . ') :call RAction("summary")<CR>'
+        endif
+        popup ]RBrowser
+        let g:rplugin_hasbrowsermenu = 1
+    endif
 endfunction
 
 function! RBrowserFindParent(word, curline, curpos)
-  let curline = a:curline
-  let curpos = a:curpos
-  while curline > 1 && curpos >= a:curpos
-    let curline -= 1
-    let line = substitute(getline(curline), "	.*", "", "")
-    if has("conceal")
-      let curpos = stridx(line, '[#')
-    else
-      let curpos = stridx(line, '[')
-    endif
-    if curpos == -1
-      let curpos = a:curpos
-    endif
-  endwhile
+    let curline = a:curline
+    let curpos = a:curpos
+    while curline > 1 && curpos >= a:curpos
+        let curline -= 1
+        let line = substitute(getline(curline), "	.*", "", "")
+        if has("conceal")
+            let curpos = stridx(line, '[#')
+        else
+            let curpos = stridx(line, '[')
+        endif
+        if curpos == -1
+            let curpos = a:curpos
+        endif
+    endwhile
 
-  if curline > 1
-    if has("conceal")
-      let word = substitute(line, '.*[#', "", "") . '$' . a:word
+    if curline > 1
+        if has("conceal")
+            let word = substitute(line, '.*[#', "", "") . '$' . a:word
+        else
+            let word = substitute(line, '.*[', "", "") . '$' . a:word
+        endif
+        if curpos != s:spacelimit
+            let word = RBrowserFindParent(word, line("."), curpos)
+        endif
+        return word
     else
-      let word = substitute(line, '.*[', "", "") . '$' . a:word
+        " Didn't find the parent: should never happen.
+        let msg = "R-plugin Error: " . a:word . ":" . curline
+        echoerr msg
     endif
-    if curpos != s:spacelimit
-      let word = RBrowserFindParent(word, line("."), curpos)
-    endif
-    return word
-  else
-    " Didn't find the parent: should never happen.
-    let msg = "R-plugin Error: " . a:word . ":" . curline
-    echoerr msg
-  endif
-  return ""
+    return ""
 endfunction
 
-function! RBrowserGetName()
-  let curpos = col(".")
-  let tabpos = stridx(getline("."), "	")
-  if curpos > tabpos
-    return
-  endif
-  let word = expand("<cword>")
+function! RBrowserGetName(complete)
+    let curpos = col(".")
 
-  " Is the object a top level one (curpos == 2)?
-  let line = getline(".")
-  if has("conceal")
-    let delim = ['{#', '[#', '(#', '"#', "'#", '%#', '=#']
-  else
-    let delim = ['{', '[', '(', '"', "'", '%', '=']
-  endif
-  for i in delim
-    let curpos = stridx(line, i)
-    if curpos != -1
-      break
+    let line = getline(".")
+    if line =~ "^$"
+        return
     endif
-  endfor
 
-  let s:spacelimit = 2
-  if has("conceal")
-    let s:spacelimit += 1
-  endif
-  if g:rplugin_curview == "libraries"
-    if &encoding == "utf-8"
-      let s:spacelimit += 7
+    " Is the object a top level one (curpos == 2)?
+    if has("conceal")
+        let delim = ['{#', '[#', '(#', '"#', "'#", '%#', '=#']
+        let word = substitute(line, '^\W*#\{-1,}\(.*\)\t.*', '\1', "")
     else
-      let s:spacelimit += 3
+        let tabpos = stridx(getline("."), "	")
+        if curpos > tabpos
+            return
+        endif
+        let delim = ['{', '[', '(', '"', "'", '%', '=']
+        let word = expand("<cword>")
     endif
-  endif
 
-  if curpos == s:spacelimit
-    " top level object
-    return word
-  else
-    if curpos > s:spacelimit
-      " Find the parent data.frame or list
-      let word = RBrowserFindParent(word, line("."), curpos)
-      return word
-    else
-      " Wrong object name delimiter: should never happen.
-      let msg = "R-plugin Error: (curpos = " . curpos . ") < (spacelimit = " . s:spacelimit . ") " . word
-      echoerr msg
-      return ""
+    if word =~ ' ' || word =~ '^[0-9]'
+        let word = '`' . word . '`'
     endif
-  endif
+
+    if a:complete == 0
+        return word
+    endif
+
+    for i in delim
+        let curpos = stridx(line, i)
+        if curpos != -1
+            break
+        endif
+    endfor
+
+    let s:spacelimit = 2
+    if has("conceal")
+        let s:spacelimit += 1
+    endif
+    if g:rplugin_curview == "libraries"
+        if &encoding == "utf-8"
+            let s:spacelimit += 7
+        else
+            let s:spacelimit += 3
+        endif
+    endif
+
+    if curpos == s:spacelimit
+        " top level object
+        return word
+    else
+        if curpos > s:spacelimit
+            " Find the parent data.frame or list
+            let word = RBrowserFindParent(word, line("."), curpos)
+            " Unnamed objects of lists
+            if word =~ '\$\[\[[0-9]*\]\]'
+                let word = substitute(word, '\$\[\[\([0-9]*\)\]\]', '[[\1]]', "g")
+            endif
+            return word
+        else
+            " Wrong object name delimiter: should never happen.
+            let msg = "R-plugin Error: (curpos = " . curpos . ") < (spacelimit = " . s:spacelimit . ") " . word
+            echoerr msg
+            return ""
+        endif
+    endif
 endfunction
 
 function! MakeRBrowserMenu()
-  let g:rplugin_curbuf = bufname("%")
-  if g:rplugin_hasmenu == 1
-    return
-  endif
-  menutranslate clear
-  call RControlMenu()
+    let g:rplugin_curbuf = bufname("%")
+    if g:rplugin_hasmenu == 1
+        return
+    endif
+    menutranslate clear
+    call RControlMenu()
+    call RBrowserMenu()
 endfunction
 
 function! UnMakeRBrowserMenu()
-  if g:rplugin_curview == "libraries"
-    let g:rplugin_curlline = line(".")
-    let g:rplugin_curlcol = col(".")
-  else
-    let g:rplugin_curbline = line(".")
-    let g:rplugin_curbcol = col(".")
-  endif
-  if !has("gui_running") || g:rplugin_hasmenu == 0 || g:vimrplugin_never_unmake_menu == 1 || &previewwindow
-    return
-  endif
-  aunmenu R
-  let g:rplugin_hasmenu = 0
+    if g:rplugin_curview == "libraries"
+        let g:rplugin_curlline = line(".")
+        let g:rplugin_curlcol = col(".")
+    else
+        let g:rplugin_curbline = line(".")
+        let g:rplugin_curbcol = col(".")
+    endif
+    if !has("gui_running") || g:rplugin_hasmenu == 0 || g:vimrplugin_never_unmake_menu == 1 || &previewwindow
+        return
+    endif
+    aunmenu R
+    let g:rplugin_hasmenu = 0
 endfunction
 
 nmap <buffer> <CR> :call RBrowserDoubleClick()<CR>
@@ -521,6 +631,7 @@ nmap <buffer> <RightMouse> :call RBrowserRightClick()<CR>
 
 call RControlMenu()
 call RControlMaps()
+call RBrowserMenu()
 
 setlocal winfixwidth
 setlocal bufhidden=wipe

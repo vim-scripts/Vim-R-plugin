@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria
 
-Version: 110208
+Version: 110222
 For Vim version 7.3
 
  1. Overview                                    |r-plugin-overview|
@@ -285,14 +285,12 @@ Control
   . Plot (cur)                                         \rg
   . Plot and summary (cur)                             \rb
   --------------------------------------------------------
-  . Update Object Browser                              \ro
   . Set working directory (cur file path)              \rd
-  . Build R tags file                   :RBuildTags
-  . Build omniList (loaded packages)    :RUpdateObjList
-  . Build omniList (installed packages) :RUpdateObjListAll
   --------------------------------------------------------
   . Sweave (cur file)                                  \sw
   . Sweave and PDF (cur file)                          \sp
+  . Sweave, BibTeX and PDF (cur file)                  \sb
+----------------------------------------------------------
 
 Edit
   . Indent (line)                                       ==
@@ -302,11 +300,20 @@ Edit
   . Add/Align right comment (line, sel)                 \;
   . Go (next R chunk)                                   gn
   . Go (previous R chunk)                               gN
+  . Build omniList (loaded packages)    :RUpdateObjList
+  . Build omniList (installed packages) :RUpdateObjListAll
+  . Build R tags file                   :RBuildTags
+----------------------------------------------------------
+
+Object Browser
+  . Show/Update                                        \ro
+  . Expand (all lists)                                 \r=
+  . Collapse (all lists)                               \r-
+  . Toggle (cur)                                     Enter
   --------------------------------------------------------
 
 Please see |r-plugin-key-bindings| to learn how to customize the key bindings
-without editing the plugin directly, and |vimrplugin_underscore| to disable
-underscore replacement.
+without editing the plugin directly. 
 
 After the command \ao, Vim will save the current buffer if it has any pending
 changes, run "R CMD BATCH --no-restore --no-save" on the current file and show
@@ -317,10 +324,12 @@ deletes the .Rout file if it exists.
 
 R syntax uses " <- " to assign values to variables which is inconvenient to
 type. In insert mode, typing a single underscore, "_", will write " <- ",
-unless you are typing inside a string. If necessary, it is possible to insert
-an actual underscore into your file by typing a second underscore.  This
-behavior is similar to the EMACS ESS mode some users may be familiar with and
-is enabled by default.
+unless you are typing inside a string. The replacement will always happen if
+syntax highlighting is off (see |:syn-on| and |:syn-off|). If necessary, it is
+possible to insert an actual underscore into your file by typing a second
+underscore.  This behavior is similar to the EMACS ESS mode some users may be
+familiar with and is enabled by default. You have to change the value of
+|vimrplugin_underscore| to disable underscore replacement.
 
 
 4.2. Edition of rnoweb files~
@@ -609,6 +618,7 @@ indentation by adding braces and line breaks to it. Example:
 |vimrplugin_specialplot|	Do .vim.plot() instead of plot()
 |vimrplugin_maxdeparse|		Argument to R args() function
 |vimrplugin_latexcmd|		Command to run on .tex files
+|vimrplugin_sweaveargs|		Arguments do Sweave()
 |vimrplugin_never_unmake_menu|	Do not unmake menu when switching buffers
 |vimrplugin_map_r|		Use 'r' to send lines and selected text
 
@@ -1066,12 +1076,16 @@ Example:
 
 7.20. LaTeX command~
 							 *vimrplugin_latexcmd*
+						       *vimrplugin_sweaveargs*
 By default, Vim calls pdflatex to produce a pdf document from the .tex file
 produced by the R Sweave command. You can use the option vimrplugin_latexcmd
 to change this behavior. Example:
 >
    let vimrplugin_latexcmd = "latex"
 <
+If you want to pass arguments do the Sweave() function, set the value of the
+vimrplugin_sweaveargs variable.
+
 
 7.21. Never unmake the R menu and tool bar buttons~
 						*vimrplugin_never_unmake_menu*
@@ -1126,6 +1140,7 @@ Only the custom key bindings for Normal mode are shown in Vim's menu, but you
 can type |:map| to see the complete list of current mappings, and below is the
 list of the names for custom key bindings:
 >
+   RBibTeX                    RESendFile                  RSendFunction
    RCommentLine               RESendFunction              RSendLAndOpenNewOne
    RClearAll                  RESendMBlock                RSendLine
    RClearConsole              RESendParagraph             RSendMBlock
@@ -1140,7 +1155,7 @@ list of the names for custom key bindings:
    REDSendMBlock              RSPlot                      RSweave
    REDSendParagraph           RSaveClose                  RUpdateObjBrowser
    REDSendSelection           RSendFile                   RVanillaStart
-   RESendFile                 RSendFunction
+
 <
 The plugin also contains a function called RAction which allows you to build
 ad-hoc commands to R. This function takes the name of an R function such as
@@ -1217,9 +1232,9 @@ directory after the installation:
    r-plugin/omniList
    r-plugin/vimbrowser.R
    r-plugin/vimhelp.R
+   r-plugin/vimSweave.R
    r-plugin/r.snippets
    r-plugin/rpager.sh
-   r-plugin/rsyntax.vim
    r-plugin/specialfuns.R
    r-plugin/tex_indent.vim
    r-plugin/vimActivate.js
@@ -1251,7 +1266,7 @@ and in your |vimrc| (see |vimrplugin_vimpager|):
 <
 
 10.3. How do marked blocks work?~
-
+							  *r-plugin-showmarks*
 Vim allows several marks (bookmarks). The most commonly used marks are the
 lowercase alphabet letters.  If the cursor is between any two marks, the
 plugin will send all of the lines between them to R.
@@ -1269,7 +1284,7 @@ add the following two lines to your |vimrc| to customize ShowMarks behavior:
 <
 
 10.4. Use snipMate~
-
+							   *r-plugin-snippets*
 You probably will want to use the snipMate plugin to insert snippets of code
 in your R script. The plugin may be downloaded from:
 
@@ -1283,7 +1298,7 @@ create an rnoweb.snippet by concatenating both tex.snippets and r.snippets.
 
 
 10.5. Easier key bindings for most used commands~
-
+							   *r-plugin-bindings*
 The most used commands from Vim-R-plugin probably are "Send line" and "Send
 selection". You may find it a good idea to map them to the space bar in your
 |vimrc| (suggestion made by Iago Mosqueira):
@@ -1297,7 +1312,7 @@ You may also want to remap <C-x><C-o>:
 
 
 10.6. Remap the <LocalLeader>~
-
+							*r-plugin-localleader*
 People writing Rnoweb documents may find it better to use a comma or other key
 as the <LocalLeader> instead of the default backslash (see |maplocalleader|):
 >
@@ -1305,7 +1320,7 @@ as the <LocalLeader> instead of the default backslash (see |maplocalleader|):
 <
 
 10.7. Use a tags file to jump to function definitions~
-
+							   *r-plugin-tagsfile*
 Vim can jump to a function definition if it finds a "tags" file with the
 information about the place where the function is defined.  To generate the
 tags file, use the R function rtags(), which will build an Emacs tags file.
@@ -1341,7 +1356,7 @@ Example on how to test whether your setup is ok:
 
 
 10.8. Indenting setup~
-
+							  *r-plugin-indenting*
 Note: In Normal mode, type |==| to indent the current line and gg=G to format
 the entire buffer (see |gg|, |=| and |G| for details). These are Vim commands;
 they are not specific to R code.
@@ -1392,7 +1407,7 @@ Notes: (1) Not all code indented by Emacs/ESS will be indented by the
 
 
 10.9. Folding setup~
-
+							    *r-plugin-folding*
 Vim has several methods of folding text (see |fold-methods| and
 |fold-commands|). To enable the syntax method of folding for R files, put in
 your |vimrc|:
@@ -1497,6 +1512,13 @@ and qqq() to quit the function (See debug's help for details).
 ==============================================================================
 11. News~
 							       *r-plugin-news*
+
+110222 (2011-02-22)
+ * Added syntax/rhelp.vim.
+ * New command for rnoweb files: BibTeX current file (\sb).
+ * New commands for the object browser: open visible lists (\r=) and close
+   visible lists (\r-).
+ * Reorganization of the GUI menu.
 
 110208 (2011-02-08)
  * Fixed bug in "else if" constructions (thanks to Dan Kelley for reporting

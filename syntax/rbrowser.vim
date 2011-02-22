@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:	Object browser of Vim-R-plugin
 " Maintainer:	Jakson Alves de Aquino (jalvesaq@gmail.com)
-" Last Change:	Wed Nov 10, 2010  06:58PM
+" Last Change:	Mon Feb 21, 2011  06:44PM
 
 if exists("b:current_syntax")
   finish
@@ -13,25 +13,25 @@ setlocal iskeyword=@,48-57,_,.
 if has("conceal")
   setlocal conceallevel=2
   setlocal concealcursor=nvc
-  syn match rbrowserNumeric	"{#.*	" contains=rbrowserDelim,rbrowserTab
-  syn match rbrowserCharacter	/"#.*	/ contains=rbrowserDelim,rbrowserTab
-  syn match rbrowserFactor	"'#.*	" contains=rbrowserDelim,rbrowserTab
-  syn match rbrowserFunction	"(#.*	" contains=rbrowserDelim,rbrowserTab
-  syn match rbrowserList	"\[#.*	" contains=rbrowserDelim,rbrowserTab
-  syn match rbrowserLogical	"%#.*	" contains=rbrowserDelim,rbrowserTab
-  syn match rbrowserLibrary	"##.*	" contains=rbrowserDelim,rbrowserTab
-  syn match rbrowserRepeat	"!#.*	" contains=rbrowserDelim,rbrowserTab
-  syn match rbrowserUnknown	"=#.*	" contains=rbrowserDelim,rbrowserTab
+  syn match rbrowserNumeric	"{#.*\t" contains=rbrowserDelim,rbrowserTab
+  syn match rbrowserCharacter	/"#.*\t/ contains=rbrowserDelim,rbrowserTab
+  syn match rbrowserFactor	"'#.*\t" contains=rbrowserDelim,rbrowserTab
+  syn match rbrowserFunction	"(#.*\t" contains=rbrowserDelim,rbrowserTab
+  syn match rbrowserList	"\[#.*\t" contains=rbrowserDelim,rbrowserTab
+  syn match rbrowserLogical	"%#.*\t" contains=rbrowserDelim,rbrowserTab
+  syn match rbrowserLibrary	"##.*\t" contains=rbrowserDelim,rbrowserTab
+  syn match rbrowserRepeat	"!#.*\t" contains=rbrowserDelim,rbrowserTab
+  syn match rbrowserUnknown	"=#.*\t" contains=rbrowserDelim,rbrowserTab
 else
-  syn match rbrowserNumeric	"{.*	" contains=rbrowserDelim,rbrowserTab
-  syn match rbrowserCharacter	/".*	/ contains=rbrowserDelim,rbrowserTab
-  syn match rbrowserFactor	"'.*	" contains=rbrowserDelim,rbrowserTab
-  syn match rbrowserFunction	"(.*	" contains=rbrowserDelim,rbrowserTab
-  syn match rbrowserList		"\[.*	" contains=rbrowserDelim,rbrowserTab
-  syn match rbrowserLogical	"%.*	" contains=rbrowserDelim,rbrowserTab
-  syn match rbrowserLibrary	"#.*	" contains=rbrowserDelim,rbrowserTab
-  syn match rbrowserRepeat	"!.*	" contains=rbrowserDelim,rbrowserTab
-  syn match rbrowserUnknown	"=.*	" contains=rbrowserDelim,rbrowserTab
+  syn match rbrowserNumeric	"{.*\t" contains=rbrowserDelim,rbrowserTab
+  syn match rbrowserCharacter	/".*\t/ contains=rbrowserDelim,rbrowserTab
+  syn match rbrowserFactor	"'.*\t" contains=rbrowserDelim,rbrowserTab
+  syn match rbrowserFunction	"(.*\t" contains=rbrowserDelim,rbrowserTab
+  syn match rbrowserList	"\[.*\t" contains=rbrowserDelim,rbrowserTab
+  syn match rbrowserLogical	"%.*\t" contains=rbrowserDelim,rbrowserTab
+  syn match rbrowserLibrary	"#.*\t" contains=rbrowserDelim,rbrowserTab
+  syn match rbrowserRepeat	"!.*\t" contains=rbrowserDelim,rbrowserTab
+  syn match rbrowserUnknown	"=.*\t" contains=rbrowserDelim,rbrowserTab
 endif
 syn match rbrowserEnv		"^.GlobalEnv "
 syn match rbrowserEnv		"^Libraries "
@@ -53,7 +53,7 @@ if &encoding != "utf-8"
   syn match rbrowserTreePart	"|-"
 endif
 
-syn match rbrowserTab contained "	"
+syn match rbrowserTab contained "\t"
 if has("conceal")
   syn match rbrowserDelim contained /'#\|"#\|(#\|\[#\|{#\|%#\|##\|!#\|=#/ conceal
 else

@@ -4,7 +4,7 @@
 " Language:     LaTeX
 " Maintainer:   Johannes Tanzler <johannes.tanzler@aon.at>
 " Created:      Sat, 16 Feb 2002 16:50:19 +0100
-" Last Change:	Sun Feb 06, 2011  04:55PM
+" Last Change:	Wed Feb 09, 2011  01:36PM
 " Last Update:  18th feb 2002, by LH :
 "               (*) better support for the option
 "               (*) use some regex instead of several '||'.
@@ -89,9 +89,6 @@ setlocal indentexpr=GetTeXIndent2()
 setlocal nolisp
 setlocal nosmartindent
 setlocal autoindent
-if &filetype == "rnoweb"
-  setlocal iskeyword=@,48-57,_,.
-endif
 exec 'setlocal indentkeys+=}' . substitute(g:tex_items, '^\|\(\\|\)', ',=', 'g')
 let g:tex_items = '^\s*' . g:tex_items
 
