@@ -85,14 +85,14 @@ FILES:
    r-plugin/omniList
    r-plugin/vimbrowser.R
    r-plugin/vimhelp.R
+   r-plugin/vimprint.R
+   r-plugin/vimSweave.R
    r-plugin/r.snippets
-   r-plugin/rpager.sh
    r-plugin/specialfuns.R
    r-plugin/tex_indent.vim
    r-plugin/vimActivate.js
    r-plugin/windows.py
    syntax/rbrowser.vim
-   syntax/rhelp.vim
    syntax/rout.vim
    syntax/r.vim
 

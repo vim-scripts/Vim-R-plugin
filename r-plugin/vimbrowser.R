@@ -9,8 +9,8 @@
         else if(is.character(x)) x.class <- "character"
         else if(is.function(x)) x.class <- "function"
         else if(is.logical(x)) x.class <- "logical"
-        else if(is.data.frame(x)) x.class <- "data.frame"
-        else if(is.list(x)) x.class <- "list"
+        else if(is.data.frame(x) && !is.null(names(x)) && length(names(x)) > 0) x.class <- "data.frame"
+        else if(is.list(x) && !is.null(names(x)) && length(names(x)) > 0) x.class <- "list"
         else x.class <- "other"
 
         cat("'", x.name, "': {'class': \"", x.class, '"', sep = "")
@@ -20,18 +20,9 @@
         if(is.list(x)){
             x.names <- names(x)
             llen <- length(x)
-            if(is.null(x.names)){
-                if(llen > 0)
-                    x.names <- paste('[[', 1:llen, ']]', sep = "")
-                else {
-                    cat("}")
-                    return(invisible(NULL))
-                }
-            } else {
-                idx <- grep("^$", x.names)
-                nnn <- 1:llen
-                x.names[idx] <- paste('[[', nnn[idx], ']]', sep = "")
-            }
+            idx <- grep("^$", x.names)
+            nnn <- 1:llen
+            x.names[idx] <- paste('[[', nnn[idx], ']]', sep = "")
             curlist <- paste(curlist, x.name, sep = "-")
             cat(", 'items': {", sep = "")
 

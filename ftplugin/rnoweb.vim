@@ -17,7 +17,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Thu Feb 17, 2011  11:02PM
+" Last Change: Sun May 22, 2011  08:27AM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -27,6 +27,10 @@ endif
 
 " Don't load another plugin for this buffer
 let b:did_rnoweb_ftplugin = 1
+
+" Enable syntax highlight of LaTeX errors in R Console (if using Conque
+" Shell)
+let syn_rout_latex = 1
 
 " Source scripts common to R, Rnoweb, Rhelp and rdoc files:
 runtime r-plugin/common_global.vim

@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria
 
-Version: 110222
+Version: 110614
 For Vim version 7.3
 
  1. Overview                                    |r-plugin-overview|
@@ -54,7 +54,8 @@ to deal with.
       - Special highlighting for R output (.Rout files).
       - Spell check only strings and comments.
       - Fold code when foldmethod=syntax.
-  * Smart indentation for R and Rnoweb syntax.
+  * Syntax highlighting for RHelp syntax.
+  * Smart indentation for R, RHelp and Rnoweb syntax.
   * Integrated communication with R:
       - Start/Close R.
       - Send lines, selection, paragraphs, functions, blocks, entire file.
@@ -331,6 +332,21 @@ underscore.  This behavior is similar to the EMACS ESS mode some users may be
 familiar with and is enabled by default. You have to change the value of
 |vimrplugin_underscore| to disable underscore replacement.
 
+When you press \rh, the plugin shows the help for the function under the
+cursor. The plugin also checks the class of the object passed as argument to
+the function to try to figure out whether the function is a generic one and
+whether it is more appropriate to show a specific method. The same procedure
+is followed with \rp, that is, while printing an object. For example, if you
+run the code below and, then, press <LocalLeader>rh and <LocalLeader>rp over
+the two occurrences of summary, the plugin will show different documentations
+and print different objects in each case:
+>
+   y <- rnorm(100)
+   x <- rnorm(100)
+   m <- lm(y ~ x)
+   summary(x)
+   summary(m)
+<
 
 4.2. Edition of rnoweb files~
 
@@ -436,9 +452,9 @@ line.
 								 *:RBuildTags*
 Vim can jump to functions defined in other files if you press CTRL-] over the
 name of a function, but it needs a tags file to be able to find the function
-definition (see |tags-and-searches|). The command  :RBuildTags  call the R
+definition (see |tags-and-searches|). The command  :RBuildTags  calls the R
 function rtags() to build the tags file for the R scripts in the current
-directory. Please read the |r-plugin-tips| to learn how to create a tags file
+directory. Please read |r-plugin-tagsfile| to learn how to create a tags file
 referencing source code located in other directories, including the entire R
 source code.
 
@@ -894,6 +910,14 @@ your own ~/.screenrc, put in your |vimrc|:
 >
    let vimrplugin_noscreenrc = 1
 <
+Below is a sample ~/.screenrc you may consider as a starting point to create
+your own:
+>
+   msgwait 0
+   termcapinfo xterm* 'ti@:te@'
+   vbell off
+   term screen-256color
+<
 
 7.15. Integration with screen.vim (Linux/Unix only)~
 						     *vimrplugin_screenplugin*
@@ -959,19 +983,18 @@ for a complete list):
   <c-a>p            switch to the previous screen session
   <c-a>S            split the current region in two new ones
   <c-a>X            kill the current region
-  <c-a>Esc          Enter copy/scrollback mode
-  Esc               Quit the copy/scrollback mode
+  <c-a>Esc          enter copy/scrollback mode
+  Esc               quit the copy/scrollback mode
 
-By default, screen waits briefly after it receives external commands and
-other default options may not be what you want. Please read screen
-documentation to know how to configure it. Below is a sample ~/.screenrc you
-may consider as a starting point to create your own:
->
-   msgwait 0
-   termcapinfo xterm* 'ti@:te@'
-   vbell off
-   term screen-256color
-<
+By default, screen waits briefly after it receives external commands and other
+default options may not be what you want. Please read screen documentation to
+know how to configure it (see also |vimrplugin_noscreenrc|).
+
+Note: <C-a> is the screen scape character, and it will not be passed to
+applications running under screen. To send <c-a> to either R or Vim you have
+to type <c-a>a. You can also set a different escape character in your
+~/.screenrc (see |vimrplugin_noscreenrc|).
+
 
 7.16. Integration with Conque Shell plugin~
 						     *vimrplugin_conqueplugin*
@@ -1232,9 +1255,9 @@ directory after the installation:
    r-plugin/omniList
    r-plugin/vimbrowser.R
    r-plugin/vimhelp.R
+   r-plugin/vimprint.R
    r-plugin/vimSweave.R
    r-plugin/r.snippets
-   r-plugin/rpager.sh
    r-plugin/specialfuns.R
    r-plugin/tex_indent.vim
    r-plugin/vimActivate.js
@@ -1474,16 +1497,42 @@ processing.
 10.15. Edit your ~/.Rprofile~
 
 You may want to edit your ~/.Rprofile. Two common options are the use of GVim
-as the text editor and the use of html help. Example for Linux:
+as the text editor and the use of html help. Example for Linux with these two
+options and some others:
 >
    if (interactive()) {
      local({
-       options(editor = 'gvim -f -c "set ft=r"')
-       options(help_type = "html")
+        options(editor = 'gvim -f -c "set ft=r"')
+        options(warn = 1)
+        options(max.print = 999)
+        if(nchar(Sys.getenv("DISPLAY")) > 1){
+            options(help_type = "html")
+            grDevices::X11.options(width = 4.5, height = 4,
+	        xpos = 1000, ypos = 0, pointsize = 10)
+        } else {
+            options(help_type = "text")
+        }
      })
    }
 <
-and for Windows:
+The test for the environment variable DISPLAY is useful if you eventually use
+the plugin over ssh or on the Linux console.
+
+The X11.options() is used to choose the position and dimensions of the X11
+graphical device. You can also install the application wmctrl and create
+shortcuts in your desktop environment to the commands
+>
+   wmctrl -r "R Graphics" -b add,above
+   wmctrl -r "R Graphics" -b remove,above
+<
+which will toggle the "always on top" state of the X11 device window.
+Alternatively, you can right click on the X11 device window title bar and
+choose "Always on top". This is useful to emulate a feature present in R IDEs
+which can display R plots in a separate panel. Although we can not embed an R
+graphical device in Vim, we can at least make it always visible over the
+terminal emulator or the GVim window.
+
+An example for Windows:
 >
    if (interactive()) {
      local({
@@ -1509,9 +1558,64 @@ called it will enter in debugging mode. Once debugging a function, you can hit
 and qqq() to quit the function (See debug's help for details).
 
 
+10.17. Turn the R-plugin into a global plugin~
+							     *r-plugin-global*
+The Vim-R-plugin is a file type plugin. If you want its functionality
+available for all file types, then do one of the following:
+
+10.17.1. When using either GVim or Vim + Conque Shell plugin~
+
+Go to your ~/.vim/plugin directory and create a symbolic link to
+~/.vim/r-plugin/global_r_plugin.vim. That is, type the following
+in an terminal emulator:
+>
+   cd ~/.vim/plugin/
+   ln -s ../r-plugin/global_r_plugin.vim
+<
+Then, typing <LocalLeader>rf will activate the plugin and start an R session.
+The <LocalLeader>rf shortcut is hardcoded in the global_r_plugin.vim script.
+If you prefer to use another shortcut, instead of creating a symbolic link,
+make a copy of the file to the ~/.vim/plugin directory and edit it. On
+Windows, you probably will have to make a copy of the file to the
+~/vimfiles/plugin directory.
+
+10.17.2. When using Vim + screen plugin (either screen or tmux)~
+
+Put in your |vimrc| (replace <F2> with the shortcut of your preference):
+>
+   nmap <F2> :runtime ftplugin/r.vim<CR>
+<
+Press <F2>\rf<F2> to use R. Tha is, press <F2> before AND after starting R
+with the shortcut <LocalLeader>rf (or any other key binding that you have
+defined in your |vimrc| as the shortcut to start R). The first time that <F2>
+is pressed, the plugin's functions and key bindings are made available.
+However, when R is started, Vim is closed and restarted by the screen plugin,
+and the Vim-R-plugin functions and key bindings are lost. Consequently, the
+ftplugin/r.vim script must be sourced again by pressing <F2> for the second
+time.
+
+
+10.18. Vim-LaTeX-suite and Rnoweb files~
+
+If you want to use the Vim-LaTeX-suite plugin with Rnoweb files, create a file
+named rnw.vim at ~/.vim/ftdetect with the following content:
+>
+   autocmd BufRead,BufNewFile *.Rnw set filetype=tex
+   autocmd BufRead,BufNewFile *.rnw set filetype=tex
+<
+
 ==============================================================================
 11. News~
 							       *r-plugin-news*
+
+110614 (2011-06-14)
+ * When doing the command \rh, the plugin tries to show the help for the
+   method corresponding to the class of the object passed as argument to the
+   function. The same with \rp (thanks to Thomas Scheike for suggesting the
+   feature).
+ * Removed scipt rpager.sh.
+ * Added script global_r_plugin.vim to allow the use of the plugin with any
+   file type.
 
 110222 (2011-02-22)
  * Added syntax/rhelp.vim.

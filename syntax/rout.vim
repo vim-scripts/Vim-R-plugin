@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:    R output Files
 " Maintainer:  Jakson Aquino <jalvesaq@gmail.com>
-" Last Change: Sun Feb 20, 2011  12:06PM
+" Last Change: Sun May 22, 2011  08:43AM
 "
 
 " Version Clears: {{{1
@@ -12,6 +12,10 @@ if version < 600
 elseif exists("b:current_syntax")
   finish
 endif 
+
+if !exists("syn_rout_latex")
+    let g:syn_rout_latex = 0
+endif
 
 syn case match
 
@@ -104,6 +108,14 @@ if v:lang =~ "^ru"
   syn match routWarn	"^Предупреждение.*"
 endif
 
+" LaTeX errors
+if syn_rout_latex == 1
+    syn match routWarn "^No file .*"
+    syn match routWarn "^Underfull .*"
+    syn match routWarn "^Overfull .*"
+    syn match routWarn "^LaTeX Warning: .*"
+    syn match routError "^! LaTeX Error: .*"
+endif
 
 " Define the default highlighting.
 if g:vimrplugin_routmorecolors == 0

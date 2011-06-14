@@ -2,7 +2,7 @@
 " Language:    R Help File
 " Maintainer: Jakson Aquino <jalvesaq@gmail.com>
 " Former Maintainer: Johannes Ranke <jranke@uni-bremen.de>
-" Last Change: Sat Feb 19, 2011  02:13PM
+" Last Change: Thu Apr 14, 2011  05:03PM
 " Version:     0.7.4
 " SVN:		   $Id: rhelp.vim 90 2010-11-22 10:58:11Z ranke $
 " Remarks:     - Includes R syntax highlighting in the appropriate
@@ -13,6 +13,7 @@
 "              - No support for \if, \ifelse and \out as I don't understand
 "                them and have no examples at hand (help welcome).
 "              - No support for \var tag within quoted string (dito)
+"              - No support for spell checking.
 
 " Version Clears: {{{1
 " For version 5.x: Clear all syntax items

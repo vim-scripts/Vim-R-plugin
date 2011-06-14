@@ -16,7 +16,7 @@
 "
 " Author: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          
-" Last Change: Mon Feb 21, 2011  07:26PM
+" Last Change: Sat Mar 19, 2011  10:35AM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -301,7 +301,7 @@ function! RBrowserAddItemToList(key, curlist)
     endif
 endfunction
 
-function RBrowserFillCloseList()
+function! RBrowserFillCloseList()
     let thekeys = sort(keys(b:workspace))
     for key in thekeys
         let s:curlist = ""
@@ -430,7 +430,7 @@ function! RBrowserDoubleClick()
     echon
 endfunction
 
-function RBrowserOpenCloseLists(status)
+function! RBrowserOpenCloseLists(status)
     if ! buflisted("Object_Browser")
         call RWarningMsg('There is no "Object_Browser" buffer.')
         return
@@ -457,11 +457,15 @@ function RBrowserOpenCloseLists(status)
 endfunction
 
 function! RBrowserRightClick()
+    echon
     if line(".") == 1
         return
     endif
 
     let key = RBrowserGetName(1)
+    if key == ""
+        return
+    endif
 
     let line = getline(".")
     let isfunction = 0
@@ -475,26 +479,25 @@ function! RBrowserRightClick()
         endif
     endif
 
-    if key != ""
-        if g:rplugin_hasbrowsermenu == 1
-            aunmenu ]RBrowser
-        endif
-        let key = substitute(key, '\.', '\\.', "g")
-        let key = substitute(key, ' ', '\\ ', "g")
-        if isfunction
-            exe 'amenu ]RBrowser.args('. key . ') :call RAction("args")<CR>'
-            exe 'amenu ]RBrowser.example('. key . ') :call RAction("example")<CR>'
-            exe 'amenu ]RBrowser.help('. key . ') :call RAction("help")<CR>'
-        else
-            exe 'amenu ]RBrowser.names('. key . ') :call RAction("names")<CR>'
-            exe 'amenu ]RBrowser.plot('. key . ') :call RAction("plot")<CR>'
-            exe 'amenu ]RBrowser.print(' . key . ') :call RAction("print")<CR>'
-            exe 'amenu ]RBrowser.str('. key . ') :call RAction("str")<CR>'
-            exe 'amenu ]RBrowser.summary('. key . ') :call RAction("summary")<CR>'
-        endif
-        popup ]RBrowser
-        let g:rplugin_hasbrowsermenu = 1
+    if g:rplugin_hasbrowsermenu == 1
+        aunmenu ]RBrowser
     endif
+    let key = substitute(key, '\.', '\\.', "g")
+    let key = substitute(key, ' ', '\\ ', "g")
+
+    exe 'amenu ]RBrowser.summary('. key . ') :call RAction("summary")<CR>'
+    exe 'amenu ]RBrowser.str('. key . ') :call RAction("str")<CR>'
+    exe 'amenu ]RBrowser.names('. key . ') :call RAction("names")<CR>'
+    exe 'amenu ]RBrowser.plot('. key . ') :call RAction("plot")<CR>'
+    exe 'amenu ]RBrowser.print(' . key . ') :call RAction("print")<CR>'
+    amenu ]RBrowser.-sep01- <nul>
+    exe 'amenu ]RBrowser.example('. key . ') :call RAction("example")<CR>'
+    exe 'amenu ]RBrowser.help('. key . ') :call RAction("help")<CR>'
+    if isfunction
+        exe 'amenu ]RBrowser.args('. key . ') :call RAction("args")<CR>'
+    endif
+    popup ]RBrowser
+    let g:rplugin_hasbrowsermenu = 1
 endfunction
 
 function! RBrowserFindParent(word, curline, curpos)
@@ -566,6 +569,9 @@ function! RBrowserGetName(complete)
             break
         endif
     endfor
+    if curpos == -1
+        return ""
+    endif
 
     let s:spacelimit = 2
     if has("conceal")

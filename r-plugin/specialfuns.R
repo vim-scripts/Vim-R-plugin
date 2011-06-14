@@ -16,40 +16,41 @@
 
 
 .vim.list.args <- function(ff){
-  knownGenerics <- c(names(.knownS3Generics),
-    tools:::.get_internal_S3_generics()) # from methods()
-  ff <- deparse(substitute(ff))
-  keyf <- paste("^", ff, "$", sep="")
-  is.generic <- (length(grep(keyf, knownGenerics)) > 0)
-  if(is.generic){
-    mm <- methods(ff)
-    l <- length(mm)
-    if(l > 0){
-      for(i in 1:l){
-        if(exists(mm[i])){
-          cat(ff, "[method ", mm[i], "]:\n", sep="")
-          print(args(mm[i]))
-          cat("\n")
+    knownGenerics <- c(names(.knownS3Generics),
+                       tools:::.get_internal_S3_generics()) # from methods()
+    ff <- deparse(substitute(ff))
+    keyf <- paste("^", ff, "$", sep="")
+    is.generic <- (length(grep(keyf, knownGenerics)) > 0)
+    if(is.generic){
+        mm <- methods(ff)
+        l <- length(mm)
+        if(l > 0){
+            for(i in 1:l){
+                if(exists(mm[i])){
+                    cat(ff, "[method ", mm[i], "]:\n", sep="")
+                    print(args(mm[i]))
+                    cat("\n")
+                }
+            }
+            return(invisible(NULL))
         }
-      }
-      return(invisible(NULL))
     }
-  }
-  print(args(ff))
+    print(args(ff))
 }
 
 
 .vim.plot <- function(x)
 {
-  if(is.numeric(x)){
-    oldpar <- par(no.readonly = TRUE)
-    par(mfrow = c(2, 1))
-    hist(x, col = "lightgray")
-    boxplot(x, main = paste("Boxplot of", deparse(substitute(x))),
-        col = "lightgray", horizontal = TRUE)
-    par(oldpar)
-  } else {
-    plot(x)
-  }
+    xname <- deparse(substitute(x))
+    if(length(grep("numeric", class(x))) > 0){
+        oldpar <- par(no.readonly = TRUE)
+        par(mfrow = c(2, 1))
+        hist(x, col = "lightgray", main = paste("Histogram of", xname), xlab = xname)
+        boxplot(x, main = paste("Boxplot of", xname),
+                col = "lightgray", horizontal = TRUE)
+        par(oldpar)
+    } else {
+        plot(x)
+    }
 }
 

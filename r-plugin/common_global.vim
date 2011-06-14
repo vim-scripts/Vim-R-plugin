@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Tue Feb 22, 2011  07:59PM
+" Last Change: Fri Jun 03, 2011  04:47PM
 "
 " Purposes of this file: Create all functions and commands and Set the
 " value of all global variables  and some buffer variables.for r,
@@ -55,7 +55,7 @@ function RSetDefaultValue(var, val)
 endfunction
 
 function ReplaceUnderS()
-    if &filetype == "rnoweb" && RnwIsInRCode() == 0
+    if (&filetype == "rnoweb" || &filetype == "tex") && RnwIsInRCode() == 0
         let isString = 1
     else
         let j = col(".")
@@ -610,7 +610,8 @@ endfunction
 " Function to send commands
 " return 0 on failure and 1 on success
 function SendCmdToR(cmd)
-    let cmd = "\025" . a:cmd
+    " ^K clean from cursor to the right and ^U clean from cursor to the left
+    let cmd = "\013" . "\025" . a:cmd
 
     if has("gui_win32") && g:vimrplugin_conqueplugin == 0
         let cmd = cmd . "\n"
@@ -967,9 +968,17 @@ function SendLineToR(godown)
         endif
     endif
 
-    if &filetype == "rdoc" && search("^Examples:$", "bncW") == 0
-        call RWarningMsg('Not in the "Examples" section.')
-        return
+    if &filetype == "rdoc"
+        if getline(1) =~ '^The topic'
+            let topic = substitute(line, '.*::', '', "")
+            let package = substitute(line, '::.*', '', "")
+            call ShowRDoc(topic, package)
+            return
+        endif
+        if search("^Examples:$", "bncW") == 0
+            call RWarningMsg('Not in the "Examples" section.')
+            return
+        endif
     endif
 
     let b:needsnewomnilist = 1
@@ -1198,18 +1207,83 @@ function SetRTextWidth()
     endif
 endfunction
 
+function RGetClassFor(rkeyword)
+    let classfor = ""
+    let line = substitute(getline("."), '#.*', '', "")
+    let begin = col(".")
+    if strlen(line) > begin
+        let piece = strpart(line, begin)
+        while piece !~ '^' . a:rkeyword
+            let begin -= 1
+            let piece = strpart(line, begin)
+        endwhile
+        let line = piece
+        if line !~ '^\k*\s*('
+            return classfor
+        endif
+        let begin = 1
+        let linelen = strlen(line)
+        while line[begin] != '(' && begin < linelen
+            let begin += 1
+        endwhile
+        let begin += 1
+        let line = strpart(line, begin)
+        let line = substitute(line, '^\s*', '', "")
+        if line =~ '^\k*\s*(' || line =~ '^\k*\s*=\s*\k*\s*('
+            let idx = 0
+            while line[idx] != '('
+                let idx += 1
+            endwhile
+            let idx += 1
+            let nparen = 1
+            let len = strlen(line)
+            let lnum = line(".")
+            while nparen != 0
+                if line[idx] == '('
+                    let nparen += 1
+                else
+                    if line[idx] == ')'
+                        let nparen -= 1
+                    endif
+                endif
+                let idx += 1
+                if idx == len
+                    let lnum += 1
+                    let line = line . substitute(getline(lnum), '#.*', '', "")
+                    let len = strlen(line)
+                endif
+            endwhile
+            let classfor = strpart(line, 0, idx)
+        else
+            let classfor = substitute(line, ').*', '', "")
+            let classfor = substitute(classfor, ',.*', '', "")
+            let classfor = substitute(classfor, ' .*', '', "")
+        endif
+    endif
+    return classfor
+endfunction
+
 " Show R's help doc in Vim's buffer
 " (based  on pydoc plugin)
-function ShowRDoc(rkeyword)
+function ShowRDoc(rkeyword, package)
     if filewritable(g:rplugin_docfile)
         call delete(g:rplugin_docfile)
     endif
 
+    let classfor = ""
     if bufname("%") =~ "Object_Browser"
         let savesb = &switchbuf
         set switchbuf=useopen,usetab
         exe "sb " . b:rscript_buffer
         exe "set switchbuf=" . savesb
+    else
+        if a:package == ""
+            let classfor = RGetClassFor(a:rkeyword)
+        endif
+    endif
+
+    if classfor =~ '='
+        let classfor = "eval(expression(" . classfor . "))"
     endif
 
     if g:vimrplugin_vimpager == "tabnew"
@@ -1227,7 +1301,15 @@ function ShowRDoc(rkeyword)
     call SetRTextWidth()
 
     call writefile(['Wait...'], g:rplugin_docfile . "lock")
-    call SendCmdToR("source('" . g:rplugin_home . "/r-plugin/vimhelp.R') ; .vim.help('" . a:rkeyword . "', " . g:rplugin_htw . "L)")
+    if classfor == ""
+        if a:package == ""
+            call SendCmdToR("source('" . g:rplugin_home . "/r-plugin/vimhelp.R') ; .vim.help('" . a:rkeyword . "', " . g:rplugin_htw . "L)")
+        else
+            call SendCmdToR("source('" . g:rplugin_home . "/r-plugin/vimhelp.R') ; .vim.help('" . a:rkeyword . "', " . g:rplugin_htw . "L, package = '" . a:package . "')")
+        endif
+    else
+        call SendCmdToR("source('" . g:rplugin_home . "/r-plugin/vimhelp.R') ; .vim.help('" . a:rkeyword . "', " . g:rplugin_htw . "L, " . classfor . ")")
+    endif
     sleep 50m
 
     let i = 0
@@ -1310,7 +1392,19 @@ function ShowRDoc(rkeyword)
     normal! ggdd
     setlocal nomodified
     setlocal nomodifiable
+endfunction
 
+function PrintRObject(rkeyword)
+    if bufname("%") =~ "Object_Browser"
+        let classfor = ""
+    else
+        let classfor = RGetClassFor(a:rkeyword)
+    endif
+    if classfor == ""
+        call SendCmdToR("print(" . a:rkeyword . ")")
+    else
+        call SendCmdToR("source('" . g:rplugin_home . "/r-plugin/vimprint.R') ; .vim.print('" . a:rkeyword . "', " . classfor . ")")
+    endif
 endfunction
 
 " Call R functions for the word under cursor
@@ -1324,10 +1418,14 @@ function RAction(rcmd)
     if strlen(rkeyword) > 0
         if a:rcmd == "help"
             if g:vimrplugin_vimpager != "no"
-                call ShowRDoc(rkeyword)
+                call ShowRDoc(rkeyword, "")
             else
                 call SendCmdToR("help(" . rkeyword . ")")
             endif
+            return
+        endif
+        if a:rcmd == "print"
+            call PrintRObject(rkeyword)
             return
         endif
         let rfun = a:rcmd
@@ -1596,10 +1694,10 @@ function MakeRMenu()
     call RCreateMenuItem("ni", 'Send.Function\ (cur,\ echo\ and\ down)', '<Plug>REDSendFunction', 'fa', ':call SendFunctionToR("echo", "down")')
     "-------------------------------
     menu R.Send.-Sep3- <nul>
-    call RCreateMenuItem("v0", 'Send.Selection', '<Plug>RSendSelection', 'ss', ':call SendSelectionToR("silent", "stay")')
-    call RCreateMenuItem("v0", 'Send.Selection\ (echo)', '<Plug>RESendSelection', 'se', ':call SendSelectionToR("echo", "stay")')
-    call RCreateMenuItem("v0", 'Send.Selection\ (and\ down)', '<Plug>RDSendSelection', 'sd', ':call SendSelectionToR("silent", "down")')
-    call RCreateMenuItem("v0", 'Send.Selection\ (echo\ and\ down)', '<Plug>REDSendSelection', 'sa', ':call SendSelectionToR("echo", "down")')
+    call RCreateMenuItem("v", 'Send.Selection', '<Plug>RSendSelection', 'ss', ':call SendSelectionToR("silent", "stay")')
+    call RCreateMenuItem("v", 'Send.Selection\ (echo)', '<Plug>RESendSelection', 'se', ':call SendSelectionToR("echo", "stay")')
+    call RCreateMenuItem("v", 'Send.Selection\ (and\ down)', '<Plug>RDSendSelection', 'sd', ':call SendSelectionToR("silent", "down")')
+    call RCreateMenuItem("v", 'Send.Selection\ (echo\ and\ down)', '<Plug>REDSendSelection', 'sa', ':call SendSelectionToR("echo", "down")')
     "-------------------------------
     menu R.Send.-Sep4- <nul>
     call RCreateMenuItem("ni", 'Send.Paragraph', '<Plug>RSendParagraph', 'pp', ':call SendParagraphToR("silent", "stay")')
@@ -1721,6 +1819,7 @@ function MakeRMenu()
     amenu R.Help\ (plugin).FAQ\ and\ tips.Customize\ key\ bindings :help r-plugin-bindings<CR>
     amenu R.Help\ (plugin).FAQ\ and\ tips.SnipMate :help r-plugin-snippets<CR>
     amenu R.Help\ (plugin).FAQ\ and\ tips.Highlight\ marks :help r-plugin-showmarks<CR>
+    amenu R.Help\ (plugin).FAQ\ and\ tips.Global\ plugin :help r-plugin-global<CR>
     amenu R.Help\ (plugin).FAQ\ and\ tips.Jump\ to\ function\ definitions :help r-plugin-tagsfile<CR>
     amenu R.Help\ (plugin).News :help r-plugin-news<CR>
 
@@ -1793,8 +1892,7 @@ function UnMakeRMenu()
 endfunction
 
 
-function ROpenGraphicsDevice()
-    call SendCmdToR('x11(title = "Vim-R-plugin Graphics", width = 3.5, height = 3.5, pointsize = 9, xpos = -1, ypos = 0)')
+function SpaceForRGrDevice()
     let savesb = &switchbuf
     set switchbuf=useopen,usetab
     let l:sr = &splitright
@@ -1854,10 +1952,10 @@ function RCreateSendMaps()
 
     " Selection
     "-------------------------------------
-    call RCreateMaps("v0", '<Plug>RSendSelection',   'ss', ':call SendSelectionToR("silent", "stay")')
-    call RCreateMaps("v0", '<Plug>RESendSelection',  'se', ':call SendSelectionToR("echo", "stay")')
-    call RCreateMaps("v0", '<Plug>RDSendSelection',  'sd', ':call SendSelectionToR("silent", "down")')
-    call RCreateMaps("v0", '<Plug>REDSendSelection', 'sa', ':call SendSelectionToR("echo", "down")')
+    call RCreateMaps("v", '<Plug>RSendSelection',   'ss', ':call SendSelectionToR("silent", "stay")')
+    call RCreateMaps("v", '<Plug>RESendSelection',  'se', ':call SendSelectionToR("echo", "stay")')
+    call RCreateMaps("v", '<Plug>RDSendSelection',  'sd', ':call SendSelectionToR("silent", "down")')
+    call RCreateMaps("v", '<Plug>REDSendSelection', 'sa', ':call SendSelectionToR("echo", "down")')
 
     " Paragraph
     "-------------------------------------
