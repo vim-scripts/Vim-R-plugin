@@ -16,14 +16,18 @@
 "
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
-"          
-" Last Change: Sun May 22, 2011  08:27AM
+"
+" Last Change: Mon Jun 27, 2011  11:15AM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
 if exists("b:did_rnoweb_ftplugin") || exists("disable_r_ftplugin")
     finish
 endif
+
+" The below enables (g)Vim runs Vim-R-Plugin and Vim-Latex-Suite together to noweb files
+" (Sweave)
+runtime! ftplugin/tex_latexSuite.vim
 
 " Don't load another plugin for this buffer
 let b:did_rnoweb_ftplugin = 1

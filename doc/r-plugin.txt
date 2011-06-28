@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria
 
-Version: 110614
+Version: 110628
 For Vim version 7.3
 
  1. Overview                                    |r-plugin-overview|
@@ -1594,19 +1594,19 @@ and the Vim-R-plugin functions and key bindings are lost. Consequently, the
 ftplugin/r.vim script must be sourced again by pressing <F2> for the second
 time.
 
-
 10.18. Vim-LaTeX-suite and Rnoweb files~
 
-If you want to use the Vim-LaTeX-suite plugin with Rnoweb files, create a file
-named rnw.vim at ~/.vim/ftdetect with the following content:
->
-   autocmd BufRead,BufNewFile *.Rnw set filetype=tex
-   autocmd BufRead,BufNewFile *.rnw set filetype=tex
-<
+From Vim-R-plugin 110628 you can use all resources of Vim-LaTeX-suite plugin
+with Rnoweb files without any additional configuration. For this, the necessary
+code was added to the Vim-R-plugin/ftplugin/rnoweb.vim file.
 
 ==============================================================================
 11. News~
 							       *r-plugin-news*
+110628 (2011-06-28)
+ * From this version you can use all resources of Vim-LaTeX-suite plugin
+   with Rnoweb files without any additional configuration. For this,
+   the necessary code was added to the Vim-R-plugin/ftplugin/rnoweb.vim file.
 
 110614 (2011-06-14)
  * When doing the command \rh, the plugin tries to show the help for the
