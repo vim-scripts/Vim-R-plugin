@@ -1594,19 +1594,20 @@ and the Vim-R-plugin functions and key bindings are lost. Consequently, the
 ftplugin/r.vim script must be sourced again by pressing <F2> for the second
 time.
 
-10.18. Vim-LaTeX-suite and Rnoweb files~
 
-From Vim-R-plugin 110628 you can use all resources of Vim-LaTeX-suite plugin
-with Rnoweb files without any additional configuration. For this, the necessary
-code was added to the Vim-R-plugin/ftplugin/rnoweb.vim file.
+10.18. Disable syntax highlight of R functions~
+
+If you want to disable the syntax highlight of R functions edit the file
+~/.vim/r-plugin/functions.vim and delete all lines, but do not delete the
+file.
+
 
 ==============================================================================
 11. News~
 							       *r-plugin-news*
-110628 (2011-06-28)
- * From this version you can use all resources of Vim-LaTeX-suite plugin
-   with Rnoweb files without any additional configuration. For this,
-   the necessary code was added to the Vim-R-plugin/ftplugin/rnoweb.vim file.
+
+ * Vim-LaTeX-suite plugin can be used with Rnoweb files without any additional
+   configuration. The necessary code was added to the ftplugin/rnoweb.vim.
 
 110614 (2011-06-14)
  * When doing the command \rh, the plugin tries to show the help for the
