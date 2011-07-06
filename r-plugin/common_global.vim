@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Fri Jun 03, 2011  04:47PM
+" Last Change: Mon Jun 27, 2011  08:40AM
 "
 " Purposes of this file: Create all functions and commands and Set the
 " value of all global variables  and some buffer variables.for r,
@@ -2230,30 +2230,36 @@ if g:rplugin_home != g:rplugin_uservimfiles
     if !isdirectory(g:rplugin_uservimfiles . "/r-plugin")
         call mkdir(g:rplugin_uservimfiles . "/r-plugin", "p")
     endif
+endif
 
-    " If there is no functions.vim, copy the default one
-    if !filereadable(g:rplugin_uservimfiles . "/r-plugin/functions.vim")
-        if filereadable("/usr/share/vim/addons/r-plugin/functions.vim")
-            let ffile = readfile("/usr/share/vim/addons/r-plugin/functions.vim")
+" If there is no functions.vim, copy the default one
+if !filereadable(g:rplugin_uservimfiles . "/r-plugin/functions.vim")
+    if filereadable("/usr/share/vim/addons/r-plugin/functions.vim")
+        let ffile = readfile("/usr/share/vim/addons/r-plugin/functions.vim")
+        call writefile(ffile, g:rplugin_uservimfiles . "/r-plugin/functions.vim")
+        unlet ffile
+    else
+        if g:rplugin_home != g:rplugin_uservimfiles && filereadable(g:rplugin_home . "/r-plugin/functions.vim")
+            let ffile = readfile(g:rplugin_home . "/r-plugin/functions.vim")
             call writefile(ffile, g:rplugin_uservimfiles . "/r-plugin/functions.vim")
             unlet ffile
         endif
     endif
+endif
 
-    " If there is no omniList, copy the default one
-    if !filereadable(g:rplugin_omnifname)
-        if filereadable("/usr/share/vim/addons/r-plugin/omniList")
-            let omnilines = readfile("/usr/share/vim/addons/r-plugin/omniList")
+" If there is no omniList, copy the default one
+if !filereadable(g:rplugin_omnifname)
+    if filereadable("/usr/share/vim/addons/r-plugin/omniList")
+        let omnilines = readfile("/usr/share/vim/addons/r-plugin/omniList")
+    else
+        if filereadable(g:rplugin_home . "/r-plugin/omniList")
+            let omnilines = readfile(g:rplugin_home . "/r-plugin/omniList")
         else
-            if filereadable(g:rplugin_home . "/r-plugin/omniList")
-                let omnilines = readfile(g:rplugin_home . "/r-plugin/omniList")
-            else
-                let omnilines = []
-            endif
+            let omnilines = []
         endif
-        call writefile(omnilines, g:rplugin_omnifname)
-        unlet omnilines
     endif
+    call writefile(omnilines, g:rplugin_omnifname)
+    unlet omnilines
 endif
 
 " Minimum width for the Object Browser
