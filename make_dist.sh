@@ -14,11 +14,11 @@
 # http://www.r-project.org/Licenses/
 
 
-############################################################
-#   This script builds both the zip and the deb files of  ##
-#   released versions of the plugin. The files are        ##
-#   created at the /tmp directory.                        ##
-############################################################
+###########################################################
+#   This script builds both the zip and the deb files of  #
+#   released versions of the plugin. The files are        #
+#   created at the /tmp directory.                        #
+###########################################################
 
 
 # It's necessary to run the script as root to have the files permissions and
@@ -189,7 +189,7 @@ Version: $PLUGINVERSION
 Architecture: all
 Maintainer: Jakson Alves de Aquino <jalvesaq@gmail.com>
 Installed-Size: $INSTALLEDSIZE
-Depends: vim | vim-gtk | vim-gnome, screen, vim-addon-manager, r-base | r-base-core
+Depends: vim | vim-gtk | vim-gnome, screen, tmux, ncurses-term, vim-addon-manager, r-base | r-base-core
 Enhances: vim
 Section: text
 Priority: extra

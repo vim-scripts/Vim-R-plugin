@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Mon Jun 27, 2011  08:40AM
+" Last Change: Sat Jul 09, 2011  08:31PM
 "
 " Purposes of this file: Create all functions and commands and Set the
 " value of all global variables  and some buffer variables.for r,
@@ -2000,6 +2000,7 @@ call RSetDefaultValue("g:vimrplugin_underscore",        1)
 call RSetDefaultValue("g:vimrplugin_rnowebchunk",       1)
 call RSetDefaultValue("g:vimrplugin_i386",              0)
 call RSetDefaultValue("g:vimrplugin_applescript",       1)
+call RSetDefaultValue("g:vimrplugin_tmux",              1)
 call RSetDefaultValue("g:vimrplugin_screenvsplit",      0)
 call RSetDefaultValue("g:vimrplugin_conquevsplit",      0)
 call RSetDefaultValue("g:vimrplugin_listmethods",       0)
@@ -2126,12 +2127,15 @@ if has("gui_win32")
         let g:vimrplugin_sleeptime = 0.02
     endif
 else
-    if !executable('screen') && !exists("g:ConqueTerm_Version")
-        if has("python") || has("python3")
-            call RWarningMsg("Please, install either the 'screen' application or the 'Conque Shell' plugin to enable the Vim-R-plugin.")
-        else
-            call RWarningMsg("Please, install the 'screen' application to enable the Vim-R-plugin.")
-        endif
+    if (has("gui_running") || g:vimrplugin_tmux == 0) && !executable('screen')
+        let s:rplugin_missing_screen = 1
+        call RWarningMsg("Please, install the 'screen' application to enable the Vim-R-plugin with GVim.")
+    endif
+    if !has("gui_running") && !executable('tmux') && g:vimrplugin_tmux == 1
+        let s:rplugin_missing_tmux = 1
+        call RWarningMsg("Please, install the 'tmux' application to enable the Vim-R-plugin.")
+    endif
+    if exists("s:rplugin_missing_tmux") || exists("s:rplugin_missing_screen")
         call input("Press <Enter> to continue. ")
         let g:rplugin_failed = 1
         finish
@@ -2159,34 +2163,10 @@ endif
 let g:rplugin_docfile = $VIMRPLUGIN_TMPDIR . "/Rdoc"
 let g:rplugin_globalenvfname = $VIMRPLUGIN_TMPDIR . "/GlobalEnvList"
 
-" Use Conque Shell plugin by default... 
-if exists("g:ConqueTerm_Loaded") && !exists("g:vimrplugin_conqueplugin")
-    if has("python") || has("python3")
-        let g:vimrplugin_conqueplugin = 1
-        " ... unless explicitly told otherwise in the vimrc
-        if exists("g:vimrplugin_screenplugin") && g:vimrplugin_screenplugin == 1
-            let g:vimrplugin_conqueplugin = 0
-        endif
-    else
-        call RWarningMsg("Python interface must be enabled to run Vim-R-Plugin with Conque Shell.")
-        let g:vimrplugin_conqueplugin = 0
-        sleep 2
-    endif
-endif
-if exists("g:vimrplugin_conqueplugin") && g:vimrplugin_conqueplugin == 1
-    if !exists("g:ConqueTerm_Version") || (exists("g:ConqueTerm_Version") && g:ConqueTerm_Version < 120)
-        let g:vimrplugin_conqueplugin = 0
-        call RWarningMsg("Vim-R-plugin requires Conque Shell plugin >= 1.2")
-        call input("Press <Enter> to continue. ")
-    endif
-endif
-
-if !exists("g:vimrplugin_conqueplugin")
-    let g:vimrplugin_conqueplugin = 0
-endif
-
-if g:vimrplugin_conqueplugin == 1
-    let g:vimrplugin_screenplugin = 0
+if g:vimrplugin_tmux
+    let g:ScreenImpl = 'Tmux'
+else
+    let g:ScreenImpl = 'GnuScreen'
 endif
 
 if !exists("g:vimrplugin_screenplugin")
@@ -2211,13 +2191,33 @@ if !exists("g:vimrplugin_screenplugin") || has('gui_running')
     let g:vimrplugin_screenplugin = 0
 endif
 
+" Use Conque Shell plugin
+if g:vimrplugin_screenplugin == 0 && !exists("g:vimrplugin_conqueplugin")
+    if exists("g:ConqueTerm_Loaded")
+        if has("python") || has("python3")
+            let g:vimrplugin_conqueplugin = 1
+        else
+            call RWarningMsg("Python interface must be enabled to run Vim-R-Plugin with Conque Shell.")
+            let g:vimrplugin_conqueplugin = 0
+            sleep 2
+        endif
+    endif
+    if !exists("g:vimrplugin_conqueplugin")
+        let g:vimrplugin_conqueplugin = 0
+    endif
+endif
+
+if exists("g:vimrplugin_conqueplugin") && g:vimrplugin_conqueplugin == 1
+    if !exists("g:ConqueTerm_Version") || (exists("g:ConqueTerm_Version") && g:ConqueTerm_Version < 210)
+        let g:vimrplugin_conqueplugin = 0
+        call RWarningMsg("Vim-R-plugin requires Conque Shell plugin >= 2.1")
+        call input("Press <Enter> to continue. ")
+    endif
+endif
+
 " Check again if screen is installed
 if !has("gui_win32") && g:vimrplugin_conqueplugin == 0 && g:vimrplugin_screenplugin == 0 && !executable("screen")
-    if (has("python") || has("python3")) && !exists("g:ConqueTerm_Version")
-        call RWarningMsg("Please, install either the 'screen' application or the 'Conque Shell' plugin to enable the Vim-R-plugin.")
-    else
-        call RWarningMsg("Please, install the 'screen' application to enable the Vim-R-plugin.")
-    endif
+    call RWarningMsg("Please, install both the 'screen' and the 'tmux' applications to enable the Vim-R-plugin.")
     call input("Press <Enter> to continue. ")
     let g:rplugin_failed = 1
     finish

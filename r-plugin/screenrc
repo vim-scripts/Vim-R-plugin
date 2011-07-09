@@ -1,0 +1,8 @@
+msgwait 0
+termcapinfo xterm* 'ti@:te@'
+vbell off
+term screen-256color
+startup_message off
+bind a resize +1
+bind z resize -1
+
