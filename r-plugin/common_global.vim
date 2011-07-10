@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Sat Jul 09, 2011  11:33PM
+" Last Change: Sun Jul 10, 2011  07:31AM
 "
 " Purposes of this file: Create all functions and commands and Set the
 " value of all global variables  and some buffer variables.for r,
@@ -2003,6 +2003,7 @@ call RSetDefaultValue("g:vimrplugin_applescript",       1)
 call RSetDefaultValue("g:vimrplugin_tmux",              1)
 call RSetDefaultValue("g:vimrplugin_screenvsplit",      0)
 call RSetDefaultValue("g:vimrplugin_conquevsplit",      0)
+call RSetDefaultValue("g:vimrplugin_conqueplugin",      0)
 call RSetDefaultValue("g:vimrplugin_listmethods",       0)
 call RSetDefaultValue("g:vimrplugin_specialplot",       0)
 call RSetDefaultValue("g:vimrplugin_nosingler",         0)
@@ -2202,30 +2203,13 @@ if !exists("g:vimrplugin_screenplugin") || has('gui_running')
     let g:vimrplugin_screenplugin = 0
 endif
 
-" Use Conque Shell plugin
-if g:vimrplugin_screenplugin == 0 && !exists("g:vimrplugin_conqueplugin")
-    if exists("g:ConqueTerm_Loaded")
-        if has("python") || has("python3")
-            let g:vimrplugin_conqueplugin = 1
-        else
-            call RWarningMsg("Python interface must be enabled to run Vim-R-Plugin with Conque Shell.")
-            let g:vimrplugin_conqueplugin = 0
-            sleep 2
-        endif
-    endif
-    if !exists("g:vimrplugin_conqueplugin")
-        let g:vimrplugin_conqueplugin = 0
-    endif
-endif
-
-if exists("g:vimrplugin_conqueplugin") && g:vimrplugin_conqueplugin == 1
+if g:vimrplugin_conqueplugin == 1
     if !exists("g:ConqueTerm_Version") || (exists("g:ConqueTerm_Version") && g:ConqueTerm_Version < 210)
         let g:vimrplugin_conqueplugin = 0
         call RWarningMsg("Vim-R-plugin requires Conque Shell plugin >= 2.1")
         call input("Press <Enter> to continue. ")
     endif
 endif
-
 
 " Are we in a Debian package? Is the plugin being running for the first time?
 let g:rplugin_omnifname = g:rplugin_uservimfiles . "/r-plugin/omniList"

@@ -1550,6 +1550,7 @@ output. If you want to try the Conque Shell, install it from:
 
 and put in your |vimrc|:
 >
+   let vimrplugin_screenplugin = 0
    let vimrplugin_conqueplugin = 1
 <
 By default, the window will be split horizontally. Put the following in your
