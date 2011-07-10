@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Sat Jul 09, 2011  08:31PM
+" Last Change: Sat Jul 09, 2011  11:33PM
 "
 " Purposes of this file: Create all functions and commands and Set the
 " value of all global variables  and some buffer variables.for r,
@@ -2127,15 +2127,43 @@ if has("gui_win32")
         let g:vimrplugin_sleeptime = 0.02
     endif
 else
-    if (has("gui_running") || g:vimrplugin_tmux == 0) && !executable('screen')
-        let s:rplugin_missing_screen = 1
-        call RWarningMsg("Please, install the 'screen' application to enable the Vim-R-plugin with GVim.")
+    if !has("gui_running")
+        if g:vimrplugin_tmux == 1 && (!exists("g:vimrplugin_screenplugin") || (exists("g:vimrplugin_screenplugin") && g:vimrplugin_screenplugin == 1)) && !executable('tmux')
+            let rplugin_missing_tmux = 1
+            call RWarningMsg("Please, either install the 'tmux' application (recommended) or put 'let vimrplugin_screenplugin = 0' in your vimrc to enable the Vim-R-plugin.")
+        endif
+        
+        if !exists("g:vimrplugin_screenplugin")
+            if exists("g:ScreenVersion")
+                let g:vimrplugin_screenplugin = 1
+            else
+                call RWarningMsg("Please, either install the screen plugin (http://www.vim.org/scripts/script.php?script_id=2711) (recommended) or put 'let vimrplugin_screenplugin = 0' in your vimrc.")
+                call input("Press <Enter> to continue. ")
+                let g:rplugin_failed = 1
+                finish
+            endif
+        endif
+
+        if !exists("g:ScreenVersion")
+            " g:ScreenVersion was introduced in screen plugin 1.3
+            if g:vimrplugin_screenplugin == 1
+                call RWarningMsg("Vim-R-plugin requires Screen plugin >= 1.3")
+                call input("Press <Enter> to continue. ")
+            endif
+            let g:vimrplugin_screenplugin = 0
+        endif
     endif
-    if !has("gui_running") && !executable('tmux') && g:vimrplugin_tmux == 1
-        let s:rplugin_missing_tmux = 1
-        call RWarningMsg("Please, install the 'tmux' application to enable the Vim-R-plugin.")
+
+    if (has("gui_running") || (!has("gui_running") && (g:vimrplugin_tmux == 0 || g:vimrplugin_screenplugin == 0))) && !executable('screen')
+        let rplugin_missing_screen = 1
+        if has("gui_running")
+            call RWarningMsg("Please, install the 'screen' application to enable the Vim-R-plugin with GVim.")
+        else
+            call RWarningMsg("Please, install the 'screen' application to enable the Vim-R-plugin.")
+        endif
     endif
-    if exists("s:rplugin_missing_tmux") || exists("s:rplugin_missing_screen")
+
+    if exists("rplugin_missing_tmux") || exists("rplugin_missing_screen")
         call input("Press <Enter> to continue. ")
         let g:rplugin_failed = 1
         finish
@@ -2169,23 +2197,6 @@ else
     let g:ScreenImpl = 'GnuScreen'
 endif
 
-if !exists("g:vimrplugin_screenplugin")
-    if exists("g:ScreenVersion")
-        let g:vimrplugin_screenplugin = 1
-    else
-        let g:vimrplugin_screenplugin = 0
-    endif
-endif
-
-if !exists("g:ScreenVersion")
-    " g:ScreenVersion was introduced in screen plugin 1.3
-    if g:vimrplugin_screenplugin == 1
-        call RWarningMsg("Vim-R-plugin requires Screen plugin >= 1.3")
-        call input("Press <Enter> to continue. ")
-    endif
-    let g:vimrplugin_screenplugin = 0
-endif
-
 " The screen.vim plugin only works on terminal emulators
 if !exists("g:vimrplugin_screenplugin") || has('gui_running')
     let g:vimrplugin_screenplugin = 0
@@ -2215,13 +2226,6 @@ if exists("g:vimrplugin_conqueplugin") && g:vimrplugin_conqueplugin == 1
     endif
 endif
 
-" Check again if screen is installed
-if !has("gui_win32") && g:vimrplugin_conqueplugin == 0 && g:vimrplugin_screenplugin == 0 && !executable("screen")
-    call RWarningMsg("Please, install both the 'screen' and the 'tmux' applications to enable the Vim-R-plugin.")
-    call input("Press <Enter> to continue. ")
-    let g:rplugin_failed = 1
-    finish
-endif
 
 " Are we in a Debian package? Is the plugin being running for the first time?
 let g:rplugin_omnifname = g:rplugin_uservimfiles . "/r-plugin/omniList"
