@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Sun Jul 10, 2011  07:31AM
+" Last Change: Sun Jul 10, 2011  10:53AM
 "
 " Purposes of this file: Create all functions and commands and Set the
 " value of all global variables  and some buffer variables.for r,
@@ -384,7 +384,7 @@ function StartR(whatr)
             if exists(":ScreenShellVertical") == 2
                 exec 'ScreenShellVertical ' . rcmd
             else
-                call RWarningMsg("The screen plugin version >= 1.1 is required to split the window vertically.")
+                call RWarningMsg("Did you put \"let g:ScreenImpl = 'Tmux'\" in your vimrc?")
                 call input("Press <Enter> to continue. ")
                 exec 'ScreenShell ' . rcmd
             endif
@@ -1784,9 +1784,9 @@ function MakeRMenu()
 
     amenu R.Help\ (plugin).Options.Underscore\ and\ Rnoweb\ code :help vimrplugin_underscore<CR>
     amenu R.Help\ (plugin).Options.Object\ Browser :help vimrplugin_objbr_place<CR>
+    amenu R.Help\ (plugin).Options.Vim\ as\ pager\ for\ R\ help :help vimrplugin_vimpager<CR>
     if !has("gui_win32")
         amenu R.Help\ (plugin).Options.Terminal\ emulator :help vimrplugin_term<CR>
-        amenu R.Help\ (plugin).Options.Vim\ as\ pager\ for\ R\ help :help vimrplugin_vimpager<CR>
         amenu R.Help\ (plugin).Options.Number\ of\ R\ processes :help vimrplugin_nosingler<CR>
         amenu R.Help\ (plugin).Options.Screen\ configuration :help vimrplugin_noscreenrc<CR>
         amenu R.Help\ (plugin).Options.Screen\ plugin :help vimrplugin_screenplugin<CR>
@@ -1794,7 +1794,6 @@ function MakeRMenu()
     if !has("gui_macvim")
         amenu R.Help\ (plugin).Options.Integration\ with\ Apple\ Script :help vimrplugin_applescript<CR>
     endif
-    amenu R.Help\ (plugin).Options.Conque\ Shell\ plugin :help vimrplugin_conqueplugin<CR>
     if has("gui_win32")
         amenu R.Help\ (plugin).Options.Use\ 32\ bit\ version\ of\ R :help vimrplugin_i386<CR>
         amenu R.Help\ (plugin).Options.Sleep\ time :help vimrplugin_sleeptime<CR>
@@ -2004,6 +2003,7 @@ call RSetDefaultValue("g:vimrplugin_tmux",              1)
 call RSetDefaultValue("g:vimrplugin_screenvsplit",      0)
 call RSetDefaultValue("g:vimrplugin_conquevsplit",      0)
 call RSetDefaultValue("g:vimrplugin_conqueplugin",      0)
+call RSetDefaultValue("g:vimrplugin_screenplugin",      1)
 call RSetDefaultValue("g:vimrplugin_listmethods",       0)
 call RSetDefaultValue("g:vimrplugin_specialplot",       0)
 call RSetDefaultValue("g:vimrplugin_nosingler",         0)
@@ -2128,30 +2128,29 @@ if has("gui_win32")
         let g:vimrplugin_sleeptime = 0.02
     endif
 else
+    if has("gui_running")
+        let g:vimrplugin_screenplugin = 0
+    endif
     if !has("gui_running")
-        if g:vimrplugin_tmux == 1 && (!exists("g:vimrplugin_screenplugin") || (exists("g:vimrplugin_screenplugin") && g:vimrplugin_screenplugin == 1)) && !executable('tmux')
+        if g:vimrplugin_tmux && g:vimrplugin_screenplugin && !executable('tmux')
             let rplugin_missing_tmux = 1
             call RWarningMsg("Please, either install the 'tmux' application (recommended) or put 'let vimrplugin_screenplugin = 0' in your vimrc to enable the Vim-R-plugin.")
         endif
         
-        if !exists("g:vimrplugin_screenplugin")
-            if exists("g:ScreenVersion")
-                let g:vimrplugin_screenplugin = 1
-            else
+        if g:vimrplugin_screenplugin
+            if !exists("g:ScreenVersion")
                 call RWarningMsg("Please, either install the screen plugin (http://www.vim.org/scripts/script.php?script_id=2711) (recommended) or put 'let vimrplugin_screenplugin = 0' in your vimrc.")
                 call input("Press <Enter> to continue. ")
                 let g:rplugin_failed = 1
                 finish
+            else
+                if g:ScreenVersion < "1.4"
+                    call RWarningMsg("Vim-R-plugin requires Screen plugin >= 1.3")
+                    call input("Press <Enter> to continue. ")
+                    let g:rplugin_failed = 1
+                    finish
+                endif
             endif
-        endif
-
-        if !exists("g:ScreenVersion")
-            " g:ScreenVersion was introduced in screen plugin 1.3
-            if g:vimrplugin_screenplugin == 1
-                call RWarningMsg("Vim-R-plugin requires Screen plugin >= 1.3")
-                call input("Press <Enter> to continue. ")
-            endif
-            let g:vimrplugin_screenplugin = 0
         endif
     endif
 
@@ -2206,8 +2205,9 @@ endif
 if g:vimrplugin_conqueplugin == 1
     if !exists("g:ConqueTerm_Version") || (exists("g:ConqueTerm_Version") && g:ConqueTerm_Version < 210)
         let g:vimrplugin_conqueplugin = 0
-        call RWarningMsg("Vim-R-plugin requires Conque Shell plugin >= 2.1")
+        call RWarningMsg("You are using Conque Shell plugin " . g:ConqueTerm_Version . ". Vim-R-plugin requires Conque Shell >= 2.1")
         call input("Press <Enter> to continue. ")
+        finish
     endif
 endif
 
