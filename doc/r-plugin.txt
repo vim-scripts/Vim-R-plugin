@@ -29,8 +29,8 @@ This plugin improves Vim's support for editing R code and makes it possible to
 integrate Vim with R.
 
 It uses some ideas and code from Johannes Ranke's (vim-r-plugin), Eric Van
-Dewoestine's (screen plugin), Vincent Nijs (R.vim for Mac OS X) and some ideas
-from the Tinn-R (Windows only) project.
+Dewoestine's (screen.vim plugin), Vincent Nijs (R.vim for Mac OS X) and some
+ideas from the Tinn-R (Windows only) project.
 
 The latest stable version of this plugin is available at:
 
@@ -104,11 +104,12 @@ replaced. Please, look at |r-plugin-files| to see the list of files.
 In addition to having R installed in your system, this plugin requires users
 to install:
 
-   tmux: http://tmux.sourceforge.net
-   screen: http://www.gnu.org/s/screen
-   screen plugin: http://www.vim.org/scripts/script.php?script_id=2711
+   Tmux:              http://tmux.sourceforge.net
+   GNU Screen:        http://www.gnu.org/s/screen
+   screen.vim plugin: http://www.vim.org/scripts/script.php?script_id=2711
+   ncurses-term:      http://invisible-island.net/ncurses
 
-   Note: The tmux and screen applications are already packaged for most
+   Note: Tmux, GNU Screen and ncurses-term are already packaged for most
    GNU/Linux distributions and other Unix variants. Unfortunately its
    installation instructions vary widely and are beyond the scope of this
    documentation.
@@ -505,7 +506,7 @@ passed to applications running under tmux. To send <c-a> to either R or Vim
 you have to type <c-a>a. You can also set a different escape character in your
 ~/.tmux.conf.
 
-Note: Read the screen plugin documentation, especially the section
+Note: Read the screen.vim plugin documentation, especially the section
 |screen-gotchas| (the E325 is caused by the presence of 'swapfile'). This
 problem will not happen if you start Vim from within a tmux session, as in the
 example below.
@@ -684,7 +685,7 @@ indentation by adding braces and line breaks to it. Example:
 |vimrplugin_indent_commented|	Indent lines commented with the \cc command
 |vimrplugin_sleeptime|		Delay while sending commands in MS Windows
 |vimrplugin_noscreenrc|		Do not write custom screenrc
-|vimrplugin_screenplugin|	Use the screen plugin
+|vimrplugin_screenplugin|	Use the screen.vim plugin
 |vimrplugin_screenvsplit|	Split the window vertically with screen plugin
 |vimrplugin_tmux|		Choose between tmux and screen
 |vimrplugin_applescript|	Use osascript in Mac OS X.
@@ -958,24 +959,26 @@ of screen. If you prefer to use the screen application, put in your |vimrc|:
 >
    let vimrplugin_tmux = 0
 <
-Start Vim and do the command <LocalLeader>rf. The screen plugin will split the
-terminal in two regions and will run R in one of them. Using both plugins at
-the same time is especially useful for users who may prefer to use Vim and R
-in a terminal emulator, rather than using the graphical interface provided by
-GVim.
+Start Vim and do the command <LocalLeader>rf. The screen.vim plugin will split
+the terminal in two regions and will run R in one of them. Using both plugins
+at the same time is especially useful for users who may prefer to use Vim and
+R in a terminal emulator, rather than using the graphical interface provided
+by GVim.
 
-If you have the screen plugin installed but prefer do not integrate it
+If you have the screen.vim plugin installed but prefer do not integrate it
 with the Vim-R-plugin you will need to add the following to your |vimrc|:
 >
    let vimrplugin_screenplugin = 0
 <
 The screen.vim plugin supports both screen and tmux, but only tmux allows you
-to split the terminal vertically. Please read |screen-intro| and
-|screen-shell-vertical| for details.  By default, the Vim-R-plugin will tell
-the screen plugin to split the terminal horizontally. If you prefer to split
-it vertically put in your |vimrc|:
+to split the terminal vertically (that is, to have the panels side by side).
+Please read |screen-intro| and |screen-shell-vertical| for details.  By
+default, the Vim-R-plugin will tell the screen.vim plugin to split the
+terminal horizontally. If you prefer to split it vertically put in your
+|vimrc|:
 >
    let vimrplugin_screenvsplit = 1
+   let g:ScreenImpl = 'Tmux'
 <
 
 7.17. Integration with Apple Script (OS X only)~
@@ -1495,7 +1498,7 @@ make a copy of the file to the ~/.vim/plugin directory and edit it. On
 Windows, you probably will have to make a copy of the file to the
 ~/vimfiles/plugin directory.
 
-10.17.2. When using Vim + screen plugin (either tmux or screen)~
+10.17.2. When using Vim + screen.vim plugin (either tmux or screen)~
 
 Put in your |vimrc| (replace <F2> with the shortcut of your preference):
 >
@@ -1505,10 +1508,10 @@ Press <F2>\rf<F2> to use R. Tha is, press <F2> before AND after starting R
 with the shortcut <LocalLeader>rf (or any other key binding that you have
 defined in your |vimrc| as the shortcut to start R). The first time that <F2>
 is pressed, the plugin's functions and key bindings are made available.
-However, when R is started, Vim is closed and restarted by the screen plugin,
-and the Vim-R-plugin functions and key bindings are lost. Consequently, the
-ftplugin/r.vim script must be sourced again by pressing <F2> for the second
-time.
+However, when R is started, Vim is closed and restarted by the screen.vim
+plugin, and the Vim-R-plugin functions and key bindings are lost.
+Consequently, the ftplugin/r.vim script must be sourced again by pressing <F2>
+for the second time.
 
 
 10.18. Disable syntax highlight of R functions~
