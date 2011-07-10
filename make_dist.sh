@@ -54,10 +54,11 @@ sed -i -e "s/Version: [0-9][0-9][0-9][0-9][0-9][0-9]/Version: $PLUGINVERSION/" d
 tar -cvzf /tmp/vimrplugintmpfile.tar.gz ftdetect/r.vim indent/r.vim \
     indent/rnoweb.vim indent/rhelp.vim autoload/rcomplete.vim ftplugin/r*.vim \
     syntax/rout.vim syntax/r.vim syntax/rhelp.vim syntax/rdoc.vim syntax/rbrowser.vim \
-    r-plugin/*.R doc/r-plugin.txt r-plugin/functions.vim \
+    doc/r-plugin.txt r-plugin/*.R r-plugin/functions.vim \
     r-plugin/global_r_plugin.vim r-plugin/omniList r-plugin/windows.py \
     r-plugin/vimActivate.js r-plugin/tex_indent.vim r-plugin/r.snippets \
     r-plugin/common_buffer.vim r-plugin/common_global.vim \
+    r-plugin/tmux.conf r-plugin/screenrc \
     bitmaps/ricon.xbm bitmaps/ricon.png \
     bitmaps/RStart.png bitmaps/RStart.bmp \
     bitmaps/RClose.png bitmaps/RClose.bmp \
@@ -131,6 +132,8 @@ files:
 - r-plugin/global_r_plugin.vim
 - r-plugin/specialfuns.R
 - r-plugin/tex_indent.vim
+- r-plugin/tmux.conf
+- r-plugin/screenrc
 - r-plugin/vimbrowser.R
 - r-plugin/vimhelp.R
 - r-plugin/vimprint.R
