@@ -3,9 +3,9 @@
 			     Plugin to work with R~
 
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
-         Jose Claudio Faria
+         Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 110706
+Version: 110710
 For Vim version 7.3
 
  1. Overview                                    |r-plugin-overview|
@@ -24,7 +24,6 @@ For Vim version 7.3
 ==============================================================================
 1. Overview~
 							   *r-plugin-overview*
-
 This plugin improves Vim's support for editing R code and makes it possible to
 integrate Vim with R.
 
@@ -47,7 +46,6 @@ to deal with.
 ==============================================================================
 2. Main features~
 							   *r-plugin-features*
-
   * Syntax highlighting for R syntax, including:
       - Special characters in strings.
       - Functions of all installed packages (must be updated manually).
@@ -83,7 +81,6 @@ to deal with.
 ==============================================================================
 3. Installation~
 						       *r-plugin-installation*
-
 3.1. General instructions I~
 
 You need to activate plugins and indentation according to 'filetype'. You
@@ -123,20 +120,20 @@ are in at the same directory):
 >
   :helptags ~/.vim/doc
 <
-If you do not have a custom tmux configuration file yet, copy the file
+If you do not have a custom Tmux configuration file yet, copy the file
 ~/.vim/r-plugin/tmux.conf to ~/.tmux.conf
 
-If you are using Vim (not GVim), the plugin will run inside a tmux session. If
-are not already an user of tmux, please, read the |r-plugin-tmux| section to
+If you are using Vim (not GVim), the plugin will run inside a Tmux session. If
+are not already an user of Tmux, please, read the |r-plugin-tmux| section to
 learn a few useful shortcuts. The tmux.conf file that ships with this plugin
-sets tmux to work with vi key bindings.
+sets Tmux to work with vi key bindings.
 
 Note: The recommended way of using the plugin on Linux is running Vim in a
-terminal emulator, using tmux to split the terminal in two regions. This is
+terminal emulator, using Tmux to split the terminal in two regions. This is
 the default configuration when running Vim in a terminal emulator. It is also
 possible to use the plugin with GVim and R in a external terminal emulator,
 Vim in a terminal emulator and R in an external terminal emulator, and using
-screen instead of tmux to split the terminal emulator in two regions.
+GNU Screen instead of Tmux to split the terminal emulator in two regions.
 
 3.2.2. Windows~
 
@@ -161,7 +158,7 @@ similar to one of the following:
 >
   C:\Documents and Settings\yourlogin\vimfiles
   C:\Users\yourlogin\vimfiles
-
+<
 Uncompress the archive. Right click on the plugin's zip file and choose
 "Extract all". Then choose ~/vimfiles as the destination directory.
 
@@ -197,19 +194,19 @@ you may prefer to install the Debian package available at:
 
 3.4. General instructions II (optional steps)~
 
-update list of objects~
+Update list of objects~
 
 Start R and update the list of objects for omni completion and syntax
 highlight (see |:RUpdateObjList| for details).
 
 
-customize the plugin~
+Customize the plugin~
 
 Please, read the section |r-plugin-options|. Emacs/ESS users should read the
-section 10.8 of this document (Indenting setup).
+section Indenting setup (|r-plugin-indenting|) of this document.
 
 
-hide unused buttons~
+Hide unused buttons~
 
 Edit Vim's toolbar and remove the buttons that you never use. The plugin adds
 some buttons to the toolbar, but you may not see them because gvim has too
@@ -219,7 +216,7 @@ on the toolbar:
    http://vim.wikia.com/wiki/Hide_toolbar_or_menus_to_see_more_text
 
 
-install additional plugins~
+Install additional plugins~
 
 You may be interested in installing additional general plugins to get
 functionality not provided by this file type plugin. ShowMarks and snipMate
@@ -229,7 +226,6 @@ are particularly interesting. Please read |r-plugin-tips| for details.
 ==============================================================================
 4. Use~
 								*r-plugin-use*
-
 4.1. Key bindings~
 
 To use the plugin, open a .R or .Rnw or .Rd file with Vim and type \rf
@@ -242,13 +238,12 @@ some cases, toolbar buttons. In the list below, the backslash represents the
 enabled in all filetypes supported by the plugin (r, rnoweb, rhelp):
 
 Start/Close
-  . Start R (default)                                    \rf
-  . Start R --vanilla                                    \rv
-  . Start R (custom)                                     \rc
-  ----------------------------------------------------------
-  . Close R (no save)                                    \rq
-  . Close R (save workspace)                             \rw
--------------------------------------------------------------
+  . Start R (default)                                  \rf
+  . Start R --vanilla                                  \rv
+  . Start R (custom)                                   \rc
+  --------------------------------------------------------
+  . Close R (no save)                                  \rq
+-----------------------------------------------------------
 
 Send
   . File                                               \aa
@@ -280,7 +275,7 @@ Send
   . Line (and new one)                                  \q
 -----------------------------------------------------------
 
-Control
+Command
   . List space                                         \rl
   . Clear console                                      \rr
   . Clear all                                          \rm
@@ -302,27 +297,39 @@ Control
   . Sweave (cur file)                                  \sw
   . Sweave and PDF (cur file)                          \sp
   . Sweave, BibTeX and PDF (cur file)                  \sb
-----------------------------------------------------------
+  --------------------------------------------------------
+  . Build tags file (cur dir)                  :RBuildTags
+-----------------------------------------------------------
 
 Edit
+  . Insert "<-"
+  --------------------------------------------------------
   . Indent (line)                                       ==
   . Indent (selected lines)                              =
   . Indent (whole buffer)                             gg=G
+  --------------------------------------------------------
   . Comment/Uncomment (line, sel)                      \cc
   . Add/Align right comment (line, sel)                 \;
+  --------------------------------------------------------
   . Go (next R chunk)                                   gn
   . Go (previous R chunk)                               gN
-  . Build omniList (loaded packages)    :RUpdateObjList
+-----------------------------------------------------------
+
+Syntax
+  . Build omniList (loaded packages)       :RUpdateObjList
   . Build omniList (installed packages) :RUpdateObjListAll
-  . Build R tags file                   :RBuildTags
-----------------------------------------------------------
+-----------------------------------------------------------
 
 Object Browser
   . Show/Update                                        \ro
   . Expand (all lists)                                 \r=
   . Collapse (all lists)                               \r-
   . Toggle (cur)                                     Enter
-  --------------------------------------------------------
+-----------------------------------------------------------
+
+Help (plugin)
+Help (R)
+-----------------------------------------------------------
 
 Please see |r-plugin-key-bindings| to learn how to customize the key bindings
 without editing the plugin directly. 
@@ -473,14 +480,14 @@ source code.
 4.7. Tmux usage~
 							       *r-plugin-tmux*
 When running Vim in an terminal emulator (Linux/Unix only), the Vim-R-plugin
-will use the screen.vim plugin to restart Vim and start R in a tmux session.
-The tmux configuration file provided by the Vim-R-plugin configures tmux to
-use vi key bindings. The configuration script also sets <C-a> as the tmux
+will use the screen.vim plugin to restart Vim and start R in a Tmux session.
+The Tmux configuration file provided by the Vim-R-plugin configures Tmux to
+use vi key bindings. The configuration script also sets <C-a> as the Tmux
 scape character (the default is <C-b>), that is, you have to type <C-a> before
-typing a tmux command. Below are the most useful key bindings to use the
+typing a Tmux command. Below are the most useful key bindings to use the
 Vim-R-plugin with the provided tmux.conf.
 
-    <C-a>arrow keys : Move the cursor to the tmux panel above, below, at the
+    <C-a>arrow keys : Move the cursor to the Tmux panel above, below, at the
                       right or at the left of the current one.
 
     <C-a><C-Up>     : Move the panel division upward one line, that is, resize
@@ -491,36 +498,36 @@ Vim-R-plugin with the provided tmux.conf.
 
     <C-a>[          : Enter the copy/scroll back mode. You can use vi key
 		      bindings to move the cursor around the panel. Press
-		      <Enter> to exit the copy mode. Please, read the tmux
+		      <Enter> to exit the copy mode. Please, read the Tmux
 		      manual to learn how to copy and paste code between
 		      panels.
 
-Please, read the manual page of tmux if you want to change the tmux
-configuration and learn more commands. To read the tmux manual, type in the
+Please, read the manual page of Tmux if you want to change the Tmux
+configuration and learn more commands. To read the Tmux manual, type in the
 terminal emulator:
 >
   man tmux
 >
-Note: <C-a> was configured as the tmux scape character, and it will not be
-passed to applications running under tmux. To send <c-a> to either R or Vim
+Note: <C-a> was configured as the Tmux scape character, and it will not be
+passed to applications running under Tmux. To send <C-a> to either R or Vim
 you have to type <c-a>a. You can also set a different escape character in your
 ~/.tmux.conf.
 
 Note: Read the screen.vim plugin documentation, especially the section
 |screen-gotchas| (the E325 is caused by the presence of 'swapfile'). This
-problem will not happen if you start Vim from within a tmux session, as in the
+problem will not happen if you start Vim from within a Tmux session, as in the
 example below.
 
 A sample detachable session could be:
 
-  - Start tmux:
+  - Start Tmux:
       tmux
-  - Start vim:
+  - Start Vim:
       vim theScript.R
   - Use Vim to start an R session:
       \rf
   - Send code from Vim to R, and, then, detach Vim and R with <c-a>d
-  - Some time latter reattach the tmux session:
+  - Some time latter reattach the Tmux session:
       tmux attach
 
  
@@ -558,16 +565,16 @@ command: |:RUpdateObjList|.
 
 Vim and R run as independent processes. The main disadvantage is that we have
 limited communication between the two applications: Vim can send strings to R
-through screen and R can write files to be read by Vim. That's all.  The main
+through GNU Screen and R can write files to be read by Vim. That's all. The main
 advantage is that Vim's or the plugin's bugs will not affect R.
 
-The r-plugin uses screen to communicate with R. First, the plugin initiates a
-new screen session and  uses this to start a new R process. The plugin's menu
+The Vim-R-plugin uses GNU Screen to communicate with R. First, the plugin initiates a
+new GNU Screen session and  uses this to start a new R process. The plugin's menu
 options, toolbar buttons and key bindings can then be used to communicate with
-the newly started R process. The plugin sends commands to R through screen. By
+the newly started R process. The plugin sends commands to R through GNU Screen. By
 default, all Vim buffers share the same R process, but it is also possible to
 configure Vim so that each buffer runs its own instance of R in a separate
-terminal emulator. In this case, the screen sessions have unique names. The
+terminal emulator. In this case, the GNU Screen sessions have unique names. The
 names are made using the user name and the seconds of localtime(). Hence, a
 name clash is possible if a single user starts more than one Vim buffer at the
 same second. To change the default behavior and force all Vim buffers to use
@@ -633,10 +640,10 @@ Normal, Visual and Insert modes.
 
 6.7. quit(save = "yes") may not work properly~
 
-If you are using either the Screen plugin (and are not running R in an
-external terminal), the R command quit(save = "yes") may not have time enough
-to save the workspace. Vim will sleep for 1 second after the command \rw
-before killing R but this time is not enough for big workspaces.
+If you are using either the screen.vim plugin (not running R in an external
+terminal), the R command quit(save = "yes") may not have time enough to save
+the workspace. Vim will sleep for 1 second after the command \rw before
+killing R but this time is not enough for big workspaces.
 
 
 6.8. Syntactically correct code may be wrongly indented~
@@ -687,7 +694,7 @@ indentation by adding braces and line breaks to it. Example:
 |vimrplugin_noscreenrc|		Do not write custom screenrc
 |vimrplugin_screenplugin|	Use the screen.vim plugin
 |vimrplugin_screenvsplit|	Split the window vertically with screen plugin
-|vimrplugin_tmux|		Choose between tmux and screen
+|vimrplugin_tmux|		Choose between Tmux and GNU Screen
 |vimrplugin_applescript|	Use osascript in Mac OS X.
 |vimrplugin_open_df|		Show data.frame elements in the Object Browser
 |vimrplugin_open_list|		Show list elements in the Object Browser
@@ -751,8 +758,8 @@ put in your |vimrc|:
 							  *vimrplugin_open_df*
 							*vimrplugin_open_list*
 							 *vimrplugin_allnames*
-By default, the Object Browser will be created with 40 columns at the right
-side of the script window. You can change the Object Browser's default width
+By default, the object browser will be created with 40 columns at the right
+side of the script window. You can change the object browser's default width
 and placement by putting different values in your |vimrc|, as in the examples
 below:
 >
@@ -761,7 +768,7 @@ below:
 <
 The minimum width of the Object Browser windows is 9 columns.
 
-By default, the elements of data.frames are shown in the Object Browser, but
+By default, the elements of data.frames are shown in the object browser, but
 not the elements of other types of lists. You can put the following in your
 |vimrc| to change this behavior:
 >
@@ -769,7 +776,7 @@ not the elements of other types of lists. You can put the following in your
    let vimrplugin_open_list = 1
 <
 By default, names of objects which begin with a . are omitted. If you prefer
-to see them in the Object Browser, put in your |vimrc|:
+to see them in the object browser, put in your |vimrc|:
 >
    let vimrplugin_allnames = 1
 <
@@ -819,7 +826,7 @@ values to some variables in your |vimrc|, as in the example:
 7.5. Number of R processes (Linux/Unix only)~
 							*vimrplugin_nosingler*
 						  *vimrplugin_by_vim_instance*
-7.5.1 Using (G)Vim without the Screen plugin~
+7.5.1 Using (G)Vim without the screen.vim plugin~
 
 By default, all buffers of all (G)Vim instances send code to the same R process.
 If you prefer that each Vim buffer uses its own R process, put the following
@@ -835,17 +842,17 @@ code to other R processes then put the following in your |vimrc|:
 >
 The |vimrplugin_by_vim_instance| option requires that Vim is acting as a
 command server because the variable |v:servername| is used to make the name of
-the screen session which will run R. By default, GVim runs as server, but Vim
+the GNU Screen session which will run R. By default, GVim runs as server, but Vim
 does not. Hence, if you are using Vim you have either to start Vim with the
 argument --servername or use the screen.vim plugin which tries to restart Vim
 with the --servername argument. If you want to use more than nine GVim
 instances you will have to use the --servername argument because screen will
 not differentiate between the names "GVIM1" and "GVIM10".
 
-7.5.2 Using the Screen plugin~
+7.5.2 Using the screen.vim plugin~
 
-Both options are ignored when using Vim in a terminal emulator and using
-the Screen plugin. The plugin behaves as if the |vimrplugin_by_instance| was
+Both options are ignored when using Vim in a terminal emulator and using the
+screen.vim plugin. The plugin behaves as if the |vimrplugin_by_instance| was
 enabled.
 
 
@@ -929,7 +936,7 @@ this document), according to the table below:
 		 0                        1                #
 		 1                        1                ##
 		 0                        0                ###
-
+<
 
 7.13. Sleep time (Windows only)~
 							*vimrplugin_sleeptime*
@@ -942,20 +949,21 @@ example show how to adjust the value of sleeptime in your |vimrc|:
 
 7.14. Tmux and Screen configuration (Linux/Unix only)~
 						       *vimrplugin_noscreenrc*
-GVim (or Vim running R in an external terminal emulator) runs 
-screen with the configuration files located at ~/.vim/r-plugin. If you want to
-use your own ~/.tmux.conf or ~/.screenrc, put in your |vimrc|:
+GVim (or Vim running R in an external terminal emulator) runs GNU Screen with
+the configuratio file. If you want to use your own ~/.screenrc, put in your
+|vimrc|:
 >
    let vimrplugin_noscreenrc = 1
 <
 
-7.15. Integration with screen.vim (Linux/Unix only)~
+7.15. Integration with screen.vim plugin (Linux/Unix only)~
 						     *vimrplugin_screenplugin*
 						     *vimrplugin_screenvsplit*
 							     *vimrplugin_tmux*
 By default, when running in a terminal emulator, the Vim-R-plugin uses the
-screen.vim plugin if it is installed and, by default, it will use tmux instead
-of screen. If you prefer to use the screen application, put in your |vimrc|:
+screen.vim plugin if it is installed and, by default, it will use Tmux instead
+of GNU Screen. If you prefer to use the GNU Screen application, put in your
+|vimrc|:
 >
    let vimrplugin_tmux = 0
 <
@@ -970,7 +978,7 @@ with the Vim-R-plugin you will need to add the following to your |vimrc|:
 >
    let vimrplugin_screenplugin = 0
 <
-The screen.vim plugin supports both screen and tmux, but only tmux allows you
+The screen.vim plugin supports both screen and Tmux, but only Tmux allows you
 to split the terminal vertically (that is, to have the panels side by side).
 Please read |screen-intro| and |screen-shell-vertical| for details.  By
 default, the Vim-R-plugin will tell the screen.vim plugin to split the
@@ -984,7 +992,7 @@ terminal horizontally. If you prefer to split it vertically put in your
 7.17. Integration with Apple Script (OS X only)~
 							*vimrplugin_applescript*
 In Mac OS X, the plugin will try to send commands to R gui using Apple Script
-if the Screen plugin is not installed. If you prefer to have R running in an
+if the screen.vim plugin is not installed. If you prefer to have R running in an
 external terminal emulator, put in your |vimrc|:
 >
    let vimrplugin_applescript = 0
@@ -1110,11 +1118,11 @@ gender.
 To make it even easier to use this function, you could write a custom key
 binding that would allow you to rapidly get the levels of the object under
 your cursor. Add the following to your |vimrc| to have an easy way to pass R
-the levels command.
+the levels command:
 >
    map <LocalLeader>rk :call RAction("levels")<CR>
 <
-then (assuming that the local leader key is "\") if you type \rk R will
+Then (assuming that the local leader key is "\") if you type \rk R will
 receive the command
 >
    levels(myObject)
@@ -1188,7 +1196,6 @@ directory after the installation:
 ==============================================================================
 10. FAQ and tips~
 							       *r-plugin-tips*
-
 10.1. Is it possible to stop R from within Vim?~
 
 Sorry, it is not possible. You have to press ^C into R's terminal emulator.
@@ -1498,7 +1505,7 @@ make a copy of the file to the ~/.vim/plugin directory and edit it. On
 Windows, you probably will have to make a copy of the file to the
 ~/vimfiles/plugin directory.
 
-10.17.2. When using Vim + screen.vim plugin (either tmux or screen)~
+10.17.2. When using Vim + screen.vim plugin (either Tmux or GNU Screen)~
 
 Put in your |vimrc| (replace <F2> with the shortcut of your preference):
 >
@@ -1561,8 +1568,7 @@ By default, the window will be split horizontally. Put the following in your
 >
    let vimrplugin_conquevsplit = 1
 <
-You may also need to change the time that the Conque Shell waits for R output:
-
+You may also need to change the time that the Conque Shell waits for R output.
 After a command is sent to the Conque buffer, the Conque Shell plugin waits
 100 milliseconds (on Linux) or 200 milliseconds (on Windows) before reading
 R's output. Longer values for the waiting time will increase the chances that
@@ -1613,8 +1619,8 @@ the R syntax highlighted.
 							       *r-plugin-news*
 
  * New option: vimrplugin_tmux.
- * Set tmux as the default instead of either screen or conque shell.
- * Document tmux as the prefered way of running the plugin on Linux.
+ * Set Tmux as the default instead of either GNU Screen or Conque Shell.
+ * Document Tmux as the prefered way of running the plugin on Linux.
  * Vim-LaTeX-suite plugin can be used with Rnoweb files without any additional
    configuration. The necessary code was added to the ftplugin/rnoweb.vim.
 
