@@ -17,7 +17,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "
-" Last Change: Sun Jul 03, 2011  11:08AM
+" Last Change: Mon Jul 11, 2011  11:13PM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -117,6 +117,7 @@ function! RMakePDF(bibtex)
     endif
 
     let pdfcmd = pdfcmd . ")"
+    let b:needsnewomnilist = 1
     let ok = SendCmdToR(pdfcmd)
     if ok == 0
         return
@@ -127,6 +128,7 @@ endfunction
 " Sweave the current buffer content
 function! RSweave()
     update
+    let b:needsnewomnilist = 1
     call RSetWD()
     call SendCmdToR('Sweave("' . expand("%:t") . '")')
     echon
