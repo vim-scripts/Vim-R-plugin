@@ -42,7 +42,7 @@
 .vim.plot <- function(x)
 {
     xname <- deparse(substitute(x))
-    if(length(grep("numeric", class(x))) > 0){
+    if(length(grep("numeric", class(x))) > 0 || length(grep("integer", class(x))) > 0){
         oldpar <- par(no.readonly = TRUE)
         par(mfrow = c(2, 1))
         hist(x, col = "lightgray", main = paste("Histogram of", xname), xlab = xname)
