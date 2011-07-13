@@ -62,7 +62,7 @@ to deal with.
       - Send to R the Sweave and pdflatex commands.
       - Run R inside a Vim's buffer.
   * Omni completion (auto-completion) for R objects (.GlobalEnv and installed
-    packages. The list of installed packages must be updated manually.
+    packages). The list of installed packages must be updated manually.
   * Ability to see R's documentation in a Vim's buffer:
       - Automatic calculation of the best layout of the R documentation buffer
 	(split the window either horizontally or vertically according to the
@@ -124,14 +124,14 @@ If you do not have a custom Tmux configuration file yet, copy the file
 ~/.vim/r-plugin/tmux.conf to ~/.tmux.conf
 
 If you are using Vim (not GVim), the plugin will run inside a Tmux session. If
-are not already an user of Tmux, please, read the |r-plugin-tmux| section to
+are not already a user of Tmux, please, read the |r-plugin-tmux| section to
 learn a few useful shortcuts. The tmux.conf file that ships with this plugin
 sets Tmux to work with vi key bindings.
 
 Note: The recommended way of using the plugin on Linux is running Vim in a
 terminal emulator, using Tmux to split the terminal in two regions. This is
 the default configuration when running Vim in a terminal emulator. It is also
-possible to use the plugin with GVim and R in a external terminal emulator,
+possible to use the plugin with GVim and R in an external terminal emulator,
 Vim in a terminal emulator and R in an external terminal emulator, and using
 GNU Screen instead of Tmux to split the terminal emulator in two regions.
 
@@ -479,7 +479,7 @@ source code.
 
 4.7. Tmux usage~
 							       *r-plugin-tmux*
-When running Vim in an terminal emulator (Linux/Unix only), the Vim-R-plugin
+When running Vim in a terminal emulator (Linux/Unix only), the Vim-R-plugin
 will use the screen.vim plugin to restart Vim and start R in a Tmux session.
 The Tmux configuration file provided by the Vim-R-plugin configures Tmux to
 use vi key bindings. The configuration script also sets <C-a> as the Tmux
@@ -496,11 +496,18 @@ Vim-R-plugin with the provided tmux.conf.
 		      the vertical split, you should use <C-Left> and
 		      <C-Right> to resize the panels.
 
-    <C-a>[          : Enter the copy/scroll back mode. You can use vi key
-		      bindings to move the cursor around the panel. Press
-		      <Enter> to exit the copy mode. Please, read the Tmux
-		      manual to learn how to copy and paste code between
-		      panels.
+    <C-a>[          : Enter the copy/scroll back mode. You can use <PgUp>,
+		      <PgDown> and vi key bindings to move the cursor around
+		      the panel. Press q to quit copy mode.
+    <C-a>]          : Paste the content of Tmux paste buffer.
+
+While in the copy and scroll back mode, the following key bindings are very
+useful:
+
+    q               : Quit the copy and scroll mode.
+    <Space>         : Start text selection.
+    v<Space>        : Start retangular text selection.
+    <Enter>         : Copy the selection to Tmux paste buffer.
 
 Please, read the manual page of Tmux if you want to change the Tmux
 configuration and learn more commands. To read the Tmux manual, type in the
@@ -741,8 +748,8 @@ The last argument must be the one which precedes the command to be executed.
 7.2. Underscore and Rnoweb completion of code block~
 						       *vimrplugin_underscore*
 						      *vimrplugin_rnowebchunk*
-While editing R code, '_' is replace with ' <- '. To disable this feature, put
-in your |vimrc|:
+While editing R code, '_' is replaced with ' <- '. To disable this feature,
+put in your |vimrc|:
 >
    let vimrplugin_underscore = 0
 <
@@ -1203,7 +1210,7 @@ Sorry, it is not possible. You have to press ^C into R's terminal emulator.
 
 10.2. Html help and custom pager~
 
-If you prefer to see help pages in a html browser, put in your ~/.Rprofile:
+If you prefer to see help pages in an html browser, put in your ~/.Rprofile:
 >
    options(help_type = "html")
 <
@@ -1493,7 +1500,7 @@ available for all file types, then do one of the following:
 
 Go to your ~/.vim/plugin directory and create a symbolic link to
 ~/.vim/r-plugin/global_r_plugin.vim. That is, type the following
-in an terminal emulator:
+in a terminal emulator:
 >
    cd ~/.vim/plugin/
    ln -s ../r-plugin/global_r_plugin.vim
@@ -1548,7 +1555,7 @@ important Vim limitations are:
   - The InsertCharPre event was implemented in a way that causes problems to
     Conque Shell. We have to patch Vim's source code.
 
-  - Vim does not have an timer which would make the Conque Shell more
+  - Vim does not have a timer which would make the Conque Shell more
     efficient. Vim uses the same variable, 'updatetime', to do both save swap
     files and trigger |CursorHold| events.
 
