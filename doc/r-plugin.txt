@@ -60,7 +60,6 @@ to deal with.
       - Send commands with the object under cursor as argument: help, args,
 	plot, print, str, summary, example, names.
       - Send to R the Sweave and pdflatex commands.
-      - Run R inside a Vim's buffer.
   * Omni completion (auto-completion) for R objects (.GlobalEnv and installed
     packages). The list of installed packages must be updated manually.
   * Ability to see R's documentation in a Vim's buffer:
@@ -107,16 +106,17 @@ to install:
    ncurses-term:      http://invisible-island.net/ncurses
 
    Note: Tmux, GNU Screen and ncurses-term are already packaged for most
-   GNU/Linux distributions and other Unix variants. Unfortunately its
-   installation instructions vary widely and are beyond the scope of this
-   documentation.
+   GNU/Linux distributions and other Unix variants. The library ncurses-term
+   is necessary only for 256 color support in the terminal emulator.
+   Unfortunately its installation instructions vary widely and are beyond the
+   scope of this documentation.
 
 Uncompress the archive:
 >
    unzip vim-r-plugin-*.zip -d ~/.vim
 <
 Start Vim and build the tags file for this document (and others that eventually
-are in at the same directory):
+are in the same directory):
 >
   :helptags ~/.vim/doc
 <
@@ -130,10 +130,11 @@ sets Tmux to work with vi key bindings.
 
 Note: The recommended way of using the plugin on Linux is running Vim in a
 terminal emulator, using Tmux to split the terminal in two regions. This is
-the default configuration when running Vim in a terminal emulator. It is also
-possible to use the plugin with GVim and R in an external terminal emulator,
-Vim in a terminal emulator and R in an external terminal emulator, and using
-GNU Screen instead of Tmux to split the terminal emulator in two regions.
+the default configuration when running Vim in a terminal emulator, but it is
+also possible to use the plugin with GVim and R in an external terminal
+emulator, Vim in a terminal emulator and R in an external terminal emulator,
+and using GNU Screen instead of Tmux to split the terminal emulator in two
+regions.
 
 3.2.2. Windows~
 
@@ -302,7 +303,7 @@ Command
 -----------------------------------------------------------
 
 Edit
-  . Insert "<-"
+  . Insert "<-"                                          _
   --------------------------------------------------------
   . Indent (line)                                       ==
   . Indent (selected lines)                              =
@@ -414,9 +415,10 @@ and, then, build the "omniList".
 
 You have to do \ro to either start or updated the Object Browser. The Object
 Browser has two views: .GlobalEnv and Libraries. If you either press <Enter>
-or double click on the first line of the Object Browser it will toggle the
-view between the objects in .GlobalEnv and the currently loaded libraries (but
-only libraries loaded when |:RUpdateObjList| was run will be shown).
+or double click (GVim only) on the first line of the Object Browser it will
+toggle the view between the objects in .GlobalEnv and the currently loaded
+libraries (but only libraries loaded when |:RUpdateObjList| was run will be
+shown).
 
 In the .GlobalEnv view, if an object has the attribute "label", it will be
 displayed in the Object Browser. The options |vimrplugin_open_df| and
@@ -517,13 +519,16 @@ terminal emulator:
 >
 Note: <C-a> was configured as the Tmux scape character, and it will not be
 passed to applications running under Tmux. To send <C-a> to either R or Vim
-you have to type <c-a>a. You can also set a different escape character in your
+you have to type <C-a>a. You can also set a different escape character in your
 ~/.tmux.conf.
 
-Note: Read the screen.vim plugin documentation, especially the section
-|screen-gotchas| (the E325 is caused by the presence of 'swapfile'). This
-problem will not happen if you start Vim from within a Tmux session, as in the
-example below.
+With Tmux, you can the detach the Vim-R session and reattach it latter. This
+is useful if you plan to begin the use the Vim-R-plugin in a machine and
+latter move to another another computer. However, normally you will get
+|E325|, caused by the presence of a 'swapfile' (please, read the screen.vim
+plugin documentation, especially the section |screen-gotchas| for details).
+This problem will not happen if you start Vim from within a Tmux session, as
+in the example below.
 
 A sample detachable session could be:
 
@@ -533,8 +538,9 @@ A sample detachable session could be:
       vim theScript.R
   - Use Vim to start an R session:
       \rf
-  - Send code from Vim to R, and, then, detach Vim and R with <c-a>d
-  - Some time latter reattach the Tmux session:
+  - Send code from Vim to R, and, then, detach Vim and R with <C-a>d
+  - Some time latter (even if accessing the machine remotely) reattach the
+    Tmux session:
       tmux attach
 
  
@@ -557,10 +563,6 @@ complete the name of a data.frame, the columns are not shown.  But when the
 data.frame name is already complete, and you have inserted the '$' symbol,
 omni completion will show the column names.
 
-The file containing the list of objects used for omni completion is built by
-the R function contained in the script ~/.vim/r-plugin/buil_omniList.R. This
-function is sourced by R, which causes R to create the list used by Vim.
-
 Vim uses two files: one for the objects of .GlobalEnv and the other for all
 other objects. The .GlobalEnv list is stored in the /tmp/r-plugin-yourlogin
 directory and, thus, is deleted after each reboot. The other file is stored in
@@ -575,17 +577,19 @@ limited communication between the two applications: Vim can send strings to R
 through GNU Screen and R can write files to be read by Vim. That's all. The main
 advantage is that Vim's or the plugin's bugs will not affect R.
 
-The Vim-R-plugin uses GNU Screen to communicate with R. First, the plugin initiates a
-new GNU Screen session and  uses this to start a new R process. The plugin's menu
-options, toolbar buttons and key bindings can then be used to communicate with
-the newly started R process. The plugin sends commands to R through GNU Screen. By
-default, all Vim buffers share the same R process, but it is also possible to
-configure Vim so that each buffer runs its own instance of R in a separate
-terminal emulator. In this case, the GNU Screen sessions have unique names. The
-names are made using the user name and the seconds of localtime(). Hence, a
-name clash is possible if a single user starts more than one Vim buffer at the
-same second. To change the default behavior and force all Vim buffers to use
-different R processes see |vimrplugin_single_r|.
+If the screen.vim plugin is not installed or if you are using GVim, the
+Vim-R-plugin uses GNU Screen to communicate with R. First, the plugin
+initiates a new GNU Screen session and  uses this to start a new R process.
+The plugin's menu options, toolbar buttons and key bindings can then be used
+to communicate with the newly started R process. The plugin sends commands to
+R through GNU Screen. By default, all Vim buffers share the same R process,
+but it is also possible to configure Vim so that each buffer runs its own
+instance of R in a separate terminal emulator. In this case, the GNU Screen
+sessions have unique names. The names are made using the user name and the
+seconds of localtime(). Hence, a name clash is possible if a single user
+starts more than one Vim buffer at the same second. To change the default
+behavior and force all Vim buffers to use different R processes see
+|vimrplugin_single_r|.
 
 
 ==============================================================================
@@ -614,10 +618,10 @@ to another.
 6.3. R session is detached when GVim is closed (Linux/Unix only)~
 
 If you launch GVim through a custom keyboard shortcut, the problem may be
-solved if you add -f as parameter to GVim. The R session will also be detached
-when GVim is closed if you launch GVim by the command line in a terminal
-emulator, and, then, close the terminal-emulator. In any case, to reattach to 
-the R session, open a new terminal window and type:
+solved if you add -f as parameter to GVim. The R session also used to be
+detached when GVim is closed if you launched GVim by the command line in a
+terminal emulator, and, then, closed the terminal-emulator. In any case, to
+reattach to the R session, open a new terminal window and type:
 >
    screen -r
 <
@@ -647,7 +651,7 @@ Normal, Visual and Insert modes.
 
 6.7. quit(save = "yes") may not work properly~
 
-If you are using either the screen.vim plugin (not running R in an external
+If you are using the screen.vim plugin (not running R in an external
 terminal), the R command quit(save = "yes") may not have time enough to save
 the workspace. Vim will sleep for 1 second after the command \rw before
 killing R but this time is not enough for big workspaces.
@@ -854,7 +858,7 @@ does not. Hence, if you are using Vim you have either to start Vim with the
 argument --servername or use the screen.vim plugin which tries to restart Vim
 with the --servername argument. If you want to use more than nine GVim
 instances you will have to use the --servername argument because screen will
-not differentiate between the names "GVIM1" and "GVIM10".
+not differentiate between names like "GVIM1" and "GVIM10".
 
 7.5.2 Using the screen.vim plugin~
 
@@ -934,9 +938,9 @@ default. To turn off the automatic indentation, put in your |vimrc|:
 >
    let vimrplugin_indent_commented = 0
 <
-What string will be added to the beginning of the line depends on the values of
-vimrplugin_indent_commented and r_indent_ess_comments (see section 10.8 of
-this document), according to the table below:
+What string will be added to the beginning of the line depends on the values
+of vimrplugin_indent_commented and r_indent_ess_comments according to the
+table below (see |r-plugin-indenting|):
 >
    vimrplugin_indent_commented   r_indent_ess_comments   string
                  1                        0                #
@@ -957,8 +961,8 @@ example show how to adjust the value of sleeptime in your |vimrc|:
 7.14. Tmux and Screen configuration (Linux/Unix only)~
 						       *vimrplugin_noscreenrc*
 GVim (or Vim running R in an external terminal emulator) runs GNU Screen with
-the configuratio file. If you want to use your own ~/.screenrc, put in your
-|vimrc|:
+a specially built configuration file. If you want to use your own ~/.screenrc,
+put in your |vimrc|:
 >
    let vimrplugin_noscreenrc = 1
 <
@@ -1008,7 +1012,7 @@ external terminal emulator, put in your |vimrc|:
 7.18. Special R functions~
 						      *vimrplugin_listmethods*
 						      *vimrplugin_specialplot*
-The R function args() list the arguments of a function, but not the arguments
+The R function args() lists the arguments of a function, but not the arguments
 of its methods. If you want that the plugin calls the function
 .vim.list.args() after <LocalLeader>ra, you have to add to your |vimrc|:
 >
@@ -1046,7 +1050,7 @@ vimrplugin_sweaveargs variable.
 						*vimrplugin_never_unmake_menu*
 Use this option if you want that the menu item R and the R related tool bar
 buttons are not deleted when you change from one buffer to another, for
-example, when go from an .R file to a .txt one:
+example, when going from an .R file to a .txt one:
 >
    let vimrplugin_never_unmake_menu = 1
 <
@@ -1056,16 +1060,15 @@ type.
 
 7.22. Map 'r'~
 							    *vimrplugin_map_r*
-Some users may already be familiar with the key bindings from earlier releases
-of the Vim-R-plugin. If the variable |vimrplugin_map_r| exists, the plugin
-will map the letter 'r' to send lines to R when there are visually selected
-lines, for compatibility with the original plugin. To activate this option,
-insert the following into |vimrc|:
+If the variable |vimrplugin_map_r| exists, the plugin will map the letter 'r'
+to send lines to R when there are visually selected lines, for compatibility
+with the original plugin. To activate this option, insert the following into
+|vimrc|:
 >
    let vimrplugin_map_r = 1
 <
-You may want to add the following three lines to your |vimrc| which were in 
-the original plugin and will increase compatibility with code edited with
+You may want to add the following three lines to your |vimrc| which were in
+Johannes Ranke's plugin and will increase compatibility with code edited with
 Emacs:
 >
    set expandtab
@@ -1087,9 +1090,8 @@ To customize a key binding you should put in your |vimrc| something like:
    imap <F2> <Plug>RStart
    vmap <F2> <Plug>RStart
 <
-The above example shows how you can increase compatibility with old versions
-of the Vim-R-plugin, by changing the key binding used to start R from
-<LocalLeader>rf to the old default value, F2.
+The above example shows how to change key binding used to start R from
+<LocalLeader>rf to <F2>.
 
 Only the custom key bindings for Normal mode are shown in Vim's menu, but you
 can type |:map| to see the complete list of current mappings, and below is the
@@ -1190,8 +1192,10 @@ directory after the installation:
    r-plugin/vimprint.R
    r-plugin/vimSweave.R
    r-plugin/r.snippets
+   r-plugin/screenrc
    r-plugin/specialfuns.R
    r-plugin/tex_indent.vim
+   r-plugin/tmux.conf
    r-plugin/vimActivate.js
    r-plugin/windows.py
    syntax/rbrowser.vim
@@ -1223,10 +1227,11 @@ and in your |vimrc| (see |vimrplugin_vimpager|):
 							  *r-plugin-showmarks*
 Vim allows several marks (bookmarks). The most commonly used marks are the
 lowercase alphabet letters.  If the cursor is between any two marks, the
-plugin will send all of the lines between them to R.
+plugin will send all of the lines between them to R. To create a mark, press
+m<letter> in Normal mode.
   
-To make it easier to remember where blocks begin and end, we recommended that
-you use the ShowMarks plugin available at:
+We recommended the use of ShowMarks plugin which show what lines have marks
+defined. The plugin is available at:
 
    http://www.vim.org/scripts/script.php?script_id=152
   
@@ -1305,8 +1310,8 @@ Example on how to test whether your setup is ok:
 
    1. Type "mapply()" in an R script and save the buffer.
    2. Press CTRL-] over "mapply" (Vim should jump to "mapply.R").
-   4. Locate the string "do_mapply", which is the name of a C function.
-   5. Press CTRL-] over "do_mapply" (Vim sould jump to "mapply.c").
+   3. Locate the string "do_mapply", which is the name of a C function.
+   4. Press CTRL-] over "do_mapply" (Vim sould jump to "mapply.c").
 
 
 10.8. Indenting setup~
@@ -1417,12 +1422,12 @@ at the "Window Management" section for "Group and Tab Windows").
 
 It is because Vim and R run as separate processes and, thus, it is not
 possible to Vim to know whether R is busy or not. If R was running as part of
-the text editor, as happens with JGR and RKward, which are linked to libR.so,
-it would be possible to wait for R to finish processing a command before
-sending to it a command to rebuild the list of objects for the Object Browser.
-This command should be sent after each line sent to R.  But if the
-Vim-R-plugin did this, the use of Vim would be blocked until R finished its
-processing. 
+the text editor, as happens with RStudio, JGR, RKward, and others, which are
+linked to libR.so, it would be possible to wait for R to finish processing a
+command before sending to it a command to rebuild the list of objects for the
+Object Browser. This command should be sent after each line sent to R.  But if
+the Vim-R-plugin did this, the use of Vim would be blocked until R finished
+its processing. 
 
 
 10.15. Edit your ~/.Rprofile~
@@ -1434,7 +1439,6 @@ options and some others:
    if (interactive()) {
      local({
         options(editor = 'gvim -f -c "set ft=r"')
-        options(warn = 1)
         options(max.print = 999)
         if(nchar(Sys.getenv("DISPLAY")) > 1){
             options(help_type = "html")
@@ -1483,10 +1487,12 @@ the R package "debug":
    mtrace(function)
 <
 Once the library is installed and loaded, you should use mtrace(function_name)
-to enable debugging a function. Then, the next time that the function is
-called it will enter in debugging mode. Once debugging a function, you can hit
-<Enter> to evaluate the current line, go(n) to go to line n in the function
-and qqq() to quit the function (See debug's help for details).
+to enable the debugging of a function. Then, the next time that the function
+is called it will enter in debugging mode. Once debugging a function, you can
+hit <Enter> to evaluate the current line, go(n) to go to line n in the
+function and qqq() to quit the function (See debug's help for details). An
+useful tip is to click on the title bar of the debug window and choose "Always
+on top" or a similar option provided by your desktop manager.
 
 There is also the R package "edtdbg" which aims to integrate R debugging
 facilities with Vim.
@@ -1518,7 +1524,7 @@ Put in your |vimrc| (replace <F2> with the shortcut of your preference):
 >
    nmap <F2> :runtime ftplugin/r.vim<CR>
 <
-Press <F2>\rf<F2> to use R. Tha is, press <F2> before AND after starting R
+Press <F2>\rf<F2> to use R. That is, press <F2> before AND after starting R
 with the shortcut <LocalLeader>rf (or any other key binding that you have
 defined in your |vimrc| as the shortcut to start R). The first time that <F2>
 is pressed, the plugin's functions and key bindings are made available.
@@ -1543,7 +1549,7 @@ can also use the Conque Shell plugin, but the Conque Shell still has some
 important bugs and Vim has limitations that make the use of Conque Shell not
 fully satisfying. The most important bug of Conque Shell is that it sometimes
 do not show the complete output of an R command. This problem happens more
-frequently when there are non ascii letters in the output. The three most
+frequently when there are non ascii characters in the output. The three most
 important Vim limitations are:
 
   - We cannot scroll the windows of a buffer that is not being edited and,
@@ -1627,7 +1633,7 @@ the R syntax highlighted.
 
  * New option: vimrplugin_tmux.
  * Set Tmux as the default instead of either GNU Screen or Conque Shell.
- * Document Tmux as the prefered way of running the plugin on Linux.
+ * Document Tmux as the preferred way of running the plugin on Linux.
  * Vim-LaTeX-suite plugin can be used with Rnoweb files without any additional
    configuration. The necessary code was added to the ftplugin/rnoweb.vim.
 
@@ -1636,7 +1642,7 @@ the R syntax highlighted.
    method corresponding to the class of the object passed as argument to the
    function. The same with \rp (thanks to Thomas Scheike for suggesting the
    feature).
- * Removed scipt rpager.sh.
+ * Removed script rpager.sh.
  * Added script global_r_plugin.vim to allow the use of the plugin with any
    file type.
 
