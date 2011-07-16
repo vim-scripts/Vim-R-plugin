@@ -17,7 +17,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "
-" Last Change: Mon Jul 11, 2011  11:13PM
+" Last Change: Fri Jul 15, 2011  10:54PM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -26,7 +26,7 @@ if exists("b:did_rnoweb_ftplugin") || exists("disable_r_ftplugin")
 endif
 
 " Enables Vim-Latex-Suite if it is installed
-runtime! ftplugin/tex_latexSuite.vim
+runtime ftplugin/tex_latexSuite.vim
 
 " Don't load another plugin for this buffer
 let b:did_rnoweb_ftplugin = 1
