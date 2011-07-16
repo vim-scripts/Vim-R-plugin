@@ -17,7 +17,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "
-" Last Change: Fri Jul 15, 2011  10:54PM
+" Last Change: Sat Jul 16, 2011  12:14PM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -25,11 +25,11 @@ if exists("b:did_rnoweb_ftplugin") || exists("disable_r_ftplugin")
     finish
 endif
 
-" Enables Vim-Latex-Suite if it is installed
-runtime ftplugin/tex_latexSuite.vim
-
 " Don't load another plugin for this buffer
 let b:did_rnoweb_ftplugin = 1
+
+" Enables Vim-Latex-Suite if it is installed
+runtime ftplugin/tex_latexSuite.vim
 
 " Enable syntax highlight of LaTeX errors in R Console (if using Conque
 " Shell)
