@@ -730,7 +730,8 @@ list:
     5. Eterm, 
     6. rxvt, 
     7. aterm, 
-    8. xterm.
+    8. roxterm,
+    9. xterm.
 
 If Vim does not select your favorite terminal emulator, you may define it in 
 your |vimrc| by setting the variable vimrplugin_term, as shown below:

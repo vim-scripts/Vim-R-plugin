@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Sun Jul 10, 2011  10:53AM
+" Last Change: Fri Jul 15, 2011  10:10PM
 "
 " Purposes of this file: Create all functions and commands and Set the
 " value of all global variables  and some buffer variables.for r,
@@ -2278,7 +2278,7 @@ if has("gui_win32")
     " No external terminal emulator will be called, so any value is good
     let g:vimrplugin_term = "xterm"
 else
-    let s:terminals = ['gnome-terminal', 'konsole', 'xfce4-terminal', 'Eterm', 'rxvt', 'aterm', 'xterm']
+    let s:terminals = ['gnome-terminal', 'konsole', 'xfce4-terminal', 'Eterm', 'rxvt', 'aterm', 'roxterm', 'xterm']
     if has('mac')
         let s:terminals = ['iTerm', 'Terminal.app'] + s:terminals
     endif
@@ -2316,6 +2316,11 @@ endif
 
 if g:vimrplugin_term == "rxvt" || g:vimrplugin_term == "aterm"
     let g:rplugin_termcmd = g:vimrplugin_term . " -e"
+endif
+
+if g:vimrplugin_term == "roxterm"
+    " Cannot set icon: http://bugzilla.gnome.org/show_bug.cgi?id=126081
+    let g:rplugin_termcmd = g:vimrplugin_term . " --directory='" . expand("%:p:h") . "' --title R -e"
 endif
 
 if g:vimrplugin_term == "xterm" || g:vimrplugin_term == "uxterm"
