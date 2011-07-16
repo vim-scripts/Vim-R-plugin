@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Fri Jul 15, 2011  10:10PM
+" Last Change: Sat Jul 16, 2011  12:42PM
 "
 " Purposes of this file: Create all functions and commands and Set the
 " value of all global variables  and some buffer variables.for r,
@@ -2145,7 +2145,7 @@ else
                 finish
             else
                 if g:ScreenVersion < "1.4"
-                    call RWarningMsg("Vim-R-plugin requires Screen plugin >= 1.3")
+                    call RWarningMsg("Vim-R-plugin requires Screen plugin >= 1.4")
                     call input("Press <Enter> to continue. ")
                     let g:rplugin_failed = 1
                     finish
