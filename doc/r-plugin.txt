@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 110710
+Version: 110716
 For Vim version 7.3
 
  1. Overview                                    |r-plugin-overview|
@@ -375,8 +375,8 @@ shortcut to send the current line makes the cursor to jump to the next chunk.
 While editing rnoweb files, the following commands are available in Normal
 mode:
 
-   gn : go to the next chunk of R code
-   gN : go to the previous chunk of R code
+   [count]gn : go to the next chunk of R code
+   [count]gN : go to the previous chunk of R code
 
 
 4.3. Omni completion and the highlighting of functions~
@@ -1637,6 +1637,8 @@ the R syntax highlighted.
  * Document Tmux as the preferred way of running the plugin on Linux.
  * Vim-LaTeX-suite plugin can be used with Rnoweb files without any additional
    configuration. The necessary code was added to the ftplugin/rnoweb.vim.
+ * Added count argument to normal mode commands gn and gN (thanks to Ivan
+   Bezerra for the suggestion).
 
 110614 (2011-06-14)
  * When doing the command \rh, the plugin tries to show the help for the

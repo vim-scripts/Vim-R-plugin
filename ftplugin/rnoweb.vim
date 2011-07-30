@@ -17,7 +17,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "
-" Last Change: Sat Jul 16, 2011  12:14PM
+" Last Change: Sat Jul 30, 2011  11:31AM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -67,34 +67,43 @@ function! RnwIsInRCode()
     endif
 endfunction
 
-function! RnwPreviousChunk()
+function! RnwPreviousChunk() range
     echon
-    let curline = line(".")
-    if RnwIsInRCode()
-        let i = search("^<<.*$", "bnW")
-        if i != 0
-            call cursor(i-1, 1)
+    let rg = range(a:firstline, a:lastline)
+    let chunk = len(rg)
+    for var in range(1, chunk)
+        let curline = line(".")
+        if RnwIsInRCode()
+            let i = search("^<<.*$", "bnW")
+            if i != 0
+                call cursor(i-1, 1)
+            endif
         endif
-    endif
-
-    let i = search("^<<.*$", "bnW")
-    if i == 0
-        call cursor(curline, 1)
-        call RWarningMsg("There is no previous R code chunk to go.")
-    else
-        call cursor(i+1, 1)
-    endif
+        let i = search("^<<.*$", "bnW")
+        if i == 0
+            call cursor(curline, 1)
+            call RWarningMsg("There is no previous R code chunk to go.")
+            return
+        else
+            call cursor(i+1, 1)
+        endif
+    endfor
     return
 endfunction
 
-function! RnwNextChunk()
+function! RnwNextChunk() range
     echon
-    let i = search("^<<.*$", "nW")
-    if i == 0
-        call RWarningMsg("There is no next R code chunk to go.")
-    else
-        call cursor(i+1, 1)
-    endif
+    let rg = range(a:firstline, a:lastline)
+    let chunk = len(rg)
+    for var in range(1, chunk)
+        let i = search("^<<.*$", "nW")
+        if i == 0
+            call RWarningMsg("There is no next R code chunk to go.")
+            return
+        else
+            call cursor(i+1, 1)
+        endif
+    endfor
     return
 endfunction
 
