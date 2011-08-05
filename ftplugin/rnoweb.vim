@@ -16,8 +16,8 @@
 "
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
-"          
-" Last Change: Sun May 22, 2011  08:27AM
+"
+" Last Change: Sat Jul 30, 2011  12:42PM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -27,6 +27,9 @@ endif
 
 " Don't load another plugin for this buffer
 let b:did_rnoweb_ftplugin = 1
+
+" Enables Vim-Latex-Suite if it is installed
+runtime ftplugin/tex_latexSuite.vim
 
 " Enable syntax highlight of LaTeX errors in R Console (if using Conque
 " Shell)
@@ -64,34 +67,43 @@ function! RnwIsInRCode()
     endif
 endfunction
 
-function! RnwPreviousChunk()
+function! RnwPreviousChunk() range
     echon
-    let curline = line(".")
-    if RnwIsInRCode()
-        let i = search("^<<.*$", "bnW")
-        if i != 0
-            call cursor(i-1, 1)
+    let rg = range(a:firstline, a:lastline)
+    let chunk = len(rg)
+    for var in range(1, chunk)
+        let curline = line(".")
+        if RnwIsInRCode()
+            let i = search("^<<.*$", "bnW")
+            if i != 0
+                call cursor(i-1, 1)
+            endif
         endif
-    endif
-
-    let i = search("^<<.*$", "bnW")
-    if i == 0
-        call cursor(curline, 1)
-        call RWarningMsg("There is no previous R code chunk to go.")
-    else
-        call cursor(i+1, 1)
-    endif
+        let i = search("^<<.*$", "bnW")
+        if i == 0
+            call cursor(curline, 1)
+            call RWarningMsg("There is no previous R code chunk to go.")
+            return
+        else
+            call cursor(i+1, 1)
+        endif
+    endfor
     return
 endfunction
 
-function! RnwNextChunk()
+function! RnwNextChunk() range
     echon
-    let i = search("^<<.*$", "nW")
-    if i == 0
-        call RWarningMsg("There is no next R code chunk to go.")
-    else
-        call cursor(i+1, 1)
-    endif
+    let rg = range(a:firstline, a:lastline)
+    let chunk = len(rg)
+    for var in range(1, chunk)
+        let i = search("^<<.*$", "nW")
+        if i == 0
+            call RWarningMsg("There is no next R code chunk to go.")
+            return
+        else
+            call cursor(i+1, 1)
+        endif
+    endfor
     return
 endfunction
 
@@ -114,6 +126,7 @@ function! RMakePDF(bibtex)
     endif
 
     let pdfcmd = pdfcmd . ")"
+    let b:needsnewomnilist = 1
     let ok = SendCmdToR(pdfcmd)
     if ok == 0
         return
@@ -124,13 +137,14 @@ endfunction
 " Sweave the current buffer content
 function! RSweave()
     update
+    let b:needsnewomnilist = 1
     call RSetWD()
     call SendCmdToR('Sweave("' . expand("%:t") . '")')
     echon
 endfunction
 
 if g:vimrplugin_rnowebchunk == 1
-    " Write code chunck in rnoweb files
+    " Write code chunk in rnoweb files
     imap <buffer> < <Esc>:call RWriteChunk()<CR>a
 endif
 

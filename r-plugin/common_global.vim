@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Fri Jun 03, 2011  04:47PM
+" Last Change: Sat Jul 16, 2011  12:42PM
 "
 " Purposes of this file: Create all functions and commands and Set the
 " value of all global variables  and some buffer variables.for r,
@@ -384,7 +384,7 @@ function StartR(whatr)
             if exists(":ScreenShellVertical") == 2
                 exec 'ScreenShellVertical ' . rcmd
             else
-                call RWarningMsg("The screen plugin version >= 1.1 is required to split the window vertically.")
+                call RWarningMsg("Did you put \"let g:ScreenImpl = 'Tmux'\" in your vimrc?")
                 call input("Press <Enter> to continue. ")
                 exec 'ScreenShell ' . rcmd
             endif
@@ -1784,9 +1784,9 @@ function MakeRMenu()
 
     amenu R.Help\ (plugin).Options.Underscore\ and\ Rnoweb\ code :help vimrplugin_underscore<CR>
     amenu R.Help\ (plugin).Options.Object\ Browser :help vimrplugin_objbr_place<CR>
+    amenu R.Help\ (plugin).Options.Vim\ as\ pager\ for\ R\ help :help vimrplugin_vimpager<CR>
     if !has("gui_win32")
         amenu R.Help\ (plugin).Options.Terminal\ emulator :help vimrplugin_term<CR>
-        amenu R.Help\ (plugin).Options.Vim\ as\ pager\ for\ R\ help :help vimrplugin_vimpager<CR>
         amenu R.Help\ (plugin).Options.Number\ of\ R\ processes :help vimrplugin_nosingler<CR>
         amenu R.Help\ (plugin).Options.Screen\ configuration :help vimrplugin_noscreenrc<CR>
         amenu R.Help\ (plugin).Options.Screen\ plugin :help vimrplugin_screenplugin<CR>
@@ -1794,7 +1794,6 @@ function MakeRMenu()
     if !has("gui_macvim")
         amenu R.Help\ (plugin).Options.Integration\ with\ Apple\ Script :help vimrplugin_applescript<CR>
     endif
-    amenu R.Help\ (plugin).Options.Conque\ Shell\ plugin :help vimrplugin_conqueplugin<CR>
     if has("gui_win32")
         amenu R.Help\ (plugin).Options.Use\ 32\ bit\ version\ of\ R :help vimrplugin_i386<CR>
         amenu R.Help\ (plugin).Options.Sleep\ time :help vimrplugin_sleeptime<CR>
@@ -2000,8 +1999,11 @@ call RSetDefaultValue("g:vimrplugin_underscore",        1)
 call RSetDefaultValue("g:vimrplugin_rnowebchunk",       1)
 call RSetDefaultValue("g:vimrplugin_i386",              0)
 call RSetDefaultValue("g:vimrplugin_applescript",       1)
+call RSetDefaultValue("g:vimrplugin_tmux",              1)
 call RSetDefaultValue("g:vimrplugin_screenvsplit",      0)
 call RSetDefaultValue("g:vimrplugin_conquevsplit",      0)
+call RSetDefaultValue("g:vimrplugin_conqueplugin",      0)
+call RSetDefaultValue("g:vimrplugin_screenplugin",      1)
 call RSetDefaultValue("g:vimrplugin_listmethods",       0)
 call RSetDefaultValue("g:vimrplugin_specialplot",       0)
 call RSetDefaultValue("g:vimrplugin_nosingler",         0)
@@ -2126,12 +2128,42 @@ if has("gui_win32")
         let g:vimrplugin_sleeptime = 0.02
     endif
 else
-    if !executable('screen') && !exists("g:ConqueTerm_Version")
-        if has("python") || has("python3")
-            call RWarningMsg("Please, install either the 'screen' application or the 'Conque Shell' plugin to enable the Vim-R-plugin.")
+    if has("gui_running")
+        let g:vimrplugin_screenplugin = 0
+    endif
+    if !has("gui_running")
+        if g:vimrplugin_tmux && g:vimrplugin_screenplugin && !executable('tmux')
+            let rplugin_missing_tmux = 1
+            call RWarningMsg("Please, either install the 'tmux' application (recommended) or put 'let vimrplugin_screenplugin = 0' in your vimrc to enable the Vim-R-plugin.")
+        endif
+        
+        if g:vimrplugin_screenplugin
+            if !exists("g:ScreenVersion")
+                call RWarningMsg("Please, either install the screen plugin (http://www.vim.org/scripts/script.php?script_id=2711) (recommended) or put 'let vimrplugin_screenplugin = 0' in your vimrc.")
+                call input("Press <Enter> to continue. ")
+                let g:rplugin_failed = 1
+                finish
+            else
+                if g:ScreenVersion < "1.4"
+                    call RWarningMsg("Vim-R-plugin requires Screen plugin >= 1.4")
+                    call input("Press <Enter> to continue. ")
+                    let g:rplugin_failed = 1
+                    finish
+                endif
+            endif
+        endif
+    endif
+
+    if (has("gui_running") || (!has("gui_running") && (g:vimrplugin_tmux == 0 || g:vimrplugin_screenplugin == 0))) && !executable('screen')
+        let rplugin_missing_screen = 1
+        if has("gui_running")
+            call RWarningMsg("Please, install the 'screen' application to enable the Vim-R-plugin with GVim.")
         else
             call RWarningMsg("Please, install the 'screen' application to enable the Vim-R-plugin.")
         endif
+    endif
+
+    if exists("rplugin_missing_tmux") || exists("rplugin_missing_screen")
         call input("Press <Enter> to continue. ")
         let g:rplugin_failed = 1
         finish
@@ -2159,51 +2191,10 @@ endif
 let g:rplugin_docfile = $VIMRPLUGIN_TMPDIR . "/Rdoc"
 let g:rplugin_globalenvfname = $VIMRPLUGIN_TMPDIR . "/GlobalEnvList"
 
-" Use Conque Shell plugin by default... 
-if exists("g:ConqueTerm_Loaded") && !exists("g:vimrplugin_conqueplugin")
-    if has("python") || has("python3")
-        let g:vimrplugin_conqueplugin = 1
-        " ... unless explicitly told otherwise in the vimrc
-        if exists("g:vimrplugin_screenplugin") && g:vimrplugin_screenplugin == 1
-            let g:vimrplugin_conqueplugin = 0
-        endif
-    else
-        call RWarningMsg("Python interface must be enabled to run Vim-R-Plugin with Conque Shell.")
-        let g:vimrplugin_conqueplugin = 0
-        sleep 2
-    endif
-endif
-if exists("g:vimrplugin_conqueplugin") && g:vimrplugin_conqueplugin == 1
-    if !exists("g:ConqueTerm_Version") || (exists("g:ConqueTerm_Version") && g:ConqueTerm_Version < 120)
-        let g:vimrplugin_conqueplugin = 0
-        call RWarningMsg("Vim-R-plugin requires Conque Shell plugin >= 1.2")
-        call input("Press <Enter> to continue. ")
-    endif
-endif
-
-if !exists("g:vimrplugin_conqueplugin")
-    let g:vimrplugin_conqueplugin = 0
-endif
-
-if g:vimrplugin_conqueplugin == 1
-    let g:vimrplugin_screenplugin = 0
-endif
-
-if !exists("g:vimrplugin_screenplugin")
-    if exists("g:ScreenVersion")
-        let g:vimrplugin_screenplugin = 1
-    else
-        let g:vimrplugin_screenplugin = 0
-    endif
-endif
-
-if !exists("g:ScreenVersion")
-    " g:ScreenVersion was introduced in screen plugin 1.3
-    if g:vimrplugin_screenplugin == 1
-        call RWarningMsg("Vim-R-plugin requires Screen plugin >= 1.3")
-        call input("Press <Enter> to continue. ")
-    endif
-    let g:vimrplugin_screenplugin = 0
+if g:vimrplugin_tmux
+    let g:ScreenImpl = 'Tmux'
+else
+    let g:ScreenImpl = 'GnuScreen'
 endif
 
 " The screen.vim plugin only works on terminal emulators
@@ -2211,16 +2202,13 @@ if !exists("g:vimrplugin_screenplugin") || has('gui_running')
     let g:vimrplugin_screenplugin = 0
 endif
 
-" Check again if screen is installed
-if !has("gui_win32") && g:vimrplugin_conqueplugin == 0 && g:vimrplugin_screenplugin == 0 && !executable("screen")
-    if (has("python") || has("python3")) && !exists("g:ConqueTerm_Version")
-        call RWarningMsg("Please, install either the 'screen' application or the 'Conque Shell' plugin to enable the Vim-R-plugin.")
-    else
-        call RWarningMsg("Please, install the 'screen' application to enable the Vim-R-plugin.")
+if g:vimrplugin_conqueplugin == 1
+    if !exists("g:ConqueTerm_Version") || (exists("g:ConqueTerm_Version") && g:ConqueTerm_Version < 210)
+        let g:vimrplugin_conqueplugin = 0
+        call RWarningMsg("You are using Conque Shell plugin " . g:ConqueTerm_Version . ". Vim-R-plugin requires Conque Shell >= 2.1")
+        call input("Press <Enter> to continue. ")
+        finish
     endif
-    call input("Press <Enter> to continue. ")
-    let g:rplugin_failed = 1
-    finish
 endif
 
 " Are we in a Debian package? Is the plugin being running for the first time?
@@ -2230,30 +2218,36 @@ if g:rplugin_home != g:rplugin_uservimfiles
     if !isdirectory(g:rplugin_uservimfiles . "/r-plugin")
         call mkdir(g:rplugin_uservimfiles . "/r-plugin", "p")
     endif
+endif
 
-    " If there is no functions.vim, copy the default one
-    if !filereadable(g:rplugin_uservimfiles . "/r-plugin/functions.vim")
-        if filereadable("/usr/share/vim/addons/r-plugin/functions.vim")
-            let ffile = readfile("/usr/share/vim/addons/r-plugin/functions.vim")
+" If there is no functions.vim, copy the default one
+if !filereadable(g:rplugin_uservimfiles . "/r-plugin/functions.vim")
+    if filereadable("/usr/share/vim/addons/r-plugin/functions.vim")
+        let ffile = readfile("/usr/share/vim/addons/r-plugin/functions.vim")
+        call writefile(ffile, g:rplugin_uservimfiles . "/r-plugin/functions.vim")
+        unlet ffile
+    else
+        if g:rplugin_home != g:rplugin_uservimfiles && filereadable(g:rplugin_home . "/r-plugin/functions.vim")
+            let ffile = readfile(g:rplugin_home . "/r-plugin/functions.vim")
             call writefile(ffile, g:rplugin_uservimfiles . "/r-plugin/functions.vim")
             unlet ffile
         endif
     endif
+endif
 
-    " If there is no omniList, copy the default one
-    if !filereadable(g:rplugin_omnifname)
-        if filereadable("/usr/share/vim/addons/r-plugin/omniList")
-            let omnilines = readfile("/usr/share/vim/addons/r-plugin/omniList")
+" If there is no omniList, copy the default one
+if !filereadable(g:rplugin_omnifname)
+    if filereadable("/usr/share/vim/addons/r-plugin/omniList")
+        let omnilines = readfile("/usr/share/vim/addons/r-plugin/omniList")
+    else
+        if filereadable(g:rplugin_home . "/r-plugin/omniList")
+            let omnilines = readfile(g:rplugin_home . "/r-plugin/omniList")
         else
-            if filereadable(g:rplugin_home . "/r-plugin/omniList")
-                let omnilines = readfile(g:rplugin_home . "/r-plugin/omniList")
-            else
-                let omnilines = []
-            endif
+            let omnilines = []
         endif
-        call writefile(omnilines, g:rplugin_omnifname)
-        unlet omnilines
     endif
+    call writefile(omnilines, g:rplugin_omnifname)
+    unlet omnilines
 endif
 
 " Minimum width for the Object Browser
@@ -2284,7 +2278,7 @@ if has("gui_win32")
     " No external terminal emulator will be called, so any value is good
     let g:vimrplugin_term = "xterm"
 else
-    let s:terminals = ['gnome-terminal', 'konsole', 'xfce4-terminal', 'Eterm', 'rxvt', 'aterm', 'xterm']
+    let s:terminals = ['gnome-terminal', 'konsole', 'xfce4-terminal', 'Eterm', 'rxvt', 'aterm', 'roxterm', 'xterm']
     if has('mac')
         let s:terminals = ['iTerm', 'Terminal.app'] + s:terminals
     endif
@@ -2322,6 +2316,11 @@ endif
 
 if g:vimrplugin_term == "rxvt" || g:vimrplugin_term == "aterm"
     let g:rplugin_termcmd = g:vimrplugin_term . " -e"
+endif
+
+if g:vimrplugin_term == "roxterm"
+    " Cannot set icon: http://bugzilla.gnome.org/show_bug.cgi?id=126081
+    let g:rplugin_termcmd = g:vimrplugin_term . " --directory='" . expand("%:p:h") . "' --title R -e"
 endif
 
 if g:vimrplugin_term == "xterm" || g:vimrplugin_term == "uxterm"
