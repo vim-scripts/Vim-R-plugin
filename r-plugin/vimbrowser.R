@@ -16,7 +16,10 @@
         cat("'", x.name, "': {'class': \"", x.class, '"', sep = "")
         x.label <- attr(x, "label", exact = TRUE)
         if(length(x.label) > 1) x.label <- x.label[[1]]
-        if(!is.null(x.label)) cat(", 'label': \"", x.label, '"', sep = "")
+        if(!is.null(x.label)){
+            x.label <- gsub('"', '\\\\"', x.label)
+            cat(", 'label': \"", x.label, '"', sep = "")
+        }
         if(is.list(x)){
             x.names <- names(x)
             llen <- length(x)
