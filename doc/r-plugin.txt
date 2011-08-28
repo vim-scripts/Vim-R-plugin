@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 110716
+Version: 110824
 For Vim version 7.3
 
  1. Overview                                    |r-plugin-overview|
@@ -144,15 +144,28 @@ to install several external dependencies:
     * Vim's version must be >= 7.3
 
     * Python: http://www.python.org/download/
-      Note: Be careful to download the correct Python version because Vim
-      needs a specific version of Python DLL. For example, the official Vim
-      7.3 for Windows needs either Python 2.7 or 3.1. Note: the official Vim
-      is 32 bit and, thus, Python must be 32 bit too.
 
+      Note: The official Vim is 32 bit and, thus, Python must be 32 bit too.
+
+      Note: Be careful to download the correct Python version because Vim
+	    needs a specific version of Python DLL. For example, the official
+	    Vim 7.3 for Windows needs either Python 2.7 or 3.1. To discover
+	    what Python version Vim was compiled against, do the following:
+
+	    1. Type  :version  in Vim (normal mode).
+
+	    2. Look for a string like -DDYNAMIC_PYTHON_DLL="python27.dll".
+
+	    3. Install the Python version which corresponds to the version
+	       which Vim was linked against. In the example of step 2
+	       (python27.dll) the required Python version is 2.7.x.
+      
     * pywin32: http://sourceforge.net/projects/pywin32/
+
       Note: The default download may not match the Python version Vim was
-      linked with. You have to "View all files" on the download page to find
-      the file that matches the version of Python that you installed.
+      linked against. You have to "View all files" on the download page to
+      find the file that matches exactly the version of Python that you
+      installed.
 
 Create your |vimfiles| directory if you do not have it yet. Its path will be
 similar to one of the following:
@@ -1382,6 +1395,14 @@ prefer to start editing files with all folds open, put in your |vimrc|:
 Notes: (1) Enabling folding may slow down Vim. (2) Folding is not a file type
 plugin option. It is a feature defined in syntax/r.vim.
 
+Note: Indentation of R code is very slow because the indentation algorithm
+sometimes goes backwards looking for an opening parenthesis or brace or for
+the beginning of a "for", "if" or "while" statement. This is necessary because
+the indentation level of a given line depends on the indentation level of the
+previous line, but the previous line is not always the line above. It's the
+line where the statement immediately above started. Of course someone may
+develop a better algorithm in the future.
+
 
 10.10. Automatically close parenthesis~
 
@@ -1632,6 +1653,10 @@ the R syntax highlighted.
 12. News~
 							       *r-plugin-news*
 
+ * Fixed bug in code indentation after unbalanced parentesis when
+   r_indent_align_args = 0 (thanks to Peng Yu for reporting the bug).
+
+110805 (2011-08-05)
  * New option: vimrplugin_tmux.
  * Set Tmux as the default instead of either GNU Screen or Conque Shell.
  * Document Tmux as the preferred way of running the plugin on Linux.
