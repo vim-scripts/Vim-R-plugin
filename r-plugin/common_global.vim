@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Sat Jul 16, 2011  12:42PM
+" Last Change: Tue Aug 30, 2011  08:50AM
 "
 " Purposes of this file: Create all functions and commands and Set the
 " value of all global variables  and some buffer variables.for r,
@@ -2175,6 +2175,13 @@ else
     endif
     if !exists("g:vimrplugin_r_args")
         let g:vimrplugin_r_args = " "
+    endif
+
+    if has("gui_macvim") && g:vimrplugin_applescript && !exists("g:ScreenVersion")
+        let g:vimrplugin_screenplugin = 0
+        let g:vimrplugin_conqueplugin = 0 
+        let g:vimrplugin_term_cmd = "none"
+        let g:vimrplugin_term = "none"
     endif
 endif
 

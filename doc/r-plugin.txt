@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 110824
+Version: 110830
 For Vim version 7.3
 
  1. Overview                                    |r-plugin-overview|
@@ -97,6 +97,19 @@ replaced. Please, look at |r-plugin-files| to see the list of files.
 
 3.2.1. Unix (Linux, OS X, etc.)~
 
+Uncompress the archive:
+>
+   unzip vim-r-plugin-*.zip -d ~/.vim
+<
+Start Vim and build the tags file for this document (and others that eventually
+are in the same directory):
+>
+  :helptags ~/.vim/doc
+<
+Note: If you are using OS X and prefer that Vim uses AppleScript to send
+commands to R, then the installation is finished and you should now read
+sections 3.3 and 3.4.
+
 In addition to having R installed in your system, this plugin requires users
 to install:
 
@@ -111,15 +124,6 @@ to install:
    Unfortunately its installation instructions vary widely and are beyond the
    scope of this documentation.
 
-Uncompress the archive:
->
-   unzip vim-r-plugin-*.zip -d ~/.vim
-<
-Start Vim and build the tags file for this document (and others that eventually
-are in the same directory):
->
-  :helptags ~/.vim/doc
-<
 If you do not have a custom Tmux configuration file yet, copy the file
 ~/.vim/r-plugin/tmux.conf to ~/.tmux.conf
 
