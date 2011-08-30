@@ -181,6 +181,9 @@ zip -r /tmp/vim-r-plugin-$PLUGINVERSION.zip .
 # Delete the files unnecessary in a Debian system
 rm bitmaps/*.bmp r-plugin/windows.py r-plugin/vimActivate.js
 
+# Add a comment to r-plugin.txt:
+sed -e 's/3.2.1. Unix (Linux, OS X, etc.)./3.2.1. Unix (Linux, OS X, etc.)~\n\nNote: If the plugin was installed from the Debian package, then the\ninstallation is finished and you should now read sections 3.3 and 3.4./' -i doc/r-plugin.txt
+
 # Create the DEBIAN directory
 cd /tmp/vim-r-plugin-tmp
 mkdir DEBIAN
