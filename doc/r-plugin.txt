@@ -185,8 +185,8 @@ are in the same directory):
 >
   :helptags ~\vimfiles\doc
 <
-Start R and try to send some lines from GVim to R Console. You may have to
-adjust the value of |vimrplugin_sleeptime|.
+Start editing an R file with GVim and try to send some lines to R Console. You
+may have to adjust the value of |vimrplugin_sleeptime|.
 
 
 3.3. Troubleshooting (if the plugin doesn't work)~
@@ -1018,9 +1018,9 @@ terminal horizontally. If you prefer to split it vertically put in your
    let g:ScreenImpl = 'Tmux'
 <
 
-7.17. Integration with Apple Script (OS X only)~
+7.17. Integration with AppleScript (OS X only)~
 							*vimrplugin_applescript*
-In Mac OS X, the plugin will try to send commands to R gui using Apple Script
+In Mac OS X, the plugin will try to send commands to R gui using AppleScript
 if the screen.vim plugin is not installed. If you prefer to have R running in an
 external terminal emulator, put in your |vimrc|:
 >
@@ -1575,7 +1575,7 @@ can also use the Conque Shell plugin, but the Conque Shell still has some
 important bugs and Vim has limitations that make the use of Conque Shell not
 fully satisfying. The most important bug of Conque Shell is that it sometimes
 do not show the complete output of an R command. This problem happens more
-frequently when there are non ascii characters in the output. The three most
+frequently when there are non ascii characters in the output. The two most
 important Vim limitations are:
 
   - We cannot scroll the windows of a buffer that is not being edited and,
@@ -1583,9 +1583,6 @@ important Vim limitations are:
     are running an R command that slowly generates a lot of output because the
     shell buffer does not scroll when there is new output but it is not the
     currently active buffer.
-
-  - The InsertCharPre event was implemented in a way that causes problems to
-    Conque Shell. We have to patch Vim's source code.
 
   - Vim does not have a timer which would make the Conque Shell more
     efficient. Vim uses the same variable, 'updatetime', to do both save swap
@@ -1657,8 +1654,12 @@ the R syntax highlighted.
 12. News~
 							       *r-plugin-news*
 
- * Fixed bug in code indentation after unbalanced parentesis when
+ * Fixed bug in code indentation after unbalanced brackets when
+   r_indent_align_args = 0 (thanks to Chris Neff for reporting the bug).
+ * Fixed bug in code indentation after unbalanced parenthesis when
    r_indent_align_args = 0 (thanks to Peng Yu for reporting the bug).
+ * Really make the use of AppleScript the default on OS X (thanks for Jason
+   for reporting the bug).
 
 110805 (2011-08-05)
  * New option: vimrplugin_tmux.
@@ -1710,7 +1711,7 @@ the R syntax highlighted.
  * Don't send "^@$" as part of a paragraph in rnoweb files (thanks to Fabio
    Correa for reporting the bug).
  * More useful warning message when PyWin32 isn't installed.
- * Initial support to Apple Script on Mac OS X (thanks to Vincent Nijs for
+ * Initial support to AppleScript on Mac OS X (thanks to Vincent Nijs for
    writing and testing the code).
 
 101121 (2010-11-21)
