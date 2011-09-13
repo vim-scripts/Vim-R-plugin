@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Tue Aug 30, 2011  08:50AM
+" Last Change: Mon Sep 12, 2011  09:44PM
 "
 " Purposes of this file: Create all functions and commands and Set the
 " value of all global variables  and some buffer variables.for r,
@@ -2093,7 +2093,8 @@ if has("gui_win32")
         else
             exe s:py . " GetRPathPy()"
             if s:rinstallpath == "Not found"
-                call RWarningMsg('Could not find R path in Windows Registry.')
+                call RWarningMsg("Could not find R path in Windows Registry.")
+                call RWarningMsg("Please, either install R or set the value of 'vimrplugin_r_path'.")
                 call input("Press <Enter> to continue. ")
                 let g:rplugin_failed = 1
                 finish

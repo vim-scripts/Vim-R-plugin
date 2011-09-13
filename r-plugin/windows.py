@@ -115,6 +115,9 @@ def StartRPy():
         else:
             vim.command("RWarningMsg('Personal folder not found in registry')")
 
-    os.spawnv(os.P_NOWAIT, rpath, rargs)
+    if os.path.exists(rpath):
+        os.spawnv(os.P_NOWAIT, rpath, rargs)
+    else:
+        vim.command("echoerr 'File ' . g:rplugin_Rgui . ' not found.'")
 
 # vim: sw=4 tabstop=4 expandtab
