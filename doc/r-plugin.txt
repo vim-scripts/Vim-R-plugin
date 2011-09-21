@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 110830
+Version: 110921
 For Vim version 7.3
 
  1. Overview                                    |r-plugin-overview|
@@ -139,6 +139,8 @@ also possible to use the plugin with GVim and R in an external terminal
 emulator, Vim in a terminal emulator and R in an external terminal emulator,
 and using GNU Screen instead of Tmux to split the terminal emulator in two
 regions.
+
+Note: Tmux 1.3 needs Screen plugin 1.4 and Tmux 1.5 needs Screen plugin 1.5.
 
 3.2.2. Windows~
 
