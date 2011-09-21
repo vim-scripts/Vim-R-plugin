@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Mon Sep 12, 2011  09:44PM
+" Last Change: Wed Sep 21, 2011  09:16AM
 "
 " Purposes of this file: Create all functions and commands and Set the
 " value of all global variables  and some buffer variables.for r,
@@ -2180,7 +2180,6 @@ else
 
     if has("gui_macvim") && g:vimrplugin_applescript && !exists("g:ScreenVersion")
         let g:vimrplugin_screenplugin = 0
-        let g:vimrplugin_conqueplugin = 0 
         let g:vimrplugin_term_cmd = "none"
         let g:vimrplugin_term = "none"
     endif
@@ -2211,9 +2210,9 @@ if !exists("g:vimrplugin_screenplugin") || has('gui_running')
 endif
 
 if g:vimrplugin_conqueplugin == 1
-    if !exists("g:ConqueTerm_Version") || (exists("g:ConqueTerm_Version") && g:ConqueTerm_Version < 210)
+    if !exists("g:ConqueTerm_Version") || (exists("g:ConqueTerm_Version") && g:ConqueTerm_Version < 230)
         let g:vimrplugin_conqueplugin = 0
-        call RWarningMsg("You are using Conque Shell plugin " . g:ConqueTerm_Version . ". Vim-R-plugin requires Conque Shell >= 2.1")
+        call RWarningMsg("You are using Conque Shell plugin " . g:ConqueTerm_Version . ". Vim-R-plugin requires Conque Shell >= 2.3")
         call input("Press <Enter> to continue. ")
         finish
     endif
