@@ -1430,6 +1430,28 @@ code automatically, breaking only comment lines, put in your |vimrc|:
    autocmd FileType r setlocal formatoptions=cq
 <
 
+10.12. Vim with 256 colors in a terminal emulator (Linux/Unix only)~
+
+If you want 256 colors support in Vim, install the package ncurses-term. Then
+put in your ~/.bashrc:
+>
+   if [ "x" != "x$DISPLAY" ]
+   then
+     export TERM=xterm-256color
+   fi
+<
+Finally, put in your |vimrc|:
+>
+   if &term =~ "xterm" || &term =~ "256" || $DISPLAY != ""
+       set t_Co=256
+   endif
+   colorscheme your_prefered_color_scheme
+<
+You have to search the internet for color schemes supporting 256 colors,
+download and copy them to ~/.vim/colors. You may use the command
+|:colorscheme| to try them all before setting your preference in your |vimrc|.
+
+
 10.12. Run your Makefile from within R~
 
 Do you have many Rnoweb files included in a master tex or Rnoweb file and use
@@ -1658,6 +1680,7 @@ the R syntax highlighted.
 12. News~
 							       *r-plugin-news*
 
+ * New option: vimrplugin_notmuxconf.
  * Fixed bug in code indentation after unbalanced brackets when
    r_indent_align_args = 0 (thanks to Chris Neff for reporting the bug).
  * Fixed bug in code indentation after unbalanced parenthesis when
