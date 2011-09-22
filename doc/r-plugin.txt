@@ -1452,7 +1452,7 @@ download and copy them to ~/.vim/colors. You may use the command
 |:colorscheme| to try them all before setting your preference in your |vimrc|.
 
 
-10.12. Run your Makefile from within R~
+10.13. Run your Makefile from within R~
 
 Do you have many Rnoweb files included in a master tex or Rnoweb file and use
 a Makefile to build the pdf? You may consider it useful to put the following
@@ -1461,7 +1461,7 @@ line in your |vimrc|:
    nmap <LocalLeader>sm :update<CR>:call SendCmdToR('system("make")')<CR>
 <
 
-10.13. Group windows with compiz~
+10.14. Group windows with compiz~
 
 If you are using Compiz, it may be easier to work with the plugin if the
 various related windows (editor, terminal, and graphics window) are grouped
@@ -1470,7 +1470,7 @@ may need CompizConfig Settings Manager installed to enable this feature (look
 at the "Window Management" section for "Group and Tab Windows").
 
 
-10.14. Why do I have to updated the Object Browser manually?~
+10.15. Why do I have to updated the Object Browser manually?~
 
 It is because Vim and R run as separate processes and, thus, it is not
 possible to Vim to know whether R is busy or not. If R was running as part of
@@ -1482,7 +1482,7 @@ the Vim-R-plugin did this, the use of Vim would be blocked until R finished
 its processing. 
 
 
-10.15. Edit your ~/.Rprofile~
+10.16. Edit your ~/.Rprofile~
 
 You may want to edit your ~/.Rprofile. Two common options are the use of GVim
 as the text editor and the use of html help. Example for Linux with these two
@@ -1529,7 +1529,7 @@ An example for Windows:
    }
 <
 
-10.16. Debugging R functions~
+10.17. Debugging R functions~
 
 The Vim-R-Plugin does not have debugging facilities, but you may want to use
 the R package "debug":
@@ -1549,12 +1549,12 @@ on top" or a similar option provided by your desktop manager.
 There is also the R package "edtdbg" which aims to integrate R debugging
 facilities with Vim.
 
-10.17. Turn the R-plugin into a global plugin~
+10.18. Turn the R-plugin into a global plugin~
 							     *r-plugin-global*
 The Vim-R-plugin is a file type plugin. If you want its functionality
 available for all file types, then do one of the following:
 
-10.17.1. When using GVim~
+10.18.1. When using GVim~
 
 Go to your ~/.vim/plugin directory and create a symbolic link to
 ~/.vim/r-plugin/global_r_plugin.vim. That is, type the following
@@ -1570,7 +1570,7 @@ make a copy of the file to the ~/.vim/plugin directory and edit it. On
 Windows, you probably will have to make a copy of the file to the
 ~/vimfiles/plugin directory.
 
-10.17.2. When using Vim + screen.vim plugin (either Tmux or GNU Screen)~
+10.18.2. When using Vim + screen.vim plugin (either Tmux or GNU Screen)~
 
 Put in your |vimrc| (replace <F2> with the shortcut of your preference):
 >
@@ -1586,7 +1586,7 @@ Consequently, the ftplugin/r.vim script must be sourced again by pressing <F2>
 for the second time.
 
 
-10.18. Disable syntax highlight of R functions~
+10.19. Disable syntax highlight of R functions~
 
 If you want to disable the syntax highlight of R functions edit the file
 ~/.vim/r-plugin/functions.vim and delete all lines, but do not delete the
