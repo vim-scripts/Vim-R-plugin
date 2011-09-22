@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Wed Sep 21, 2011  09:16AM
+" Last Change: Thu Sep 22, 2011  12:47PM
 "
 " Purposes of this file: Create all functions and commands and Set the
 " value of all global variables  and some buffer variables.for r,
@@ -380,6 +380,7 @@ function StartR(whatr)
     endif
 
     if g:vimrplugin_screenplugin
+        let rcmd = "export VIMRPLUGIN_TMPDIR=" . $VIMRPLUGIN_TMPDIR . " ; ". rcmd
         if g:vimrplugin_screenvsplit
             if exists(":ScreenShellVertical") == 2
                 exec 'ScreenShellVertical ' . rcmd
@@ -2008,6 +2009,7 @@ call RSetDefaultValue("g:vimrplugin_listmethods",       0)
 call RSetDefaultValue("g:vimrplugin_specialplot",       0)
 call RSetDefaultValue("g:vimrplugin_nosingler",         0)
 call RSetDefaultValue("g:vimrplugin_noscreenrc",        0)
+call RSetDefaultValue("g:vimrplugin_notmuxconf",        0)
 call RSetDefaultValue("g:vimrplugin_routnotab",         0) 
 call RSetDefaultValue("g:vimrplugin_editor_w",         66)
 call RSetDefaultValue("g:vimrplugin_help_w",           46)
@@ -2200,6 +2202,14 @@ let g:rplugin_globalenvfname = $VIMRPLUGIN_TMPDIR . "/GlobalEnvList"
 
 if g:vimrplugin_tmux
     let g:ScreenImpl = 'Tmux'
+    if g:ScreenShellTmuxInitArgs == ""
+        if $DISPLAY != ""
+            let g:ScreenShellTmuxInitArgs = "-2"
+        endif
+        if g:vimrplugin_notmuxconf == 0
+            let g:ScreenShellTmuxInitArgs = g:ScreenShellTmuxInitArgs . " -f " . rplugin_home . "/r-plugin/tmux.conf"
+        endif
+    endif
 else
     let g:ScreenImpl = 'GnuScreen'
 endif
