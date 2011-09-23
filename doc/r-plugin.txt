@@ -548,13 +548,22 @@ in the example below.
 
 A sample detachable session could be:
 
+  - Create your ~/.tmux.conf if it does not exist yet. You may use the
+    r-plugin/tmux.conf as a starting point to your own configuration file.
+
   - Start Tmux:
       tmux
+
   - Start Vim:
       vim theScript.R
+
   - Use Vim to start an R session:
       \rf
+
   - Send code from Vim to R, and, then, detach Vim and R with <C-a>d
+    The command will be <C-b>d if you have not set <C-a> as the scape
+    character in your ~/.tmux.conf.
+
   - Some time latter (even if accessing the machine remotely) reattach the
     Tmux session:
       tmux attach
@@ -731,7 +740,7 @@ indentation by adding braces and line breaks to it. Example:
 |vimrplugin_maxdeparse|		Argument to R args() function
 |vimrplugin_latexcmd|		Command to run on .tex files
 |vimrplugin_sweaveargs|		Arguments do Sweave()
-|vimrplugin_never_unmake_menu|	Do not unmake menu when switching buffers
+|vimrplugin_never_unmake_menu|	Do not unmake the menu when switching buffers
 |vimrplugin_map_r|		Use 'r' to send lines and selected text
 
 
@@ -1542,7 +1551,7 @@ Once the library is installed and loaded, you should use mtrace(function_name)
 to enable the debugging of a function. Then, the next time that the function
 is called it will enter in debugging mode. Once debugging a function, you can
 hit <Enter> to evaluate the current line, go(n) to go to line n in the
-function and qqq() to quit the function (See debug's help for details). An
+function and qqq() to quit the function (See debug's help for details). A
 useful tip is to click on the title bar of the debug window and choose "Always
 on top" or a similar option provided by your desktop manager.
 
@@ -1616,7 +1625,7 @@ important Vim limitations are:
 
 In spite of these problems, the use of Conque Shell already has some
 advantages: the ability to edit R's output, and the syntax highlighting of the
-output. If you want to try the Conque Shell, install it from:
+output. If you want to try the Conque Shell, install it from
 
    http://www.vim.org/scripts/script.php?script_id=2771
 
@@ -1681,6 +1690,10 @@ the R syntax highlighted.
 							       *r-plugin-news*
 
  * New option: vimrplugin_notmuxconf.
+ * Fixed bug when starting tmux before vim: the environment variable
+   VIMRPLUGIN_TMPDIR was not being set. Thanks to Michel Lang for reporting
+   the bug and helping to track its source, and thanks to Eric Dewoestine for
+   explaining how to fix the bug.
  * Fixed bug in code indentation after unbalanced brackets when
    r_indent_align_args = 0 (thanks to Chris Neff for reporting the bug).
  * Fixed bug in code indentation after unbalanced parenthesis when
