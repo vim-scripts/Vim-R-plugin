@@ -82,9 +82,9 @@ mkdir -p vim-r-plugin-tmp/usr/share/doc/vim-r-plugin
 DEBIANTIME=`date -R`
 echo "vim-r-plugin ($PLUGINVERSION-1) unstable; urgency=low
 
-* Initial Release.
+  * Initial Release.
 
--- Jakson Alves de Aquino <jalvesaq@gmail.com>  $DEBIANTIME
+ -- Jakson Alves de Aquino <jalvesaq@gmail.com>  $DEBIANTIME
 " > vim-r-plugin-tmp/usr/share/doc/vim-r-plugin/changelog
 gzip --best vim-r-plugin-tmp/usr/share/doc/vim-r-plugin/changelog
 
