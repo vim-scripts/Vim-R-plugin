@@ -21,14 +21,6 @@
 ###########################################################
 
 
-# It's necessary to run the script as root to have the files permissions and
-# ownership correctly set in the Debian package.
-# The script requires the use of sudo to become root.
-if [ "$USER" != "root" ]
-then
-  echo "You must be root to run this script!"
-  exit 0
-fi
 
 PLUGINHOME=`pwd`
 PLUGINVERSION=`date +%y%m%d`
@@ -172,7 +164,6 @@ of the GNU General Public License.
 # Unpack the tar.gz and create the zip file
 tar -xvzf vimrplugintmpfile.tar.gz -C vim-r-plugin-tmp/usr/share/vim/addons > /dev/null
 rm vimrplugintmpfile.tar.gz
-chown -R root.root vim-r-plugin-tmp
 cd vim-r-plugin-tmp/usr/share/vim/addons
 chmod +w r-plugin/tex_indent.vim
 rm -f /tmp/vim-r-plugin-$PLUGINVERSION.zip
@@ -233,18 +224,11 @@ chmod +x DEBIAN/postrm DEBIAN/postinst
 
 # Build the Debian package
 cd /tmp
-dpkg-deb -b vim-r-plugin-tmp vim-r-plugin_$PLUGINVERSION-1_all.deb
+fakeroot dpkg-deb -b vim-r-plugin-tmp vim-r-plugin_$PLUGINVERSION-1_all.deb
 
 # Clean
 rm -rf vim-r-plugin-tmp
 
-# Change the ownership of both the zip and the deb files, so you can move and
-# delete them without becoming root.
-if [ "x$SUDO_USER" != "x" ]
-then
-    cd /tmp
-    chown $SUDO_USER.$SUDO_USER vim-r-plugin-$PLUGINVERSION.zip vim-r-plugin_$PLUGINVERSION-1_all.deb
-fi
 
 # Warn if the date in the doc is outdated
 PLUGINVERSION=`date +"%Y-%m-%d"`
