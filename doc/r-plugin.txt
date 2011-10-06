@@ -579,7 +579,35 @@ A sample detachable session could be:
     Tmux session:
       tmux attach
 
- 
+
+4.8. GNU Screen usage~
+							     *r-plugin-screen*
+When running Vim in a terminal emulator (Linux/Unix only), the Vim-R-plugin
+will use the screen.vim plugin to restart Vim and start R in a Tmux session.
+However, the plugin will use GNU Screen if Tmux is not installed or you have
+set the value of vimrplugin_tmux = 0 in your |vimrc|.
+
+You may want to create your own ~/.screenrc to customize GNU Screen behavior.
+The Vim-R-plugin comes with a sample screenrc (at r-plugin directory) that you
+can use. Below are the most useful key bindings to use the Vim-R-plugin with
+the provided screenrc:
+
+    <C-Tab>    : Move the cursor to the next panel.
+    <C-a>a     : Decrease the height of the current panel.
+    <C-a>z     : Increase the height of the current panel.
+    <C-a>[     : Enter the copy/scroll back mode. You can use <PgUp>,
+		 <PgDown> and vi key bindings to move the cursor around
+		 the panel. Press q to quit copy mode.
+    <C-a>]     : Paste the content of GNU Screen paste buffer.
+
+While in the copy and scroll back mode, the following key bindings are very
+useful:
+
+    q          : Quit the copy and scroll mode.
+    <Space>    : Start text selection.
+    <Enter>    : Copy the selection to GNU Screen paste buffer.
+
+
 ==============================================================================
 5. How the plugin works~
 							*r-plugin-functioning*
