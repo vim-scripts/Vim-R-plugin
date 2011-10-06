@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 111002
+Version: 111006
 For Vim version 7.3
 
  1. Overview                                    |r-plugin-overview|
@@ -129,28 +129,23 @@ are not already a user of Tmux, please, read the |r-plugin-tmux| section to
 learn a few useful shortcuts. The tmux.conf file that ships with this plugin
 sets Tmux to work with vi key bindings.
 
-Note: The recommended way of using the plugin on Linux is running Vim in a
-terminal emulator, using Tmux to split the terminal in two regions. This is
-the default configuration when running Vim in a terminal emulator, but it is
-also possible to use the plugin with GVim and R in an external terminal
-emulator, Vim in a terminal emulator and R in an external terminal emulator,
-and using GNU Screen instead of Tmux to split the terminal emulator in two
-regions. The two lists below show how the plugin will work in different
-conditions:
+Note: The plugin can use different mechanisms to send commands to R. The
+mechanism that will be used depends on both what applications and plugins you
+have installed and what options you have in your |vimrc|. The two lists below
+show how the plugin will work in different conditions:
 
-   Vim                                  Condition
-   ------------------------------       -------------------------------------
-   Screen plugin (Tmux)                 default on Linux 
-   Screen plugin (GNU Screen)           vimrplugin_tmux = 0 or Tmux not found
-   GNU Screen (external terminal)       vimrplugin_screenplugin = 0
-   Conque Shell                         vimrplugin_screenplugin = 0 and
-                                        vimrplugin_conqueplugin = 1
+   Vim                               Condition
+   ------------------------------    -------------------------------------
+   Screen plugin (Tmux)              default on Linux 
+   Screen plugin (GNU Screen)        vimrplugin_tmux = 0 or Tmux not found
+   GNU Screen (external terminal)    vimrplugin_screenplugin = 0
+   Conque Shell                      idem and vimrplugin_conqueplugin = 1
 
 
-   GVim                                 Condition
-   ------------------------------       -------------------------------------
-   GNU Screen (external terminal)       default on Linux
-   Conque Shell                         vimrplugin_conqueplugin = 1
+   GVim                              Condition
+   ------------------------------    -------------------------------------
+   GNU Screen (external terminal)    default on Linux
+   Conque Shell                      vimrplugin_conqueplugin = 1
 
 
 3.2.2. Windows~
@@ -163,6 +158,8 @@ to install several external dependencies:
     * Python: http://www.python.org/download/
 
       Note: The official Vim is 32 bit and, thus, Python must be 32 bit too.
+      However, Vim and R run as independent processes, that is, you may have
+      32 bit Vim sending commands to 64 bit R.
 
       Note: Be careful to download the correct Python version because Vim
 	    needs a specific version of Python DLL. For example, the official
@@ -719,6 +716,12 @@ indentation by adding braces and line breaks to it. Example:
     class(x) <- c(if(ordered) "ordered", "factor")
 <
 
+6.9. Commands are sent twice on Mac OS X~
+
+If you use the screen plugin with GNU Screen, individual lines may be sent
+duplicated to R on Mac OS X.
+
+
 ==============================================================================
 7. Options~
 							    *r-plugin-options*
@@ -1018,8 +1021,10 @@ If you want to use your own ~/.tmux.conf, put in your vimrc:
 							     *vimrplugin_tmux*
 By default, when running in a terminal emulator, the Vim-R-plugin uses the
 screen.vim plugin if it is installed and, by default, it will use Tmux instead
-of GNU Screen. If both GNU Screen and Tmux are installed but you prefer to use
-the GNU Screen application, put in your |vimrc|:
+of GNU Screen. Tmux was chosen as default because it may be split vertically
+and its regions are easier to resize. If both GNU Screen and Tmux are
+installed but you prefer to use the GNU Screen application, put in your
+|vimrc|:
 >
    let vimrplugin_tmux = 0
 <
