@@ -186,15 +186,21 @@ Version: $PLUGINVERSION
 Architecture: all
 Maintainer: Jakson Alves de Aquino <jalvesaq@gmail.com>
 Installed-Size: $INSTALLEDSIZE
-Depends: vim | vim-gtk | vim-gnome, screen, tmux, ncurses-term, vim-addon-manager, r-base | r-base-core
+Depends: vim | vim-gtk | vim-gnome, screen, tmux, ncurses-term, vim-addon-manager, r-base-core
 Enhances: vim
 Section: text
 Priority: extra
 Homepage: http://www.vim.org/scripts/script.php?script_id=2628
 Description: Plugin to work with R
- This filetype plugin uses screen to communicate with R, but the communication
- does not work on Microsoft Windows. The new functions are similar to what you
- can find in Tinn-R and ess mode of emacs." > DEBIAN/control
+ This filetype plugin has the following main features:
+      - Start/Close R.
+      - Send lines, selection, paragraphs, functions, blocks, entire file.
+      - Send commands with the object under cursor as argument:
+        help, args, plot, print, str, summary, example, names.
+      - Support for editing Rnoweb files.
+      - Omni completion (auto-completion) for R objects.
+      - Ability to see R documentation in a Vim buffer.
+      - Object Browser." > DEBIAN/control
 
 # Create the md5sum file
 arquivos=`find -type f | grep -v DEBIAN | sed -e 's/^\.\///'`
