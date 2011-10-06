@@ -186,7 +186,7 @@ Version: $PLUGINVERSION
 Architecture: all
 Maintainer: Jakson Alves de Aquino <jalvesaq@gmail.com>
 Installed-Size: $INSTALLEDSIZE
-Depends: vim | vim-gtk | vim-gnome, screen, tmux, ncurses-term, vim-addon-manager, r-base-core
+Depends: vim | vim-gtk | vim-gnome, screen, tmux (>= 1.5), ncurses-term, vim-addon-manager, r-base-core
 Enhances: vim
 Section: text
 Priority: extra
