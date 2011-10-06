@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Thu Oct 06, 2011  12:28AM
+" Last Change: Thu Oct 06, 2011  12:42AM
 "
 " Purposes of this file: Create all functions and commands and Set the
 " value of all global variables  and some buffer variables.for r,
@@ -2044,11 +2044,6 @@ else
     call RSetDefaultValue("g:vimrplugin_screenplugin", 0)
 endif
 
-if g:vimrplugin_applescript
-    let g:vimrplugin_term_cmd = "none"
-    let g:vimrplugin_term = "none"
-endif
-
 if has("gui_win32")
     call RSetDefaultValue("g:vimrplugin_conquesleep", 200)
     let vimrplugin_screenplugin = 0
@@ -2309,7 +2304,7 @@ let s:all_marks = "abcdefghijklmnopqrstuvwxyz"
 call writefile([], g:rplugin_globalenvfname)
 
 " Choose a terminal (code adapted from screen.vim)
-if has("gui_win32")
+if has("gui_win32") || vimrplugin_applescript
     " No external terminal emulator will be called, so any value is good
     let g:vimrplugin_term = "xterm"
 else
@@ -2341,6 +2336,8 @@ if !exists("g:vimrplugin_term") && !exists("g:vimrplugin_term_cmd")
     finish
 endif
 
+let g:rplugin_termcmd = g:vimrplugin_term . " -e"
+
 if g:vimrplugin_term == "gnome-terminal" || g:vimrplugin_term == "xfce4-terminal"
     " Cannot set icon: http://bugzilla.gnome.org/show_bug.cgi?id=126081
     let g:rplugin_termcmd = g:vimrplugin_term . " --working-directory='" . expand("%:p:h") . "' --title R -e"
@@ -2352,10 +2349,6 @@ endif
 
 if g:vimrplugin_term == "Eterm"
     let g:rplugin_termcmd = "Eterm --icon " . g:rplugin_home . "/bitmaps/ricon.png -e"
-endif
-
-if g:vimrplugin_term == "rxvt" || g:vimrplugin_term == "aterm"
-    let g:rplugin_termcmd = g:vimrplugin_term . " -e"
 endif
 
 if g:vimrplugin_term == "roxterm"
