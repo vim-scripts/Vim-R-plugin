@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Mon Oct 03, 2011  12:17AM
+" Last Change: Thu Oct 06, 2011  12:28AM
 "
 " Purposes of this file: Create all functions and commands and Set the
 " value of all global variables  and some buffer variables.for r,
@@ -44,6 +44,12 @@ let g:rplugin_did_global_stuff = 1
 function RWarningMsg(wmsg)
     echohl WarningMsg
     echomsg a:wmsg
+    echohl Normal
+endfunction
+
+function RWarningMsgInp(wmsg)
+    echohl WarningMsg
+    call input(a:wmsg . " [Press <Enter> to continue] ")
     echohl Normal
 endfunction
 
@@ -393,8 +399,7 @@ function StartR(whatr)
             if exists(":ScreenShellVertical") == 2
                 exec 'ScreenShellVertical ' . rcmd
             else
-                call RWarningMsg("Did you put \"let g:ScreenImpl = 'Tmux'\" in your vimrc?")
-                call input("Press <Enter> to continue. ")
+                call RWarningMsgInp("Did you put \"let g:ScreenImpl = 'Tmux'\" in your vimrc?")
                 exec 'ScreenShell ' . rcmd
             endif
         else
@@ -2066,14 +2071,12 @@ if g:vimrplugin_screenplugin
             endif
         endif
         if !exists("g:ScreenVersion")
-            call RWarningMsg("Please, either install the screen plugin (http://www.vim.org/scripts/script.php?script_id=2711) (recommended) or put 'let vimrplugin_screenplugin = 0' in your vimrc.")
-            call input("Press <Enter> to continue. ")
+            call RWarningMsgInp("Please, either install the screen plugin (http://www.vim.org/scripts/script.php?script_id=2711) (recommended) or put 'let vimrplugin_screenplugin = 0' in your vimrc.")
             let g:rplugin_failed = 1
             finish
         else
             if g:ScreenVersion < "1.5"
-                call RWarningMsg("Vim-R-plugin requires Screen plugin >= 1.5")
-                call input("Press <Enter> to continue. ")
+                call RWarningMsgInp("Vim-R-plugin requires Screen plugin >= 1.5")
                 let g:rplugin_failed = 1
                 finish
             endif
@@ -2133,9 +2136,7 @@ if has("gui_win32")
     endif
 
     if s:py == ""
-        call RWarningMsg("Python interface must be enabled to run Vim-R-Plugin.")
-        call RWarningMsg("Please do  ':h r-plugin-installation'  for details.")
-        call input("Press <Enter> to continue. ")
+        call RWarningMsgInp("Python interface must be enabled to run Vim-R-Plugin. Please do  ':h r-plugin-installation'  for details.")
         let g:rplugin_failed = 1
         finish
     endif
@@ -2150,9 +2151,7 @@ if has("gui_win32")
         else
             exe s:py . " GetRPathPy()"
             if s:rinstallpath == "Not found"
-                call RWarningMsg("Could not find R path in Windows Registry.")
-                call RWarningMsg("Please, either install R or set the value of 'vimrplugin_r_path'.")
-                call input("Press <Enter> to continue. ")
+                call RWarningMsgInp("Could not find R path in Windows Registry. Please, either install R or set the value of 'vimrplugin_r_path'.")
                 let g:rplugin_failed = 1
                 finish
             endif
@@ -2189,11 +2188,10 @@ else
     if g:vimrplugin_applescript == 0 && (has("gui_running") || (!has("gui_running") && (g:vimrplugin_tmux == 0 || g:vimrplugin_screenplugin == 0))) && !executable('screen')
         let rplugin_missing_screen = 1
         if has("gui_running")
-            call RWarningMsg("Please, install the 'screen' application to enable the Vim-R-plugin with GVim.")
+            call RWarningMsgInp("Please, install the 'screen' application to enable the Vim-R-plugin with GVim.")
         else
-            call RWarningMsg("Please, install the 'screen' application to enable the Vim-R-plugin.")
+            call RWarningMsgInp("Please, install the 'screen' application to enable the Vim-R-plugin.")
         endif
-        call input("Press <Enter> to continue. ")
         let g:rplugin_failed = 1
         finish
     endif
@@ -2243,8 +2241,7 @@ endif
 if g:vimrplugin_conqueplugin == 1
     if !exists("g:ConqueTerm_Version") || (exists("g:ConqueTerm_Version") && g:ConqueTerm_Version < 230)
         let g:vimrplugin_conqueplugin = 0
-        call RWarningMsg("You are using Conque Shell plugin " . g:ConqueTerm_Version . ". Vim-R-plugin requires Conque Shell >= 2.3")
-        call input("Press <Enter> to continue. ")
+        call RWarningMsgInp("You are using Conque Shell plugin " . g:ConqueTerm_Version . ". Vim-R-plugin requires Conque Shell >= 2.3")
         finish
     endif
 endif
@@ -2322,8 +2319,7 @@ else
     endif
     if exists("g:vimrplugin_term")
         if !executable(g:vimrplugin_term)
-            call RWarningMsg("'" . g:vimrplugin_term . "' not found. Please change the value of 'vimrplugin_term' in your vimrc.")
-            call input("Press <Enter> to continue. ")
+            call RWarningMsgInp("'" . g:vimrplugin_term . "' not found. Please change the value of 'vimrplugin_term' in your vimrc.")
             unlet g:vimrplugin_term
         endif
     endif
@@ -2340,8 +2336,7 @@ else
 endif
 
 if !exists("g:vimrplugin_term") && !exists("g:vimrplugin_term_cmd")
-    call RWarningMsg("Please, set the variable 'g:vimrplugin_term_cmd' in your .vimrc.\nRead the plugin documentation for details.")
-    call input("Press <Enter> to continue. ")
+    call RWarningMsgInp("Please, set the variable 'g:vimrplugin_term_cmd' in your .vimrc.\nRead the plugin documentation for details.")
     let g:rplugin_failed = 1
     finish
 endif
