@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Thu Oct 06, 2011  10:31PM
+" Last Change: Fri Oct 07, 2011  10:40AM
 "
 " Purposes of this file: Create all functions and commands and Set the
 " value of all global variables  and some buffer variables.for r,
@@ -48,9 +48,17 @@ function RWarningMsg(wmsg)
 endfunction
 
 function RWarningMsgInp(wmsg)
+    let savelz = &lazyredraw
+    set lazyredraw
     echohl WarningMsg
-    call input(a:wmsg . " [Press <Enter> to continue] ")
+    echomsg a:wmsg
     echohl Normal
+    call input("[Press <Enter> to continue] ")
+    if savelz
+        set lazyredraw
+    else
+        set nolazyredraw
+    endif
 endfunction
 
 " Set default value of some variables:
