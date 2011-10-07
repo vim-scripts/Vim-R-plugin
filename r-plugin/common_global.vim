@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Thu Oct 06, 2011  12:42AM
+" Last Change: Thu Oct 06, 2011  10:31PM
 "
 " Purposes of this file: Create all functions and commands and Set the
 " value of all global variables  and some buffer variables.for r,
@@ -624,8 +624,11 @@ endfunction
 " Function to send commands
 " return 0 on failure and 1 on success
 function SendCmdToR(cmd)
-    " ^K clean from cursor to the right and ^U clean from cursor to the left
-    let cmd = "\013" . "\025" . a:cmd
+    " ^K (\013) cleans from cursor to the right and ^U (\025) cleans from
+    " cursor to the left. However, ^U causes a beep if there is nothing to
+    " clean. The solution is to use ^A (\001) to move the cursor to the
+    " beginning of the line before sending ^K.
+    let cmd = "\001" . "\013" . a:cmd
 
     if has("gui_win32") && g:vimrplugin_conqueplugin == 0
         let cmd = cmd . "\n"
@@ -2183,9 +2186,9 @@ else
     if g:vimrplugin_applescript == 0 && (has("gui_running") || (!has("gui_running") && (g:vimrplugin_tmux == 0 || g:vimrplugin_screenplugin == 0))) && !executable('screen')
         let rplugin_missing_screen = 1
         if has("gui_running")
-            call RWarningMsgInp("Please, install the 'screen' application to enable the Vim-R-plugin with GVim.")
+            call RWarningMsgInp("Please, install the 'GNU Screen' application to enable the Vim-R-plugin with GVim.")
         else
-            call RWarningMsgInp("Please, install the 'screen' application to enable the Vim-R-plugin.")
+            call RWarningMsgInp("Please, install the 'GNU Screen' application to enable the Vim-R-plugin.")
         endif
         let g:rplugin_failed = 1
         finish
