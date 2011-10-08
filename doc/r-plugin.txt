@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 111006
+Version: 111007
 For Vim version 7.3
 
  1. Overview                                    |r-plugin-overview|
@@ -113,7 +113,7 @@ sections 3.3 and 3.4.
 In addition to having R installed in your system, this plugin requires users
 to install:
 
-   Tmux (>= 1.5):     http://tmux.sourceforge.net
+   Tmux (>= 1.4):     http://tmux.sourceforge.net
    GNU Screen:        http://www.gnu.org/s/screen
    screen.vim plugin: http://www.vim.org/scripts/script.php?script_id=2711
    ncurses-term:      http://invisible-island.net/ncurses
@@ -1274,6 +1274,7 @@ directory after the installation:
    r-plugin/vimSweave.R
    r-plugin/r.snippets
    r-plugin/screenrc
+   r-plugin/screenrc.xterm
    r-plugin/specialfuns.R
    r-plugin/tex_indent.vim
    r-plugin/tmux.conf
@@ -1739,15 +1740,16 @@ the R syntax highlighted.
 12. News~
 							       *r-plugin-news*
 
+ * Fixed spell check bug in R documentation files (.Rd).
+ * Fixed beep bug when sending commands to R.
  * New option: vimrplugin_notmuxconf.
  * Fixed bug when starting tmux before vim: the environment variable
    VIMRPLUGIN_TMPDIR was not being set. Thanks to Michel Lang for reporting
    the bug and helping to track its source, and thanks to Eric Dewoestine for
    explaining how to fix the bug.
- * Fixed bug in code indentation after unbalanced brackets when
-   r_indent_align_args = 0 (thanks to Chris Neff for reporting the bug).
- * Fixed bug in code indentation after unbalanced parenthesis when
-   r_indent_align_args = 0 (thanks to Peng Yu for reporting the bug).
+ * Fixed bug in code indentation after unbalanced brackets and parenthesis
+   when r_indent_align_args = 0 (thanks to Chris Neff and Peng Yu for
+   reporting the bugs).
  * Really make the use of AppleScript the default on OS X (thanks for Jason
    for reporting the bug).
 

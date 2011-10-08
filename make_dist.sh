@@ -50,7 +50,7 @@ tar -cvzf /tmp/vimrplugintmpfile.tar.gz ftdetect/r.vim indent/r.vim \
     r-plugin/global_r_plugin.vim r-plugin/omniList r-plugin/windows.py \
     r-plugin/vimActivate.js r-plugin/tex_indent.vim r-plugin/r.snippets \
     r-plugin/common_buffer.vim r-plugin/common_global.vim \
-    r-plugin/tmux.conf r-plugin/screenrc \
+    r-plugin/tmux.conf r-plugin/screenrc r-plugin/screenrc.xterm \
     bitmaps/ricon.xbm bitmaps/ricon.png \
     bitmaps/RStart.png bitmaps/RStart.bmp \
     bitmaps/RClose.png bitmaps/RClose.bmp \
@@ -126,6 +126,7 @@ files:
 - r-plugin/tex_indent.vim
 - r-plugin/tmux.conf
 - r-plugin/screenrc
+- r-plugin/screenrc.xterm
 - r-plugin/vimbrowser.R
 - r-plugin/vimhelp.R
 - r-plugin/vimprint.R

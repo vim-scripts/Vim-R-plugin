@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Fri Oct 07, 2011  10:40AM
+" Last Change: Fri Oct 07, 2011  09:14PM
 "
 " Purposes of this file: Create all functions and commands and Set the
 " value of all global variables  and some buffer variables.for r,
@@ -49,14 +49,14 @@ endfunction
 
 function RWarningMsgInp(wmsg)
     let savelz = &lazyredraw
-    set lazyredraw
+    if savelz == 0
+        set lazyredraw
+    endif
     echohl WarningMsg
     echomsg a:wmsg
     echohl Normal
     call input("[Press <Enter> to continue] ")
-    if savelz
-        set lazyredraw
-    else
+    if savelz == 0
         set nolazyredraw
     endif
 endfunction
@@ -2015,6 +2015,21 @@ command RBuildTags :call SendCmdToR('rtags(ofile = "TAGS")')
 "             rplugin_    for internal parameters
 "==========================================================================
 
+" g:rplugin_home should be the directory where the r-plugin files are.  For
+" users following the installation instructions it will be at ~/.vim or
+" ~/vimfiles, that is, the same value of g:rplugin_uservimfiles. However the
+" variables will have different values if the plugin is installed somewhere
+" else in the runtimepath.
+let g:rplugin_home = expand("<sfile>:h:h")
+
+" g:rplugin_uservimfiles must be a writable directory. It will be g:rplugin_home
+" unless it's not writable. Then it wil be ~/.vim or ~/vimfiles.
+if filewritable(g:rplugin_home) == 2
+    let g:rplugin_uservimfiles = g:rplugin_home
+else
+    let g:rplugin_uservimfiles = split(&runtimepath, ",")[0]
+endif
+
 " Variables whose default value is fixed
 call RSetDefaultValue("g:vimrplugin_map_r",             0)
 call RSetDefaultValue("g:vimrplugin_open_df",           1)
@@ -2055,6 +2070,12 @@ else
     call RSetDefaultValue("g:vimrplugin_screenplugin", 0)
 endif
 
+" The screen.vim plugin only works on terminal emulators
+if has('gui_running')
+    let g:vimrplugin_screenplugin = 0
+    let g:vimrplugin_tmux = 0
+endif
+
 if has("gui_win32")
     call RSetDefaultValue("g:vimrplugin_conquesleep", 200)
     let vimrplugin_screenplugin = 0
@@ -2063,50 +2084,54 @@ else
 endif
 
 if g:vimrplugin_screenplugin
-    if has("gui_running")
-        let g:vimrplugin_tmux = 0
-        let g:vimrplugin_screenplugin = 0
+    if !exists("g:ScreenVersion")
+        call RWarningMsgInp("Please, either install the screen plugin (http://www.vim.org/scripts/script.php?script_id=2711) (recommended) or put 'let vimrplugin_screenplugin = 0' in your vimrc.")
+        let g:rplugin_failed = 1
+        finish
     else
-        if !exists("g:vimrplugin_tmux")
-            if executable('tmux')
-                let g:vimrplugin_tmux = 1
-                let rplugin_missing_tmux = 0
-            else
-                let g:vimrplugin_tmux = 0
-                let rplugin_missing_tmux = 1
-            endif
-        endif
-        if !exists("g:ScreenVersion")
-            call RWarningMsgInp("Please, either install the screen plugin (http://www.vim.org/scripts/script.php?script_id=2711) (recommended) or put 'let vimrplugin_screenplugin = 0' in your vimrc.")
+        if g:ScreenVersion < "1.5"
+            call RWarningMsgInp("Vim-R-plugin requires Screen plugin >= 1.5")
             let g:rplugin_failed = 1
             finish
+        endif
+    endif
+    if !exists("g:vimrplugin_tmux")
+        if executable('tmux')
+            let g:vimrplugin_tmux = 1
+            let rplugin_missing_tmux = 0
         else
-            if g:ScreenVersion < "1.5"
-                call RWarningMsgInp("Vim-R-plugin requires Screen plugin >= 1.5")
-                let g:rplugin_failed = 1
-                finish
+            let g:vimrplugin_tmux = 0
+            let rplugin_missing_tmux = 1
+        endif
+    endif
+
+    " To get 256 colors you have to set the $TERM environment variable to
+    " xterm-256color. See   :h r-plugin-tips 
+    if g:vimrplugin_tmux
+        let g:ScreenImpl = 'Tmux'
+        if g:ScreenShellTmuxInitArgs == ""
+            if $DISPLAY != "" || $TERM =~ "xterm"
+                let g:ScreenShellTmuxInitArgs = "-2"
+            endif
+            if g:vimrplugin_notmuxconf == 0
+                let g:ScreenShellTmuxInitArgs = g:ScreenShellTmuxInitArgs . " -f " . rplugin_home . "/r-plugin/tmux.conf"
+            endif
+        endif
+    else
+        let g:ScreenImpl = 'GnuScreen'
+        if g:vimrplugin_noscreenrc == 0 && exists("g:ScreenShellScreenInitArgs") && g:ScreenShellScreenInitArgs == ""
+            if $DISPLAY != "" || $TERM =~ "xterm"
+                let g:ScreenShellScreenInitArgs = " -c " . g:rplugin_home . "/r-plugin/screenrc.xterm "
+            else
+                let g:ScreenShellScreenInitArgs = " -c " . g:rplugin_home . "/r-plugin/screenrc "
             endif
         endif
     endif
+
 else
     let g:vimrplugin_tmux = 0
 endif
 
-
-" g:rplugin_home should be the directory where the r-plugin files are.  For
-" users following the installation instructions it will be at ~/.vim or
-" ~/vimfiles, that is, the same value of g:rplugin_uservimfiles. However the
-" variables will have different values if the plugin is installed somewhere
-" else in the runtimepath.
-let g:rplugin_home = expand("<sfile>:h:h")
-
-" g:rplugin_uservimfiles must be a writable directory. It will be g:rplugin_home
-" unless it's not writable. Then it wil be ~/.vim or ~/vimfiles.
-if filewritable(g:rplugin_home) == 2
-    let g:rplugin_uservimfiles = g:rplugin_home
-else
-    let g:rplugin_uservimfiles = split(&runtimepath, ",")[0]
-endif
 
 " Start with an empty list of objects in the workspace
 let g:rplugin_globalenvlines = []
@@ -2224,25 +2249,6 @@ endif
 
 let g:rplugin_docfile = $VIMRPLUGIN_TMPDIR . "/Rdoc"
 let g:rplugin_globalenvfname = $VIMRPLUGIN_TMPDIR . "/GlobalEnvList"
-
-if g:vimrplugin_tmux
-    let g:ScreenImpl = 'Tmux'
-    if g:ScreenShellTmuxInitArgs == ""
-        if $DISPLAY != ""
-            let g:ScreenShellTmuxInitArgs = "-2"
-        endif
-        if g:vimrplugin_notmuxconf == 0
-            let g:ScreenShellTmuxInitArgs = g:ScreenShellTmuxInitArgs . " -f " . rplugin_home . "/r-plugin/tmux.conf"
-        endif
-    endif
-else
-    let g:ScreenImpl = 'GnuScreen'
-endif
-
-" The screen.vim plugin only works on terminal emulators
-if !exists("g:vimrplugin_screenplugin") || has('gui_running')
-    let g:vimrplugin_screenplugin = 0
-endif
 
 if g:vimrplugin_conqueplugin == 1
     if !exists("g:ConqueTerm_Version") || (exists("g:ConqueTerm_Version") && g:ConqueTerm_Version < 230)
