@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Fri Oct 07, 2011  09:14PM
+" Last Change: Sun Oct 09, 2011  02:19PM
 "
 " Purposes of this file: Create all functions and commands and Set the
 " value of all global variables  and some buffer variables.for r,
@@ -1816,7 +1816,7 @@ function MakeRMenu()
         amenu R.Help\ (plugin).Options.Screen\ configuration :help vimrplugin_noscreenrc<CR>
         amenu R.Help\ (plugin).Options.Screen\ plugin :help vimrplugin_screenplugin<CR>
     endif
-    if has("gui_macvim") | has("gui_mac") | has("mac") | has("macunix")
+    if has("gui_macvim") || has("gui_mac") || has("mac") || has("macunix")
         amenu R.Help\ (plugin).Options.Integration\ with\ Apple\ Script :help vimrplugin_applescript<CR>
     endif
     if has("gui_win32")
@@ -2058,7 +2058,7 @@ call RSetDefaultValue("g:vimrplugin_vimpager",       "'vertical'")
 call RSetDefaultValue("g:vimrplugin_latexcmd", "'pdflatex'")
 call RSetDefaultValue("g:vimrplugin_objbr_place", "'console,right'")
 
-if has("gui_macvim") | has("gui_mac") | has("mac") | has("macunix")
+if has("gui_macvim") || has("gui_mac") || has("mac") || has("macunix")
     call RSetDefaultValue("g:vimrplugin_applescript", 1)
 else
     call RSetDefaultValue("g:vimrplugin_applescript", 0)
