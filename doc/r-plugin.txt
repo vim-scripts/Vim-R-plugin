@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 111007
+Version: 111010
 For Vim version 7.3
 
  1. Overview                                    |r-plugin-overview|
@@ -113,7 +113,7 @@ sections 3.3 and 3.4.
 In addition to having R installed in your system, this plugin requires users
 to install:
 
-   Tmux (>= 1.4):     http://tmux.sourceforge.net
+   Tmux:              http://tmux.sourceforge.net
    GNU Screen:        http://www.gnu.org/s/screen
    screen.vim plugin: http://www.vim.org/scripts/script.php?script_id=2711
    ncurses-term:      http://invisible-island.net/ncurses
@@ -132,7 +132,7 @@ sets Tmux to work with vi key bindings.
 Note: The plugin can use different mechanisms to send commands to R. The
 mechanism that will be used depends on both what applications and plugins you
 have installed and what options you have in your |vimrc|. The two lists below
-show how the plugin will work in different conditions:
+show how the plugin will work on Linux in different conditions:
 
    Vim                               Condition
    ------------------------------    -------------------------------------
@@ -146,6 +146,10 @@ show how the plugin will work in different conditions:
    ------------------------------    -------------------------------------
    GNU Screen (external terminal)    default on Linux
    Conque Shell                      vimrplugin_conqueplugin = 1
+
+
+Note: On Mac OS X the plugin will use AppleScript in both Vim and GVim unless
+vimrplugin_applescript = 0.
 
 
 3.2.2. Windows~

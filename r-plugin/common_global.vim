@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Sun Oct 09, 2011  02:19PM
+" Last Change: Mon Oct 10, 2011  11:30PM
 "
 " Purposes of this file: Create all functions and commands and Set the
 " value of all global variables  and some buffer variables.for r,
@@ -2067,7 +2067,8 @@ endif
 if g:vimrplugin_applescript == 0
     call RSetDefaultValue("g:vimrplugin_screenplugin", 1)
 else
-    call RSetDefaultValue("g:vimrplugin_screenplugin", 0)
+    let g:vimrplugin_screenplugin = 0
+    let g:vimrplugin_conqueplugin = 0
 endif
 
 " The screen.vim plugin only works on terminal emulators
@@ -2084,24 +2085,17 @@ else
 endif
 
 if g:vimrplugin_screenplugin
+    let g:vimrplugin_conqueplugin = 0
     if !exists("g:ScreenVersion")
         call RWarningMsgInp("Please, either install the screen plugin (http://www.vim.org/scripts/script.php?script_id=2711) (recommended) or put 'let vimrplugin_screenplugin = 0' in your vimrc.")
         let g:rplugin_failed = 1
         finish
-    else
-        if g:ScreenVersion < "1.5"
-            call RWarningMsgInp("Vim-R-plugin requires Screen plugin >= 1.5")
-            let g:rplugin_failed = 1
-            finish
-        endif
     endif
     if !exists("g:vimrplugin_tmux")
         if executable('tmux')
             let g:vimrplugin_tmux = 1
-            let rplugin_missing_tmux = 0
         else
             let g:vimrplugin_tmux = 0
-            let rplugin_missing_tmux = 1
         endif
     endif
 
@@ -2132,6 +2126,26 @@ else
     let g:vimrplugin_tmux = 0
 endif
 
+if g:vimrplugin_screenplugin
+    " Future: Remove this Tmux version test on 2014
+    if g:vimrplugin_tmux
+        let s:xx = system("tmux -V")
+        let s:xx = substitute(s:xx, '.*tmux \([0-9]\.[0-9]\).*', '\1', '')
+        if strlen(s:xx) > 6 && g:ScreenVersion > "1.4"
+            call RWarningMsgInp("Tmux <= 1.3 requires Screen plugin <= 1.4. You should either upgrade Tmux or downgrade the Screen plugin.")
+        endif
+        if strlen(s:xx) < 7 && g:ScreenVersion < "1.5"
+            call RWarningMsgInp("Vim-R-plugin requires Screen plugin >= 1.5")
+            let g:rplugin_failed = 1
+            finish
+        endif
+        unlet s:xx
+    elseif g:ScreenVersion < "1.5"
+        call RWarningMsgInp("Vim-R-plugin requires Screen plugin >= 1.5")
+        let g:rplugin_failed = 1
+        finish
+    endif
+endif
 
 " Start with an empty list of objects in the workspace
 let g:rplugin_globalenvlines = []
@@ -2382,3 +2396,13 @@ if exists("g:vimrplugin_term_cmd")
     let g:rplugin_termcmd = g:vimrplugin_term_cmd
 endif
 
+" Debugging code:
+if g:vimrplugin_screenplugin && g:vimrplugin_conqueplugin
+    echoerr "Error number 1"
+endif
+if g:vimrplugin_screenplugin && g:vimrplugin_applescript
+    echoerr "Error number 2"
+endif
+if g:vimrplugin_conqueplugin && g:vimrplugin_applescript
+    echoerr "Error number 3"
+endif
