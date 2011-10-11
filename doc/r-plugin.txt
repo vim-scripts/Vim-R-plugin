@@ -1051,6 +1051,16 @@ If you want to use your own ~/.tmux.conf, put in your vimrc:
 						     *vimrplugin_screenplugin*
 						     *vimrplugin_screenvsplit*
 							     *vimrplugin_tmux*
+The screen.vim plugin supports both screen and Tmux, but only Tmux allows you
+to split the terminal vertically (that is, to have the panels side by side).
+Please read |screen-intro| and |screen-shell-vertical| for details.  By
+default, the Vim-R-plugin will tell the screen.vim plugin to split the
+terminal horizontally. If you prefer to split it vertically put in your
+|vimrc|:
+>
+   let vimrplugin_screenvsplit = 1
+   let g:ScreenImpl = 'Tmux'
+<
 By default, when running in a terminal emulator, the Vim-R-plugin uses the
 screen.vim plugin if it is installed and, by default, it will use Tmux instead
 of GNU Screen. Tmux was chosen as default because it may be split vertically
@@ -1072,16 +1082,6 @@ If you have the screen.vim plugin installed but prefer do not integrate it
 with the Vim-R-plugin you will need to add the following to your |vimrc|:
 >
    let vimrplugin_screenplugin = 0
-<
-The screen.vim plugin supports both screen and Tmux, but only Tmux allows you
-to split the terminal vertically (that is, to have the panels side by side).
-Please read |screen-intro| and |screen-shell-vertical| for details.  By
-default, the Vim-R-plugin will tell the screen.vim plugin to split the
-terminal horizontally. If you prefer to split it vertically put in your
-|vimrc|:
->
-   let vimrplugin_screenvsplit = 1
-   let g:ScreenImpl = 'Tmux'
 <
 
 7.17. Integration with AppleScript (OS X only)~
