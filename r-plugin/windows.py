@@ -10,11 +10,10 @@ try:
     import win32com.client
     import win32con
 except ImportError:
-    vim.command("call RWarningMsg('Did you install PyWin32?')")
     import platform
     myPyVersion = platform.python_version()
     myArch = platform.architecture()
-    vim.command("call RWarningMsg('The Python version being used is: " + myPyVersion + " (" + myArch[0] + ")')")
+    vim.command("call RWarningMsgInp('Did you install PyWin32? The Python version being used is: " + myPyVersion + " (" + myArch[0] + ")')")
 
 
 def SendToRPy(aString):
