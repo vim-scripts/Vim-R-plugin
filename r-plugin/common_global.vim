@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Wed Oct 12, 2011  12:57PM
+" Last Change: Wed Oct 12, 2011  05:32PM
 "
 " Purposes of this file: Create all functions and commands and Set the
 " value of all global variables  and some buffer variables.for r,
@@ -2181,7 +2181,29 @@ if has("gui_win32")
     endif
 
     if s:py == ""
-        call RWarningMsgInp("Python interface must be enabled to run Vim-R-Plugin. Please do  ':h r-plugin-installation'  for details.")
+        redir => s:vimversion
+        silent version
+        redir END
+        let s:haspy2 = stridx(s:vimversion, '+python ')
+        if s:haspy2 < 0
+            let s:haspy2 = stridx(s:vimversion, '+python/dyn')
+        endif
+        let s:haspy3 = stridx(s:vimversion, '+python3')
+        if s:haspy2 || s:haspy3
+            let s:pyver = ""
+            if s:haspy2 && s:haspy3
+                let s:pyver = " (" . substitute(s:vimversion, '.*\(python2.\.dll\).*', '\1', '') . ", "
+                let s:pyver = s:pyver . substitute(s:vimversion, '.*\(python3.\.dll\).*', '\1', '') . ")"
+            elseif s:haspy3 && s:haspy2 < 0
+                let s:pyver = " (" . substitute(s:vimversion, '.*\(python3.\.dll\).*', '\1', '') . ")"
+            elseif s:haspy2 && s:haspy3 < 0
+                let s:pyver = " (" . substitute(s:vimversion, '.*\(python2.\.dll\).*', '\1', '') . ")"
+            endif
+            let s:xx = substitute(s:vimversion, '.*\([0-9][0-9]-bit\).*', '\1', "")
+            call RWarningMsgInp("This version of Vim was compiled against Python" . s:pyver . ", but Python was not found. Please, install " . s:xx . " Python from www.python.org.")
+        else
+            call RWarningMsgInp("This version of Vim was not compiled with Python support.")
+        endif
         let g:rplugin_failed = 1
         finish
     endif
