@@ -13,7 +13,8 @@ except ImportError:
     import platform
     myPyVersion = platform.python_version()
     myArch = platform.architecture()
-    vim.command("call RWarningMsgInp('Did you install PyWin32? The Python version being used is: " + myPyVersion + " (" + myArch[0] + ")')")
+    vim.command("call RWarningMsgInp('Please install PyWin32. The Python version being used is: " + myPyVersion + " (" + myArch[0] + ")')")
+    vim.command("let rplugin_pywin32 = 0")
 
 
 def SendToRPy(aString):

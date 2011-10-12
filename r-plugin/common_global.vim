@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Mon Oct 10, 2011  11:30PM
+" Last Change: Wed Oct 12, 2011  12:57PM
 "
 " Purposes of this file: Create all functions and commands and Set the
 " value of all global variables  and some buffer variables.for r,
@@ -2185,7 +2185,12 @@ if has("gui_win32")
         let g:rplugin_failed = 1
         finish
     endif
+    let rplugin_pywin32 = 1
     exe s:py . "file " . substitute(g:rplugin_home, " ", '\ ', "g") . '\r-plugin\windows.py' 
+    if rplugin_pywin32 == 0
+        let g:rplugin_failed = 1
+        finish
+    endif
     let g:rplugin_jspath = g:rplugin_home . "\\r-plugin\\vimActivate.js"
     let g:rplugin_home = substitute(g:rplugin_home, "\\", "/", "g")
     let g:rplugin_uservimfiles = substitute(g:rplugin_uservimfiles, "\\", "/", "g")
