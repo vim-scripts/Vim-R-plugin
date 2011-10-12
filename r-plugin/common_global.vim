@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Wed Oct 12, 2011  05:32PM
+" Last Change: Wed Oct 12, 2011  06:25PM
 "
 " Purposes of this file: Create all functions and commands and Set the
 " value of all global variables  and some buffer variables.for r,
@@ -2189,14 +2189,14 @@ if has("gui_win32")
             let s:haspy2 = stridx(s:vimversion, '+python/dyn')
         endif
         let s:haspy3 = stridx(s:vimversion, '+python3')
-        if s:haspy2 || s:haspy3
+        if s:haspy2 > 0 || s:haspy3 > 0
             let s:pyver = ""
-            if s:haspy2 && s:haspy3
+            if s:haspy2 > 0 && s:haspy3 > 0
                 let s:pyver = " (" . substitute(s:vimversion, '.*\(python2.\.dll\).*', '\1', '') . ", "
                 let s:pyver = s:pyver . substitute(s:vimversion, '.*\(python3.\.dll\).*', '\1', '') . ")"
-            elseif s:haspy3 && s:haspy2 < 0
+            elseif s:haspy3 > 0 && s:haspy2 < 0
                 let s:pyver = " (" . substitute(s:vimversion, '.*\(python3.\.dll\).*', '\1', '') . ")"
-            elseif s:haspy2 && s:haspy3 < 0
+            elseif s:haspy2 > 0 && s:haspy3 < 0
                 let s:pyver = " (" . substitute(s:vimversion, '.*\(python2.\.dll\).*', '\1', '') . ")"
             endif
             let s:xx = substitute(s:vimversion, '.*\([0-9][0-9]-bit\).*', '\1', "")
