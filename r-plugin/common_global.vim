@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Wed Oct 12, 2011  11:21PM
+" Last Change: Thu Oct 13, 2011  11:57AM
 "
 " Purposes of this file: Create all functions and commands and Set the
 " value of all global variables  and some buffer variables.for r,
@@ -436,6 +436,8 @@ function StartR(whatr)
         endif
 
         let savesb = &switchbuf
+        let savewd = &autochdir
+        set noautochdir
         set switchbuf=useopen,usetab
         if g:vimrplugin_conquevsplit == 1
             let l:sr = &splitright
@@ -478,6 +480,11 @@ function StartR(whatr)
         exe "setlocal syntax=rout"
         exe "sil noautocmd sb " . g:rplugin_curbuf
         exe "set switchbuf=" . savesb
+        if savewd
+            set autochdir
+        else
+            set noautochdir
+        endif
     else
         if g:vimrplugin_noscreenrc == 1
             let scrrc = " "
