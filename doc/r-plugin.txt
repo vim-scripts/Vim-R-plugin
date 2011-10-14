@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 111010
+Version: 111014
 For Vim version 7.3
 
  1. Overview                                    |r-plugin-overview|
@@ -46,7 +46,7 @@ to deal with.
 ==============================================================================
 2. Main features~
 							   *r-plugin-features*
-  * Syntax highlighting for R syntax, including:
+  * Syntax highlighting for R code, including:
       - Special characters in strings.
       - Functions of all installed packages (must be updated manually).
       - Special highlighting for R output (.Rout files).
@@ -106,14 +106,14 @@ are in the same directory):
 >
   :helptags ~/.vim/doc
 <
-Note: If you are using OS X and prefer that Vim uses AppleScript to send
+Note: If you are using Mac OS X and prefer that Vim uses AppleScript to send
 commands to R, then the installation is finished and you should now read
 sections 3.3 and 3.4.
 
 In addition to having R installed in your system, this plugin requires users
 to install:
 
-   Tmux:              http://tmux.sourceforge.net
+   Tmux >= 1.3:       http://tmux.sourceforge.net
    GNU Screen:        http://www.gnu.org/s/screen
    screen.vim plugin: http://www.vim.org/scripts/script.php?script_id=2711
    ncurses-term:      http://invisible-island.net/ncurses
@@ -155,7 +155,7 @@ vimrplugin_applescript = 0.
 3.2.2. Windows~
 
 In addition to having R installed in your system, this plugin requires users
-to install several external dependencies:
+to install external dependencies:
 
     * Vim's version must be >= 7.3
 
@@ -167,8 +167,10 @@ to install several external dependencies:
 
       Note: Be careful to download the correct Python version because Vim
 	    needs a specific version of Python DLL. For example, the official
-	    Vim 7.3 for Windows needs either Python 2.7 or 3.1. To discover
-	    what Python version Vim was compiled against, do the following:
+	    Vim 7.3 for Windows needs either Python 2.7 or 3.1. If Python was
+	    not installed or was not found, the Vim-R-plugin will output
+	    information about what Python version Vim was compiled against. Do
+	    the following if you want to discover this information manually:
 
 	    1. Type  :version  in Vim (normal mode).
 
@@ -211,7 +213,7 @@ the key bindings will not be active while editing either unnamed files or
 files with name extensions other than .R or .Rnw. If the plugin is active,
 pressing <LocalLeader>rf should start R (the <LocalLeader> is '\' by default).
 
-Look at the ~/.vim (Linux, Unix, Os X) or ~/vimfiles (Windows) directory. Is
+Look at the ~/.vim (Linux, Unix, OS X) or ~/vimfiles (Windows) directory. Is
 there a subdirectory named "r-plugin"? If not, then you unpacked the plugin in
 the wrong place.
 
@@ -1744,6 +1746,7 @@ the R syntax highlighted.
 12. News~
 							       *r-plugin-news*
 
+111014 (2011-10-14)
  * Fixed spell check bug in R documentation files (.Rd).
  * Fixed beep bug when sending commands to R.
  * New option: vimrplugin_notmuxconf.
