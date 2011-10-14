@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Sat Jul 16, 2011  12:42PM
+" Last Change: Fri Oct 14, 2011  12:56PM
 "
 " Purposes of this file: Create all functions and commands and Set the
 " value of all global variables  and some buffer variables.for r,
@@ -45,6 +45,27 @@ function RWarningMsg(wmsg)
     echohl WarningMsg
     echomsg a:wmsg
     echohl Normal
+endfunction
+
+function RWarningMsgInp(wmsg)
+    let savedlz = &lazyredraw
+    if savedlz == 0
+        set lazyredraw
+    endif
+    let savedsm = &shortmess
+    set shortmess-=T
+    echohl WarningMsg
+    echomsg a:wmsg
+    echohl Normal
+    " The message disappears if starting to edit an empty buffer
+    if line("$") == 1 && strlen(getline("$")) == 0
+        sleep 2
+    endif
+    call input("[Press <Enter> to continue] ")
+    if savedlz == 0
+        set nolazyredraw
+    endif
+    let &shortmess = savedsm
 endfunction
 
 " Set default value of some variables:
@@ -349,8 +370,13 @@ function StartR(whatr)
         endif
     endif
 
-    if has("gui_macvim") && g:vimrplugin_applescript && g:vimrplugin_screenplugin == 0 && g:vimrplugin_conqueplugin == 0
-        if isdirectory("/Applications/R64.app") && g:vimrplugin_i386 == 0
+    if g:vimrplugin_applescript && g:vimrplugin_screenplugin == 0 && g:vimrplugin_conqueplugin == 0
+        if isdirectory("/Applications/R64.app")
+            let g:rplugin_r64app = 1
+        else
+            let g:rplugin_r64app = 0
+        endif
+        if g:rplugin_r64app && g:vimrplugin_i386 == 0
             let rcmd = "/Applications/R64.app"
         else
             let rcmd = "/Applications/R.app"
@@ -358,7 +384,10 @@ function StartR(whatr)
         if g:rplugin_r_args != " "
             let rcmd = rcmd . " " . g:rplugin_r_args
         endif
-        call system("open " . rcmd)
+        let rlog = system("open " . rcmd)
+        if v:shell_error
+            call RWarningMsg(rlog)
+        endif
         lcd -
         return
     endif
@@ -380,12 +409,12 @@ function StartR(whatr)
     endif
 
     if g:vimrplugin_screenplugin
+        let rcmd = "export VIMRPLUGIN_TMPDIR=" . $VIMRPLUGIN_TMPDIR . " ; ". rcmd
         if g:vimrplugin_screenvsplit
             if exists(":ScreenShellVertical") == 2
                 exec 'ScreenShellVertical ' . rcmd
             else
-                call RWarningMsg("Did you put \"let g:ScreenImpl = 'Tmux'\" in your vimrc?")
-                call input("Press <Enter> to continue. ")
+                call RWarningMsgInp("Did you put \"let g:ScreenImpl = 'Tmux'\" in your vimrc?")
                 exec 'ScreenShell ' . rcmd
             endif
         else
@@ -407,6 +436,8 @@ function StartR(whatr)
         endif
 
         let savesb = &switchbuf
+        let savewd = &autochdir
+        set noautochdir
         set switchbuf=useopen,usetab
         if g:vimrplugin_conquevsplit == 1
             let l:sr = &splitright
@@ -449,6 +480,11 @@ function StartR(whatr)
         exe "setlocal syntax=rout"
         exe "sil noautocmd sb " . g:rplugin_curbuf
         exe "set switchbuf=" . savesb
+        if savewd
+            set autochdir
+        else
+            set noautochdir
+        endif
     else
         if g:vimrplugin_noscreenrc == 1
             let scrrc = " "
@@ -610,8 +646,16 @@ endfunction
 " Function to send commands
 " return 0 on failure and 1 on success
 function SendCmdToR(cmd)
-    " ^K clean from cursor to the right and ^U clean from cursor to the left
-    let cmd = "\013" . "\025" . a:cmd
+    " ^K (\013) cleans from cursor to the right and ^U (\025) cleans from
+    " cursor to the left. However, ^U causes a beep if there is nothing to
+    " clean. The solution is to use ^A (\001) to move the cursor to the
+    " beginning of the line before sending ^K. But the control characters may
+    " cause Conque to show the output incompletely.
+    if vimrplugin_conqueplugin
+        let cmd = a:cmd
+    else
+        let cmd = "\001" . "\013" . a:cmd
+    endif
 
     if has("gui_win32") && g:vimrplugin_conqueplugin == 0
         let cmd = cmd . "\n"
@@ -681,8 +725,8 @@ function SendCmdToR(cmd)
         return 1
     endif
 
-    if has("gui_macvim") && g:vimrplugin_applescript && g:vimrplugin_screenplugin == 0 && g:vimrplugin_conqueplugin == 0
-        if isdirectory("/Applications/R64.app") && g:vimrplugin_i386 == 0
+    if g:vimrplugin_applescript && g:vimrplugin_screenplugin == 0 && g:vimrplugin_conqueplugin == 0
+        if g:rplugin_r64app && g:vimrplugin_i386 == 0
             let rcmd = "R64"
         else
             let rcmd = "R"
@@ -1791,7 +1835,7 @@ function MakeRMenu()
         amenu R.Help\ (plugin).Options.Screen\ configuration :help vimrplugin_noscreenrc<CR>
         amenu R.Help\ (plugin).Options.Screen\ plugin :help vimrplugin_screenplugin<CR>
     endif
-    if !has("gui_macvim")
+    if has("gui_macvim") || has("gui_mac") || has("mac") || has("macunix")
         amenu R.Help\ (plugin).Options.Integration\ with\ Apple\ Script :help vimrplugin_applescript<CR>
     endif
     if has("gui_win32")
@@ -1990,42 +2034,6 @@ command RBuildTags :call SendCmdToR('rtags(ofile = "TAGS")')
 "             rplugin_    for internal parameters
 "==========================================================================
 
-" Variables whose default value is fixed
-call RSetDefaultValue("g:vimrplugin_map_r",             0)
-call RSetDefaultValue("g:vimrplugin_open_df",           1)
-call RSetDefaultValue("g:vimrplugin_open_list",         0)
-call RSetDefaultValue("g:vimrplugin_allnames",          0)
-call RSetDefaultValue("g:vimrplugin_underscore",        1)
-call RSetDefaultValue("g:vimrplugin_rnowebchunk",       1)
-call RSetDefaultValue("g:vimrplugin_i386",              0)
-call RSetDefaultValue("g:vimrplugin_applescript",       1)
-call RSetDefaultValue("g:vimrplugin_tmux",              1)
-call RSetDefaultValue("g:vimrplugin_screenvsplit",      0)
-call RSetDefaultValue("g:vimrplugin_conquevsplit",      0)
-call RSetDefaultValue("g:vimrplugin_conqueplugin",      0)
-call RSetDefaultValue("g:vimrplugin_screenplugin",      1)
-call RSetDefaultValue("g:vimrplugin_listmethods",       0)
-call RSetDefaultValue("g:vimrplugin_specialplot",       0)
-call RSetDefaultValue("g:vimrplugin_nosingler",         0)
-call RSetDefaultValue("g:vimrplugin_noscreenrc",        0)
-call RSetDefaultValue("g:vimrplugin_routnotab",         0) 
-call RSetDefaultValue("g:vimrplugin_editor_w",         66)
-call RSetDefaultValue("g:vimrplugin_help_w",           46)
-call RSetDefaultValue("g:vimrplugin_objbr_w",          40)
-call RSetDefaultValue("g:vimrplugin_buildwait",       120)
-call RSetDefaultValue("g:vimrplugin_indent_commented",  1)
-call RSetDefaultValue("g:vimrplugin_by_vim_instance",   0)
-call RSetDefaultValue("g:vimrplugin_never_unmake_menu", 0)
-call RSetDefaultValue("g:vimrplugin_vimpager",       "'vertical'")
-call RSetDefaultValue("g:vimrplugin_latexcmd", "'pdflatex'")
-call RSetDefaultValue("g:vimrplugin_objbr_place", "'console,right'")
-
-if has("gui_win32")
-    call RSetDefaultValue("g:vimrplugin_conquesleep",     200)
-else
-    call RSetDefaultValue("g:vimrplugin_conquesleep",     100)
-endif
-
 " g:rplugin_home should be the directory where the r-plugin files are.  For
 " users following the installation instructions it will be at ~/.vim or
 " ~/vimfiles, that is, the same value of g:rplugin_uservimfiles. However the
@@ -2039,6 +2047,123 @@ if filewritable(g:rplugin_home) == 2
     let g:rplugin_uservimfiles = g:rplugin_home
 else
     let g:rplugin_uservimfiles = split(&runtimepath, ",")[0]
+endif
+
+" Variables whose default value is fixed
+call RSetDefaultValue("g:vimrplugin_map_r",             0)
+call RSetDefaultValue("g:vimrplugin_open_df",           1)
+call RSetDefaultValue("g:vimrplugin_open_list",         0)
+call RSetDefaultValue("g:vimrplugin_allnames",          0)
+call RSetDefaultValue("g:vimrplugin_underscore",        1)
+call RSetDefaultValue("g:vimrplugin_rnowebchunk",       1)
+call RSetDefaultValue("g:vimrplugin_i386",              0)
+call RSetDefaultValue("g:vimrplugin_screenvsplit",      0)
+call RSetDefaultValue("g:vimrplugin_conquevsplit",      0)
+call RSetDefaultValue("g:vimrplugin_conqueplugin",      0)
+call RSetDefaultValue("g:vimrplugin_listmethods",       0)
+call RSetDefaultValue("g:vimrplugin_specialplot",       0)
+call RSetDefaultValue("g:vimrplugin_nosingler",         0)
+call RSetDefaultValue("g:vimrplugin_noscreenrc",        0)
+call RSetDefaultValue("g:vimrplugin_notmuxconf",        0)
+call RSetDefaultValue("g:vimrplugin_routnotab",         0) 
+call RSetDefaultValue("g:vimrplugin_editor_w",         66)
+call RSetDefaultValue("g:vimrplugin_help_w",           46)
+call RSetDefaultValue("g:vimrplugin_objbr_w",          40)
+call RSetDefaultValue("g:vimrplugin_buildwait",       120)
+call RSetDefaultValue("g:vimrplugin_indent_commented",  1)
+call RSetDefaultValue("g:vimrplugin_by_vim_instance",   0)
+call RSetDefaultValue("g:vimrplugin_never_unmake_menu", 0)
+call RSetDefaultValue("g:vimrplugin_vimpager",       "'vertical'")
+call RSetDefaultValue("g:vimrplugin_latexcmd", "'pdflatex'")
+call RSetDefaultValue("g:vimrplugin_objbr_place", "'console,right'")
+
+if has("gui_macvim") || has("gui_mac") || has("mac") || has("macunix")
+    call RSetDefaultValue("g:vimrplugin_applescript", 1)
+else
+    call RSetDefaultValue("g:vimrplugin_applescript", 0)
+endif
+
+if g:vimrplugin_applescript == 0
+    call RSetDefaultValue("g:vimrplugin_screenplugin", 1)
+else
+    let g:vimrplugin_screenplugin = 0
+    let g:vimrplugin_conqueplugin = 0
+endif
+
+" The screen.vim plugin only works on terminal emulators
+if has('gui_running')
+    let g:vimrplugin_screenplugin = 0
+    let g:vimrplugin_tmux = 0
+endif
+
+if has("gui_win32")
+    call RSetDefaultValue("g:vimrplugin_conquesleep", 200)
+    let vimrplugin_screenplugin = 0
+else
+    call RSetDefaultValue("g:vimrplugin_conquesleep", 100)
+endif
+
+if g:vimrplugin_screenplugin
+    let g:vimrplugin_conqueplugin = 0
+    if !exists("g:ScreenVersion")
+        call RWarningMsgInp("Please, either install the screen plugin (http://www.vim.org/scripts/script.php?script_id=2711) (recommended) or put 'let vimrplugin_screenplugin = 0' in your vimrc.")
+        let g:rplugin_failed = 1
+        finish
+    endif
+    if !exists("g:vimrplugin_tmux")
+        if executable('tmux')
+            let g:vimrplugin_tmux = 1
+        else
+            let g:vimrplugin_tmux = 0
+        endif
+    endif
+
+    " To get 256 colors you have to set the $TERM environment variable to
+    " xterm-256color. See   :h r-plugin-tips 
+    if g:vimrplugin_tmux
+        let g:ScreenImpl = 'Tmux'
+        if g:ScreenShellTmuxInitArgs == ""
+            if $DISPLAY != "" || $TERM =~ "xterm"
+                let g:ScreenShellTmuxInitArgs = "-2"
+            endif
+            if g:vimrplugin_notmuxconf == 0
+                let g:ScreenShellTmuxInitArgs = g:ScreenShellTmuxInitArgs . " -f " . rplugin_home . "/r-plugin/tmux.conf"
+            endif
+        endif
+    else
+        let g:ScreenImpl = 'GnuScreen'
+        if g:vimrplugin_noscreenrc == 0 && exists("g:ScreenShellScreenInitArgs") && g:ScreenShellScreenInitArgs == ""
+            if $DISPLAY != "" || $TERM =~ "xterm"
+                let g:ScreenShellScreenInitArgs = " -c " . g:rplugin_home . "/r-plugin/screenrc.xterm "
+            else
+                let g:ScreenShellScreenInitArgs = " -c " . g:rplugin_home . "/r-plugin/screenrc "
+            endif
+        endif
+    endif
+
+else
+    let g:vimrplugin_tmux = 0
+endif
+
+if g:vimrplugin_screenplugin
+    " Future: Remove this Tmux version test on 2014
+    if g:vimrplugin_tmux
+        let s:xx = system("tmux -V")
+        let s:xx = substitute(s:xx, '.*tmux \([0-9]\.[0-9]\).*', '\1', '')
+        if strlen(s:xx) > 6 && g:ScreenVersion > "1.4"
+            call RWarningMsgInp("Tmux <= 1.3 requires Screen plugin <= 1.4. You should either upgrade Tmux or downgrade the Screen plugin.")
+        endif
+        if strlen(s:xx) < 7 && g:ScreenVersion < "1.5"
+            call RWarningMsgInp("Vim-R-plugin requires Screen plugin >= 1.5")
+            let g:rplugin_failed = 1
+            finish
+        endif
+        unlet s:xx
+    elseif g:ScreenVersion < "1.5"
+        call RWarningMsgInp("Vim-R-plugin requires Screen plugin >= 1.5")
+        let g:rplugin_failed = 1
+        finish
+    endif
 endif
 
 " Start with an empty list of objects in the workspace
@@ -2060,7 +2185,6 @@ else
 endif
 
 if has("gui_win32")
-    let vimrplugin_screenplugin = 0
     " python has priority over python3, unless ConqueTerm_PyVersion == 3
     if has("python")
         let s:py = "py"
@@ -2076,13 +2200,38 @@ if has("gui_win32")
     endif
 
     if s:py == ""
-        call RWarningMsg("Python interface must be enabled to run Vim-R-Plugin.")
-        call RWarningMsg("Please do  ':h r-plugin-installation'  for details.")
-        call input("Press <Enter> to continue. ")
+        redir => s:vimversion
+        silent version
+        redir END
+        let s:haspy2 = stridx(s:vimversion, '+python ')
+        if s:haspy2 < 0
+            let s:haspy2 = stridx(s:vimversion, '+python/dyn')
+        endif
+        let s:haspy3 = stridx(s:vimversion, '+python3')
+        if s:haspy2 > 0 || s:haspy3 > 0
+            let s:pyver = ""
+            if s:haspy2 > 0 && s:haspy3 > 0
+                let s:pyver = " (" . substitute(s:vimversion, '.*\(python2.\.dll\).*', '\1', '') . ", "
+                let s:pyver = s:pyver . substitute(s:vimversion, '.*\(python3.\.dll\).*', '\1', '') . ")"
+            elseif s:haspy3 > 0 && s:haspy2 < 0
+                let s:pyver = " (" . substitute(s:vimversion, '.*\(python3.\.dll\).*', '\1', '') . ")"
+            elseif s:haspy2 > 0 && s:haspy3 < 0
+                let s:pyver = " (" . substitute(s:vimversion, '.*\(python2.\.dll\).*', '\1', '') . ")"
+            endif
+            let s:xx = substitute(s:vimversion, '.*\([0-9][0-9]-bit\).*', '\1', "")
+            call RWarningMsgInp("This version of Vim was compiled against Python" . s:pyver . ", but Python was not found. Please, install " . s:xx . " Python from www.python.org.")
+        else
+            call RWarningMsgInp("This version of Vim was not compiled with Python support.")
+        endif
         let g:rplugin_failed = 1
         finish
     endif
+    let rplugin_pywin32 = 1
     exe s:py . "file " . substitute(g:rplugin_home, " ", '\ ', "g") . '\r-plugin\windows.py' 
+    if rplugin_pywin32 == 0
+        let g:rplugin_failed = 1
+        finish
+    endif
     let g:rplugin_jspath = g:rplugin_home . "\\r-plugin\\vimActivate.js"
     let g:rplugin_home = substitute(g:rplugin_home, "\\", "/", "g")
     let g:rplugin_uservimfiles = substitute(g:rplugin_uservimfiles, "\\", "/", "g")
@@ -2093,8 +2242,7 @@ if has("gui_win32")
         else
             exe s:py . " GetRPathPy()"
             if s:rinstallpath == "Not found"
-                call RWarningMsg('Could not find R path in Windows Registry.')
-                call input("Press <Enter> to continue. ")
+                call RWarningMsgInp("Could not find R path in Windows Registry. Please, either install R or set the value of 'vimrplugin_r_path'.")
                 let g:rplugin_failed = 1
                 finish
             endif
@@ -2128,46 +2276,17 @@ if has("gui_win32")
         let g:vimrplugin_sleeptime = 0.02
     endif
 else
-    if has("gui_running")
-        let g:vimrplugin_screenplugin = 0
-    endif
-    if !has("gui_running")
-        if g:vimrplugin_tmux && g:vimrplugin_screenplugin && !executable('tmux')
-            let rplugin_missing_tmux = 1
-            call RWarningMsg("Please, either install the 'tmux' application (recommended) or put 'let vimrplugin_screenplugin = 0' in your vimrc to enable the Vim-R-plugin.")
-        endif
-        
-        if g:vimrplugin_screenplugin
-            if !exists("g:ScreenVersion")
-                call RWarningMsg("Please, either install the screen plugin (http://www.vim.org/scripts/script.php?script_id=2711) (recommended) or put 'let vimrplugin_screenplugin = 0' in your vimrc.")
-                call input("Press <Enter> to continue. ")
-                let g:rplugin_failed = 1
-                finish
-            else
-                if g:ScreenVersion < "1.4"
-                    call RWarningMsg("Vim-R-plugin requires Screen plugin >= 1.4")
-                    call input("Press <Enter> to continue. ")
-                    let g:rplugin_failed = 1
-                    finish
-                endif
-            endif
-        endif
-    endif
-
-    if (has("gui_running") || (!has("gui_running") && (g:vimrplugin_tmux == 0 || g:vimrplugin_screenplugin == 0))) && !executable('screen')
+    if g:vimrplugin_applescript == 0 && (has("gui_running") || (!has("gui_running") && (g:vimrplugin_tmux == 0 || g:vimrplugin_screenplugin == 0))) && !executable('screen')
         let rplugin_missing_screen = 1
         if has("gui_running")
-            call RWarningMsg("Please, install the 'screen' application to enable the Vim-R-plugin with GVim.")
+            call RWarningMsgInp("Please, install the 'GNU Screen' application to enable the Vim-R-plugin with GVim.")
         else
-            call RWarningMsg("Please, install the 'screen' application to enable the Vim-R-plugin.")
+            call RWarningMsgInp("Please, install the 'GNU Screen' application to enable the Vim-R-plugin.")
         endif
-    endif
-
-    if exists("rplugin_missing_tmux") || exists("rplugin_missing_screen")
-        call input("Press <Enter> to continue. ")
         let g:rplugin_failed = 1
         finish
     endif
+
     if exists("g:vimrplugin_r_path")
         let g:rplugin_R = g:vimrplugin_r_path . "/R"
     else
@@ -2191,22 +2310,10 @@ endif
 let g:rplugin_docfile = $VIMRPLUGIN_TMPDIR . "/Rdoc"
 let g:rplugin_globalenvfname = $VIMRPLUGIN_TMPDIR . "/GlobalEnvList"
 
-if g:vimrplugin_tmux
-    let g:ScreenImpl = 'Tmux'
-else
-    let g:ScreenImpl = 'GnuScreen'
-endif
-
-" The screen.vim plugin only works on terminal emulators
-if !exists("g:vimrplugin_screenplugin") || has('gui_running')
-    let g:vimrplugin_screenplugin = 0
-endif
-
 if g:vimrplugin_conqueplugin == 1
-    if !exists("g:ConqueTerm_Version") || (exists("g:ConqueTerm_Version") && g:ConqueTerm_Version < 210)
+    if !exists("g:ConqueTerm_Version") || (exists("g:ConqueTerm_Version") && g:ConqueTerm_Version < 230)
         let g:vimrplugin_conqueplugin = 0
-        call RWarningMsg("You are using Conque Shell plugin " . g:ConqueTerm_Version . ". Vim-R-plugin requires Conque Shell >= 2.1")
-        call input("Press <Enter> to continue. ")
+        call RWarningMsgInp("You are using Conque Shell plugin " . g:ConqueTerm_Version . ". Vim-R-plugin requires Conque Shell >= 2.3")
         finish
     endif
 endif
@@ -2274,13 +2381,19 @@ let s:all_marks = "abcdefghijklmnopqrstuvwxyz"
 call writefile([], g:rplugin_globalenvfname)
 
 " Choose a terminal (code adapted from screen.vim)
-if has("gui_win32")
+if has("gui_win32") || vimrplugin_applescript
     " No external terminal emulator will be called, so any value is good
     let g:vimrplugin_term = "xterm"
 else
     let s:terminals = ['gnome-terminal', 'konsole', 'xfce4-terminal', 'Eterm', 'rxvt', 'aterm', 'roxterm', 'xterm']
     if has('mac')
         let s:terminals = ['iTerm', 'Terminal.app'] + s:terminals
+    endif
+    if exists("g:vimrplugin_term")
+        if !executable(g:vimrplugin_term)
+            call RWarningMsgInp("'" . g:vimrplugin_term . "' not found. Please change the value of 'vimrplugin_term' in your vimrc.")
+            unlet g:vimrplugin_term
+        endif
     endif
     if !exists("g:vimrplugin_term")
         for term in s:terminals
@@ -2295,11 +2408,12 @@ else
 endif
 
 if !exists("g:vimrplugin_term") && !exists("g:vimrplugin_term_cmd")
-    call RWarningMsg("Please, set the variable 'g:vimrplugin_term_cmd' in your .vimrc.\nRead the plugin documentation for details.")
-    call input("Press <Enter> to continue. ")
+    call RWarningMsgInp("Please, set the variable 'g:vimrplugin_term_cmd' in your .vimrc.\nRead the plugin documentation for details.")
     let g:rplugin_failed = 1
     finish
 endif
+
+let g:rplugin_termcmd = g:vimrplugin_term . " -e"
 
 if g:vimrplugin_term == "gnome-terminal" || g:vimrplugin_term == "xfce4-terminal"
     " Cannot set icon: http://bugzilla.gnome.org/show_bug.cgi?id=126081
@@ -2312,10 +2426,6 @@ endif
 
 if g:vimrplugin_term == "Eterm"
     let g:rplugin_termcmd = "Eterm --icon " . g:rplugin_home . "/bitmaps/ricon.png -e"
-endif
-
-if g:vimrplugin_term == "rxvt" || g:vimrplugin_term == "aterm"
-    let g:rplugin_termcmd = g:vimrplugin_term . " -e"
 endif
 
 if g:vimrplugin_term == "roxterm"
@@ -2332,3 +2442,13 @@ if exists("g:vimrplugin_term_cmd")
     let g:rplugin_termcmd = g:vimrplugin_term_cmd
 endif
 
+" Debugging code:
+if g:vimrplugin_screenplugin && g:vimrplugin_conqueplugin
+    echoerr "Error number 1"
+endif
+if g:vimrplugin_screenplugin && g:vimrplugin_applescript
+    echoerr "Error number 2"
+endif
+if g:vimrplugin_conqueplugin && g:vimrplugin_applescript
+    echoerr "Error number 3"
+endif

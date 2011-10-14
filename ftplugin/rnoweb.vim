@@ -17,7 +17,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "
-" Last Change: Sat Jul 30, 2011  12:42PM
+" Last Change: Tue Aug 30, 2011  09:25AM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -35,14 +35,14 @@ runtime ftplugin/tex_latexSuite.vim
 " Shell)
 let syn_rout_latex = 1
 
-" Source scripts common to R, Rnoweb, Rhelp and rdoc files:
+" Source scripts common to R, Rnoweb, Rhelp and Rdoc:
 runtime r-plugin/common_global.vim
 if exists("g:rplugin_failed")
     finish
 endif
 
-" Some buffer variables common to R, Rnoweb, Rhelp and rdoc file need be
-" defined after the global ones:
+" Some buffer variables common to R, Rnoweb, Rhelp and Rdoc need to be defined
+" after the global ones:
 runtime r-plugin/common_buffer.vim
 
 setlocal iskeyword=@,48-57,_,.

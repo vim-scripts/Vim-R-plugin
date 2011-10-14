@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 110805
+Version: 111014
 For Vim version 7.3
 
  1. Overview                                    |r-plugin-overview|
@@ -46,7 +46,7 @@ to deal with.
 ==============================================================================
 2. Main features~
 							   *r-plugin-features*
-  * Syntax highlighting for R syntax, including:
+  * Syntax highlighting for R code, including:
       - Special characters in strings.
       - Functions of all installed packages (must be updated manually).
       - Special highlighting for R output (.Rout files).
@@ -97,20 +97,6 @@ replaced. Please, look at |r-plugin-files| to see the list of files.
 
 3.2.1. Unix (Linux, OS X, etc.)~
 
-In addition to having R installed in your system, this plugin requires users
-to install:
-
-   Tmux:              http://tmux.sourceforge.net
-   GNU Screen:        http://www.gnu.org/s/screen
-   screen.vim plugin: http://www.vim.org/scripts/script.php?script_id=2711
-   ncurses-term:      http://invisible-island.net/ncurses
-
-   Note: Tmux, GNU Screen and ncurses-term are already packaged for most
-   GNU/Linux distributions and other Unix variants. The library ncurses-term
-   is necessary only for 256 color support in the terminal emulator.
-   Unfortunately its installation instructions vary widely and are beyond the
-   scope of this documentation.
-
 Uncompress the archive:
 >
    unzip vim-r-plugin-*.zip -d ~/.vim
@@ -120,39 +106,86 @@ are in the same directory):
 >
   :helptags ~/.vim/doc
 <
-If you do not have a custom Tmux configuration file yet, copy the file
-~/.vim/r-plugin/tmux.conf to ~/.tmux.conf
+Note: If you are using Mac OS X and prefer that Vim uses AppleScript to send
+commands to R, then the installation is finished and you should now read
+sections 3.3 and 3.4.
+
+In addition to having R installed in your system, this plugin requires users
+to install:
+
+   Tmux >= 1.3:       http://tmux.sourceforge.net
+   GNU Screen:        http://www.gnu.org/s/screen
+   screen.vim plugin: http://www.vim.org/scripts/script.php?script_id=2711
+   ncurses-term:      http://invisible-island.net/ncurses
+
+   Note: Tmux, GNU Screen and ncurses-term are already packaged for most
+   GNU/Linux distributions and other Unix variants. The library ncurses-term
+   is necessary only for 256 color support in the terminal emulator.
+   Unfortunately their installation instructions vary widely and are beyond
+   the scope of this documentation.
 
 If you are using Vim (not GVim), the plugin will run inside a Tmux session. If
 are not already a user of Tmux, please, read the |r-plugin-tmux| section to
 learn a few useful shortcuts. The tmux.conf file that ships with this plugin
 sets Tmux to work with vi key bindings.
 
-Note: The recommended way of using the plugin on Linux is running Vim in a
-terminal emulator, using Tmux to split the terminal in two regions. This is
-the default configuration when running Vim in a terminal emulator, but it is
-also possible to use the plugin with GVim and R in an external terminal
-emulator, Vim in a terminal emulator and R in an external terminal emulator,
-and using GNU Screen instead of Tmux to split the terminal emulator in two
-regions.
+Note: The plugin can use different mechanisms to send commands to R. The
+mechanism that will be used depends on both what applications and plugins you
+have installed and what options you have in your |vimrc|. The two lists below
+show how the plugin will work on Linux in different conditions:
+
+   Vim                               Condition
+   ------------------------------    -------------------------------------
+   Screen plugin (Tmux)              default on Linux 
+   Screen plugin (GNU Screen)        vimrplugin_tmux = 0 or Tmux not found
+   GNU Screen (external terminal)    vimrplugin_screenplugin = 0
+   Conque Shell                      idem and vimrplugin_conqueplugin = 1
+
+
+   GVim                              Condition
+   ------------------------------    -------------------------------------
+   GNU Screen (external terminal)    default on Linux
+   Conque Shell                      vimrplugin_conqueplugin = 1
+
+
+Note: On Mac OS X the plugin will use AppleScript in both Vim and GVim unless
+vimrplugin_applescript = 0.
+
 
 3.2.2. Windows~
 
 In addition to having R installed in your system, this plugin requires users
-to install several external dependencies:
+to install external dependencies:
 
     * Vim's version must be >= 7.3
 
     * Python: http://www.python.org/download/
-      Note: Be careful to download the correct Python version because Vim
-      needs a specific version of Python DLL. For example, the official Vim
-      7.3 for Windows needs either Python 2.7 or 3.1. Note: the official Vim
-      is 32 bit and, thus, Python must be 32 bit too.
 
+      Note: The official Vim is 32 bit and, thus, Python must be 32 bit too.
+      However, Vim and R run as independent processes, that is, you may have
+      32 bit Vim sending commands to 64 bit R.
+
+      Note: Be careful to download the correct Python version because Vim
+	    needs a specific version of Python DLL. For example, the official
+	    Vim 7.3 for Windows needs either Python 2.7 or 3.1. If Python was
+	    not installed or was not found, the Vim-R-plugin will output
+	    information about what Python version Vim was compiled against. Do
+	    the following if you want to discover this information manually:
+
+	    1. Type  :version  in Vim (normal mode).
+
+	    2. Look for a string like -DDYNAMIC_PYTHON_DLL="python27.dll".
+
+	    3. Install the Python version which corresponds to the version
+	       which Vim was linked against. In the example of step 2
+	       (python27.dll) the required Python version is 2.7.x.
+      
     * pywin32: http://sourceforge.net/projects/pywin32/
+
       Note: The default download may not match the Python version Vim was
-      linked with. You have to "View all files" on the download page to find
-      the file that matches the version of Python that you installed.
+      linked against. You have to "View all files" on the download page to
+      find the file that matches exactly the version of Python that you
+      installed.
 
 Create your |vimfiles| directory if you do not have it yet. Its path will be
 similar to one of the following:
@@ -168,8 +201,8 @@ are in the same directory):
 >
   :helptags ~\vimfiles\doc
 <
-Start R and try to send some lines from GVim to R Console. You may have to
-adjust the value of |vimrplugin_sleeptime|.
+Start editing an R file with GVim and try to send some lines to R Console. You
+may have to adjust the value of |vimrplugin_sleeptime|.
 
 
 3.3. Troubleshooting (if the plugin doesn't work)~
@@ -180,7 +213,7 @@ the key bindings will not be active while editing either unnamed files or
 files with name extensions other than .R or .Rnw. If the plugin is active,
 pressing <LocalLeader>rf should start R (the <LocalLeader> is '\' by default).
 
-Look at the ~/.vim (Linux, Unix, Os X) or ~/vimfiles (Windows) directory. Is
+Look at the ~/.vim (Linux, Unix, OS X) or ~/vimfiles (Windows) directory. Is
 there a subdirectory named "r-plugin"? If not, then you unpacked the plugin in
 the wrong place.
 
@@ -532,18 +565,55 @@ in the example below.
 
 A sample detachable session could be:
 
+  - Create your ~/.tmux.conf if it does not exist yet. You may use the
+    r-plugin/tmux.conf as a starting point to your own configuration file.
+
   - Start Tmux:
       tmux
+
   - Start Vim:
       vim theScript.R
+
   - Use Vim to start an R session:
       \rf
+
   - Send code from Vim to R, and, then, detach Vim and R with <C-a>d
+    The command will be <C-b>d if you have not set <C-a> as the scape
+    character in your ~/.tmux.conf.
+
   - Some time latter (even if accessing the machine remotely) reattach the
     Tmux session:
       tmux attach
 
- 
+
+4.8. GNU Screen usage~
+							     *r-plugin-screen*
+When running Vim in a terminal emulator (Linux/Unix only), the Vim-R-plugin
+will use the screen.vim plugin to restart Vim and start R in a Tmux session.
+However, the plugin will use GNU Screen if Tmux is not installed or you have
+set the value of vimrplugin_tmux = 0 in your |vimrc|.
+
+You may want to create your own ~/.screenrc to customize GNU Screen behavior.
+The Vim-R-plugin comes with a sample screenrc (at r-plugin directory) that you
+can use. Below are the most useful key bindings to use the Vim-R-plugin with
+the provided screenrc:
+
+    <C-Tab>    : Move the cursor to the next panel.
+    <C-a>a     : Decrease the height of the current panel.
+    <C-a>z     : Increase the height of the current panel.
+    <C-a>[     : Enter the copy/scroll back mode. You can use <PgUp>,
+		 <PgDown> and vi key bindings to move the cursor around
+		 the panel. Press q to quit copy mode.
+    <C-a>]     : Paste the content of GNU Screen paste buffer.
+
+While in the copy and scroll back mode, the following key bindings are very
+useful:
+
+    q          : Quit the copy and scroll mode.
+    <Space>    : Start text selection.
+    <Enter>    : Copy the selection to GNU Screen paste buffer.
+
+
 ==============================================================================
 5. How the plugin works~
 							*r-plugin-functioning*
@@ -680,43 +750,49 @@ indentation by adding braces and line breaks to it. Example:
     class(x) <- c(if(ordered) "ordered", "factor")
 <
 
+6.9. Commands are sent twice on Mac OS X~
+
+If you use the screen plugin with GNU Screen, individual lines may be sent
+duplicated to R on Mac OS X.
+
+
 ==============================================================================
 7. Options~
 							    *r-plugin-options*
-|vimrplugin_term|		External terminal to be used
-|vimrplugin_term_cmd|		Complete command to open an external terminal
-|vimrplugin_underscore|		Convert '_' into ' <- '
-|vimrplugin_rnowebchunk|	Convert '<' into '<<>>=\n@' in Rnoweb files
-|vimrplugin_objbr_place|	Placement of Object Browser
-|vimrplugin_objbr_w|		Initial width of Object Browser window
-|vimrplugin_vimpager|		Use Vim to see R documentation
-|vimrplugin_editor_w|		Minimum width of R script buffer
-|vimrplugin_help_w|		Desired width of R documentation buffer
-|vimrplugin_nosingler|		A single R process for all Vim instances
-|vimrplugin_by_vim_instance|	Each Vim instance runs its own R
-|vimrplugin_i386|		Use 32 bit version of R
-|vimrplugin_r_path|		Directory where R is
-|vimrplugin_r_args|		Arguments to pass to R
-|vimrplugin_buildwait|		Time to wait for :RUpdateObjList to finish
-|vimrplugin_routmorecolors|	More syntax highlighting in R output
-|vimrplugin_routnotab|		Show output of R CMD BATCH in new window
-|vimrplugin_indent_commented|	Indent lines commented with the \cc command
-|vimrplugin_sleeptime|		Delay while sending commands in MS Windows
-|vimrplugin_noscreenrc|		Do not write custom screenrc
-|vimrplugin_screenplugin|	Use the screen.vim plugin
-|vimrplugin_screenvsplit|	Split the window vertically with screen plugin
-|vimrplugin_tmux|		Choose between Tmux and GNU Screen
-|vimrplugin_applescript|	Use osascript in Mac OS X.
-|vimrplugin_open_df|		Show data.frame elements in the Object Browser
-|vimrplugin_open_list|		Show list elements in the Object Browser
-|vimrplugin_allnames|		Show names which begin with a dot
-|vimrplugin_listmethods|	Do .vim.list.args() instead of args()
-|vimrplugin_specialplot|	Do .vim.plot() instead of plot()
-|vimrplugin_maxdeparse|		Argument to R args() function
-|vimrplugin_latexcmd|		Command to run on .tex files
-|vimrplugin_sweaveargs|		Arguments do Sweave()
-|vimrplugin_never_unmake_menu|	Do not unmake menu when switching buffers
-|vimrplugin_map_r|		Use 'r' to send lines and selected text
+|vimrplugin_term|              External terminal to be used
+|vimrplugin_term_cmd|          Complete command to open an external terminal
+|vimrplugin_underscore|        Convert '_' into ' <- '
+|vimrplugin_rnowebchunk|       Convert '<' into '<<>>=\n@' in Rnoweb files
+|vimrplugin_objbr_place|       Placement of Object Browser
+|vimrplugin_objbr_w|           Initial width of Object Browser window
+|vimrplugin_vimpager|          Use Vim to see R documentation
+|vimrplugin_editor_w|          Minimum width of R script buffer
+|vimrplugin_help_w|            Desired width of R documentation buffer
+|vimrplugin_nosingler|         A single R process for all Vim instances
+|vimrplugin_by_vim_instance|   Each Vim instance runs its own R
+|vimrplugin_i386|              Use 32 bit version of R
+|vimrplugin_r_path|            Directory where R is
+|vimrplugin_r_args|            Arguments to pass to R
+|vimrplugin_buildwait|         Time to wait for :RUpdateObjList to finish
+|vimrplugin_routmorecolors|    More syntax highlighting in R output
+|vimrplugin_routnotab|         Show output of R CMD BATCH in new window
+|vimrplugin_indent_commented|  Indent lines commented with the \cc command
+|vimrplugin_sleeptime|         Delay while sending commands in MS Windows
+|vimrplugin_noscreenrc|        Do not write custom screenrc
+|vimrplugin_screenplugin|      Use the screen.vim plugin
+|vimrplugin_screenvsplit|      Split the window vertically (screen plugin)
+|vimrplugin_tmux|              Choose between Tmux and GNU Screen
+|vimrplugin_applescript|       Use osascript in Mac OS X.
+|vimrplugin_open_df|           Show data.frame elements in the Obj. Browser
+|vimrplugin_open_list|         Show list elements in the Object Browser
+|vimrplugin_allnames|          Show names which begin with a dot
+|vimrplugin_listmethods|       Do .vim.list.args() instead of args()
+|vimrplugin_specialplot|       Do .vim.plot() instead of plot()
+|vimrplugin_maxdeparse|        Argument to R args() function
+|vimrplugin_latexcmd|          Command to run on .tex files
+|vimrplugin_sweaveargs|        Arguments do Sweave()
+|vimrplugin_never_unmake_menu| Do not unmake the menu when switching buffers
+|vimrplugin_map_r|             Use 'r' to send lines and selected text
 
 
 7.1. Terminal emulator (Linux/Unix only)~
@@ -961,24 +1037,43 @@ example show how to adjust the value of sleeptime in your |vimrc|:
 
 7.14. Tmux and Screen configuration (Linux/Unix only)~
 						       *vimrplugin_noscreenrc*
+						       *vimrplugin_notmuxconf*
 GVim (or Vim running R in an external terminal emulator) runs GNU Screen with
 a specially built configuration file. If you want to use your own ~/.screenrc,
 put in your |vimrc|:
 >
    let vimrplugin_noscreenrc = 1
 <
+If you want to use your own ~/.tmux.conf, put in your vimrc:
+>
+   let vimrplugin_notmuxconf = 1
+<
 
 7.15. Integration with screen.vim plugin (Linux/Unix only)~
 						     *vimrplugin_screenplugin*
 						     *vimrplugin_screenvsplit*
 							     *vimrplugin_tmux*
+The screen.vim plugin supports both screen and Tmux, but only Tmux allows you
+to split the terminal vertically (that is, to have the panels side by side).
+Please read |screen-intro| and |screen-shell-vertical| for details.  By
+default, the Vim-R-plugin will tell the screen.vim plugin to split the
+terminal horizontally. If you prefer to split it vertically put in your
+|vimrc|:
+>
+   let vimrplugin_screenvsplit = 1
+   let g:ScreenImpl = 'Tmux'
+<
 By default, when running in a terminal emulator, the Vim-R-plugin uses the
 screen.vim plugin if it is installed and, by default, it will use Tmux instead
-of GNU Screen. If you prefer to use the GNU Screen application, put in your
+of GNU Screen. Tmux was chosen as default because it may be split vertically
+and its regions are easier to resize. If both GNU Screen and Tmux are
+installed but you prefer to use the GNU Screen application, put in your
 |vimrc|:
 >
    let vimrplugin_tmux = 0
 <
+If Tmux is not installed, the Vim-R-plugin will use GNU Screen.
+
 Start Vim and do the command <LocalLeader>rf. The screen.vim plugin will split
 the terminal in two regions and will run R in one of them. Using both plugins
 at the same time is especially useful for users who may prefer to use Vim and
@@ -990,24 +1085,15 @@ with the Vim-R-plugin you will need to add the following to your |vimrc|:
 >
    let vimrplugin_screenplugin = 0
 <
-The screen.vim plugin supports both screen and Tmux, but only Tmux allows you
-to split the terminal vertically (that is, to have the panels side by side).
-Please read |screen-intro| and |screen-shell-vertical| for details.  By
-default, the Vim-R-plugin will tell the screen.vim plugin to split the
-terminal horizontally. If you prefer to split it vertically put in your
-|vimrc|:
->
-   let vimrplugin_screenvsplit = 1
-   let g:ScreenImpl = 'Tmux'
-<
 
-7.17. Integration with Apple Script (OS X only)~
+7.17. Integration with AppleScript (OS X only)~
 							*vimrplugin_applescript*
-In Mac OS X, the plugin will try to send commands to R gui using Apple Script
-if the screen.vim plugin is not installed. If you prefer to have R running in an
+In Mac OS X, the plugin will try to send commands to R gui using AppleScript
+if running the GUI version of MacVim. If you prefer to have R running in an
 external terminal emulator, put in your |vimrc|:
 >
    let vimrplugin_applescript = 0
+   let vimrplugin_screenplugin = 0
 <
 
 7.18. Special R functions~
@@ -1194,6 +1280,7 @@ directory after the installation:
    r-plugin/vimSweave.R
    r-plugin/r.snippets
    r-plugin/screenrc
+   r-plugin/screenrc.xterm
    r-plugin/specialfuns.R
    r-plugin/tex_indent.vim
    r-plugin/tmux.conf
@@ -1382,6 +1469,14 @@ prefer to start editing files with all folds open, put in your |vimrc|:
 Notes: (1) Enabling folding may slow down Vim. (2) Folding is not a file type
 plugin option. It is a feature defined in syntax/r.vim.
 
+Note: Indentation of R code is very slow because the indentation algorithm
+sometimes goes backwards looking for an opening parenthesis or brace or for
+the beginning of a "for", "if" or "while" statement. This is necessary because
+the indentation level of a given line depends on the indentation level of the
+previous line, but the previous line is not always the line above. It's the
+line where the statement immediately above started. Of course someone may
+develop a better algorithm in the future.
+
 
 10.10. Automatically close parenthesis~
 
@@ -1401,7 +1496,29 @@ code automatically, breaking only comment lines, put in your |vimrc|:
    autocmd FileType r setlocal formatoptions=cq
 <
 
-10.12. Run your Makefile from within R~
+10.12. Vim with 256 colors in a terminal emulator (Linux/Unix only)~
+
+If you want 256 colors support in Vim, install the package ncurses-term. Then
+put in your ~/.bashrc:
+>
+   if [ "x" != "x$DISPLAY" ]
+   then
+     export TERM=xterm-256color
+   fi
+<
+Finally, put in your |vimrc|:
+>
+   if &term =~ "xterm" || &term =~ "256" || $DISPLAY != ""
+       set t_Co=256
+   endif
+   colorscheme your_prefered_color_scheme
+<
+You have to search the internet for color schemes supporting 256 colors,
+download and copy them to ~/.vim/colors. You may use the command
+|:colorscheme| to try them all before setting your preference in your |vimrc|.
+
+
+10.13. Run your Makefile from within R~
 
 Do you have many Rnoweb files included in a master tex or Rnoweb file and use
 a Makefile to build the pdf? You may consider it useful to put the following
@@ -1410,7 +1527,7 @@ line in your |vimrc|:
    nmap <LocalLeader>sm :update<CR>:call SendCmdToR('system("make")')<CR>
 <
 
-10.13. Group windows with compiz~
+10.14. Group windows with compiz~
 
 If you are using Compiz, it may be easier to work with the plugin if the
 various related windows (editor, terminal, and graphics window) are grouped
@@ -1419,7 +1536,7 @@ may need CompizConfig Settings Manager installed to enable this feature (look
 at the "Window Management" section for "Group and Tab Windows").
 
 
-10.14. Why do I have to updated the Object Browser manually?~
+10.15. Why do I have to updated the Object Browser manually?~
 
 It is because Vim and R run as separate processes and, thus, it is not
 possible to Vim to know whether R is busy or not. If R was running as part of
@@ -1431,7 +1548,7 @@ the Vim-R-plugin did this, the use of Vim would be blocked until R finished
 its processing. 
 
 
-10.15. Edit your ~/.Rprofile~
+10.16. Edit your ~/.Rprofile~
 
 You may want to edit your ~/.Rprofile. Two common options are the use of GVim
 as the text editor and the use of html help. Example for Linux with these two
@@ -1478,7 +1595,7 @@ An example for Windows:
    }
 <
 
-10.16. Debugging R functions~
+10.17. Debugging R functions~
 
 The Vim-R-Plugin does not have debugging facilities, but you may want to use
 the R package "debug":
@@ -1491,19 +1608,19 @@ Once the library is installed and loaded, you should use mtrace(function_name)
 to enable the debugging of a function. Then, the next time that the function
 is called it will enter in debugging mode. Once debugging a function, you can
 hit <Enter> to evaluate the current line, go(n) to go to line n in the
-function and qqq() to quit the function (See debug's help for details). An
+function and qqq() to quit the function (See debug's help for details). A
 useful tip is to click on the title bar of the debug window and choose "Always
 on top" or a similar option provided by your desktop manager.
 
 There is also the R package "edtdbg" which aims to integrate R debugging
 facilities with Vim.
 
-10.17. Turn the R-plugin into a global plugin~
+10.18. Turn the R-plugin into a global plugin~
 							     *r-plugin-global*
 The Vim-R-plugin is a file type plugin. If you want its functionality
 available for all file types, then do one of the following:
 
-10.17.1. When using GVim~
+10.18.1. When using GVim~
 
 Go to your ~/.vim/plugin directory and create a symbolic link to
 ~/.vim/r-plugin/global_r_plugin.vim. That is, type the following
@@ -1519,7 +1636,7 @@ make a copy of the file to the ~/.vim/plugin directory and edit it. On
 Windows, you probably will have to make a copy of the file to the
 ~/vimfiles/plugin directory.
 
-10.17.2. When using Vim + screen.vim plugin (either Tmux or GNU Screen)~
+10.18.2. When using Vim + screen.vim plugin (either Tmux or GNU Screen)~
 
 Put in your |vimrc| (replace <F2> with the shortcut of your preference):
 >
@@ -1535,7 +1652,7 @@ Consequently, the ftplugin/r.vim script must be sourced again by pressing <F2>
 for the second time.
 
 
-10.18. Disable syntax highlight of R functions~
+10.19. Disable syntax highlight of R functions~
 
 If you want to disable the syntax highlight of R functions edit the file
 ~/.vim/r-plugin/functions.vim and delete all lines, but do not delete the
@@ -1550,7 +1667,7 @@ can also use the Conque Shell plugin, but the Conque Shell still has some
 important bugs and Vim has limitations that make the use of Conque Shell not
 fully satisfying. The most important bug of Conque Shell is that it sometimes
 do not show the complete output of an R command. This problem happens more
-frequently when there are non ascii characters in the output. The three most
+frequently when there are non ascii characters in the output. The two most
 important Vim limitations are:
 
   - We cannot scroll the windows of a buffer that is not being edited and,
@@ -1559,16 +1676,13 @@ important Vim limitations are:
     shell buffer does not scroll when there is new output but it is not the
     currently active buffer.
 
-  - The InsertCharPre event was implemented in a way that causes problems to
-    Conque Shell. We have to patch Vim's source code.
-
   - Vim does not have a timer which would make the Conque Shell more
     efficient. Vim uses the same variable, 'updatetime', to do both save swap
     files and trigger |CursorHold| events.
 
 In spite of these problems, the use of Conque Shell already has some
 advantages: the ability to edit R's output, and the syntax highlighting of the
-output. If you want to try the Conque Shell, install it from:
+output. If you want to try the Conque Shell, install it from
 
    http://www.vim.org/scripts/script.php?script_id=2771
 
@@ -1631,6 +1745,21 @@ the R syntax highlighted.
 ==============================================================================
 12. News~
 							       *r-plugin-news*
+
+111014 (2011-10-14)
+ * Fixed spell check bug in R documentation files (.Rd).
+ * Fixed beep bug when sending commands to R.
+ * New option: vimrplugin_notmuxconf.
+ * Fixed bug when starting tmux before vim: the environment variable
+   VIMRPLUGIN_TMPDIR was not being set. Thanks to Michel Lang for reporting
+   the bug and helping to track its source, and thanks to Eric Dewoestine for
+   explaining how to fix the bug.
+ * Fixed bug in code indentation after unbalanced brackets and parenthesis
+   when r_indent_align_args = 0 (thanks to Chris Neff and Peng Yu for
+   reporting the bugs).
+ * Really make the use of AppleScript the default on OS X (thanks for Jason
+   for reporting the bug).
+
 110805 (2011-08-05)
  * New option: vimrplugin_tmux.
  * Set Tmux as the default instead of either GNU Screen or Conque Shell.
@@ -1681,7 +1810,7 @@ the R syntax highlighted.
  * Don't send "^@$" as part of a paragraph in rnoweb files (thanks to Fabio
    Correa for reporting the bug).
  * More useful warning message when PyWin32 isn't installed.
- * Initial support to Apple Script on Mac OS X (thanks to Vincent Nijs for
+ * Initial support to AppleScript on Mac OS X (thanks to Vincent Nijs for
    writing and testing the code).
 
 101121 (2010-11-21)
@@ -1806,7 +1935,7 @@ the R syntax highlighted.
 100512 (2010-05-12)
  * Thanks to Tortonesi Mauro who wrote a patch to make the plugin work with
    pathogen.vim.
- * Added simple syntax hightlight for .Rout files.
+ * Added simple syntax highlight for .Rout files.
  * Increased the time limit of RUpdateObjList to two minutes.
  * Improvement in the syntax highlight based on code written by Zhuojun Chen.
  * Thanks to Scott Kostyshak who helped to improve the documentation.
@@ -1863,7 +1992,7 @@ the R syntax highlighted.
  * Better word detection before calling R's help().
  * Fixed bug in underscore replacement.
  * Fixed small bug in code indentation.
- * Added scipt rpager.sh.
+ * Added script rpager.sh.
  * Added two new plugin options: no underscore replacement and fixed name for
    the pipe file instead of random one.
 

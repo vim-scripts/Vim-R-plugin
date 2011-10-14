@@ -2,7 +2,7 @@
 " Language:	R
 " Author:	Jakson Alves de Aquino <jalvesaq@gmail.com>
 " URL:		http://www.vim.org/scripts/script.php?script_id=2628
-" Last Change:	Tue Feb 08, 2011  10:03AM
+" Last Change:	Sun Sep 11, 2011  10:55PM
 
 
 " Only load this indent file when no other was loaded.
@@ -451,17 +451,34 @@ function GetRIndent()
     let ind = indent(lnum)
     let pind = indent(plnum)
 
+    if g:r_indent_align_args == 0 && pb != 0
+        let ind += pb * &sw
+        return ind
+    endif
+
+    if g:r_indent_align_args == 0 && bb != 0
+        let ind += bb * &sw
+        return ind
+    endif
+
     if ind == pind || (ind == (pind  + &sw) && pline =~ '{$' && ppost_else == 0)
         return ind
     endif
 
-    while pind < ind && plnum > 0
+    let pline = getline(plnum)
+    let pbb = s:Get_paren_balance(pline, '[', ']')
+
+    while pind < ind && plnum > 0 && ppb == 0 && pbb == 0
         let ind = pind
         let plnum = s:Get_prev_line(plnum)
         let pline = getline(plnum)
+        let ppb = s:Get_paren_balance(pline, '(', ')')
+        let pbb = s:Get_paren_balance(pline, '[', ']')
         while pline =~ '^\s*else'
             let plnum = s:Get_matching_if(plnum, 1)
             let pline = getline(plnum)
+            let ppb = s:Get_paren_balance(pline, '(', ')')
+            let pbb = s:Get_paren_balance(pline, '[', ']')
         endwhile
         let pind = indent(plnum)
         if ind == (pind  + &sw) && pline =~ '{$'

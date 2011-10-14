@@ -2,27 +2,29 @@ This is a mirror of http://www.vim.org/scripts/script.php?script_id=2628
 
 This plugin improves Vim's support for editing R code and makes it possible to integrate Vim with R. The functionality is similar to what you can find in Tinn-R and ESS mode of Emacs. This filetype plugin uses either tmux or screen with the Screen plugin (Linux, OS X, or other Unix, vimscript #2711) or Python (Microsoft Windows) or Apple Script (Mac OS X) to communicate with R. 
 
-Screenshots and Debian package: http://sites.google.com/site/jalvesaq/vimrplugin
+Screenshots and Debian package: http://www.lepem.ufc.br/jaa/vim-r-plugin.html
 Development code: https://github.com/jcfaria/Vim-R-plugin
 
 MAIN FEATURES:
 
-  * Syntax highlighting for R syntax, including:
+  * Syntax highlighting for R code, including:
       - Special characters in strings.
       - Functions of all installed packages (must be updated manually).
       - Special highlighting for R output (.Rout files).
       - Spell check only strings and comments.
       - Fold code when foldmethod=syntax.
   * Syntax highlighting for RHelp syntax.
-  * Smart indentation for R, RHelp and Rnoweb syntax.
+  * Smart indentation for R syntax.
+  * Smart indentation for RHelp syntax.
   * Integrated communication with R:
       - Start/Close R.
       - Send lines, selection, paragraphs, functions, blocks, entire file.
       - Send commands with the object under cursor as argument: help, args,
 	plot, print, str, summary, example, names.
       - Send to R the Sweave and pdflatex commands.
+      - Run R inside a Vim's buffer.
   * Omni completion (auto-completion) for R objects (.GlobalEnv and installed
-    packages). The list of installed packages must be updated manually.
+    packages. The list of installed packages must be updated manually.
   * Ability to see R's documentation in a Vim's buffer:
       - Automatic calculation of the best layout of the R documentation buffer
 	(split the window either horizontally or vertically according to the
@@ -88,6 +90,7 @@ FILES:
    r-plugin/vimSweave.R
    r-plugin/r.snippets
    r-plugin/screenrc
+   r-plugin/screenrc.xterm
    r-plugin/specialfuns.R
    r-plugin/tex_indent.vim
    r-plugin/tmux.conf

@@ -10,11 +10,11 @@ try:
     import win32com.client
     import win32con
 except ImportError:
-    vim.command("call RWarningMsg('Did you install PyWin32?')")
     import platform
     myPyVersion = platform.python_version()
     myArch = platform.architecture()
-    vim.command("call RWarningMsg('The Python version being used is: " + myPyVersion + " (" + myArch[0] + ")')")
+    vim.command("call RWarningMsgInp('Please install PyWin32. The Python version being used is: " + myPyVersion + " (" + myArch[0] + ")')")
+    vim.command("let rplugin_pywin32 = 0")
 
 
 def SendToRPy(aString):
@@ -115,6 +115,9 @@ def StartRPy():
         else:
             vim.command("RWarningMsg('Personal folder not found in registry')")
 
-    os.spawnv(os.P_NOWAIT, rpath, rargs)
+    if os.path.isfile(rpath):
+        os.spawnv(os.P_NOWAIT, rpath, rargs)
+    else:
+        vim.command("echoerr 'File ' . g:rplugin_Rgui . ' not found.'")
 
 # vim: sw=4 tabstop=4 expandtab
