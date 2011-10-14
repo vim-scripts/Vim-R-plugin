@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Fri Oct 14, 2011  12:56PM
+" Last Change: Fri Oct 14, 2011  07:40PM
 "
 " Purposes of this file: Create all functions and commands and Set the
 " value of all global variables  and some buffer variables.for r,
@@ -651,7 +651,7 @@ function SendCmdToR(cmd)
     " clean. The solution is to use ^A (\001) to move the cursor to the
     " beginning of the line before sending ^K. But the control characters may
     " cause Conque to show the output incompletely.
-    if vimrplugin_conqueplugin
+    if g:vimrplugin_conqueplugin
         let cmd = a:cmd
     else
         let cmd = "\001" . "\013" . a:cmd
