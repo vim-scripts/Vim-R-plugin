@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Thu Oct 13, 2011  11:57AM
+" Last Change: Fri Oct 14, 2011  12:56PM
 "
 " Purposes of this file: Create all functions and commands and Set the
 " value of all global variables  and some buffer variables.for r,
@@ -649,8 +649,13 @@ function SendCmdToR(cmd)
     " ^K (\013) cleans from cursor to the right and ^U (\025) cleans from
     " cursor to the left. However, ^U causes a beep if there is nothing to
     " clean. The solution is to use ^A (\001) to move the cursor to the
-    " beginning of the line before sending ^K.
-    let cmd = "\001" . "\013" . a:cmd
+    " beginning of the line before sending ^K. But the control characters may
+    " cause Conque to show the output incompletely.
+    if vimrplugin_conqueplugin
+        let cmd = a:cmd
+    else
+        let cmd = "\001" . "\013" . a:cmd
+    endif
 
     if has("gui_win32") && g:vimrplugin_conqueplugin == 0
         let cmd = cmd . "\n"
