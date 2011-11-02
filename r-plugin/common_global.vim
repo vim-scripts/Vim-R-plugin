@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Fri Oct 14, 2011  07:40PM
+" Last Change: Tue Nov 01, 2011  11:04PM
 "
 " Purposes of this file: Create all functions and commands and Set the
 " value of all global variables  and some buffer variables.for r,
@@ -371,11 +371,6 @@ function StartR(whatr)
     endif
 
     if g:vimrplugin_applescript && g:vimrplugin_screenplugin == 0 && g:vimrplugin_conqueplugin == 0
-        if isdirectory("/Applications/R64.app")
-            let g:rplugin_r64app = 1
-        else
-            let g:rplugin_r64app = 0
-        endif
         if g:rplugin_r64app && g:vimrplugin_i386 == 0
             let rcmd = "/Applications/R64.app"
         else
@@ -2088,6 +2083,11 @@ if g:vimrplugin_applescript == 0
 else
     let g:vimrplugin_screenplugin = 0
     let g:vimrplugin_conqueplugin = 0
+    if isdirectory("/Applications/R64.app")
+        let g:rplugin_r64app = 1
+    else
+        let g:rplugin_r64app = 0
+    endif
 endif
 
 " The screen.vim plugin only works on terminal emulators
