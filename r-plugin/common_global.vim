@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Tue Nov 01, 2011  11:04PM
+" Last Change: Fri Nov 04, 2011  08:41AM
 "
 " Purposes of this file: Create all functions and commands and Set the
 " value of all global variables  and some buffer variables.for r,
@@ -238,7 +238,7 @@ function MovePosRLineComment(lnum, cpos)
             let ok = 0
         endif
         if ok == 0
-            call RWarningMsg("Not inside a R code chunk.")
+            call RWarningMsg("Not inside an R code chunk.")
             return
         endif
     endif
@@ -252,7 +252,7 @@ function MovePosRLineComment(lnum, cpos)
             let ok = 0
         endif
         if ok == 0
-            call RWarningMsg("Not inside a R code section.")
+            call RWarningMsg("Not inside an R code section.")
             return
         endif
     endif
@@ -802,7 +802,7 @@ endfunction
 " Function to get the marks which the cursor is between
 function SendMBlockToR(e, m)
     if &filetype == "rnoweb" && RnwIsInRCode() == 0
-        call RWarningMsg("Not inside a R code chunk.")
+        call RWarningMsg("Not inside an R code chunk.")
         return
     endif
     if &filetype == "rdoc" && search("^Examples:$", "bncW") == 0
@@ -848,7 +848,7 @@ endfunction
 function SendFunctionToR(e, m)
     echon
     if &filetype == "rnoweb" && RnwIsInRCode() == 0
-        call RWarningMsg("Not inside a R code chunk.")
+        call RWarningMsg("Not inside an R code chunk.")
         return
     endif
     if &filetype == "rdoc" && search("^Examples:$", "bncW") == 0
@@ -911,7 +911,7 @@ endfunction
 function SendSelectionToR(e, m)
     echon
     if &filetype == "rnoweb" && RnwIsInRCode() == 0
-        call RWarningMsg("Not inside a R code chunk.")
+        call RWarningMsg("Not inside an R code chunk.")
         return
     endif
     if &filetype == "rdoc" && search("^Examples:$", "bncW") == 0
@@ -946,7 +946,7 @@ endfunction
 " Send paragraph to R
 function SendParagraphToR(e, m)
     if &filetype == "rnoweb" && RnwIsInRCode() == 0
-        call RWarningMsg("Not inside a R code chunk.")
+        call RWarningMsg("Not inside an R code chunk.")
         return
     endif
     if &filetype == "rdoc" && search("^Examples:$", "bncW") == 0
@@ -1002,7 +1002,7 @@ function SendLineToR(godown)
             return
         endif
         if RnwIsInRCode() == 0
-            call RWarningMsg("Not inside a R code chunk.")
+            call RWarningMsg("Not inside an R code chunk.")
             return
         endif
     endif
@@ -1726,25 +1726,33 @@ function MakeRMenu()
     call RCreateMenuItem("ni", 'Send.Block\ (cur,\ down)', '<Plug>RDSendMBlock', 'bd', ':call SendMBlockToR("silent", "down")')
     call RCreateMenuItem("ni", 'Send.Block\ (cur,\ echo\ and\ down)', '<Plug>REDSendMBlock', 'ba', ':call SendMBlockToR("echo", "down")')
     "-------------------------------
-    menu R.Send.-Sep2- <nul>
+    if &filetype == "rnoweb" || g:vimrplugin_never_unmake_menu
+        menu R.Send.-Sep2- <nul>
+        call RCreateMenuItem("ni", 'Send.Chunk\ (cur)', '<Plug>RSendChunk', 'cc', ':call SendChunkToR("silent", "stay")')
+        call RCreateMenuItem("ni", 'Send.Chunk\ (cur,\ echo)', '<Plug>RESendChunk', 'ce', ':call SendChunkToR("echo", "stay")')
+        call RCreateMenuItem("ni", 'Send.Chunk\ (cur,\ down)', '<Plug>RDSendChunk', 'cd', ':call SendChunkToR("silent", "down")')
+        call RCreateMenuItem("ni", 'Send.Chunk\ (cur,\ echo\ and\ down)', '<Plug>REDSendChunk', 'ca', ':call SendChunkToR("echo", "down")')
+    endif
+    "-------------------------------
+    menu R.Send.-Sep3- <nul>
     call RCreateMenuItem("ni", 'Send.Function\ (cur)', '<Plug>RSendFunction', 'ff', ':call SendFunctionToR("silent", "stay")')
     call RCreateMenuItem("ni", 'Send.Function\ (cur,\ echo)', '<Plug>RESendFunction', 'fe', ':call SendFunctionToR("echo", "stay")')
     call RCreateMenuItem("ni", 'Send.Function\ (cur\ and\ down)', '<Plug>RDSendFunction', 'fd', ':call SendFunctionToR("silent", "down")')
     call RCreateMenuItem("ni", 'Send.Function\ (cur,\ echo\ and\ down)', '<Plug>REDSendFunction', 'fa', ':call SendFunctionToR("echo", "down")')
     "-------------------------------
-    menu R.Send.-Sep3- <nul>
+    menu R.Send.-Sep4- <nul>
     call RCreateMenuItem("v", 'Send.Selection', '<Plug>RSendSelection', 'ss', ':call SendSelectionToR("silent", "stay")')
     call RCreateMenuItem("v", 'Send.Selection\ (echo)', '<Plug>RESendSelection', 'se', ':call SendSelectionToR("echo", "stay")')
     call RCreateMenuItem("v", 'Send.Selection\ (and\ down)', '<Plug>RDSendSelection', 'sd', ':call SendSelectionToR("silent", "down")')
     call RCreateMenuItem("v", 'Send.Selection\ (echo\ and\ down)', '<Plug>REDSendSelection', 'sa', ':call SendSelectionToR("echo", "down")')
     "-------------------------------
-    menu R.Send.-Sep4- <nul>
+    menu R.Send.-Sep5- <nul>
     call RCreateMenuItem("ni", 'Send.Paragraph', '<Plug>RSendParagraph', 'pp', ':call SendParagraphToR("silent", "stay")')
     call RCreateMenuItem("ni", 'Send.Paragraph\ (echo)', '<Plug>RESendParagraph', 'pe', ':call SendParagraphToR("echo", "stay")')
     call RCreateMenuItem("ni", 'Send.Paragraph\ (and\ down)', '<Plug>RDSendParagraph', 'pd', ':call SendParagraphToR("silent", "down")')
     call RCreateMenuItem("ni", 'Send.Paragraph\ (echo\ and\ down)', '<Plug>REDSendParagraph', 'pa', ':call SendParagraphToR("echo", "down")')
     "-------------------------------
-    menu R.Send.-Sep5- <nul>
+    menu R.Send.-Sep6- <nul>
     call RCreateMenuItem("ni0", 'Send.Line', '<Plug>RSendLine', 'l', ':call SendLineToR("stay")')
     call RCreateMenuItem("ni0", 'Send.Line\ (and\ down)', '<Plug>RDSendLine', 'd', ':call SendLineToR("down")')
     call RCreateMenuItem("i", 'Send.Line\ (and\ new\ one)', '<Plug>RSendLAndOpenNewOne', 'q', ':call SendLineToR("newline")')
@@ -1754,19 +1762,19 @@ function MakeRMenu()
     "----------------------------------------------------------------------------
     call RControlMenu()
     "-------------------------------
-    menu R.Command.-Sep5- <nul>
+    menu R.Command.-Sep1- <nul>
     if &filetype != "rdoc"
         call RCreateMenuItem("nvi", 'Command.Set\ working\ directory\ (cur\ file\ path)', '<Plug>RSetwd', 'rd', ':call RSetWD()')
     endif
     "-------------------------------
     if &filetype == "rnoweb" || g:vimrplugin_never_unmake_menu
-        menu R.Command.-Sep6- <nul>
+        menu R.Command.-Sep2- <nul>
         call RCreateMenuItem("nvi", 'Command.Sweave\ (cur\ file)', '<Plug>RSweave', 'sw', ':call RSweave()')
         call RCreateMenuItem("nvi", 'Command.Sweave\ and\ PDF\ (cur\ file)', '<Plug>RMakePDF', 'sp', ':call RMakePDF("nobib")')
         call RCreateMenuItem("nvi", 'Command.Sweave,\ BibTeX\ and\ PDF\ (cur\ file)', '<Plug>RMakePDF', 'sb', ':call RMakePDF("bibtex")')
     endif
     "-------------------------------
-    menu R.Command.-Sep6a- <nul>
+    menu R.Command.-Sep3- <nul>
     if &filetype == "r" || &filetype == "rnoweb" || g:vimrplugin_never_unmake_menu
         nmenu R.Command.Build\ tags\ file\ (cur\ dir)<Tab>:RBuildTags :call SendCmdToR('rtags(ofile = "TAGS")')<CR>
         imenu R.Command.Build\ tags\ file\ (cur\ dir)<Tab>:RBuildTags <Esc>:call SendCmdToR('rtags(ofile = "TAGS")')<CR>a
@@ -1786,8 +1794,8 @@ function MakeRMenu()
         vmenu R.Edit.Indent\ (selected\ lines)<Tab>= =
         nmenu R.Edit.Indent\ (whole\ buffer)<Tab>gg=G gg=G
         menu R.Edit.-Sep72- <nul>
-        call RCreateMenuItem("ni", 'Edit.Comment/Uncomment\ (line/sel)', '<Plug>RCommentLine', 'cc', ':call RComment("normal")')
-        call RCreateMenuItem("v", 'Edit.Comment/Uncomment\ (line/sel)', '<Plug>RCommentLine', 'cc', ':call RComment("selection")')
+        call RCreateMenuItem("ni", 'Edit.Comment/Uncomment\ (line/sel)', '<Plug>RCommentLine', 'xx', ':call RComment("normal")')
+        call RCreateMenuItem("v", 'Edit.Comment/Uncomment\ (line/sel)', '<Plug>RCommentLine', 'xx', ':call RComment("selection")')
         call RCreateMenuItem("ni", 'Edit.Add/Align\ right\ comment\ (line,\ sel)', '<Plug>RRightComment', ';', ':call MovePosRCodeComment("normal")')
         call RCreateMenuItem("v", 'Edit.Add/Align\ right\ comment\ (line,\ sel)', '<Plug>RRightComment', ';', ':call MovePosRCodeComment("selection")')
         if &filetype == "rnoweb" || g:vimrplugin_never_unmake_menu
@@ -1963,8 +1971,8 @@ endfunction
 function RCreateEditMaps()
     " Edit
     "-------------------------------------
-    call RCreateMaps("ni", '<Plug>RCommentLine',   'cc', ':call RComment("normal")')
-    call RCreateMaps("v", '<Plug>RCommentLine',   'cc', ':call RComment("selection")')
+    call RCreateMaps("ni", '<Plug>RCommentLine',   'xx', ':call RComment("normal")')
+    call RCreateMaps("v", '<Plug>RCommentLine',   'xx', ':call RComment("selection")')
     call RCreateMaps("ni", '<Plug>RRightComment',   ';', ':call MovePosRCodeComment("normal")')
     call RCreateMaps("v", '<Plug>RRightComment',    ';', ':call MovePosRCodeComment("selection")')
     " Replace 'underline' with '<-'

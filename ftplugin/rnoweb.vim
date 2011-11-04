@@ -17,7 +17,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "
-" Last Change: Tue Aug 30, 2011  09:25AM
+" Last Change: Fri Nov 04, 2011  08:38AM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -134,6 +134,25 @@ function! RMakePDF(bibtex)
     echon
 endfunction  
 
+" Send Sweave chunk to R
+function SendChunkToR(e, m)
+    if RnwIsInRCode() == 0
+        call RWarningMsg("Not inside an R code chunk.")
+        return
+    endif
+    let chunkline = search("^<<", "bncW") + 1
+    let docline = search("^@", "ncW") - 1
+    let lines = getline(chunkline, docline)
+    let ok = RSourceLines(lines, a:e)
+    if ok == 0
+        return
+    endif
+    if a:m == "down"
+        call RnwNextChunk()
+    endif  
+    echon
+endfunction
+
 " Sweave the current buffer content
 function! RSweave()
     update
@@ -162,6 +181,10 @@ call RCreateMaps("nvi", '<Plug>RSweave',      'sw', ':call RSweave()')
 call RCreateMaps("nvi", '<Plug>RMakePDF',     'sp', ':call RMakePDF("nobib")')
 call RCreateMaps("nvi", '<Plug>RBibTeX',      'sb', ':call RMakePDF("bibtex")')
 call RCreateMaps("nvi", '<Plug>RIndent',      'si', ':call RnwToggleIndentSty()')
+call RCreateMaps("ni", '<Plug>RSendChunk',     'cc', ':call SendChunkToR("silent", "stay")')
+call RCreateMaps("ni", '<Plug>RESendChunk',    'ce', ':call SendChunkToR("echo", "stay")')
+call RCreateMaps("ni", '<Plug>RDSendChunk',    'cd', ':call SendChunkToR("silent", "down")')
+call RCreateMaps("ni", '<Plug>REDSendChunk',   'ca', ':call SendChunkToR("echo", "down")')
 nmap <buffer> gn :call RnwNextChunk()<CR>
 nmap <buffer> gN :call RnwPreviousChunk()<CR>
 

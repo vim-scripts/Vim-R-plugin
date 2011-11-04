@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 111014
+Version: 111104
 For Vim version 7.3
 
  1. Overview                                    |r-plugin-overview|
@@ -289,6 +289,11 @@ Send
   . Block (cur, down)                                  \bd
   . Block (cur, echo and down)                         \ba
   --------------------------------------------------------
+  . Chunk (cur)                                        \cc
+  . Chunk (cur, echo)                                  \ce
+  . Chunk (cur, down)                                  \cd
+  . Chunk (cur, echo and down)                         \ca
+  --------------------------------------------------------
   . Function (cur)                                     \ff
   . Function (cur, echo)                               \fe
   . Function (cur and down)                            \fd
@@ -342,7 +347,7 @@ Edit
   . Indent (selected lines)                              =
   . Indent (whole buffer)                             gg=G
   --------------------------------------------------------
-  . Comment/Uncomment (line, sel)                      \cc
+  . Comment/Uncomment (line, sel)                      \xx
   . Add/Align right comment (line, sel)                 \;
   --------------------------------------------------------
   . Go (next R chunk)                                   gn
@@ -487,7 +492,7 @@ classify the objects:
 4.5. Commenting and uncommenting lines~
 
 You can toogle the state of a line as either commented or uncommented by
-typing <LocalLeader>cc.
+typing <LocalLeader>xx.
 
 You can also add comments to the right of a line with the <LocalLeader>;
 shortcut. By default, the comment starts at the 40th column, which can be
@@ -557,11 +562,11 @@ you have to type <C-a>a. You can also set a different escape character in your
 
 With Tmux, you can the detach the Vim-R session and reattach it latter. This
 is useful if you plan to begin the use the Vim-R-plugin in a machine and
-latter move to another another computer. However, normally you will get
-|E325|, caused by the presence of a 'swapfile' (please, read the screen.vim
-plugin documentation, especially the section |screen-gotchas| for details).
-This problem will not happen if you start Vim from within a Tmux session, as
-in the example below.
+latter move to another computer. However, normally you will get |E325|, caused
+by the presence of a 'swapfile' (please, read the screen.vim plugin
+documentation, especially the section |screen-gotchas| for details). This
+problem will not happen if you start Vim from within a Tmux session, as in the
+example below.
 
 A sample detachable session could be:
 
@@ -776,7 +781,7 @@ duplicated to R on Mac OS X.
 |vimrplugin_buildwait|         Time to wait for :RUpdateObjList to finish
 |vimrplugin_routmorecolors|    More syntax highlighting in R output
 |vimrplugin_routnotab|         Show output of R CMD BATCH in new window
-|vimrplugin_indent_commented|  Indent lines commented with the \cc command
+|vimrplugin_indent_commented|  Indent lines commented with the \xx command
 |vimrplugin_sleeptime|         Delay while sending commands in MS Windows
 |vimrplugin_noscreenrc|        Do not write custom screenrc
 |vimrplugin_screenplugin|      Use the screen.vim plugin
@@ -890,11 +895,11 @@ document.
 
 The valid values of vimrplugin_vimpager are:
    
-   "horizontal": Split the window horizontally.
    "vertical"  : Split the window vertically if the editor width is large
 		 enough; otherwise, split the window horizontally and attempt
 		 to set the window height to at least 20 lines.
 		 This is the default.
+   "horizontal": Split the window horizontally.
    "tab"       : Show the help document in a new tab. If there is already a
                  tab with an R help document, use it.
    "tabnew"    : Show the help document in a new tab.
@@ -1008,7 +1013,7 @@ a new split window, put in your |vimrc|:
 
 7.12. Indent commented lines~
 						 *vimrplugin_indent_commented*
-You can type \cc (where "\" is the <LocalLeader>) to comment out a line or
+You can type \xx (where "\" is the <LocalLeader>) to comment out a line or
 selected lines. If the line already starts with a comment string, it will be
 removed. After adding the comment string, the line will be reindented by
 default. To turn off the automatic indentation, put in your |vimrc|:
@@ -1184,22 +1189,23 @@ Only the custom key bindings for Normal mode are shown in Vim's menu, but you
 can type |:map| to see the complete list of current mappings, and below is the
 list of the names for custom key bindings:
 >
-   RBibTeX                    RESendFile                  RSendFunction
-   RCommentLine               RESendFunction              RSendLAndOpenNewOne
-   RClearAll                  RESendMBlock                RSendLine
-   RClearConsole              RESendParagraph             RSendMBlock
-   RClose                     RESendSelection             RSendParagraph
-   RCustomStart               RHelp                       RSendSelection
-   RDSendFunction             RListSpace                  RSetwd
-   RDSendLine                 RMakePDF                    RShowArgs
-   RDSendMBlock               RObjectNames                RShowEx
-   RDSendParagraph            RObjectPr                   RShowRout
-   RDSendSelection            RObjectStr                  RStart
-   REDSendFunction            RPlot                       RSummary
-   REDSendMBlock              RSPlot                      RSweave
-   REDSendParagraph           RSaveClose                  RUpdateObjBrowser
-   REDSendSelection           RSendFile                   RVanillaStart
-
+   RBibTeX                   RSendChunk               RObjectNames
+   RClearAll                 RDSendChunk              RObjectPr
+   RClearConsole             RESendChunk              RObjectStr
+   RClose                    REDSendChunk             RPlot
+   RCommentLine              RSendParagraph           RSPlot
+   RCustomStart              RDSendParagraph          RSaveClose
+   RSendFunction             RESendParagraph          RSetwd
+   RDSendFunction            REDSendParagraph         RShowArgs
+   RESendFunction            RSendSelection           RShowEx
+   REDSendFunction           RDSendSelection          RShowRout
+   RSendLine                 RESendSelection          RStart
+   RDSendLine                REDSendSelection         RSummary
+   RSendLAndOpenNewOne       RSendFile                RSweave
+   RSendMBlock               RESendFile               RUpdateObjBrowser
+   RDSendMBlock              RHelp                    RVanillaStart
+   RESendMBlock              RListSpace
+   REDSendMBlock             RMakePDF
 <
 The plugin also contains a function called RAction which allows you to build
 ad-hoc commands to R. This function takes the name of an R function such as
@@ -1745,6 +1751,11 @@ the R syntax highlighted.
 ==============================================================================
 12. News~
 							       *r-plugin-news*
+
+ * Changed key binding for commenting/uncommenting code from \cc to \xx.
+ * Added function SendChunkToR() and its corresponding key bindings:
+   \cc, \ce, \cd and \ca (thanks to Xavier Fernández i Marín for suggesting
+   the feature).
 
 111014 (2011-10-14)
  * Fixed spell check bug in R documentation files (.Rd).
