@@ -2,9 +2,7 @@
 " Language:    R Help File
 " Maintainer: Jakson Aquino <jalvesaq@gmail.com>
 " Former Maintainer: Johannes Ranke <jranke@uni-bremen.de>
-" Last Change: Fri Oct 07, 2011  08:37AM
-" Version:     0.7.4
-" SVN:		   $Id: rhelp.vim 90 2010-11-22 10:58:11Z ranke $
+" Last Change: Wed Nov 02, 2011  03:47PM
 " Remarks:     - Includes R syntax highlighting in the appropriate
 "                sections if an r.vim file is in the same directory or in the
 "                default debian location.
@@ -13,7 +11,6 @@
 "              - No support for \if, \ifelse and \out as I don't understand
 "                them and have no examples at hand (help welcome).
 "              - No support for \var tag within quoted string (dito)
-"              - No support for spell checking.
 
 " Version Clears: {{{1
 " For version 5.x: Clear all syntax items
