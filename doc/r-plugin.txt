@@ -798,6 +798,7 @@ duplicated to R on Mac OS X.
 |vimrplugin_sweaveargs|        Arguments do Sweave()
 |vimrplugin_never_unmake_menu| Do not unmake the menu when switching buffers
 |vimrplugin_map_r|             Use 'r' to send lines and selected text
+|vimrplugin_ca_ck|             Add ^A^K to the beginning of commands.
 
 
 7.1. Terminal emulator (Linux/Unix only)~
@@ -1166,6 +1167,20 @@ Emacs:
    set expandtab
    set shiftwidth=4
    set tabstop=8
+<
+
+7.23. Add ^A^K to the beginning of commands~
+							    *vimrplugin_ca_ck*
+When one types <C-a> in the R Console the cursor goes to the beginning of the
+line and one types <C-k> the characters to the right of the cursor are
+deleted. Sending <C-a> may be problematic if using GNU Screen in some systems
+and may cause incomplete output when using the Conque Shell plugin. The
+Vim-R-plugin will add <C-a><C-k> to every command, unless
+|vimrplugin_conqueplugin| = 1 or |vimrplugin_screenplugin| = 1 and
+|vimrplugin_tmux| = 0. You can change this behavior by setting the value of
+|vimrplugin_ca_ck| in your |vimrc|. Example:
+>
+   let vimrplugin_ca_ck = 1
 <
 
 ==============================================================================
@@ -1756,6 +1771,8 @@ the R syntax highlighted.
  * Added function SendChunkToR() and its corresponding key bindings:
    \cc, \ce, \cd and \ca (thanks to Xavier Fernández i Marín for suggesting
    the feature).
+ * New option (vimrplugin_ca_ck) was created to fix bug reported by Xavier
+   Fernández i Marín: spurious ^A^K being added to lines sent to R.
 
 111014 (2011-10-14)
  * Fixed spell check bug in R documentation files (.Rd).

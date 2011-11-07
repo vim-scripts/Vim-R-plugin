@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Fri Nov 04, 2011  08:41AM
+" Last Change: Sat Nov 05, 2011  10:39AM
 "
 " Purposes of this file: Create all functions and commands and Set the
 " value of all global variables  and some buffer variables.for r,
@@ -641,15 +641,10 @@ endfunction
 " Function to send commands
 " return 0 on failure and 1 on success
 function SendCmdToR(cmd)
-    " ^K (\013) cleans from cursor to the right and ^U (\025) cleans from
-    " cursor to the left. However, ^U causes a beep if there is nothing to
-    " clean. The solution is to use ^A (\001) to move the cursor to the
-    " beginning of the line before sending ^K. But the control characters may
-    " cause Conque to show the output incompletely.
-    if g:vimrplugin_conqueplugin
-        let cmd = a:cmd
-    else
+    if g:vimrplugin_ca_ck
         let cmd = "\001" . "\013" . a:cmd
+    else
+        let cmd = a:cmd
     endif
 
     if has("gui_win32") && g:vimrplugin_conqueplugin == 0
@@ -2378,6 +2373,17 @@ let g:rplugin_liblist = readfile(g:rplugin_omnifname)
 " Control the menu 'R' and the tool bar buttons
 if !exists("g:rplugin_hasmenu")
     let g:rplugin_hasmenu = 0
+endif
+
+" ^K (\013) cleans from cursor to the right and ^U (\025) cleans from cursor
+" to the left. However, ^U causes a beep if there is nothing to clean. The
+" solution is to use ^A (\001) to move the cursor to the beginning of the line
+" before sending ^K. But the control characters may cause problems in some
+" circumstances.
+if g:vimrplugin_conqueplugin || (g:vimrplugin_screenplugin && g:vimrplugin_tmux == 0)
+    call RSetDefaultValue("g:vimrplugin_ca_ck", 0)
+else
+    call RSetDefaultValue("g:vimrplugin_ca_ck", 1)
 endif
 
 " List of marks that the plugin seeks to find the block to be sent to R

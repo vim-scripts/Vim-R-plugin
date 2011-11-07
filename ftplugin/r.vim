@@ -19,7 +19,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Tue Feb 08, 2011  09:31AM
+" Last Change: Fri Nov 04, 2011  10:02PM
 "
 " Please see doc/r-plugin.txt for usage details.
 "==========================================================================
@@ -31,6 +31,9 @@ endif
 
 " Don't load another plugin for this buffer
 let b:did_r_ftplugin = 1
+
+let s:cpo_save = &cpo
+set cpo&vim
 
 setlocal commentstring=#%s
 setlocal comments=b:#,b:##,b:###
@@ -106,4 +109,7 @@ endif
 
 " Menu R
 call MakeRMenu()
+
+let &cpo = s:cpo_save
+unlet s:cpo_save
 

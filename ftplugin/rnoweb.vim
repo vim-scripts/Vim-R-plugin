@@ -17,7 +17,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "
-" Last Change: Fri Nov 04, 2011  08:38AM
+" Last Change: Fri Nov 04, 2011  08:43PM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -27,6 +27,9 @@ endif
 
 " Don't load another plugin for this buffer
 let b:did_rnoweb_ftplugin = 1
+
+let s:cpo_save = &cpo
+set cpo&vim
 
 " Enables Vim-Latex-Suite if it is installed
 runtime ftplugin/tex_latexSuite.vim
@@ -190,4 +193,7 @@ nmap <buffer> gN :call RnwPreviousChunk()<CR>
 
 " Menu R
 call MakeRMenu()
+
+let &cpo = s:cpo_save
+unlet s:cpo_save
 

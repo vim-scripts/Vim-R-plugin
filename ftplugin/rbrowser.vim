@@ -16,7 +16,7 @@
 "
 " Author: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          
-" Last Change: Sat Mar 19, 2011  10:35AM
+" Last Change: Fri Nov 04, 2011  08:43PM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -26,6 +26,9 @@ endif
 
 " Don't load another plugin for this buffer
 let b:did_ftplugin = 1
+
+let s:cpo_save = &cpo
+set cpo&vim
 
 setlocal noswapfile
 set buftype=nofile
@@ -648,4 +651,7 @@ exe "augroup " . s:thisbuffname
 au BufEnter <buffer> call MakeRBrowserMenu()
 au BufLeave <buffer> call UnMakeRBrowserMenu()
 exe "augroup END"
+
+let &cpo = s:cpo_save
+unlet s:cpo_save
 

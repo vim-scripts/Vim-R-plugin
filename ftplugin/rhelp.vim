@@ -19,7 +19,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Sat Feb 05, 2011  09:18AM
+" Last Change: Fri Nov 04, 2011  08:42PM
 "
 " Please see doc/r-plugin.txt for usage details.
 "==========================================================================
@@ -31,6 +31,9 @@ endif
 
 " Don't load another plugin for this buffer
 let b:did_rhelp_ftplugin = 1
+
+let s:cpo_save = &cpo
+set cpo&vim
 
 " Source scripts common to R, Rnoweb, Rhelp and rdoc files:
 runtime r-plugin/common_global.vim
@@ -89,4 +92,6 @@ call RCreateMaps("nvi", '<Plug>RSetwd',        'rd', ':call RSetWD()')
 " Menu R
 call MakeRMenu()
 
+let &cpo = s:cpo_save
+unlet s:cpo_save
 
