@@ -17,10 +17,10 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Sat Nov 05, 2011  10:39AM
+" Last Change: Thu Nov 10, 2011  11:56AM
 "
-" Purposes of this file: Create all functions and commands and Set the
-" value of all global variables  and some buffer variables.for r,
+" Purposes of this file: Create all functions and commands and set the
+" value of all global variables and some buffer variables.for r,
 " rnoweb, rhelp, rdoc, and rbrowser files
 "
 " Why not an autoload script? Because autoload was designed to store
@@ -1221,7 +1221,7 @@ function SetRTextWidth()
             let min_h = (g:vimrplugin_help_w > 73) ? g:vimrplugin_help_w : 73
 
             if wwidth > (min_e + min_h)
-                " The editor window is large enough to be splitted as either >80+73 or
+                " The editor window is large enough to be split as either >80+73 or
                 " the user defined minimum values
                 let s:hwidth = min_h
             elseif wwidth > (min_e + g:vimrplugin_help_w)
@@ -2075,6 +2075,13 @@ call RSetDefaultValue("g:vimrplugin_vimpager",       "'vertical'")
 call RSetDefaultValue("g:vimrplugin_latexcmd", "'pdflatex'")
 call RSetDefaultValue("g:vimrplugin_objbr_place", "'console,right'")
 
+" ^K (\013) cleans from cursor to the right and ^U (\025) cleans from cursor
+" to the left. However, ^U causes a beep if there is nothing to clean. The
+" solution is to use ^A (\001) to move the cursor to the beginning of the line
+" before sending ^K. But the control characters may cause problems in some
+" circumstances.
+call RSetDefaultValue("g:vimrplugin_ca_ck", 0)
+
 if has("gui_macvim") || has("gui_mac") || has("mac") || has("macunix")
     call RSetDefaultValue("g:vimrplugin_applescript", 1)
 else
@@ -2375,17 +2382,6 @@ if !exists("g:rplugin_hasmenu")
     let g:rplugin_hasmenu = 0
 endif
 
-" ^K (\013) cleans from cursor to the right and ^U (\025) cleans from cursor
-" to the left. However, ^U causes a beep if there is nothing to clean. The
-" solution is to use ^A (\001) to move the cursor to the beginning of the line
-" before sending ^K. But the control characters may cause problems in some
-" circumstances.
-if g:vimrplugin_conqueplugin || (g:vimrplugin_screenplugin && g:vimrplugin_tmux == 0)
-    call RSetDefaultValue("g:vimrplugin_ca_ck", 0)
-else
-    call RSetDefaultValue("g:vimrplugin_ca_ck", 1)
-endif
-
 " List of marks that the plugin seeks to find the block to be sent to R
 let s:all_marks = "abcdefghijklmnopqrstuvwxyz"
 
@@ -2466,3 +2462,4 @@ endif
 if g:vimrplugin_conqueplugin && g:vimrplugin_applescript
     echoerr "Error number 3"
 endif
+
