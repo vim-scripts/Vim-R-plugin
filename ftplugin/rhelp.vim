@@ -19,7 +19,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Fri Nov 04, 2011  08:42PM
+" Last Change: Thu Nov 10, 2011  11:57PM
 "
 " Please see doc/r-plugin.txt for usage details.
 "==========================================================================
@@ -90,7 +90,9 @@ call RControlMaps()
 call RCreateMaps("nvi", '<Plug>RSetwd',        'rd', ':call RSetWD()')
 
 " Menu R
-call MakeRMenu()
+if has("gui")
+    call MakeRMenu()
+endif
 
 let &cpo = s:cpo_save
 unlet s:cpo_save

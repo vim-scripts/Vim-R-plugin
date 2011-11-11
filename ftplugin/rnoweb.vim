@@ -17,7 +17,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "
-" Last Change: Fri Nov 04, 2011  08:43PM
+" Last Change: Thu Nov 10, 2011  11:58PM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -192,7 +192,9 @@ nmap <buffer> gn :call RnwNextChunk()<CR>
 nmap <buffer> gN :call RnwPreviousChunk()<CR>
 
 " Menu R
-call MakeRMenu()
+if has("gui")
+    call MakeRMenu()
+endif
 
 let &cpo = s:cpo_save
 unlet s:cpo_save

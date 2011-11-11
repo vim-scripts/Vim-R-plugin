@@ -491,12 +491,12 @@ classify the objects:
 
 4.5. Commenting and uncommenting lines~
 
-You can toogle the state of a line as either commented or uncommented by
+You can toggle the state of a line as either commented or uncommented by
 typing <LocalLeader>xx.
 
 You can also add comments to the right of a line with the <LocalLeader>;
 shortcut. By default, the comment starts at the 40th column, which can be
-changed by setting the valude of r_indent_comment_column, as below:
+changed by setting the value of r_indent_comment_column, as below:
 >
    let r_indent_comment_column = 20
 <
@@ -546,7 +546,7 @@ useful:
 
     q               : Quit the copy and scroll mode.
     <Space>         : Start text selection.
-    v<Space>        : Start retangular text selection.
+    v<Space>        : Start rectangular text selection.
     <Enter>         : Copy the selection to Tmux paste buffer.
 
 Please, read the manual page of Tmux if you want to change the Tmux
@@ -679,18 +679,7 @@ entire code is sourced, which makes it more difficult to find errors in the
 code sent to R.
 
 
-6.2. GVim's toolbar buttons, menu and title bar blink during omni completion~
-
-The plugin unmakes the R menu and the related toolbar buttons when Vim leaves
-the R buffer. During omni completion, Vim leaves the R buffer and goes to the
-scratch window which is not recognized as an R file type. Consequently, the
-plugin unmakes the toolbar buttons and R related menu items. If you prefer,
-you can use the option |vimrplugin_never_unmake_menu| but, then, the menu and
-tool bar buttons will never be deleted, even if you change from one file type
-to another.
-
-
-6.3. R session is detached when GVim is closed (Linux/Unix only)~
+6.2. R session is detached when GVim is closed (Linux/Unix only)~
 
 If you launch GVim through a custom keyboard shortcut, the problem may be
 solved if you add -f as parameter to GVim. The R session also used to be
@@ -701,38 +690,30 @@ reattach to the R session, open a new terminal window and type:
    screen -r
 <
 
-6.4. The clipboard's content is lost (Windows only)~
+6.3. The clipboard's content is lost (Windows only)~
 
 On Windows, the plugin copies the command that will be sent to R into the
 clipboard.  Thus, if you have anything in the clipboard it will be lost while
 using the plugin.
 
 
-6.5. The buffer name must be in the window title (Windows only)~
+6.4. The buffer name must be in the window title (Windows only)~
 
 On Windows the plugin tries to activate the "R Console" window, paste the
 command that is being sent to R, and, then, activate the GVim window. To
 activate the GVim window the plugin requires that the name of the file being
-edited be in the GVim windows title. This is the default on Vim if you have
-not set the option 'titlestring'.
+edited be in the GVim window title. This is the default if you have not set
+the option 'titlestring'.
 
 
-6.6. The menu may not reflect some of your custom key bindings~
+6.5. The menu may not reflect some of your custom key bindings~
 
 If you have created a custom key binding for the Vim-R-plugin, the menu in
 GVim will not always reflect the correct key binding if it is not the same for
 Normal, Visual and Insert modes.
 
 
-6.7. quit(save = "yes") may not work properly~
-
-If you are using the screen.vim plugin (not running R in an external
-terminal), the R command quit(save = "yes") may not have time enough to save
-the workspace. Vim will sleep for 1 second after the command \rw before
-killing R but this time is not enough for big workspaces.
-
-
-6.8. Syntactically correct code may be wrongly indented~
+6.6. Syntactically correct code may be wrongly indented~
 
 If the Vim-R-plugin indents your code wrongly you may get the correct
 indentation by adding braces and line breaks to it. Example:
@@ -755,7 +736,7 @@ indentation by adding braces and line breaks to it. Example:
     class(x) <- c(if(ordered) "ordered", "factor")
 <
 
-6.9. Commands are sent twice on Mac OS X~
+6.7. Commands are sent twice on Mac OS X~
 
 If you use the screen plugin with GNU Screen, individual lines may be sent
 duplicated to R on Mac OS X.
@@ -1175,10 +1156,7 @@ When one types <C-a> in the R Console the cursor goes to the beginning of the
 line and one types <C-k> the characters to the right of the cursor are
 deleted. Sending <C-a> may be problematic if using GNU Screen in some systems
 and may cause incomplete output when using the Conque Shell plugin. The
-Vim-R-plugin will add <C-a><C-k> to every command, unless
-|vimrplugin_conqueplugin| = 1 or |vimrplugin_screenplugin| = 1 and
-|vimrplugin_tmux| = 0. You can change this behavior by setting the value of
-|vimrplugin_ca_ck| in your |vimrc|. Example:
+Vim-R-plugin will add <C-a><C-k> to every command if you put in your |vimrc|:
 >
    let vimrplugin_ca_ck = 1
 <
@@ -1773,6 +1751,7 @@ the R syntax highlighted.
    the feature).
  * New option (vimrplugin_ca_ck) was created to fix bug reported by Xavier
    Fernández i Marín: spurious ^A^K being added to lines sent to R.
+ * Don't blink the menu and toolbar buttons when doing omni completion.
 
 111014 (2011-10-14)
  * Fixed spell check bug in R documentation files (.Rd).

@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Thu Nov 10, 2011  11:56AM
+" Last Change: Fri Nov 11, 2011  12:11AM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -1591,6 +1591,7 @@ function RBrowserMenu()
         imenu R.Object\ browser.Toggle\ (cur)<Tab>Enter <Esc>:call RBrowserDoubleClick()<CR>
         nmenu R.Object\ browser.Toggle\ (cur)<Tab>Enter :call RBrowserDoubleClick()<CR>
     endif
+    let g:rplugin_hasmenu = 1
 endfunction
 
 function RControlMenu()
@@ -1689,7 +1690,7 @@ function RCreateMaps(type, plug, combo, target)
 endfunction
 
 function MakeRMenu()
-    if g:rplugin_hasmenu == 1 || !has("gui_running")
+    if g:rplugin_hasmenu == 1
         return
     endif
 
@@ -1865,6 +1866,7 @@ function MakeRMenu()
     amenu R.Help\ (plugin).News :help r-plugin-news<CR>
 
     amenu R.Help\ (R) :call SendCmdToR("help.start()")<CR>
+    let g:rplugin_hasmenu = 1
 
     "----------------------------------------------------------------------------
     " ToolBar
@@ -1908,28 +1910,31 @@ function MakeRMenu()
     tmenu ToolBar.RListSpace List objects
     tmenu ToolBar.RClear Clear the console screen
     tmenu ToolBar.RClearAll Remove objects from workspace and clear the console screen
-    let g:rplugin_hasmenu = 1
+    let g:rplugin_hasbuttons = 1
 endfunction
 
 function UnMakeRMenu()
-    if !has("gui_running") || g:rplugin_hasmenu == 0 || g:vimrplugin_never_unmake_menu == 1 || &previewwindow
+    if g:rplugin_hasmenu == 0 || g:vimrplugin_never_unmake_menu == 1 || &previewwindow || (&buftype == "nofile" && &filetype != "conque_term" && &filetype != "rbrowser")
         return
     endif
     aunmenu R
-    aunmenu ToolBar.RClearAll
-    aunmenu ToolBar.RClear
-    aunmenu ToolBar.RListSpace
-    aunmenu ToolBar.RSendLine
-    aunmenu ToolBar.RSendSelection
-    aunmenu ToolBar.RSendParagraph
-    aunmenu ToolBar.RSendFunction
-    aunmenu ToolBar.RSendBlock
-    if &filetype == "r"
-        aunmenu ToolBar.RSendFile
-    endif
-    aunmenu ToolBar.RClose
-    aunmenu ToolBar.RStart
     let g:rplugin_hasmenu = 0
+    if g:rplugin_hasbuttons
+        aunmenu ToolBar.RClearAll
+        aunmenu ToolBar.RClear
+        aunmenu ToolBar.RListSpace
+        aunmenu ToolBar.RSendLine
+        aunmenu ToolBar.RSendSelection
+        aunmenu ToolBar.RSendParagraph
+        aunmenu ToolBar.RSendFunction
+        aunmenu ToolBar.RSendBlock
+        if g:rplugin_lastft == "r"
+            aunmenu ToolBar.RSendFile
+        endif
+        aunmenu ToolBar.RClose
+        aunmenu ToolBar.RStart
+        let g:rplugin_hasbuttons = 0
+    endif
 endfunction
 
 
@@ -2018,8 +2023,19 @@ function RCreateSendMaps()
 endfunction
 
 function RBufEnter()
-    call MakeRMenu()
-    let g:rplugin_curbuf = bufname("%")
+    if &filetype != g:rplugin_lastft
+        call UnMakeRMenu()
+        if &filetype == "r" || &filetype == "rnoweb" || &filetype == "rdoc" || &filetype == "rbrowser" || &filetype == "rhelp"
+            if &filetype == "rbrowser"
+                call MakeRBrowserMenu()
+            else
+                call MakeRMenu()
+            endif
+        endif
+    endif
+    if &buftype != "nofile" || &filetype == "conque_term" || &filetype == "rbrowser"
+        let g:rplugin_lastft = &filetype
+    endif
 endfunction
 
 command RUpdateObjList :call RBuildSyntaxFile("loaded")
@@ -2450,6 +2466,16 @@ endif
 " Override default settings:
 if exists("g:vimrplugin_term_cmd")
     let g:rplugin_termcmd = g:vimrplugin_term_cmd
+endif
+
+augroup RBufControl
+    au BufEnter * let g:rplugin_curbuf = bufname("%")
+augroup END
+
+if has("gui")
+    augroup RMenuControl
+        au BufEnter * call RBufEnter()
+    augroup END
 endif
 
 " Debugging code:

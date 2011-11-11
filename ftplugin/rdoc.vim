@@ -19,7 +19,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Fri Nov 04, 2011  08:42PM
+" Last Change: Thu Nov 10, 2011  11:58PM
 "
 " Please see doc/r-plugin.txt for usage details.
 "==========================================================================
@@ -50,7 +50,9 @@ call RCreateSendMaps()
 call RControlMaps()
 
 " Menu R
-call MakeRMenu()
+if has("gui")
+    call MakeRMenu()
+endif
 
 setlocal bufhidden=wipe
 setlocal noswapfile
