@@ -1,0 +1,229 @@
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# A copy of the GNU General Public License is available at
+# http://www.r-project.org/Licenses/
+
+
+###########################################################
+#   This script builds both the zip and the deb files of  #
+#   released versions of the plugin. The files are        #
+#   created at the /tmp directory.                        #
+###########################################################
+
+
+
+PLUGINHOME=`pwd`
+PLUGINVERSION=`date +%y%m%d`
+DEBIANTIME=`date -R`
+PLUGINDOCVERSION=`date +"%Y-%m-%d"`
+
+zip:
+	# Clean previously created files
+	(cd /tmp ;\
+	    rm -rf vim-r-plugin-tmp/usr/share/vim/addons ;\
+	    mkdir -p vim-r-plugin-tmp/usr/share/vim/addons )
+	rm -f /tmp/vim-r-plugin-$(PLUGINVERSION).zip
+	# To make the distribution version of the plugin the files
+	# functions.vim.vanilla and omniList.vanilla must exist. To generate these
+	# files, the Vim command :RUpdateObjList must be run with R vanilla running
+	# (that is, R with only the default libraries loaded) and, then, the files
+	# functions.vim and omniList must be renamed.
+	( cd r-plugin ;\
+	    mv functions.vim functions.vim.current ;\
+	    mv omniList omniList.current ;\
+	    cp functions.vim.vanilla functions.vim ;\
+	    cp omniList.vanilla omniList )
+	# Update the version date in doc/r-plugin.txt header
+	sed -i -e "s/Version: [0-9][0-9][0-9][0-9][0-9][0-9]/Version: $(PLUGINVERSION)/" doc/r-plugin.txt
+	# Create a tar.gz file
+	tar -cvzf /tmp/vimrplugintmpfile.tar.gz ftdetect/r.vim indent/r.vim \
+	    indent/rnoweb.vim indent/rhelp.vim autoload/rcomplete.vim ftplugin/r*.vim \
+	    syntax/rout.vim syntax/r.vim syntax/rhelp.vim syntax/rdoc.vim syntax/rbrowser.vim \
+	    doc/r-plugin.txt r-plugin/*.R r-plugin/functions.vim \
+	    r-plugin/global_r_plugin.vim r-plugin/omniList r-plugin/windows.py \
+	    r-plugin/vimActivate.js r-plugin/tex_indent.vim r-plugin/r.snippets \
+	    r-plugin/common_buffer.vim r-plugin/common_global.vim \
+	    r-plugin/tmux.conf r-plugin/screenrc r-plugin/screenrc.xterm \
+	    bitmaps/ricon.xbm bitmaps/ricon.png \
+	    bitmaps/RStart.png bitmaps/RStart.bmp \
+	    bitmaps/RClose.png bitmaps/RClose.bmp \
+	    bitmaps/RSendFile.png bitmaps/RSendFile.bmp \
+	    bitmaps/RSendBlock.png bitmaps/RSendBlock.bmp \
+	    bitmaps/RSendFunction.png bitmaps/RSendFunction.bmp \
+	    bitmaps/RSendParagraph.png bitmaps/RSendParagraph.bmp \
+	    bitmaps/RSendSelection.png bitmaps/RSendSelection.bmp \
+	    bitmaps/RSendLine.png bitmaps/RSendLine.bmp \
+	    bitmaps/RListSpace.png bitmaps/RListSpace.bmp \
+	    bitmaps/RClear.png bitmaps/RClear.bmp \
+	    bitmaps/RClearAll.png bitmaps/RClearAll.bmp
+	# Rename the functions.vim and omniList files
+	( cd $(PLUGINHOME)/r-plugin ;\
+	    mv functions.vim.current functions.vim ;\
+	    mv omniList.current omniList )
+	# Unpack the tar.gz and create the zip file
+	(cd /tmp ;\
+	    tar -xvzf vimrplugintmpfile.tar.gz -C vim-r-plugin-tmp/usr/share/vim/addons > /dev/null ;\
+	    rm vimrplugintmpfile.tar.gz )
+	(cd /tmp/vim-r-plugin-tmp/usr/share/vim/addons ;\
+	    chmod +w r-plugin/tex_indent.vim ;\
+	    rm -f /tmp/vim-r-plugin-$(PLUGINVERSION).zip ;\
+	    zip -r /tmp/vim-r-plugin-$(PLUGINVERSION).zip . )
+	# Warn if the date in the doc is outdated
+	-grep $(PLUGINDOCVERSION) doc/r-plugin.txt > /tmp/docdateok
+	if [ "x`cat /tmp/docdateok`" = "x" ] ; then echo "\033[31mYou must update the version date in r-plugin.txt\033[0m" ; fi
+
+deb:
+	# Clean previously created files
+	(cd /tmp ; rm -rf vim-r-plugin-tmp )
+	# Create the directory of a Debian package
+	( cd /tmp ;\
+	    mkdir -p vim-r-plugin-tmp/usr/share/vim/addons ;\
+	    mkdir -p vim-r-plugin-tmp/usr/share/vim/registry ;\
+	    mkdir -p vim-r-plugin-tmp/usr/share/doc/vim-r-plugin )
+	# Create the Debian changelog
+	echo $(DEBCHANGELOG) "vim-r-plugin ($(PLUGINVERSION)-1) unstable; urgency=low\n\
+	\n\
+	  * Initial Release.\n\
+	\n\
+	 -- Jakson Alves de Aquino <jalvesaq@gmail.com>  $(DEBIANTIME)\n\
+	" | gzip --best > /tmp/vim-r-plugin-tmp/usr/share/doc/vim-r-plugin/changelog.gz
+	# Create the yaml script
+	echo "addon: r-plugin\n\
+	    description: \"Filetype plugin to work with R\"\n\
+	    disabledby: \"let disable_r_ftplugin = 1\"\n\
+	    files:\n\
+	    - autoload/rcomplete.vim\n\
+	    - bitmaps/RClose.png\n\
+	    - bitmaps/RClear.png\n\
+	    - bitmaps/RClearAll.png\n\
+	    - bitmaps/RListSpace.png\n\
+	    - bitmaps/RSendBlock.png\n\
+	    - bitmaps/RSendFile.png\n\
+	    - bitmaps/RSendFunction.png\n\
+	    - bitmaps/RSendLine.png\n\
+	    - bitmaps/RSendParagraph.png\n\
+	    - bitmaps/RSendSelection.png\n\
+	    - bitmaps/RStart.png\n\
+	    - bitmaps/ricon.png\n\
+	    - bitmaps/ricon.xbm\n\
+	    - doc/r-plugin.txt\n\
+	    - ftdetect/r.vim\n\
+	    - ftplugin/r.vim\n\
+	    - ftplugin/rbrowser.vim\n\
+	    - ftplugin/rdoc.vim\n\
+	    - ftplugin/rhelp.vim\n\
+	    - ftplugin/rnoweb.vim\n\
+	    - indent/r.vim\n\
+	    - indent/rnoweb.vim\n\
+	    - indent/rhelp.vim\n\
+	    - r-plugin/build_omniList.R\n\
+	    - r-plugin/common_buffer.vim\n\
+	    - r-plugin/common_global.vim\n\
+	    - r-plugin/etags2ctags.R\n\
+	    - r-plugin/global_r_plugin.vim\n\
+	    - r-plugin/specialfuns.R\n\
+	    - r-plugin/tex_indent.vim\n\
+	    - r-plugin/tmux.conf\n\
+	    - r-plugin/screenrc\n\
+	    - r-plugin/screenrc.xterm\n\
+	    - r-plugin/vimbrowser.R\n\
+	    - r-plugin/vimhelp.R\n\
+	    - r-plugin/vimprint.R\n\
+	    - r-plugin/vimSweave.R\n\
+	    - syntax/r.vim\n\
+	    - syntax/rdoc.vim\n\
+	    - syntax/rout.vim\n\
+	    - syntax/rhelp.vim\n\
+	    - syntax/rbrowser.vim\n\
+	    " > /tmp/vim-r-plugin-tmp/usr/share/vim/registry/vim-r-plugin.yaml
+	# Create the copyright
+	echo "Copyright (C) 2011 Jakson Aquino\n\
+	\n\
+	License: GPLv2+\n\
+	\n\
+	This program is free software; you can redistribute it and/or modify\n\
+	it under the terms of the GNU General Public License as published by\n\
+	the Free Software Foundation; either version 2 of the License, or\n\
+	(at your option) any later version.\n\
+	\n\
+	This program is distributed in the hope that it will be useful,\n\
+	but WITHOUT ANY WARRANTY; without even the implied warranty of\n\
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n\
+	GNU General Public License for more details.\n\
+	\n\
+	You should have received a copy of the GNU General Public License\n\
+	along with this program; if not, write to the Free Software\n\
+	Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.\n\
+	\n\
+	See /usr/share/common-licenses/GPL-2, or\n\
+	<http://www.gnu.org/copyleft/gpl.txt> for the terms of the latest version\n\
+	of the GNU General Public License.\n\
+	" > /tmp/vim-r-plugin-tmp/usr/share/doc/vim-r-plugin/copyright
+	unzip /tmp/vim-r-plugin-$(PLUGINVERSION).zip -d /tmp/vim-r-plugin-tmp/usr/share/vim/addons
+	# Delete the files unnecessary in a Debian system
+	(cd /tmp/vim-r-plugin-tmp/usr/share/vim/addons ;\
+	    rm bitmaps/*.bmp r-plugin/windows.py r-plugin/vimActivate.js )
+	# Add a comment to r-plugin.txt
+	(cd /tmp/vim-r-plugin-tmp/usr/share/vim/addons ;\
+	    sed -e 's/3.2.1. Unix (Linux, OS X, etc.)./3.2.1. Unix (Linux, OS X, etc.)~\n\nNote: If the plugin was installed from the Debian package, then the\ninstallation is finished and you should now read sections 3.3 and 3.4./' -i doc/r-plugin.txt )
+	# Create the DEBIAN directory
+	( cd /tmp/vim-r-plugin-tmp ;\
+	    mkdir DEBIAN ;\
+	    INSTALLEDSIZE=`du -s | sed -e 's/\t.*//'` )
+	# Create the control file
+	echo "Package: vim-r-plugin\n\
+	Version: $(PLUGINVERSION)\n\
+	Architecture: all\n\
+	Maintainer: Jakson Alves de Aquino <jalvesaq@gmail.com>\n\
+	Installed-Size: $(INSTALLEDSIZE)\n\
+	Depends: vim | vim-gtk | vim-gnome, screen, tmux (>= 1.5), ncurses-term, vim-addon-manager, r-base-core\n\
+	Enhances: vim\n\
+	Section: text\n\
+	Priority: extra\n\
+	Homepage: http://www.vim.org/scripts/script.php?script_id=2628\n\
+	Description: Plugin to work with R\n\
+	 This filetype plugin has the following main features:\n\
+	       - Start/Close R.\n\
+	       - Send lines, selection, paragraphs, functions, blocks, entire file.\n\
+	       - Send commands with the object under cursor as argument:\n\
+	         help, args, plot, print, str, summary, example, names.\n\
+	       - Support for editing Rnoweb files.\n\
+	       - Omni completion (auto-completion) for R objects.\n\
+	       - Ability to see R documentation in a Vim buffer.\n\
+	       - Object Browser." > /tmp/vim-r-plugin-tmp/DEBIAN/control
+	# Create the md5sum file
+	(cd /tmp/vim-r-plugin-tmp/ ;\
+	    find usr -type f -print0 | xargs -0 md5sum > DEBIAN/md5sums )
+	# Create the posinst and postrm scripts
+	echo '#!/bin/sh\n\
+	set -e\n\
+	\n\
+	helpztags /usr/share/vim/addons/doc\n\
+	\n\
+	exit 0\n\
+	' > /tmp/vim-r-plugin-tmp/DEBIAN/postinst
+	echo '#!/bin/sh\n\
+	set -e\n\
+	\n\
+	helpztags /usr/share/vim/addons/doc\n\
+	\n\
+	exit 0\n\
+	' > /tmp/vim-r-plugin-tmp/DEBIAN/postrm
+	# Fix permissions
+	(cd /tmp/vim-r-plugin-tmp ;\
+	    chmod g-w -R * ;\
+	    chmod +x DEBIAN/postinst DEBIAN/postrm )
+	# Build the Debian package
+	( cd /tmp ;\
+	    fakeroot dpkg-deb -b vim-r-plugin-tmp vim-r-plugin_$(PLUGINVERSION)-1_all.deb )
+
+
