@@ -80,6 +80,7 @@ zip:
 	# Warn if the date in the doc is outdated
 	-grep $(PLUGINDOCVERSION) doc/r-plugin.txt > /tmp/docdateok
 	if [ "x`cat /tmp/docdateok`" = "x" ] ; then echo "\033[31mYou must update the version date in r-plugin.txt\033[0m" ; fi
+	rm /tmp/docdateok
 
 deb:
 	# Clean previously created files
@@ -226,4 +227,10 @@ deb:
 	( cd /tmp ;\
 	    fakeroot dpkg-deb -b vim-r-plugin-tmp vim-r-plugin_$(PLUGINVERSION)-1_all.deb )
 
+htmldoc:
+	(cd doc ;\
+	    /usr/local/share/vim/vim73/doc/vim2html.pl tags r-plugin.txt ;\
+	    mv r-plugin.html /tmp )
+
+all: zip deb htmldoc
 
