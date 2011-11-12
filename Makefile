@@ -25,6 +25,7 @@ PLUGINHOME=`pwd`
 PLUGINVERSION=`date +%y%m%d`
 DEBIANTIME=`date -R`
 PLUGINDOCVERSION=`date +"%Y-%m-%d"`
+VIM2HTML=/usr/local/share/vim/vim73/doc/vim2html.pl 
 
 zip:
 	# Clean previously created files
@@ -229,7 +230,7 @@ deb:
 
 htmldoc:
 	(cd doc ;\
-	    /usr/local/share/vim/vim73/doc/vim2html.pl tags r-plugin.txt ;\
+	    $(VIM2HTML) tags r-plugin.txt ;\
 	    mv r-plugin.html /tmp )
 
 all: zip deb htmldoc
