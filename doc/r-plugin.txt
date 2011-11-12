@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 111104
+Version: 111112
 For Vim version 7.3
 
  1. Overview                                    |r-plugin-overview|
@@ -22,8 +22,9 @@ For Vim version 7.3
 
 
 ==============================================================================
-1. Overview~
 							   *r-plugin-overview*
+1. Overview~
+
 This plugin improves Vim's support for editing R code and makes it possible to
 integrate Vim with R.
 
@@ -44,8 +45,9 @@ to deal with.
 
 
 ==============================================================================
-2. Main features~
 							   *r-plugin-features*
+2. Main features~
+
   * Syntax highlighting for R code, including:
       - Special characters in strings.
       - Functions of all installed packages (must be updated manually).
@@ -78,8 +80,13 @@ to deal with.
 
 
 ==============================================================================
-3. Installation~
 						       *r-plugin-installation*
+3. Installation~
+
+The installation instructions are split in three sections: (1) general
+instructions for all operating systems; (2) instructions that are specific for
+Unix/Linux, OS X or Windows; and (3) troubleshooting.
+
 3.1. General instructions I~
 
 You need to activate plugins and indentation according to 'filetype'. You
@@ -258,8 +265,9 @@ are particularly interesting. Please read |r-plugin-tips| for details.
 
 
 ==============================================================================
-4. Use~
 								*r-plugin-use*
+4. Use~
+
 4.1. Key bindings~
 
 To use the plugin, open a .R or .Rnw or .Rd file with Vim and type \rf
@@ -620,8 +628,8 @@ useful:
 
 
 ==============================================================================
-5. How the plugin works~
 							*r-plugin-functioning*
+5. How the plugin works~
 
 5.1. Omni completion~
 
@@ -668,8 +676,8 @@ behavior and force all Vim buffers to use different R processes see
 
 
 ==============================================================================
-6. Known bugs and workarounds~
 							 *r-plugin-known-bugs*
+6. Known bugs and workarounds~
 
 6.1. R's source() issues~
 
@@ -743,8 +751,9 @@ duplicated to R on Mac OS X.
 
 
 ==============================================================================
-7. Options~
 							    *r-plugin-options*
+7. Options~
+
 |vimrplugin_term|              External terminal to be used
 |vimrplugin_term_cmd|          Complete command to open an external terminal
 |vimrplugin_underscore|        Convert '_' into ' <- '
@@ -1162,8 +1171,9 @@ Vim-R-plugin will add <C-a><C-k> to every command if you put in your |vimrc|:
 <
 
 ==============================================================================
-8. Custom key bindings~
 						       *r-plugin-key-bindings*
+8. Custom key bindings~
+
 When creating custom key bindings for the Vim-R-plugin, it is necessary to
 create three maps for most functions because the way the function is called is
 different in each Vim mode. Thus, key bindings must be made for Normal mode,
@@ -1227,8 +1237,9 @@ and "levels" with the R function that you want to call.
 
 
 ==============================================================================
-9. Files~
 							      *r-plugin-files*
+9. Files~
+
 The following files are part of the plugin and should be in your ~/.vim
 directory after the installation:
 
@@ -1292,8 +1303,9 @@ directory after the installation:
 8 directories, 39 files
 
 ==============================================================================
-10. FAQ and tips~
 							       *r-plugin-tips*
+10. FAQ and tips~
+
 10.1. Is it possible to stop R from within Vim?~
 
 Sorry, it is not possible. You have to press ^C into R's terminal emulator.
@@ -1659,6 +1671,7 @@ file.
 
 
 ==============================================================================
+							     *r-plugin-conque*
 11. Integration with the Conque Shell plugin~
 
 In addition to being integrated with the screen.vim plugin the Vim-R-plugin
@@ -1742,9 +1755,10 @@ the R syntax highlighted.
 
 
 ==============================================================================
-12. News~
 							       *r-plugin-news*
+12. News~
 
+111112 (2011-11-12)
  * Changed key binding for commenting/uncommenting code from \cc to \xx.
  * Added function SendChunkToR() and its corresponding key bindings:
    \cc, \ce, \cd and \ca (thanks to Xavier Fernández i Marín for suggesting
