@@ -231,7 +231,8 @@ deb:
 htmldoc:
 	(cd doc ;\
 	    $(VIM2HTML) tags r-plugin.txt ;\
-	    mv r-plugin.html /tmp )
+	    sed -i -e 's/<code class.*gmail.com.*code>//' r-plugin.html ;\
+	    mv r-plugin.html vim-stylesheet.css /tmp )
 
 all: zip deb htmldoc
 
