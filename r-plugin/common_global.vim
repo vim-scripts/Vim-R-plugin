@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Fri Nov 11, 2011  12:11AM
+" Last Change: Sun Nov 13, 2011  11:14AM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -481,16 +481,38 @@ function StartR(whatr)
             set noautochdir
         endif
     else
-        if g:vimrplugin_noscreenrc == 1
-            let scrrc = " "
+        if g:vimrplugin_tmux
+            if g:vimrplugin_notmuxconf
+                let tmxcnf = " "
+            else
+                let tmxcnf = "-f " . g:rplugin_home . "/r-plugin/tmux.conf"
+            endif
+            call system("tmux has-session -t" . b:screensname)
+            if v:shell_error
+                if g:rplugin_termcmd =~ "gnome-terminal" || g:rplugin_termcmd =~ "xfce4-terminal" || g:rplugin_termcmd =~ "iterm"
+                    let opencmd = printf("%s 'tmux %s new-session -s %s \"%s\"' &", g:rplugin_termcmd, tmxcnf, b:screensname, rcmd)
+                else
+                    let opencmd = printf("%s tmux %s new-session -s %s \"%s\" &", g:rplugin_termcmd, tmxcnf, b:screensname, rcmd)
+                endif
+            else
+                if g:rplugin_termcmd =~ "gnome-terminal" || g:rplugin_termcmd =~ "xfce4-terminal" || g:rplugin_termcmd =~ "iterm"
+                    let opencmd = printf("%s 'tmux %s attach-session -d -t %s' &", g:rplugin_termcmd, tmxcnf, b:screensname)
+                else
+                    let opencmd = printf("%s tmux %s attach-session -d -t %s &", g:rplugin_termcmd, tmxcnf, b:screensname)
+                endif
+            endif
         else
-            let scrrc = RWriteScreenRC()
-        endif
-        " Some terminals want quotes (see screen.vim)
-        if g:rplugin_termcmd =~ "gnome-terminal" || g:rplugin_termcmd =~ "xfce4-terminal" || g:rplugin_termcmd =~ "iterm"
-            let opencmd = printf("%s 'screen %s -d -RR -S %s %s' &", g:rplugin_termcmd, scrrc, b:screensname, rcmd)
-        else
-            let opencmd = printf("%s screen %s -d -RR -S %s %s &", g:rplugin_termcmd, scrrc, b:screensname, rcmd)
+            if g:vimrplugin_noscreenrc == 1
+                let scrrc = " "
+            else
+                let scrrc = RWriteScreenRC()
+            endif
+            " Some terminals want quotes (see screen.vim)
+            if g:rplugin_termcmd =~ "gnome-terminal" || g:rplugin_termcmd =~ "xfce4-terminal" || g:rplugin_termcmd =~ "iterm"
+                let opencmd = printf("%s 'screen %s -d -RR -S %s %s' &", g:rplugin_termcmd, scrrc, b:screensname, rcmd)
+            else
+                let opencmd = printf("%s screen %s -d -RR -S %s %s &", g:rplugin_termcmd, scrrc, b:screensname, rcmd)
+            endif
         endif
         let rlog = system(opencmd)
         if v:shell_error
@@ -733,13 +755,24 @@ function SendCmdToR(cmd)
 
     " Send the command to R running in an external terminal emulator
     let str = substitute(cmd, "'", "'\\\\''", "g")
-    let scmd = 'screen -S ' . b:screensname . " -X stuff '" . str . "\<C-M>'"
-    let rlog = system(scmd)
-    if v:shell_error
-        let rlog = substitute(rlog, '\n', ' ', 'g')
-        let rlog = substitute(rlog, '\r', ' ', 'g')
-        call RWarningMsg(rlog)
-        return 0
+    if g:vimrplugin_tmux
+        let tcmd = 'tmux send-keys -t ' . b:screensname . " '" . str . "\<C-M>'"
+        let rlog = system(tcmd)
+        if v:shell_error
+            let rlog = substitute(rlog, '\n', ' ', 'g')
+            let rlog = substitute(rlog, '\r', ' ', 'g')
+            call RWarningMsg(rlog)
+            return 0
+        endif
+    else
+        let scmd = 'screen -S ' . b:screensname . " -X stuff '" . str . "\<C-M>'"
+        let rlog = system(scmd)
+        if v:shell_error
+            let rlog = substitute(rlog, '\n', ' ', 'g')
+            let rlog = substitute(rlog, '\r', ' ', 'g')
+            call RWarningMsg(rlog)
+            return 0
+        endif
     endif
     return 1
 endfunction
@@ -2064,6 +2097,7 @@ else
 endif
 
 " Variables whose default value is fixed
+call RSetDefaultValue("g:vimrplugin_gvimtmux",          0)
 call RSetDefaultValue("g:vimrplugin_map_r",             0)
 call RSetDefaultValue("g:vimrplugin_open_df",           1)
 call RSetDefaultValue("g:vimrplugin_open_list",         0)
@@ -2169,6 +2203,10 @@ if g:vimrplugin_screenplugin
 
 else
     let g:vimrplugin_tmux = 0
+endif
+
+if g:vimrplugin_gvimtmux
+    let g:vimrplugin_tmux = 1
 endif
 
 if g:vimrplugin_screenplugin

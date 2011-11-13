@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 111112
+Version: 111113
 For Vim version 7.3
 
  1. Overview                                    |r-plugin-overview|
@@ -83,9 +83,9 @@ to deal with.
 						       *r-plugin-installation*
 3. Installation~
 
-The installation instructions are split in three sections: (1) general
+The installation instructions are split in four sections: (1) general
 instructions for all operating systems; (2) instructions that are specific for
-Unix/Linux, OS X or Windows; and (3) troubleshooting.
+either Unix/Linux/OSX or Windows; (3) troubleshooting; and (4) optional steps.
 
 3.1. General instructions I~
 
@@ -230,7 +230,7 @@ read them? Type the command |:messages| in Normal mode to see them again.
 Are you using Debian, Ubuntu or other Debian based Linux distribution? If yes,
 you may prefer to install the Debian package available at:
 
-   https://sites.google.com/site/jalvesaq/vimrplugin
+   http://www.lepem.ufc.br/jaa/vim-r-plugin.html
 
 
 3.4. General instructions II (optional steps)~
@@ -1758,7 +1758,7 @@ the R syntax highlighted.
 							       *r-plugin-news*
 12. News~
 
-111112 (2011-11-12)
+111113 (2011-11-13)
  * Changed key binding for commenting/uncommenting code from \cc to \xx.
  * Added function SendChunkToR() and its corresponding key bindings:
    \cc, \ce, \cd and \ca (thanks to Xavier Fernández i Marín for suggesting
@@ -1766,6 +1766,9 @@ the R syntax highlighted.
  * New option (vimrplugin_ca_ck) was created to fix bug reported by Xavier
    Fernández i Marín: spurious ^A^K being added to lines sent to R.
  * Don't blink the menu and toolbar buttons when doing omni completion.
+ * New experimental feature: when running GVim, run external terminal emulator
+   using Tmux instead of GNU Screen. The option is activated by
+   vimrplugin_gvimtmux.
 
 111014 (2011-10-14)
  * Fixed spell check bug in R documentation files (.Rd).
