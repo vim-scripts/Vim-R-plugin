@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Sun Nov 13, 2011  11:14AM
+" Last Change: Sun Nov 13, 2011  03:12PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -756,7 +756,15 @@ function SendCmdToR(cmd)
     " Send the command to R running in an external terminal emulator
     let str = substitute(cmd, "'", "'\\\\''", "g")
     if g:vimrplugin_tmux
-        let tcmd = 'tmux send-keys -t ' . b:screensname . " '" . str . "\<C-M>'"
+        let tcmd = "tmux set-buffer '" . str . "\<C-M>'"
+        let rlog = system(tcmd)
+        if v:shell_error
+            let rlog = substitute(rlog, '\n', ' ', 'g')
+            let rlog = substitute(rlog, '\r', ' ', 'g')
+            call RWarningMsg(rlog)
+            return 0
+        endif
+        let tcmd = 'tmux paste-buffer -t ' . b:screensname
         let rlog = system(tcmd)
         if v:shell_error
             let rlog = substitute(rlog, '\n', ' ', 'g')
