@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Sun Nov 13, 2011  03:12PM
+" Last Change: Sun Nov 13, 2011  07:54PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -756,31 +756,16 @@ function SendCmdToR(cmd)
     " Send the command to R running in an external terminal emulator
     let str = substitute(cmd, "'", "'\\\\''", "g")
     if g:vimrplugin_tmux
-        let tcmd = "tmux set-buffer '" . str . "\<C-M>'"
-        let rlog = system(tcmd)
-        if v:shell_error
-            let rlog = substitute(rlog, '\n', ' ', 'g')
-            let rlog = substitute(rlog, '\r', ' ', 'g')
-            call RWarningMsg(rlog)
-            return 0
-        endif
-        let tcmd = 'tmux paste-buffer -t ' . b:screensname
-        let rlog = system(tcmd)
-        if v:shell_error
-            let rlog = substitute(rlog, '\n', ' ', 'g')
-            let rlog = substitute(rlog, '\r', ' ', 'g')
-            call RWarningMsg(rlog)
-            return 0
-        endif
+        let scmd = "tmux set-buffer '" . str . "\<C-M>' && tmux paste-buffer -t " . b:screensname
     else
         let scmd = 'screen -S ' . b:screensname . " -X stuff '" . str . "\<C-M>'"
-        let rlog = system(scmd)
-        if v:shell_error
-            let rlog = substitute(rlog, '\n', ' ', 'g')
-            let rlog = substitute(rlog, '\r', ' ', 'g')
-            call RWarningMsg(rlog)
-            return 0
-        endif
+    endif
+    let rlog = system(scmd)
+    if v:shell_error
+        let rlog = substitute(rlog, '\n', ' ', 'g')
+        let rlog = substitute(rlog, '\r', ' ', 'g')
+        call RWarningMsg(rlog)
+        return 0
     endif
     return 1
 endfunction
