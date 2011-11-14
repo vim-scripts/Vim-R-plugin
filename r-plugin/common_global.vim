@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Mon Nov 14, 2011  12:31AM
+" Last Change: Mon Nov 14, 2011  12:53AM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -2160,7 +2160,7 @@ endif
 if g:vimrplugin_applescript == 0 && !has("gui_win32")
     let s:hastmux = executable('tmux')
     let s:hasscreen = executable('screen')
-    if s:hastmux == 0 && s:hasscreen == 0
+    if s:hastmux == 0 && s:hasscreen == 0 && g:vimrplugin_conqueplugin == 0
         call RWarningMsgInp("Please, install the 'Tmux' application to enable the Vim-R-plugin.")
         let g:rplugin_failed = 1
         finish
@@ -2168,7 +2168,7 @@ if g:vimrplugin_applescript == 0 && !has("gui_win32")
     if s:hastmux == 0 && s:hasscreen == 1
         let g:vimrplugin_tmux = 0
     endif
-    if g:vimrplugin_tmux == 0 && s:hasscreen == 0
+    if g:vimrplugin_tmux == 0 && s:hasscreen == 0 && g:vimrplugin_conqueplugin == 0
         call RWarningMsgInp("The value of vimrplugin_tmux = 0 but the GNU Screen application was not found.")
         let g:rplugin_failed = 1
         finish

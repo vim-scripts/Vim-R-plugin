@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 111113
+Version: 111114
 For Vim version 7.3
 
  1. Overview                                    |r-plugin-overview|
@@ -153,7 +153,7 @@ show how the plugin will work on Linux in different conditions:
    ------------------------------    -------------------------------------
    Tmux (external terminal)          default on Linux
    GNU Screen (external terminal)    vimrplugin_tmux = 0 or Tmux not found
-   Conque Shell                      vimrplugin_conqueplugin = 1
+   Conque Shell                      idem and vimrplugin_conqueplugin = 1
 
 
 Note: On Mac OS X the plugin will use AppleScript in both Vim and GVim unless
