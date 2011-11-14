@@ -16,7 +16,7 @@
 "
 " Author: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          
-" Last Change: Sat Mar 19, 2011  10:35AM
+" Last Change: Thu Nov 10, 2011  11:53PM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -26,6 +26,9 @@ endif
 
 " Don't load another plugin for this buffer
 let b:did_ftplugin = 1
+
+let s:cpo_save = &cpo
+set cpo&vim
 
 setlocal noswapfile
 set buftype=nofile
@@ -616,7 +619,7 @@ function! MakeRBrowserMenu()
     call RBrowserMenu()
 endfunction
 
-function! UnMakeRBrowserMenu()
+function! LeaveRBrowser()
     if g:rplugin_curview == "libraries"
         let g:rplugin_curlline = line(".")
         let g:rplugin_curlcol = col(".")
@@ -624,28 +627,28 @@ function! UnMakeRBrowserMenu()
         let g:rplugin_curbline = line(".")
         let g:rplugin_curbcol = col(".")
     endif
-    if !has("gui_running") || g:rplugin_hasmenu == 0 || g:vimrplugin_never_unmake_menu == 1 || &previewwindow
-        return
-    endif
-    aunmenu R
-    let g:rplugin_hasmenu = 0
 endfunction
 
 nmap <buffer> <CR> :call RBrowserDoubleClick()<CR>
 nmap <buffer> <2-LeftMouse> :call RBrowserDoubleClick()<CR>
 nmap <buffer> <RightMouse> :call RBrowserRightClick()<CR>
 
-call RControlMenu()
 call RControlMaps()
-call RBrowserMenu()
 
 setlocal winfixwidth
 setlocal bufhidden=wipe
 
-let s:thisbuffname = substitute(bufname("%"), '\.', '', "g")
-let s:thisbuffname = substitute(s:thisbuffname, ' ', '', "g")
-exe "augroup " . s:thisbuffname
-au BufEnter <buffer> call MakeRBrowserMenu()
-au BufLeave <buffer> call UnMakeRBrowserMenu()
-exe "augroup END"
+if has("gui")
+    call RControlMenu()
+    call RBrowserMenu()
+    let s:thisbuffname = substitute(bufname("%"), '\.', '', "g")
+    let s:thisbuffname = substitute(s:thisbuffname, ' ', '', "g")
+    exe "augroup " . s:thisbuffname
+    au BufLeave <buffer> call LeaveRBrowser()
+    exe "augroup END"
+    unlet s:thisbuffname
+endif
+
+let &cpo = s:cpo_save
+unlet s:cpo_save
 

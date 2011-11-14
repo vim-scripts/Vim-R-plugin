@@ -1,6 +1,6 @@
 This is a mirror of http://www.vim.org/scripts/script.php?script_id=2628
 
-This plugin improves Vim's support for editing R code and makes it possible to integrate Vim with R. The functionality is similar to what you can find in Tinn-R and ESS mode of Emacs. This filetype plugin uses either tmux or screen with the Screen plugin (Linux, OS X, or other Unix, vimscript #2711) or Python (Microsoft Windows) or Apple Script (Mac OS X) to communicate with R. 
+This plugin improves Vim's support for editing R code and makes it possible to integrate Vim with R. The functionality is similar to what you can find in Tinn-R and ESS mode of Emacs. This filetype plugin uses Tmux and the Screen plugin (Linux, OS X, or other Unix, vimscript #2711) or Python (Microsoft Windows) or Apple Script (Mac OS X) to communicate with R. 
 
 Screenshots and Debian package: http://www.lepem.ufc.br/jaa/vim-r-plugin.html
 Development code: https://github.com/jcfaria/Vim-R-plugin
@@ -40,63 +40,11 @@ MAIN FEATURES:
   * Most of the plugin's behavior is customizable.
 
 
-USE: Please, read the plugin's documentation.
+USE:
+
+   See http://www.lepem.ufc.br/jaa/r-plugin.html#r-plugin-use
 
 FILES:
 
-   autoload/rcomplete.vim
-   bitmaps/RClearAll.bmp
-   bitmaps/RClearAll.png
-   bitmaps/RClear.bmp
-   bitmaps/RClear.png
-   bitmaps/RClose.bmp
-   bitmaps/RClose.png
-   bitmaps/ricon.png
-   bitmaps/ricon.xbm
-   bitmaps/RListSpace.bmp
-   bitmaps/RListSpace.png
-   bitmaps/RSendBlock.bmp
-   bitmaps/RSendBlock.png
-   bitmaps/RSendFile.bmp
-   bitmaps/RSendFile.png
-   bitmaps/RSendFunction.bmp
-   bitmaps/RSendFunction.png
-   bitmaps/RSendLine.bmp
-   bitmaps/RSendLine.png
-   bitmaps/RSendParagraph.bmp
-   bitmaps/RSendParagraph.png
-   bitmaps/RSendSelection.bmp
-   bitmaps/RSendSelection.png
-   bitmaps/RStart.bmp
-   bitmaps/RStart.png
-   doc/r-plugin.txt
-   ftdetect/r.vim
-   ftplugin/rhelp.vim
-   ftplugin/rnoweb.vim
-   ftplugin/r.vim
-   ftplugin/rbrowser.vim
-   indent/r.vim
-   indent/rhelp.vim
-   indent/rnoweb.vim
-   r-plugin/build_omniList.R
-   r-plugin/common_buffer.vim
-   r-plugin/common_global.vim
-   r-plugin/etags2ctags.R
-   r-plugin/functions.vim
-   r-plugin/omniList
-   r-plugin/vimbrowser.R
-   r-plugin/vimhelp.R
-   r-plugin/vimprint.R
-   r-plugin/vimSweave.R
-   r-plugin/r.snippets
-   r-plugin/screenrc
-   r-plugin/screenrc.xterm
-   r-plugin/specialfuns.R
-   r-plugin/tex_indent.vim
-   r-plugin/tmux.conf
-   r-plugin/vimActivate.js
-   r-plugin/windows.py
-   syntax/rbrowser.vim
-   syntax/rout.vim
-   syntax/r.vim
+   See http://www.lepem.ufc.br/jaa/r-plugin.html#r-plugin-files
 

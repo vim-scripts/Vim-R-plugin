@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 111014
+Version: 111114
 For Vim version 7.3
 
  1. Overview                                    |r-plugin-overview|
@@ -22,8 +22,9 @@ For Vim version 7.3
 
 
 ==============================================================================
-1. Overview~
 							   *r-plugin-overview*
+1. Overview~
+
 This plugin improves Vim's support for editing R code and makes it possible to
 integrate Vim with R.
 
@@ -44,8 +45,9 @@ to deal with.
 
 
 ==============================================================================
-2. Main features~
 							   *r-plugin-features*
+2. Main features~
+
   * Syntax highlighting for R code, including:
       - Special characters in strings.
       - Functions of all installed packages (must be updated manually).
@@ -78,8 +80,13 @@ to deal with.
 
 
 ==============================================================================
-3. Installation~
 						       *r-plugin-installation*
+3. Installation~
+
+The installation instructions are split in four sections: (1) general
+instructions for all operating systems; (2) instructions that are specific for
+either Unix/Linux/OSX or Windows; (3) troubleshooting; and (4) optional steps.
+
 3.1. General instructions I~
 
 You need to activate plugins and indentation according to 'filetype'. You
@@ -114,38 +121,39 @@ In addition to having R installed in your system, this plugin requires users
 to install:
 
    Tmux >= 1.3:       http://tmux.sourceforge.net
-   GNU Screen:        http://www.gnu.org/s/screen
    screen.vim plugin: http://www.vim.org/scripts/script.php?script_id=2711
    ncurses-term:      http://invisible-island.net/ncurses
 
-   Note: Tmux, GNU Screen and ncurses-term are already packaged for most
-   GNU/Linux distributions and other Unix variants. The library ncurses-term
-   is necessary only for 256 color support in the terminal emulator.
+   Note: Tmux and ncurses-term are already packaged for most GNU/Linux
+   distributions and other Unix variants. The library ncurses-term is
+   necessary only for 256 color support in the terminal emulator.
    Unfortunately their installation instructions vary widely and are beyond
    the scope of this documentation.
 
 If you are using Vim (not GVim), the plugin will run inside a Tmux session. If
-are not already a user of Tmux, please, read the |r-plugin-tmux| section to
-learn a few useful shortcuts. The tmux.conf file that ships with this plugin
-sets Tmux to work with vi key bindings.
+you are not already a user of Tmux, please, read the |r-plugin-tmux| section
+to learn a few useful shortcuts. The tmux.conf file that ships with this
+plugin sets Tmux to work with Vi key bindings.
 
 Note: The plugin can use different mechanisms to send commands to R. The
 mechanism that will be used depends on both what applications and plugins you
 have installed and what options you have in your |vimrc|. The two lists below
 show how the plugin will work on Linux in different conditions:
 
-   Vim                               Condition
+   Vim                               Condition~
    ------------------------------    -------------------------------------
    Screen plugin (Tmux)              default on Linux 
    Screen plugin (GNU Screen)        vimrplugin_tmux = 0 or Tmux not found
-   GNU Screen (external terminal)    vimrplugin_screenplugin = 0
+   Tmux (external terminal)          vimrplugin_screenplugin = 0
+   GNU Screen (external terminal)    vimrplugin_screenplugin = 0 and no Tmux
    Conque Shell                      idem and vimrplugin_conqueplugin = 1
 
 
-   GVim                              Condition
+   GVim                              Condition~
    ------------------------------    -------------------------------------
-   GNU Screen (external terminal)    default on Linux
-   Conque Shell                      vimrplugin_conqueplugin = 1
+   Tmux (external terminal)          default on Linux
+   GNU Screen (external terminal)    vimrplugin_tmux = 0 or Tmux not found
+   Conque Shell                      idem and vimrplugin_conqueplugin = 1
 
 
 Note: On Mac OS X the plugin will use AppleScript in both Vim and GVim unless
@@ -223,7 +231,7 @@ read them? Type the command |:messages| in Normal mode to see them again.
 Are you using Debian, Ubuntu or other Debian based Linux distribution? If yes,
 you may prefer to install the Debian package available at:
 
-   https://sites.google.com/site/jalvesaq/vimrplugin
+   http://www.lepem.ufc.br/jaa/vim-r-plugin.html
 
 
 3.4. General instructions II (optional steps)~
@@ -258,8 +266,9 @@ are particularly interesting. Please read |r-plugin-tips| for details.
 
 
 ==============================================================================
-4. Use~
 								*r-plugin-use*
+4. Use~
+
 4.1. Key bindings~
 
 To use the plugin, open a .R or .Rnw or .Rd file with Vim and type \rf
@@ -288,6 +297,11 @@ Send
   . Block (cur, echo)                                  \be
   . Block (cur, down)                                  \bd
   . Block (cur, echo and down)                         \ba
+  --------------------------------------------------------
+  . Chunk (cur)                                        \cc
+  . Chunk (cur, echo)                                  \ce
+  . Chunk (cur, down)                                  \cd
+  . Chunk (cur, echo and down)                         \ca
   --------------------------------------------------------
   . Function (cur)                                     \ff
   . Function (cur, echo)                               \fe
@@ -342,7 +356,7 @@ Edit
   . Indent (selected lines)                              =
   . Indent (whole buffer)                             gg=G
   --------------------------------------------------------
-  . Comment/Uncomment (line, sel)                      \cc
+  . Comment/Uncomment (line, sel)                      \xx
   . Add/Align right comment (line, sel)                 \;
   --------------------------------------------------------
   . Go (next R chunk)                                   gn
@@ -486,12 +500,12 @@ classify the objects:
 
 4.5. Commenting and uncommenting lines~
 
-You can toogle the state of a line as either commented or uncommented by
-typing <LocalLeader>cc.
+You can toggle the state of a line as either commented or uncommented by
+typing <LocalLeader>xx.
 
 You can also add comments to the right of a line with the <LocalLeader>;
 shortcut. By default, the comment starts at the 40th column, which can be
-changed by setting the valude of r_indent_comment_column, as below:
+changed by setting the value of r_indent_comment_column, as below:
 >
    let r_indent_comment_column = 20
 <
@@ -541,7 +555,7 @@ useful:
 
     q               : Quit the copy and scroll mode.
     <Space>         : Start text selection.
-    v<Space>        : Start retangular text selection.
+    v<Space>        : Start rectangular text selection.
     <Enter>         : Copy the selection to Tmux paste buffer.
 
 Please, read the manual page of Tmux if you want to change the Tmux
@@ -557,11 +571,11 @@ you have to type <C-a>a. You can also set a different escape character in your
 
 With Tmux, you can the detach the Vim-R session and reattach it latter. This
 is useful if you plan to begin the use the Vim-R-plugin in a machine and
-latter move to another another computer. However, normally you will get
-|E325|, caused by the presence of a 'swapfile' (please, read the screen.vim
-plugin documentation, especially the section |screen-gotchas| for details).
-This problem will not happen if you start Vim from within a Tmux session, as
-in the example below.
+latter move to another computer. However, normally you will get |E325|, caused
+by the presence of a 'swapfile' (please, read the screen.vim plugin
+documentation, especially the section |screen-gotchas| for details). This
+problem will not happen if you start Vim from within a Tmux session, as in the
+example below.
 
 A sample detachable session could be:
 
@@ -590,8 +604,8 @@ A sample detachable session could be:
 							     *r-plugin-screen*
 When running Vim in a terminal emulator (Linux/Unix only), the Vim-R-plugin
 will use the screen.vim plugin to restart Vim and start R in a Tmux session.
-However, the plugin will use GNU Screen if Tmux is not installed or you have
-set the value of vimrplugin_tmux = 0 in your |vimrc|.
+However, the plugin will use GNU Screen if Tmux is not installed or if you
+have set the value of vimrplugin_tmux = 0 in your |vimrc|.
 
 You may want to create your own ~/.screenrc to customize GNU Screen behavior.
 The Vim-R-plugin comes with a sample screenrc (at r-plugin directory) that you
@@ -615,8 +629,8 @@ useful:
 
 
 ==============================================================================
-5. How the plugin works~
 							*r-plugin-functioning*
+5. How the plugin works~
 
 5.1. Omni completion~
 
@@ -640,31 +654,30 @@ directory and, thus, is deleted after each reboot. The other file is stored in
 command: |:RUpdateObjList|.
 
 
-5.2. Communication through screen, without the screen plugin (Linux/Unix only)~
+5.2. Communication through Tmux, without the screen plugin (Linux/Unix only)~
 
 Vim and R run as independent processes. The main disadvantage is that we have
 limited communication between the two applications: Vim can send strings to R
-through GNU Screen and R can write files to be read by Vim. That's all. The main
+through Tmux and R can write files to be read by Vim. That's all. The main
 advantage is that Vim's or the plugin's bugs will not affect R.
 
 If the screen.vim plugin is not installed or if you are using GVim, the
-Vim-R-plugin uses GNU Screen to communicate with R. First, the plugin
-initiates a new GNU Screen session and  uses this to start a new R process.
-The plugin's menu options, toolbar buttons and key bindings can then be used
-to communicate with the newly started R process. The plugin sends commands to
-R through GNU Screen. By default, all Vim buffers share the same R process,
-but it is also possible to configure Vim so that each buffer runs its own
-instance of R in a separate terminal emulator. In this case, the GNU Screen
-sessions have unique names. The names are made using the user name and the
-seconds of localtime(). Hence, a name clash is possible if a single user
-starts more than one Vim buffer at the same second. To change the default
-behavior and force all Vim buffers to use different R processes see
-|vimrplugin_single_r|.
+Vim-R-plugin uses Tmux to communicate with R. First, the plugin initiates a
+new Tmux session and  uses this to start a new R process. The plugin's menu
+options, toolbar buttons and key bindings can then be used to communicate with
+the newly started R process. The plugin sends commands to R through Tmux. By
+default, all Vim buffers share the same R process, but it is also possible to
+configure Vim so that each buffer runs its own instance of R in a separate
+terminal emulator. In this case, the Tmux sessions have unique names. The
+names are made using the user name and the seconds of localtime(). Hence, a
+name clash is possible if a single user starts more than one Vim buffer at the
+same second. To change the default behavior and force all Vim buffers to use
+different R processes see |vimrplugin_single_r|.
 
 
 ==============================================================================
-6. Known bugs and workarounds~
 							 *r-plugin-known-bugs*
+6. Known bugs and workarounds~
 
 6.1. R's source() issues~
 
@@ -674,18 +687,7 @@ entire code is sourced, which makes it more difficult to find errors in the
 code sent to R.
 
 
-6.2. GVim's toolbar buttons, menu and title bar blink during omni completion~
-
-The plugin unmakes the R menu and the related toolbar buttons when Vim leaves
-the R buffer. During omni completion, Vim leaves the R buffer and goes to the
-scratch window which is not recognized as an R file type. Consequently, the
-plugin unmakes the toolbar buttons and R related menu items. If you prefer,
-you can use the option |vimrplugin_never_unmake_menu| but, then, the menu and
-tool bar buttons will never be deleted, even if you change from one file type
-to another.
-
-
-6.3. R session is detached when GVim is closed (Linux/Unix only)~
+6.2. R session is detached when GVim is closed (Linux/Unix only)~
 
 If you launch GVim through a custom keyboard shortcut, the problem may be
 solved if you add -f as parameter to GVim. The R session also used to be
@@ -696,38 +698,30 @@ reattach to the R session, open a new terminal window and type:
    screen -r
 <
 
-6.4. The clipboard's content is lost (Windows only)~
+6.3. The clipboard's content is lost (Windows only)~
 
 On Windows, the plugin copies the command that will be sent to R into the
 clipboard.  Thus, if you have anything in the clipboard it will be lost while
 using the plugin.
 
 
-6.5. The buffer name must be in the window title (Windows only)~
+6.4. The buffer name must be in the window title (Windows only)~
 
 On Windows the plugin tries to activate the "R Console" window, paste the
 command that is being sent to R, and, then, activate the GVim window. To
 activate the GVim window the plugin requires that the name of the file being
-edited be in the GVim windows title. This is the default on Vim if you have
-not set the option 'titlestring'.
+edited be in the GVim window title. This is the default if you have not set
+the option 'titlestring'.
 
 
-6.6. The menu may not reflect some of your custom key bindings~
+6.5. The menu may not reflect some of your custom key bindings~
 
 If you have created a custom key binding for the Vim-R-plugin, the menu in
 GVim will not always reflect the correct key binding if it is not the same for
 Normal, Visual and Insert modes.
 
 
-6.7. quit(save = "yes") may not work properly~
-
-If you are using the screen.vim plugin (not running R in an external
-terminal), the R command quit(save = "yes") may not have time enough to save
-the workspace. Vim will sleep for 1 second after the command \rw before
-killing R but this time is not enough for big workspaces.
-
-
-6.8. Syntactically correct code may be wrongly indented~
+6.6. Syntactically correct code may be wrongly indented~
 
 If the Vim-R-plugin indents your code wrongly you may get the correct
 indentation by adding braces and line breaks to it. Example:
@@ -750,15 +744,16 @@ indentation by adding braces and line breaks to it. Example:
     class(x) <- c(if(ordered) "ordered", "factor")
 <
 
-6.9. Commands are sent twice on Mac OS X~
+6.7. Commands are sent twice on Mac OS X~
 
 If you use the screen plugin with GNU Screen, individual lines may be sent
 duplicated to R on Mac OS X.
 
 
 ==============================================================================
-7. Options~
 							    *r-plugin-options*
+7. Options~
+
 |vimrplugin_term|              External terminal to be used
 |vimrplugin_term_cmd|          Complete command to open an external terminal
 |vimrplugin_underscore|        Convert '_' into ' <- '
@@ -776,7 +771,7 @@ duplicated to R on Mac OS X.
 |vimrplugin_buildwait|         Time to wait for :RUpdateObjList to finish
 |vimrplugin_routmorecolors|    More syntax highlighting in R output
 |vimrplugin_routnotab|         Show output of R CMD BATCH in new window
-|vimrplugin_indent_commented|  Indent lines commented with the \cc command
+|vimrplugin_indent_commented|  Indent lines commented with the \xx command
 |vimrplugin_sleeptime|         Delay while sending commands in MS Windows
 |vimrplugin_noscreenrc|        Do not write custom screenrc
 |vimrplugin_screenplugin|      Use the screen.vim plugin
@@ -793,6 +788,7 @@ duplicated to R on Mac OS X.
 |vimrplugin_sweaveargs|        Arguments do Sweave()
 |vimrplugin_never_unmake_menu| Do not unmake the menu when switching buffers
 |vimrplugin_map_r|             Use 'r' to send lines and selected text
+|vimrplugin_ca_ck|             Add ^A^K to the beginning of commands.
 
 
 7.1. Terminal emulator (Linux/Unix only)~
@@ -890,11 +886,11 @@ document.
 
 The valid values of vimrplugin_vimpager are:
    
-   "horizontal": Split the window horizontally.
    "vertical"  : Split the window vertically if the editor width is large
 		 enough; otherwise, split the window horizontally and attempt
 		 to set the window height to at least 20 lines.
 		 This is the default.
+   "horizontal": Split the window horizontally.
    "tab"       : Show the help document in a new tab. If there is already a
                  tab with an R help document, use it.
    "tabnew"    : Show the help document in a new tab.
@@ -930,7 +926,7 @@ code to other R processes then put the following in your |vimrc|:
 >
 The |vimrplugin_by_vim_instance| option requires that Vim is acting as a
 command server because the variable |v:servername| is used to make the name of
-the GNU Screen session which will run R. By default, GVim runs as server, but Vim
+the Tmux session which will run R. By default, GVim runs as server, but Vim
 does not. Hence, if you are using Vim you have either to start Vim with the
 argument --servername or use the screen.vim plugin which tries to restart Vim
 with the --servername argument. If you want to use more than nine GVim
@@ -1008,7 +1004,7 @@ a new split window, put in your |vimrc|:
 
 7.12. Indent commented lines~
 						 *vimrplugin_indent_commented*
-You can type \cc (where "\" is the <LocalLeader>) to comment out a line or
+You can type \xx (where "\" is the <LocalLeader>) to comment out a line or
 selected lines. If the line already starts with a comment string, it will be
 removed. After adding the comment string, the line will be reindented by
 default. To turn off the automatic indentation, put in your |vimrc|:
@@ -1038,24 +1034,24 @@ example show how to adjust the value of sleeptime in your |vimrc|:
 7.14. Tmux and Screen configuration (Linux/Unix only)~
 						       *vimrplugin_noscreenrc*
 						       *vimrplugin_notmuxconf*
-GVim (or Vim running R in an external terminal emulator) runs GNU Screen with
-a specially built configuration file. If you want to use your own ~/.screenrc,
+GVim (or Vim running R in an external terminal emulator) runs Tmux with a
+specially built configuration file. If you want to use your own ~/.tmux.conf,
 put in your |vimrc|:
 >
-   let vimrplugin_noscreenrc = 1
-<
-If you want to use your own ~/.tmux.conf, put in your vimrc:
->
    let vimrplugin_notmuxconf = 1
+<
+If you want to use your own ~/.screenrc, put in your vimrc:
+>
+   let vimrplugin_noscreenrc = 1
 <
 
 7.15. Integration with screen.vim plugin (Linux/Unix only)~
 						     *vimrplugin_screenplugin*
 						     *vimrplugin_screenvsplit*
 							     *vimrplugin_tmux*
-The screen.vim plugin supports both screen and Tmux, but only Tmux allows you
-to split the terminal vertically (that is, to have the panels side by side).
-Please read |screen-intro| and |screen-shell-vertical| for details.  By
+The screen.vim plugin supports both GNU Screen and Tmux, but only Tmux allows
+you to split the terminal vertically (that is, to have the panels side by
+side). Please read |screen-intro| and |screen-shell-vertical| for details.  By
 default, the Vim-R-plugin will tell the screen.vim plugin to split the
 terminal horizontally. If you prefer to split it vertically put in your
 |vimrc|:
@@ -1065,9 +1061,9 @@ terminal horizontally. If you prefer to split it vertically put in your
 <
 By default, when running in a terminal emulator, the Vim-R-plugin uses the
 screen.vim plugin if it is installed and, by default, it will use Tmux instead
-of GNU Screen. Tmux was chosen as default because it may be split vertically
-and its regions are easier to resize. If both GNU Screen and Tmux are
-installed but you prefer to use the GNU Screen application, put in your
+of GNU Screen. Tmux was chosen as default because it may split the terminal
+vertically and its regions are easier to resize. If both GNU Screen and Tmux
+are installed but you prefer to use the GNU Screen application, put in your
 |vimrc|:
 >
    let vimrplugin_tmux = 0
@@ -1163,9 +1159,22 @@ Emacs:
    set tabstop=8
 <
 
+7.23. Add ^A^K to the beginning of commands~
+							    *vimrplugin_ca_ck*
+When one types <C-a> in the R Console the cursor goes to the beginning of the
+line and one types <C-k> the characters to the right of the cursor are
+deleted. Sending <C-a> may be problematic if using either Tmux or GNU Screen
+in some systems and may cause incomplete output when using the Conque Shell
+plugin. The Vim-R-plugin will add <C-a><C-k> to every command if you put in
+your |vimrc|:
+>
+   let vimrplugin_ca_ck = 1
+<
+
 ==============================================================================
-8. Custom key bindings~
 						       *r-plugin-key-bindings*
+8. Custom key bindings~
+
 When creating custom key bindings for the Vim-R-plugin, it is necessary to
 create three maps for most functions because the way the function is called is
 different in each Vim mode. Thus, key bindings must be made for Normal mode,
@@ -1184,22 +1193,23 @@ Only the custom key bindings for Normal mode are shown in Vim's menu, but you
 can type |:map| to see the complete list of current mappings, and below is the
 list of the names for custom key bindings:
 >
-   RBibTeX                    RESendFile                  RSendFunction
-   RCommentLine               RESendFunction              RSendLAndOpenNewOne
-   RClearAll                  RESendMBlock                RSendLine
-   RClearConsole              RESendParagraph             RSendMBlock
-   RClose                     RESendSelection             RSendParagraph
-   RCustomStart               RHelp                       RSendSelection
-   RDSendFunction             RListSpace                  RSetwd
-   RDSendLine                 RMakePDF                    RShowArgs
-   RDSendMBlock               RObjectNames                RShowEx
-   RDSendParagraph            RObjectPr                   RShowRout
-   RDSendSelection            RObjectStr                  RStart
-   REDSendFunction            RPlot                       RSummary
-   REDSendMBlock              RSPlot                      RSweave
-   REDSendParagraph           RSaveClose                  RUpdateObjBrowser
-   REDSendSelection           RSendFile                   RVanillaStart
-
+   RBibTeX                   RSendChunk               RObjectNames
+   RClearAll                 RDSendChunk              RObjectPr
+   RClearConsole             RESendChunk              RObjectStr
+   RClose                    REDSendChunk             RPlot
+   RCommentLine              RSendParagraph           RSPlot
+   RCustomStart              RDSendParagraph          RSaveClose
+   RSendFunction             RESendParagraph          RSetwd
+   RDSendFunction            REDSendParagraph         RShowArgs
+   RESendFunction            RSendSelection           RShowEx
+   REDSendFunction           RDSendSelection          RShowRout
+   RSendLine                 RESendSelection          RStart
+   RDSendLine                REDSendSelection         RSummary
+   RSendLAndOpenNewOne       RSendFile                RSweave
+   RSendMBlock               RESendFile               RUpdateObjBrowser
+   RDSendMBlock              RHelp                    RVanillaStart
+   RESendMBlock              RListSpace
+   REDSendMBlock             RMakePDF
 <
 The plugin also contains a function called RAction which allows you to build
 ad-hoc commands to R. This function takes the name of an R function such as
@@ -1228,8 +1238,9 @@ and "levels" with the R function that you want to call.
 
 
 ==============================================================================
-9. Files~
 							      *r-plugin-files*
+9. Files~
+
 The following files are part of the plugin and should be in your ~/.vim
 directory after the installation:
 
@@ -1293,8 +1304,9 @@ directory after the installation:
 8 directories, 39 files
 
 ==============================================================================
-10. FAQ and tips~
 							       *r-plugin-tips*
+10. FAQ and tips~
+
 10.1. Is it possible to stop R from within Vim?~
 
 Sorry, it is not possible. You have to press ^C into R's terminal emulator.
@@ -1660,6 +1672,7 @@ file.
 
 
 ==============================================================================
+							     *r-plugin-conque*
 11. Integration with the Conque Shell plugin~
 
 In addition to being integrated with the screen.vim plugin the Vim-R-plugin
@@ -1743,8 +1756,18 @@ the R syntax highlighted.
 
 
 ==============================================================================
-12. News~
 							       *r-plugin-news*
+12. News~
+
+111114 (2011-11-14)
+ * Changed key binding for commenting/uncommenting code from \cc to \xx.
+ * Added function SendChunkToR() and its corresponding key bindings:
+   \cc, \ce, \cd and \ca (thanks to Xavier Fernández i Marín for suggesting
+   the feature).
+ * New option (vimrplugin_ca_ck) was created to fix bug reported by Xavier
+   Fernández i Marín: spurious ^A^K being added to lines sent to R.
+ * Don't blink the menu and toolbar buttons when doing omni completion.
+ * Use Tmux to run R in an external terminal emulator.
 
 111014 (2011-10-14)
  * Fixed spell check bug in R documentation files (.Rd).
