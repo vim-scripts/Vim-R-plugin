@@ -100,53 +100,53 @@ deb:
 	" | gzip --best > /tmp/vim-r-plugin-tmp/usr/share/doc/vim-r-plugin/changelog.gz
 	# Create the yaml script
 	echo "addon: r-plugin\n\
-	    description: \"Filetype plugin to work with R\"\n\
-	    disabledby: \"let disable_r_ftplugin = 1\"\n\
-	    files:\n\
-	    - autoload/rcomplete.vim\n\
-	    - bitmaps/RClose.png\n\
-	    - bitmaps/RClear.png\n\
-	    - bitmaps/RClearAll.png\n\
-	    - bitmaps/RListSpace.png\n\
-	    - bitmaps/RSendBlock.png\n\
-	    - bitmaps/RSendFile.png\n\
-	    - bitmaps/RSendFunction.png\n\
-	    - bitmaps/RSendLine.png\n\
-	    - bitmaps/RSendParagraph.png\n\
-	    - bitmaps/RSendSelection.png\n\
-	    - bitmaps/RStart.png\n\
-	    - bitmaps/ricon.png\n\
-	    - bitmaps/ricon.xbm\n\
-	    - doc/r-plugin.txt\n\
-	    - ftdetect/r.vim\n\
-	    - ftplugin/r.vim\n\
-	    - ftplugin/rbrowser.vim\n\
-	    - ftplugin/rdoc.vim\n\
-	    - ftplugin/rhelp.vim\n\
-	    - ftplugin/rnoweb.vim\n\
-	    - indent/r.vim\n\
-	    - indent/rnoweb.vim\n\
-	    - indent/rhelp.vim\n\
-	    - r-plugin/build_omniList.R\n\
-	    - r-plugin/common_buffer.vim\n\
-	    - r-plugin/common_global.vim\n\
-	    - r-plugin/etags2ctags.R\n\
-	    - r-plugin/global_r_plugin.vim\n\
-	    - r-plugin/specialfuns.R\n\
-	    - r-plugin/tex_indent.vim\n\
-	    - r-plugin/tmux.conf\n\
-	    - r-plugin/screenrc\n\
-	    - r-plugin/screenrc.xterm\n\
-	    - r-plugin/vimbrowser.R\n\
-	    - r-plugin/vimhelp.R\n\
-	    - r-plugin/vimprint.R\n\
-	    - r-plugin/vimSweave.R\n\
-	    - syntax/r.vim\n\
-	    - syntax/rdoc.vim\n\
-	    - syntax/rout.vim\n\
-	    - syntax/rhelp.vim\n\
-	    - syntax/rbrowser.vim\n\
-	    " > /tmp/vim-r-plugin-tmp/usr/share/vim/registry/vim-r-plugin.yaml
+	description: \"Filetype plugin to work with R\"\n\
+	disabledby: \"let disable_r_ftplugin = 1\"\n\
+	files:\n\
+	  - autoload/rcomplete.vim\n\
+	  - bitmaps/RClose.png\n\
+	  - bitmaps/RClear.png\n\
+	  - bitmaps/RClearAll.png\n\
+	  - bitmaps/RListSpace.png\n\
+	  - bitmaps/RSendBlock.png\n\
+	  - bitmaps/RSendFile.png\n\
+	  - bitmaps/RSendFunction.png\n\
+	  - bitmaps/RSendLine.png\n\
+	  - bitmaps/RSendParagraph.png\n\
+	  - bitmaps/RSendSelection.png\n\
+	  - bitmaps/RStart.png\n\
+	  - bitmaps/ricon.png\n\
+	  - bitmaps/ricon.xbm\n\
+	  - doc/r-plugin.txt\n\
+	  - ftdetect/r.vim\n\
+	  - ftplugin/r.vim\n\
+	  - ftplugin/rbrowser.vim\n\
+	  - ftplugin/rdoc.vim\n\
+	  - ftplugin/rhelp.vim\n\
+	  - ftplugin/rnoweb.vim\n\
+	  - indent/r.vim\n\
+	  - indent/rnoweb.vim\n\
+	  - indent/rhelp.vim\n\
+	  - r-plugin/build_omniList.R\n\
+	  - r-plugin/common_buffer.vim\n\
+	  - r-plugin/common_global.vim\n\
+	  - r-plugin/etags2ctags.R\n\
+	  - r-plugin/global_r_plugin.vim\n\
+	  - r-plugin/specialfuns.R\n\
+	  - r-plugin/tex_indent.vim\n\
+	  - r-plugin/tmux.conf\n\
+	  - r-plugin/screenrc\n\
+	  - r-plugin/screenrc.xterm\n\
+	  - r-plugin/vimbrowser.R\n\
+	  - r-plugin/vimhelp.R\n\
+	  - r-plugin/vimprint.R\n\
+	  - r-plugin/vimSweave.R\n\
+	  - syntax/r.vim\n\
+	  - syntax/rdoc.vim\n\
+	  - syntax/rout.vim\n\
+	  - syntax/rhelp.vim\n\
+	  - syntax/rbrowser.vim\n\
+	" > /tmp/vim-r-plugin-tmp/usr/share/vim/registry/vim-r-plugin.yaml
 	# Create the copyright
 	echo "Copyright (C) 2011 Jakson Aquino\n\
 	\n\
