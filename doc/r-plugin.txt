@@ -121,37 +121,38 @@ In addition to having R installed in your system, this plugin requires users
 to install:
 
    Tmux >= 1.3:       http://tmux.sourceforge.net
-   GNU Screen:        http://www.gnu.org/s/screen
    screen.vim plugin: http://www.vim.org/scripts/script.php?script_id=2711
    ncurses-term:      http://invisible-island.net/ncurses
 
-   Note: Tmux, GNU Screen and ncurses-term are already packaged for most
-   GNU/Linux distributions and other Unix variants. The library ncurses-term
-   is necessary only for 256 color support in the terminal emulator.
+   Note: Tmux and ncurses-term are already packaged for most GNU/Linux
+   distributions and other Unix variants. The library ncurses-term is
+   necessary only for 256 color support in the terminal emulator.
    Unfortunately their installation instructions vary widely and are beyond
    the scope of this documentation.
 
 If you are using Vim (not GVim), the plugin will run inside a Tmux session. If
-are not already a user of Tmux, please, read the |r-plugin-tmux| section to
-learn a few useful shortcuts. The tmux.conf file that ships with this plugin
-sets Tmux to work with vi key bindings.
+you are not already a user of Tmux, please, read the |r-plugin-tmux| section
+to learn a few useful shortcuts. The tmux.conf file that ships with this
+plugin sets Tmux to work with Vi key bindings.
 
 Note: The plugin can use different mechanisms to send commands to R. The
 mechanism that will be used depends on both what applications and plugins you
 have installed and what options you have in your |vimrc|. The two lists below
 show how the plugin will work on Linux in different conditions:
 
-   Vim                               Condition
+   Vim                               Condition~
    ------------------------------    -------------------------------------
    Screen plugin (Tmux)              default on Linux 
    Screen plugin (GNU Screen)        vimrplugin_tmux = 0 or Tmux not found
-   GNU Screen (external terminal)    vimrplugin_screenplugin = 0
+   Tmux (external terminal)          vimrplugin_screenplugin = 0
+   GNU Screen (external terminal)    vimrplugin_screenplugin = 0 and no Tmux
    Conque Shell                      idem and vimrplugin_conqueplugin = 1
 
 
-   GVim                              Condition
+   GVim                              Condition~
    ------------------------------    -------------------------------------
-   GNU Screen (external terminal)    default on Linux
+   Tmux (external terminal)          default on Linux
+   GNU Screen (external terminal)    vimrplugin_tmux = 0 or Tmux not found
    Conque Shell                      vimrplugin_conqueplugin = 1
 
 
@@ -603,8 +604,8 @@ A sample detachable session could be:
 							     *r-plugin-screen*
 When running Vim in a terminal emulator (Linux/Unix only), the Vim-R-plugin
 will use the screen.vim plugin to restart Vim and start R in a Tmux session.
-However, the plugin will use GNU Screen if Tmux is not installed or you have
-set the value of vimrplugin_tmux = 0 in your |vimrc|.
+However, the plugin will use GNU Screen if Tmux is not installed or if you
+have set the value of vimrplugin_tmux = 0 in your |vimrc|.
 
 You may want to create your own ~/.screenrc to customize GNU Screen behavior.
 The Vim-R-plugin comes with a sample screenrc (at r-plugin directory) that you
@@ -653,26 +654,25 @@ directory and, thus, is deleted after each reboot. The other file is stored in
 command: |:RUpdateObjList|.
 
 
-5.2. Communication through screen, without the screen plugin (Linux/Unix only)~
+5.2. Communication through Tmux, without the screen plugin (Linux/Unix only)~
 
 Vim and R run as independent processes. The main disadvantage is that we have
 limited communication between the two applications: Vim can send strings to R
-through GNU Screen and R can write files to be read by Vim. That's all. The main
+through Tmux and R can write files to be read by Vim. That's all. The main
 advantage is that Vim's or the plugin's bugs will not affect R.
 
 If the screen.vim plugin is not installed or if you are using GVim, the
-Vim-R-plugin uses GNU Screen to communicate with R. First, the plugin
-initiates a new GNU Screen session and  uses this to start a new R process.
-The plugin's menu options, toolbar buttons and key bindings can then be used
-to communicate with the newly started R process. The plugin sends commands to
-R through GNU Screen. By default, all Vim buffers share the same R process,
-but it is also possible to configure Vim so that each buffer runs its own
-instance of R in a separate terminal emulator. In this case, the GNU Screen
-sessions have unique names. The names are made using the user name and the
-seconds of localtime(). Hence, a name clash is possible if a single user
-starts more than one Vim buffer at the same second. To change the default
-behavior and force all Vim buffers to use different R processes see
-|vimrplugin_single_r|.
+Vim-R-plugin uses Tmux to communicate with R. First, the plugin initiates a
+new Tmux session and  uses this to start a new R process. The plugin's menu
+options, toolbar buttons and key bindings can then be used to communicate with
+the newly started R process. The plugin sends commands to R through Tmux. By
+default, all Vim buffers share the same R process, but it is also possible to
+configure Vim so that each buffer runs its own instance of R in a separate
+terminal emulator. In this case, the Tmux sessions have unique names. The
+names are made using the user name and the seconds of localtime(). Hence, a
+name clash is possible if a single user starts more than one Vim buffer at the
+same second. To change the default behavior and force all Vim buffers to use
+different R processes see |vimrplugin_single_r|.
 
 
 ==============================================================================
@@ -926,7 +926,7 @@ code to other R processes then put the following in your |vimrc|:
 >
 The |vimrplugin_by_vim_instance| option requires that Vim is acting as a
 command server because the variable |v:servername| is used to make the name of
-the GNU Screen session which will run R. By default, GVim runs as server, but Vim
+the Tmux session which will run R. By default, GVim runs as server, but Vim
 does not. Hence, if you are using Vim you have either to start Vim with the
 argument --servername or use the screen.vim plugin which tries to restart Vim
 with the --servername argument. If you want to use more than nine GVim
@@ -1034,24 +1034,24 @@ example show how to adjust the value of sleeptime in your |vimrc|:
 7.14. Tmux and Screen configuration (Linux/Unix only)~
 						       *vimrplugin_noscreenrc*
 						       *vimrplugin_notmuxconf*
-GVim (or Vim running R in an external terminal emulator) runs GNU Screen with
-a specially built configuration file. If you want to use your own ~/.screenrc,
+GVim (or Vim running R in an external terminal emulator) runs Tmux with a
+specially built configuration file. If you want to use your own ~/.tmux.conf,
 put in your |vimrc|:
 >
-   let vimrplugin_noscreenrc = 1
-<
-If you want to use your own ~/.tmux.conf, put in your vimrc:
->
    let vimrplugin_notmuxconf = 1
+<
+If you want to use your own ~/.screenrc, put in your vimrc:
+>
+   let vimrplugin_noscreenrc = 1
 <
 
 7.15. Integration with screen.vim plugin (Linux/Unix only)~
 						     *vimrplugin_screenplugin*
 						     *vimrplugin_screenvsplit*
 							     *vimrplugin_tmux*
-The screen.vim plugin supports both screen and Tmux, but only Tmux allows you
-to split the terminal vertically (that is, to have the panels side by side).
-Please read |screen-intro| and |screen-shell-vertical| for details.  By
+The screen.vim plugin supports both GNU Screen and Tmux, but only Tmux allows
+you to split the terminal vertically (that is, to have the panels side by
+side). Please read |screen-intro| and |screen-shell-vertical| for details.  By
 default, the Vim-R-plugin will tell the screen.vim plugin to split the
 terminal horizontally. If you prefer to split it vertically put in your
 |vimrc|:
@@ -1061,9 +1061,9 @@ terminal horizontally. If you prefer to split it vertically put in your
 <
 By default, when running in a terminal emulator, the Vim-R-plugin uses the
 screen.vim plugin if it is installed and, by default, it will use Tmux instead
-of GNU Screen. Tmux was chosen as default because it may be split vertically
-and its regions are easier to resize. If both GNU Screen and Tmux are
-installed but you prefer to use the GNU Screen application, put in your
+of GNU Screen. Tmux was chosen as default because it may split the terminal
+vertically and its regions are easier to resize. If both GNU Screen and Tmux
+are installed but you prefer to use the GNU Screen application, put in your
 |vimrc|:
 >
    let vimrplugin_tmux = 0
@@ -1163,9 +1163,10 @@ Emacs:
 							    *vimrplugin_ca_ck*
 When one types <C-a> in the R Console the cursor goes to the beginning of the
 line and one types <C-k> the characters to the right of the cursor are
-deleted. Sending <C-a> may be problematic if using GNU Screen in some systems
-and may cause incomplete output when using the Conque Shell plugin. The
-Vim-R-plugin will add <C-a><C-k> to every command if you put in your |vimrc|:
+deleted. Sending <C-a> may be problematic if using either Tmux or GNU Screen
+in some systems and may cause incomplete output when using the Conque Shell
+plugin. The Vim-R-plugin will add <C-a><C-k> to every command if you put in
+your |vimrc|:
 >
    let vimrplugin_ca_ck = 1
 <
@@ -1758,7 +1759,7 @@ the R syntax highlighted.
 							       *r-plugin-news*
 12. News~
 
-111113 (2011-11-13)
+111114 (2011-11-14)
  * Changed key binding for commenting/uncommenting code from \cc to \xx.
  * Added function SendChunkToR() and its corresponding key bindings:
    \cc, \ce, \cd and \ca (thanks to Xavier Fernández i Marín for suggesting
@@ -1766,9 +1767,7 @@ the R syntax highlighted.
  * New option (vimrplugin_ca_ck) was created to fix bug reported by Xavier
    Fernández i Marín: spurious ^A^K being added to lines sent to R.
  * Don't blink the menu and toolbar buttons when doing omni completion.
- * New experimental feature: when running GVim, run external terminal emulator
-   using Tmux instead of GNU Screen. The option is activated by
-   vimrplugin_gvimtmux.
+ * Use Tmux to run R in an external terminal emulator.
 
 111014 (2011-10-14)
  * Fixed spell check bug in R documentation files (.Rd).

@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Sun Nov 13, 2011  07:54PM
+" Last Change: Mon Nov 14, 2011  12:31AM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -2090,7 +2090,6 @@ else
 endif
 
 " Variables whose default value is fixed
-call RSetDefaultValue("g:vimrplugin_gvimtmux",          0)
 call RSetDefaultValue("g:vimrplugin_map_r",             0)
 call RSetDefaultValue("g:vimrplugin_open_df",           1)
 call RSetDefaultValue("g:vimrplugin_open_list",         0)
@@ -2133,9 +2132,11 @@ endif
 
 if g:vimrplugin_applescript == 0
     call RSetDefaultValue("g:vimrplugin_screenplugin", 1)
+    call RSetDefaultValue("g:vimrplugin_tmux", 1)
 else
     let g:vimrplugin_screenplugin = 0
     let g:vimrplugin_conqueplugin = 0
+    let g:vimrplugin_tmux = 0
     if isdirectory("/Applications/R64.app")
         let g:rplugin_r64app = 1
     else
@@ -2146,15 +2147,34 @@ endif
 " The screen.vim plugin only works on terminal emulators
 if has('gui_running')
     let g:vimrplugin_screenplugin = 0
-    let g:vimrplugin_tmux = 0
 endif
 
 if has("gui_win32")
     call RSetDefaultValue("g:vimrplugin_conquesleep", 200)
     let vimrplugin_screenplugin = 0
+    let vimrplugin_tmux = 0
 else
     call RSetDefaultValue("g:vimrplugin_conquesleep", 100)
 endif
+
+if g:vimrplugin_applescript == 0 && !has("gui_win32")
+    let s:hastmux = executable('tmux')
+    let s:hasscreen = executable('screen')
+    if s:hastmux == 0 && s:hasscreen == 0
+        call RWarningMsgInp("Please, install the 'Tmux' application to enable the Vim-R-plugin.")
+        let g:rplugin_failed = 1
+        finish
+    endif
+    if s:hastmux == 0 && s:hasscreen == 1
+        let g:vimrplugin_tmux = 0
+    endif
+    if g:vimrplugin_tmux == 0 && s:hasscreen == 0
+        call RWarningMsgInp("The value of vimrplugin_tmux = 0 but the GNU Screen application was not found.")
+        let g:rplugin_failed = 1
+        finish
+    endif
+endif
+
 
 if g:vimrplugin_screenplugin
     let g:vimrplugin_conqueplugin = 0
@@ -2162,13 +2182,6 @@ if g:vimrplugin_screenplugin
         call RWarningMsgInp("Please, either install the screen plugin (http://www.vim.org/scripts/script.php?script_id=2711) (recommended) or put 'let vimrplugin_screenplugin = 0' in your vimrc.")
         let g:rplugin_failed = 1
         finish
-    endif
-    if !exists("g:vimrplugin_tmux")
-        if executable('tmux')
-            let g:vimrplugin_tmux = 1
-        else
-            let g:vimrplugin_tmux = 0
-        endif
     endif
 
     " To get 256 colors you have to set the $TERM environment variable to
@@ -2193,13 +2206,6 @@ if g:vimrplugin_screenplugin
             endif
         endif
     endif
-
-else
-    let g:vimrplugin_tmux = 0
-endif
-
-if g:vimrplugin_gvimtmux
-    let g:vimrplugin_tmux = 1
 endif
 
 if g:vimrplugin_screenplugin
@@ -2333,17 +2339,6 @@ if has("gui_win32")
         let g:vimrplugin_sleeptime = 0.02
     endif
 else
-    if g:vimrplugin_applescript == 0 && (has("gui_running") || (!has("gui_running") && (g:vimrplugin_tmux == 0 || g:vimrplugin_screenplugin == 0))) && !executable('screen')
-        let rplugin_missing_screen = 1
-        if has("gui_running")
-            call RWarningMsgInp("Please, install the 'GNU Screen' application to enable the Vim-R-plugin with GVim.")
-        else
-            call RWarningMsgInp("Please, install the 'GNU Screen' application to enable the Vim-R-plugin.")
-        endif
-        let g:rplugin_failed = 1
-        finish
-    endif
-
     if exists("g:vimrplugin_r_path")
         let g:rplugin_R = g:vimrplugin_r_path . "/R"
     else
