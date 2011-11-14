@@ -187,7 +187,7 @@ deb:
 	Architecture: all\n\
 	Maintainer: Jakson Alves de Aquino <jalvesaq@gmail.com>\n\
 	Installed-Size: $(INSTALLEDSIZE)\n\
-	Depends: vim | vim-gtk | vim-gnome, screen, tmux (>= 1.5), ncurses-term, vim-addon-manager, r-base-core\n\
+	Depends: vim | vim-gtk | vim-gnome, tmux (>= 1.5), ncurses-term, vim-addon-manager, r-base-core\n\
 	Enhances: vim\n\
 	Section: text\n\
 	Priority: extra\n\
