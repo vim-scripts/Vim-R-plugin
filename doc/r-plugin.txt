@@ -876,6 +876,11 @@ If you do not want to see R documentation in a Vim's buffer, put in your
 >
    let vimrplugin_vimpager = "no"
 <
+If you want to use Vim to see R documentation even when looking for help in
+the R console, put in your .Rprofile:
+>
+   options(pager = "vim -c 'set ft=rdoc' -")
+<
 
 7.4.2. Details and other options:~
 
@@ -1568,15 +1573,12 @@ options and some others:
 >
    if (interactive()) {
      local({
-        options(editor = 'gvim -f -c "set ft=r"')
+        options(editor = "gvim -f -c 'set ft=r'")
+        options(pager = "vim -c 'set ft=rdoc' -")
         options(max.print = 999)
-        if(nchar(Sys.getenv("DISPLAY")) > 1){
-            options(help_type = "html")
+        if(nchar(Sys.getenv("DISPLAY")) > 1)
             grDevices::X11.options(width = 4.5, height = 4,
 	        xpos = 1000, ypos = 0, pointsize = 10)
-        } else {
-            options(help_type = "text")
-        }
      })
    }
 <

@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Mon Nov 14, 2011  12:53AM
+" Last Change: Thu Nov 17, 2011  12:21PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -1423,7 +1423,6 @@ function ShowRDoc(rkeyword, package)
         endif
     endif
 
-    set filetype=rdoc
     setlocal modifiable
     let g:rplugin_curbuf = bufname("%")
 
@@ -1440,15 +1439,7 @@ function ShowRDoc(rkeyword, package)
 
     normal! ggdG
     exe "read " . g:rplugin_docfile
-    let lnr = line("$")
-    for i in range(1, lnr)
-        call setline(i, substitute(getline(i), "_\010", "", "g"))
-    endfor
-    let has_ex = search("^Examples:$")
-    if has_ex
-        let lnr = line("$") + 1
-        call setline(lnr, '###')
-    endif
+    set filetype=rdoc
     normal! ggdd
     setlocal nomodified
     setlocal nomodifiable
