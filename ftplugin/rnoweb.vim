@@ -17,7 +17,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "
-" Last Change: Thu Nov 10, 2011  11:58PM
+" Last Change: Mon Nov 14, 2011  10:01PM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -138,7 +138,7 @@ function! RMakePDF(bibtex)
 endfunction  
 
 " Send Sweave chunk to R
-function SendChunkToR(e, m)
+function! SendChunkToR(e, m)
     if RnwIsInRCode() == 0
         call RWarningMsg("Not inside an R code chunk.")
         return
