@@ -1761,6 +1761,9 @@ the R syntax highlighted.
 							       *r-plugin-news*
 12. News~
 
+ * Add "terminal" to the list of known terminal emulators (thanks for "i5m"
+   for the patch).
+
 111114 (2011-11-14)
  * Changed key binding for commenting/uncommenting code from \cc to \xx.
  * Added function SendChunkToR() and its corresponding key bindings:

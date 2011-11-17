@@ -489,13 +489,13 @@ function StartR(whatr)
             endif
             call system("tmux has-session -t" . b:screensname)
             if v:shell_error
-                if g:rplugin_termcmd =~ "gnome-terminal" || g:rplugin_termcmd =~ "xfce4-terminal" || g:rplugin_termcmd =~ "iterm"
+                if g:rplugin_termcmd =~ "gnome-terminal" || g:rplugin_termcmd =~ "xfce4-terminal" || g:rplugin_termcmd =~ "terminal" || g:rplugin_termcmd =~ "iterm"
                     let opencmd = printf("%s 'tmux %s new-session -s %s \"%s\"' &", g:rplugin_termcmd, tmxcnf, b:screensname, rcmd)
                 else
                     let opencmd = printf("%s tmux %s new-session -s %s \"%s\" &", g:rplugin_termcmd, tmxcnf, b:screensname, rcmd)
                 endif
             else
-                if g:rplugin_termcmd =~ "gnome-terminal" || g:rplugin_termcmd =~ "xfce4-terminal" || g:rplugin_termcmd =~ "iterm"
+                if g:rplugin_termcmd =~ "gnome-terminal" || g:rplugin_termcmd =~ "xfce4-terminal" || g:rplugin_termcmd =~ "terminal" || g:rplugin_termcmd =~ "iterm"
                     let opencmd = printf("%s 'tmux %s attach-session -d -t %s' &", g:rplugin_termcmd, tmxcnf, b:screensname)
                 else
                     let opencmd = printf("%s tmux %s attach-session -d -t %s &", g:rplugin_termcmd, tmxcnf, b:screensname)
@@ -508,7 +508,7 @@ function StartR(whatr)
                 let scrrc = RWriteScreenRC()
             endif
             " Some terminals want quotes (see screen.vim)
-            if g:rplugin_termcmd =~ "gnome-terminal" || g:rplugin_termcmd =~ "xfce4-terminal" || g:rplugin_termcmd =~ "iterm"
+            if g:rplugin_termcmd =~ "gnome-terminal" || g:rplugin_termcmd =~ "xfce4-terminal" || g:rplugin_termcmd =~ "terminal"|| g:rplugin_termcmd =~ "iterm"
                 let opencmd = printf("%s 'screen %s -d -RR -S %s %s' &", g:rplugin_termcmd, scrrc, b:screensname, rcmd)
             else
                 let opencmd = printf("%s screen %s -d -RR -S %s %s &", g:rplugin_termcmd, scrrc, b:screensname, rcmd)
@@ -2428,7 +2428,7 @@ if has("gui_win32") || vimrplugin_applescript
     " No external terminal emulator will be called, so any value is good
     let g:vimrplugin_term = "xterm"
 else
-    let s:terminals = ['gnome-terminal', 'konsole', 'xfce4-terminal', 'Eterm', 'rxvt', 'aterm', 'roxterm', 'xterm']
+    let s:terminals = ['gnome-terminal', 'konsole', 'xfce4-terminal', 'terminal', 'Eterm', 'rxvt', 'aterm', 'roxterm', 'xterm']
     if has('mac')
         let s:terminals = ['iTerm', 'Terminal.app'] + s:terminals
     endif
@@ -2458,7 +2458,7 @@ endif
 
 let g:rplugin_termcmd = g:vimrplugin_term . " -e"
 
-if g:vimrplugin_term == "gnome-terminal" || g:vimrplugin_term == "xfce4-terminal"
+if g:vimrplugin_term == "gnome-terminal" || g:vimrplugin_term == "xfce4-terminal" || g:vimrplugin_term == "terminal"
     " Cannot set icon: http://bugzilla.gnome.org/show_bug.cgi?id=126081
     let g:rplugin_termcmd = g:vimrplugin_term . " --working-directory='" . expand("%:p:h") . "' --title R -e"
 endif
