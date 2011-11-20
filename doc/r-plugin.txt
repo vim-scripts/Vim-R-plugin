@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 111114
+Version: 1.0
 For Vim version 7.3
 
  1. Overview                                    |r-plugin-overview|
@@ -1760,6 +1760,8 @@ the R syntax highlighted.
 ==============================================================================
 							       *r-plugin-news*
 12. News~
+
+1.0 (2011-11-20)
 
  * Add "terminal" to the list of known terminal emulators (thanks for "i5m"
    for the patch).

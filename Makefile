@@ -22,9 +22,9 @@
 
 
 PLUGINHOME=`pwd`
-PLUGINVERSION=`date +%y%m%d`
+PLUGINVERSION=1.0
 DEBIANTIME=`date -R`
-PLUGINDOCVERSION=`date +"%Y-%m-%d"`
+PLUGINRELEASEDATE=`date +"%Y-%m-%d"`
 VIM2HTML=/usr/local/share/vim/vim73/doc/vim2html.pl 
 
 zip:
@@ -43,8 +43,9 @@ zip:
 	    mv omniList omniList.current ;\
 	    cp functions.vim.vanilla functions.vim ;\
 	    cp omniList.vanilla omniList )
-	# Update the version date in doc/r-plugin.txt header
-	sed -i -e "s/Version: [0-9][0-9][0-9][0-9][0-9][0-9]/Version: $(PLUGINVERSION)/" doc/r-plugin.txt
+	# Update the version date in doc/r-plugin.txt header and in the news
+	sed -i -e "s/^Version: [0-9].[0-9]/Version: $(PLUGINVERSION)/" doc/r-plugin.txt
+	sed -i -e "s/^$(PLUGINVERSION) (201[0-9]-[0-9][0-9]-[0-9][0-9])/$(PLUGINVERSION) ($(PLUGINRELEASEDATE))/" doc/r-plugin.txt
 	# Create a tar.gz file
 	tar -cvzf /tmp/vimrplugintmpfile.tar.gz ftdetect/r.vim indent/r.vim \
 	    indent/rnoweb.vim indent/rhelp.vim autoload/rcomplete.vim ftplugin/r*.vim \
@@ -78,10 +79,6 @@ zip:
 	    chmod +w r-plugin/tex_indent.vim ;\
 	    rm -f /tmp/vim-r-plugin-$(PLUGINVERSION).zip ;\
 	    zip -r /tmp/vim-r-plugin-$(PLUGINVERSION).zip . )
-	# Warn if the date in the doc is outdated
-	-grep $(PLUGINDOCVERSION) doc/r-plugin.txt > /tmp/docdateok
-	if [ "x`cat /tmp/docdateok`" = "x" ] ; then echo "\033[31mYou must update the version date in r-plugin.txt\033[0m" ; fi
-	rm /tmp/docdateok
 
 deb:
 	# Clean previously created files
