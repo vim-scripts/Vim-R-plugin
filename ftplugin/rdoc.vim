@@ -19,7 +19,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Thu Nov 17, 2011  12:41PM
+" Last Change: Mon Nov 21, 2011  08:55AM
 "
 " Please see doc/r-plugin.txt for usage details.
 "==========================================================================
@@ -43,7 +43,7 @@ runtime r-plugin/common_global.vim
 runtime r-plugin/common_buffer.vim
 
 " Prepare R documentation output to be displayed by Vim
-function FixRdoc()
+function! FixRdoc()
     let lnr = line("$")
     for i in range(1, lnr)
         call setline(i, substitute(getline(i), "_\010", "", "g"))
