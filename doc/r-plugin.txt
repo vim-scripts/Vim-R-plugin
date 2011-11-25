@@ -117,19 +117,26 @@ Note: If you are using Mac OS X and prefer that Vim uses AppleScript to send
 commands to R, then the installation is finished and you should now read
 sections 3.3 and 3.4.
 
-In addition to having R installed in your system, this plugin requires users
-to install:
+In addition to having R installed in your system, this plugin has the
+following dependencies:
 
-   Tmux >= 1.3:       http://tmux.sourceforge.net
-   screen.vim plugin: http://www.vim.org/scripts/script.php?script_id=2711
-   ncurses-term:      http://invisible-island.net/ncurses
+   Depends:~
+   Tmux >= 1.3:   http://tmux.sourceforge.net
+   Screen plugin: http://www.vim.org/scripts/script.php?script_id=2711
+
+   Recommends:~
+   ncurses-term:  http://invisible-island.net/ncurses
+   colorout:      An R package.
 
    Note: Tmux and ncurses-term are already packaged for most GNU/Linux
    distributions and other Unix variants. The library ncurses-term is
    necessary only for 256 color support in the terminal emulator.
    Unfortunately their installation instructions vary widely and are beyond
-   the scope of this documentation.
-
+   the scope of this documentation. The colorout package colorizes the R
+   output and can be installed from within R:
+>
+   install.packages("colorout")
+<
 If you are using Vim (not GVim), the plugin will run inside a Tmux session. If
 you are not already a user of Tmux, please, read the |r-plugin-tmux| section
 to learn a few useful shortcuts. The tmux.conf file that ships with this
@@ -1695,9 +1702,9 @@ important Vim limitations are:
     efficient. Vim uses the same variable, 'updatetime', to do both save swap
     files and trigger |CursorHold| events.
 
-In spite of these problems, the use of Conque Shell already has some
-advantages: the ability to edit R's output, and the syntax highlighting of the
-output. If you want to try the Conque Shell, install it from
+These limitations will be solved only if someone with good knowledge of C
+programming writes patches to Vim source code. Anyway, if you want to try the
+Conque Shell, install it from
 
    http://www.vim.org/scripts/script.php?script_id=2771
 
