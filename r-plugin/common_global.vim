@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Sat Nov 19, 2011  05:05PM
+" Last Change: Fri Nov 25, 2011  07:53PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -132,7 +132,6 @@ function RCommentLine(lnum, ind, cmt)
 endfunction
 
 function RComment(mode)
-    echon
     let cpos = getpos(".")
     if a:mode == "selection"
         let fline = line("'<")
@@ -191,7 +190,6 @@ function RComment(mode)
 endfunction
 
 function MovePosRCodeComment(mode)
-    echon
     if a:mode == "selection"
         let fline = line("'<")
         let lline = line("'>")
@@ -283,7 +281,6 @@ function CountBraces(line)
 endfunction
 
 function RnwPreviousChunk()
-    echon
     let curline = line(".")
     if RnwIsInRCode()
         let i = search("^<<.*$", "bnW")
@@ -303,7 +300,6 @@ function RnwPreviousChunk()
 endfunction
 
 function RnwNextChunk()
-    echon
     let linenr = search("^<<.*", "nW")
     if linenr == 0
         call RWarningMsg("There is no next R code chunk to go.")
@@ -530,7 +526,7 @@ endfunction
 " Open an Object Browser window
 function RObjBrowser()
     " Only opens the Object Browser if R is running
-    if g:vimrplugin_screenplugin && !exists("g:ScreenShellSend")
+    if g:vimrplugin_screenplugin && !exists("g:ScreenShellSend") && !exists("b:isremoteobjbr")
         return
     endif
     if g:vimrplugin_conqueplugin && !exists("b:conque_bufname")
@@ -541,9 +537,9 @@ function RObjBrowser()
     let lockfile = $VIMRPLUGIN_TMPDIR . "/objbrowser" . "lock"
     call writefile(["Wait!"], lockfile)
     if g:vimrplugin_allnames == 1
-        call SendCmdToR("source('" . g:rplugin_home . "/r-plugin/vimbrowser.R') ; .vim.browser(TRUE)")
+        call SendCmdToR('source("' . g:rplugin_home . '/r-plugin/vimbrowser.R") ; .vim.browser(TRUE)')
     else
-        call SendCmdToR("source('" . g:rplugin_home . "/r-plugin/vimbrowser.R') ; .vim.browser()")
+        call SendCmdToR('source("' . g:rplugin_home . '/r-plugin/vimbrowser.R") ; .vim.browser()')
     endif
     sleep 50m
     let i = 0 
@@ -562,6 +558,86 @@ function RObjBrowser()
     endwhile
 
     let g:rplugin_origbuf = bufname("%")
+
+    " Start the object browser in a new vim instance on a Tmux pane:
+    if g:vimrplugin_screenplugin && g:vimrplugin_objbr_place =~ "console"
+        let objbr = $VIMRPLUGIN_TMPDIR . "/objbrowser"
+        let i = 1
+        while !filereadable(objbr)
+            sleep 100m
+            if i == 20
+                return
+            endif
+        endwhile
+
+        " This is the Object Browser
+        if exists("b:isremoteobjbr")
+            setlocal modifiable
+            let curline = line(".")
+            let curcol = col(".")
+            normal! ggdG
+            exe "source " . objbr
+            call RBrowserFillCloseList()
+            call RBrowserFill(0)
+            setlocal nomodified
+            call cursor(curline, curcol)
+            redraw
+            echon
+            return
+        endif
+
+        " Start the Object Browser if it doesn't exist yet
+        let slist = serverlist()
+        if slist !~ "OBJBROWSER"
+            if g:vimrplugin_objbr_place =~ "right"
+                " not implemented yet
+            endif
+
+            let cmd = "tmux split-window -d -h -l " . g:vimrplugin_objbr_w . ' -t 1 "vim --servername OBJBROWSER"'
+            let rlog = system(cmd)
+            if v:shell_error
+                let rlog = substitute(rlog, '\n', ' ', 'g')
+                let rlog = substitute(rlog, '\r', ' ', 'g')
+                call RWarningMsg(rlog)
+                return 0
+            endif
+        endif
+
+        let objbrowserfile = $VIMRPLUGIN_TMPDIR . "/objbrowserInit"
+        call writefile([
+                    \ 'let b:objbrtitle = "' . b:objbrtitle . '"',
+                    \ 'let b:screensname = "' . b:screensname . '"',
+                    \ 'let b:rscript_buffer = "' . bufname("%") . '"',
+                    \ 'let b:isremoteobjbr = 1',
+                    \ 'let b:myservername = "' . v:servername . '"',
+                    \ 'set filetype=rbrowser',
+                    \ 'set statusline=lc',
+                    \ 'setlocal modifiable',
+                    \ 'let curline = line(".")',
+                    \ 'let curcol = col(".")',
+                    \ 'normal! ggdG',
+                    \ 'source ' . objbr,
+                    \ 'call RBrowserFillCloseList()',
+                    \ 'call RBrowserFill(0)',
+                    \ 'setlocal nomodified',
+                    \ 'call cursor(curline, curcol)',
+                    \ 'redraw'], objbrowserfile)
+
+        " Wait while Vim starts
+        let idx = 0
+        while idx < 20
+            sleep 300m
+            let slist = serverlist()
+            if slist =~ "OBJBROWSER"
+                break
+            endif
+            let idx = idx + 1
+        endwhile
+
+        call remote_send("OBJBROWSER", ":source " . objbrowserfile . "<CR>")
+        call remote_send("OBJBROWSER", ":echon<CR>")
+        return
+    endif
 
     " Either load or reload the Object Browser
     let savesb = &switchbuf
@@ -660,6 +736,12 @@ function RScrollTerm()
     exe "set switchbuf=" . savesb
 endfunction
 
+" Called by the Object Browser when running remotely:
+function RGetRemoteCmd(cmd)
+    call SendCmdToR(a:cmd)
+    echon
+endfunction
+
 " Function to send commands
 " return 0 on failure and 1 on success
 function SendCmdToR(cmd)
@@ -684,6 +766,10 @@ function SendCmdToR(cmd)
 
     if g:vimrplugin_screenplugin
         if !exists("g:ScreenShellSend")
+            if exists("b:isremoteobjbr")
+                call remote_send(b:myservername, "<Esc>:call RGetRemoteCmd('" . a:cmd . "')<CR>")
+                return 1
+            endif
             call RWarningMsg("Did you already start R?")
             return 0
         endif
@@ -809,7 +895,6 @@ endfunction
 
 " Send file to R
 function SendFileToR(e)
-    echon
     let b:needsnewomnilist = 1
     let lines = getline("1", line("$"))
     let ok = RSourceLines(lines, a:e)
@@ -862,12 +947,10 @@ function SendMBlockToR(e, m)
         call cursor(lineB, 1)
         call GoDown()
     endif  
-    echon
 endfunction
 
 " Send functions to R
 function SendFunctionToR(e, m)
-    echon
     if &filetype == "rnoweb" && RnwIsInRCode() == 0
         call RWarningMsg("Not inside an R code chunk.")
         return
@@ -925,12 +1008,10 @@ function SendFunctionToR(e, m)
         call cursor(lastline, 1)
         call GoDown()
     endif
-    echon
 endfunction
 
 " Send selection to R
 function SendSelectionToR(e, m)
-    echon
     if &filetype == "rnoweb" && RnwIsInRCode() == 0
         call RWarningMsg("Not inside an R code chunk.")
         return
@@ -1007,12 +1088,10 @@ function SendParagraphToR(e, m)
     else
         call cursor(i, c)
     endif
-    echon
 endfunction
 
 " Send current line to R. Don't go down if called by <S-Enter>.
 function SendLineToR(godown)
-    echon
     let line = getline(".")
 
     if &filetype == "rnoweb"
@@ -1081,7 +1160,6 @@ function RSetWD()
     if ok == 0
         return
     endif
-    echon
 endfunction
 
 " Quit R
@@ -1113,7 +1191,6 @@ function RQuit(how)
     if bufloaded(b:objbrtitle)
         exe "bunload! " . b:objbrtitle
     endif
-    echon
 endfunction
 
 " Tell R to create a list of objects file listing all currently available
@@ -1454,13 +1531,12 @@ function PrintRObject(rkeyword)
     if classfor == ""
         call SendCmdToR("print(" . a:rkeyword . ")")
     else
-        call SendCmdToR("source('" . g:rplugin_home . "/r-plugin/vimprint.R') ; .vim.print('" . a:rkeyword . "', " . classfor . ")")
+        call SendCmdToR('source("' . g:rplugin_home . '/r-plugin/vimprint.R") ; .vim.print("' . a:rkeyword . '", ' . classfor . ")")
     endif
 endfunction
 
 " Call R functions for the word under cursor
 function RAction(rcmd)
-    echon
     if &filetype == "rbrowser"
         let rkeyword = RBrowserGetName(1)
     else
@@ -1636,7 +1712,7 @@ endfunction
 function RControlMaps()
     " List space, clear console, clear all
     "-------------------------------------
-    call RCreateMaps("nvi", '<Plug>RListSpace',    'rl', ':call SendCmdToR("ls()")<CR>:echon')
+    call RCreateMaps("nvi", '<Plug>RListSpace',    'rl', ':call SendCmdToR("ls()")<CR>')
     call RCreateMaps("nvi", '<Plug>RClearConsole', 'rr', ':call RClearConsole()')
     call RCreateMaps("nvi", '<Plug>RClearAll',     'rm', ':call RClearAll()')
 
@@ -1685,23 +1761,23 @@ function RCreateMaps(type, plug, combo, target)
     endif
     if a:type =~ "n"
         if hasmapto(a:plug, "n")
-            exec 'noremap <buffer> ' . a:plug . ' ' . tg
+            exec 'noremap <buffer><silent> ' . a:plug . ' ' . tg
         else
-            exec 'noremap <buffer> <LocalLeader>' . a:combo . ' ' . tg
+            exec 'noremap <buffer><silent> <LocalLeader>' . a:combo . ' ' . tg
         endif
     endif
     if a:type =~ "v"
         if hasmapto(a:plug, "v")
-            exec 'vnoremap <buffer> ' . a:plug . ' <Esc>' . tg
+            exec 'vnoremap <buffer><silent> ' . a:plug . ' <Esc>' . tg
         else
-            exec 'vnoremap <buffer> <LocalLeader>' . a:combo . ' <Esc>' . tg
+            exec 'vnoremap <buffer><silent> <LocalLeader>' . a:combo . ' <Esc>' . tg
         endif
     endif
     if a:type =~ "i"
         if hasmapto(a:plug, "i")
-            exec 'inoremap <buffer> ' . a:plug . ' <Esc>' . tg . il
+            exec 'inoremap <buffer><silent> ' . a:plug . ' <Esc>' . tg . il
         else
-            exec 'inoremap <buffer> <LocalLeader>' . a:combo . ' <Esc>' . tg . il
+            exec 'inoremap <buffer><silent> <LocalLeader>' . a:combo . ' <Esc>' . tg . il
         endif
     endif
 endfunction
@@ -1994,7 +2070,7 @@ function RCreateEditMaps()
     call RCreateMaps("v", '<Plug>RRightComment',    ';', ':call MovePosRCodeComment("selection")')
     " Replace 'underline' with '<-'
     if g:vimrplugin_underscore == 1
-        imap <buffer> _ <Esc>:call ReplaceUnderS()<CR>a
+        imap <buffer><silent> _ <Esc>:call ReplaceUnderS()<CR>a
     endif
 endfunction
 
@@ -2035,7 +2111,7 @@ function RCreateSendMaps()
 
     " For compatibility with Johannes Ranke's plugin
     if g:vimrplugin_map_r == 1
-        vnoremap <buffer> r <Esc>:call SendSelectionToR("silent", "down")<CR>
+        vnoremap <buffer><silent> r <Esc>:call SendSelectionToR("silent", "down")<CR>
     endif
 endfunction
 

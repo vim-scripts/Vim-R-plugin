@@ -16,7 +16,7 @@
 "
 " Author: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          
-" Last Change: Thu Nov 10, 2011  11:53PM
+" Last Change: Fri Nov 25, 2011  04:31PM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -24,11 +24,19 @@ if exists("b:did_ftplugin")
     finish
 endif
 
+
 " Don't load another plugin for this buffer
 let b:did_ftplugin = 1
 
 let s:cpo_save = &cpo
 set cpo&vim
+
+" Source scripts common to R, Rnoweb, Rhelp and rdoc files:
+runtime r-plugin/common_global.vim
+
+" Some buffer variables common to R, Rnoweb, Rhelp and rdoc file need be
+" defined after the global ones:
+runtime r-plugin/common_buffer.vim
 
 setlocal noswapfile
 set buftype=nofile
@@ -406,11 +414,9 @@ function! RBrowserFill(fromother)
     else
         call RBrowserShowGE(a:fromother)
     endif
-    echon
 endfunction
 
 function! RBrowserDoubleClick()
-    echon
     " Toggle view: Objects in the workspace X List of libraries
     if line(".") == 1
         if g:rplugin_curview == "libraries"
@@ -430,21 +436,22 @@ function! RBrowserDoubleClick()
             break
         endif
     endfor
-    echon
 endfunction
 
 function! RBrowserOpenCloseLists(status)
-    if ! buflisted("Object_Browser")
-        call RWarningMsg('There is no "Object_Browser" buffer.')
-        return
-    endif
+    if !exists("b:isremoteobjbr")
+        if !buflisted("Object_Browser")
+            call RWarningMsg('There is no "Object_Browser" buffer.')
+            return
+        endif
 
-    let switchedbuf = 0
-    if g:rplugin_curbuf != "Object_Browser"
-        let savesb = &switchbuf
-        set switchbuf=useopen,usetab
-        sil noautocmd sb Object_Browser
-        let switchedbuf = 1
+        let switchedbuf = 0
+        if g:rplugin_curbuf != "Object_Browser"
+            let savesb = &switchbuf
+            set switchbuf=useopen,usetab
+            sil noautocmd sb Object_Browser
+            let switchedbuf = 1
+        endif
     endif
 
     for key in keys(g:rplugin_opendict)
@@ -452,15 +459,15 @@ function! RBrowserOpenCloseLists(status)
     endfor
     call RBrowserFill(0)
 
-    if switchedbuf
-        exe "sil noautocmd sb " . g:rplugin_curbuf
-        exe "set switchbuf=" . savesb
+    if !exists("b:isremoteobjbr")
+        if switchedbuf
+            exe "sil noautocmd sb " . g:rplugin_curbuf
+            exe "set switchbuf=" . savesb
+        endif
     endif
-    echon
 endfunction
 
 function! RBrowserRightClick()
-    echon
     if line(".") == 1
         return
     endif
@@ -629,9 +636,9 @@ function! LeaveRBrowser()
     endif
 endfunction
 
-nmap <buffer> <CR> :call RBrowserDoubleClick()<CR>
-nmap <buffer> <2-LeftMouse> :call RBrowserDoubleClick()<CR>
-nmap <buffer> <RightMouse> :call RBrowserRightClick()<CR>
+nmap <buffer><silent> <CR> :call RBrowserDoubleClick()<CR>
+nmap <buffer><silent> <2-LeftMouse> :call RBrowserDoubleClick()<CR>
+nmap <buffer><silent> <RightMouse> :call RBrowserRightClick()<CR>
 
 call RControlMaps()
 
