@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Sat Nov 26, 2011  04:06PM
+" Last Change: Sat Nov 26, 2011  04:12PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -1183,6 +1183,7 @@ function RQuit(how)
     endif
     if g:vimrplugin_screenplugin && exists(':ScreenQuit')
         ScreenQuit
+        q
     elseif g:vimrplugin_conqueplugin
         sleep 200m
         exe "sil bdelete " . b:conque_bufname
