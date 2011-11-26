@@ -17,7 +17,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "
-" Last Change: Fri Nov 25, 2011  04:20PM
+" Last Change: Fri Nov 25, 2011  08:43PM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -187,7 +187,7 @@ nmap <buffer><silent> gn :call RnwNextChunk()<CR>
 nmap <buffer><silent> gN :call RnwPreviousChunk()<CR>
 
 " Menu R
-if has("gui")
+if has("gui_running")
     call MakeRMenu()
 endif
 

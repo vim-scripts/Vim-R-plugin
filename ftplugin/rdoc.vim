@@ -19,7 +19,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Mon Nov 21, 2011  08:55AM
+" Last Change: Fri Nov 25, 2011  08:52PM
 "
 " Please see doc/r-plugin.txt for usage details.
 "==========================================================================
@@ -54,6 +54,13 @@ function! FixRdoc()
         call setline(lnr, '###')
     endif
     normal! gg
+
+    " Clear undo history
+    let old_undolevels = &undolevels
+    set undolevels=-1
+    exe "normal a \<BS>\<Esc>"
+    let &undolevels = old_undolevels
+    unlet old_undolevels
 endfunction
 
 "==========================================================================
@@ -63,7 +70,7 @@ call RCreateSendMaps()
 call RControlMaps()
 
 " Menu R
-if has("gui")
+if has("gui_running")
     call MakeRMenu()
 endif
 

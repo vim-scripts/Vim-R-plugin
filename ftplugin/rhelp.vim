@@ -19,7 +19,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Thu Nov 10, 2011  11:57PM
+" Last Change: Fri Nov 25, 2011  08:43PM
 "
 " Please see doc/r-plugin.txt for usage details.
 "==========================================================================
@@ -90,7 +90,7 @@ call RControlMaps()
 call RCreateMaps("nvi", '<Plug>RSetwd',        'rd', ':call RSetWD()')
 
 " Menu R
-if has("gui")
+if has("gui_running")
     call MakeRMenu()
 endif
 

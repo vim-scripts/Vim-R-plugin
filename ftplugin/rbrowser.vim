@@ -16,7 +16,7 @@
 "
 " Author: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          
-" Last Change: Fri Nov 25, 2011  04:31PM
+" Last Change: Fri Nov 25, 2011  08:44PM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -645,7 +645,7 @@ call RControlMaps()
 setlocal winfixwidth
 setlocal bufhidden=wipe
 
-if has("gui")
+if has("gui_running")
     call RControlMenu()
     call RBrowserMenu()
     let s:thisbuffname = substitute(bufname("%"), '\.', '', "g")
