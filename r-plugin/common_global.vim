@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Sat Nov 26, 2011  04:12PM
+" Last Change: Sat Nov 26, 2011  05:27PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -400,7 +400,7 @@ function StartR(whatr)
     endif
 
     if g:vimrplugin_screenplugin
-        let rcmd = "export VIMRPLUGIN_TMPDIR=" . $VIMRPLUGIN_TMPDIR . " ; ". rcmd
+        let rcmd = "VIMRPLUGIN_TMPDIR=" . $VIMRPLUGIN_TMPDIR . " ". rcmd
         if g:vimrplugin_screenvsplit
             if exists(":ScreenShellVertical") == 2
                 exec 'ScreenShellVertical ' . rcmd
@@ -1183,7 +1183,6 @@ function RQuit(how)
     endif
     if g:vimrplugin_screenplugin && exists(':ScreenQuit')
         ScreenQuit
-        q
     elseif g:vimrplugin_conqueplugin
         sleep 200m
         exe "sil bdelete " . b:conque_bufname
