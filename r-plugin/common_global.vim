@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Fri Nov 25, 2011  11:56PM
+" Last Change: Sat Nov 26, 2011  12:43PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -526,7 +526,7 @@ endfunction
 " Open an Object Browser window
 function RObjBrowser()
     " Only opens the Object Browser if R is running
-    if g:vimrplugin_screenplugin && !exists("g:ScreenShellSend") && !exists("b:isremoteobjbr")
+    if g:vimrplugin_screenplugin && !exists("g:ScreenShellSend") && !exists("b:myservername")
         return
     endif
     if g:vimrplugin_conqueplugin && !exists("b:conque_bufname")
@@ -571,18 +571,11 @@ function RObjBrowser()
         endwhile
 
         " This is the Object Browser
-        if exists("b:isremoteobjbr")
-            setlocal modifiable
-            let curline = line(".")
-            let curcol = col(".")
-            normal! ggdG
-            exe "source " . objbr
-            call RBrowserFillCloseList()
-            call RBrowserFill(0)
-            setlocal nomodified
-            call cursor(curline, curcol)
-            redraw
-            echon
+        if exists("b:myservername")
+            if remote_expr(b:myservername, "mode()") != "n"
+                call remote_send(b:myservername, "<Esc>")
+            endif
+            call remote_expr(b:myservername, "RObjBrowser()")
             return
         endif
 
@@ -607,7 +600,7 @@ function RObjBrowser()
                 return 0
             endif
             if g:vimrplugin_objbr_place =~ "left"
-                call system("tmux swap-pane -s 1 -t 2")
+                call system("tmux swap-pane -d -s 1 -t 2")
             endif
         endif
 
@@ -616,10 +609,8 @@ function RObjBrowser()
                     \ 'let b:objbrtitle = "' . b:objbrtitle . '"',
                     \ 'let b:screensname = "' . b:screensname . '"',
                     \ 'let b:rscript_buffer = "' . bufname("%") . '"',
-                    \ 'let b:isremoteobjbr = 1',
                     \ 'let b:myservername = "' . v:servername . '"',
                     \ 'set filetype=rbrowser',
-                    \ 'set statusline=lc',
                     \ 'setlocal modifiable',
                     \ 'let curline = line(".")',
                     \ 'let curcol = col(".")',
@@ -774,13 +765,11 @@ function SendCmdToR(cmd)
 
     if g:vimrplugin_screenplugin
         if !exists("g:ScreenShellSend")
-            if exists("b:isremoteobjbr")
-                let remotemode = remote_expr(b:myservername, "mode()")
-                if remotemode == "n"
-                    call remote_send(b:myservername, ":call RGetRemoteCmd('" . a:cmd . "')<CR>")
-                else
-                    call remote_send(b:myservername, "<Esc>:call RGetRemoteCmd('" . a:cmd . "')<CR>")
+            if exists("b:myservername")
+                if remote_expr(b:myservername, "mode()") != "n"
+                    call remote_send(b:myservername, "<Esc>")
                 endif
+                call remote_expr(b:myservername, "RGetRemoteCmd('" . a:cmd . "')")
                 return 1
             endif
             call RWarningMsg("Did you already start R?")
@@ -1180,6 +1169,11 @@ endfunction
 
 " Quit R
 function RQuit(how)
+    if serverlist() =~ "OBJBROWSER"
+        call remote_send("OBJBROWSER", ":q<CR>")
+        sleep 500m
+    endif
+
     if a:how == "save"
         call SendCmdToR('quit(save = "yes")')
         sleep 1
@@ -2620,5 +2614,8 @@ if g:vimrplugin_screenplugin && g:vimrplugin_applescript
 endif
 if g:vimrplugin_conqueplugin && g:vimrplugin_applescript
     echoerr "Error number 3"
+endif
+if g:vimrplugin_screenplugin && has("gui_running")
+    echoerr "Error number 4"
 endif
 
