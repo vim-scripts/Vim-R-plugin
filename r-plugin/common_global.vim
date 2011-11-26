@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Sat Nov 26, 2011  03:44PM
+" Last Change: Sat Nov 26, 2011  04:06PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -2299,21 +2299,27 @@ if g:vimrplugin_screenplugin
     " xterm-256color. See   :h r-plugin-tips 
     if g:vimrplugin_tmux
         let g:ScreenImpl = 'Tmux'
+        let s:tmuxversion = system("tmux -V")
+        let s:tmuxversion = substitute(s:tmuxversion, '.*tmux \([0-9]\.[0-9]\).*', '\1', '')
         if g:vimrplugin_notmuxconf == 0
             if $DISPLAY != "" || $TERM =~ "xterm"
                 let g:ScreenShellTmuxInitArgs = "-2"
             endif
             let tmxcnf = $VIMRPLUGIN_TMPDIR . "/tmux.conf"
-            call writefile([
+            let cnflines = [
                         \ 'set-option -g prefix C-a',
                         \ 'unbind-key C-b',
                         \ 'bind-key C-a send-prefix',
                         \ 'set-window-option -g mode-keys vi',
                         \ 'set -g status off',
-                        \ "set -g terminal-overrides 'xterm*:smcup@:rmcup@'",
-                        \ 'set -g mode-mouse on',
-                        \ 'set -g mouse-select-pane on',
-                        \ 'set -g mouse-resize-pane on'], tmxcnf)
+                        \ "set -g terminal-overrides 'xterm*:smcup@:rmcup@'"]
+            if s:tmuxversion >= "1.5"
+                let cnflines += [
+                            \ 'set -g mode-mouse on',
+                            \ 'set -g mouse-select-pane on',
+                            \ 'set -g mouse-resize-pane on']
+            endif
+            call writefile(cnflines, tmxcnf)
             let g:ScreenShellTmuxInitArgs = g:ScreenShellTmuxInitArgs . " -f " . tmxcnf
         endif
     else
@@ -2331,17 +2337,14 @@ endif
 if g:vimrplugin_screenplugin
     " Future: Remove this Tmux version test on 2014
     if g:vimrplugin_tmux
-        let s:xx = system("tmux -V")
-        let s:xx = substitute(s:xx, '.*tmux \([0-9]\.[0-9]\).*', '\1', '')
-        if strlen(s:xx) > 6 && g:ScreenVersion > "1.4"
+        if strlen(s:tmuxversion) > 6 && g:ScreenVersion > "1.4"
             call RWarningMsgInp("Tmux <= 1.3 requires Screen plugin <= 1.4. You should either upgrade Tmux or downgrade the Screen plugin.")
         endif
-        if strlen(s:xx) < 7 && g:ScreenVersion < "1.5"
+        if strlen(s:tmuxversion) < 7 && g:ScreenVersion < "1.5"
             call RWarningMsgInp("Vim-R-plugin requires Screen plugin >= 1.5")
             let g:rplugin_failed = 1
             finish
         endif
-        unlet s:xx
     elseif g:ScreenVersion < "1.5"
         call RWarningMsgInp("Vim-R-plugin requires Screen plugin >= 1.5")
         let g:rplugin_failed = 1
