@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Fri Nov 25, 2011  11:22PM
+" Last Change: Fri Nov 25, 2011  11:56PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -876,6 +876,9 @@ function RGetKeyWord()
     let save_cursor = getpos(".")
     let curline = line(".")
     let line = getline(curline)
+    if strlen(line) == 0
+        return ""
+    endif
     " line index starts in 0; cursor index starts in 1:
     let i = col(".") - 1
     while i > 0 && "({[ " =~ line[i]
@@ -1363,7 +1366,7 @@ function RGetClassFor(rkeyword)
     let begin = col(".")
     if strlen(line) > begin
         let piece = strpart(line, begin)
-        while piece !~ '^' . a:rkeyword
+        while piece !~ '^' . a:rkeyword && begin >= 0
             let begin -= 1
             let piece = strpart(line, begin)
         endwhile
