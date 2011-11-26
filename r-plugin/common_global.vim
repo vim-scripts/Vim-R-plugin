@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Fri Nov 25, 2011  07:53PM
+" Last Change: Fri Nov 25, 2011  11:22PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -589,17 +589,25 @@ function RObjBrowser()
         " Start the Object Browser if it doesn't exist yet
         let slist = serverlist()
         if slist !~ "OBJBROWSER"
-            if g:vimrplugin_objbr_place =~ "right"
-                " not implemented yet
+            if g:vimrplugin_objbr_place =~ "left"
+                if g:vimrplugin_screenvsplit
+                    let console_w = g:vimrplugin_console_w
+                else
+                    let console_w = &columns - g:vimrplugin_objbr_w
+                endif
+                let cmd = "tmux split-window -d -h -l " . console_w . ' -t 1 "vim --servername OBJBROWSER"'
+            else
+                let cmd = "tmux split-window -d -h -l " . g:vimrplugin_objbr_w . ' -t 1 "vim --servername OBJBROWSER"'
             endif
-
-            let cmd = "tmux split-window -d -h -l " . g:vimrplugin_objbr_w . ' -t 1 "vim --servername OBJBROWSER"'
             let rlog = system(cmd)
             if v:shell_error
                 let rlog = substitute(rlog, '\n', ' ', 'g')
                 let rlog = substitute(rlog, '\r', ' ', 'g')
                 call RWarningMsg(rlog)
                 return 0
+            endif
+            if g:vimrplugin_objbr_place =~ "left"
+                call system("tmux swap-pane -s 1 -t 2")
             endif
         endif
 
@@ -767,7 +775,12 @@ function SendCmdToR(cmd)
     if g:vimrplugin_screenplugin
         if !exists("g:ScreenShellSend")
             if exists("b:isremoteobjbr")
-                call remote_send(b:myservername, "<Esc>:call RGetRemoteCmd('" . a:cmd . "')<CR>")
+                let remotemode = remote_expr(b:myservername, "mode()")
+                if remotemode == "n"
+                    call remote_send(b:myservername, ":call RGetRemoteCmd('" . a:cmd . "')<CR>")
+                else
+                    call remote_send(b:myservername, "<Esc>:call RGetRemoteCmd('" . a:cmd . "')<CR>")
+                endif
                 return 1
             endif
             call RWarningMsg("Did you already start R?")
@@ -2156,6 +2169,34 @@ else
     let g:rplugin_uservimfiles = split(&runtimepath, ",")[0]
 endif
 
+" From changelog.vim, with bug fixed by "Si" ("i5ivem")
+" Windows logins can include domain, e.g: 'DOMAIN\Username', need to remove
+" the backslash from this as otherwise cause file path problems.
+let g:rplugin_userlogin = substitute(system('whoami'), "\\", "-", "")
+
+if v:shell_error
+    let g:rplugin_userlogin = 'unknown'
+else
+    let newuline = stridx(g:rplugin_userlogin, "\n")
+    if newuline != -1
+        let g:rplugin_userlogin = strpart(g:rplugin_userlogin, 0, newuline)
+    endif
+    unlet newuline
+endif
+
+if isdirectory("/tmp")
+    let $VIMRPLUGIN_TMPDIR = "/tmp/r-plugin-" . g:rplugin_userlogin
+else
+    let $VIMRPLUGIN_TMPDIR = g:rplugin_uservimfiles . "/r-plugin"
+endif
+
+if !isdirectory($VIMRPLUGIN_TMPDIR)
+    call mkdir($VIMRPLUGIN_TMPDIR, "p", 0700)
+endif
+
+let g:rplugin_docfile = $VIMRPLUGIN_TMPDIR . "/Rdoc"
+let g:rplugin_globalenvfname = $VIMRPLUGIN_TMPDIR . "/GlobalEnvList"
+
 " Variables whose default value is fixed
 call RSetDefaultValue("g:vimrplugin_map_r",             0)
 call RSetDefaultValue("g:vimrplugin_open_df",           1)
@@ -2176,13 +2217,18 @@ call RSetDefaultValue("g:vimrplugin_routnotab",         0)
 call RSetDefaultValue("g:vimrplugin_editor_w",         66)
 call RSetDefaultValue("g:vimrplugin_help_w",           46)
 call RSetDefaultValue("g:vimrplugin_objbr_w",          40)
+call RSetDefaultValue("g:vimrplugin_console_w",        80)
 call RSetDefaultValue("g:vimrplugin_buildwait",       120)
 call RSetDefaultValue("g:vimrplugin_indent_commented",  1)
 call RSetDefaultValue("g:vimrplugin_by_vim_instance",   0)
 call RSetDefaultValue("g:vimrplugin_never_unmake_menu", 0)
 call RSetDefaultValue("g:vimrplugin_vimpager",       "'vertical'")
 call RSetDefaultValue("g:vimrplugin_latexcmd", "'pdflatex'")
-call RSetDefaultValue("g:vimrplugin_objbr_place", "'console,right'")
+if has("gui_running")
+    call RSetDefaultValue("g:vimrplugin_objbr_place", "'script,right'")
+else
+    call RSetDefaultValue("g:vimrplugin_objbr_place", "'console,right'")
+endif
 
 " ^K (\013) cleans from cursor to the right and ^U (\025) cleans from cursor
 " to the left. However, ^U causes a beep if there is nothing to clean. The
@@ -2260,7 +2306,18 @@ if g:vimrplugin_screenplugin
                 let g:ScreenShellTmuxInitArgs = "-2"
             endif
             if g:vimrplugin_notmuxconf == 0
-                let g:ScreenShellTmuxInitArgs = g:ScreenShellTmuxInitArgs . " -f " . rplugin_home . "/r-plugin/tmux.conf"
+                let tmxcnf = $VIMRPLUGIN_TMPDIR . "/tmux.conf"
+                call writefile([
+                            \ 'set-option -g prefix C-a',
+                            \ 'unbind-key C-b',
+                            \ 'bind-key C-a send-prefix',
+                            \ 'set-window-option -g mode-keys vi',
+                            \ 'set -g status off',
+                            \ "set -g terminal-overrides 'xterm*:smcup@:rmcup@'",
+                            \ 'set -g mode-mouse on',
+                            \ 'set -g mouse-select-pane on',
+                            \ 'set -g mouse-resize-pane on'], tmxcnf)
+                let g:ScreenShellTmuxInitArgs = g:ScreenShellTmuxInitArgs . " -f " . tmxcnf
             endif
         endif
     else
@@ -2296,23 +2353,16 @@ if g:vimrplugin_screenplugin
     endif
 endif
 
+" To run the Object Browser beside R Console with Tmux, Vim must have the
+" +clientserver feature and the X server must be running.
+if g:vimrplugin_screenplugin && g:vimrplugin_objbr_place =~ "console"
+    if !has("clientserver") || $DISPLAY == ""
+        let g:vimrplugin_objbr_place = substitute(g:vimrplugin_objbr_place, "console", "script", "")
+    endif
+endif
+
 " Start with an empty list of objects in the workspace
 let g:rplugin_globalenvlines = []
-
-" From changelog.vim, with bug fixed by "Si" ("i5ivem")
-" Windows logins can include domain, e.g: 'DOMAIN\Username', need to remove
-" the backslash from this as otherwise cause file path problems.
-let g:rplugin_userlogin = substitute(system('whoami'), "\\", "-", "")
-
-if v:shell_error
-    let g:rplugin_userlogin = 'unknown'
-else
-    let newuline = stridx(g:rplugin_userlogin, "\n")
-    if newuline != -1
-        let g:rplugin_userlogin = strpart(g:rplugin_userlogin, 0, newuline)
-    endif
-    unlet newuline
-endif
 
 if has("gui_win32")
     " python has priority over python3, unless ConqueTerm_PyVersion == 3
@@ -2415,19 +2465,6 @@ else
         let g:vimrplugin_r_args = " "
     endif
 endif
-
-if isdirectory("/tmp")
-    let $VIMRPLUGIN_TMPDIR = "/tmp/r-plugin-" . g:rplugin_userlogin
-else
-    let $VIMRPLUGIN_TMPDIR = g:rplugin_uservimfiles . "/r-plugin"
-endif
-
-if !isdirectory($VIMRPLUGIN_TMPDIR)
-    call mkdir($VIMRPLUGIN_TMPDIR, "p", 0700)
-endif
-
-let g:rplugin_docfile = $VIMRPLUGIN_TMPDIR . "/Rdoc"
-let g:rplugin_globalenvfname = $VIMRPLUGIN_TMPDIR . "/GlobalEnvList"
 
 if g:vimrplugin_conqueplugin == 1
     if !exists("g:ConqueTerm_Version") || (exists("g:ConqueTerm_Version") && g:ConqueTerm_Version < 230)
@@ -2565,7 +2602,7 @@ augroup RBufControl
     au BufEnter * let g:rplugin_curbuf = bufname("%")
 augroup END
 
-if has("gui")
+if has("gui_running")
     augroup RMenuControl
         au BufEnter * call RBufEnter()
     augroup END

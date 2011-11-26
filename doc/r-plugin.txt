@@ -767,6 +767,7 @@ duplicated to R on Mac OS X.
 |vimrplugin_rnowebchunk|       Convert '<' into '<<>>=\n@' in Rnoweb files
 |vimrplugin_objbr_place|       Placement of Object Browser
 |vimrplugin_objbr_w|           Initial width of Object Browser window
+|vimrplugin_console_w|         Width of R Console after starting Object Browser
 |vimrplugin_vimpager|          Use Vim to see R documentation
 |vimrplugin_editor_w|          Minimum width of R script buffer
 |vimrplugin_help_w|            Desired width of R documentation buffer
@@ -846,6 +847,7 @@ put in your |vimrc|:
 7.3. Object Browser options~
 						      *vimrplugin_objbr_place*
 							  *vimrplugin_objbr_w*
+							*vimrplugin_console_w*
 							  *vimrplugin_open_df*
 							*vimrplugin_open_list*
 							 *vimrplugin_allnames*
@@ -855,10 +857,28 @@ and placement by putting different values in your |vimrc|, as in the examples
 below:
 >
    let vimrplugin_objbr_place = "script,right"
+   let vimrplugin_objbr_place = "console,left"
    let vimrplugin_objbr_w = 30
 <
-The minimum width of the Object Browser windows is 9 columns.
+Valid values for the Object Browser placement are "script" or "console" and
+"right" or "left". The default value of |vimrplugin_objbr_place| is
+"console,right" if running in a terminal emulator and "script,right" if
+running in GVim. If running GVim, the Object Browser will always be created by
+splitting the GVim window.
 
+The minimum width of the Object Browser window is 9 columns.
+
+While splitting a Tmux pane, we can only define the width of the right pane.
+Thus, if the value of |vimrplugin_objbr_place| == "console,left", we have to
+calculate the width of R Console instead of using the value of
+|vimrplugin_objbr_w|. If |vimrplugin_screenvsplit| == 0, the Vim-R-plugin will
+use the value of 'columns' to calculate the width of R Console, but if its
+value is 1, you have to set the value of |vimrplugin_console_w| according to
+the width of the terminal emulator that you usually use (the default value is
+80):
+>
+   let vimrplugin_console_w = 90
+<
 By default, the elements of data.frames are shown in the object browser, but
 not the elements of other types of lists. You can put the following in your
 |vimrc| to change this behavior:
@@ -1768,10 +1788,12 @@ the R syntax highlighted.
 							       *r-plugin-news*
 12. News~
 
-1.0 (2011-11-20)
+1.0 (2011-11-25)
 
  * Add "terminal" to the list of known terminal emulators (thanks for "i5m"
    for the patch).
+ * Use Tmux to start the Object Browser beside the R console if
+   vimrplugin_objbr_place =~ "console".
 
 111114 (2011-11-14)
  * Changed key binding for commenting/uncommenting code from \cc to \xx.
