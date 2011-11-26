@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Sat Nov 26, 2011  12:43PM
+" Last Change: Sat Nov 26, 2011  03:44PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -2221,7 +2221,8 @@ call RSetDefaultValue("g:vimrplugin_by_vim_instance",   0)
 call RSetDefaultValue("g:vimrplugin_never_unmake_menu", 0)
 call RSetDefaultValue("g:vimrplugin_vimpager",       "'vertical'")
 call RSetDefaultValue("g:vimrplugin_latexcmd", "'pdflatex'")
-if has("gui_running")
+
+if has("gui_running") || !has("clientserver")
     call RSetDefaultValue("g:vimrplugin_objbr_place", "'script,right'")
 else
     call RSetDefaultValue("g:vimrplugin_objbr_place", "'console,right'")
@@ -2298,24 +2299,22 @@ if g:vimrplugin_screenplugin
     " xterm-256color. See   :h r-plugin-tips 
     if g:vimrplugin_tmux
         let g:ScreenImpl = 'Tmux'
-        if g:ScreenShellTmuxInitArgs == ""
+        if g:vimrplugin_notmuxconf == 0
             if $DISPLAY != "" || $TERM =~ "xterm"
                 let g:ScreenShellTmuxInitArgs = "-2"
             endif
-            if g:vimrplugin_notmuxconf == 0
-                let tmxcnf = $VIMRPLUGIN_TMPDIR . "/tmux.conf"
-                call writefile([
-                            \ 'set-option -g prefix C-a',
-                            \ 'unbind-key C-b',
-                            \ 'bind-key C-a send-prefix',
-                            \ 'set-window-option -g mode-keys vi',
-                            \ 'set -g status off',
-                            \ "set -g terminal-overrides 'xterm*:smcup@:rmcup@'",
-                            \ 'set -g mode-mouse on',
-                            \ 'set -g mouse-select-pane on',
-                            \ 'set -g mouse-resize-pane on'], tmxcnf)
-                let g:ScreenShellTmuxInitArgs = g:ScreenShellTmuxInitArgs . " -f " . tmxcnf
-            endif
+            let tmxcnf = $VIMRPLUGIN_TMPDIR . "/tmux.conf"
+            call writefile([
+                        \ 'set-option -g prefix C-a',
+                        \ 'unbind-key C-b',
+                        \ 'bind-key C-a send-prefix',
+                        \ 'set-window-option -g mode-keys vi',
+                        \ 'set -g status off',
+                        \ "set -g terminal-overrides 'xterm*:smcup@:rmcup@'",
+                        \ 'set -g mode-mouse on',
+                        \ 'set -g mouse-select-pane on',
+                        \ 'set -g mouse-resize-pane on'], tmxcnf)
+            let g:ScreenShellTmuxInitArgs = g:ScreenShellTmuxInitArgs . " -f " . tmxcnf
         endif
     else
         let g:ScreenImpl = 'GnuScreen'
@@ -2353,7 +2352,13 @@ endif
 " To run the Object Browser beside R Console with Tmux, Vim must have the
 " +clientserver feature and the X server must be running.
 if g:vimrplugin_screenplugin && g:vimrplugin_objbr_place =~ "console"
-    if !has("clientserver") || $DISPLAY == ""
+    if $DISPLAY == ""
+        let g:vimrplugin_objbr_place = substitute(g:vimrplugin_objbr_place, "console", "script", "")
+    elseif !has("clientserver")
+        " Cannot use RWarningMsgInp because the message would be visible but
+        " Vim would wait for <Enter> when R was started.
+        call RWarningMsg("Your Vim was not compiled with the 'clientserver' feature. You will not be able to start the Object Browser beside the R Console.")
+        sleep 1
         let g:vimrplugin_objbr_place = substitute(g:vimrplugin_objbr_place, "console", "script", "")
     endif
 endif

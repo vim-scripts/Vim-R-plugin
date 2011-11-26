@@ -1069,8 +1069,9 @@ example show how to adjust the value of sleeptime in your |vimrc|:
 						       *vimrplugin_noscreenrc*
 						       *vimrplugin_notmuxconf*
 GVim (or Vim running R in an external terminal emulator) runs Tmux with a
-specially built configuration file. If you want to use your own ~/.tmux.conf,
-put in your |vimrc|:
+specially built configuration file. It also overwrite the value of
+|g:ScreenShellTmuxInitArgs|. If you want to use your own ~/.tmux.conf and
+|g:ScreenShellTmuxInitArgs|, put in your |vimrc|:
 >
    let vimrplugin_notmuxconf = 1
 <
@@ -1790,7 +1791,7 @@ the R syntax highlighted.
 							       *r-plugin-news*
 12. News~
 
-1.0 (2011-11-25)
+1.0 (2011-11-26)
 
  * Add "terminal" to the list of known terminal emulators (thanks for "i5m"
    for the patch).
