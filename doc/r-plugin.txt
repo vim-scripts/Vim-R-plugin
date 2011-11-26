@@ -851,31 +851,33 @@ put in your |vimrc|:
 							  *vimrplugin_open_df*
 							*vimrplugin_open_list*
 							 *vimrplugin_allnames*
-By default, the object browser will be created with 40 columns at the right
-side of the script window. You can change the object browser's default width
-and placement by putting different values in your |vimrc|, as in the examples
-below:
+By default, the object browser will be created with 40 columns. The minimum
+width of the Object Browser window is 9 columns. You can change the object
+browser's default width by setting the value of |vimrplugin_objbr_w| in your
+|vimrc|, as below:
+>
+   let vimrplugin_objbr_w = 30
+<
+The Object Browser will always be created by splitting the Vim script window
+if you are running GVim or Vim in the Linux console (without the X server).
+However, if running Vim in a terminal emulator under the X Server, the Object
+Browser can be created in a independent Vim instance in a Tmux panel beside
+the R Console. The Vim feature |+clientserver| is required to put the Object
+Browser beside the R Console and this feature only works when the X server is
+running. Valid values for the Object Browser placement are "script" or
+"console" and "right" or "left". Examples:
 >
    let vimrplugin_objbr_place = "script,right"
    let vimrplugin_objbr_place = "console,left"
-   let vimrplugin_objbr_w = 30
 <
-Valid values for the Object Browser placement are "script" or "console" and
-"right" or "left". The default value of |vimrplugin_objbr_place| is
-"console,right" if running in a terminal emulator and "script,right" if
-running in GVim. If running GVim, the Object Browser will always be created by
-splitting the GVim window.
-
-The minimum width of the Object Browser window is 9 columns.
-
 While splitting a Tmux pane, we can only define the width of the right pane.
 Thus, if the value of |vimrplugin_objbr_place| == "console,left", we have to
 calculate the width of R Console instead of using the value of
 |vimrplugin_objbr_w|. If |vimrplugin_screenvsplit| == 0, the Vim-R-plugin will
-use the value of 'columns' to calculate the width of R Console, but if its
-value is 1, you have to set the value of |vimrplugin_console_w| according to
-the width of the terminal emulator that you usually use (the default value is
-80):
+use the value of 'columns' to calculate the width of R Console, but if
+|vimrplugin_screenvsplit| == 1, you have to set the value of
+|vimrplugin_console_w| according to the width of the terminal emulator that
+you usually use (the default value is 80):
 >
    let vimrplugin_console_w = 90
 <
