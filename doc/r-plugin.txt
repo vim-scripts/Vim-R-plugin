@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 1.0
+Version: 0.9
 For Vim version 7.3
 
  1. Overview                                    |r-plugin-overview|
@@ -88,6 +88,9 @@ instructions for all operating systems; (2) instructions that are specific for
 either Unix/Linux/OSX or Windows; (3) troubleshooting; and (4) optional steps.
 
 3.1. General instructions I~
+
+Note: Most of the plugin commands require that you type the <LocalLeader>
+which is '\' by default.
 
 You need to activate plugins and indentation according to 'filetype'. You
 should have at least the following options in your |vimrc|:
@@ -222,11 +225,13 @@ may have to adjust the value of |vimrplugin_sleeptime|.
 
 3.3. Troubleshooting (if the plugin doesn't work)~
 
+Note: The <LocalLeader> is '\' by default.
+
 The plugin is a |file-type| plugin. It will be active only if you are editing
 a .R or .Rnw file. The menu items and tool bar buttons will not be visible and
 the key bindings will not be active while editing either unnamed files or
 files with name extensions other than .R or .Rnw. If the plugin is active,
-pressing <LocalLeader>rf should start R (the <LocalLeader> is '\' by default).
+pressing <LocalLeader>rf should start R.
 
 Look at the ~/.vim (Linux, Unix, OS X) or ~/vimfiles (Windows) directory. Is
 there a subdirectory named "r-plugin"? If not, then you unpacked the plugin in
@@ -243,19 +248,19 @@ you may prefer to install the Debian package available at:
 
 3.4. General instructions II (optional steps)~
 
-Update list of objects~
+3.4.1 Update list of objects~
 
 Start R and update the list of objects for omni completion and syntax
 highlight (see |:RUpdateObjList| for details).
 
 
-Customize the plugin~
+3.4.2 Customize the plugin~
 
 Please, read the section |r-plugin-options|. Emacs/ESS users should read the
 section Indenting setup (|r-plugin-indenting|) of this document.
 
 
-Hide unused buttons~
+3.4.3 Hide unused buttons~
 
 Edit Vim's toolbar and remove the buttons that you never use. The plugin adds
 some buttons to the toolbar, but you may not see them because gvim has too
@@ -265,7 +270,7 @@ on the toolbar:
    http://vim.wikia.com/wiki/Hide_toolbar_or_menus_to_see_more_text
 
 
-Install additional plugins~
+3.4.4 Install additional plugins~
 
 You may be interested in installing additional general plugins to get
 functionality not provided by this file type plugin. ShowMarks and snipMate
@@ -278,13 +283,19 @@ are particularly interesting. Please read |r-plugin-tips| for details.
 
 4.1. Key bindings~
 
-To use the plugin, open a .R or .Rnw or .Rd file with Vim and type \rf
-(replace \ with the key used as <LocalLeader>). Then, you will be able to use
-the plugin key bindings to send commands to R.
+Note: The <LocalLeader> is '\' by default.
+
+Note: It is recommended the use of different keys for <Leader> and
+<LocalLeader> to avoid clashes between filetype plugins and general plugins
+key binds. See |filetype-plugins| and |maplocalleader|.
+
+To use the plugin, open a .R or .Rnw or .Rd file with Vim and type
+<LocalLeader>rf. Then, you will be able to use the plugin key bindings to send
+commands to R.
 
 This plugin has many key bindings, which correspond with menu entries and, in
 some cases, toolbar buttons. In the list below, the backslash represents the
-<LocalLeader> (see |maplocalleader|). Not all menu items and key bindings are
+<LocalLeader>. Not all menu items and key bindings are
 enabled in all filetypes supported by the plugin (r, rnoweb, rhelp):
 
 Start/Close
@@ -389,30 +400,31 @@ Help (R)
 Please see |r-plugin-key-bindings| to learn how to customize the key bindings
 without editing the plugin directly. 
 
-After the command \ao, Vim will save the current buffer if it has any pending
-changes, run "R CMD BATCH --no-restore --no-save" on the current file and show
-the resulting .Rout file in a new tab. Please see |vimrplugin_routnotab| if
-you prefer that the file is open in a new split window.  Note: The command
-\ao, silently writes the current buffer to its file if it was modified and
-deletes the .Rout file if it exists.
+After the command <LocalLeader>ao, Vim will save the current buffer if it has
+any pending changes, run "R CMD BATCH --no-restore --no-save" on the current
+file and show the resulting .Rout file in a new tab. Please see
+|vimrplugin_routnotab| if you prefer that the file is open in a new split
+window. Note: The command <LocalLeader>ao, silently writes the current buffer
+to its file if it was modified and deletes the .Rout file if it exists.
 
 R syntax uses " <- " to assign values to variables which is inconvenient to
 type. In insert mode, typing a single underscore, "_", will write " <- ",
 unless you are typing inside a string. The replacement will always happen if
 syntax highlighting is off (see |:syn-on| and |:syn-off|). If necessary, it is
 possible to insert an actual underscore into your file by typing a second
-underscore.  This behavior is similar to the EMACS ESS mode some users may be
+underscore. This behavior is similar to the EMACS ESS mode some users may be
 familiar with and is enabled by default. You have to change the value of
 |vimrplugin_underscore| to disable underscore replacement.
 
-When you press \rh, the plugin shows the help for the function under the
-cursor. The plugin also checks the class of the object passed as argument to
-the function to try to figure out whether the function is a generic one and
-whether it is more appropriate to show a specific method. The same procedure
-is followed with \rp, that is, while printing an object. For example, if you
-run the code below and, then, press <LocalLeader>rh and <LocalLeader>rp over
-the two occurrences of summary, the plugin will show different documentations
-and print different objects in each case:
+When you press <LocalLeader>rh, the plugin shows the help for the function
+under the cursor. The plugin also checks the class of the object passed as
+argument to the function to try to figure out whether the function is a
+generic one and whether it is more appropriate to show a specific method. The
+same procedure is followed with <LocalLeader>rp, that is, while printing an
+object. For example, if you run the code below and, then, press
+<LocalLeader>rh and <LocalLeader>rp over the two occurrences of summary, the
+plugin will show different documentations and print different objects in each
+case:
 >
    y <- rnorm(100)
    x <- rnorm(100)
@@ -423,7 +435,7 @@ and print different objects in each case:
 
 4.2. Edition of rnoweb files~
 
-In Rnoweb files (.Rnw), when the cursor is over the @ character, which
+In Rnoweb files (.Rnw), when the cursor is over the "@" character, which
 finishes an R chunk, the sending of all commands to R is suspended and the
 shortcut to send the current line makes the cursor to jump to the next chunk.
 While editing rnoweb files, the following commands are available in Normal
@@ -467,12 +479,12 @@ and, then, build the "omniList".
 
 4.4. The Object Browser~
 
-You have to do \ro to either start or updated the Object Browser. The Object
-Browser has two views: .GlobalEnv and Libraries. If you either press <Enter>
-or double click (GVim only) on the first line of the Object Browser it will
-toggle the view between the objects in .GlobalEnv and the currently loaded
-libraries (but only libraries loaded when |:RUpdateObjList| was run will be
-shown).
+You have to do <LocalLeader>ro to either start or updated the Object Browser.
+The Object Browser has two views: .GlobalEnv and Libraries. If you either
+press <Enter> or double click (GVim only) on the first line of the Object
+Browser it will toggle the view between the objects in .GlobalEnv and the
+currently loaded libraries (but only libraries loaded when |:RUpdateObjList|
+was run will be shown).
 
 In the .GlobalEnv view, if an object has the attribute "label", it will be
 displayed in the Object Browser. The options |vimrplugin_open_df| and
@@ -596,7 +608,7 @@ A sample detachable session could be:
       vim theScript.R
 
   - Use Vim to start an R session:
-      \rf
+      <LocalLeader>rf
 
   - Send code from Vim to R, and, then, detach Vim and R with <C-a>d
     The command will be <C-b>d if you have not set <C-a> as the scape
@@ -643,14 +655,14 @@ useful:
 
 Vim can automatically complete the names of R objects when CTRL-X CTRL-O is
 pressed in insert mode (see |omni-completion| for details and 'completeopt' to
-know how to customize the |omni-completion|).  Omni completion shows in a pop
+know how to customize the |omni-completion|). Omni completion shows in a pop
 up menu the name of the object, its class and its environment (most
 frequently, its package name). If the object is a function, its arguments are
 shown in a separate window.
 
 If a data.frame is found, while building the list of objects, the columns in
 the data.frame are added to the list. When you try to use omni completion to
-complete the name of a data.frame, the columns are not shown.  But when the
+complete the name of a data.frame, the columns are not shown. But when the
 data.frame name is already complete, and you have inserted the '$' symbol,
 omni completion will show the column names.
 
@@ -708,7 +720,7 @@ reattach to the R session, open a new terminal window and type:
 6.3. The clipboard's content is lost (Windows only)~
 
 On Windows, the plugin copies the command that will be sent to R into the
-clipboard.  Thus, if you have anything in the clipboard it will be lost while
+clipboard. Thus, if you have anything in the clipboard it will be lost while
 using the plugin.
 
 
@@ -767,7 +779,6 @@ duplicated to R on Mac OS X.
 |vimrplugin_rnowebchunk|       Convert '<' into '<<>>=\n@' in Rnoweb files
 |vimrplugin_objbr_place|       Placement of Object Browser
 |vimrplugin_objbr_w|           Initial width of Object Browser window
-|vimrplugin_console_w|         Width of R Console after starting Object Browser
 |vimrplugin_vimpager|          Use Vim to see R documentation
 |vimrplugin_editor_w|          Minimum width of R script buffer
 |vimrplugin_help_w|            Desired width of R documentation buffer
@@ -847,7 +858,6 @@ put in your |vimrc|:
 7.3. Object Browser options~
 						      *vimrplugin_objbr_place*
 							  *vimrplugin_objbr_w*
-							*vimrplugin_console_w*
 							  *vimrplugin_open_df*
 							*vimrplugin_open_list*
 							 *vimrplugin_allnames*
@@ -869,17 +879,6 @@ running. Valid values for the Object Browser placement are "script" or
 >
    let vimrplugin_objbr_place = "script,right"
    let vimrplugin_objbr_place = "console,left"
-<
-While splitting a Tmux pane, we can only define the width of the right pane.
-Thus, if the value of |vimrplugin_objbr_place| == "console,left", we have to
-calculate the width of R Console instead of using the value of
-|vimrplugin_objbr_w|. If |vimrplugin_screenvsplit| == 0, the Vim-R-plugin will
-use the value of 'columns' to calculate the width of R Console, but if
-|vimrplugin_screenvsplit| == 1, you have to set the value of
-|vimrplugin_console_w| according to the width of the terminal emulator that
-you usually use (the default value is 80):
->
-   let vimrplugin_console_w = 90
 <
 By default, the elements of data.frames are shown in the object browser, but
 not the elements of other types of lists. You can put the following in your
@@ -915,7 +914,7 @@ the R console, put in your .Rprofile:
 
 The plugin key bindings will remain active in the documentation buffer, and,
 thus, you will be able to send commands to R as you do while editing an R
-script.  You can, for example, use <LocalLeader>rh to jump to another R help
+script. You can, for example, use <LocalLeader>rh to jump to another R help
 document.
 
 The valid values of vimrplugin_vimpager are:
@@ -933,7 +932,7 @@ The valid values of vimrplugin_vimpager are:
 The window will be considered large enough if it has more columns than
 vimrplugin_editor_w + vimrplugin_help_w. These variables control the minimum
 width of the editor window and the help window, and their default values are,
-respectively, 66 and 46.  Thus, if you want to have more control over Vim's
+respectively, 66 and 46. Thus, if you want to have more control over Vim's
 behavior while opening R's documentations, you will want to set different
 values to some variables in your |vimrc|, as in the example:
 >
@@ -1028,20 +1027,20 @@ scripts, put the following in your |vimrc|:
 
 7.11. How to automatically open the .Rout file~
 							*vimrplugin_routnotab*
-After the command \ao, Vim will save the current buffer if it has any pending
-changes, run "R CMD BATCH --no-restore --no-save" on the current file and show
-the resulting .Rout file in a new tab. If you prefer that the file is open in
-a new split window, put in your |vimrc|:
+After the command <LocalLeader>ao, Vim will save the current buffer if it has
+any pending changes, run "R CMD BATCH --no-restore --no-save" on the current
+file and show the resulting .Rout file in a new tab. If you prefer that the
+file is open in a new split window, put in your |vimrc|:
 >
    let vimrplugin_routnotab = 1
 <
 
 7.12. Indent commented lines~
 						 *vimrplugin_indent_commented*
-You can type \xx (where "\" is the <LocalLeader>) to comment out a line or
-selected lines. If the line already starts with a comment string, it will be
-removed. After adding the comment string, the line will be reindented by
-default. To turn off the automatic indentation, put in your |vimrc|:
+You can type <LocalLeader>xx to comment out a line or selected lines. If the
+line already starts with a comment string, it will be removed. After adding
+the comment string, the line will be reindented by default. To turn off the
+automatic indentation, put in your |vimrc|:
 >
    let vimrplugin_indent_commented = 0
 <
@@ -1086,7 +1085,7 @@ If you want to use your own ~/.screenrc, put in your vimrc:
 							     *vimrplugin_tmux*
 The screen.vim plugin supports both GNU Screen and Tmux, but only Tmux allows
 you to split the terminal vertically (that is, to have the panels side by
-side). Please read |screen-intro| and |screen-shell-vertical| for details.  By
+side). Please read |screen-intro| and |screen-shell-vertical| for details. By
 default, the Vim-R-plugin will tell the screen.vim plugin to split the
 terminal horizontally. If you prefer to split it vertically put in your
 |vimrc|:
@@ -1263,8 +1262,7 @@ the levels command:
 >
    map <LocalLeader>rk :call RAction("levels")<CR>
 <
-Then (assuming that the local leader key is "\") if you type \rk R will
-receive the command
+Then if you type <LocalLeader>rk R will receive the command
 >
    levels(myObject)
 <
@@ -1361,10 +1359,10 @@ and in your |vimrc| (see |vimrplugin_vimpager|):
 10.3. How do marked blocks work?~
 							  *r-plugin-showmarks*
 Vim allows several marks (bookmarks). The most commonly used marks are the
-lowercase alphabet letters.  If the cursor is between any two marks, the
+lowercase alphabet letters. If the cursor is between any two marks, the
 plugin will send all of the lines between them to R. To create a mark, press
 m<letter> in Normal mode.
-  
+
 We recommended the use of ShowMarks plugin which show what lines have marks
 defined. The plugin is available at:
 
@@ -1416,7 +1414,7 @@ as the <LocalLeader> instead of the default backslash (see |maplocalleader|):
 10.7. Use a tags file to jump to function definitions~
 							   *r-plugin-tagsfile*
 Vim can jump to a function definition if it finds a "tags" file with the
-information about the place where the function is defined.  To generate the
+information about the place where the function is defined. To generate the
 tags file, use the R function rtags(), which will build an Emacs tags file.
 If Vim was compiled with the feature |emacs_tags|, it will be able to read the
 tags file. Otherwise, you can use the function etags2ctags() from the script
@@ -1578,9 +1576,9 @@ line in your |vimrc|:
 
 If you are using Compiz, it may be easier to work with the plugin if the
 various related windows (editor, terminal, and graphics window) are grouped
-because they will be raised together when one of them receives the focus.  You
-may need CompizConfig Settings Manager installed to enable this feature (look
-at the "Window Management" section for "Group and Tab Windows").
+because they will be raised together when one of them receives the focus.
+You may need CompizConfig Settings Manager installed to enable this feature
+(look at the "Window Management" section for "Group and Tab Windows").
 
 
 10.15. Why do I have to updated the Object Browser manually?~
@@ -1590,7 +1588,7 @@ possible to Vim to know whether R is busy or not. If R was running as part of
 the text editor, as happens with RStudio, JGR, RKward, and others, which are
 linked to libR.so, it would be possible to wait for R to finish processing a
 command before sending to it a command to rebuild the list of objects for the
-Object Browser. This command should be sent after each line sent to R.  But if
+Object Browser. This command should be sent after each line sent to R. But if
 the Vim-R-plugin did this, the use of Vim would be blocked until R finished
 its processing. 
 
@@ -1686,12 +1684,12 @@ Put in your |vimrc| (replace <F2> with the shortcut of your preference):
 >
    nmap <F2> :runtime ftplugin/r.vim<CR>
 <
-Press <F2>\rf<F2> to use R. That is, press <F2> before AND after starting R
-with the shortcut <LocalLeader>rf (or any other key binding that you have
-defined in your |vimrc| as the shortcut to start R). The first time that <F2>
-is pressed, the plugin's functions and key bindings are made available.
-However, when R is started, Vim is closed and restarted by the screen.vim
-plugin, and the Vim-R-plugin functions and key bindings are lost.
+Press <F2><LocalLeader>rf<F2> to use R. That is, press <F2> before AND after
+starting R with the shortcut <LocalLeader>rf (or any other key binding that
+you have defined in your |vimrc| as the shortcut to start R). The first time
+that <F2> is pressed, the plugin's functions and key bindings are made
+available. However, when R is started, Vim is closed and restarted by the
+screen.vim plugin, and the Vim-R-plugin functions and key bindings are lost.
 Consequently, the ftplugin/r.vim script must be sourced again by pressing <F2>
 for the second time.
 
@@ -1791,7 +1789,7 @@ the R syntax highlighted.
 							       *r-plugin-news*
 12. News~
 
-1.0 (2011-11-26)
+0.9 (2011-11-26)
 
  * Add "terminal" to the list of known terminal emulators (thanks for "i5m"
    for the patch).
