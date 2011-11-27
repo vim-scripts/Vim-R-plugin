@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Sun Nov 27, 2011  12:15AM
+" Last Change: Sun Nov 27, 2011  04:40PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -383,7 +383,7 @@ function StartR(whatr)
         return
     endif
 
-    if has("gui_win32")
+    if has("win32") || has("win64")
         if g:vimrplugin_conqueplugin == 0
             exe s:py . " StartRPy()"
             lcd -
@@ -765,7 +765,7 @@ function SendCmdToR(cmd)
         let cmd = a:cmd
     endif
 
-    if has("gui_win32") && g:vimrplugin_conqueplugin == 0
+    if (has("win32") || has("win64")) && g:vimrplugin_conqueplugin == 0
         let cmd = cmd . "\n"
         let slen = len(cmd)
         let str = ""
@@ -1155,7 +1155,7 @@ endfunction
 
 " Clear the console screen
 function RClearConsole()
-    if has("gui_win32") && g:vimrplugin_conqueplugin == 0
+    if (has("win32") || has("win64")) && g:vimrplugin_conqueplugin == 0
         exe s:py . " RClearConsolePy()"
         silent exe '!start WScript "' . g:rplugin_jspath . '" "' . expand("%") . '"'
     else
@@ -1173,7 +1173,7 @@ endfunction
 "Set working directory to the path of current buffer
 function RSetWD()
     let wdcmd = 'setwd("' . expand("%:p:h") . '")'
-    if has("gui_win32")
+    if has("win32") || has("win64")
         let wdcmd = substitute(wdcmd, "\\", "/", "g")
     endif
     let ok = SendCmdToR(wdcmd)
@@ -1319,7 +1319,7 @@ endfunction
 function SetRTextWidth()
     if !bufloaded(s:rdoctitle) || g:vimrplugin_newsize == 1
         " Bug fix for Vim < 7.2.318
-        if !has("gui_win32")
+        if !(has("win32") || has("win64"))
             let curlang = v:lang
             language C
         endif
@@ -1363,7 +1363,7 @@ function SetRTextWidth()
         endif
         let htw = printf("%f", htwf)
         let g:rplugin_htw = substitute(htw, "\\..*", "", "")
-        if !has("gui_win32")
+        if !(has("win32") || has("win64"))
             exe "language " . curlang
         endif
     endif
@@ -2279,7 +2279,7 @@ if has('gui_running')
     let g:vimrplugin_screenplugin = 0
 endif
 
-if has("gui_win32")
+if has("win32") || has("win64")
     call RSetDefaultValue("g:vimrplugin_conquesleep", 200)
     let vimrplugin_screenplugin = 0
     let vimrplugin_tmux = 0
@@ -2287,7 +2287,7 @@ else
     call RSetDefaultValue("g:vimrplugin_conquesleep", 100)
 endif
 
-if g:vimrplugin_applescript == 0 && !has("gui_win32")
+if g:vimrplugin_applescript == 0 && !(has("win32") || has("win64"))
     let s:hastmux = executable('tmux')
     let s:hasscreen = executable('screen')
     if s:hastmux == 0 && s:hasscreen == 0 && g:vimrplugin_conqueplugin == 0
@@ -2391,7 +2391,7 @@ endif
 " Start with an empty list of objects in the workspace
 let g:rplugin_globalenvlines = []
 
-if has("gui_win32")
+if has("win32") || has("win64")
     " python has priority over python3, unless ConqueTerm_PyVersion == 3
     if has("python")
         let s:py = "py"
@@ -2564,7 +2564,7 @@ let s:all_marks = "abcdefghijklmnopqrstuvwxyz"
 call writefile([], g:rplugin_globalenvfname)
 
 " Choose a terminal (code adapted from screen.vim)
-if has("gui_win32") || vimrplugin_applescript
+if has("win32") || has("win64") || vimrplugin_applescript
     " No external terminal emulator will be called, so any value is good
     let g:vimrplugin_term = "xterm"
 else

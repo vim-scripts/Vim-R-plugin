@@ -19,7 +19,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Fri Nov 25, 2011  08:43PM
+" Last Change: Sun Nov 27, 2011  04:35PM
 "
 " Please see doc/r-plugin.txt for usage details.
 "==========================================================================
@@ -59,7 +59,7 @@ function! ShowRout()
 
     " if not silent, the user will have to type <Enter>
     silent update
-    if has("gui_win32")
+    if has("win32") | has("win64")
         let rcmd = 'Rcmd.exe BATCH --no-restore --no-save "' . expand("%") . '" "' . routfile . '"'
     else
         let rcmd = g:rplugin_R . " CMD BATCH --no-restore --no-save '" . expand("%") . "' '" . routfile . "'"
