@@ -16,7 +16,7 @@
 "
 " Author: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          
-" Last Change: Fri Nov 25, 2011  08:44PM
+" Last Change: Sat Nov 26, 2011  09:13PM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -439,7 +439,7 @@ function! RBrowserDoubleClick()
 endfunction
 
 function! RBrowserOpenCloseLists(status)
-    if !exists("b:isremoteobjbr")
+    if !exists("b:myservername")
         if !buflisted("Object_Browser")
             call RWarningMsg('There is no "Object_Browser" buffer.')
             return
@@ -459,7 +459,7 @@ function! RBrowserOpenCloseLists(status)
     endfor
     call RBrowserFill(0)
 
-    if !exists("b:isremoteobjbr")
+    if !exists("b:myservername")
         if switchedbuf
             exe "sil noautocmd sb " . g:rplugin_curbuf
             exe "set switchbuf=" . savesb

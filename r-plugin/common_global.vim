@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Sat Nov 26, 2011  05:27PM
+" Last Change: Sat Nov 26, 2011  09:49PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -612,9 +612,12 @@ function RObjBrowser()
                     \ 'let b:myservername = "' . v:servername . '"',
                     \ 'set filetype=rbrowser',
                     \ 'setlocal modifiable',
+                    \ 'set shortmess=atI',
+                    \ 'set rulerformat=%3(%l%)',
+                    \ 'set noruler',
                     \ 'let curline = line(".")',
                     \ 'let curcol = col(".")',
-                    \ 'normal! ggdG',
+                    \ 'normal! ggDjdG',
                     \ 'source ' . objbr,
                     \ 'call RBrowserFillCloseList()',
                     \ 'call RBrowserFill(0)',
@@ -634,7 +637,6 @@ function RObjBrowser()
         endwhile
 
         call remote_send("OBJBROWSER", ":source " . objbrowserfile . "<CR>")
-        call remote_send("OBJBROWSER", ":echon<CR>")
         return
     endif
 
@@ -713,6 +715,15 @@ function RObjBrowser()
     redraw
     exe "sb " . g:rplugin_origbuf
     exe "set switchbuf=" . savesb
+endfunction
+
+function RObjBrowserOCLists(status)
+    if exists("*RBrowserOpenCloseLists")
+        call RBrowserOpenCloseLists(a:status)
+    elseif serverlist() =~ "OBJBROWSER"
+        call remote_expr("OBJBROWSER", "RBrowserOpenCloseLists(" . a:status . ")")
+        call remote_send("OBJBROWSER", ":redraw<CR>:echon ' '<CR>")
+    endif
 endfunction
 
 " Scroll conque term buffer (called by CursorHold event)
@@ -1747,8 +1758,13 @@ function RControlMaps()
     " Build list of objects for omni completion
     "-------------------------------------
     call RCreateMaps("nvi", '<Plug>RUpdateObjBrowser', 'ro', ':call RObjBrowser()')
-    call RCreateMaps("nvi", '<Plug>ROpenLists',        'r=', ':call RBrowserOpenCloseLists(1)')
-    call RCreateMaps("nvi", '<Plug>RCloseLists',       'r-', ':call RBrowserOpenCloseLists(0)')
+    if &filetype == "rbrowser"
+        call RCreateMaps("nvi", '<Plug>ROpenLists',        'r=', ':call RBrowserOpenCloseLists(1)')
+        call RCreateMaps("nvi", '<Plug>RCloseLists',       'r-', ':call RBrowserOpenCloseLists(0)')
+    else
+        call RCreateMaps("nvi", '<Plug>ROpenLists',        'r=', ':call RObjBrowserOCLists(1)')
+        call RCreateMaps("nvi", '<Plug>RCloseLists',       'r-', ':call RObjBrowserOCLists(0)')
+    endif
 endfunction
 
 
@@ -2301,6 +2317,9 @@ if g:vimrplugin_screenplugin
         let g:ScreenImpl = 'Tmux'
         let s:tmuxversion = system("tmux -V")
         let s:tmuxversion = substitute(s:tmuxversion, '.*tmux \([0-9]\.[0-9]\).*', '\1', '')
+        if strlen(s:tmuxversion) != 3
+            let s:tmuxversion = "1.0"
+        endif
         if g:vimrplugin_notmuxconf == 0
             if $DISPLAY != "" || $TERM =~ "xterm"
                 let g:ScreenShellTmuxInitArgs = "-2"
@@ -2337,10 +2356,10 @@ endif
 if g:vimrplugin_screenplugin
     " Future: Remove this Tmux version test on 2014
     if g:vimrplugin_tmux
-        if strlen(s:tmuxversion) > 6 && g:ScreenVersion > "1.4"
+        if s:tmuxversion == "1.0" && g:ScreenVersion > "1.4"
             call RWarningMsgInp("Tmux <= 1.3 requires Screen plugin <= 1.4. You should either upgrade Tmux or downgrade the Screen plugin.")
         endif
-        if strlen(s:tmuxversion) < 7 && g:ScreenVersion < "1.5"
+        if s:tmuxversion < "1.5" && g:ScreenVersion < "1.5"
             call RWarningMsgInp("Vim-R-plugin requires Screen plugin >= 1.5")
             let g:rplugin_failed = 1
             finish
