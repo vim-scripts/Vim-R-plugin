@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Sat Nov 26, 2011  09:49PM
+" Last Change: Sun Nov 27, 2011  12:15AM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -583,15 +583,19 @@ function RObjBrowser()
         let slist = serverlist()
         if slist !~ "OBJBROWSER"
             if g:vimrplugin_objbr_place =~ "left"
-                if g:vimrplugin_screenvsplit
-                    let console_w = g:vimrplugin_console_w
-                else
-                    let console_w = &columns - g:vimrplugin_objbr_w
+                " Get the R Console width:
+                let conw = system("tmux list-panes | cat")
+                let conw = substitute(conw, '.*\n1: \[\([0-9]*\)x.*', '\1', "")
+                let panewidth = conw - g:vimrplugin_objbr_w
+                " Just to be safe: If the above code doesn't work as expected
+                " and we get a spurious value:
+                if panewidth < 40 || panewidth > 180
+                    let panewidth = 80
                 endif
-                let cmd = "tmux split-window -d -h -l " . console_w . ' -t 1 "vim --servername OBJBROWSER"'
             else
-                let cmd = "tmux split-window -d -h -l " . g:vimrplugin_objbr_w . ' -t 1 "vim --servername OBJBROWSER"'
+                let panewidth = g:vimrplugin_objbr_w
             endif
+            let cmd = "tmux split-window -d -h -l " . panewidth . ' -t 1 "vim --servername OBJBROWSER"'
             let rlog = system(cmd)
             if v:shell_error
                 let rlog = substitute(rlog, '\n', ' ', 'g')
@@ -2230,7 +2234,6 @@ call RSetDefaultValue("g:vimrplugin_routnotab",         0)
 call RSetDefaultValue("g:vimrplugin_editor_w",         66)
 call RSetDefaultValue("g:vimrplugin_help_w",           46)
 call RSetDefaultValue("g:vimrplugin_objbr_w",          40)
-call RSetDefaultValue("g:vimrplugin_console_w",        80)
 call RSetDefaultValue("g:vimrplugin_buildwait",       120)
 call RSetDefaultValue("g:vimrplugin_indent_commented",  1)
 call RSetDefaultValue("g:vimrplugin_by_vim_instance",   0)
