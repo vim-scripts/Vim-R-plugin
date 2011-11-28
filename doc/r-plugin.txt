@@ -1596,18 +1596,16 @@ its processing.
 10.16. Edit your ~/.Rprofile~
 
 You may want to edit your ~/.Rprofile. Two common options are the use of GVim
-as the text editor and the use of html help. Example for Linux with these two
-options and some others:
+as the text editor and the use of Vim as pager. Example for Linux with these
+two options and some others:
 >
-   if (interactive()) {
-     local({
-        options(editor = "gvim -f -c 'set ft=r'")
-        options(pager = "vim -c 'set ft=rdoc' -")
-        options(max.print = 999)
-        if(nchar(Sys.getenv("DISPLAY")) > 1)
-            grDevices::X11.options(width = 4.5, height = 4,
-	        xpos = 1000, ypos = 0, pointsize = 10)
-     })
+   if(interactive()){
+       options(editor = "gvim -f -c 'set ft=r'")
+       options(pager = "vim -c 'set ft=rdoc' -")
+       library(colorout)
+       if(nchar(Sys.getenv("DISPLAY")) > 1)
+           grDevices::X11.options(width = 4.5, height = 4, xpos = 1000,
+                                  ypos = 0, pointsize = 10)
    }
 <
 The test for the environment variable DISPLAY is useful if you eventually use
@@ -1789,7 +1787,7 @@ the R syntax highlighted.
 							       *r-plugin-news*
 12. News~
 
-0.9 (2011-11-26)
+0.9 (2011-11-27)
 
  * Add "terminal" to the list of known terminal emulators (thanks for "i5m"
    for the patch).
