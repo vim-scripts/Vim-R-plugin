@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Mon Nov 28, 2011  01:16AM
+" Last Change: Mon Nov 28, 2011  09:34AM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -481,7 +481,16 @@ function StartR(whatr)
             if g:vimrplugin_notmuxconf
                 let tmxcnf = " "
             else
-                let tmxcnf = "-f " . g:rplugin_home . "/r-plugin/tmux.conf"
+                let tmxcnf = $VIMRPLUGIN_TMPDIR . "/tmux.conf"
+                let cnflines = [
+                            \ 'set-option -g prefix C-a',
+                            \ 'unbind-key C-b',
+                            \ 'bind-key C-a send-prefix',
+                            \ 'set-window-option -g mode-keys vi',
+                            \ 'set -g status off',
+                            \ "set -g terminal-overrides 'xterm*:smcup@:rmcup@'"]
+                call writefile(cnflines, tmxcnf)
+                let tmxcnf = "-f " . tmxcnf
             endif
             call system("tmux has-session -t" . b:screensname)
             if v:shell_error
@@ -1679,25 +1688,25 @@ function RCreateMenuItem(type, label, plug, combo, target)
     if a:type =~ "n"
         if hasmapto(a:plug, "n")
             let boundkey = RNMapCmd(a:plug)
-            exec 'nmenu &R.' . a:label . '<Tab>' . boundkey . ' ' . tg
+            exec 'nmenu <silent> &R.' . a:label . '<Tab>' . boundkey . ' ' . tg
         else
-            exec 'nmenu &R.' . a:label . s:tll . a:combo . ' ' . tg
+            exec 'nmenu <silent> &R.' . a:label . s:tll . a:combo . ' ' . tg
         endif
     endif
     if a:type =~ "v"
         if hasmapto(a:plug, "v")
             let boundkey = RVMapCmd(a:plug)
-            exec 'vmenu &R.' . a:label . '<Tab>' . boundkey . ' ' . '<Esc>' . tg
+            exec 'vmenu <silent> &R.' . a:label . '<Tab>' . boundkey . ' ' . '<Esc>' . tg
         else
-            exec 'vmenu &R.' . a:label . s:tll . a:combo . ' ' . '<Esc>' . tg
+            exec 'vmenu <silent> &R.' . a:label . s:tll . a:combo . ' ' . '<Esc>' . tg
         endif
     endif
     if a:type =~ "i"
         if hasmapto(a:plug, "i")
             let boundkey = RIMapCmd(a:plug)
-            exec 'imenu &R.' . a:label . '<Tab>' . boundkey . ' ' . '<Esc>' . tg . il
+            exec 'imenu <silent> &R.' . a:label . '<Tab>' . boundkey . ' ' . '<Esc>' . tg . il
         else
-            exec 'imenu &R.' . a:label . s:tll . a:combo . ' ' . '<Esc>' . tg . il
+            exec 'imenu <silent> &R.' . a:label . s:tll . a:combo . ' ' . '<Esc>' . tg . il
         endif
     endif
 endfunction
@@ -1707,8 +1716,8 @@ function RBrowserMenu()
     call RCreateMenuItem("nvi", 'Object\ browser.Expand\ (all\ lists)', '<Plug>ROpenLists', 'r=', ':call RBrowserOpenCloseLists(1)')
     call RCreateMenuItem("nvi", 'Object\ browser.Collapse\ (all\ lists)', '<Plug>RCloseLists', 'r-', ':call RBrowserOpenCloseLists(0)')
     if &filetype == "rbrowser"
-        imenu R.Object\ browser.Toggle\ (cur)<Tab>Enter <Esc>:call RBrowserDoubleClick()<CR>
-        nmenu R.Object\ browser.Toggle\ (cur)<Tab>Enter :call RBrowserDoubleClick()<CR>
+        imenu <silent> R.Object\ browser.Toggle\ (cur)<Tab>Enter <Esc>:call RBrowserDoubleClick()<CR>
+        nmenu <silent> R.Object\ browser.Toggle\ (cur)<Tab>Enter :call RBrowserDoubleClick()<CR>
     endif
     let g:rplugin_hasmenu = 1
 endfunction
@@ -1896,8 +1905,8 @@ function MakeRMenu()
     "-------------------------------
     menu R.Command.-Sep3- <nul>
     if &filetype == "r" || &filetype == "rnoweb" || g:vimrplugin_never_unmake_menu
-        nmenu R.Command.Build\ tags\ file\ (cur\ dir)<Tab>:RBuildTags :call SendCmdToR('rtags(ofile = "TAGS")')<CR>
-        imenu R.Command.Build\ tags\ file\ (cur\ dir)<Tab>:RBuildTags <Esc>:call SendCmdToR('rtags(ofile = "TAGS")')<CR>a
+        nmenu <silent> R.Command.Build\ tags\ file\ (cur\ dir)<Tab>:RBuildTags :call SendCmdToR('rtags(ofile = "TAGS")')<CR>
+        imenu <silent> R.Command.Build\ tags\ file\ (cur\ dir)<Tab>:RBuildTags <Esc>:call SendCmdToR('rtags(ofile = "TAGS")')<CR>a
     endif
 
     menu R.-Sep7- <nul>
@@ -1907,12 +1916,12 @@ function MakeRMenu()
     "----------------------------------------------------------------------------
     if &filetype == "r" || &filetype == "rnoweb" || &filetype == "rhelp" || g:vimrplugin_never_unmake_menu
         if g:vimrplugin_underscore == 1
-            imenu R.Edit.Insert\ \"\ <-\ \"<Tab>_ <Esc>:call ReplaceUnderS()<CR>a
+            imenu <silent> R.Edit.Insert\ \"\ <-\ \"<Tab>_ <Esc>:call ReplaceUnderS()<CR>a
         endif
         menu R.Edit.-Sep71- <nul>
-        nmenu R.Edit.Indent\ (line)<Tab>== ==
-        vmenu R.Edit.Indent\ (selected\ lines)<Tab>= =
-        nmenu R.Edit.Indent\ (whole\ buffer)<Tab>gg=G gg=G
+        nmenu <silent> R.Edit.Indent\ (line)<Tab>== ==
+        vmenu <silent> R.Edit.Indent\ (selected\ lines)<Tab>= =
+        nmenu <silent> R.Edit.Indent\ (whole\ buffer)<Tab>gg=G gg=G
         menu R.Edit.-Sep72- <nul>
         call RCreateMenuItem("ni", 'Edit.Comment/Uncomment\ (line/sel)', '<Plug>RCommentLine', 'xx', ':call RComment("normal")')
         call RCreateMenuItem("v", 'Edit.Comment/Uncomment\ (line/sel)', '<Plug>RCommentLine', 'xx', ':call RComment("selection")')
@@ -1920,8 +1929,8 @@ function MakeRMenu()
         call RCreateMenuItem("v", 'Edit.Add/Align\ right\ comment\ (line,\ sel)', '<Plug>RRightComment', ';', ':call MovePosRCodeComment("selection")')
         if &filetype == "rnoweb" || g:vimrplugin_never_unmake_menu
             menu R.Edit.-Sep73- <nul>
-            nmenu R.Edit.Go\ (next\ R\ chunk)<Tab>gn :call RnwNextChunk()<CR>
-            nmenu R.Edit.Go\ (previous\ R\ chunk)<Tab>gN :call RnwPreviousChunk()<CR>
+            nmenu <silent> R.Edit.Go\ (next\ R\ chunk)<Tab>gn :call RnwNextChunk()<CR>
+            nmenu <silent> R.Edit.Go\ (previous\ R\ chunk)<Tab>gN :call RnwPreviousChunk()<CR>
         endif
     endif
 
@@ -1933,10 +1942,10 @@ function MakeRMenu()
     "----------------------------------------------------------------------------
     " Syntax
     "----------------------------------------------------------------------------
-    nmenu R.Syntax.Build\ omniList\ (loaded)<Tab>:RUpdateObjList :call RBuildSyntaxFile("loaded")<CR>
-    imenu R.Syntax.Build\ omniList\ (loaded)<Tab>:RUpdateObjList <Esc>:call RBuildSyntaxFile("loaded")<CR>a
-    nmenu R.Syntax.Build\ omniList\ (installed)<Tab>:RUpdateObjListAll :call RBuildSyntaxFile("installed")<CR>
-    imenu R.Syntax.Build\ omniList\ (installed)<Tab>:RUpdateObjListAll <Esc>:call RBuildSyntaxFile("installed")<CR>a
+    nmenu <silent> R.Syntax.Build\ omniList\ (loaded)<Tab>:RUpdateObjList :call RBuildSyntaxFile("loaded")<CR>
+    imenu <silent> R.Syntax.Build\ omniList\ (loaded)<Tab>:RUpdateObjList <Esc>:call RBuildSyntaxFile("loaded")<CR>a
+    nmenu <silent> R.Syntax.Build\ omniList\ (installed)<Tab>:RUpdateObjListAll :call RBuildSyntaxFile("installed")<CR>
+    imenu <silent> R.Syntax.Build\ omniList\ (installed)<Tab>:RUpdateObjListAll <Esc>:call RBuildSyntaxFile("installed")<CR>a
 
     "----------------------------------------------------------------------------
     " Help
@@ -1996,29 +2005,29 @@ function MakeRMenu()
     " ToolBar
     "----------------------------------------------------------------------------
     " Buttons
-    amenu ToolBar.RStart :call StartR("R")<CR>
-    amenu ToolBar.RClose :call SendCmdToR('quit(save = "no")')<CR>
+    amenu <silent> ToolBar.RStart :call StartR("R")<CR>
+    amenu <silent> ToolBar.RClose :call SendCmdToR('quit(save = "no")')<CR>
     "---------------------------
     if &filetype == "r" || g:vimrplugin_never_unmake_menu
-        nmenu ToolBar.RSendFile :call SendFileToR("echo")<CR>
-        imenu ToolBar.RSendFile <Esc>:call SendFileToR("echo")<CR>
+        nmenu <silent> ToolBar.RSendFile :call SendFileToR("echo")<CR>
+        imenu <silent> ToolBar.RSendFile <Esc>:call SendFileToR("echo")<CR>
     endif
-    nmenu ToolBar.RSendBlock :call SendMBlockToR("echo", "down")<CR>
-    imenu ToolBar.RSendBlock <Esc>:call SendMBlockToR("echo", "down")<CR>
-    nmenu ToolBar.RSendFunction :call SendFunctionToR("echo", "down")<CR>
-    imenu ToolBar.RSendFunction <Esc>:call SendFunctionToR("echo", "down")<CR>
-    vmenu ToolBar.RSendSelection <ESC>:call SendSelectionToR("echo", "down")<CR>
-    nmenu ToolBar.RSendParagraph :call SendParagraphToR("echo", "down")<CR>
-    imenu ToolBar.RSendParagraph <Esc>:call SendParagraphToR("echo", "down")<CR>
-    nmenu ToolBar.RSendLine :call SendLineToR("down")<CR>
-    imenu ToolBar.RSendLine <Esc>:call SendLineToR("down")<CR>
+    nmenu <silent> ToolBar.RSendBlock :call SendMBlockToR("echo", "down")<CR>
+    imenu <silent> ToolBar.RSendBlock <Esc>:call SendMBlockToR("echo", "down")<CR>
+    nmenu <silent> ToolBar.RSendFunction :call SendFunctionToR("echo", "down")<CR>
+    imenu <silent> ToolBar.RSendFunction <Esc>:call SendFunctionToR("echo", "down")<CR>
+    vmenu <silent> ToolBar.RSendSelection <ESC>:call SendSelectionToR("echo", "down")<CR>
+    nmenu <silent> ToolBar.RSendParagraph :call SendParagraphToR("echo", "down")<CR>
+    imenu <silent> ToolBar.RSendParagraph <Esc>:call SendParagraphToR("echo", "down")<CR>
+    nmenu <silent> ToolBar.RSendLine :call SendLineToR("down")<CR>
+    imenu <silent> ToolBar.RSendLine <Esc>:call SendLineToR("down")<CR>
     "---------------------------
-    nmenu ToolBar.RListSpace :call SendCmdToR("ls()")<CR>
-    imenu ToolBar.RListSpace <Esc>:call SendCmdToR("ls()")<CR>
-    nmenu ToolBar.RClear :call RClearConsole()<CR>
-    imenu ToolBar.RClear <Esc>:call RClearConsole()<CR>
-    nmenu ToolBar.RClearAll :call RClearAll()<CR>
-    imenu ToolBar.RClearAll <Esc>:call RClearAll()<CR>
+    nmenu <silent> ToolBar.RListSpace :call SendCmdToR("ls()")<CR>
+    imenu <silent> ToolBar.RListSpace <Esc>:call SendCmdToR("ls()")<CR>
+    nmenu <silent> ToolBar.RClear :call RClearConsole()<CR>
+    imenu <silent> ToolBar.RClear <Esc>:call RClearConsole()<CR>
+    nmenu <silent> ToolBar.RClearAll :call RClearAll()<CR>
+    imenu <silent> ToolBar.RClearAll <Esc>:call RClearAll()<CR>
 
     " Hints
     tmenu ToolBar.RStart Start R (default)

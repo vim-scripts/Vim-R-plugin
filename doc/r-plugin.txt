@@ -142,8 +142,8 @@ following dependencies:
 <
 If you are using Vim (not GVim), the plugin will run inside a Tmux session. If
 you are not already a user of Tmux, please, read the |r-plugin-tmux| section
-to learn a few useful shortcuts. The tmux.conf file that ships with this
-plugin sets Tmux to work with Vi key bindings.
+to learn a few useful shortcuts. The tmux.conf file created by the plugin sets
+Tmux to work with Vi key bindings.
 
 Note: The plugin can use different mechanisms to send commands to R. The
 mechanism that will be used depends on both what applications and plugins you
@@ -550,10 +550,17 @@ source code.
 When running Vim in a terminal emulator (Linux/Unix only), the Vim-R-plugin
 will use the screen.vim plugin to restart Vim and start R in a Tmux session.
 The Tmux configuration file provided by the Vim-R-plugin configures Tmux to
-use vi key bindings. The configuration script also sets <C-a> as the Tmux
-scape character (the default is <C-b>), that is, you have to type <C-a> before
-typing a Tmux command. Below are the most useful key bindings to use the
-Vim-R-plugin with the provided tmux.conf.
+use vi key bindings. It also configures Tmux to react to mouse clicks. You
+should be able to switch the active pane by clicking on an inactive pane, to
+resize the panes by clicking on the border line and dragging it, and to scroll
+the R Console with the mouse wheel. When you use the mouse wheel, Tmux enters
+in its copy/scroll back mode (see below).
+
+The configuration script also sets <C-a> as the Tmux scape character (the
+default is <C-b>), that is, you have to type <C-a> before typing a Tmux
+command. Below are the most useful key bindings to use Tmux with the tmux.conf
+created by the Vim-R-plugin (see |vimrplugin_notmuxconf| if you prefer to use
+your own ~/.tmux.conf)
 
     <C-a>arrow keys : Move the cursor to the Tmux panel above, below, at the
                       right or at the left of the current one.
@@ -585,8 +592,7 @@ terminal emulator:
 >
 Note: <C-a> was configured as the Tmux scape character, and it will not be
 passed to applications running under Tmux. To send <C-a> to either R or Vim
-you have to type <C-a>a. You can also set a different escape character in your
-~/.tmux.conf.
+you have to type <C-a>a.
 
 With Tmux, you can the detach the Vim-R session and reattach it latter. This
 is useful if you plan to begin the use the Vim-R-plugin in a machine and
@@ -598,9 +604,20 @@ example below.
 
 A sample detachable session could be:
 
-  - Create your ~/.tmux.conf if it does not exist yet. You may use the
-    r-plugin/tmux.conf as a starting point to your own configuration file.
-
+  - Create your ~/.tmux.conf if it does not exist yet. You may put the lines
+    below in your ~/.tmux.conf as a starting point to your own configuration
+    file:
+>
+    set-option -g prefix C-a
+    unbind-key C-b
+    bind-key C-a send-prefix
+    set-window-option -g mode-keys vi
+    set -g status off
+    set -g terminal-overrides 'xterm*:smcup@:rmcup@'
+    set -g mode-mouse on
+    set -g mouse-select-pane on
+    set -g mouse-resize-pane on
+<
   - Start Tmux:
       tmux
 
@@ -1327,7 +1344,6 @@ directory after the installation:
    r-plugin/screenrc.xterm
    r-plugin/specialfuns.R
    r-plugin/tex_indent.vim
-   r-plugin/tmux.conf
    r-plugin/vimActivate.js
    r-plugin/windows.py
    syntax/rbrowser.vim
