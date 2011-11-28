@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Mon Nov 28, 2011  11:18AM
+" Last Change: Mon Nov 28, 2011  11:59AM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -1363,20 +1363,19 @@ function SetRTextWidth()
         let s:vimpager = g:vimrplugin_vimpager
 
         let wwidth = winwidth(0)
-        if wwidth <= (g:vimrplugin_help_w + g:vimrplugin_editor_w)
+
+        " Not enough room to split vertically
+        if g:vimrplugin_vimpager == "vertical" && wwidth <= (g:vimrplugin_help_w + g:vimrplugin_editor_w)
             let s:vimpager = "horizontal"
         endif
 
-        if g:vimrplugin_vimpager == "tab" || g:vimrplugin_vimpager == "tabnew"
-            let s:vimpager = "horizontal"
-        endif
-
-        if s:vimpager != "vertical"
-            "Default help_text_width:
+        if s:vimpager == "horizontal"
+            " Use the window width (at most 80 columns)
+            let htwf = (wwidth > 80) ? 88.1 : ((wwidth - 1) / 0.9)
+        elseif g:vimrplugin_vimpager == "tab" || g:vimrplugin_vimpager == "tabnew"
+            let wwidth = &columns
             let htwf = (wwidth > 80) ? 88.1 : ((wwidth - 1) / 0.9)
         else
-            " Not enough room to split vertically
-
             let min_e = (g:vimrplugin_editor_w > 80) ? g:vimrplugin_editor_w : 80
             let min_h = (g:vimrplugin_help_w > 73) ? g:vimrplugin_help_w : 73
 
