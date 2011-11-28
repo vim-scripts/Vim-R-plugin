@@ -643,10 +643,9 @@ will use the screen.vim plugin to restart Vim and start R in a Tmux session.
 However, the plugin will use GNU Screen if Tmux is not installed or if you
 have set the value of vimrplugin_tmux = 0 in your |vimrc|.
 
-You may want to create your own ~/.screenrc to customize GNU Screen behavior.
-The Vim-R-plugin comes with a sample screenrc (at r-plugin directory) that you
-can use. Below are the most useful key bindings to use the Vim-R-plugin with
-the provided screenrc:
+You may want to create your own ~/.screenrc to customize GNU Screen behavior
+(see |vimrplugin_noscreenrc|). Below are the most useful key bindings to use
+the Vim-R-plugin with the screenrc that the plugin creates:
 
     <C-Tab>    : Move the cursor to the next panel.
     <C-a>a     : Decrease the height of the current panel.
@@ -1340,8 +1339,6 @@ directory after the installation:
    r-plugin/vimprint.R
    r-plugin/vimSweave.R
    r-plugin/r.snippets
-   r-plugin/screenrc
-   r-plugin/screenrc.xterm
    r-plugin/specialfuns.R
    r-plugin/tex_indent.vim
    r-plugin/vimActivate.js

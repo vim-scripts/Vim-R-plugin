@@ -15,9 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-"          Based on previous work by Johannes Ranke
-"
-" Last Change: Mon Nov 28, 2011  09:34AM
+" Last Change: Mon Nov 28, 2011  11:18AM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -335,18 +333,43 @@ function GoDown()
 endfunction
 
 function RWriteScreenRC()
-    let b:scrfile = $VIMRPLUGIN_TMPDIR . "/" . b:screensname . ".screenrc"
-    if g:vimrplugin_nosingler == 1
-        let scrtitle = 'hardstatus string "' . expand("%:t") . '"'
-    else
-        let scrtitle = "hardstatus string R"
+    if g:vimrplugin_noscreenrc
+        return " "
     endif
-    let scrtxt = ["msgwait 1", "hardstatus lastline", scrtitle,
-                \ "caption splitonly", 'caption string "Vim-R-plugin"',
-                \ "termcapinfo xterm* 'ti@:te@'", 'vbell off']
-    call writefile(scrtxt, b:scrfile)
-    let scrrc = "-c " . b:scrfile
-    return scrrc
+
+    let scrcnf = $VIMRPLUGIN_TMPDIR . "/" . b:screensname . ".screenrc"
+
+    if g:vimrplugin_screenplugin
+        let cnflines = [
+                    \ 'msgwait 0',
+                    \ 'vbell off',
+                    \ 'startup_message off',
+                    \ 'bind a resize +1',
+                    \ 'bind z resize -1',
+                    \ "termcapinfo xterm* 'ti@:te@'"]
+        if $DISPLAY != "" || $TERM =~ "xterm"
+            let cnflines = cnflines + [
+                        \ "terminfo rxvt-unicode 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'",
+                        \ 'term screen-256color']
+        endif
+    else
+        if g:vimrplugin_nosingler == 1
+            let scrtitle = 'hardstatus string "' . expand("%:t") . '"'
+        else
+            let scrtitle = "hardstatus string R"
+        endif
+
+        let cnflines = ["msgwait 1",
+                    \ "hardstatus lastline",
+                    \ scrtitle,
+                    \ "caption splitonly",
+                    \ 'caption string "Vim-R-plugin"',
+                    \ "termcapinfo xterm* 'ti@:te@'",
+                    \ 'vbell off']
+    endif
+
+    call writefile(cnflines, scrcnf)
+    return " -c " . scrcnf
 endfunction
 
 " Start R
@@ -400,7 +423,10 @@ function StartR(whatr)
     endif
 
     if g:vimrplugin_screenplugin
-        let rcmd = "VIMRPLUGIN_TMPDIR=" . $VIMRPLUGIN_TMPDIR . " ". rcmd
+        let rcmd = "VIMRPLUGIN_TMPDIR=" . $VIMRPLUGIN_TMPDIR . " " . rcmd
+        if g:vimrplugin_tmux == 0 && g:vimrplugin_noscreenrc == 0 && exists("g:ScreenShellScreenInitArgs")
+            let g:ScreenShellScreenInitArgs = RWriteScreenRC()
+        endif
         if g:vimrplugin_screenvsplit
             if exists(":ScreenShellVertical") == 2
                 exec 'ScreenShellVertical ' . rcmd
@@ -507,11 +533,7 @@ function StartR(whatr)
                 endif
             endif
         else
-            if g:vimrplugin_noscreenrc == 1
-                let scrrc = " "
-            else
-                let scrrc = RWriteScreenRC()
-            endif
+            let scrrc = RWriteScreenRC()
             " Some terminals want quotes (see screen.vim)
             if g:rplugin_termcmd =~ "gnome-terminal" || g:rplugin_termcmd =~ "xfce4-terminal" || g:rplugin_termcmd =~ "terminal" || g:rplugin_termcmd =~ "iterm"
                 let opencmd = printf("%s 'screen %s -d -RR -S %s %s' &", g:rplugin_termcmd, scrrc, b:screensname, rcmd)
@@ -2356,13 +2378,6 @@ if g:vimrplugin_screenplugin
         endif
     else
         let g:ScreenImpl = 'GnuScreen'
-        if g:vimrplugin_noscreenrc == 0 && exists("g:ScreenShellScreenInitArgs") && g:ScreenShellScreenInitArgs == ""
-            if $DISPLAY != "" || $TERM =~ "xterm"
-                let g:ScreenShellScreenInitArgs = " -c " . g:rplugin_home . "/r-plugin/screenrc.xterm "
-            else
-                let g:ScreenShellScreenInitArgs = " -c " . g:rplugin_home . "/r-plugin/screenrc "
-            endif
-        endif
     endif
 endif
 
@@ -2387,7 +2402,7 @@ endif
 " To run the Object Browser beside R Console with Tmux, Vim must have the
 " +clientserver feature and the X server must be running.
 if g:vimrplugin_screenplugin && g:vimrplugin_objbr_place =~ "console"
-    if $DISPLAY == ""
+    if $DISPLAY == "" || g:vimrplugin_tmux == 0
         let g:vimrplugin_objbr_place = substitute(g:vimrplugin_objbr_place, "console", "script", "")
     elseif !has("clientserver")
         " Cannot use RWarningMsgInp because the message would be visible but
