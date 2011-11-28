@@ -16,7 +16,7 @@
 "
 " Author: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          
-" Last Change: Sat Nov 26, 2011  09:13PM
+" Last Change: Mon Nov 28, 2011  01:22AM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -636,6 +636,14 @@ function! LeaveRBrowser()
     endif
 endfunction
 
+function! ObBrBufUnload()
+    if exists("b:myservername")
+        let colcmd = 'Sys.sleep(1) ; options(width = getOption("width") + ' . &columns . ')'
+        call remote_expr(b:myservername, "RGetRemoteCmd('" . colcmd . "')")
+        call system("tmux select-pane -t 0")
+    endif
+endfunction
+
 nmap <buffer><silent> <CR> :call RBrowserDoubleClick()<CR>
 nmap <buffer><silent> <2-LeftMouse> :call RBrowserDoubleClick()<CR>
 nmap <buffer><silent> <RightMouse> :call RBrowserRightClick()<CR>
@@ -655,6 +663,8 @@ if has("gui_running")
     exe "augroup END"
     unlet s:thisbuffname
 endif
+
+au BufUnload <buffer> call ObBrBufUnload()
 
 let &cpo = s:cpo_save
 unlet s:cpo_save

@@ -17,7 +17,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Sun Nov 27, 2011  04:40PM
+" Last Change: Mon Nov 28, 2011  01:16AM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -606,6 +606,7 @@ function RObjBrowser()
             if g:vimrplugin_objbr_place =~ "left"
                 call system("tmux swap-pane -d -s 1 -t 2")
             endif
+            call SendCmdToR("options(width = as.numeric(Sys.getenv('COLUMNS')))")
         endif
 
         let objbrowserfile = $VIMRPLUGIN_TMPDIR . "/objbrowserInit"
