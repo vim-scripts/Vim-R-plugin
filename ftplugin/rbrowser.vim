@@ -16,7 +16,7 @@
 "
 " Author: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          
-" Last Change: Mon Nov 28, 2011  01:22AM
+" Last Change: Tue Nov 29, 2011  12:13AM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -638,8 +638,6 @@ endfunction
 
 function! ObBrBufUnload()
     if exists("b:myservername")
-        let colcmd = 'Sys.sleep(1) ; options(width = getOption("width") + ' . &columns . ')'
-        call remote_expr(b:myservername, "RGetRemoteCmd('" . colcmd . "')")
         call system("tmux select-pane -t 0")
     endif
 endfunction
