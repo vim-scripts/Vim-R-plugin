@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Tue Nov 29, 2011  12:12AM
+" Last Change: Wed Nov 30, 2011  08:42PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -672,6 +672,7 @@ function RObjBrowser()
         endwhile
 
         call remote_send("OBJBROWSER", ":source " . objbrowserfile . "<CR>")
+        call remote_send("OBJBROWSER", ":echon<CR>")
         return
     endif
 
@@ -1767,7 +1768,7 @@ endfunction
 function RControlMaps()
     " List space, clear console, clear all
     "-------------------------------------
-    call RCreateMaps("nvi", '<Plug>RListSpace',    'rl', ':call SendCmdToR("ls()")<CR>')
+    call RCreateMaps("nvi", '<Plug>RListSpace',    'rl', ':call SendCmdToR("ls()")')
     call RCreateMaps("nvi", '<Plug>RClearConsole', 'rr', ':call RClearConsole()')
     call RCreateMaps("nvi", '<Plug>RClearAll',     'rm', ':call RClearAll()')
 

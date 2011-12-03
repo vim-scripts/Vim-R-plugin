@@ -16,7 +16,7 @@
 "
 " Author: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          
-" Last Change: Tue Nov 29, 2011  12:13AM
+" Last Change: Wed Nov 30, 2011  05:17PM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -640,6 +640,10 @@ function! ObBrBufUnload()
     if exists("b:myservername")
         call system("tmux select-pane -t 0")
     endif
+endfunction
+
+function! SourceObjBrLines()
+    exe "source " . $VIMRPLUGIN_TMPDIR . "/objbrowserInit"
 endfunction
 
 nmap <buffer><silent> <CR> :call RBrowserDoubleClick()<CR>
