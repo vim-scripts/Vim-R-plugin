@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Wed Nov 30, 2011  08:42PM
+" Last Change: Mon Dec 05, 2011  07:27AM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -970,8 +970,8 @@ function SendMBlockToR(e, m)
 
     let b:needsnewomnilist = 1
     let curline = line(".")
-    let lineA = -1
-    let lineB = line("$") + 1
+    let lineA = 1
+    let lineB = line("$")
     let maxmarks = strlen(s:all_marks)
     let n = 0
     while n < maxmarks
@@ -986,9 +986,12 @@ function SendMBlockToR(e, m)
         endif
         let n = n + 1
     endwhile
-    if lineA == -1 || lineB == (line("$") + 1)
-        call RWarningMsg("The cursor is not between two marks!")
+    if lineA == 1 && lineB == (line("$"))
+        call RWarningMsg("The file has no mark!")
         return
+    endif
+    if lineB < line("$")
+        let lineB -= 1
     endif
     let lines = getline(lineA, lineB)
     let ok = RSourceLines(lines, a:e)
