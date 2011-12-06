@@ -1376,9 +1376,13 @@ and in your |vimrc| (see |vimrplugin_vimpager|):
 10.3. How do marked blocks work?~
 							  *r-plugin-showmarks*
 Vim allows several marks (bookmarks). The most commonly used marks are the
-lowercase alphabet letters. If the cursor is between any two marks, the
-plugin will send all of the lines between them to R. To create a mark, press
-m<letter> in Normal mode.
+lowercase alphabet letters. If the cursor is between any two marks, the plugin
+will send the lines between them to R. If the cursor is above the first mark,
+the plugin will send from the beginning of the file to the mark. If the cursor
+is below the last mark, the plugin will send from the mark to the end of the
+file. The mark above the cursor is included and the mark below is excluded
+from the block to be sent to R. To create a mark, press m<letter> in Normal
+mode.
 
 We recommended the use of ShowMarks plugin which show what lines have marks
 defined. The plugin is available at:
@@ -1811,7 +1815,8 @@ the R syntax highlighted.
 
 0.9 (2011-11-28)
 
- * Add "terminal" to the list of known terminal emulators (thanks for "i5m"
+ * Changed the way that blocks are sent to R.
+ * Added "terminal" to the list of known terminal emulators (thanks for "i5m"
    for the patch).
  * Use Tmux to start the Object Browser beside the R console if
    vimrplugin_objbr_place =~ "console".
