@@ -22,7 +22,7 @@
 
 
 PLUGINHOME=`pwd`
-PLUGINVERSION=1.0
+PLUGINVERSION=0.9.5
 DEBIANTIME=`date -R`
 PLUGINRELEASEDATE=`date +"%Y-%m-%d"`
 VIM2HTML=/usr/local/share/vim/vim73/doc/vim2html.pl 
@@ -44,8 +44,8 @@ zip:
 	    cp functions.vim.vanilla functions.vim ;\
 	    cp omniList.vanilla omniList )
 	# Update the version date in doc/r-plugin.txt header and in the news
-	sed -i -e "s/^Version: [0-9].[0-9]/Version: $(PLUGINVERSION)/" doc/r-plugin.txt
-	sed -i -e "s/^$(PLUGINVERSION) (201[0-9]-[0-9][0-9]-[0-9][0-9])/$(PLUGINVERSION) ($(PLUGINRELEASEDATE))/" doc/r-plugin.txt
+	sed -i -e "s/^Version: [0-9].[0-9].[0-9]/Version: $(PLUGINVERSION)/" doc/r-plugin.txt
+	sed -i -e "s/^[0-9].[0-9].[0-9] (201[0-9]-[0-9][0-9]-[0-9][0-9])$$/$(PLUGINVERSION) ($(PLUGINRELEASEDATE))/" doc/r-plugin.txt
 	# Create a tar.gz file
 	tar -cvzf /tmp/vimrplugintmpfile.tar.gz ftdetect/r.vim indent/r.vim \
 	    indent/rnoweb.vim indent/rhelp.vim autoload/rcomplete.vim ftplugin/r*.vim \
@@ -54,7 +54,6 @@ zip:
 	    r-plugin/global_r_plugin.vim r-plugin/omniList r-plugin/windows.py \
 	    r-plugin/vimActivate.js r-plugin/tex_indent.vim r-plugin/r.snippets \
 	    r-plugin/common_buffer.vim r-plugin/common_global.vim \
-	    r-plugin/tmux.conf r-plugin/screenrc r-plugin/screenrc.xterm \
 	    bitmaps/ricon.xbm bitmaps/ricon.png \
 	    bitmaps/RStart.png bitmaps/RStart.bmp \
 	    bitmaps/RClose.png bitmaps/RClose.bmp \
@@ -131,9 +130,6 @@ deb:
 	  - r-plugin/global_r_plugin.vim\n\
 	  - r-plugin/specialfuns.R\n\
 	  - r-plugin/tex_indent.vim\n\
-	  - r-plugin/tmux.conf\n\
-	  - r-plugin/screenrc\n\
-	  - r-plugin/screenrc.xterm\n\
 	  - r-plugin/vimbrowser.R\n\
 	  - r-plugin/vimhelp.R\n\
 	  - r-plugin/vimprint.R\n\

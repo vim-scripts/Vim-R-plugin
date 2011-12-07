@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 0.9
+Version: 0.9.5
 For Vim version 7.3
 
  1. Overview                                    |r-plugin-overview|
@@ -1813,7 +1813,7 @@ the R syntax highlighted.
 							       *r-plugin-news*
 12. News~
 
-0.9 (2011-11-28)
+0.9.5 (2011-12-07)
 
  * Changed the way that blocks are sent to R.
  * Added "terminal" to the list of known terminal emulators (thanks for "i5m"
