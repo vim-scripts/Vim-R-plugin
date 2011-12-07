@@ -17,7 +17,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "
-" Last Change: Thu Nov 10, 2011  11:58PM
+" Last Change: Fri Nov 25, 2011  08:43PM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -71,7 +71,6 @@ function! RnwIsInRCode()
 endfunction
 
 function! RnwPreviousChunk() range
-    echon
     let rg = range(a:firstline, a:lastline)
     let chunk = len(rg)
     for var in range(1, chunk)
@@ -95,7 +94,6 @@ function! RnwPreviousChunk() range
 endfunction
 
 function! RnwNextChunk() range
-    echon
     let rg = range(a:firstline, a:lastline)
     let chunk = len(rg)
     for var in range(1, chunk)
@@ -134,11 +132,10 @@ function! RMakePDF(bibtex)
     if ok == 0
         return
     endif
-    echon
 endfunction  
 
 " Send Sweave chunk to R
-function SendChunkToR(e, m)
+function! SendChunkToR(e, m)
     if RnwIsInRCode() == 0
         call RWarningMsg("Not inside an R code chunk.")
         return
@@ -153,7 +150,6 @@ function SendChunkToR(e, m)
     if a:m == "down"
         call RnwNextChunk()
     endif  
-    echon
 endfunction
 
 " Sweave the current buffer content
@@ -162,12 +158,11 @@ function! RSweave()
     let b:needsnewomnilist = 1
     call RSetWD()
     call SendCmdToR('Sweave("' . expand("%:t") . '")')
-    echon
 endfunction
 
 if g:vimrplugin_rnowebchunk == 1
     " Write code chunk in rnoweb files
-    imap <buffer> < <Esc>:call RWriteChunk()<CR>a
+    imap <buffer><silent> < <Esc>:call RWriteChunk()<CR>a
 endif
 
 "==========================================================================
@@ -188,11 +183,11 @@ call RCreateMaps("ni", '<Plug>RSendChunk',     'cc', ':call SendChunkToR("silent
 call RCreateMaps("ni", '<Plug>RESendChunk',    'ce', ':call SendChunkToR("echo", "stay")')
 call RCreateMaps("ni", '<Plug>RDSendChunk',    'cd', ':call SendChunkToR("silent", "down")')
 call RCreateMaps("ni", '<Plug>REDSendChunk',   'ca', ':call SendChunkToR("echo", "down")')
-nmap <buffer> gn :call RnwNextChunk()<CR>
-nmap <buffer> gN :call RnwPreviousChunk()<CR>
+nmap <buffer><silent> gn :call RnwNextChunk()<CR>
+nmap <buffer><silent> gN :call RnwPreviousChunk()<CR>
 
 " Menu R
-if has("gui")
+if has("gui_running")
     call MakeRMenu()
 endif
 

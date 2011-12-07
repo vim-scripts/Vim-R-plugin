@@ -19,7 +19,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Thu Nov 10, 2011  11:58PM
+" Last Change: Fri Nov 25, 2011  08:52PM
 "
 " Please see doc/r-plugin.txt for usage details.
 "==========================================================================
@@ -42,6 +42,26 @@ runtime r-plugin/common_global.vim
 " defined after the global ones:
 runtime r-plugin/common_buffer.vim
 
+" Prepare R documentation output to be displayed by Vim
+function! FixRdoc()
+    let lnr = line("$")
+    for i in range(1, lnr)
+        call setline(i, substitute(getline(i), "_\010", "", "g"))
+    endfor
+    let has_ex = search("^Examples:$")
+    if has_ex
+        let lnr = line("$") + 1
+        call setline(lnr, '###')
+    endif
+    normal! gg
+
+    " Clear undo history
+    let old_undolevels = &undolevels
+    set undolevels=-1
+    exe "normal a \<BS>\<Esc>"
+    let &undolevels = old_undolevels
+    unlet old_undolevels
+endfunction
 
 "==========================================================================
 " Key bindings and menu items
@@ -50,7 +70,7 @@ call RCreateSendMaps()
 call RControlMaps()
 
 " Menu R
-if has("gui")
+if has("gui_running")
     call MakeRMenu()
 endif
 
@@ -58,6 +78,8 @@ setlocal bufhidden=wipe
 setlocal noswapfile
 set buftype=nofile
 autocmd VimResized <buffer> let g:vimrplugin_newsize = 1
+call FixRdoc()
+autocmd FileType rdoc call FixRdoc()
 
 let &cpo = s:cpo_save
 unlet s:cpo_save
