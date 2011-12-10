@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Mon Dec 05, 2011  07:27AM
+" Last Change: Sat Dec 10, 2011  12:16PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -1148,6 +1148,12 @@ endfunction
 " Send current line to R. Don't go down if called by <S-Enter>.
 function SendLineToR(godown)
     let line = getline(".")
+    if strlen(line) == 0
+        if a:godown =~ "down"
+            call GoDown()
+        endif
+        return
+    endif
 
     if &filetype == "rnoweb"
         if line =~ "^@$"
