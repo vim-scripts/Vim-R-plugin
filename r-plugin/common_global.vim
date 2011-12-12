@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Sun Dec 11, 2011  10:32PM
+" Last Change: Mon Dec 12, 2011  03:28PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -104,6 +104,84 @@ function ReplaceUnderS()
     else
         exe "normal! a <- "
     endif
+endfunction
+
+function RCompleteArgs()
+    let lnum = line(".")
+    let line = getline(".")
+    let cpos = getpos(".")
+    let idx = cpos[2] - 2
+    let idx2 = cpos[2] - 2
+    call cursor(lnum, cpos[2] - 1)
+    if line[idx2] == ' ' || line[idx2] == ',' || line[idx2] == '('
+        let idx2 = cpos[2]
+        let argkey = ''
+    else
+        let argkey = RGetKeyWord()
+        let idx2 = cpos[2] - strlen(argkey)
+    endif
+    let np = 1
+    let nl = 0
+    while np != 0 && nl < 10
+        if line[idx] == '('
+            let np -= 1
+        elseif line[idx] == ')'
+            let np += 1
+        endif
+        if np == 0
+            call cursor(lnum, idx)
+            let rkeyword = '^' . RGetKeyWord() . ';'
+            call cursor(cpos[1], cpos[2])
+            for omniL in g:rplugin_liblist
+                if omniL =~ rkeyword
+                    let tmp1 = split(omniL, ';')
+                    if len(tmp1) == 5
+                        let info = tmp1[4]
+                    else
+                        let tlen = len(tmp1)
+                        let info = tmp1[4]
+                        let i = 5
+                        while i < tlen
+                            let info = info . ';' . tmp1[i]
+                            let i += 1
+                        endwhile
+                    endif
+                    let info = substitute(info, "\t", '', "g")
+                    let argsL = split(info, ",")
+                    let args = []
+                    for id in range(len(argsL))
+                        let newkey = '^' . argkey
+                        let tmp2 = split(substitute(argsL[id], "^ *", '', ""), "=")
+                        if argkey == '' || tmp2[0] =~ newkey
+                            if len(tmp2) == 2
+                                let tmp2[0] = tmp2[0] . "= "
+                                let tmp3 = {'word': tmp2[0], 'menu': tmp2[1]}
+                            else
+                                if tmp2[0] != '...'
+                                    let tmp2[0] = tmp2[0] . " = "
+                                endif
+                                let tmp3 = {'word': tmp2[0], 'menu': ''}
+                            endif
+                            call add(args, tmp3)
+                        endif
+                    endfor
+                    call complete(idx2, args)
+                    return ''
+                endif
+            endfor
+            break
+        endif
+        let idx -= 1
+        if idx == 0
+            let lnum -= 1
+            if lnum == 0
+                break
+            endif
+            let line = getline(lnum)
+            let idx = strlen(line)
+            let nl +=1
+        endif
+    endwhile
 endfunction
 
 function RCommentLine(lnum, ind, cmt)
@@ -2141,6 +2219,11 @@ function RCreateEditMaps()
     " Replace 'underline' with '<-'
     if g:vimrplugin_underscore == 1
         imap <buffer><silent> _ <Esc>:call ReplaceUnderS()<CR>a
+    endif
+    if hasmapto("<Plug>RCompleteArgs", "i")
+        imap <buffer><silent> <Plug>RCompleteArgs <C-R>=RCompleteArgs()<CR>
+    else
+        imap <buffer><silent> <C-X><C-A> <C-R>=RCompleteArgs()<CR>
     endif
 endfunction
 
