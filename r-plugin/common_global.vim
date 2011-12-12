@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Mon Dec 12, 2011  03:28PM
+" Last Change: Mon Dec 12, 2011  03:43PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -2324,6 +2324,11 @@ else
     unlet newuline
 endif
 
+if has("win32") || has("win64")
+    let g:rplugin_home = substitute(g:rplugin_home, "\\", "/", "g")
+    let g:rplugin_uservimfiles = substitute(g:rplugin_uservimfiles, "\\", "/", "g")
+endif
+
 if isdirectory("/tmp")
     let $VIMRPLUGIN_TMPDIR = "/tmp/r-plugin-" . g:rplugin_userlogin
 else
@@ -2558,8 +2563,6 @@ if has("win32") || has("win64")
         finish
     endif
     let g:rplugin_jspath = g:rplugin_home . "\\r-plugin\\vimActivate.js"
-    let g:rplugin_home = substitute(g:rplugin_home, "\\", "/", "g")
-    let g:rplugin_uservimfiles = substitute(g:rplugin_uservimfiles, "\\", "/", "g")
     if !exists("g:rplugin_rpathadded")
         if exists("g:vimrplugin_r_path")
             let $PATH = g:vimrplugin_r_path . ";" . $PATH
