@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Sat Dec 10, 2011  12:16PM
+" Last Change: Sun Dec 11, 2011  10:32PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -2278,14 +2278,16 @@ call RSetDefaultValue("g:vimrplugin_buildwait",       120)
 call RSetDefaultValue("g:vimrplugin_indent_commented",  1)
 call RSetDefaultValue("g:vimrplugin_by_vim_instance",   0)
 call RSetDefaultValue("g:vimrplugin_never_unmake_menu", 0)
-call RSetDefaultValue("g:vimrplugin_vimpager",       "'vertical'")
+call RSetDefaultValue("g:vimrplugin_vimpager",       "'tab'")
 call RSetDefaultValue("g:vimrplugin_latexcmd", "'pdflatex'")
+call RSetDefaultValue("g:vimrplugin_objbr_place", "'script,right'")
 
-if has("gui_running") || !has("clientserver")
-    call RSetDefaultValue("g:vimrplugin_objbr_place", "'script,right'")
-else
-    call RSetDefaultValue("g:vimrplugin_objbr_place", "'console,right'")
-endif
+" Old default value.
+"if has("gui_running") || !has("clientserver")
+"    call RSetDefaultValue("g:vimrplugin_objbr_place", "'script,right'")
+"else
+"    call RSetDefaultValue("g:vimrplugin_objbr_place", "'console,right'")
+"endif
 
 " ^K (\013) cleans from cursor to the right and ^U (\025) cleans from cursor
 " to the left. However, ^U causes a beep if there is nothing to clean. The
