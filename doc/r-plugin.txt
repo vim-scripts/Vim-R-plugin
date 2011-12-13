@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 0.9.5
+Version: 0.9.6
 For Vim version 7.3
 
  1. Overview                                    |r-plugin-overview|
@@ -374,6 +374,8 @@ Command
 
 Edit
   . Insert "<-"                                          _
+  . Complete function name                            ^X^O
+  . Complete function arguments                       ^X^A
   --------------------------------------------------------
   . Indent (line)                                       ==
   . Indent (selected lines)                              =
@@ -437,6 +439,12 @@ case:
    summary(x)
    summary(m)
 <
+When completing function names (CTRL-X CTRL-O) and function arguments (CTRL-X
+CTRL-A) you have to press CTRL-N to go foward in the list and CTRL-P to go
+backward (see |popupmenu-completion|). Note: if using Vim in a terminal
+emulator, Tmux will capture the CTRL-A command. You have to do CTRL-A twice to
+pass a single CTRL-A to Vim.
+
 
 4.2. Edition of rnoweb files~
 
@@ -1263,8 +1271,13 @@ list of the names for custom key bindings:
    RSendLAndOpenNewOne       RSendFile                RSweave
    RSendMBlock               RESendFile               RUpdateObjBrowser
    RDSendMBlock              RHelp                    RVanillaStart
-   RESendMBlock              RListSpace
+   RESendMBlock              RListSpace               RCompleteArgs
    REDSendMBlock             RMakePDF
+<
+The completion of function arguments only happens in Insert mode. To customize
+its keybind you should put in your |vimrc| something as in the example:
+>
+   imap <C-A> <Plug>RCompleteArgs
 <
 The plugin also contains a function called RAction which allows you to build
 ad-hoc commands to R. This function takes the name of an R function such as
@@ -1814,10 +1827,12 @@ the R syntax highlighted.
 							       *r-plugin-news*
 12. News~
 
-0.9.6 (2011-12-11)
+0.9.6 (2011-12-12)
 
+ * Fix path to R source() command on Windows.
  * New default value of vimrplugin_vimpager = "tab".
  * New default value of vimrplugin_objbr_place = "editor,right"
+ * Autocompletion of function arguments with <C-X><C-A>.
 
 0.9.5 (2011-12-07)
 
