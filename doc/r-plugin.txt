@@ -1827,7 +1827,7 @@ the R syntax highlighted.
 							       *r-plugin-news*
 12. News~
 
-0.9.6 (2011-12-12)
+0.9.6 (2011-12-13)
 
  * Fix path to R source() command on Windows.
  * New default value of vimrplugin_vimpager = "tab".

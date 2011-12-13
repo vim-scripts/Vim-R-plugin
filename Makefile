@@ -22,7 +22,7 @@
 
 
 PLUGINHOME=`pwd`
-PLUGINVERSION=0.9.5
+PLUGINVERSION=0.9.6
 DEBIANTIME=`date -R`
 PLUGINRELEASEDATE=`date +"%Y-%m-%d"`
 VIM2HTML=/usr/local/share/vim/vim73/doc/vim2html.pl 
@@ -45,7 +45,7 @@ zip:
 	    cp omniList.vanilla omniList )
 	# Update the version date in doc/r-plugin.txt header and in the news
 	sed -i -e "s/^Version: [0-9].[0-9].[0-9]/Version: $(PLUGINVERSION)/" doc/r-plugin.txt
-	sed -i -e "s/^[0-9].[0-9].[0-9] (201[0-9]-[0-9][0-9]-[0-9][0-9])$$/$(PLUGINVERSION) ($(PLUGINRELEASEDATE))/" doc/r-plugin.txt
+	sed -i -e "s/^$(PLUGINVERSION) (201[0-9]-[0-9][0-9]-[0-9][0-9])$$/$(PLUGINVERSION) ($(PLUGINRELEASEDATE))/" doc/r-plugin.txt
 	# Create a tar.gz file
 	tar -cvzf /tmp/vimrplugintmpfile.tar.gz ftdetect/r.vim indent/r.vim \
 	    indent/rnoweb.vim indent/rhelp.vim autoload/rcomplete.vim ftplugin/r*.vim \
