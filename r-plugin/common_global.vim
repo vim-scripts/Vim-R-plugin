@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Mon Dec 12, 2011  10:12PM
+" Last Change: Tue Dec 13, 2011  08:44AM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -2027,6 +2027,13 @@ function MakeRMenu()
     if &filetype == "r" || &filetype == "rnoweb" || &filetype == "rhelp" || g:vimrplugin_never_unmake_menu
         if g:vimrplugin_underscore == 1
             imenu <silent> R.Edit.Insert\ \"\ <-\ \"<Tab>_ <Esc>:call ReplaceUnderS()<CR>a
+            imenu <silent> R.Edit.Complete\ function\ name<Tab>^X^O <C-X><C-O>
+            if hasmapto("<Plug>RCompleteArgs", "i")
+                let boundkey = RIMapCmd("<Plug>RCompleteArgs")
+                exe "imenu <silent> R.Edit.Complete\\ function\\ arguments<Tab>" . boundkey . " " . boundkey
+            else
+                imenu <silent> R.Edit.Complete\ function\ arguments<Tab>^X^A <C-X><C-A>
+            endif
         endif
         menu R.Edit.-Sep71- <nul>
         nmenu <silent> R.Edit.Indent\ (line)<Tab>== ==
