@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Mon Dec 12, 2011  03:43PM
+" Last Change: Mon Dec 12, 2011  10:12PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -172,7 +172,7 @@ function RCompleteArgs()
             break
         endif
         let idx -= 1
-        if idx == 0
+        if idx <= 0
             let lnum -= 1
             if lnum == 0
                 break
@@ -182,6 +182,8 @@ function RCompleteArgs()
             let nl +=1
         endif
     endwhile
+    call cursor(cpos[1], cpos[2])
+    return ''
 endfunction
 
 function RCommentLine(lnum, ind, cmt)
