@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Mon Dec 05, 2011  07:27AM
+" Last Change: Tue Dec 13, 2011  08:44AM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -104,6 +104,86 @@ function ReplaceUnderS()
     else
         exe "normal! a <- "
     endif
+endfunction
+
+function RCompleteArgs()
+    let lnum = line(".")
+    let line = getline(".")
+    let cpos = getpos(".")
+    let idx = cpos[2] - 2
+    let idx2 = cpos[2] - 2
+    call cursor(lnum, cpos[2] - 1)
+    if line[idx2] == ' ' || line[idx2] == ',' || line[idx2] == '('
+        let idx2 = cpos[2]
+        let argkey = ''
+    else
+        let argkey = RGetKeyWord()
+        let idx2 = cpos[2] - strlen(argkey)
+    endif
+    let np = 1
+    let nl = 0
+    while np != 0 && nl < 10
+        if line[idx] == '('
+            let np -= 1
+        elseif line[idx] == ')'
+            let np += 1
+        endif
+        if np == 0
+            call cursor(lnum, idx)
+            let rkeyword = '^' . RGetKeyWord() . ';'
+            call cursor(cpos[1], cpos[2])
+            for omniL in g:rplugin_liblist
+                if omniL =~ rkeyword
+                    let tmp1 = split(omniL, ';')
+                    if len(tmp1) == 5
+                        let info = tmp1[4]
+                    else
+                        let tlen = len(tmp1)
+                        let info = tmp1[4]
+                        let i = 5
+                        while i < tlen
+                            let info = info . ';' . tmp1[i]
+                            let i += 1
+                        endwhile
+                    endif
+                    let info = substitute(info, "\t", '', "g")
+                    let argsL = split(info, ",")
+                    let args = []
+                    for id in range(len(argsL))
+                        let newkey = '^' . argkey
+                        let tmp2 = split(substitute(argsL[id], "^ *", '', ""), "=")
+                        if argkey == '' || tmp2[0] =~ newkey
+                            if len(tmp2) == 2
+                                let tmp2[0] = tmp2[0] . "= "
+                                let tmp3 = {'word': tmp2[0], 'menu': tmp2[1]}
+                            else
+                                if tmp2[0] != '...'
+                                    let tmp2[0] = tmp2[0] . " = "
+                                endif
+                                let tmp3 = {'word': tmp2[0], 'menu': ''}
+                            endif
+                            call add(args, tmp3)
+                        endif
+                    endfor
+                    call complete(idx2, args)
+                    return ''
+                endif
+            endfor
+            break
+        endif
+        let idx -= 1
+        if idx <= 0
+            let lnum -= 1
+            if lnum == 0
+                break
+            endif
+            let line = getline(lnum)
+            let idx = strlen(line)
+            let nl +=1
+        endif
+    endwhile
+    call cursor(cpos[1], cpos[2])
+    return ''
 endfunction
 
 function RCommentLine(lnum, ind, cmt)
@@ -1148,6 +1228,12 @@ endfunction
 " Send current line to R. Don't go down if called by <S-Enter>.
 function SendLineToR(godown)
     let line = getline(".")
+    if strlen(line) == 0
+        if a:godown =~ "down"
+            call GoDown()
+        endif
+        return
+    endif
 
     if &filetype == "rnoweb"
         if line =~ "^@$"
@@ -1941,6 +2027,13 @@ function MakeRMenu()
     if &filetype == "r" || &filetype == "rnoweb" || &filetype == "rhelp" || g:vimrplugin_never_unmake_menu
         if g:vimrplugin_underscore == 1
             imenu <silent> R.Edit.Insert\ \"\ <-\ \"<Tab>_ <Esc>:call ReplaceUnderS()<CR>a
+            imenu <silent> R.Edit.Complete\ function\ name<Tab>^X^O <C-X><C-O>
+            if hasmapto("<Plug>RCompleteArgs", "i")
+                let boundkey = RIMapCmd("<Plug>RCompleteArgs")
+                exe "imenu <silent> R.Edit.Complete\\ function\\ arguments<Tab>" . boundkey . " " . boundkey
+            else
+                imenu <silent> R.Edit.Complete\ function\ arguments<Tab>^X^A <C-X><C-A>
+            endif
         endif
         menu R.Edit.-Sep71- <nul>
         nmenu <silent> R.Edit.Indent\ (line)<Tab>== ==
@@ -2136,6 +2229,11 @@ function RCreateEditMaps()
     if g:vimrplugin_underscore == 1
         imap <buffer><silent> _ <Esc>:call ReplaceUnderS()<CR>a
     endif
+    if hasmapto("<Plug>RCompleteArgs", "i")
+        imap <buffer><silent> <Plug>RCompleteArgs <C-R>=RCompleteArgs()<CR>
+    else
+        imap <buffer><silent> <C-X><C-A> <C-R>=RCompleteArgs()<CR>
+    endif
 endfunction
 
 function RCreateSendMaps()
@@ -2235,6 +2333,11 @@ else
     unlet newuline
 endif
 
+if has("win32") || has("win64")
+    let g:rplugin_home = substitute(g:rplugin_home, "\\", "/", "g")
+    let g:rplugin_uservimfiles = substitute(g:rplugin_uservimfiles, "\\", "/", "g")
+endif
+
 if isdirectory("/tmp")
     let $VIMRPLUGIN_TMPDIR = "/tmp/r-plugin-" . g:rplugin_userlogin
 else
@@ -2272,14 +2375,16 @@ call RSetDefaultValue("g:vimrplugin_buildwait",       120)
 call RSetDefaultValue("g:vimrplugin_indent_commented",  1)
 call RSetDefaultValue("g:vimrplugin_by_vim_instance",   0)
 call RSetDefaultValue("g:vimrplugin_never_unmake_menu", 0)
-call RSetDefaultValue("g:vimrplugin_vimpager",       "'vertical'")
+call RSetDefaultValue("g:vimrplugin_vimpager",       "'tab'")
 call RSetDefaultValue("g:vimrplugin_latexcmd", "'pdflatex'")
+call RSetDefaultValue("g:vimrplugin_objbr_place", "'script,right'")
 
-if has("gui_running") || !has("clientserver")
-    call RSetDefaultValue("g:vimrplugin_objbr_place", "'script,right'")
-else
-    call RSetDefaultValue("g:vimrplugin_objbr_place", "'console,right'")
-endif
+" Old default value.
+"if has("gui_running") || !has("clientserver")
+"    call RSetDefaultValue("g:vimrplugin_objbr_place", "'script,right'")
+"else
+"    call RSetDefaultValue("g:vimrplugin_objbr_place", "'console,right'")
+"endif
 
 " ^K (\013) cleans from cursor to the right and ^U (\025) cleans from cursor
 " to the left. However, ^U causes a beep if there is nothing to clean. The
@@ -2467,8 +2572,6 @@ if has("win32") || has("win64")
         finish
     endif
     let g:rplugin_jspath = g:rplugin_home . "\\r-plugin\\vimActivate.js"
-    let g:rplugin_home = substitute(g:rplugin_home, "\\", "/", "g")
-    let g:rplugin_uservimfiles = substitute(g:rplugin_uservimfiles, "\\", "/", "g")
     if !exists("g:rplugin_rpathadded")
         if exists("g:vimrplugin_r_path")
             let $PATH = g:vimrplugin_r_path . ";" . $PATH

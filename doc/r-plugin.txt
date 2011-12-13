@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 0.9.5
+Version: 0.9.6
 For Vim version 7.3
 
  1. Overview                                    |r-plugin-overview|
@@ -144,10 +144,11 @@ following dependencies:
 >
    install.packages(c("colorout", "setwidth"))
 <
-If you are using Vim (not GVim), the plugin will run inside a Tmux session. If
-you are not already a user of Tmux, please, read the |r-plugin-tmux| section
-to learn a few useful shortcuts. The tmux.conf file created by the plugin sets
-Tmux to work with Vi key bindings.
+The plugin will run R inside a Tmux session. If you are using Vim (not GVim),
+you may be interested in reading |r-plugin-tmux| section to learn a few useful
+shortcuts. The tmux.conf file created by the plugin sets Tmux to work with Vi
+key bindings, <C-a> as the escape character and also enables the mouse for
+Tmux.
 
 Note: The plugin can use different mechanisms to send commands to R. The
 mechanism that will be used depends on both what applications and plugins you
@@ -373,6 +374,8 @@ Command
 
 Edit
   . Insert "<-"                                          _
+  . Complete function name                            ^X^O
+  . Complete function arguments                       ^X^A
   --------------------------------------------------------
   . Indent (line)                                       ==
   . Indent (selected lines)                              =
@@ -436,6 +439,12 @@ case:
    summary(x)
    summary(m)
 <
+When completing function names (CTRL-X CTRL-O) and function arguments (CTRL-X
+CTRL-A) you have to press CTRL-N to go foward in the list and CTRL-P to go
+backward (see |popupmenu-completion|). Note: if using Vim in a terminal
+emulator, Tmux will capture the CTRL-A command. You have to do CTRL-A twice to
+pass a single CTRL-A to Vim.
+
 
 4.2. Edition of rnoweb files~
 
@@ -939,13 +948,13 @@ document.
 
 The valid values of vimrplugin_vimpager are:
    
+   "tab"       : Show the help document in a new tab. If there is already a
+                 tab with an R help document, use it.
+		 This is the default.
    "vertical"  : Split the window vertically if the editor width is large
 		 enough; otherwise, split the window horizontally and attempt
 		 to set the window height to at least 20 lines.
-		 This is the default.
    "horizontal": Split the window horizontally.
-   "tab"       : Show the help document in a new tab. If there is already a
-                 tab with an R help document, use it.
    "tabnew"    : Show the help document in a new tab.
    "no"        : Do not show R documentation in Vim.
 
@@ -1262,8 +1271,13 @@ list of the names for custom key bindings:
    RSendLAndOpenNewOne       RSendFile                RSweave
    RSendMBlock               RESendFile               RUpdateObjBrowser
    RDSendMBlock              RHelp                    RVanillaStart
-   RESendMBlock              RListSpace
+   RESendMBlock              RListSpace               RCompleteArgs
    REDSendMBlock             RMakePDF
+<
+The completion of function arguments only happens in Insert mode. To customize
+its keybind you should put in your |vimrc| something as in the example:
+>
+   imap <C-A> <Plug>RCompleteArgs
 <
 The plugin also contains a function called RAction which allows you to build
 ad-hoc commands to R. This function takes the name of an R function such as
@@ -1812,6 +1826,13 @@ the R syntax highlighted.
 ==============================================================================
 							       *r-plugin-news*
 12. News~
+
+0.9.6 (2011-12-13)
+
+ * Fix path to R source() command on Windows.
+ * New default value of vimrplugin_vimpager = "tab".
+ * New default value of vimrplugin_objbr_place = "editor,right"
+ * Autocompletion of function arguments with <C-X><C-A>.
 
 0.9.5 (2011-12-07)
 
