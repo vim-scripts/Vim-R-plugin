@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Wed Dec 14, 2011  08:05AM
+" Last Change: Wed Dec 14, 2011  08:28AM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -1357,7 +1357,11 @@ function BuildROmniList(env, what)
     endif
     let lockfile = rtf . ".locked"
     call writefile(["Wait!"], lockfile)
-    let omnilistcmd = 'source("' . g:rplugin_home . '/r-plugin/build_omniList.R") ; .vim.bol("' . rtf . '"'
+    if g:vimrplugin_vimcom
+        let omnilistcmd = 'vim.bol("' . rtf . '"'
+    else
+        let omnilistcmd = 'source("' . g:rplugin_home . '/r-plugin/build_omniList.R") ; .vim.bol("' . rtf . '"'
+    endif
     if a:env == "libraries" && a:what == "installed"
         let omnilistcmd = omnilistcmd . ', what = "installed"'
     endif
@@ -1688,7 +1692,11 @@ function PrintRObject(rkeyword)
     if classfor == ""
         call SendCmdToR("print(" . a:rkeyword . ")")
     else
-        call SendCmdToR('source("' . g:rplugin_home . '/r-plugin/vimprint.R") ; .vim.print("' . a:rkeyword . '", ' . classfor . ")")
+        if g:vimrplugin_vimcom
+            call SendCmdToR('vim.print("' . a:rkeyword . '", ' . classfor . ")")
+        else
+            call SendCmdToR('source("' . g:rplugin_home . '/r-plugin/vimprint.R") ; .vim.print("' . a:rkeyword . '", ' . classfor . ")")
+        endif
     endif
 endfunction
 
@@ -1714,10 +1722,18 @@ function RAction(rcmd)
         endif
         let rfun = a:rcmd
         if a:rcmd == "args" && g:vimrplugin_listmethods == 1
-            let rfun = "source('" . g:rplugin_home . "/r-plugin/specialfuns.R') ; .vim.list.args"
+            if g:vimrplugin_vimcom
+                let rfun = "vim.list.args"
+            else
+                let rfun = "source('" . g:rplugin_home . "/r-plugin/specialfuns.R') ; .vim.list.args"
+            endif
         endif
         if a:rcmd == "plot" && g:vimrplugin_specialplot == 1
-            let rfun = "source('" . g:rplugin_home . "/r-plugin/specialfuns.R') ; .vim.plot"
+            if g:vimrplugin_vimcom
+                let rfun = "vim.plot"
+            else
+                let rfun = "source('" . g:rplugin_home . "/r-plugin/specialfuns.R') ; .vim.plot"
+            endif
         endif
         let raction = rfun . "(" . rkeyword . ")"
         let ok = SendCmdToR(raction)
