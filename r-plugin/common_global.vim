@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Tue Dec 13, 2011  08:44AM
+" Last Change: Wed Dec 14, 2011  08:05AM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -503,7 +503,9 @@ function StartR(whatr)
     endif
 
     if g:vimrplugin_screenplugin
-        let rcmd = "VIMRPLUGIN_TMPDIR=" . $VIMRPLUGIN_TMPDIR . " " . rcmd
+        if g:vimrplugin_vimcom == 0
+            let rcmd = "VIMRPLUGIN_TMPDIR=" . $VIMRPLUGIN_TMPDIR . " " . rcmd
+        endif
         if g:vimrplugin_tmux == 0 && g:vimrplugin_noscreenrc == 0 && exists("g:ScreenShellScreenInitArgs")
             let g:ScreenShellScreenInitArgs = RWriteScreenRC()
         endif
@@ -645,28 +647,33 @@ function RObjBrowser()
     endif
 
     " R builds the Object Browser contents.
-    let lockfile = $VIMRPLUGIN_TMPDIR . "/objbrowser" . "lock"
-    call writefile(["Wait!"], lockfile)
-    if g:vimrplugin_allnames == 1
-        call SendCmdToR('source("' . g:rplugin_home . '/r-plugin/vimbrowser.R") ; .vim.browser(TRUE)')
+    if g:vimrplugin_vimcom
+        let objbr = "'" . $VIMRPLUGIN_TMPDIR . "/objbrowser" . "'"
+        exe 'python SendToR("\004vim.browser(' . g:vimrplugin_allnames . ', ' . objbr . ')")'
     else
-        call SendCmdToR('source("' . g:rplugin_home . '/r-plugin/vimbrowser.R") ; .vim.browser()')
-    endif
-    sleep 50m
-    let i = 0 
-    while filereadable(lockfile)
-        let i = i + 1
-        sleep 50m
-        if i == 40
-            call delete(lockfile)
-            call RWarningMsg("No longer waiting for Object Browser to finish...")
-            if exists("g:rplugin_r_output")
-                echo g:rplugin_r_output
-            endif
-            sleep 2
-            return
+        let lockfile = $VIMRPLUGIN_TMPDIR . "/objbrowser" . "lock"
+        call writefile(["Wait!"], lockfile)
+        if g:vimrplugin_allnames == 1
+            call SendCmdToR('source("' . g:rplugin_home . '/r-plugin/vimbrowser.R") ; .vim.browser(TRUE)')
+        else
+            call SendCmdToR('source("' . g:rplugin_home . '/r-plugin/vimbrowser.R") ; .vim.browser()')
         endif
-    endwhile
+        sleep 50m
+        let i = 0 
+        while filereadable(lockfile)
+            let i = i + 1
+            sleep 50m
+            if i == 40
+                call delete(lockfile)
+                call RWarningMsg("No longer waiting for Object Browser to finish...")
+                if exists("g:rplugin_r_output")
+                    echo g:rplugin_r_output
+                endif
+                sleep 2
+                return
+            endif
+        endwhile
+    endif
 
     let g:rplugin_origbuf = bufname("%")
 
@@ -1582,28 +1589,33 @@ function ShowRDoc(rkeyword, package)
 
     call SetRTextWidth()
 
-    call writefile(['Wait...'], g:rplugin_docfile . "lock")
-    if classfor == ""
-        if a:package == ""
-            call SendCmdToR("source('" . g:rplugin_home . "/r-plugin/vimhelp.R') ; .vim.help('" . a:rkeyword . "', " . g:rplugin_htw . "L)")
-        else
-            call SendCmdToR("source('" . g:rplugin_home . "/r-plugin/vimhelp.R') ; .vim.help('" . a:rkeyword . "', " . g:rplugin_htw . "L, package = '" . a:package . "')")
-        endif
+    if g:vimrplugin_vimcom
+        exe 'python SendToR("\004vim.help(' . "'" . a:rkeyword . "', " . g:rplugin_htw . 'L)")'
+        exe 'python SendToR("\004vim.help(' . "'" . a:rkeyword . "', " . g:rplugin_htw . "L, '" . classfor . "')". '")'
     else
-        call SendCmdToR("source('" . g:rplugin_home . "/r-plugin/vimhelp.R') ; .vim.help('" . a:rkeyword . "', " . g:rplugin_htw . "L, " . classfor . ")")
-    endif
-    sleep 50m
-
-    let i = 0
-    while filereadable(g:rplugin_docfile . "lock") && i < 40
+        call writefile(['Wait...'], g:rplugin_docfile . "lock")
+        if classfor == ""
+            if a:package == ""
+                call SendCmdToR("source('" . g:rplugin_home . "/r-plugin/vimhelp.R') ; .vim.help('" . a:rkeyword . "', " . g:rplugin_htw . "L)")
+            else
+                call SendCmdToR("source('" . g:rplugin_home . "/r-plugin/vimhelp.R') ; .vim.help('" . a:rkeyword . "', " . g:rplugin_htw . "L, package = '" . a:package . "')")
+            endif
+        else
+            call SendCmdToR("source('" . g:rplugin_home . "/r-plugin/vimhelp.R') ; .vim.help('" . a:rkeyword . "', " . g:rplugin_htw . "L, " . classfor . ")")
+        endif
         sleep 50m
-        let i += 1
-    endwhile
-    if i == 40
-        echohl WarningMsg
-        echomsg "Waited too much time..."
-        echohl Normal
-        return
+
+        let i = 0
+        while filereadable(g:rplugin_docfile . "lock") && i < 40
+            sleep 50m
+            let i += 1
+        endwhile
+        if i == 40
+            echohl WarningMsg
+            echomsg "Waited too much time..."
+            echohl Normal
+            return
+        endif
     endif
 
     " Local variables that must be inherited by the rdoc buffer
@@ -2362,6 +2374,7 @@ call RSetDefaultValue("g:vimrplugin_i386",              0)
 call RSetDefaultValue("g:vimrplugin_screenvsplit",      0)
 call RSetDefaultValue("g:vimrplugin_conquevsplit",      0)
 call RSetDefaultValue("g:vimrplugin_conqueplugin",      0)
+call RSetDefaultValue("g:vimrplugin_vimcom",            0)
 call RSetDefaultValue("g:vimrplugin_listmethods",       0)
 call RSetDefaultValue("g:vimrplugin_specialplot",       0)
 call RSetDefaultValue("g:vimrplugin_nosingler",         0)
@@ -2385,6 +2398,14 @@ call RSetDefaultValue("g:vimrplugin_objbr_place", "'script,right'")
 "else
 "    call RSetDefaultValue("g:vimrplugin_objbr_place", "'console,right'")
 "endif
+
+if has("python")
+    if g:vimrplugin_vimcom
+        exe "pyfile " . g:rplugin_home . "/r-plugin/vimcom_client.py"
+    endif
+else
+    g:vimrplugin_vimcom = 0
+endif
 
 " ^K (\013) cleans from cursor to the right and ^U (\025) cleans from cursor
 " to the left. However, ^U causes a beep if there is nothing to clean. The
