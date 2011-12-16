@@ -16,7 +16,7 @@
 "
 " Author: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          
-" Last Change: Wed Nov 30, 2011  05:17PM
+" Last Change: Wed Dec 14, 2011  10:13PM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -646,6 +646,14 @@ function! SourceObjBrLines()
     exe "source " . $VIMRPLUGIN_TMPDIR . "/objbrowserInit"
 endfunction
 
+function! OnOBBufEnter()
+    if exists("b:myservername")
+        call remote_expr(b:myservername, "RObjBrowser()")
+    else
+        call RObjBrowser()
+    endif
+endfunction
+
 nmap <buffer><silent> <CR> :call RBrowserDoubleClick()<CR>
 nmap <buffer><silent> <2-LeftMouse> :call RBrowserDoubleClick()<CR>
 nmap <buffer><silent> <RightMouse> :call RBrowserRightClick()<CR>
@@ -667,6 +675,7 @@ if has("gui_running")
 endif
 
 au BufUnload <buffer> call ObBrBufUnload()
+au BufEnter <buffer> call OnOBBufEnter()
 
 let &cpo = s:cpo_save
 unlet s:cpo_save

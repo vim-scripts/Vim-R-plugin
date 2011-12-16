@@ -19,7 +19,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Thu Nov 10, 2011  01:35PM
+" Last Change: Thu Dec 15, 2011  10:27PM
 "
 " Please see doc/r-plugin.txt for usage details.
 "==========================================================================
@@ -97,6 +97,18 @@ if g:vimrplugin_by_vim_instance == 1
   endif
   unlet s:sname
 endif
+
+
+if g:vimrplugin_screenplugin
+    let s:uniquename = b:screensname . g:rplugin_firstbuffer
+else
+    let s:uniquename = b:screensname
+endif
+let $VIMINSTANCEID = $VIMRPLUGIN_TMPDIR . "/" . s:uniquename . "-port"
+let b:objbr_server = "OB" . s:uniquename
+unlet s:uniquename
+let b:objbr_server = toupper(substitute(b:objbr_server, '\W', "", "g"))
+
 
 let g:rplugin_lastft = &filetype
 

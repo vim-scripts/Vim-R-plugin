@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Wed Dec 14, 2011  08:28AM
+" Last Change: Fri Dec 16, 2011  01:47AM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -120,6 +120,10 @@ function RCompleteArgs()
         let argkey = RGetKeyWord()
         let idx2 = cpos[2] - strlen(argkey)
     endif
+    if b:needsnewomnilist == 1
+      call BuildROmniList("GlobalEnv", "none")
+    endif
+    let flines = g:rplugin_globalenvlines + g:rplugin_liblist
     let np = 1
     let nl = 0
     while np != 0 && nl < 10
@@ -132,7 +136,7 @@ function RCompleteArgs()
             call cursor(lnum, idx)
             let rkeyword = '^' . RGetKeyWord() . ';'
             call cursor(cpos[1], cpos[2])
-            for omniL in g:rplugin_liblist
+            for omniL in flines
                 if omniL =~ rkeyword
                     let tmp1 = split(omniL, ';')
                     if len(tmp1) == 5
@@ -636,6 +640,7 @@ function StartR(whatr)
     echon
 endfunction
 
+
 " Open an Object Browser window
 function RObjBrowser()
     " Only opens the Object Browser if R is running
@@ -645,11 +650,17 @@ function RObjBrowser()
     if g:vimrplugin_conqueplugin && !exists("b:conque_bufname")
         return
     endif
+    if g:rplugin_running_objbr == 1
+        " Called twice due to BufEnter event
+        return
+    endif
+
+    let g:rplugin_running_objbr = 1
 
     " R builds the Object Browser contents.
     if g:vimrplugin_vimcom
         let objbr = "'" . $VIMRPLUGIN_TMPDIR . "/objbrowser" . "'"
-        exe 'python SendToR("\004vim.browser(' . g:vimrplugin_allnames . ', ' . objbr . ')")'
+        exe 'python SendToR("vim.browser(' . g:vimrplugin_allnames . ', ' . objbr . ')")'
     else
         let lockfile = $VIMRPLUGIN_TMPDIR . "/objbrowser" . "lock"
         call writefile(["Wait!"], lockfile)
@@ -670,6 +681,7 @@ function RObjBrowser()
                     echo g:rplugin_r_output
                 endif
                 sleep 2
+                let g:rplugin_running_objbr = 0
                 return
             endif
         endwhile
@@ -684,8 +696,10 @@ function RObjBrowser()
         while !filereadable(objbr)
             sleep 100m
             if i == 20
+                let g:rplugin_running_objbr = 0
                 return
             endif
+            let i += 1
         endwhile
 
         " This is the Object Browser
@@ -694,12 +708,13 @@ function RObjBrowser()
                 call remote_send(b:myservername, "<Esc>")
             endif
             call remote_expr(b:myservername, "RObjBrowser()")
+            let g:rplugin_running_objbr = 0
             return
         endif
 
         " Start the Object Browser if it doesn't exist yet
         let slist = serverlist()
-        if slist !~ "OBJBROWSER"
+        if slist !~ b:objbr_server
             if g:vimrplugin_objbr_place =~ "left"
                 " Get the R Console width:
                 let conw = system("tmux list-panes | cat")
@@ -713,12 +728,13 @@ function RObjBrowser()
             else
                 let panewidth = g:vimrplugin_objbr_w
             endif
-            let cmd = "tmux split-window -d -h -l " . panewidth . ' -t 1 "vim --servername OBJBROWSER"'
+            let cmd = "tmux split-window -d -h -l " . panewidth . ' -t 1 "vim --servername ' . b:objbr_server . '"'
             let rlog = system(cmd)
             if v:shell_error
                 let rlog = substitute(rlog, '\n', ' ', 'g')
                 let rlog = substitute(rlog, '\r', ' ', 'g')
                 call RWarningMsg(rlog)
+                let g:rplugin_running_objbr = 0
                 return 0
             endif
             if g:vimrplugin_objbr_place =~ "left"
@@ -741,6 +757,7 @@ function RObjBrowser()
                     \ 'let curcol = col(".")',
                     \ 'normal! ggDjdG',
                     \ 'source ' . objbr,
+                    \ 'call delete("' . objbr . '")',
                     \ 'call RBrowserFillCloseList()',
                     \ 'call RBrowserFill(0)',
                     \ 'setlocal nomodified',
@@ -752,14 +769,15 @@ function RObjBrowser()
         while idx < 20
             sleep 300m
             let slist = serverlist()
-            if slist =~ "OBJBROWSER"
+            if slist =~ b:objbr_server
                 break
             endif
             let idx = idx + 1
         endwhile
 
-        call remote_send("OBJBROWSER", ":source " . objbrowserfile . "<CR>")
-        call remote_send("OBJBROWSER", ":echon<CR>")
+        call remote_send(b:objbr_server, ":source " . objbrowserfile . "<CR>")
+        call remote_send(b:objbr_server, ":echon<CR>")
+        let g:rplugin_running_objbr = 0
         return
     endif
 
@@ -820,8 +838,10 @@ function RObjBrowser()
         if i == 20
             exe "sb " . g:rplugin_origbuf
             exe "set switchbuf=" . savesb
+            let g:rplugin_running_objbr = 0
             return
         endif
+        let i += 1
     endwhile
     setlocal modifiable
     let curline = line(".")
@@ -838,14 +858,16 @@ function RObjBrowser()
     redraw
     exe "sb " . g:rplugin_origbuf
     exe "set switchbuf=" . savesb
+    call delete(objbr)
+    let g:rplugin_running_objbr = 0
 endfunction
 
 function RObjBrowserOCLists(status)
     if exists("*RBrowserOpenCloseLists")
         call RBrowserOpenCloseLists(a:status)
-    elseif serverlist() =~ "OBJBROWSER"
-        call remote_expr("OBJBROWSER", "RBrowserOpenCloseLists(" . a:status . ")")
-        call remote_send("OBJBROWSER", ":redraw<CR>:echon ' '<CR>")
+    elseif serverlist() =~ b:objbr_server
+        call remote_expr(b:objbr_server, "RBrowserOpenCloseLists(" . a:status . ")")
+        call remote_send(b:objbr_server, ":redraw<CR>:echon ' '<CR>")
     endif
 endfunction
 
@@ -1312,8 +1334,8 @@ endfunction
 
 " Quit R
 function RQuit(how)
-    if serverlist() =~ "OBJBROWSER"
-        call remote_send("OBJBROWSER", ":q<CR>")
+    if serverlist() =~ b:objbr_server
+        call remote_send(b:objbr_server, ":q<CR>")
         sleep 500m
     endif
 
@@ -1369,36 +1391,40 @@ function BuildROmniList(env, what)
         let omnilistcmd = omnilistcmd . ', allnames = TRUE'
     endif
     let omnilistcmd = omnilistcmd . ')'
-    let ok = SendCmdToR(omnilistcmd)
-    if ok == 0
-        return
-    endif
-
-    " Wait while R is writing the list of objects into the file
-    sleep 50m
-    let i = 0 
-    let s = 0
-    while filereadable(lockfile)
-        let s = s + 1
-        if s == 4 && a:env !~ "GlobalEnv"
-            let s = 0
-            let i = i + 1
-            let k = g:vimrplugin_buildwait - i
-            let themsg = "\rPlease, wait! [" . i . ":" . k . "]"
-            echon themsg
-        endif
-        sleep 250m
-        if i == g:vimrplugin_buildwait
-            call delete(lockfile)
-            call RWarningMsg("No longer waiting. See  :h vimrplugin_buildwait  for details.")
+    if g:vimrplugin_vimcom && a:env =~ "GlobalEnv"
+        exe "python SendToR('" . omnilistcmd . "')"
+    else
+        let ok = SendCmdToR(omnilistcmd)
+        if ok == 0
             return
         endif
-    endwhile
+
+        " Wait while R is writing the list of objects into the file
+        sleep 50m
+        let i = 0 
+        let s = 0
+        while filereadable(lockfile)
+            let s = s + 1
+            if s == 4 && a:env !~ "GlobalEnv"
+                let s = 0
+                let i = i + 1
+                let k = g:vimrplugin_buildwait - i
+                let themsg = "\rPlease, wait! [" . i . ":" . k . "]"
+                echon themsg
+            endif
+            sleep 250m
+            if i == g:vimrplugin_buildwait
+                call delete(lockfile)
+                call RWarningMsg("No longer waiting. See  :h vimrplugin_buildwait  for details.")
+                return
+            endif
+        endwhile
+    endif
 
     if a:env == "GlobalEnv"
         let g:rplugin_globalenvlines = readfile(g:rplugin_globalenvfname)
     endif
-    if i > 2
+    if g:vimrplugin_vimcom == 0 && i > 2
         echon "\rFinished in " . i . " seconds."
     endif
 endfunction
@@ -1594,8 +1620,28 @@ function ShowRDoc(rkeyword, package)
     call SetRTextWidth()
 
     if g:vimrplugin_vimcom
-        exe 'python SendToR("\004vim.help(' . "'" . a:rkeyword . "', " . g:rplugin_htw . 'L)")'
-        exe 'python SendToR("\004vim.help(' . "'" . a:rkeyword . "', " . g:rplugin_htw . "L, '" . classfor . "')". '")'
+        let g:rplugin_lastrpl = ""
+        if classfor == ""
+            exe 'python SendToR("vim.help(' . "'" . a:rkeyword . "', " . g:rplugin_htw . 'L)")'
+        else
+            exe 'python SendToR("vim.help(' . "'" . a:rkeyword . "', " . g:rplugin_htw . "L, '" . classfor . "')". '")'
+        endif
+        if g:rplugin_lastrpl != "VIMHELP"
+            if g:rplugin_lastrpl =~ "^MULTILIB"
+                echo "The topic '" . a:rkeyword . "' was found in more than one library:"
+                let libs = split(g:rplugin_lastrpl)
+                for idx in range(1, len(libs) - 1)
+                    echo idx . " : " . libs[idx]
+                endfor
+                let chn = input("Please, select one of them: ")
+                if chn > 0 && chn < len(libs)
+                    exe 'python SendToR("vim.help(' . "'" . a:rkeyword . "', " . g:rplugin_htw . "L, package='" . libs[chn] . "')" . '")'
+                endif
+            else
+                call RWarningMsg(g:rplugin_lastrpl)
+                return
+            endif
+        endif
     else
         call writefile(['Wait...'], g:rplugin_docfile . "lock")
         if classfor == ""
@@ -2801,6 +2847,10 @@ if has("gui_running")
         au BufEnter * call RBufEnter()
     augroup END
 endif
+
+let g:rplugin_firstbuffer = expand("%")
+let g:rplugin_firstbuffer = substitute(g:rplugin_firstbuffer, " ", "", "")
+let g:rplugin_running_objbr = 0
 
 " Debugging code:
 if g:vimrplugin_screenplugin && g:vimrplugin_conqueplugin
