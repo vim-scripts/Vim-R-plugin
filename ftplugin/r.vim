@@ -19,7 +19,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Sun Nov 27, 2011  04:35PM
+" Last Change: Tue Dec 20, 2011  11:38PM
 "
 " Please see doc/r-plugin.txt for usage details.
 "==========================================================================
@@ -102,7 +102,7 @@ call RCreateMaps("nvi", '<Plug>RSetwd',        'rd', ':call RSetWD()')
 "-------------------------------------
 if &filetype == "rnoweb"
     call RCreateMaps("nvi", '<Plug>RSweave',      'sw', ':call RSweave()')
-    call RCreateMaps("nvi", '<Plug>RMakePDF',     'sp', ':call RMakePDF()')
+    call RCreateMaps("nvi", '<Plug>RMakePDF',     'sp', ':call RMakePDF("nobib")')
     call RCreateMaps("nvi", '<Plug>RIndent',      'si', ':call RnwToggleIndentSty()')
 endif
 
