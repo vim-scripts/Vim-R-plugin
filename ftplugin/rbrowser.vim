@@ -16,7 +16,7 @@
 "
 " Author: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          
-" Last Change: Wed Dec 14, 2011  10:13PM
+" Last Change: Wed Dec 21, 2011  04:49PM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -78,6 +78,57 @@ endif
 let b:list_order = {}
 
 let b:liblist = []
+
+function! UpdateGlobalEnv()
+    if g:rplugin_curview == "libraries"
+        return
+    endif
+    if exists("g:rplugin_curbuf") && g:rplugin_curbuf != "Object_Browser"
+        let savesb = &switchbuf
+        set switchbuf=useopen,usetab
+        sil noautocmd sb Object_Browser
+        let g:rplugin_switchedbuf = 1
+    else
+        let g:rplugin_switchedbuf = 0
+    endif
+    set modifiable
+    let curline = line(".")
+    let curcol = col(".")
+    if !exists("curline")
+        let curline = 3
+    endif
+    if !exists("curcol")
+        let curcol = 1
+    endif
+    sil normal! ggdG
+    call setline(1, ".GlobalEnv | Libraries")
+    exe "silent read " . $VIMRPLUGIN_TMPDIR . "/object_browser"
+    call cursor(curline, curcol)
+    set nomodifiable
+    if g:rplugin_switchedbuf
+        exe "sil noautocmd sb " . g:rplugin_curbuf
+        exe "set switchbuf=" . savesb
+    endif
+endfunction
+
+function! UpdateLibraries()
+    if exists("g:rplugin_curbuf") && g:rplugin_curbuf != "Object_Browser"
+        let savesb = &switchbuf
+        set switchbuf=useopen,usetab
+        sil noautocmd sb Object_Browser
+        let g:rplugin_switchedbuf = 1
+    else
+        let g:rplugin_switchedbuf = 0
+    endif
+    exe "silent source " . $VIMRPLUGIN_TMPDIR . "/liblist"
+    if g:rplugin_curview == "libraries"
+        call RBrowserShowLibs(0)
+    endif
+    if g:rplugin_switchedbuf
+        exe "sil noautocmd sb " . g:rplugin_curbuf
+        exe "set switchbuf=" . savesb
+    endif
+endfunction
 
 function! RBrowserMakeLibDict()
     let b:libdict = {}
@@ -323,6 +374,11 @@ function! RBrowserFillCloseList()
 endfunction
 
 function! RBrowserShowGE(fromother)
+    if g:vimrplugin_vimcom
+        let g:rplugin_curview = "GlobalEnv"
+        call UpdateGlobalEnv()
+        return
+    endif
     let g:rplugin_curview = "GlobalEnv"
     if a:fromother == 0
         let g:rplugin_curbline = line(".")
@@ -351,9 +407,7 @@ function! RBrowserShowLibs(fromother)
         let g:rplugin_curlcol = col(".")
     endif
 
-    if !exists("b:libdict")
-        call RBrowserMakeLibDict()
-    endif
+    call RBrowserMakeLibDict()
 
     setlocal modifiable
     sil normal! ggdG
@@ -373,7 +427,7 @@ function! RBrowserShowLibs(fromother)
     let hasmissing = 0
     let misslibs = []
     for lib in b:liblist
-        if search('#' . lib, "wn") == 0
+        if lib != "setwidth" && search('#' . lib, "wn") == 0
             let hasmissing += 1
             call add(misslibs, lib)
         endif
@@ -428,6 +482,13 @@ function! RBrowserDoubleClick()
     endif
 
     " Toggle state of list or data.frame: open X closed
+    if g:vimrplugin_vimcom && g:rplugin_curview == "GlobalEnv"
+        let key = RBrowserGetName(1)
+        exe 'python SendToR("' . "\005" . '-' . substitute(key, '\$', '-', "g") . '")'
+        call UpdateGlobalEnv()
+        return
+    endif
+
     let key = RBrowserGetName(0)
     for i in keys(g:rplugin_opendict)
         if i == key
@@ -454,10 +515,19 @@ function! RBrowserOpenCloseLists(status)
         endif
     endif
 
-    for key in keys(g:rplugin_opendict)
-        let g:rplugin_opendict[key] = a:status
-    endfor
-    call RBrowserFill(0)
+    if g:vimrplugin_vimcom
+        exe 'python SendToR("' . "\006" . a:status . '")'
+        if g:rplugin_curview == "GlobalEnv"
+            call UpdateGlobalEnv()
+        else
+            call UpdateLibraries()
+        endif
+    else
+        for key in keys(g:rplugin_opendict)
+            let g:rplugin_opendict[key] = a:status
+        endfor
+        call RBrowserFill(0)
+    endif
 
     if !exists("b:myservername")
         if switchedbuf
@@ -637,6 +707,10 @@ function! LeaveRBrowser()
 endfunction
 
 function! ObBrBufUnload()
+    py SendToR("\x08Stop Updating Info")
+    py StopOBServer()
+    call delete($VIMRPLUGIN_TMPDIR . "/object_browser")
+    call delete($VIMRPLUGIN_TMPDIR . "/liblist")
     if exists("b:myservername")
         call system("tmux select-pane -t 0")
     endif
@@ -647,6 +721,9 @@ function! SourceObjBrLines()
 endfunction
 
 function! OnOBBufEnter()
+    if g:vimrplugin_vimcom
+        return
+    endif
     if exists("b:myservername")
         call remote_expr(b:myservername, "RObjBrowser()")
     else
@@ -673,6 +750,9 @@ if has("gui_running")
     exe "augroup END"
     unlet s:thisbuffname
 endif
+
+call writefile([], $VIMRPLUGIN_TMPDIR . "/object_browser")
+call writefile([], $VIMRPLUGIN_TMPDIR . "/liblist")
 
 au BufUnload <buffer> call ObBrBufUnload()
 au BufEnter <buffer> call OnOBBufEnter()

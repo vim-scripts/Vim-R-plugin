@@ -2,9 +2,10 @@
 import socket
 import vim
 import threading
-from os import getenv
+import os
 PORT = 0
-KeepChecking = 1
+OBPort = 0
+sock = None
 
 
 def DiscoverVimComPort():
@@ -12,9 +13,14 @@ def DiscoverVimComPort():
     HOST = "localhost"
     PORT = 9998
     repl = "NOTHING"
-    correct_repl = getenv("VIMINSTANCEID")
+    correct_repl = vim.eval("$VIMINSTANCEID")
+    if correct_repl is None:
+        correct_repl = os.getenv("VIMINSTANCEID")
+        if correct_repl is None:
+            vim.command("call RWarningMsg('VIMINSTANCEID not found.')")
+            return
 
-    while repl != correct_repl and PORT < 10050:
+    while correct_repl.find(repl) < 0 and PORT < 10050:
         PORT = PORT + 1
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.settimeout(0.1)
@@ -39,6 +45,7 @@ def SendToR(aString):
         PORT = DiscoverVimComPort()
         if PORT == 0:
             return
+    received = None
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.settimeout(3.0)
@@ -47,6 +54,8 @@ def SendToR(aString):
         sock.connect((HOST, PORT))
         sock.send(aString)
         received = sock.recv(1024)
+    except:
+        pass
     finally:
         sock.close()
 
@@ -56,21 +65,78 @@ def SendToR(aString):
         vim.command("let g:rplugin_lastrpl = '" + received + "'")
 
 
-def CheckObjects():
-    global KeepChecking
-    if KeepChecking == 0:
-        return
-    SendToR("\007Objects and Libraries?")
-    ans = vim.eval("g:rplugin_lastrpl")
-    if ans == "1":
-        vim.command("call UpdateGlobalEnv()")
-    else:
-        if ans == "2":
-            vim.command("call UpdateLibraries()")
+def OBServer():
+    global sock
+    global OBPort
+    UDP_IP="127.0.0.1"
+    OBPort=5005
+
+    while True and OBPort < 5100:
+        try:
+            OBPort += 1
+            sock = socket.socket( socket.AF_INET, socket.SOCK_DGRAM )
+            sock.bind( (UDP_IP,OBPort) )
+        except:
+            continue
         else:
-            if ans == "3":
+            break
+
+    if sock == None:
+        OBPort = 0
+        return
+    else:
+        SendToR("\007" + str(OBPort))
+
+    while True:
+        try:
+            data, addr = sock.recvfrom( 1024 ) # buffer size is 1024 bytes
+            if data.find("G") >= 0:
                 vim.command("call UpdateGlobalEnv()")
-                vim.command("call UpdateLibraries()")
-    t = threading.Timer(1.0, CheckObjects)
-    t.start()
+            else:
+                if data.find("L") >= 0:
+                    vim.command("call UpdateLibraries()")
+                else:
+                    if data.find("B") >= 0:
+                        vim.command("call UpdateGlobalEnv()")
+                        vim.command("call UpdateLibraries()")
+                    else:
+                        try:
+                            sock.shutdown(socket.SHUT_RDWR)
+                        except:
+                            vim.command("call RWarningMsg('OBS 001')")
+                            sock.close()
+                            return
+        except:
+            OBPort = 0
+            vim.command("call RWarningMsg('OBS 002')")
+            try:
+                sock.shutdown(socket.SHUT_RDWR)
+            except:
+                vim.command("call RWarningMsg('OBS 003')")
+            sock.close()
+            return
+        try:
+            sock.shutdown(socket.SHUT_RDWR)
+        except:
+            pass
+        sock.close()
+        sock = socket.socket( socket.AF_INET, socket.SOCK_DGRAM )
+        sock.bind( (UDP_IP,OBPort) )
+
+
+def RunOBServer():
+    th = threading.Thread(target=OBServer)
+    th.start()
+
+def StopOBServer():
+    global sock
+    global OBPort
+    if OBPort == 0:
+        return
+    try:
+        sock.shutdown(socket.SHUT_RDWR)
+    except:
+        pass
+    sock.close()
+    OBPort = 0
 

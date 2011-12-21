@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Fri Dec 16, 2011  01:47AM
+" Last Change: Wed Dec 21, 2011  04:20PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -458,6 +458,9 @@ endfunction
 
 " Start R
 function StartR(whatr)
+    call writefile([], $VIMRPLUGIN_TMPDIR . "/object_browser")
+    call writefile([], $VIMRPLUGIN_TMPDIR . "/liblist")
+
     " Change to buffer's directory before starting R
     lcd %:p:h
 
@@ -640,6 +643,152 @@ function StartR(whatr)
     echon
 endfunction
 
+function StartObjectBrowser()
+    if g:vimrplugin_screenplugin && g:vimrplugin_objbr_place =~ "console"
+
+        if exists("b:myservername")
+            " This is the Object Browser
+            if remote_expr(b:myservername, "mode()") != "n"
+                call remote_send(b:myservername, "<Esc>")
+            endif
+            call remote_expr(b:myservername, "RObjBrowser()")
+            let g:rplugin_running_objbr = 0
+            return
+        endif
+
+        " Start the Object Browser if it doesn't exist yet
+        let slist = serverlist()
+        if slist !~ b:objbr_server
+            if g:vimrplugin_objbr_place =~ "left"
+                " Get the R Console width:
+                let conw = system("tmux list-panes | cat")
+                let conw = substitute(conw, '.*\n1: \[\([0-9]*\)x.*', '\1', "")
+                let panewidth = conw - g:vimrplugin_objbr_w
+                " Just to be safe: If the above code doesn't work as expected
+                " and we get a spurious value:
+                if panewidth < 40 || panewidth > 180
+                    let panewidth = 80
+                endif
+            else
+                let panewidth = g:vimrplugin_objbr_w
+            endif
+            let cmd = "tmux split-window -d -h -l " . panewidth . ' -t 1 "vim --servername ' . b:objbr_server . '"'
+            let rlog = system(cmd)
+            if v:shell_error
+                let rlog = substitute(rlog, '\n', ' ', 'g')
+                let rlog = substitute(rlog, '\r', ' ', 'g')
+                call RWarningMsg(rlog)
+                let g:rplugin_running_objbr = 0
+                return 0
+            endif
+            if g:vimrplugin_objbr_place =~ "left"
+                call system("tmux swap-pane -d -s 1 -t 2")
+            endif
+        endif
+
+        " Wait while Vim starts
+        let idx = 0
+        while idx < 20
+            sleep 300m
+            let slist = serverlist()
+            if slist =~ b:objbr_server
+                break
+            endif
+            let idx = idx + 1
+        endwhile
+
+        let objbrowserfile = $VIMRPLUGIN_TMPDIR . "/objbrowserInit"
+        if g:vimrplugin_objbr_place =~ "console" && g:vimrplugin_conqueplugin == 0
+            let obscmd = 'python RunOBServer()'
+        else
+            let obscmd = ' '
+        endif
+        call writefile([
+                    \ 'let b:objbrtitle = "' . b:objbrtitle . '"',
+                    \ 'let b:screensname = "' . b:screensname . '"',
+                    \ 'let b:rscript_buffer = "' . bufname("%") . '"',
+                    \ 'let b:myservername = "' . v:servername . '"',
+                    \ 'set filetype=rbrowser',
+                    \ 'let $VIMINSTANCEID="' . $VIMINSTANCEID . '"',
+                    \ 'setlocal modifiable',
+                    \ 'set shortmess=atI',
+                    \ 'set rulerformat=%3(%l%)',
+                    \ 'set noruler',
+                    \ 'let curline = line(".")',
+                    \ 'let curcol = col(".")',
+                    \ 'normal! ggdG',
+                    \ 'setlocal nomodified',
+                    \ 'call cursor(curline, curcol)',
+                    \ 'exe "pyfile " . g:rplugin_home . "/r-plugin/vimcom.py"',
+                    \ 'python SendToR("\003GlobalEnv")',
+                    \ 'python SendToR("\004Libraries")',
+                    \ 'call UpdateGlobalEnv()',
+                    \ 'call UpdateLibraries()',
+                    \ obscmd,
+                    \ 'redraw'], objbrowserfile)
+
+        call remote_send(b:objbr_server, ":source " . objbrowserfile . "<CR>")
+        call remote_send(b:objbr_server, ":echon<CR>")
+        return
+    endif
+
+    " Either load or reload the Object Browser
+    let savesb = &switchbuf
+    set switchbuf=useopen,usetab
+    if bufloaded(b:objbrtitle)
+        exe "sb " . b:objbrtitle
+    else
+        " Copy the values of some local variables that will be inherited
+        let g:tmp_objbrtitle = b:objbrtitle
+        let g:tmp_screensname = b:screensname
+        let g:tmp_curbufname = bufname("%")
+
+        if g:vimrplugin_conqueplugin == 1
+            " Copy the values of some local variables that will be inherited
+            let g:tmp_conqueshell = b:conqueshell
+            let g:tmp_conque_bufname = b:conque_bufname
+
+            if g:vimrplugin_objbr_place =~ "console"
+                exe "sil sb " . b:conque_bufname
+                normal! G0
+            endif
+        endif
+
+        let l:sr = &splitright
+        if g:vimrplugin_objbr_place =~ "right"
+            set splitright
+        else
+            set nosplitright
+        endif
+        exe "vsplit " . b:objbrtitle
+        let &splitright = l:sr
+        exe "vertical resize " . g:vimrplugin_objbr_w
+        set filetype=rbrowser
+
+        " Inheritance of some local variables
+        if g:vimrplugin_conqueplugin == 1
+            let b:conqueshell = g:tmp_conqueshell
+            let b:conque_bufname = g:tmp_conque_bufname
+            unlet g:tmp_conqueshell
+            unlet g:tmp_conque_bufname
+        endif
+        let b:screensname = g:tmp_screensname
+        let b:objbrtitle = g:tmp_objbrtitle
+        let b:rscript_buffer = g:tmp_curbufname
+        unlet g:tmp_objbrtitle
+        unlet g:tmp_screensname
+        unlet g:tmp_curbufname
+        exe "pyfile " . g:rplugin_home . "/r-plugin/vimcom.py"
+        python SendToR("\003GlobalEnv")
+        python SendToR("\004Libraries")
+        call UpdateGlobalEnv()
+        call UpdateLibraries()
+        if g:vimrplugin_objbr_place =~ "console" && g:vimrplugin_conqueplugin == 0
+            python RunOBServer()
+        endif
+    endif
+
+endfunction
 
 " Open an Object Browser window
 function RObjBrowser()
@@ -657,35 +806,42 @@ function RObjBrowser()
 
     let g:rplugin_running_objbr = 1
 
-    " R builds the Object Browser contents.
     if g:vimrplugin_vimcom
-        let objbr = "'" . $VIMRPLUGIN_TMPDIR . "/objbrowser" . "'"
-        exe 'python SendToR("vim.browser(' . g:vimrplugin_allnames . ', ' . objbr . ')")'
-    else
-        let lockfile = $VIMRPLUGIN_TMPDIR . "/objbrowser" . "lock"
-        call writefile(["Wait!"], lockfile)
-        if g:vimrplugin_allnames == 1
-            call SendCmdToR('source("' . g:rplugin_home . '/r-plugin/vimbrowser.R") ; .vim.browser(TRUE)')
-        else
-            call SendCmdToR('source("' . g:rplugin_home . '/r-plugin/vimbrowser.R") ; .vim.browser()')
+        call StartObjectBrowser()
+        python SendToR("\003GlobalEnv")
+        python SendToR("\004Libraries")
+        if exists("*UpdateGlobalEnv")
+            call UpdateGlobalEnv()
+            call UpdateLibraries()
         endif
-        sleep 50m
-        let i = 0 
-        while filereadable(lockfile)
-            let i = i + 1
-            sleep 50m
-            if i == 40
-                call delete(lockfile)
-                call RWarningMsg("No longer waiting for Object Browser to finish...")
-                if exists("g:rplugin_r_output")
-                    echo g:rplugin_r_output
-                endif
-                sleep 2
-                let g:rplugin_running_objbr = 0
-                return
-            endif
-        endwhile
+        let g:rplugin_running_objbr = 0
+        return
     endif
+
+    " R builds the Object Browser contents.
+    let lockfile = $VIMRPLUGIN_TMPDIR . "/objbrowser" . "lock"
+    call writefile(["Wait!"], lockfile)
+    if g:vimrplugin_allnames == 1
+        call SendCmdToR('source("' . g:rplugin_home . '/r-plugin/vimbrowser.R") ; .vim.browser(TRUE)')
+    else
+        call SendCmdToR('source("' . g:rplugin_home . '/r-plugin/vimbrowser.R") ; .vim.browser()')
+    endif
+    sleep 50m
+    let i = 0 
+    while filereadable(lockfile)
+        let i = i + 1
+        sleep 50m
+        if i == 40
+            call delete(lockfile)
+            call RWarningMsg("No longer waiting for Object Browser to finish...")
+            if exists("g:rplugin_r_output")
+                echo g:rplugin_r_output
+            endif
+            sleep 2
+            let g:rplugin_running_objbr = 0
+            return
+        endif
+    endwhile
 
     let g:rplugin_origbuf = bufname("%")
 
@@ -702,8 +858,8 @@ function RObjBrowser()
             let i += 1
         endwhile
 
-        " This is the Object Browser
         if exists("b:myservername")
+            " This is the Object Browser
             if remote_expr(b:myservername, "mode()") != "n"
                 call remote_send(b:myservername, "<Esc>")
             endif
@@ -755,7 +911,7 @@ function RObjBrowser()
                     \ 'set noruler',
                     \ 'let curline = line(".")',
                     \ 'let curcol = col(".")',
-                    \ 'normal! ggDjdG',
+                    \ 'silent normal! ggdG',
                     \ 'source ' . objbr,
                     \ 'call delete("' . objbr . '")',
                     \ 'call RBrowserFillCloseList()',
@@ -827,7 +983,6 @@ function RObjBrowser()
         unlet g:tmp_objbrtitle
         unlet g:tmp_screensname
         unlet g:tmp_curbufname
-
     endif
 
 
@@ -2463,7 +2618,7 @@ call RSetDefaultValue("g:vimrplugin_objbr_place", "'script,right'")
 
 if has("python")
     if g:vimrplugin_vimcom
-        exe "pyfile " . g:rplugin_home . "/r-plugin/vimcom_client.py"
+        exe "pyfile " . g:rplugin_home . "/r-plugin/vimcom.py"
     endif
 else
     g:vimrplugin_vimcom = 0
@@ -2851,6 +3006,8 @@ endif
 let g:rplugin_firstbuffer = expand("%")
 let g:rplugin_firstbuffer = substitute(g:rplugin_firstbuffer, " ", "", "")
 let g:rplugin_running_objbr = 0
+let g:rplugin_has_new_lib = 0
+let g:rplugin_has_new_obj = 0
 
 " Debugging code:
 if g:vimrplugin_screenplugin && g:vimrplugin_conqueplugin
