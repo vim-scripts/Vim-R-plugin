@@ -17,7 +17,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "
-" Last Change: Fri Nov 25, 2011  08:43PM
+" Last Change: Thu Dec 22, 2011  08:59AM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -112,7 +112,7 @@ endfunction
 function! RMakePDF(bibtex)
     update
     call RSetWD()
-    let pdfcmd = "source('" . g:rplugin_home . "/r-plugin/vimSweave.R') ; .vim.Sweave('" . expand("%:t") . "'"
+    let pdfcmd = "vim.Sweave('" . expand("%:t") . "'"
 
     if g:vimrplugin_latexcmd != "pdflatex"
         let pdfcmd = pdfcmd . ", latexcmd = '" . g:vimrplugin_latexcmd . "'"

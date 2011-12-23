@@ -91,32 +91,32 @@ def OBServer():
         try:
             data, addr = sock.recvfrom( 1024 ) # buffer size is 1024 bytes
             if data.find("G") >= 0:
-                vim.command("call UpdateGlobalEnv()")
+                vim.command("call UpdateOB('GlobalEnv')")
             else:
                 if data.find("L") >= 0:
-                    vim.command("call UpdateLibraries()")
+                    vim.command("call UpdateOB('libraries')")
                 else:
                     if data.find("B") >= 0:
-                        vim.command("call UpdateGlobalEnv()")
-                        vim.command("call UpdateLibraries()")
+                        vim.command("call UpdateOB('GlobalEnv')")
+                        vim.command("call UpdateOB('libraries')")
                     else:
                         try:
-                            sock.shutdown(socket.SHUT_RDWR)
+                            sock.shutdown(socket.SHUT_RD)
                         except:
-                            vim.command("call RWarningMsg('OBS 001')")
+                            pass
                             sock.close()
                             return
         except:
             OBPort = 0
             vim.command("call RWarningMsg('OBS 002')")
             try:
-                sock.shutdown(socket.SHUT_RDWR)
+                sock.shutdown(socket.SHUT_RD)
             except:
                 vim.command("call RWarningMsg('OBS 003')")
             sock.close()
             return
         try:
-            sock.shutdown(socket.SHUT_RDWR)
+            sock.shutdown(socket.SHUT_RD)
         except:
             pass
         sock.close()
@@ -131,10 +131,11 @@ def RunOBServer():
 def StopOBServer():
     global sock
     global OBPort
+    SendToR("\x08Stop Updating Info")
     if OBPort == 0:
         return
     try:
-        sock.shutdown(socket.SHUT_RDWR)
+        sock.shutdown(socket.SHUT_RD)
     except:
         pass
     sock.close()

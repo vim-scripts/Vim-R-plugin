@@ -22,7 +22,7 @@
 
 
 PLUGINHOME=`pwd`
-PLUGINVERSION=0.9.6
+PLUGINVERSION=0.9.8
 DEBIANTIME=`date -R`
 PLUGINRELEASEDATE=`date +"%Y-%m-%d"`
 VIM2HTML=/usr/local/share/vim/vim73/doc/vim2html.pl 
@@ -50,7 +50,7 @@ zip:
 	tar -cvzf /tmp/vimrplugintmpfile.tar.gz ftdetect/r.vim indent/r.vim \
 	    indent/rnoweb.vim indent/rhelp.vim autoload/rcomplete.vim ftplugin/r*.vim \
 	    syntax/rout.vim syntax/r.vim syntax/rhelp.vim syntax/rdoc.vim syntax/rbrowser.vim \
-	    doc/r-plugin.txt r-plugin/*.R r-plugin/functions.vim \
+	    doc/r-plugin.txt r-plugin/functions.vim r-plugin/vimcom.py \
 	    r-plugin/global_r_plugin.vim r-plugin/omniList r-plugin/windows.py \
 	    r-plugin/vimActivate.js r-plugin/tex_indent.vim r-plugin/r.snippets \
 	    r-plugin/common_buffer.vim r-plugin/common_global.vim \
@@ -123,17 +123,11 @@ deb:
 	  - indent/r.vim\n\
 	  - indent/rnoweb.vim\n\
 	  - indent/rhelp.vim\n\
-	  - r-plugin/build_omniList.R\n\
 	  - r-plugin/common_buffer.vim\n\
 	  - r-plugin/common_global.vim\n\
-	  - r-plugin/etags2ctags.R\n\
+	  - r-plugin/vimcom.py\n\
 	  - r-plugin/global_r_plugin.vim\n\
-	  - r-plugin/specialfuns.R\n\
 	  - r-plugin/tex_indent.vim\n\
-	  - r-plugin/vimbrowser.R\n\
-	  - r-plugin/vimhelp.R\n\
-	  - r-plugin/vimprint.R\n\
-	  - r-plugin/vimSweave.R\n\
 	  - syntax/r.vim\n\
 	  - syntax/rdoc.vim\n\
 	  - syntax/rout.vim\n\
