@@ -19,7 +19,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Thu Dec 15, 2011  10:27PM
+" Last Change: Mon Jan 02, 2012  05:50PM
 "
 " Please see doc/r-plugin.txt for usage details.
 "==========================================================================
@@ -109,6 +109,9 @@ let b:objbr_server = "OB" . s:uniquename
 unlet s:uniquename
 let b:objbr_server = toupper(substitute(b:objbr_server, '\W', "", "g"))
 
+if exists("g:rplugin_lastft") && g:rplugin_lastft != &filetype
+    call RBufEnter()
+endif
 
 let g:rplugin_lastft = &filetype
 
