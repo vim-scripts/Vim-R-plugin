@@ -72,7 +72,7 @@ to deal with.
       - Send code and commands to R (useful to run examples).
       - Jump to another R documentation.
       - Syntax highlighting of R documentation.
-  * Object Browser (.GlobalEnv and loaded packages; must be updated manually):
+  * Object Browser (.GlobalEnv and loaded packages):
       - Send commands with the object under cursor as argument.
       - Call R's help() with the object under cursor as argument.
       - Syntax highlighting of the Object Browser.
@@ -1094,10 +1094,11 @@ If you want to use your own ~/.screenrc, put in your vimrc:
 							     *vimrplugin_tmux*
 The screen.vim plugin supports both GNU Screen and Tmux, but only Tmux allows
 you to split the terminal vertically (that is, to have the panels side by
-side). Please read |screen-intro| and |screen-shell-vertical| for details. By
-default, the Vim-R-plugin will tell the screen.vim plugin to split the
-terminal horizontally. If you prefer to split it vertically put in your
-|vimrc|:
+side). Also, the automatic updating of the Object Browser is enabled only when
+running R in a Tmux session. Please read |screen-intro| and
+|screen-shell-vertical| for details. By default, the Vim-R-plugin will tell
+the screen.vim plugin to split the terminal horizontally. If you prefer to
+split it vertically put in your |vimrc|:
 >
    let vimrplugin_screenvsplit = 1
    let g:ScreenImpl = 'Tmux'
@@ -1206,10 +1207,11 @@ Emacs:
 							    *vimrplugin_ca_ck*
 When one types <C-a> in the R Console the cursor goes to the beginning of the
 line and one types <C-k> the characters to the right of the cursor are
-deleted. Sending <C-a> may be problematic if using either Tmux or GNU Screen
-in some systems and may cause incomplete output when using the Conque Shell
-plugin. The Vim-R-plugin will add <C-a><C-k> to every command if you put in
-your |vimrc|:
+deleted. This is useful to avoid characters left on the R Console being mixed
+with commands sent by Vim. However, sending <C-a> may be problematic if using
+either Tmux or GNU Screen in some systems and may cause incomplete output when
+using the Conque Shell plugin. The Vim-R-plugin will add <C-a><C-k> to every
+command if you put in your |vimrc|:
 >
    let vimrplugin_ca_ck = 1
 <
@@ -1557,7 +1559,12 @@ put in your ~/.bashrc:
 >
    if [ "x" != "x$DISPLAY" ]
    then
-     export TERM=xterm-256color
+       if [ "screen" = "$TERM" ]
+       then
+           export TERM=screen-256color
+       else
+           export TERM=xterm-256color
+       fi
    fi
 <
 Finally, put in your |vimrc|:
@@ -1736,8 +1743,9 @@ important Vim limitations are:
     files and trigger |CursorHold| events.
 
 These limitations will be solved only if someone with good knowledge of C
-programming writes patches to Vim source code. Anyway, if you want to try the
-Conque Shell, install it from
+programming writes patches to Vim source code and the patches are accepted by
+the Vim developer. Anyway, if you want to try the Conque Shell, install it
+from
 
    http://www.vim.org/scripts/script.php?script_id=2771
 
@@ -1801,7 +1809,7 @@ the R syntax highlighted.
 							       *r-plugin-news*
 12. News~
 
-0.9.8 (2011-12-22)
+0.9.8 (2011-12-23)
 
  * Use the R package vimcom. The following options are now set on the vimcom R
    package and no longer in the Vim-R-plugin: allnames, open_df, and

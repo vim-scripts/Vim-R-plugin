@@ -19,7 +19,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Mon Jan 02, 2012  05:50PM
+" Last Change: Mon Jan 02, 2012  07:10PM
 "
 " Please see doc/r-plugin.txt for usage details.
 "==========================================================================
@@ -109,7 +109,7 @@ let b:objbr_server = "OB" . s:uniquename
 unlet s:uniquename
 let b:objbr_server = toupper(substitute(b:objbr_server, '\W', "", "g"))
 
-if exists("g:rplugin_lastft") && g:rplugin_lastft != &filetype
+if has("gui_running") && exists("g:rplugin_lastft") && g:rplugin_lastft != &filetype
     call RBufEnter()
 endif
 

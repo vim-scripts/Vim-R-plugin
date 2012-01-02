@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Sun Jan 01, 2012  09:09PM
+" Last Change: Mon Jan 02, 2012  07:26PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -511,7 +511,12 @@ function StartR(whatr)
 
     if g:vimrplugin_screenplugin
         if $TERM =~ "screen"
-            let rcmd = "VIMRPLUGIN_TMPDIR=" . $VIMRPLUGIN_TMPDIR . " " . rcmd
+            if g:vimrplugin_tmux
+                call system("tmux set-environment VIMRPLUGIN_TMPDIR " . $VIMRPLUGIN_TMPDIR)
+                call system("tmux set-environment VIMINSTANCEID " . $VIMINSTANCEID)
+            else
+                let rcmd = "VIMRPLUGIN_TMPDIR=" . $VIMRPLUGIN_TMPDIR . " " . rcmd
+            endif
         endif
         if g:vimrplugin_tmux == 0 && g:vimrplugin_noscreenrc == 0 && exists("g:ScreenShellScreenInitArgs")
             let g:ScreenShellScreenInitArgs = RWriteScreenRC()
