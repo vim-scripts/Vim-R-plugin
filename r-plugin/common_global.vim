@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Thu Dec 22, 2011  11:45PM
+" Last Change: Sun Jan 01, 2012  09:09PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -1549,6 +1549,7 @@ function ShowRDoc(rkeyword, package, getclass)
     elseif a:package != ""
         exe 'Py SendToR("vim.help(' . "'" . a:rkeyword . "', " . g:rplugin_htw . "L, package='" . a:package  . "')". '")'
     else
+        let classfor = substitute(classfor, '"', '\\"', "g")
         exe 'Py SendToR("vim.help(' . "'" . a:rkeyword . "', " . g:rplugin_htw . "L, '" . classfor . "')". '")'
     endif
     if g:rplugin_lastrpl != "VIMHELP"
