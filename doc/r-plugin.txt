@@ -495,11 +495,11 @@ and, then, build the "omniList".
 
 You have to do <LocalLeader>ro to either start or updated the Object Browser.
 The updating is automatic only if the Object Browser is running in a separate
-Tmux panel beside the R Console. The Object Browser has two views: .GlobalEnv
-and Libraries. If you either press <Enter> or double click (GVim or Vim with
-'mouse' set to "a") on the first line of the Object Browser it will toggle the
-view between the objects in .GlobalEnv and the currently loaded libraries (but
-only libraries loaded when |:RUpdateObjList| was run will be shown).
+Tmux panel. The Object Browser has two views: .GlobalEnv and Libraries. If you
+either press <Enter> or double click (GVim or Vim with 'mouse' set to "a") on
+the first line of the Object Browser it will toggle the view between the
+objects in .GlobalEnv and the currently loaded libraries (but only libraries
+loaded when |:RUpdateObjList| was run will be shown).
 
 In the .GlobalEnv view, if an object has the attribute "label", it will also
 be displayed. Please, see the R help for package vimcom for some options to

@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Mon Jan 02, 2012  07:26PM
+" Last Change: Mon Jan 02, 2012  09:01PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -649,7 +649,7 @@ function StartR(whatr)
 endfunction
 
 function StartObjectBrowser()
-    if g:vimrplugin_screenplugin && g:vimrplugin_objbr_place =~ "console"
+    if g:vimrplugin_screenplugin && g:vimrplugin_tmux
 
         if exists("b:myservername")
             " This is the Object Browser
@@ -665,10 +665,15 @@ function StartObjectBrowser()
         let slist = serverlist()
         if slist !~ b:objbr_server
             if g:vimrplugin_objbr_place =~ "left"
-                " Get the R Console width:
-                let conw = system("tmux list-panes | cat")
-                let conw = substitute(conw, '.*\n1: \[\([0-9]*\)x.*', '\1', "")
-                let panewidth = conw - g:vimrplugin_objbr_w
+                let panw = system("tmux list-panes | cat")
+                if g:vimrplugin_objbr_place =~ "console"
+                    " Get the R Console width:
+                    let panw = substitute(panw, '.*\n1: \[\([0-9]*\)x.*', '\1', "")
+                else
+                    " Get the Vim with
+                    let panw = substitute(panw, '.*0: \[\([0-9]*\)x.*', '\1', "")
+                endif
+                let panewidth = panw - g:vimrplugin_objbr_w
                 " Just to be safe: If the above code doesn't work as expected
                 " and we get a spurious value:
                 if panewidth < 40 || panewidth > 180
@@ -677,7 +682,11 @@ function StartObjectBrowser()
             else
                 let panewidth = g:vimrplugin_objbr_w
             endif
-            let cmd = "tmux split-window -d -h -l " . panewidth . ' -t 1 "vim --servername ' . b:objbr_server . '"'
+            if g:vimrplugin_objbr_place =~ "console"
+                let cmd = "tmux split-window -d -h -l " . panewidth . ' -t 1 "vim --servername ' . b:objbr_server . '"'
+            else
+                let cmd = "tmux split-window -d -h -l " . panewidth . ' -t 0 "vim --servername ' . b:objbr_server . '"'
+            endif
             let rlog = system(cmd)
             if v:shell_error
                 let rlog = substitute(rlog, '\n', ' ', 'g')
@@ -687,7 +696,11 @@ function StartObjectBrowser()
                 return 0
             endif
             if g:vimrplugin_objbr_place =~ "left"
-                call system("tmux swap-pane -d -s 1 -t 2")
+                if g:vimrplugin_objbr_place =~ "console"
+                    call system("tmux swap-pane -d -s 1 -t 2")
+                else
+                    call system("tmux swap-pane -d -s 0 -t 1")
+                endif
             endif
         endif
 
@@ -703,7 +716,7 @@ function StartObjectBrowser()
         endwhile
 
         let objbrowserfile = $VIMRPLUGIN_TMPDIR . "/objbrowserInit"
-        if g:vimrplugin_objbr_place =~ "console" && g:vimrplugin_conqueplugin == 0
+        if g:vimrplugin_conqueplugin == 0
             let obscmd = 'Py RunOBServer()'
         else
             let obscmd = ' '
