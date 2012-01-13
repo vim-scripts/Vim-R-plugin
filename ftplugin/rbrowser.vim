@@ -16,7 +16,7 @@
 "
 " Author: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          
-" Last Change: Thu Dec 22, 2011  10:53PM
+" Last Change: Thu Jan 12, 2012  10:34AM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -58,7 +58,7 @@ function! UpdateOB(what)
     if g:rplugin_curview != a:what
         return
     endif
-    if exists("g:rplugin_curbuf") && g:rplugin_curbuf != "Object_Browser" && !exists("b:myservername")
+    if exists("g:rplugin_curbuf") && g:rplugin_curbuf != "Object_Browser" && g:rplugin_editor_port == 0
         let savesb = &switchbuf
         set switchbuf=useopen,usetab
         sil noautocmd sb Object_Browser
@@ -117,7 +117,7 @@ function! RBrowserDoubleClick()
 endfunction
 
 function! RBrowserOpenCloseLists(status)
-    if !exists("b:myservername")
+    if g:rplugin_editor_port == 0
         if !buflisted("Object_Browser")
             call RWarningMsg('There is no "Object_Browser" buffer.')
             return
@@ -139,7 +139,7 @@ function! RBrowserOpenCloseLists(status)
         call UpdateOB("libraries")
     endif
 
-    if !exists("b:myservername")
+    if g:rplugin_editor_port == 0
         if switchedbuf
             exe "sil noautocmd sb " . g:rplugin_curbuf
             exe "set switchbuf=" . savesb
@@ -215,7 +215,7 @@ function! RBrowserFindParent(word, curline, curpos)
     if g:rplugin_curview == "GlobalEnv"
         let spacelimit = 3
     else
-        if $LC_MESSAGES =~ "UTF-8"
+        if s:isutf8
             let spacelimit = 10
         else
             let spacelimit = 6
@@ -279,7 +279,7 @@ function! RBrowserGetName(complete)
         endif
     else
         if g:rplugin_curview == "libraries"
-            if $LC_MESSAGES =~ "UTF-8"
+            if s:isutf8
                 if curpos == 10
                     return word
                 endif
@@ -315,10 +315,10 @@ function! MakeRBrowserMenu()
 endfunction
 
 function! ObBrBufUnload()
-    Py StopOBServer()
+    Py StopServer()
     call delete($VIMRPLUGIN_TMPDIR . "/object_browser")
     call delete($VIMRPLUGIN_TMPDIR . "/liblist")
-    if exists("b:myservername")
+    if g:rplugin_editor_port
         call system("tmux select-pane -t 0")
     endif
 endfunction
@@ -346,6 +346,13 @@ call writefile([], $VIMRPLUGIN_TMPDIR . "/liblist")
 
 au BufUnload <buffer> call ObBrBufUnload()
 
+let s:envstring = tolower($LC_MESSAGES . $LC_ALL . $LANG)
+if s:envstring =~ "utf-8" || s:envstring =~ "utf8"
+    let s:isutf8 = 1
+else
+    let s:isutf8 = 0
+endif
+unlet s:envstring
 
 let &cpo = s:cpo_save
 unlet s:cpo_save

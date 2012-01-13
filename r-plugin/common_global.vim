@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Mon Jan 02, 2012  09:01PM
+" Last Change: Thu Jan 12, 2012  10:45PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -651,19 +651,64 @@ endfunction
 function StartObjectBrowser()
     if g:vimrplugin_screenplugin && g:vimrplugin_tmux
 
-        if exists("b:myservername")
+        if g:rplugin_editor_port
             " This is the Object Browser
-            if remote_expr(b:myservername, "mode()") != "n"
-                call remote_send(b:myservername, "<Esc>")
-            endif
-            call remote_expr(b:myservername, "RObjBrowser()")
+            Py VimClient("EXPR call RObjBrowser()")
             let g:rplugin_running_objbr = 0
             return
         endif
 
+        if g:rplugin_myport == 0
+            let g:rplugin_myport1 = 6005
+            let g:rplugin_myport2 = 6100
+            Py RunServer()
+            Py vim.command("let g:rplugin_myport = " + str(MyPort))
+        endif
+
         " Start the Object Browser if it doesn't exist yet
-        let slist = serverlist()
-        if slist !~ b:objbr_server
+        if g:rplugin_objbr_port == 0
+            let objbrowserfile = $VIMRPLUGIN_TMPDIR . "/objbrowserInit"
+            call writefile([
+                        \ 'let b:objbrtitle = "' . b:objbrtitle . '"',
+                        \ 'let b:screensname = "' . b:screensname . '"',
+                        \ 'let b:rscript_buffer = "' . bufname("%") . '"',
+                        \ 'set filetype=rbrowser',
+                        \ 'let $VIMINSTANCEID="' . $VIMINSTANCEID . '"',
+                        \ 'setlocal modifiable',
+                        \ 'set shortmess=atI',
+                        \ 'set rulerformat=%3(%l%)',
+                        \ 'set noruler',
+                        \ 'let curline = line(".")',
+                        \ 'let curcol = col(".")',
+                        \ 'normal! ggdG',
+                        \ 'setlocal nomodified',
+                        \ 'call cursor(curline, curcol)',
+                        \ 'exe "PyFile " . g:rplugin_home . "/r-plugin/vimcom.py"',
+                        \ 'Py SendToR("\003GlobalEnv")',
+                        \ 'Py SendToR("\004Libraries")',
+                        \ 'call UpdateOB("GlobalEnv")',
+                        \ 'let g:rplugin_editor_port = ' . g:rplugin_myport ,
+                        \ 'Py OtherPort = ' . g:rplugin_myport ,
+                        \ 'let g:rplugin_myport1 = 5005',
+                        \ 'let g:rplugin_myport2 = 5100',
+                        \ 'sleep 250m',
+                        \ 'function! RBrSendToR(cmd)',
+                        \ 'let scmd = "tmux set-buffer '. "'" . '" . a:cmd . "\<C-M>' . "'" . ' && tmux paste-buffer -t 2"',
+                        \ '    let rlog = system(scmd)',
+                        \ '    if v:shell_error',
+                        \ '        let rlog = substitute(rlog, "\n", " ", "g")',
+                        \ '        let rlog = substitute(rlog, "\r", " ", "g")',
+                        \ '        call RWarningMsg(rlog)',
+                        \ '        return 0',
+                        \ '    endif',
+                        \ 'endfunction',
+                        \ 'Py RunServer()',
+                        \ 'sleep 250m',
+                        \ 'Py VimClient("EXPR let g:rplugin_objbr_port = " + str(MyPort))',
+                        \ 'sleep 200m',
+                        \ 'Py VimClient("EXPR Py OtherPort = " + str(MyPort))',
+                        \ 'redraw'], objbrowserfile)
+
             if g:vimrplugin_objbr_place =~ "left"
                 let panw = system("tmux list-panes | cat")
                 if g:vimrplugin_objbr_place =~ "console"
@@ -683,10 +728,11 @@ function StartObjectBrowser()
                 let panewidth = g:vimrplugin_objbr_w
             endif
             if g:vimrplugin_objbr_place =~ "console"
-                let cmd = "tmux split-window -d -h -l " . panewidth . ' -t 1 "vim --servername ' . b:objbr_server . '"'
+                let trgt = ' -t 1 ' 
             else
-                let cmd = "tmux split-window -d -h -l " . panewidth . ' -t 0 "vim --servername ' . b:objbr_server . '"'
+                let trgt = ' -t 0 ' 
             endif
+            let cmd = "tmux split-window -d -h -l " . panewidth . trgt . '"vim -c ' . "'source " . objbrowserfile . "'" . '"'
             let rlog = system(cmd)
             if v:shell_error
                 let rlog = substitute(rlog, '\n', ' ', 'g')
@@ -702,50 +748,14 @@ function StartObjectBrowser()
                     call system("tmux swap-pane -d -s 0 -t 1")
                 endif
             endif
+            let ii = 0
+            echo "Please, wait..."
+            while g:rplugin_objbr_port == 0 && ii < 10
+                sleep 200m
+                let ii = ii + 1
+            endwhile
+            echon "\rObject Browser loaded."
         endif
-
-        " Wait while Vim starts
-        let idx = 0
-        while idx < 20
-            sleep 300m
-            let slist = serverlist()
-            if slist =~ b:objbr_server
-                break
-            endif
-            let idx = idx + 1
-        endwhile
-
-        let objbrowserfile = $VIMRPLUGIN_TMPDIR . "/objbrowserInit"
-        if g:vimrplugin_conqueplugin == 0
-            let obscmd = 'Py RunOBServer()'
-        else
-            let obscmd = ' '
-        endif
-        call writefile([
-                    \ 'let b:objbrtitle = "' . b:objbrtitle . '"',
-                    \ 'let b:screensname = "' . b:screensname . '"',
-                    \ 'let b:rscript_buffer = "' . bufname("%") . '"',
-                    \ 'let b:myservername = "' . v:servername . '"',
-                    \ 'set filetype=rbrowser',
-                    \ 'let $VIMINSTANCEID="' . $VIMINSTANCEID . '"',
-                    \ 'setlocal modifiable',
-                    \ 'set shortmess=atI',
-                    \ 'set rulerformat=%3(%l%)',
-                    \ 'set noruler',
-                    \ 'let curline = line(".")',
-                    \ 'let curcol = col(".")',
-                    \ 'normal! ggdG',
-                    \ 'setlocal nomodified',
-                    \ 'call cursor(curline, curcol)',
-                    \ 'exe "PyFile " . g:rplugin_home . "/r-plugin/vimcom.py"',
-                    \ 'Py SendToR("\003GlobalEnv")',
-                    \ 'Py SendToR("\004Libraries")',
-                    \ 'call UpdateOB("GlobalEnv")',
-                    \ obscmd,
-                    \ 'redraw'], objbrowserfile)
-
-        call remote_send(b:objbr_server, ":source " . objbrowserfile . "<CR>")
-        call remote_send(b:objbr_server, ":echon<CR>")
         return
     endif
 
@@ -799,9 +809,6 @@ function StartObjectBrowser()
         Py SendToR("\003GlobalEnv")
         Py SendToR("\004Libraries")
         call UpdateOB("GlobalEnv")
-        if g:vimrplugin_objbr_place =~ "console" && g:vimrplugin_conqueplugin == 0
-            Py RunOBServer()
-        endif
     endif
 endfunction
 
@@ -813,7 +820,7 @@ function RObjBrowser()
     endif
 
     " Only opens the Object Browser if R is running
-    if g:vimrplugin_screenplugin && !exists("g:ScreenShellSend") && !exists("b:myservername")
+    if g:vimrplugin_screenplugin && !exists("g:ScreenShellSend")
         return
     endif
     if g:vimrplugin_conqueplugin && !exists("b:conque_bufname")
@@ -840,9 +847,9 @@ endfunction
 function RObjBrowserOCLists(status)
     if exists("*RBrowserOpenCloseLists")
         call RBrowserOpenCloseLists(a:status)
-    elseif serverlist() =~ b:objbr_server
-        call remote_expr(b:objbr_server, "RBrowserOpenCloseLists(" . a:status . ")")
-        call remote_send(b:objbr_server, ":redraw<CR>:echon ' '<CR>")
+    elseif g:rplugin_objbr_port
+        exe 'Py VimClient("EXPR call RBrowserOpenCloseLists('. "'" . a:status . "')" . '")'
+        Py VimClient("EXPR silent :redraw<CR>:echon ' '<CR>")
     endif
 endfunction
 
@@ -868,6 +875,7 @@ endfunction
 
 " Called by the Object Browser when running remotely:
 function RGetRemoteCmd(cmd)
+    call RWarningMsg(a:cmd)
     call SendCmdToR(a:cmd)
     echon
 endfunction
@@ -895,18 +903,15 @@ function SendCmdToR(cmd)
     endif
 
     if g:vimrplugin_screenplugin
-        if !exists("g:ScreenShellSend")
-            if exists("b:myservername")
-                if remote_expr(b:myservername, "mode()") != "n"
-                    call remote_send(b:myservername, "<Esc>")
-                endif
-                call remote_expr(b:myservername, "RGetRemoteCmd('" . a:cmd . "')")
-                return 1
-            endif
+        if !exists("g:ScreenShellSend") && !exists("*RBrSendToR")
             call RWarningMsg("Did you already start R?")
             return 0
         endif
-        call g:ScreenShellSend(cmd)
+        if exists("g:ScreenShellSend")
+            call g:ScreenShellSend(cmd)
+        else
+            call RBrSendToR(cmd)
+        endif
         return 1
     elseif g:vimrplugin_conqueplugin
         if !exists("b:conque_bufname")
@@ -1309,9 +1314,14 @@ endfunction
 
 " Quit R
 function RQuit(how)
-    if serverlist() =~ b:objbr_server
-        call remote_send(b:objbr_server, ":q<CR>")
-        sleep 500m
+    if g:rplugin_objbr_port
+        Py VimClient("FINISH")
+        sleep 200m
+        Py OtherPort = 0
+    endif
+    if g:rplugin_myport
+        Py StopServer()
+        sleep 200m
     endif
 
     if a:how == "save"
@@ -1671,15 +1681,11 @@ function RAction(rcmd)
     if strlen(rkeyword) > 0
         if a:rcmd == "help"
             if g:vimrplugin_vimpager != "no"
-                if (bufname("%") =~ "Object_Browser" || exists("b:myservername")) && g:rplugin_curview == "libraries"
+                if (bufname("%") =~ "Object_Browser" || g:rplugin_editor_port) && g:rplugin_curview == "libraries"
                     let pkg = RBGetPkgName()
-                    if exists("b:myservername")
+                    if g:rplugin_editor_port
                         call system("tmux select-pane -t 0")
-                        call remote_expr(b:myservername, "ShowRDoc('" . rkeyword . "', '" . pkg . "', 0)")
-                        if remote_expr(b:myservername, "mode()") != "n"
-                            call remote_send(b:myservername, "<Esc>")
-                        endif
-                        call remote_send(b:myservername, "<Enter>")
+                        exe 'Py VimClient("EXPR call ShowRDoc(' . "'" . rkeyword . "', '" . pkg . "', 0)" . '")'
                     else
                         call ShowRDoc(rkeyword, pkg, 0)
                     endif
@@ -2374,13 +2380,6 @@ call RSetDefaultValue("g:vimrplugin_vimpager",       "'tab'")
 call RSetDefaultValue("g:vimrplugin_latexcmd", "'pdflatex'")
 call RSetDefaultValue("g:vimrplugin_objbr_place", "'script,right'")
 
-" Old default value.
-"if has("gui_running") || !has("clientserver")
-"    call RSetDefaultValue("g:vimrplugin_objbr_place", "'script,right'")
-"else
-"    call RSetDefaultValue("g:vimrplugin_objbr_place", "'console,right'")
-"endif
-
 
 " python has priority over python3, unless ConqueTerm_PyVersion == 3
 if has("python3") && exists("g:ConqueTerm_PyVersion") && g:ConqueTerm_PyVersion == 3
@@ -2516,20 +2515,6 @@ if g:vimrplugin_screenplugin
         call RWarningMsgInp("Vim-R-plugin requires Screen plugin >= 1.5")
         let g:rplugin_failed = 1
         finish
-    endif
-endif
-
-" To run the Object Browser beside R Console with Tmux, Vim must have the
-" +clientserver feature and the X server must be running.
-if g:vimrplugin_screenplugin && g:vimrplugin_objbr_place =~ "console"
-    if $DISPLAY == "" || g:vimrplugin_tmux == 0
-        let g:vimrplugin_objbr_place = substitute(g:vimrplugin_objbr_place, "console", "script", "")
-    elseif !has("clientserver")
-        " Cannot use RWarningMsgInp because the message would be visible but
-        " Vim would wait for <Enter> when R was started.
-        call RWarningMsg("Your Vim was not compiled with the 'clientserver' feature. You will not be able to start the Object Browser beside the R Console.")
-        sleep 1
-        let g:vimrplugin_objbr_place = substitute(g:vimrplugin_objbr_place, "console", "script", "")
     endif
 endif
 
@@ -2755,8 +2740,14 @@ if exists("g:vimrplugin_term_cmd")
     let g:rplugin_termcmd = g:vimrplugin_term_cmd
 endif
 
+function FinalActions()
+    Py StopServer()
+    sleep 200m
+endfunction
+
 augroup RBufControl
     au BufEnter * let g:rplugin_curbuf = bufname("%")
+    au VimLeavePre * call FinalActions()
 augroup END
 
 if has("gui_running")
@@ -2770,6 +2761,9 @@ let g:rplugin_firstbuffer = substitute(g:rplugin_firstbuffer, " ", "", "")
 let g:rplugin_running_objbr = 0
 let g:rplugin_has_new_lib = 0
 let g:rplugin_has_new_obj = 0
+let g:rplugin_objbr_port = 0
+let g:rplugin_myport = 0
+let g:rplugin_editor_port = 0
 
 " Debugging code:
 if g:vimrplugin_screenplugin && g:vimrplugin_conqueplugin

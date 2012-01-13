@@ -19,7 +19,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Mon Jan 02, 2012  07:10PM
+" Last Change: Wed Jan 11, 2012  11:31PM
 "
 " Please see doc/r-plugin.txt for usage details.
 "==========================================================================
@@ -105,9 +105,7 @@ else
     let s:uniquename = b:screensname
 endif
 let $VIMINSTANCEID = $VIMRPLUGIN_TMPDIR . "/" . s:uniquename . "-port"
-let b:objbr_server = "OB" . s:uniquename
 unlet s:uniquename
-let b:objbr_server = toupper(substitute(b:objbr_server, '\W', "", "g"))
 
 if has("gui_running") && exists("g:rplugin_lastft") && g:rplugin_lastft != &filetype
     call RBufEnter()
