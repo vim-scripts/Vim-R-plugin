@@ -19,7 +19,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Wed Jan 11, 2012  11:31PM
+" Last Change: Fri Jan 13, 2012  07:20AM
 "
 " Please see doc/r-plugin.txt for usage details.
 "==========================================================================
@@ -106,10 +106,6 @@ else
 endif
 let $VIMINSTANCEID = $VIMRPLUGIN_TMPDIR . "/" . s:uniquename . "-port"
 unlet s:uniquename
-
-if has("gui_running") && exists("g:rplugin_lastft") && g:rplugin_lastft != &filetype
-    call RBufEnter()
-endif
 
 let g:rplugin_lastft = &filetype
 
