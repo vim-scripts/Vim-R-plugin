@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Thu Jan 12, 2012  10:45PM
+" Last Change: Fri Jan 13, 2012  10:01PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -662,12 +662,23 @@ function StartObjectBrowser()
             let g:rplugin_myport1 = 6005
             let g:rplugin_myport2 = 6100
             Py RunServer()
-            Py vim.command("let g:rplugin_myport = " + str(MyPort))
+            sleep 100m
+            let ii = 0
+            while ii < 10 && g:rplugin_myport == 0
+                Py vim.command("let g:rplugin_myport = " + str(MyPort))
+                let ii = ii + 1
+                sleep 100m
+            endwhile
         endif
 
         " Start the Object Browser if it doesn't exist yet
         if g:rplugin_objbr_port == 0
             let objbrowserfile = $VIMRPLUGIN_TMPDIR . "/objbrowserInit"
+            if exists("g:ScreenShellSession")
+                let tmxs = " -S " . g:ScreenShellSession . " "
+            else
+                let tmxs = " "
+            endif
             call writefile([
                         \ 'let b:objbrtitle = "' . b:objbrtitle . '"',
                         \ 'let b:screensname = "' . b:screensname . '"',
@@ -693,7 +704,7 @@ function StartObjectBrowser()
                         \ 'let g:rplugin_myport2 = 5100',
                         \ 'sleep 250m',
                         \ 'function! RBrSendToR(cmd)',
-                        \ 'let scmd = "tmux set-buffer '. "'" . '" . a:cmd . "\<C-M>' . "'" . ' && tmux paste-buffer -t 2"',
+                        \ 'let scmd = "tmux set-buffer '. "'" . '" . a:cmd . "\<C-M>' . "'" . ' && tmux' . tmxs . 'paste-buffer -t %1"',
                         \ '    let rlog = system(scmd)',
                         \ '    if v:shell_error',
                         \ '        let rlog = substitute(rlog, "\n", " ", "g")',
@@ -703,7 +714,13 @@ function StartObjectBrowser()
                         \ '    endif',
                         \ 'endfunction',
                         \ 'Py RunServer()',
-                        \ 'sleep 250m',
+                        \ 'sleep 100m',
+                        \ 'let ii = 0',
+                        \ 'while ii < 10 && g:rplugin_myport == 0',
+                        \ '  Py vim.command("let g:rplugin_myport = " + str(MyPort))',
+                        \ '  let ii = ii + 1',
+                        \ '  sleep 100m',
+                        \ 'endwhile',
                         \ 'Py VimClient("EXPR let g:rplugin_objbr_port = " + str(MyPort))',
                         \ 'sleep 200m',
                         \ 'Py VimClient("EXPR Py OtherPort = " + str(MyPort))',
@@ -749,12 +766,14 @@ function StartObjectBrowser()
                 endif
             endif
             let ii = 0
+            echohl WarningMsg
             echo "Please, wait..."
+            echohl Normal
             while g:rplugin_objbr_port == 0 && ii < 10
                 sleep 200m
                 let ii = ii + 1
             endwhile
-            echon "\rObject Browser loaded."
+            echon "\r               "
         endif
         return
     endif
@@ -1318,6 +1337,7 @@ function RQuit(how)
         Py VimClient("FINISH")
         sleep 200m
         Py OtherPort = 0
+        let g:rplugin_objbr_port = 0
     endif
     if g:rplugin_myport
         Py StopServer()
@@ -2485,13 +2505,10 @@ if g:vimrplugin_screenplugin
                         \ 'bind-key C-a send-prefix',
                         \ 'set-window-option -g mode-keys vi',
                         \ 'set -g status off',
-                        \ "set -g terminal-overrides 'xterm*:smcup@:rmcup@'"]
-            if s:tmuxversion >= "1.5"
-                let cnflines += [
-                            \ 'set -g mode-mouse on',
-                            \ 'set -g mouse-select-pane on',
-                            \ 'set -g mouse-resize-pane on']
-            endif
+                        \ "set -g terminal-overrides 'xterm*:smcup@:rmcup@'",
+                        \ 'set -g mode-mouse on',
+                        \ 'set -g mouse-select-pane on',
+                        \ 'set -g mouse-resize-pane on']
             call writefile(cnflines, tmxcnf)
             let g:ScreenShellTmuxInitArgs = g:ScreenShellTmuxInitArgs . " -f " . tmxcnf
         endif
@@ -2502,21 +2519,18 @@ endif
 
 if g:vimrplugin_screenplugin
     " Future: Remove this Tmux version test on 2014
-    if g:vimrplugin_tmux
-        if s:tmuxversion == "1.0" && g:ScreenVersion > "1.4"
-            call RWarningMsgInp("Tmux <= 1.3 requires Screen plugin <= 1.4. You should either upgrade Tmux or downgrade the Screen plugin.")
-        endif
-        if s:tmuxversion < "1.5" && g:ScreenVersion < "1.5"
-            call RWarningMsgInp("Vim-R-plugin requires Screen plugin >= 1.5")
-            let g:rplugin_failed = 1
-            finish
-        endif
-    elseif g:ScreenVersion < "1.5"
+    if g:vimrplugin_tmux && s:tmuxversion < "1.5"
+        call RWarningMsgInp("Vim-R-plugin requires Tmux >= 1.5")
+        let g:rplugin_failed = 1
+        finish
+    endif
+    if g:ScreenVersion < "1.5"
         call RWarningMsgInp("Vim-R-plugin requires Screen plugin >= 1.5")
         let g:rplugin_failed = 1
         finish
     endif
 endif
+unlet s:tmuxversion
 
 " Start with an empty list of objects in the workspace
 let g:rplugin_globalenvlines = []
