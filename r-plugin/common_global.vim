@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Fri Jan 13, 2012  10:01PM
+" Last Change: Mon Jan 16, 2012  08:45AM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -2489,11 +2489,6 @@ if g:vimrplugin_screenplugin
     " xterm-256color. See   :h r-plugin-tips 
     if g:vimrplugin_tmux
         let g:ScreenImpl = 'Tmux'
-        let s:tmuxversion = system("tmux -V")
-        let s:tmuxversion = substitute(s:tmuxversion, '.*tmux \([0-9]\.[0-9]\).*', '\1', '')
-        if strlen(s:tmuxversion) != 3
-            let s:tmuxversion = "1.0"
-        endif
         if g:vimrplugin_notmuxconf == 0
             if $DISPLAY != "" || $TERM =~ "xterm"
                 let g:ScreenShellTmuxInitArgs = "-2"
@@ -2517,20 +2512,25 @@ if g:vimrplugin_screenplugin
     endif
 endif
 
+let s:tmuxversion = system("tmux -V")
+let s:tmuxversion = substitute(s:tmuxversion, '.*tmux \([0-9]\.[0-9]\).*', '\1', '')
+if strlen(s:tmuxversion) != 3
+    let s:tmuxversion = "1.0"
+endif
+if g:vimrplugin_tmux && s:tmuxversion < "1.5"
+    call RWarningMsgInp("Vim-R-plugin requires Tmux >= 1.5")
+    let g:rplugin_failed = 1
+    finish
+endif
+unlet s:tmuxversion
+
 if g:vimrplugin_screenplugin
-    " Future: Remove this Tmux version test on 2014
-    if g:vimrplugin_tmux && s:tmuxversion < "1.5"
-        call RWarningMsgInp("Vim-R-plugin requires Tmux >= 1.5")
-        let g:rplugin_failed = 1
-        finish
-    endif
     if g:ScreenVersion < "1.5"
         call RWarningMsgInp("Vim-R-plugin requires Screen plugin >= 1.5")
         let g:rplugin_failed = 1
         finish
     endif
 endif
-unlet s:tmuxversion
 
 " Start with an empty list of objects in the workspace
 let g:rplugin_globalenvlines = []

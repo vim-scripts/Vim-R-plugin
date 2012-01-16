@@ -120,6 +120,7 @@ def VimServer():
                                 pass
                             if re.match("^FINISH", data):
                                 FinishNow = True
+                                MyPort = 0
 
         except:
             MyPort = 0
