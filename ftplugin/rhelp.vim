@@ -19,7 +19,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Sun Nov 27, 2011  04:35PM
+" Last Change: Mon Feb 13, 2012  08:39AM
 "
 " Please see doc/r-plugin.txt for usage details.
 "==========================================================================
@@ -44,41 +44,6 @@ endif
 " Some buffer variables common to R, Rnoweb, Rhelp and rdoc file need be
 " defined after the global ones:
 runtime r-plugin/common_buffer.vim
-
-" Run R CMD BATCH on current file and load the resulting .Rout in a split
-" window
-function! ShowRout()
-    let routfile = expand("%:r") . ".Rout"
-    if bufloaded(routfile)
-        exe "bunload " . routfile
-        call delete(routfile)
-    endif
-
-    " if not silent, the user will have to type <Enter>
-    silent update
-    if has("win32") || has("win64")
-        let rcmd = 'Rcmd.exe BATCH --no-restore --no-save "' . expand("%") . '" "' . routfile . '"'
-    else
-        let rcmd = g:rplugin_R . " CMD BATCH --no-restore --no-save '" . expand("%") . "' '" . routfile . "'"
-    endif
-    echo "Please wait for: " . rcmd
-    let rlog = system(rcmd)
-    if v:shell_error && rlog != ""
-        call RWarningMsg('Error: "' . rlog . '"')
-        sleep 1
-    endif
-
-    if filereadable(routfile)
-        if g:vimrplugin_routnotab == 1
-            exe "split " . routfile
-        else
-            exe "tabnew " . routfile
-        endif
-    else
-        call RWarningMsg("The file '" . routfile . "' is not readable.")
-    endif
-endfunction
-
 
 "==========================================================================
 " Key bindings and menu items
