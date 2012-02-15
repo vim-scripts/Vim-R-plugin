@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Mon Jan 16, 2012  08:45AM
+" Last Change: Mon Feb 13, 2012  10:04AM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -461,18 +461,20 @@ function StartR(whatr)
     call writefile([], $VIMRPLUGIN_TMPDIR . "/object_browser")
     call writefile([], $VIMRPLUGIN_TMPDIR . "/liblist")
 
+    if !exists("b:rplugin_R")
+        call SetRPath()
+    endif
+
     " Change to buffer's directory before starting R
     lcd %:p:h
 
     if a:whatr =~ "vanilla"
-        let g:rplugin_r_args = "--vanilla"
+        let b:rplugin_r_args = "--vanilla"
     else
         if a:whatr =~ "custom"
             call inputsave()
-            let g:rplugin_r_args = input('Enter parameters for R: ')
+            let b:rplugin_r_args = input('Enter parameters for R: ')
             call inputrestore()
-        else
-            let g:rplugin_r_args = g:vimrplugin_r_args
         endif
     endif
 
@@ -482,8 +484,8 @@ function StartR(whatr)
         else
             let rcmd = "/Applications/R.app"
         endif
-        if g:rplugin_r_args != " "
-            let rcmd = rcmd . " " . g:rplugin_r_args
+        if b:rplugin_r_args != " "
+            let rcmd = rcmd . " " . b:rplugin_r_args
         endif
         let rlog = system("open " . rcmd)
         if v:shell_error
@@ -499,14 +501,14 @@ function StartR(whatr)
             lcd -
             return
         else
-            let g:rplugin_R = "Rterm.exe"
+            let b:rplugin_R = "Rterm.exe"
         endif
     endif
 
-    if g:rplugin_r_args == " "
-        let rcmd = g:rplugin_R
+    if b:rplugin_r_args == " "
+        let rcmd = b:rplugin_R
     else
-        let rcmd = g:rplugin_R . " " . g:rplugin_r_args
+        let rcmd = b:rplugin_R . " " . b:rplugin_r_args
     endif
 
     if g:vimrplugin_screenplugin
@@ -704,7 +706,7 @@ function StartObjectBrowser()
                         \ 'let g:rplugin_myport2 = 5100',
                         \ 'sleep 250m',
                         \ 'function! RBrSendToR(cmd)',
-                        \ 'let scmd = "tmux set-buffer '. "'" . '" . a:cmd . "\<C-M>' . "'" . ' && tmux' . tmxs . 'paste-buffer -t %1"',
+                        \ '    let scmd = "tmux set-buffer '. "'" . '" . a:cmd . "\<C-M>' . "'" . ' && tmux' . tmxs . 'paste-buffer -t %1"',
                         \ '    let rlog = system(scmd)',
                         \ '    if v:shell_error',
                         \ '        let rlog = substitute(rlog, "\n", " ", "g")',
@@ -1344,13 +1346,18 @@ function RQuit(how)
         sleep 200m
     endif
 
-    if a:how == "save"
-        call SendCmdToR('quit(save = "yes")')
-        sleep 1
+    if exists("b:quit_command")
+        call SendCmdToR(b:quit_command)
     else
-        call SendCmdToR('quit(save = "no")')
-        sleep 250m
+        if a:how == "save"
+            call SendCmdToR('quit(save = "yes")')
+            sleep 1
+        else
+            call SendCmdToR('quit(save = "no")')
+        endif
     endif
+    sleep 250m
+
     if g:vimrplugin_screenplugin && exists(':ScreenQuit')
         ScreenQuit
     elseif g:vimrplugin_conqueplugin
@@ -1969,7 +1976,7 @@ function MakeRMenu()
     call RCreateMenuItem("nvi", 'Start/Close.Start\ R\ (custom)', '<Plug>RCustomStart', 'rc', ':call StartR("custom")')
     "-------------------------------
     menu R.Start/Close.-Sep1- <nul>
-    call RCreateMenuItem("nvi", 'Start/Close.Close\ R\ (no\ save)', '<Plug>RClose', 'rq', ":call SendCmdToR('quit(save = \"no\")')")
+    call RCreateMenuItem("nvi", 'Start/Close.Close\ R\ (no\ save)', '<Plug>RClose', 'rq', ":call RQuit('no')")
 
     "----------------------------------------------------------------------------
     " Send
@@ -2144,7 +2151,7 @@ function MakeRMenu()
     "----------------------------------------------------------------------------
     " Buttons
     amenu <silent> ToolBar.RStart :call StartR("R")<CR>
-    amenu <silent> ToolBar.RClose :call SendCmdToR('quit(save = "no")')<CR>
+    amenu <silent> ToolBar.RClose :call RQuit('no')<CR>
     "---------------------------
     if &filetype == "r" || g:vimrplugin_never_unmake_menu
         nmenu <silent> ToolBar.RSendFile :call SendFileToR("echo")<CR>
@@ -2311,6 +2318,23 @@ function RBufEnter()
     endif
     if &buftype != "nofile" || &filetype == "conque_term" || &filetype == "rbrowser"
         let g:rplugin_lastft = &filetype
+    endif
+endfunction
+
+function SetRPath()
+    if exists("g:vimrplugin_r_path")
+        if isdirectory(g:vimrplugin_r_path)
+            let b:rplugin_R = g:vimrplugin_r_path . "/R"
+        else
+            let b:rplugin_R = g:vimrplugin_r_path
+        endif
+    else
+        let b:rplugin_R = "R"
+    endif
+    if !exists("g:vimrplugin_r_args")
+        let b:rplugin_r_args = " "
+    else
+        let b:rplugin_r_args = g:vimrplugin_r_args
     endif
 endfunction
 
@@ -2572,9 +2596,9 @@ if has("win32") || has("win64")
     endif
     let g:rplugin_jspath = g:rplugin_home . "\\r-plugin\\vimActivate.js"
     if !exists("g:rplugin_rpathadded")
-        if exists("g:vimrplugin_r_path")
+        if exists("g:vimrplugin_r_path") && isdirectory(g:vimrplugin_r_path)
             let $PATH = g:vimrplugin_r_path . ";" . $PATH
-            let g:rplugin_Rgui = g:vimrplugin_r_path . "\\Rgui.exe"
+            let b:rplugin_Rgui = g:vimrplugin_r_path . "\\Rgui.exe"
         else
             Py GetRPathPy()
             if s:rinstallpath == "Not found"
@@ -2588,20 +2612,22 @@ if has("win32") || has("win64")
                 endif
                 if g:vimrplugin_i386
                     let $PATH = s:rinstallpath . '\bin\i386;' . $PATH
-                    let g:rplugin_Rgui = s:rinstallpath . '\bin\i386\Rgui.exe'
+                    let b:rplugin_Rgui = s:rinstallpath . '\bin\i386\Rgui.exe'
                 else
                     let $PATH = s:rinstallpath . '\bin\x64;' . $PATH
-                    let g:rplugin_Rgui = s:rinstallpath . '\bin\x64\Rgui.exe'
+                    let b:rplugin_Rgui = s:rinstallpath . '\bin\x64\Rgui.exe'
                 endif
             else
                 let $PATH = s:rinstallpath . '\bin;' . $PATH
-                let g:rplugin_Rgui = s:rinstallpath . '\bin\Rgui.exe'
+                let b:rplugin_Rgui = s:rinstallpath . '\bin\Rgui.exe'
             endif
             unlet s:rinstallpath
         endif
         let g:rplugin_rpathadded = 1
     endif
-    let g:rplugin_R = "Rgui.exe"
+    if !exists("b:rplugin_R")
+        let b:rplugin_R = "Rgui.exe"
+    endif
     let g:vimrplugin_term_cmd = "none"
     let g:vimrplugin_term = "none"
     let g:vimrplugin_noscreenrc = 1
@@ -2610,15 +2636,6 @@ if has("win32") || has("win64")
     endif
     if !exists("g:vimrplugin_sleeptime")
         let g:vimrplugin_sleeptime = 0.02
-    endif
-else
-    if exists("g:vimrplugin_r_path")
-        let g:rplugin_R = g:vimrplugin_r_path . "/R"
-    else
-        let g:rplugin_R = "R"
-    endif
-    if !exists("g:vimrplugin_r_args")
-        let g:vimrplugin_r_args = " "
     endif
 endif
 

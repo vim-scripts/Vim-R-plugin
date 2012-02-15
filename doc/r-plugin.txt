@@ -1648,38 +1648,15 @@ facilities with Vim.
 9.18. Turn the R-plugin into a global plugin~
 							     *r-plugin-global*
 The Vim-R-plugin is a file type plugin. If you want its functionality
-available for all file types, then do one of the following:
-
-9.18.1. When using GVim~
-
-Go to your ~/.vim/plugin directory and create a symbolic link to
-~/.vim/r-plugin/global_r_plugin.vim. That is, type the following
-in a terminal emulator:
+available for all file types, then go to your ~/.vim/plugin directory and
+create a symbolic link to ~/.vim/r-plugin/global_r_plugin.vim. That is, type
+the following in a terminal emulator:
 >
    cd ~/.vim/plugin/
    ln -s ../r-plugin/global_r_plugin.vim
 <
-Then, typing <LocalLeader>rf will activate the plugin and start an R session.
-The <LocalLeader>rf shortcut is hardcoded in the global_r_plugin.vim script.
-If you prefer to use another shortcut, instead of creating a symbolic link,
-make a copy of the file to the ~/.vim/plugin directory and edit it. On
-Windows, you probably will have to make a copy of the file to the
+On Windows, you probably will have to make a copy of the file to the
 ~/vimfiles/plugin directory.
-
-9.18.2. When using Vim + screen.vim plugin (either Tmux or GNU Screen)~
-
-Put in your |vimrc| (replace <F2> with the shortcut of your preference):
->
-   nmap <F2> :runtime ftplugin/r.vim<CR>
-<
-Press <F2><LocalLeader>rf<F2> to use R. That is, press <F2> before AND after
-starting R with the shortcut <LocalLeader>rf (or any other key binding that
-you have defined in your |vimrc| as the shortcut to start R). The first time
-that <F2> is pressed, the plugin's functions and key bindings are made
-available. However, when R is started, Vim is closed and restarted by the
-screen.vim plugin, and the Vim-R-plugin functions and key bindings are lost.
-Consequently, the ftplugin/r.vim script must be sourced again by pressing <F2>
-for the second time.
 
 
 9.19. Disable syntax highlight of R functions~
@@ -1776,14 +1753,14 @@ the R syntax highlighted.
 							       *r-plugin-news*
 10. News~
 
-0.9.8 (2012-01-12)
+0.9.8 (2012-02-14)
 
  * Use the R package vimcom. The following options are now set on the vimcom R
    package and no longer in the Vim-R-plugin: allnames, open_df, and
    open_list.
  * Automatic update of the Object Browser when running R in a Tmux session.
    
-0.9.7 (2012-01-03)
+0.9.7 (2012-02-12)
 
  * Minor bug fixes.
 

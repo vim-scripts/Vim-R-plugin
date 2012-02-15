@@ -19,7 +19,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Tue Dec 20, 2011  11:38PM
+" Last Change: Mon Feb 13, 2012  08:57AM
 "
 " Please see doc/r-plugin.txt for usage details.
 "==========================================================================
@@ -44,7 +44,7 @@ if exists("g:rplugin_failed")
     finish
 endif
 
-" Some buffer variables common to R, Rnoweb, Rhelp and rdoc file need be
+" Some buffer variables common to R, Rnoweb, Rhelp and rdoc files need be
 " defined after the global ones:
 runtime r-plugin/common_buffer.vim
 
@@ -62,7 +62,7 @@ function! ShowRout()
     if has("win32") | has("win64")
         let rcmd = 'Rcmd.exe BATCH --no-restore --no-save "' . expand("%") . '" "' . routfile . '"'
     else
-        let rcmd = g:rplugin_R . " CMD BATCH --no-restore --no-save '" . expand("%") . "' '" . routfile . "'"
+        let rcmd = b:rplugin_R . " CMD BATCH --no-restore --no-save '" . expand("%") . "' '" . routfile . "'"
     endif
     echo "Please wait for: " . rcmd
     let rlog = system(rcmd)
