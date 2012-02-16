@@ -16,7 +16,7 @@
 "
 " Author: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          
-" Last Change: Thu Jan 12, 2012  10:34AM
+" Last Change: Thu Feb 16, 2012  09:26AM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -58,7 +58,10 @@ function! UpdateOB(what)
     if g:rplugin_curview != a:what
         return
     endif
-    if exists("g:rplugin_curbuf") && g:rplugin_curbuf != "Object_Browser" && g:rplugin_editor_port == 0
+    redir => s:bufl
+    silent buffers
+    redir END
+    if exists("g:rplugin_curbuf") && g:rplugin_curbuf != "Object_Browser" && g:rplugin_editor_port == 0 && s:bufl =~ "Object_Browser"
         let savesb = &switchbuf
         set switchbuf=useopen,usetab
         sil noautocmd sb Object_Browser

@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Mon Feb 13, 2012  10:04AM
+" Last Change: Thu Feb 16, 2012  12:16PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -2795,6 +2795,8 @@ let g:rplugin_has_new_obj = 0
 let g:rplugin_objbr_port = 0
 let g:rplugin_myport = 0
 let g:rplugin_editor_port = 0
+
+call SetRPath()
 
 " Debugging code:
 if g:vimrplugin_screenplugin && g:vimrplugin_conqueplugin
