@@ -126,7 +126,7 @@ following dependencies:
    Vim >= 7.3 with Python support.
    Tmux >= 1.3:   http://tmux.sourceforge.net
    Screen plugin: http://www.vim.org/scripts/script.php?script_id=2711
-   vimcom:        http://www.lepem.ufc.br/jaa/vimcom
+   vimcom:        An R package.
 
    Recommends:~
    ncurses-term:  http://invisible-island.net/ncurses
@@ -139,11 +139,12 @@ following dependencies:
    Unfortunately their installation instructions vary widely and are beyond
    the scope of this documentation.
    
-   The colorout package colorizes the R output and the setwidth package
+   The vimcom package creates a server on R to allow the communication with
+   Vim, the colorout package colorizes the R output and the setwidth package
    adjusts the value of options("width") whenever the terminal is resized.
-   Both can be installed from within R:
+   They can be installed from within R:
 >
-   install.packages(c("colorout", "setwidth"))
+   install.packages(c("vimcom", "colorout", "setwidth"))
 <
 The plugin will run R inside a Tmux session. If you are using Vim (not GVim),
 you may be interested in reading |r-plugin-tmux| section to learn a few useful
