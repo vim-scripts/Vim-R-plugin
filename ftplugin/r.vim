@@ -19,7 +19,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Mon Feb 13, 2012  08:57AM
+" Last Change: Fri Feb 17, 2012  08:38AM
 "
 " Please see doc/r-plugin.txt for usage details.
 "==========================================================================
@@ -35,8 +35,11 @@ let b:did_r_ftplugin = 1
 let s:cpo_save = &cpo
 set cpo&vim
 
-setlocal commentstring=#%s
-setlocal comments=b:#,b:##,b:###
+" Don't do this if called by ../r-plugin/global_r_plugin.vim
+if &filetype == "r"
+    setlocal commentstring=#%s
+    setlocal comments=b:#,b:##,b:###
+endif
 
 " Source scripts common to R, Rnoweb, Rhelp and rdoc files:
 runtime r-plugin/common_global.vim
