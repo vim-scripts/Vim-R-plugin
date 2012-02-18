@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Thu Feb 16, 2012  12:16PM
+" Last Change: Sat Feb 18, 2012  07:18PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -706,7 +706,7 @@ function StartObjectBrowser()
                         \ 'let g:rplugin_myport2 = 5100',
                         \ 'sleep 250m',
                         \ 'function! RBrSendToR(cmd)',
-                        \ '    let scmd = "tmux set-buffer '. "'" . '" . a:cmd . "\<C-M>' . "'" . ' && tmux' . tmxs . 'paste-buffer -t %1"',
+                        \ '    let scmd = "tmux set-buffer '. "'" . '" . a:cmd . "\<C-M>' . "'" . ' && tmux' . tmxs . 'paste-buffer -t ' . g:rplugin_tmuxpane . '"',
                         \ '    let rlog = system(scmd)',
                         \ '    if v:shell_error',
                         \ '        let rlog = substitute(rlog, "\n", " ", "g")',
@@ -2795,6 +2795,7 @@ let g:rplugin_has_new_obj = 0
 let g:rplugin_objbr_port = 0
 let g:rplugin_myport = 0
 let g:rplugin_editor_port = 0
+let g:rplugin_tmuxpane = '%1'
 
 call SetRPath()
 

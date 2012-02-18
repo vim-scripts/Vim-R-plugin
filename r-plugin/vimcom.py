@@ -11,7 +11,6 @@ sock = None
 th = None
 FinishNow = False
 
-
 def DiscoverVimComPort():
     global VimComPort
     HOST = "localhost"
@@ -31,7 +30,11 @@ def DiscoverVimComPort():
         try:
             sock.connect((HOST, VimComPort))
             sock.send("\002What port?")
-            repl = sock.recv(1024)
+            xx = sock.recv(1024)
+            x = re.split("&", xx)
+            if len(x) == 2:
+                vim.command("let g:rplugin_tmuxpane = '" + x[1] + "'")
+            repl = x[0]
         except:
             pass
         sock.close()
