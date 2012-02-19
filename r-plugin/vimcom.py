@@ -33,7 +33,7 @@ def DiscoverVimComPort():
             xx = sock.recv(1024)
             x = re.split("&", xx)
             if len(x) == 2:
-                vim.command("let g:rplugin_tmuxpane = '" + x[1] + "'")
+                vim.command("let g:rplugin_rpane = '" + x[1] + "'")
             repl = x[0]
         except:
             pass

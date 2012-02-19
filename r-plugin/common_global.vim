@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Sat Feb 18, 2012  07:18PM
+" Last Change: Sat Feb 18, 2012  11:19PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -681,6 +681,25 @@ function StartObjectBrowser()
             else
                 let tmxs = " "
             endif
+
+            if !exists("g:rplugin_edpane")
+                let g:rplugin_edpane = $TMUX_PANE
+                if strlen(g:rplugin_edpane) == 0
+                    let g:rplugin_edpane = '%0'
+                endif
+            endif
+
+            if !exists("g:rplugin_rpane")
+                Py SendToR("\002What port?")
+                let xx = g:rplugin_lastrpl
+                let xxx = split(xx, "&")
+                if len(xxx) == 2
+                    let g:rplugin_rpane = xxx[1]
+                else
+                    let g:rplugin_rpane = '%1'
+                endif
+            endif
+
             call writefile([
                         \ 'let b:objbrtitle = "' . b:objbrtitle . '"',
                         \ 'let b:screensname = "' . b:screensname . '"',
@@ -705,8 +724,9 @@ function StartObjectBrowser()
                         \ 'let g:rplugin_myport1 = 5005',
                         \ 'let g:rplugin_myport2 = 5100',
                         \ 'sleep 250m',
+                        \ 'call writefile([$TMUX_PANE], $VIMRPLUGIN_TMPDIR . "/objbrpane")',
                         \ 'function! RBrSendToR(cmd)',
-                        \ '    let scmd = "tmux set-buffer '. "'" . '" . a:cmd . "\<C-M>' . "'" . ' && tmux' . tmxs . 'paste-buffer -t ' . g:rplugin_tmuxpane . '"',
+                        \ '    let scmd = "tmux set-buffer '. "'" . '" . a:cmd . "\<C-M>' . "'" . ' && tmux' . tmxs . 'paste-buffer -t ' . g:rplugin_rpane . '"',
                         \ '    let rlog = system(scmd)',
                         \ '    if v:shell_error',
                         \ '        let rlog = substitute(rlog, "\n", " ", "g")',
@@ -747,11 +767,10 @@ function StartObjectBrowser()
                 let panewidth = g:vimrplugin_objbr_w
             endif
             if g:vimrplugin_objbr_place =~ "console"
-                let trgt = ' -t 1 ' 
+                let cmd = "tmux split-window -d -h -l " . panewidth . " -t " . g:rplugin_rpane . ' "vim -c ' . "'source " . objbrowserfile . "'" . '"'
             else
-                let trgt = ' -t 0 ' 
+                let cmd = "tmux split-window -d -h -l " . panewidth . " -t " . g:rplugin_edpane . ' "vim -c ' . "'source " . objbrowserfile . "'" . '"'
             endif
-            let cmd = "tmux split-window -d -h -l " . panewidth . trgt . '"vim -c ' . "'source " . objbrowserfile . "'" . '"'
             let rlog = system(cmd)
             if v:shell_error
                 let rlog = substitute(rlog, '\n', ' ', 'g')
@@ -760,11 +779,14 @@ function StartObjectBrowser()
                 let g:rplugin_running_objbr = 0
                 return 0
             endif
+            let xx = readfile($VIMRPLUGIN_TMPDIR . "/objbrpane")
+            let g:rplugin_obpane = xx[0]
+
             if g:vimrplugin_objbr_place =~ "left"
                 if g:vimrplugin_objbr_place =~ "console"
-                    call system("tmux swap-pane -d -s 1 -t 2")
+                    call system("tmux swap-pane -d -s " . g:rplugin_rpane . " -t " . g:rplugin_obpane)
                 else
-                    call system("tmux swap-pane -d -s 0 -t 1")
+                    call system("tmux swap-pane -d -s " . g:rplugin_edpane . " -t " . g:rplugin_obpane)
                 endif
             endif
             let ii = 0
@@ -1358,8 +1380,10 @@ function RQuit(how)
     endif
     sleep 250m
 
-    if g:vimrplugin_screenplugin && exists(':ScreenQuit')
-        ScreenQuit
+    if g:vimrplugin_screenplugin
+        if exists(':ScreenQuit')
+            ScreenQuit
+        endif
     elseif g:vimrplugin_conqueplugin
         sleep 200m
         exe "sil bdelete " . b:conque_bufname
@@ -1711,7 +1735,7 @@ function RAction(rcmd)
                 if (bufname("%") =~ "Object_Browser" || g:rplugin_editor_port) && g:rplugin_curview == "libraries"
                     let pkg = RBGetPkgName()
                     if g:rplugin_editor_port
-                        call system("tmux select-pane -t 0")
+                        call system("tmux select-pane -t " . g:rplugin_edpane)
                         exe 'Py VimClient("EXPR call ShowRDoc(' . "'" . rkeyword . "', '" . pkg . "', 0)" . '")'
                     else
                         call ShowRDoc(rkeyword, pkg, 0)
@@ -2795,7 +2819,6 @@ let g:rplugin_has_new_obj = 0
 let g:rplugin_objbr_port = 0
 let g:rplugin_myport = 0
 let g:rplugin_editor_port = 0
-let g:rplugin_tmuxpane = '%1'
 
 call SetRPath()
 
