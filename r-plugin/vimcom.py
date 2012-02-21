@@ -30,11 +30,7 @@ def DiscoverVimComPort():
         try:
             sock.connect((HOST, VimComPort))
             sock.send("\002What port?")
-            xx = sock.recv(1024)
-            x = re.split("&", xx)
-            if len(x) == 2:
-                vim.command("let g:rplugin_rpane = '" + x[1] + "'")
-            repl = x[0]
+            repl = sock.recv(1024)
         except:
             pass
         sock.close()

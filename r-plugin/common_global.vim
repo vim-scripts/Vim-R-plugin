@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Sat Feb 18, 2012  11:19PM
+" Last Change: Mon Feb 20, 2012  11:49PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -685,22 +685,21 @@ function StartObjectBrowser()
             if !exists("g:rplugin_edpane")
                 let g:rplugin_edpane = $TMUX_PANE
                 if strlen(g:rplugin_edpane) == 0
-                    let g:rplugin_edpane = '%0'
+                    let g:rplugin_edpane = '0'
                 endif
             endif
 
-            if !exists("g:rplugin_rpane")
-                Py SendToR("\002What port?")
-                let xx = g:rplugin_lastrpl
-                let xxx = split(xx, "&")
-                if len(xxx) == 2
-                    let g:rplugin_rpane = xxx[1]
-                else
-                    let g:rplugin_rpane = '%1'
-                endif
+            let rcmd = 'writeLines(Sys.getenv("TMUX_PANE"), "' . $VIMRPLUGIN_TMPDIR . "/rpane" . '")'
+            exe "Py SendToR('" . rcmd . "')"
+            let xx = readfile($VIMRPLUGIN_TMPDIR . "/rpane")
+            let g:rplugin_rpane = xx[0]
+            if g:rplugin_rpane !~ "%[0-9]"
+                call RWarningMsg("R pane on Tmux undefined")
+                let g:rplugin_rpane = '1'
             endif
 
             call writefile([
+                        \ 'call writefile([$TMUX_PANE], $VIMRPLUGIN_TMPDIR . "/objbrpane")',
                         \ 'let b:objbrtitle = "' . b:objbrtitle . '"',
                         \ 'let b:screensname = "' . b:screensname . '"',
                         \ 'let b:rscript_buffer = "' . bufname("%") . '"',
@@ -724,7 +723,6 @@ function StartObjectBrowser()
                         \ 'let g:rplugin_myport1 = 5005',
                         \ 'let g:rplugin_myport2 = 5100',
                         \ 'sleep 250m',
-                        \ 'call writefile([$TMUX_PANE], $VIMRPLUGIN_TMPDIR . "/objbrpane")',
                         \ 'function! RBrSendToR(cmd)',
                         \ '    let scmd = "tmux set-buffer '. "'" . '" . a:cmd . "\<C-M>' . "'" . ' && tmux' . tmxs . 'paste-buffer -t ' . g:rplugin_rpane . '"',
                         \ '    let rlog = system(scmd)',
@@ -771,6 +769,9 @@ function StartObjectBrowser()
             else
                 let cmd = "tmux split-window -d -h -l " . panewidth . " -t " . g:rplugin_edpane . ' "vim -c ' . "'source " . objbrowserfile . "'" . '"'
             endif
+
+            call delete($VIMRPLUGIN_TMPDIR . "/objbrpane")
+
             let rlog = system(cmd)
             if v:shell_error
                 let rlog = substitute(rlog, '\n', ' ', 'g')
@@ -779,6 +780,12 @@ function StartObjectBrowser()
                 let g:rplugin_running_objbr = 0
                 return 0
             endif
+
+            let ii = 0
+            while !filereadable($VIMRPLUGIN_TMPDIR . "/objbrpane")
+                let ii = ii + 1
+                sleep 50m
+            endwhile
             let xx = readfile($VIMRPLUGIN_TMPDIR . "/objbrpane")
             let g:rplugin_obpane = xx[0]
 
@@ -1413,8 +1420,6 @@ function BuildROmniList(env, what)
     else
         let rtf = g:rplugin_omnifname
     endif
-    let lockfile = rtf . ".locked"
-    call writefile(["Wait!"], lockfile)
     let omnilistcmd = 'vim.bol("' . rtf . '"'
     if a:env == "libraries" && a:what == "installed"
         let omnilistcmd = omnilistcmd . ', what = "installed"'
@@ -1428,6 +1433,7 @@ function BuildROmniList(env, what)
     if a:env == "GlobalEnv"
         let g:rplugin_globalenvlines = readfile(g:rplugin_globalenvfname)
     endif
+    echon
 endfunction
 
 function RBuildSyntaxFile(what)
