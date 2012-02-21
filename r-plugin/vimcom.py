@@ -135,8 +135,11 @@ def VimServer():
             pass
         sock.close()
         if FinishNow == False:
-            sock = socket.socket( socket.AF_INET, socket.SOCK_DGRAM )
-            sock.bind( (UDP_IP,MyPort) )
+            try:
+                sock = socket.socket( socket.AF_INET, socket.SOCK_DGRAM )
+                sock.bind( (UDP_IP,MyPort) )
+            except:
+                pass
 
 def RunServer():
     global th
