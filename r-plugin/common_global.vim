@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Mon Feb 20, 2012  11:49PM
+" Last Change: Tue Feb 21, 2012  03:54PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -1368,7 +1368,6 @@ function RQuit(how)
         Py VimClient("FINISH")
         sleep 200m
         Py OtherPort = 0
-        let g:rplugin_objbr_port = 0
     endif
     if g:rplugin_myport
         Py StopServer()
@@ -1386,6 +1385,12 @@ function RQuit(how)
         endif
     endif
     sleep 250m
+
+    if g:rplugin_objbr_port
+        call system("tmux kill-pane -t " . g:rplugin_obpane)
+        let g:rplugin_objbr_port = 0
+        sleep 250m
+    endif
 
     if g:vimrplugin_screenplugin
         if exists(':ScreenQuit')
