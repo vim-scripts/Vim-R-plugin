@@ -146,6 +146,15 @@ following dependencies:
 >
    install.packages(c("vimcom", "colorout", "setwidth"))
 <
+   You certainly will want to put something like the following in your
+   ~/.Rprofile:
+>
+   if(interactive()){
+       library(colorout)
+       library(setwidth)
+       library(vimcom)
+   }
+<
 The plugin will run R inside a Tmux session. If you are using Vim (not GVim),
 you may be interested in reading |r-plugin-tmux| section to learn a few useful
 shortcuts. The tmux.conf file created by the plugin sets Tmux to work with Vi
@@ -1588,6 +1597,7 @@ two options and some others:
    if(interactive()){
        library(colorout)
        library(setwidth)
+       library(vimcom)
        if(nchar(Sys.getenv("DISPLAY")) > 1){
 	   grDevices::X11.options(width = 4.5, height = 4, ypos = 0,
 				  xpos = 1000, pointsize = 10)
@@ -1754,7 +1764,7 @@ the R syntax highlighted.
 							       *r-plugin-news*
 10. News~
 
-0.9.8 (2012-02-16)
+0.9.8 (2012-02-21)
 
  * Use the R package vimcom. The following options are now set on the vimcom R
    package and no longer in the Vim-R-plugin: allnames, open_df, and
