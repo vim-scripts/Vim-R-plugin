@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Tue Feb 21, 2012  03:54PM
+" Last Change: Wed Feb 22, 2012  10:48AM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -1433,7 +1433,20 @@ function BuildROmniList(env, what)
         let omnilistcmd = omnilistcmd . ', allnames = TRUE'
     endif
     let omnilistcmd = omnilistcmd . ')'
+
+    call delete($VIMRPLUGIN_TMPDIR . "/vimbol_finished")
+    echohl WarningMsg
+    echo "Please, wait..."
+    echohl Normal
     exe "Py SendToR('" . omnilistcmd . "')"
+    sleep 2
+    let ii = 0
+    while !filereadable($VIMRPLUGIN_TMPDIR . "/vimbol_finished") && ii < g:vimrplugin_buildwait
+        let ii += 1
+        sleep
+    endwhile
+    call SendCmdToR(' ')
+    echon "\r               "
 
     if a:env == "GlobalEnv"
         let g:rplugin_globalenvlines = readfile(g:rplugin_globalenvfname)
@@ -2451,7 +2464,7 @@ call RSetDefaultValue("g:vimrplugin_routnotab",         0)
 call RSetDefaultValue("g:vimrplugin_editor_w",         66)
 call RSetDefaultValue("g:vimrplugin_help_w",           46)
 call RSetDefaultValue("g:vimrplugin_objbr_w",          40)
-call RSetDefaultValue("g:vimrplugin_buildwait",       120)
+call RSetDefaultValue("g:vimrplugin_buildwait",       180)
 call RSetDefaultValue("g:vimrplugin_indent_commented",  1)
 call RSetDefaultValue("g:vimrplugin_by_vim_instance",   0)
 call RSetDefaultValue("g:vimrplugin_never_unmake_menu", 0)

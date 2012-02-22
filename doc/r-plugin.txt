@@ -995,7 +995,7 @@ the SDI style of the graphical user interface.
 
 6.9. Time necessary to build list of objects for omni completion~
 							*vimrplugin_buildwait*
-If your system needs more than 120 seconds to build the list of objects for
+If your system needs more than 180 seconds to build the list of objects for
 omni completion after you do the command |:RUpdateObjList|, then you should
 set the value of |vimrplugin_buildwait| to a higher value. Example:
 >
