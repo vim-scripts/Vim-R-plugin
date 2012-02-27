@@ -3,7 +3,7 @@
 " Maintainer:	      Jakson Aquino <jalvesaq@gmail.com>
 " Former Maintainers: Vaidotas Zemlys <zemlys@gmail.com>
 " 		      Tom Payne <tom@tompayne.org>
-" Last Change:	      Sun Feb 20, 2011  12:06PM
+" Last Change:	      Mon Feb 27, 2012  10:45AM
 " Filenames:	      *.R *.r *.Rhistory *.Rt
 " 
 " NOTE: The highlighting of R functions is defined in the
@@ -105,7 +105,7 @@ syn match rOperator    '-'
 syn match rOperator    '*'
 syn match rOperator    '+'
 syn match rOperator    '='
-syn match rOperator    "[|!<>^~`/:@]"
+syn match rOperator    "[|!<>^~`/:]"
 syn match rOperator    "%\{2}\|%\*%\|%\/%\|%in%\|%o%\|%x%"
 syn match rOpError  '*\{3}'
 syn match rOpError  '//'
@@ -141,9 +141,11 @@ syn match rParenError "[\]}]" contained
 runtime r-plugin/functions.vim
 
 syn match rDollar display contained "\$"
+syn match rDollar display contained "@"
 
 " List elements will not be highlighted as functions:
 syn match rLstElmt "\$[a-zA-Z0-9\\._]*" contains=rDollar
+syn match rLstElmt "@[a-zA-Z0-9\\._]*" contains=rDollar
 
 " Functions that may add new objects
 syn keyword rPreProc     library require attach detach source
