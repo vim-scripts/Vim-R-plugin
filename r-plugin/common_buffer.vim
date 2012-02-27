@@ -19,7 +19,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Thu Feb 16, 2012  09:48AM
+" Last Change: Mon Feb 27, 2012  10:24AM
 "
 " Please see doc/r-plugin.txt for usage details.
 "==========================================================================
@@ -109,6 +109,7 @@ if g:vimrplugin_screenplugin
 else
     let s:uniquename = b:screensname
 endif
+let s:uniquename = substitute(s:uniquename, '/', '', 'g')
 let $VIMINSTANCEID = $VIMRPLUGIN_TMPDIR . "/" . s:uniquename . "-port"
 unlet s:uniquename
 
