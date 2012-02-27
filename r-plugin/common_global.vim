@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Mon Feb 27, 2012  12:24PM
+" Last Change: Mon Feb 27, 2012  12:45PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -2847,7 +2847,7 @@ if has("gui_running")
     augroup END
 endif
 
-let g:rplugin_firstbuffer = expand("%")
+let g:rplugin_firstbuffer = expand("%:p")
 let g:rplugin_running_objbr = 0
 let g:rplugin_has_new_lib = 0
 let g:rplugin_has_new_obj = 0
