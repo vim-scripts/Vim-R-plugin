@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Mon Feb 27, 2012  10:37AM
+" Last Change: Mon Feb 27, 2012  12:03PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -691,6 +691,11 @@ function StartObjectBrowser()
 
             let rcmd = 'writeLines(Sys.getenv("TMUX_PANE"), "' . $VIMRPLUGIN_TMPDIR . "/rpane" . '")'
             exe "Py SendToR('" . rcmd . "')"
+            let ii = 0
+            while !filereadable($VIMRPLUGIN_TMPDIR . "/rpane") && ii < 20
+                let ii = ii + 1
+                sleep 50m
+            endwhile
             let xx = readfile($VIMRPLUGIN_TMPDIR . "/rpane")
             let g:rplugin_rpane = xx[0]
             if g:rplugin_rpane !~ "%[0-9]"
@@ -782,7 +787,7 @@ function StartObjectBrowser()
             endif
 
             let ii = 0
-            while !filereadable($VIMRPLUGIN_TMPDIR . "/objbrpane")
+            while !filereadable($VIMRPLUGIN_TMPDIR . "/objbrpane") && ii < 20
                 let ii = ii + 1
                 sleep 50m
             endwhile
