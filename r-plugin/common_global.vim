@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Wed Feb 22, 2012  10:48AM
+" Last Change: Mon Feb 27, 2012  10:37AM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -1438,14 +1438,13 @@ function BuildROmniList(env, what)
     echohl WarningMsg
     echo "Please, wait..."
     echohl Normal
-    exe "Py SendToR('" . omnilistcmd . "')"
+    call SendCmdToR(omnilistcmd)
     sleep 2
     let ii = 0
     while !filereadable($VIMRPLUGIN_TMPDIR . "/vimbol_finished") && ii < g:vimrplugin_buildwait
         let ii += 1
         sleep
     endwhile
-    call SendCmdToR(' ')
     echon "\r               "
 
     if a:env == "GlobalEnv"
@@ -2836,7 +2835,6 @@ if has("gui_running")
 endif
 
 let g:rplugin_firstbuffer = expand("%")
-let g:rplugin_firstbuffer = substitute(g:rplugin_firstbuffer, " ", "", "")
 let g:rplugin_running_objbr = 0
 let g:rplugin_has_new_lib = 0
 let g:rplugin_has_new_obj = 0
