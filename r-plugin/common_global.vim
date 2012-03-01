@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Mon Feb 27, 2012  12:45PM
+" Last Change: Wed Feb 29, 2012  10:49PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -1470,6 +1470,7 @@ function RBuildSyntaxFile(what)
     call BuildROmniList("libraries", a:what)
     sleep 1
     let g:rplugin_liblist = readfile(g:rplugin_omnifname)
+    call BuildRHelpList()
     let res = []
     let nf = 0
     let funlist = ""
@@ -1743,6 +1744,41 @@ function ShowRDoc(rkeyword, package, getclass)
     normal! ggdd
     setlocal nomodified
     setlocal nomodifiable
+endfunction
+
+function BuildRHelpList()
+    if !exists("s:list_of_objs")
+        let s:list_of_objs = []
+    endif
+    for xx in g:rplugin_liblist
+        let xxx = split(xx, ";")
+        if xxx[0] !~ '\$'
+            call add(s:list_of_objs, xxx[0])
+        endif
+    endfor
+endfunction
+
+function RLisObjs(arglead, cmdline, curpos)
+    let lob = []
+    let rkeyword = '^' . a:arglead
+    for xx in s:list_of_objs
+        if xx =~ rkeyword
+            call add(lob, xx)
+        endif
+    endfor
+    return lob
+endfunction
+
+function RAskHelp(...)
+    if a:1 == ""
+        call SendCmdToR("help.start()")
+        return
+    endif
+    if g:vimrplugin_vimpager != "no"
+        call ShowRDoc(a:1, "", 0)
+    else
+        call SendCmdToR("help(" . a:1. ")")
+    endif
 endfunction
 
 function PrintRObject(rkeyword)
@@ -2203,7 +2239,7 @@ function MakeRMenu()
     amenu R.Help\ (plugin).FAQ\ and\ tips.Jump\ to\ function\ definitions :help r-plugin-tagsfile<CR>
     amenu R.Help\ (plugin).News :help r-plugin-news<CR>
 
-    amenu R.Help\ (R) :call SendCmdToR("help.start()")<CR>
+    amenu R.Help\ (R)<Tab>:Rhelp :call SendCmdToR("help.start()")<CR>
     let g:rplugin_hasmenu = 1
 
     "----------------------------------------------------------------------------
@@ -2401,6 +2437,7 @@ endfunction
 command RUpdateObjList :call RBuildSyntaxFile("loaded")
 command RUpdateObjListAll :call RBuildSyntaxFile("installed")
 command RBuildTags :call SendCmdToR('rtags(ofile = "TAGS")')
+command -nargs=? -complete=customlist,RLisObjs Rhelp :call RAskHelp(<q-args>)
 
 "==========================================================================
 " Global variables
@@ -2754,6 +2791,7 @@ endif
 " Keeps the libraries object list in memory to avoid the need of reading the file
 " repeatedly:
 let g:rplugin_liblist = readfile(g:rplugin_omnifname)
+call BuildRHelpList()
 
 
 " Control the menu 'R' and the tool bar buttons

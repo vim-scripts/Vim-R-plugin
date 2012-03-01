@@ -412,7 +412,7 @@ Object Browser
 -----------------------------------------------------------
 
 Help (plugin)
-Help (R)
+Help (R)                                            :Rhelp
 -----------------------------------------------------------
 
 Please see |r-plugin-key-bindings| to learn how to customize the key bindings
@@ -455,6 +455,16 @@ CTRL-A) you have to press CTRL-N to go foward in the list and CTRL-P to go
 backward (see |popupmenu-completion|). Note: if using Vim in a terminal
 emulator, Tmux will capture the CTRL-A command. You have to do CTRL-A twice to
 pass a single CTRL-A to Vim.
+
+To get help on an R topic, type in Vim (Normal mode):
+>
+   :Rhelp topic
+<
+The command may be abbreviated to  :Rh  and you can both press <Tab> to
+trigger the autocompletion of R objects names or hit CTRL-D to list the
+possible completions (see |cmdline-completion| for details on the various ways
+of getting command-line completion). The list of objects used for
+autocompletion is the same one built by  |:RUpdateObjList|.
 
 
 4.2. Edition of rnoweb files~
@@ -1770,6 +1780,7 @@ the R syntax highlighted.
    package and no longer in the Vim-R-plugin: allnames, open_df, and
    open_list.
  * Automatic update of the Object Browser when running R in a Tmux session.
+ * New command  :Rhelp (thanks for Nir Atias for suggesting the new feature).
    
 0.9.7 (2012-02-12)
 
