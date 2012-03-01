@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Wed Feb 29, 2012  10:49PM
+" Last Change: Thu Mar 01, 2012  11:03AM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -1613,6 +1613,10 @@ function RGetClassFor(rkeyword)
             let classfor = substitute(classfor, ',.*', '', "")
             let classfor = substitute(classfor, ' .*', '', "")
         endif
+    endif
+    if classfor =~ "^'" && classfor =~ "'$"
+        let classfor = substitute(classfor, "^'", '"', "")
+        let classfor = substitute(classfor, "'$", '"', "")
     endif
     return classfor
 endfunction
