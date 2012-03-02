@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Thu Mar 01, 2012  11:03AM
+" Last Change: Fri Mar 02, 2012  11:55AM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -912,7 +912,6 @@ function RObjBrowserOCLists(status)
         call RBrowserOpenCloseLists(a:status)
     elseif g:rplugin_objbr_port
         exe 'Py VimClient("EXPR call RBrowserOpenCloseLists('. "'" . a:status . "')" . '")'
-        Py VimClient("EXPR silent :redraw<CR>:echon ' '<CR>")
     endif
 endfunction
 
