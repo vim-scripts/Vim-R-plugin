@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Fri Mar 02, 2012  11:55AM
+" Last Change: Fri Mar 02, 2012  01:55PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -728,6 +728,7 @@ function StartObjectBrowser()
                         \ 'Py SendToR("\004Libraries")',
                         \ 'call UpdateOB("GlobalEnv")',
                         \ 'let g:rplugin_editor_port = ' . g:rplugin_myport ,
+                        \ 'let g:rplugin_edpane = "' . g:rplugin_edpane . '"',
                         \ 'Py OtherPort = ' . g:rplugin_myport ,
                         \ 'let g:rplugin_myport1 = 5005',
                         \ 'let g:rplugin_myport2 = 5100',
@@ -1747,6 +1748,7 @@ function ShowRDoc(rkeyword, package, getclass)
     normal! ggdd
     setlocal nomodified
     setlocal nomodifiable
+    redraw
 endfunction
 
 function BuildRHelpList()
@@ -1806,20 +1808,24 @@ function RAction(rcmd)
     endif
     if strlen(rkeyword) > 0
         if a:rcmd == "help"
-            if g:vimrplugin_vimpager != "no"
-                if (bufname("%") =~ "Object_Browser" || g:rplugin_editor_port) && g:rplugin_curview == "libraries"
-                    let pkg = RBGetPkgName()
+            if g:vimrplugin_vimpager == "no"
+                call SendCmdToR("help(" . rkeyword . ")")
+            else
+                if (bufname("%") =~ "Object_Browser" || g:rplugin_editor_port)
+                    if g:rplugin_curview == "libraries"
+                        let pkg = RBGetPkgName()
+                    else
+                        let pkg = ""
+                    endif
                     if g:rplugin_editor_port
                         call system("tmux select-pane -t " . g:rplugin_edpane)
-                        exe 'Py VimClient("EXPR call ShowRDoc(' . "'" . rkeyword . "', '" . pkg . "', 0)" . '")'
+                        exe "Py VimClient('EXPR call ShowRDoc(" . '"' . rkeyword . '", "' . pkg . '", 0)' . "')"
                     else
                         call ShowRDoc(rkeyword, pkg, 0)
                     endif
                     return
                 endif
                 call ShowRDoc(rkeyword, "", 1)
-            else
-                call SendCmdToR("help(" . rkeyword . ")")
             endif
             return
         endif
