@@ -16,7 +16,7 @@
 "
 " Author: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          
-" Last Change: Thu Feb 16, 2012  09:26AM
+" Last Change: Fri Mar 02, 2012  10:40AM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -39,7 +39,7 @@ runtime r-plugin/common_global.vim
 runtime r-plugin/common_buffer.vim
 
 setlocal noswapfile
-set buftype=nofile
+setlocal buftype=nofile
 setlocal nowrap
 
 if !exists("g:rplugin_hasmenu")
@@ -356,6 +356,29 @@ else
     let s:isutf8 = 0
 endif
 unlet s:envstring
+
+function RBrowserUpdate()
+    if g:rplugin_whatupdate == "G"
+        call UpdateOB('GlobalEnv')
+        let g:rplugin_whatupdate = "N"
+    elseif g:rplugin_whatupdate == "L"
+        call UpdateOB('libraries')
+        let g:rplugin_whatupdate = "N"
+    elseif g:rplugin_whatupdate == "B"
+        call UpdateOB('GlobalEnv')
+        call UpdateOB('libraries')
+        let g:rplugin_whatupdate = "N"
+    endif
+endfunction
+
+let g:rplugin_whatupdate = "N"
+if g:vimrplugin_screenplugin
+    set updatetime=50
+    " The function VimServer() in vimcom.py should only set the value of
+    " rplugin_whatupdate instead of calling UpdateOB(). However, the procedure
+    " would not work because CursorHold is not retriggered
+    "autocmd CursorHold <buffer> call RBrowserUpdate()
+endif
 
 let &cpo = s:cpo_save
 unlet s:cpo_save
