@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Fri Mar 02, 2012  01:55PM
+" Last Change: Sun Mar 04, 2012  08:01PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -697,11 +697,14 @@ function StartObjectBrowser()
                 sleep 50m
             endwhile
             if ii == 20
-                call RWarningMsg("Communication Vim-R through VimCom failed [rpane].")
-                return
+                call RWarningMsg("R did not save its Tmux pane. The Object Browser may not work well.")
             endif
-            let xx = readfile($VIMRPLUGIN_TMPDIR . "/rpane")
-            let g:rplugin_rpane = xx[0]
+            if filereadable($VIMRPLUGIN_TMPDIR . "/rpane")
+                let xx = readfile($VIMRPLUGIN_TMPDIR . "/rpane")
+                let g:rplugin_rpane = xx[0]
+            else
+                let g:rplugin_rpane = '1'
+            endif
             if g:rplugin_rpane !~ "%[0-9]"
                 call RWarningMsg("R pane on Tmux undefined")
                 let g:rplugin_rpane = '1'
@@ -1663,7 +1666,7 @@ function ShowRDoc(rkeyword, package, getclass)
 
     call SetRTextWidth()
 
-    let g:rplugin_lastrpl = ""
+    let g:rplugin_lastrpl = "R did not reply."
     if classfor == "" && a:package == ""
         exe 'Py SendToR("vim.help(' . "'" . a:rkeyword . "', " . g:rplugin_htw . 'L)")'
     elseif a:package != ""
