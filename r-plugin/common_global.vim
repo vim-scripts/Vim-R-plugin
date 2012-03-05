@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Sun Mar 04, 2012  11:14PM
+" Last Change: Mon Mar 05, 2012  08:46AM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -685,10 +685,12 @@ function StartObjectBrowser()
             if !exists("g:rplugin_edpane")
                 let g:rplugin_edpane = $TMUX_PANE
                 if strlen(g:rplugin_edpane) == 0
-                    let g:rplugin_edpane = '0'
+                    echoer "Could not find the environment variable TMUX_PANE."
+                    return
                 endif
             endif
 
+            call delete($VIMRPLUGIN_TMPDIR . "/rpane")
             let rcmd = 'writeLines(Sys.getenv("TMUX_PANE"), "' . $VIMRPLUGIN_TMPDIR . "/rpane" . '")'
             exe "Py SendToR('" . rcmd . "')"
             let ii = 0
@@ -696,18 +698,16 @@ function StartObjectBrowser()
                 let ii = ii + 1
                 sleep 50m
             endwhile
-            if ii == 20
-                call RWarningMsg("R did not save its Tmux pane. The Object Browser may not work well.")
+            if !filereadable($VIMRPLUGIN_TMPDIR . "/rpane")
+                echoer "The number of the R Tmux pane is unknown."
+                return
             endif
-            if filereadable($VIMRPLUGIN_TMPDIR . "/rpane")
-                let xx = readfile($VIMRPLUGIN_TMPDIR . "/rpane")
-                let g:rplugin_rpane = xx[0]
-            else
-                let g:rplugin_rpane = '1'
-            endif
+            let xx = readfile($VIMRPLUGIN_TMPDIR . "/rpane")
+            let g:rplugin_rpane = xx[0]
             if g:rplugin_rpane !~ "%[0-9]"
-                call RWarningMsg("R pane on Tmux undefined")
-                let g:rplugin_rpane = '1'
+                echoer 'The number of the R Tmux pane is invalid: "' . g:rplugin_rpane . '"'
+                unlet g:rplugin_rpane
+                return
             endif
 
             call writefile([
@@ -799,12 +799,17 @@ function StartObjectBrowser()
                 let ii = ii + 1
                 sleep 50m
             endwhile
-            if ii == 20
-                call RWarningMsg("Communication Vim-R through VimCom failed [objbrpane].")
+            if !filereadable($VIMRPLUGIN_TMPDIR . "/objbrpane")
+                echoer "The Tmux pane number of the Object Browser is unknown."
                 return
             endif
             let xx = readfile($VIMRPLUGIN_TMPDIR . "/objbrpane")
             let g:rplugin_obpane = xx[0]
+            if g:rplugin_obpane !~ "%[0-9]"
+                echoer 'The number of the Object Browser Tmux pane is invalid: "' . g:rplugin_obpane . '"'
+                unlet g:rplugin_obpane
+                return
+            endif
 
             if g:vimrplugin_objbr_place =~ "left"
                 if g:vimrplugin_objbr_place =~ "console"
@@ -1405,8 +1410,8 @@ function RQuit(how)
     if g:rplugin_objbr_port
         " check if the pane still exists before trying to kill it because the
         " user may have already closed the Object Browser manually.
-        let panw = system("tmux list-panes | cat")
-        if panw =~ g:rplugin_obpane
+        let plst = system("tmux list-panes | cat")
+        if plst =~ g:rplugin_obpane
             call system("tmux kill-pane -t " . g:rplugin_obpane)
         endif
         let g:rplugin_objbr_port = 0
