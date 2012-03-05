@@ -97,7 +97,7 @@ def VimServer():
         try:
             data, addr = sock.recvfrom( 1024 ) # buffer size is 1024 bytes
             if re.match("EXPR ", data):
-                vim.command("exe '" + re.sub("^EXPR ", "", data) + "'")
+                vim.command("silent exe '" + re.sub("^EXPR ", "", data) + "'")
             else:
                 if re.match("^G", data):
                     vim.command("call UpdateOB('GlobalEnv')")
@@ -109,19 +109,16 @@ def VimServer():
                             vim.command("call UpdateOB('GlobalEnv')")
                             vim.command("call UpdateOB('libraries')")
                         else:
-                            try:
-                                sock.shutdown(socket.SHUT_RD)
-                            except:
-                                pass
-                            try:
-                                sock.close()
-                            except:
-                                pass
                             if re.match("^FINISH", data):
                                 FinishNow = True
                                 MyPort = 0
+                            else:
+                                if data != "":
+                                    vim.command("call RWarningMsg('Strange string received: " + '"' + data + '"' + "')")
+                                    vim.command("sleep 1")
 
-        except:
+        except Exception as errmsg:
+            vim.command("call RWarningMsg('Server failed to read data: " + str(errmsg) + "')")
             MyPort = 0
             try:
                 sock.shutdown(socket.SHUT_RD)
@@ -138,7 +135,8 @@ def VimServer():
             try:
                 sock = socket.socket( socket.AF_INET, socket.SOCK_DGRAM )
                 sock.bind( (UDP_IP,MyPort) )
-            except:
+            except Exception as errmsg:
+                vim.command("call RWarningMsg('Server reactivation failed: " + str(errmsg) + "')")
                 pass
 
 def RunServer():
