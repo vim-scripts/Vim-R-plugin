@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Sun Mar 04, 2012  08:01PM
+" Last Change: Sun Mar 04, 2012  11:14PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -1403,7 +1403,12 @@ function RQuit(how)
     sleep 250m
 
     if g:rplugin_objbr_port
-        call system("tmux kill-pane -t " . g:rplugin_obpane)
+        " check if the pane still exists before trying to kill it because the
+        " user may have already closed the Object Browser manually.
+        let panw = system("tmux list-panes | cat")
+        if panw =~ g:rplugin_obpane
+            call system("tmux kill-pane -t " . g:rplugin_obpane)
+        endif
         let g:rplugin_objbr_port = 0
         sleep 250m
     endif
@@ -1821,8 +1826,8 @@ function RAction(rcmd)
                         let pkg = ""
                     endif
                     if g:rplugin_editor_port
-                        call system("tmux select-pane -t " . g:rplugin_edpane)
                         exe "Py VimClient('EXPR call ShowRDoc(" . '"' . rkeyword . '", "' . pkg . '", 0)' . "')"
+                        call system("tmux select-pane -t " . g:rplugin_edpane)
                     else
                         call ShowRDoc(rkeyword, pkg, 0)
                     endif
