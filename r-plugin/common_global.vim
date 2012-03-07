@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Mon Mar 05, 2012  08:46AM
+" Last Change: Wed Mar 07, 2012  11:24AM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -732,6 +732,7 @@ function StartObjectBrowser()
                         \ 'call UpdateOB("GlobalEnv")',
                         \ 'let g:rplugin_editor_port = ' . g:rplugin_myport ,
                         \ 'let g:rplugin_edpane = "' . g:rplugin_edpane . '"',
+                        \ 'let g:rplugin_rpane = "' . g:rplugin_rpane . '"',
                         \ 'Py OtherPort = ' . g:rplugin_myport ,
                         \ 'let g:rplugin_myport1 = 5005',
                         \ 'let g:rplugin_myport2 = 5100',
@@ -1831,8 +1832,13 @@ function RAction(rcmd)
                         let pkg = ""
                     endif
                     if g:rplugin_editor_port
-                        exe "Py VimClient('EXPR call ShowRDoc(" . '"' . rkeyword . '", "' . pkg . '", 0)' . "')"
-                        call system("tmux select-pane -t " . g:rplugin_edpane)
+                        let hlog = system("tmux select-pane -t " . g:rplugin_rpane . " && tmux set-buffer 'help(" . '"' . rkeyword  . '", ' . '"' . pkg . '")' . "\<C-M>' && tmux paste-buffer -t " . g:rplugin_rpane)
+                        if v:shell_error
+                            let hlog = substitute(hlog, "\n", " ", "g")
+                            let hlog = substitute(hlog, "\r", " ", "g")
+                            call RWarningMsg(hlog)
+                            return 0',
+                        endif',
                     else
                         call ShowRDoc(rkeyword, pkg, 0)
                     endif
