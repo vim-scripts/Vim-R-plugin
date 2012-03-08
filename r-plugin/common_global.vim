@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Thu Mar 08, 2012  07:22AM
+" Last Change: Thu Mar 08, 2012  10:16AM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -1852,9 +1852,8 @@ function RAction(rcmd)
                     else
                         let pkg = ""
                     endif
-                    if exists("*RBrSendToR")
-                        call RBrSendToR('help("' . rkeyword  . '", "' . pkg . '")')
-                        let slog = system("tmux select-pane -t " . g:rplugin_rpane)
+                    if exists("b:this_is_ob")
+                        let slog = system("tmux set-buffer '" . "\<Esc>" . ':call ShowRDoc("' . rkeyword . '", "' . pkg . '", 0)' . "\<C-M>' && tmux paste-buffer -t " . g:rplugin_edpane . " && tmux select-pane -t " . g:rplugin_edpane)
                         if v:shell_error
                             call RWarningMsg(slog)
                         endif
