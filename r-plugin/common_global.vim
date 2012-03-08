@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Wed Mar 07, 2012  11:24AM
+" Last Change: Thu Mar 08, 2012  07:22AM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -691,8 +691,7 @@ function StartObjectBrowser()
             endif
 
             call delete($VIMRPLUGIN_TMPDIR . "/rpane")
-            let rcmd = 'writeLines(Sys.getenv("TMUX_PANE"), "' . $VIMRPLUGIN_TMPDIR . "/rpane" . '")'
-            exe "Py SendToR('" . rcmd . "')"
+            Py SendToR("\001Tmux pane")
             let ii = 0
             while !filereadable($VIMRPLUGIN_TMPDIR . "/rpane") && ii < 20
                 let ii = ii + 1
@@ -712,6 +711,10 @@ function StartObjectBrowser()
 
             call writefile([
                         \ 'call writefile([$TMUX_PANE], $VIMRPLUGIN_TMPDIR . "/objbrpane")',
+                        \ 'let b:this_is_ob = 1',
+                        \ 'let g:rplugin_editor_port = ' . g:rplugin_myport ,
+                        \ 'let g:rplugin_edpane = "' . g:rplugin_edpane . '"',
+                        \ 'let g:rplugin_rpane = "' . g:rplugin_rpane . '"',
                         \ 'let b:objbrtitle = "' . b:objbrtitle . '"',
                         \ 'let b:screensname = "' . b:screensname . '"',
                         \ 'let b:rscript_buffer = "' . bufname("%") . '"',
@@ -727,12 +730,6 @@ function StartObjectBrowser()
                         \ 'setlocal nomodified',
                         \ 'call cursor(curline, curcol)',
                         \ 'exe "PyFile " . g:rplugin_home . "/r-plugin/vimcom.py"',
-                        \ 'Py SendToR("\003GlobalEnv")',
-                        \ 'Py SendToR("\004Libraries")',
-                        \ 'call UpdateOB("GlobalEnv")',
-                        \ 'let g:rplugin_editor_port = ' . g:rplugin_myport ,
-                        \ 'let g:rplugin_edpane = "' . g:rplugin_edpane . '"',
-                        \ 'let g:rplugin_rpane = "' . g:rplugin_rpane . '"',
                         \ 'Py OtherPort = ' . g:rplugin_myport ,
                         \ 'let g:rplugin_myport1 = 5005',
                         \ 'let g:rplugin_myport2 = 5100',
@@ -758,6 +755,7 @@ function StartObjectBrowser()
                         \ 'Py VimClient("EXPR let g:rplugin_objbr_port = " + str(MyPort))',
                         \ 'sleep 200m',
                         \ 'Py VimClient("EXPR Py OtherPort = " + str(MyPort))',
+                        \ 'call UpdateOB("GlobalEnv")',
                         \ 'redraw'], objbrowserfile)
 
             if g:vimrplugin_objbr_place =~ "left"
@@ -917,11 +915,34 @@ function RObjBrowser()
     return
 endfunction
 
-function RObjBrowserOCLists(status)
-    if exists("*RBrowserOpenCloseLists")
-        call RBrowserOpenCloseLists(a:status)
-    elseif g:rplugin_objbr_port
-        exe 'Py VimClient("EXPR call RBrowserOpenCloseLists('. "'" . a:status . "')" . '")'
+function RBrowserOpenCloseLists(status)
+    if g:vimrplugin_screenplugin && !exists("b:this_is_ob")
+        let stt = a:status + 2
+    else
+        let stt = a:status
+    endif
+
+    let switchedbuf = 0
+    if buflisted("Object_Browser") && g:rplugin_curbuf != "Object_Browser"
+        let savesb = &switchbuf
+        set switchbuf=useopen,usetab
+        sil noautocmd sb Object_Browser
+        let switchedbuf = 1
+    endif
+
+    exe 'Py SendToR("' . "\006" . stt . '")'
+
+    if exists("g:rplugin_curview")
+        if g:rplugin_curview == "GlobalEnv"
+            call UpdateOB("GlobalEnv")
+        else
+            call UpdateOB("libraries")
+        endif
+    endif
+
+    if switchedbuf
+        exe "sil noautocmd sb " . g:rplugin_curbuf
+        exe "set switchbuf=" . savesb
     endif
 endfunction
 
@@ -1825,20 +1846,18 @@ function RAction(rcmd)
             if g:vimrplugin_vimpager == "no"
                 call SendCmdToR("help(" . rkeyword . ")")
             else
-                if (bufname("%") =~ "Object_Browser" || g:rplugin_editor_port)
+                if bufname("%") =~ "Object_Browser" || exists("*RBrSendToR")
                     if g:rplugin_curview == "libraries"
                         let pkg = RBGetPkgName()
                     else
                         let pkg = ""
                     endif
-                    if g:rplugin_editor_port
-                        let hlog = system("tmux select-pane -t " . g:rplugin_rpane . " && tmux set-buffer 'help(" . '"' . rkeyword  . '", ' . '"' . pkg . '")' . "\<C-M>' && tmux paste-buffer -t " . g:rplugin_rpane)
+                    if exists("*RBrSendToR")
+                        call RBrSendToR('help("' . rkeyword  . '", "' . pkg . '")')
+                        let slog = system("tmux select-pane -t " . g:rplugin_rpane)
                         if v:shell_error
-                            let hlog = substitute(hlog, "\n", " ", "g")
-                            let hlog = substitute(hlog, "\r", " ", "g")
-                            call RWarningMsg(hlog)
-                            return 0',
-                        endif',
+                            call RWarningMsg(slog)
+                        endif
                     else
                         call ShowRDoc(rkeyword, pkg, 0)
                     endif
@@ -2034,13 +2053,8 @@ function RControlMaps()
     " Build list of objects for omni completion
     "-------------------------------------
     call RCreateMaps("nvi", '<Plug>RUpdateObjBrowser', 'ro', ':call RObjBrowser()')
-    if &filetype == "rbrowser"
-        call RCreateMaps("nvi", '<Plug>ROpenLists',        'r=', ':call RBrowserOpenCloseLists(1)')
-        call RCreateMaps("nvi", '<Plug>RCloseLists',       'r-', ':call RBrowserOpenCloseLists(0)')
-    else
-        call RCreateMaps("nvi", '<Plug>ROpenLists',        'r=', ':call RObjBrowserOCLists(1)')
-        call RCreateMaps("nvi", '<Plug>RCloseLists',       'r-', ':call RObjBrowserOCLists(0)')
-    endif
+    call RCreateMaps("nvi", '<Plug>ROpenLists',        'r=', ':call RBrowserOpenCloseLists(1)')
+    call RCreateMaps("nvi", '<Plug>RCloseLists',       'r-', ':call RBrowserOpenCloseLists(0)')
 endfunction
 
 

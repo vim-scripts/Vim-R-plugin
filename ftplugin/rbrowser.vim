@@ -16,7 +16,7 @@
 "
 " Author: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          
-" Last Change: Fri Mar 02, 2012  10:40AM
+" Last Change: Thu Mar 08, 2012  08:19AM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -114,39 +114,13 @@ function! RBrowserDoubleClick()
         exe 'Py SendToR("' . "\005" . '-' . substitute(key, '\$', '-', "g") . '")'
         call UpdateOB("GlobalEnv")
     else
-        exe 'Py SendToR("' . "\005" . substitute(key, '\$', '-', "g") . '")'
+        let key = substitute(key, '\$', '-', "g") 
+        let key = substitute(key, '`', '', "g") 
+        if key !~ "^package:"
+            let key = "package:" . RBGetPkgName() . '-' . key
+        endif
+        exe 'Py SendToR("' . "\005" . key . '")'
         call UpdateOB("libraries")
-    endif
-endfunction
-
-function! RBrowserOpenCloseLists(status)
-    if g:rplugin_editor_port == 0
-        if !buflisted("Object_Browser")
-            call RWarningMsg('There is no "Object_Browser" buffer.')
-            return
-        endif
-
-        let switchedbuf = 0
-        if g:rplugin_curbuf != "Object_Browser"
-            let savesb = &switchbuf
-            set switchbuf=useopen,usetab
-            sil noautocmd sb Object_Browser
-            let switchedbuf = 1
-        endif
-    endif
-
-    exe 'Py SendToR("' . "\006" . a:status . '")'
-    if g:rplugin_curview == "GlobalEnv"
-        call UpdateOB("GlobalEnv")
-    else
-        call UpdateOB("libraries")
-    endif
-
-    if g:rplugin_editor_port == 0
-        if switchedbuf
-            exe "sil noautocmd sb " . g:rplugin_curbuf
-            exe "set switchbuf=" . savesb
-        endif
     endif
 endfunction
 
@@ -322,7 +296,7 @@ function! ObBrBufUnload()
     call delete($VIMRPLUGIN_TMPDIR . "/object_browser")
     call delete($VIMRPLUGIN_TMPDIR . "/liblist")
     if g:rplugin_editor_port
-        call system("tmux select-pane -t 0")
+        call system("tmux select-pane -t " . g:rplugin_edpane)
     endif
 endfunction
 
@@ -373,7 +347,7 @@ endfunction
 
 let g:rplugin_whatupdate = "N"
 if g:vimrplugin_screenplugin
-    set updatetime=50
+    " set updatetime=50
     " The function VimServer() in vimcom.py should only set the value of
     " rplugin_whatupdate instead of calling UpdateOB(). However, the procedure
     " would not work because CursorHold is not retriggered
