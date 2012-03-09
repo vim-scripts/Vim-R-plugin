@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Thu Mar 08, 2012  10:36PM
+" Last Change: Fri Mar 09, 2012  12:26PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -590,7 +590,7 @@ function StartR(whatr)
         unlet g:tmp_conque_bufname
         unlet g:tmp_objbrtitle
 
-        exe "setlocal syntax=rout"
+        setlocal syntax=rout
         exe "sil noautocmd sb " . g:rplugin_curbuf
         exe "set switchbuf=" . savesb
         if savewd
@@ -1487,7 +1487,11 @@ function BuildROmniList(env, what)
     echo "Please, wait..."
     echohl Normal
     call SendCmdToR(omnilistcmd)
-    sleep 2
+    if a:env =~ "GlobalEnv"
+        sleep 100m
+    else
+        sleep 2
+    endif
     let ii = 0
     while !filereadable($VIMRPLUGIN_TMPDIR . "/vimbol_finished") && ii < g:vimrplugin_buildwait
         let ii += 1
@@ -1540,7 +1544,7 @@ function RBuildSyntaxFile(what)
         call UpdateOB("libraries")
     else
         unlet b:current_syntax
-        exe "runtime syntax/r.vim"
+        runtime syntax/r.vim
     endif
 endfunction
 
@@ -1879,9 +1883,9 @@ function RAction(rcmd)
         endif
         if a:rcmd == "plotsumm"
             if g:vimrplugin_specialplot == 1
-                let raction = "vim.plot(" . rkeyword . ") ; summary(" . rkeyword . ")"
+                let raction = "vim.plot(" . rkeyword . "); summary(" . rkeyword . ")"
             else
-                let raction = "plot(" . rkeyword . ") ; summary(" . rkeyword . ")"
+                let raction = "plot(" . rkeyword . "); summary(" . rkeyword . ")"
             endif
             call SendCmdToR(raction)
             return
@@ -2543,8 +2547,6 @@ let g:rplugin_globalenvfname = $VIMRPLUGIN_TMPDIR . "/GlobalEnvList"
 
 " Variables whose default value is fixed
 call RSetDefaultValue("g:vimrplugin_map_r",             0)
-call RSetDefaultValue("g:vimrplugin_open_df",           1)
-call RSetDefaultValue("g:vimrplugin_open_list",         0)
 call RSetDefaultValue("g:vimrplugin_allnames",          0)
 call RSetDefaultValue("g:vimrplugin_underscore",        1)
 call RSetDefaultValue("g:vimrplugin_rnowebchunk",       1)
