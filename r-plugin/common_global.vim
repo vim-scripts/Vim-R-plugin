@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Thu Mar 08, 2012  10:16AM
+" Last Change: Thu Mar 08, 2012  10:36PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -1877,11 +1877,18 @@ function RAction(rcmd)
         if a:rcmd == "plot" && g:vimrplugin_specialplot == 1
             let rfun = "vim.plot"
         endif
-        let raction = rfun . "(" . rkeyword . ")"
-        let ok = SendCmdToR(raction)
-        if ok == 0
+        if a:rcmd == "plotsumm"
+            if g:vimrplugin_specialplot == 1
+                let raction = "vim.plot(" . rkeyword . ") ; summary(" . rkeyword . ")"
+            else
+                let raction = "plot(" . rkeyword . ") ; summary(" . rkeyword . ")"
+            endif
+            call SendCmdToR(raction)
             return
         endif
+
+        let raction = rfun . "(" . rkeyword . ")"
+        call SendCmdToR(raction)
     endif
 endfunction
 
@@ -2020,7 +2027,7 @@ function RControlMenu()
     menu R.Command.-Sep3- <nul>
     call RCreateMenuItem("nvi", 'Command.Summary\ (cur)', '<Plug>RSummary', 'rs', ':call RAction("summary")')
     call RCreateMenuItem("nvi", 'Command.Plot\ (cur)', '<Plug>RPlot', 'rg', ':call RAction("plot")')
-    call RCreateMenuItem("nvi", 'Command.Plot\ and\ summary\ (cur)', '<Plug>RSPlot', 'rb', ':call RAction("plot")<CR>:call RAction("summary")')
+    call RCreateMenuItem("nvi", 'Command.Plot\ and\ summary\ (cur)', '<Plug>RSPlot', 'rb', ':call RAction("plotsumm")')
     let g:rplugin_hasmenu = 1
 endfunction
 
@@ -2047,7 +2054,7 @@ function RControlMaps()
     "-------------------------------------
     call RCreateMaps("nvi", '<Plug>RSummary',      'rs', ':call RAction("summary")')
     call RCreateMaps("nvi", '<Plug>RPlot',         'rg', ':call RAction("plot")')
-    call RCreateMaps("nvi", '<Plug>RSPlot',        'rb', ':call RAction("plot")<CR>:call RAction("summary")')
+    call RCreateMaps("nvi", '<Plug>RSPlot',        'rb', ':call RAction("plotsumm")')
 
     " Build list of objects for omni completion
     "-------------------------------------
