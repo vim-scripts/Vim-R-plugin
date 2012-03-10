@@ -401,7 +401,6 @@ Edit
 
 Syntax
   . Build omniList (loaded packages)       :RUpdateObjList
-  . Build omniList (installed packages) :RUpdateObjListAll
 -----------------------------------------------------------
 
 Object Browser
@@ -481,7 +480,6 @@ mode:
 
 4.3. Omni completion and the highlighting of functions~
 							     *:RUpdateObjList*
-							  *:RUpdateObjListAll*
 The plugin adds some features to the default syntax highlight of R code. One
 such feature is the highlight of R functions. However, only functions that
 R loads by default are highlighted. To add functions of other libraries, you
@@ -499,7 +497,7 @@ completion (|compl-omni|) including all objects currently in R's workspace,
 with the exception of the .GlobalEnv objects. These two lists are stored
 permanently in the ~/.vim/r-plugin directory.
 
-The command  :RUpdateObjList  waits 120 seconds to R finish building the list.
+The command  :RUpdateObjList  waits 60 seconds to R finish building the list.
 If this time is not enough to your system, please, set a different value of
 |vimrplugin_buildwait|.
 
@@ -507,7 +505,9 @@ You should run  :RUpdateObjList  whenever you upgrade R since some functions
 are removed and new ones are added at each new R version.
 
 The command  :RUpdateObjListAll  will tell R to load all installed packages
-and, then, build the "omniList".
+and, then, build the "omniList". If you have too many installed packages, this
+may cause problems: R may be unable to load all packages and Vim may be unable
+to load the list of functions for syntax highlight.
 
 
 4.4. Omni completion~
@@ -1005,7 +1005,7 @@ the SDI style of the graphical user interface.
 
 6.9. Time necessary to build list of objects for omni completion~
 							*vimrplugin_buildwait*
-If your system needs more than 180 seconds to build the list of objects for
+If your system needs more than 60 seconds to build the list of objects for
 omni completion after you do the command |:RUpdateObjList|, then you should
 set the value of |vimrplugin_buildwait| to a higher value. Example:
 >
@@ -1774,7 +1774,7 @@ the R syntax highlighted.
 							       *r-plugin-news*
 10. News~
 
-0.9.8 (2012-02-21)
+0.9.8 (2012-03-08)
 
  * Use the R package vimcom. The following options are now set on the vimcom R
    package and no longer in the Vim-R-plugin: allnames, open_df, and
