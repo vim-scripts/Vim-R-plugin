@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Fri Mar 09, 2012  11:36PM
+" Last Change: Sun Mar 11, 2012  04:19PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -2489,7 +2489,6 @@ function SetRPath()
 endfunction
 
 command RUpdateObjList :call RBuildSyntaxFile("loaded")
-command RUpdateObjListAll :call RBuildSyntaxFile("installed")
 command RBuildTags :call SendCmdToR('rtags(ofile = "TAGS")')
 command -nargs=? -complete=customlist,RLisObjs Rhelp :call RAskHelp(<q-args>)
 

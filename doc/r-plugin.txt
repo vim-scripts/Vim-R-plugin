@@ -504,10 +504,8 @@ If this time is not enough to your system, please, set a different value of
 You should run  :RUpdateObjList  whenever you upgrade R since some functions
 are removed and new ones are added at each new R version.
 
-The command  :RUpdateObjListAll  will tell R to load all installed packages
-and, then, build the "omniList". If you have too many installed packages, this
-may cause problems: R may be unable to load all packages and Vim may be unable
-to load the list of functions for syntax highlight.
+Note: If you have too many loaded packages Vim may be unable to load the list
+of functions for syntax highlight.
 
 
 4.4. Omni completion~
@@ -1781,6 +1779,8 @@ the R syntax highlighted.
    open_list.
  * Automatic update of the Object Browser when running R in a Tmux session.
  * New command  :Rhelp (thanks for Nir Atias for suggesting the new feature).
+ * Remove the command  :RUpdateObjListAll  because Vim may not load the
+   syntax file if it is too big.
    
 0.9.7 (2012-02-12)
 
