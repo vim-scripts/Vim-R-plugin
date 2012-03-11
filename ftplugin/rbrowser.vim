@@ -16,7 +16,7 @@
 "
 " Author: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          
-" Last Change: Thu Mar 08, 2012  08:19AM
+" Last Change: Sun Mar 11, 2012  04:09PM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -304,6 +304,27 @@ function! SourceObjBrLines()
     exe "source " . $VIMRPLUGIN_TMPDIR . "/objbrowserInit"
 endfunction
 
+function! OBDelete()
+    if line(".") < 3
+        return
+    endif
+    let obj = RBrowserGetName(1)
+    if g:rplugin_curview == "GlobalEnv"
+        if obj =~ '\$'
+            let cmd = obj . ' <- NULL'
+        else
+            let cmd = 'rm(' . obj . ')'
+        endif
+    else
+        if obj =~ "^package:"
+            let cmd = 'detach("' . obj . '", unload = TRUE, character.only = TRUE)'
+        else
+            return
+        endif
+    endif
+    call RBrSendToR(cmd)
+endfunction
+
 nmap <buffer><silent> <CR> :call RBrowserDoubleClick()<CR>
 nmap <buffer><silent> <2-LeftMouse> :call RBrowserDoubleClick()<CR>
 nmap <buffer><silent> <RightMouse> :call RBrowserRightClick()<CR>
@@ -322,6 +343,10 @@ call writefile([], $VIMRPLUGIN_TMPDIR . "/object_browser")
 call writefile([], $VIMRPLUGIN_TMPDIR . "/liblist")
 
 au BufUnload <buffer> call ObBrBufUnload()
+
+if $TMUX_PANE =~ ""
+    nmap <buffer><silent> dd :call OBDelete()<CR>
+endif
 
 let s:envstring = tolower($LC_MESSAGES . $LC_ALL . $LANG)
 if s:envstring =~ "utf-8" || s:envstring =~ "utf8"
@@ -344,6 +369,7 @@ function RBrowserUpdate()
         let g:rplugin_whatupdate = "N"
     endif
 endfunction
+
 
 let g:rplugin_whatupdate = "N"
 if g:vimrplugin_screenplugin
