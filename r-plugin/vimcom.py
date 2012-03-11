@@ -156,7 +156,7 @@ def StopServer():
     vim.command("let g:rplugin_myport = 0")
     ft = vim.eval("&filetype")
     if ft == "rbrowser":
-        VimClient("EXPR let g:rplugin_objbr_port = 0")
+        VimClient("EXPR let g:rplugin_objbr_port = 0 | let g:vimrplugin_objbr_w = " + vim.eval("&columns"))
     if MyPort == 0:
         return
     try:
