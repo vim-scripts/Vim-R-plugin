@@ -16,7 +16,7 @@
 "
 " Author: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          
-" Last Change: Mon Mar 12, 2012  08:55AM
+" Last Change: Mon Mar 12, 2012  09:05AM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -55,11 +55,14 @@ endif
 let g:rplugin_curview = "GlobalEnv"
 
 let g:rplugin_ob_busy = 0
+let g:rplugin_need_up = 0
 
 function! UpdateOB(what)
     if g:rplugin_ob_busy == 1
+        let g:rplugin_need_up = 1
         return
     endif
+    let g:rplugin_need_up = 0
     let g:rplugin_ob_busy = 1
     if g:rplugin_curview != a:what
         let g:rplugin_ob_busy = 0
@@ -337,7 +340,6 @@ function! OBDelete(immediate)
         call RBrSendToR(cmd)
         sleep 100m
         let g:rplugin_ob_busy = 0
-        call UpdateOB(g:rplugin_curview)
     endif
     return ""
 endfunction
@@ -359,7 +361,6 @@ function! OBMultiDelete()
     call RBrSendToR(cmd)
     sleep 150m
     let g:rplugin_ob_busy = 0
-    call UpdateOB(g:rplugin_curview)
 endfunction
 
 nmap <buffer><silent> <CR> :call RBrowserDoubleClick()<CR>
@@ -395,27 +396,14 @@ endif
 unlet s:envstring
 
 function RBrowserUpdate()
-    if g:rplugin_whatupdate == "G"
-        call UpdateOB('GlobalEnv')
-        let g:rplugin_whatupdate = "N"
-    elseif g:rplugin_whatupdate == "L"
-        call UpdateOB('libraries')
-        let g:rplugin_whatupdate = "N"
-    elseif g:rplugin_whatupdate == "B"
-        call UpdateOB('GlobalEnv')
-        call UpdateOB('libraries')
-        let g:rplugin_whatupdate = "N"
+    if g:rplugin_need_up
+        call UpdateOB(g:rplugin_curview)
     endif
 endfunction
 
-
-let g:rplugin_whatupdate = "N"
 if g:vimrplugin_screenplugin
-    " set updatetime=50
-    " The function VimServer() in vimcom.py should only set the value of
-    " rplugin_whatupdate instead of calling UpdateOB(). However, the procedure
-    " would not work because CursorHold is not retriggered
-    "autocmd CursorHold <buffer> call RBrowserUpdate()
+    set updatetime=100
+    autocmd CursorHold <buffer> call RBrowserUpdate()
 endif
 
 let &cpo = s:cpo_save
