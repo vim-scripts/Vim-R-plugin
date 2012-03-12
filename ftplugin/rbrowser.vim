@@ -16,7 +16,7 @@
 "
 " Author: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          
-" Last Change: Sun Mar 11, 2012  11:29PM
+" Last Change: Sun Mar 11, 2012  11:58PM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -62,6 +62,7 @@ function! UpdateOB(what)
     endif
     let g:rplugin_ob_busy = 1
     if g:rplugin_curview != a:what
+        let g:rplugin_ob_busy = 0
         return
     endif
     redir => s:bufl
