@@ -16,7 +16,7 @@
 "
 " Author: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          
-" Last Change: Mon Mar 12, 2012  09:05AM
+" Last Change: Mon Mar 12, 2012  10:52AM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -62,8 +62,8 @@ function! UpdateOB(what)
         let g:rplugin_need_up = 1
         return
     endif
-    let g:rplugin_need_up = 0
     let g:rplugin_ob_busy = 1
+    let g:rplugin_need_up = 0
     if g:rplugin_curview != a:what
         let g:rplugin_ob_busy = 0
         return
@@ -316,6 +316,9 @@ function! SourceObjBrLines()
 endfunction
 
 function! OBDelete(immediate)
+    if g:rplugin_ob_busy || g:rplugin_need_up
+        return ""
+    endif
     let g:rplugin_ob_busy = 1
     if line(".") < 3
         return ""
@@ -334,17 +337,20 @@ function! OBDelete(immediate)
             return ""
         endif
     endif
+
     if a:immediate == 0
         return cmd
-    else
-        call RBrSendToR(cmd)
-        sleep 100m
-        let g:rplugin_ob_busy = 0
     endif
+
+    call RBrSendToR(cmd)
+    let g:rplugin_ob_busy = 0
     return ""
 endfunction
 
 function! OBMultiDelete()
+    if g:rplugin_ob_busy || g:rplugin_need_up
+        return
+    endif
     let g:rplugin_ob_busy = 1
     let fline = line("'<")
     let eline = line("'>")
@@ -359,7 +365,6 @@ function! OBMultiDelete()
         let cmd = cmd . OBDelete(0)
     endfor
     call RBrSendToR(cmd)
-    sleep 150m
     let g:rplugin_ob_busy = 0
 endfunction
 
