@@ -565,6 +565,10 @@ any) used to classify the objects:
 	 Type		is.list()
 	 Function	is.function()
 
+When running in a terminal emulator under Tmux, the Object Browser will be
+updated automatically. One limitation is that objects made available by the
+command data() will not have their classes recognized in the GlobalEnv view.
+
 
 4.6. Commenting and uncommenting lines~
 
@@ -1094,9 +1098,13 @@ split it vertically put in your |vimrc|:
 By default, when running in a terminal emulator, the Vim-R-plugin uses the
 screen.vim plugin if it is installed and, by default, it will use Tmux instead
 of GNU Screen. Tmux was chosen as default because it may split the terminal
-vertically and its regions are easier to resize. If both GNU Screen and Tmux
-are installed but you prefer to use the GNU Screen application, put in your
-|vimrc|:
+vertically and its regions are easier to resize. If you want that the R
+Console starts with a specific width, put in your |vimrc| your preferred value:
+>
+   let g:ScreenShellWidth = 80
+<
+If both GNU Screen and Tmux are installed but you prefer to use the GNU Screen
+application, put in your |vimrc|:
 >
    let vimrplugin_tmux = 0
 <
@@ -1605,7 +1613,10 @@ two options and some others:
    if(interactive()){
        library(colorout)
        library(setwidth)
+       options(vimcom.verbose = 1, vimcom.allnames = TRUE)
        library(vimcom)
+       if(Sys.getenv("TERM") != "linux" && Sys.getenv("TERM") != "")
+	   setOutputColors256(verbose = FALSE)
        if(nchar(Sys.getenv("DISPLAY")) > 1){
 	   grDevices::X11.options(width = 4.5, height = 4, ypos = 0,
 				  xpos = 1000, pointsize = 10)
