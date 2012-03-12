@@ -16,7 +16,7 @@
 "
 " Author: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          
-" Last Change: Sun Mar 11, 2012  11:58PM
+" Last Change: Mon Mar 12, 2012  08:55AM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -277,7 +277,7 @@ function! RBrowserGetName(complete)
             let word = RBrowserFindParent(word, line("."), curpos)
             " Unnamed objects of lists
             if word =~ '\$\[\[[0-9]*\]\]'
-                let word = substitute(word, '\$\[\[\([0-9]*\)\]\]', '[[\1]]', "g")
+                let word = substitute(word, '\$\[\[\([0-9]*\)\]\]', '-[[\1]]', "g")
             endif
             return word
         else
