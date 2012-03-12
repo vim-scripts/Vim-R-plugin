@@ -135,7 +135,8 @@ def VimServer():
             try:
                 sock = socket.socket( socket.AF_INET, socket.SOCK_DGRAM )
                 sock.bind( (UDP_IP,MyPort) )
-            except:
+            except Exception as errmsg:
+                vim.command("call RWarningMsg('Server failed to bind: " + str(errmsg) + "')")
                 pass
 
 def RunServer():
