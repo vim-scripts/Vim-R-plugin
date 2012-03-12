@@ -135,8 +135,7 @@ def VimServer():
             try:
                 sock = socket.socket( socket.AF_INET, socket.SOCK_DGRAM )
                 sock.bind( (UDP_IP,MyPort) )
-            except Exception as errmsg:
-                vim.command("call RWarningMsg('Server reactivation failed: " + str(errmsg) + "')")
+            except:
                 pass
 
 def RunServer():
