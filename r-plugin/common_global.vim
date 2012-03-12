@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Sun Mar 11, 2012  04:19PM
+" Last Change: Sun Mar 11, 2012  11:55PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -2835,8 +2835,8 @@ if !filereadable(g:rplugin_omnifname)
 endif
 
 " Minimum width for the Object Browser
-if g:vimrplugin_objbr_w < 9
-    let g:vimrplugin_objbr_w = 9
+if g:vimrplugin_objbr_w < 10
+    let g:vimrplugin_objbr_w = 10
 endif
 
 " Keeps the libraries object list in memory to avoid the need of reading the file
