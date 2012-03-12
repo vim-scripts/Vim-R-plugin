@@ -16,7 +16,7 @@
 "
 " Author: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          
-" Last Change: Sun Mar 11, 2012  04:09PM
+" Last Change: Sun Mar 11, 2012  11:29PM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -54,7 +54,13 @@ endif
 " Current view of the object browser: .GlobalEnv X loaded libraries
 let g:rplugin_curview = "GlobalEnv"
 
+let g:rplugin_ob_busy = 0
+
 function! UpdateOB(what)
+    if g:rplugin_ob_busy == 1
+        return
+    endif
+    let g:rplugin_ob_busy = 1
     if g:rplugin_curview != a:what
         return
     endif
@@ -93,6 +99,7 @@ function! UpdateOB(what)
         exe "sil noautocmd sb " . g:rplugin_curbuf
         exe "set switchbuf=" . savesb
     endif
+    let g:rplugin_ob_busy = 0
 endfunction
 
 function! RBrowserDoubleClick()
@@ -304,9 +311,10 @@ function! SourceObjBrLines()
     exe "source " . $VIMRPLUGIN_TMPDIR . "/objbrowserInit"
 endfunction
 
-function! OBDelete()
+function! OBDelete(immediate)
+    let g:rplugin_ob_busy = 1
     if line(".") < 3
-        return
+        return ""
     endif
     let obj = RBrowserGetName(1)
     if g:rplugin_curview == "GlobalEnv"
@@ -319,10 +327,38 @@ function! OBDelete()
         if obj =~ "^package:"
             let cmd = 'detach("' . obj . '", unload = TRUE, character.only = TRUE)'
         else
-            return
+            return ""
         endif
     endif
+    if a:immediate == 0
+        return cmd
+    else
+        call RBrSendToR(cmd)
+        sleep 100m
+        let g:rplugin_ob_busy = 0
+        call UpdateOB(g:rplugin_curview)
+    endif
+    return ""
+endfunction
+
+function! OBMultiDelete()
+    let g:rplugin_ob_busy = 1
+    let fline = line("'<")
+    let eline = line("'>")
+    let nl= 0
+    let cmd = ""
+    for ii in range(fline, eline)
+        call setpos(".", [0, ii, 1, 0])
+        let nl+= 1
+        if nl > 1
+            let cmd = cmd . "; "
+        endif
+        let cmd = cmd . OBDelete(0)
+    endfor
     call RBrSendToR(cmd)
+    sleep 150m
+    let g:rplugin_ob_busy = 0
+    call UpdateOB(g:rplugin_curview)
 endfunction
 
 nmap <buffer><silent> <CR> :call RBrowserDoubleClick()<CR>
@@ -344,8 +380,9 @@ call writefile([], $VIMRPLUGIN_TMPDIR . "/liblist")
 
 au BufUnload <buffer> call ObBrBufUnload()
 
-if $TMUX_PANE =~ ""
-    nmap <buffer><silent> dd :call OBDelete()<CR>
+if $TMUX_PANE != ""
+    nmap <buffer><silent> d :call OBDelete(1)<CR>
+    vmap <buffer><silent> d <Esc>:call OBMultiDelete()<CR>
 endif
 
 let s:envstring = tolower($LC_MESSAGES . $LC_ALL . $LANG)
