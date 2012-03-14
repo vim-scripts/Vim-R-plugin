@@ -567,7 +567,11 @@ any) used to classify the objects:
 
 When running in a terminal emulator under Tmux, the Object Browser will be
 updated automatically. One limitation is that objects made available by the
-command data() will not have their classes recognized in the GlobalEnv view.
+command data() may not have their classes recognized in the GlobalEnv view.
+Also, when running under Tmux, the Normal mode command  d  deletes the object
+on the cursor line or the element of a list or data.frame. If the Object
+Browser is showing the libraries, the library currently on the cursor line is
+detached.
 
 
 4.6. Commenting and uncommenting lines~
@@ -727,25 +731,14 @@ entire code is sourced, which makes it more difficult to find errors in the
 code sent to R.
 
 
-5.2. R session is detached when GVim is closed (Linux/Unix only)~
-
-If you launch GVim through a custom keyboard shortcut, the problem may be
-solved if you add -f as parameter to GVim. The R session also used to be
-detached when GVim is closed if you launched GVim by the command line in a
-terminal emulator, and, then, closed the terminal-emulator. In any case, to
-reattach to the R session, open a new terminal window and type:
->
-   screen -r
-<
-
-5.3. The clipboard's content is lost (Windows only)~
+5.2. The clipboard's content is lost (Windows only)~
 
 On Windows, the plugin copies the command that will be sent to R into the
 clipboard. Thus, if you have anything in the clipboard it will be lost while
 using the plugin.
 
 
-5.4. The buffer name must be in the window title (Windows only)~
+5.3. The buffer name must be in the window title (Windows only)~
 
 On Windows the plugin tries to activate the "R Console" window, paste the
 command that is being sent to R, and, then, activate the GVim window. To
@@ -754,14 +747,14 @@ edited be in the GVim window title. This is the default if you have not set
 the option 'titlestring'.
 
 
-5.5. The menu may not reflect some of your custom key bindings~
+5.4. The menu may not reflect some of your custom key bindings~
 
 If you have created a custom key binding for the Vim-R-plugin, the menu in
 GVim will not always reflect the correct key binding if it is not the same for
 Normal, Visual and Insert modes.
 
 
-5.6. Syntactically correct code may be wrongly indented~
+5.5. Syntactically correct code may be wrongly indented~
 
 If the Vim-R-plugin indents your code wrongly you may get the correct
 indentation by adding braces and line breaks to it. Example:
@@ -784,11 +777,22 @@ indentation by adding braces and line breaks to it. Example:
     class(x) <- c(if(ordered) "ordered", "factor")
 <
 
-5.7. Commands are sent twice on Mac OS X~
+5.6. Commands are sent twice on Mac OS X~
 
 If you use the screen plugin with GNU Screen, individual lines may be sent
 duplicated to R on Mac OS X.
 
+
+5.7. R session is detached when GVim is closed (Linux/Unix only)~
+
+If you launch GVim through a custom keyboard shortcut, the problem may be
+solved if you add -f as parameter to GVim. The R session also used to be
+detached when GVim is closed if you launched GVim by the command line in a
+terminal emulator, and, then, closed the terminal-emulator. In any case, to
+reattach to the R session, open a new terminal window and type:
+>
+   screen -r
+<
 
 ==============================================================================
 							    *r-plugin-options*
@@ -1718,13 +1722,17 @@ important Vim limitations are:
 
 These limitations will be solved only if someone with good knowledge of C
 programming writes patches to Vim source code and the patches are accepted by
-the Vim developer. Anyway, if you want to try the Conque Shell, install it
-from
+the Vim developer.
+
+In addition to these two limitations, the automatic update of the Object
+Browser only works when running Vim under Tmux. Anyway, if you want to try the
+Conque Shell, install it from
 
    http://www.vim.org/scripts/script.php?script_id=2771
 
 and put in your |vimrc|:
 >
+   let vimrplugin_applescript = 0
    let vimrplugin_screenplugin = 0
    let vimrplugin_conqueplugin = 1
 <
@@ -1792,6 +1800,8 @@ the R syntax highlighted.
  * New command  :Rhelp (thanks for Nir Atias for suggesting the new feature).
  * Remove the command  :RUpdateObjListAll  because Vim may not load the
    syntax file if it is too big.
+ * New command in normal and visual modes when on the Object Browser: "d"
+   deletes objects and detach libraries.
    
 0.9.7 (2012-02-12)
 
