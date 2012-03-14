@@ -16,7 +16,7 @@
 "
 " Author: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          
-" Last Change: Wed Mar 14, 2012  11:20AM
+" Last Change: Wed Mar 14, 2012  08:18PM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -395,12 +395,9 @@ function RKeepRunning()
     endif
 endfunction
 
-if g:vimrplugin_screenplugin
+if $TMUX_PANE != ""
     set updatetime=3200
     autocmd CursorHold <buffer> call RKeepRunning()
-endif
-
-if $TMUX_PANE != ""
     nmap <buffer><silent> d :call OBDelete()<CR>
     vmap <buffer><silent> d <Esc>:call OBMultiDelete()<CR>
 endif
