@@ -16,7 +16,7 @@
 "
 " Author: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          
-" Last Change: Mon Mar 12, 2012  10:52AM
+" Last Change: Wed Mar 14, 2012  11:20AM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -55,17 +55,12 @@ endif
 let g:rplugin_curview = "GlobalEnv"
 
 let g:rplugin_ob_busy = 0
-let g:rplugin_need_up = 0
 
 function! UpdateOB(what)
-    if g:rplugin_ob_busy == 1
-        let g:rplugin_need_up = 1
+    if g:rplugin_curview != a:what
         return
     endif
-    let g:rplugin_ob_busy = 1
-    let g:rplugin_need_up = 0
-    if g:rplugin_curview != a:what
-        let g:rplugin_ob_busy = 0
+    if g:rplugin_ob_busy
         return
     endif
     redir => s:bufl
@@ -103,7 +98,6 @@ function! UpdateOB(what)
         exe "sil noautocmd sb " . g:rplugin_curbuf
         exe "set switchbuf=" . savesb
     endif
-    let g:rplugin_ob_busy = 0
 endfunction
 
 function! RBrowserDoubleClick()
@@ -315,14 +309,7 @@ function! SourceObjBrLines()
     exe "source " . $VIMRPLUGIN_TMPDIR . "/objbrowserInit"
 endfunction
 
-function! OBDelete(immediate)
-    if g:rplugin_ob_busy || g:rplugin_need_up
-        return ""
-    endif
-    let g:rplugin_ob_busy = 1
-    if line(".") < 3
-        return ""
-    endif
+function! OBGetDeleteCmd()
     let obj = RBrowserGetName(1)
     if g:rplugin_curview == "GlobalEnv"
         if obj =~ '\$'
@@ -337,23 +324,34 @@ function! OBDelete(immediate)
             return ""
         endif
     endif
+    return cmd
+endfunction
 
-    if a:immediate == 0
-        return cmd
-    endif
-
-    call RBrSendToR(cmd)
+function! OBSendDeleteCmd(cmd)
+    let g:rplugin_ob_busy = 1
+    call RBrSendToR(a:cmd)
+    sleep 250m
     let g:rplugin_ob_busy = 0
-    return ""
+    call UpdateOB(g:rplugin_curview)
+endfunction
+
+function! OBDelete()
+    if g:rplugin_ob_busy || line(".") < 3
+        return
+    endif
+    let cmd = OBGetDeleteCmd()
+    call OBSendDeleteCmd(cmd)
 endfunction
 
 function! OBMultiDelete()
-    if g:rplugin_ob_busy || g:rplugin_need_up
+    if g:rplugin_ob_busy
         return
     endif
-    let g:rplugin_ob_busy = 1
     let fline = line("'<")
     let eline = line("'>")
+    if fline < 3
+        return
+    endif
     let nl= 0
     let cmd = ""
     for ii in range(fline, eline)
@@ -362,10 +360,12 @@ function! OBMultiDelete()
         if nl > 1
             let cmd = cmd . "; "
         endif
-        let cmd = cmd . OBDelete(0)
+        let cmd = cmd . OBGetDeleteCmd()
+        if g:rplugin_curview == "GlobalEnv"
+            let cmd = substitute(cmd, "); rm(", ", ", "")
+        endif
     endfor
-    call RBrSendToR(cmd)
-    let g:rplugin_ob_busy = 0
+    call OBSendDeleteCmd(cmd)
 endfunction
 
 nmap <buffer><silent> <CR> :call RBrowserDoubleClick()<CR>
@@ -387,8 +387,21 @@ call writefile([], $VIMRPLUGIN_TMPDIR . "/liblist")
 
 au BufUnload <buffer> call ObBrBufUnload()
 
+function RKeepRunning()
+    if g:rplugin_myport == 0
+        Py StopServer()
+        sleep 250m
+        Py RunServer()
+    endif
+endfunction
+
+if g:vimrplugin_screenplugin
+    set updatetime=3200
+    autocmd CursorHold <buffer> call RKeepRunning()
+endif
+
 if $TMUX_PANE != ""
-    nmap <buffer><silent> d :call OBDelete(1)<CR>
+    nmap <buffer><silent> d :call OBDelete()<CR>
     vmap <buffer><silent> d <Esc>:call OBMultiDelete()<CR>
 endif
 
@@ -399,17 +412,6 @@ else
     let s:isutf8 = 0
 endif
 unlet s:envstring
-
-function RBrowserUpdate()
-    if g:rplugin_need_up
-        call UpdateOB(g:rplugin_curview)
-    endif
-endfunction
-
-if g:vimrplugin_screenplugin
-    set updatetime=100
-    autocmd CursorHold <buffer> call RBrowserUpdate()
-endif
 
 let &cpo = s:cpo_save
 unlet s:cpo_save
