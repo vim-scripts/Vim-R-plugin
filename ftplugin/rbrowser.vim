@@ -16,7 +16,7 @@
 "
 " Author: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          
-" Last Change: Thu Mar 15, 2012  09:14AM
+" Last Change: Thu Mar 15, 2012  09:54AM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -336,7 +336,7 @@ function! OBSendDeleteCmd(cmd)
 endfunction
 
 function! OBDelete()
-    if g:rplugin_ob_busy || line(".") < 3
+    if g:rplugin_ob_busy || line(".") < 3 || g:rplugin_myport == 0
         return
     endif
     let cmd = OBGetDeleteCmd(line("."))
@@ -344,7 +344,7 @@ function! OBDelete()
 endfunction
 
 function! OBMultiDelete()
-    if g:rplugin_ob_busy
+    if g:rplugin_ob_busy || g:rplugin_myport == 0
         return
     endif
     let fline = line("'<")
