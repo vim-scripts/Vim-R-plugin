@@ -16,7 +16,7 @@
 "
 " Author: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          
-" Last Change: Wed Mar 14, 2012  08:18PM
+" Last Change: Thu Mar 15, 2012  09:14AM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -114,7 +114,7 @@ function! RBrowserDoubleClick()
     endif
 
     " Toggle state of list or data.frame: open X closed
-    let key = RBrowserGetName(1)
+    let key = RBrowserGetName(1, line("."))
     if g:rplugin_curview == "GlobalEnv"
         exe 'Py SendToR("' . "\005" . '-' . substitute(key, '\$', '-', "g") . '")'
         call UpdateOB("GlobalEnv")
@@ -134,7 +134,7 @@ function! RBrowserRightClick()
         return
     endif
 
-    let key = RBrowserGetName(1)
+    let key = RBrowserGetName(1, line("."))
     if key == ""
         return
     endif
@@ -217,10 +217,10 @@ function! RBrowserFindParent(word, curline, curpos)
     return ""
 endfunction
 
-function! RBrowserGetName(complete)
+function! RBrowserGetName(complete, lnum)
     let curpos = col(".")
 
-    let line = getline(".")
+    let line = getline(a:lnum)
     if line =~ "^$"
         return
     endif
@@ -309,8 +309,8 @@ function! SourceObjBrLines()
     exe "source " . $VIMRPLUGIN_TMPDIR . "/objbrowserInit"
 endfunction
 
-function! OBGetDeleteCmd()
-    let obj = RBrowserGetName(1)
+function! OBGetDeleteCmd(lnum)
+    let obj = RBrowserGetName(1, a:lnum)
     if g:rplugin_curview == "GlobalEnv"
         if obj =~ '\$'
             let cmd = obj . ' <- NULL'
@@ -339,7 +339,7 @@ function! OBDelete()
     if g:rplugin_ob_busy || line(".") < 3
         return
     endif
-    let cmd = OBGetDeleteCmd()
+    let cmd = OBGetDeleteCmd(line("."))
     call OBSendDeleteCmd(cmd)
 endfunction
 
@@ -355,12 +355,11 @@ function! OBMultiDelete()
     let nl= 0
     let cmd = ""
     for ii in range(fline, eline)
-        call setpos(".", [0, ii, 1, 0])
         let nl+= 1
         if nl > 1
             let cmd = cmd . "; "
         endif
-        let cmd = cmd . OBGetDeleteCmd()
+        let cmd = cmd . OBGetDeleteCmd(ii)
         if g:rplugin_curview == "GlobalEnv"
             let cmd = substitute(cmd, "); rm(", ", ", "")
         endif
@@ -392,6 +391,7 @@ function RKeepRunning()
         Py StopServer()
         sleep 250m
         Py RunServer()
+        echon
     endif
 endfunction
 

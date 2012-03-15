@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Sun Mar 11, 2012  11:55PM
+" Last Change: Thu Mar 15, 2012  09:16AM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -1845,7 +1845,7 @@ endfunction
 " Call R functions for the word under cursor
 function RAction(rcmd)
     if &filetype == "rbrowser"
-        let rkeyword = RBrowserGetName(1)
+        let rkeyword = RBrowserGetName(1, line("."))
     else
         let rkeyword = RGetKeyWord()
     endif

@@ -571,7 +571,8 @@ command data() may not have their classes recognized in the GlobalEnv view.
 Also, when running under Tmux, the Normal mode command  d  deletes the object
 on the cursor line or the element of a list or data.frame. If the Object
 Browser is showing the libraries, the library currently on the cursor line is
-detached.
+detached. The Object Browser may stop to be updated automatically for a few
+seconds if you press  d  many times quickly.
 
 
 4.6. Commenting and uncommenting lines~
@@ -1791,7 +1792,7 @@ the R syntax highlighted.
 							       *r-plugin-news*
 10. News~
 
-0.9.8 (2012-03-08)
+0.9.8 (2012-03-15)
 
  * Use the R package vimcom. The following options are now set on the vimcom R
    package and no longer in the Vim-R-plugin: allnames, open_df, and

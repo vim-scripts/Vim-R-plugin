@@ -137,7 +137,7 @@ def VimServer():
                 sock.bind( (UDP_IP,MyPort) )
             except Exception as errmsg:
                 vim.command("let g:rplugin_myport = 0")
-                vim.command("call RWarningMsg('Server failed to bind: " + str(errmsg) + "')")
+                vim.command("call RWarningMsg('" + str(errmsg) + "')")
                 pass
 
 def RunServer():
