@@ -96,6 +96,8 @@ def VimServer():
     while FinishNow == False:
         try:
             data, addr = sock.recvfrom( 1024 ) # buffer size is 1024 bytes
+            if vim.eval("g:rplugin_ob_busy") == "1":
+                data = ""
             if re.match("EXPR ", data):
                 vim.command("silent exe '" + re.sub("^EXPR ", "", data) + "'")
             else:

@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Thu Mar 15, 2012  09:16AM
+" Last Change: Thu Mar 15, 2012  10:44PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -2943,6 +2943,7 @@ let g:rplugin_has_new_obj = 0
 let g:rplugin_objbr_port = 0
 let g:rplugin_myport = 0
 let g:rplugin_editor_port = 0
+let g:rplugin_ob_busy = 0
 
 call SetRPath()
 

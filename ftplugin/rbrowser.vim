@@ -16,7 +16,7 @@
 "
 " Author: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          
-" Last Change: Thu Mar 15, 2012  09:54AM
+" Last Change: Thu Mar 15, 2012  10:48PM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -54,7 +54,6 @@ endif
 " Current view of the object browser: .GlobalEnv X loaded libraries
 let g:rplugin_curview = "GlobalEnv"
 
-let g:rplugin_ob_busy = 0
 
 function! UpdateOB(what)
     if g:rplugin_curview != a:what
@@ -333,6 +332,7 @@ function! OBSendDeleteCmd(cmd)
     sleep 250m
     let g:rplugin_ob_busy = 0
     call UpdateOB(g:rplugin_curview)
+    sleep 10m
 endfunction
 
 function! OBDelete()
