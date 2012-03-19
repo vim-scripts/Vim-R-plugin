@@ -88,6 +88,7 @@ def VimServer():
 
     if sock == None:
         MyPort = 0
+        vim.command("call RWarningMsg('Could not bind to any port.')")
         return
     else:
         vim.command("let g:rplugin_myport = " + str(MyPort))
