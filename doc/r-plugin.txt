@@ -63,6 +63,7 @@ to deal with.
       - Send to R the Sweave and pdflatex commands.
   * Omni completion (auto-completion) for R objects (.GlobalEnv and installed
     packages). The list of installed packages must be updated manually.
+  * Auto-completion of function arguments.
   * Ability to see R's documentation in a Vim's buffer:
       - Automatic calculation of the best layout of the R documentation buffer
 	(split the window either horizontally or vertically according to the
@@ -172,14 +173,12 @@ show how the plugin will work on Linux in different conditions:
    Screen plugin (GNU Screen)        vimrplugin_tmux = 0 or Tmux not found
    Tmux (external terminal)          vimrplugin_screenplugin = 0
    GNU Screen (external terminal)    vimrplugin_screenplugin = 0 and no Tmux
-   Conque Shell                      idem and vimrplugin_conqueplugin = 1
 
 
    GVim                              Condition~
    ------------------------------    -------------------------------------
    Tmux (external terminal)          default on Linux
    GNU Screen (external terminal)    vimrplugin_tmux = 0 or Tmux not found
-   Conque Shell                      idem and vimrplugin_conqueplugin = 1
 
 
 Note: On Mac OS X the plugin will use AppleScript in both Vim and GVim unless
@@ -220,6 +219,9 @@ to install external dependencies:
       linked against. You have to "View all files" on the download page to
       find the file that matches exactly the version of Python that you
       installed.
+
+    * vimcom: An R package. You can install it with the R command
+      install.packages("vimcom").
 
 Create your |vimfiles| directory if you do not have it yet. Its path will be
 similar to one of the following:
@@ -278,8 +280,8 @@ section Indenting setup (|r-plugin-indenting|) of this document.
 
 3.4.3 Hide unused buttons~
 
-Edit Vim's toolbar and remove the buttons that you never use. The plugin adds
-some buttons to the toolbar, but you may not see them because gvim has too
+Edit GVim's toolbar and remove the buttons that you never use. The plugin adds
+some buttons to the toolbar, but you may not see them because GVim has too
 many buttons by default. Please see the page below to know how to hide buttons
 on the toolbar:
 
@@ -572,7 +574,9 @@ Also, when running under Tmux, the Normal mode command  d  deletes the object
 on the cursor line or the element of a list or data.frame. If the Object
 Browser is showing the libraries, the library currently on the cursor line is
 detached. The Object Browser may stop to be updated automatically for a few
-seconds if you press  d  many times quickly.
+seconds if you press  d  many times quickly. Please, use a value greater than
+250 to set the time in miliseconds that the Object Browser should wait for R
+message that the object was already deleted (see |vimrplugin_ob_sleep|).
 
 
 4.6. Commenting and uncommenting lines~
@@ -805,6 +809,7 @@ reattach to the R session, open a new terminal window and type:
 |vimrplugin_rnowebchunk|       Convert '<' into '<<>>=\n@' in Rnoweb files
 |vimrplugin_objbr_place|       Placement of Object Browser
 |vimrplugin_objbr_w|           Initial width of Object Browser window
+|vimrplugin_objbr_sleep|       Time the Object Browser waits for R after "d"
 |vimrplugin_vimpager|          Use Vim to see R documentation
 |vimrplugin_editor_w|          Minimum width of R script buffer
 |vimrplugin_help_w|            Desired width of R documentation buffer
@@ -898,6 +903,14 @@ beside the R Console. Valid values for the Object Browser placement are
    let vimrplugin_objbr_place = "script,right"
    let vimrplugin_objbr_place = "console,left"
 <
+When deleting an object from the Object Browser (possible if running Vim under
+Tmux), the following option controls the time in miliseconds that the Object
+Browser will wait for R to send the message updating the list of objects:
+>
+   let vimrplugin_ob_sleep = 250m
+<
+You should increase this value if the "[Errno 98]" message appears frequently.
+
 
 6.4. Vim as pager for R help~
 							 *vimrplugin_vimpager*
@@ -1210,9 +1223,8 @@ When one types <C-a> in the R Console the cursor goes to the beginning of the
 line and one types <C-k> the characters to the right of the cursor are
 deleted. This is useful to avoid characters left on the R Console being mixed
 with commands sent by Vim. However, sending <C-a> may be problematic if using
-either Tmux or GNU Screen in some systems and may cause incomplete output when
-using the Conque Shell plugin. The Vim-R-plugin will add <C-a><C-k> to every
-command if you put in your |vimrc|:
+either Tmux or GNU Screen in some systems. The Vim-R-plugin will add
+<C-a><C-k> to every command if you put in your |vimrc|:
 >
    let vimrplugin_ca_ck = 1
 <
@@ -1278,6 +1290,8 @@ your cursor. Add the following to your |vimrc| to have an easy way to pass R
 the levels command:
 >
    map <LocalLeader>rk :call RAction("levels")<CR>
+   map <LocalLeader>t :call RAction("tail")<CR>
+   map <LocalLeader>h :call RAction("head")<CR>
 <
 Then if you type <LocalLeader>rk R will receive the command
 >
@@ -1731,11 +1745,19 @@ Conque Shell, install it from
 
    http://www.vim.org/scripts/script.php?script_id=2771
 
-and put in your |vimrc|:
+do not load the R package "colorout", and put in your |vimrc|:
 >
+   let vimrplugin_ca_ck = 0
    let vimrplugin_applescript = 0
    let vimrplugin_screenplugin = 0
    let vimrplugin_conqueplugin = 1
+<
+You may also want to put the following Conque options in your |vimrc| (look at
+the Conque Shell documentations for details):
+>
+   let ConqueTerm_CWInsert = 1
+   let ConqueTerm_Color = 0
+   let ConqueTerm_ReadUnfocused = 1
 <
 By default, the window will be split horizontally. Put the following in your
 |vimrc| if you prefer to split the window vertically:
@@ -1761,18 +1783,6 @@ Then, you will be able to scroll the R Console buffer at any time by pressing th
 <F5> key in Normal mode. Of course, you should replace <F5> with your
 preferred key.
 
-You may also want to put the following Conque options in your |vimrc| (look at
-the Conque Shell documentations for details):
->
-   let ConqueTerm_CWInsert = 1
-   let ConqueTerm_Color = 0
-   let ConqueTerm_ReadUnfocused = 1
-<
-Note: The use of |ConqueTerm_ReadUnfocused| will set the value of 'updatetime'
-to 1000 milliseconds.
->
-   let vimrplugin_conquesleep = 1
-<
 With the Conque Shell, the option |vimrplugin_nosingler| is ignored, and, by
 default, the object browser window will be created at the right of the R
 Console window.
@@ -1792,7 +1802,7 @@ the R syntax highlighted.
 							       *r-plugin-news*
 10. News~
 
-0.9.8 (2012-03-15)
+0.9.8 (2012-03-19)
 
  * Use the R package vimcom. The following options are now set on the vimcom R
    package and no longer in the Vim-R-plugin: allnames, open_df, and
@@ -1802,7 +1812,7 @@ the R syntax highlighted.
  * Remove the command  :RUpdateObjListAll  because Vim may not load the
    syntax file if it is too big.
  * New command in normal and visual modes when on the Object Browser: "d"
-   deletes objects and detach libraries.
+   deletes objects and detach libraries. New option: vimrplugin_ob_sleep.
    
 0.9.7 (2012-02-12)
 
