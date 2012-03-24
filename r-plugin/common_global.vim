@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Thu Mar 15, 2012  10:44PM
+" Last Change: Sat Mar 24, 2012  08:10AM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -1417,6 +1417,11 @@ function RQuit(how)
         sleep 200m
     endif
 
+    if bufloaded(b:objbrtitle)
+        exe "bunload! " . b:objbrtitle
+        sleep 150m
+    endif
+
     if exists("b:quit_command")
         call SendCmdToR(b:quit_command)
     else
@@ -1459,9 +1464,6 @@ function RQuit(how)
         endif
     endif
 
-    if bufloaded(b:objbrtitle)
-        exe "bunload! " . b:objbrtitle
-    endif
 endfunction
 
 " Tell R to create a list of objects file listing all currently available
