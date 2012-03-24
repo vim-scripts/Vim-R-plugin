@@ -1289,9 +1289,9 @@ binding that would allow you to rapidly get the levels of the object under
 your cursor. Add the following to your |vimrc| to have an easy way to pass R
 the levels command:
 >
-   map <LocalLeader>rk :call RAction("levels")<CR>
-   map <LocalLeader>t :call RAction("tail")<CR>
-   map <LocalLeader>h :call RAction("head")<CR>
+   map <silent> <LocalLeader>rk :call RAction("levels")<CR>
+   map <silent> <LocalLeader>t :call RAction("tail")<CR>
+   map <silent> <LocalLeader>h :call RAction("head")<CR>
 <
 Then if you type <LocalLeader>rk R will receive the command
 >
@@ -1300,6 +1300,11 @@ Then if you type <LocalLeader>rk R will receive the command
 You should replace <LocalLeader>rk with the key binding that you want to use
 and "levels" with the R function that you want to call.
 
+If the command that you want to send does not require an R object as argument,
+you can create a shortcut to it by following the example:
+>
+   map <silent> <LocalLeader>s :call SendCmdToR("search()")
+<
 
 ==============================================================================
 							      *r-plugin-files*
@@ -1802,7 +1807,7 @@ the R syntax highlighted.
 							       *r-plugin-news*
 10. News~
 
-0.9.8 (2012-03-19)
+0.9.8 (2012-03-24)
 
  * Use the R package vimcom. The following options are now set on the vimcom R
    package and no longer in the Vim-R-plugin: allnames, open_df, and
