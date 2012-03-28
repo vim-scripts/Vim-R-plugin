@@ -221,8 +221,14 @@ to install external dependencies:
       installed.
 
     * vimcom: An R package. You can install it with the R command
-      install.packages("vimcom").
-
+      install.packages("vimcom"). The vimcom package creates a server on R to
+      allow the communication with Vim. You certainly will want to put
+      the following lines in your Rprofile (usually at ~/Documents/.Rprofile):
+>
+      if(interactive()){
+	  library(vimcom)
+      }
+<
 Create your |vimfiles| directory if you do not have it yet. Its path will be
 similar to one of the following:
 >
@@ -381,6 +387,9 @@ Command
   . Sweave (cur file)                                  \sw
   . Sweave and PDF (cur file)                          \sp
   . Sweave, BibTeX and PDF (cur file)                  \sb
+  . Knitr (cur file)                                   \kn
+  . Knitr and PDF (cur file)                           \kp
+  . Knitr, BibTeX and PDF (cur file)                   \kb
   --------------------------------------------------------
   . Build tags file (cur dir)                  :RBuildTags
 -----------------------------------------------------------
@@ -1177,6 +1186,7 @@ Example:
 6.19. LaTeX command~
 							 *vimrplugin_latexcmd*
 						       *vimrplugin_sweaveargs*
+							 *vimrplugin_knitargs*
 By default, Vim calls pdflatex to produce a pdf document from the .tex file
 produced by the R Sweave command. You can use the option vimrplugin_latexcmd
 to change this behavior. Example:
@@ -1185,6 +1195,9 @@ to change this behavior. Example:
 <
 If you want to pass arguments do the Sweave() function, set the value of the
 vimrplugin_sweaveargs variable.
+
+If you want to pass arguments do the knit() function, set the value of the
+vimrplugin_knitargs variable.
 
 
 6.20. Never unmake the R menu and tool bar buttons~
@@ -1807,7 +1820,7 @@ the R syntax highlighted.
 							       *r-plugin-news*
 10. News~
 
-0.9.8 (2012-03-24)
+0.9.8 (2012-03-28)
 
  * Use the R package vimcom. The following options are now set on the vimcom R
    package and no longer in the Vim-R-plugin: allnames, open_df, and
@@ -1818,6 +1831,7 @@ the R syntax highlighted.
    syntax file if it is too big.
  * New command in normal and visual modes when on the Object Browser: "d"
    deletes objects and detach libraries. New option: vimrplugin_ob_sleep.
+ * Add support to knitr package.
    
 0.9.7 (2012-02-12)
 

@@ -17,7 +17,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "
-" Last Change: Thu Dec 22, 2011  08:59AM
+" Last Change: Wed Mar 28, 2012  10:39AM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -109,10 +109,14 @@ function! RnwNextChunk() range
 endfunction
 
 " Sweave and compile the current buffer content
-function! RMakePDF(bibtex)
+function! RMakePDF(bibtex, knit)
     update
     call RSetWD()
     let pdfcmd = "vim.Sweave('" . expand("%:t") . "'"
+
+    if a:knit
+        let pdfcmd = pdfcmd . ', knit = TRUE'
+    endif
 
     if g:vimrplugin_latexcmd != "pdflatex"
         let pdfcmd = pdfcmd . ", latexcmd = '" . g:vimrplugin_latexcmd . "'"
@@ -122,8 +126,14 @@ function! RMakePDF(bibtex)
         let pdfcmd = pdfcmd . ", bibtex = TRUE"
     endif
 
-    if exists("g:vimrplugin_sweaveargs")
-        let pdfcmd = pdfcmd . ", " . g:vimrplugin_sweaveargs
+    if a:knit
+        if exists("g:vimrplugin_knitargs")
+            let pdfcmd = pdfcmd . ", " . g:vimrplugin_knitargs
+        endif
+    else
+        if exists("g:vimrplugin_sweaveargs")
+            let pdfcmd = pdfcmd . ", " . g:vimrplugin_sweaveargs
+        endif
     endif
 
     let pdfcmd = pdfcmd . ")"
@@ -153,11 +163,15 @@ function! SendChunkToR(e, m)
 endfunction
 
 " Sweave the current buffer content
-function! RSweave()
+function! RSweave(knit)
     update
     let b:needsnewomnilist = 1
     call RSetWD()
-    call SendCmdToR('Sweave("' . expand("%:t") . '")')
+    if a:knit
+        call SendCmdToR('require(knitr); knit("' . expand("%:t") . '")')
+    else
+        call SendCmdToR('Sweave("' . expand("%:t") . '")')
+    endif
 endfunction
 
 if g:vimrplugin_rnowebchunk == 1
@@ -175,14 +189,17 @@ call RControlMaps()
 call RCreateMaps("nvi", '<Plug>RSetwd',        'rd', ':call RSetWD()')
 
 " Only .Rnw files use these functions:
-call RCreateMaps("nvi", '<Plug>RSweave',      'sw', ':call RSweave()')
-call RCreateMaps("nvi", '<Plug>RMakePDF',     'sp', ':call RMakePDF("nobib")')
-call RCreateMaps("nvi", '<Plug>RBibTeX',      'sb', ':call RMakePDF("bibtex")')
+call RCreateMaps("nvi", '<Plug>RSweave',      'sw', ':call RSweave(0)')
+call RCreateMaps("nvi", '<Plug>RMakePDF',     'sp', ':call RMakePDF("nobib", 0)')
+call RCreateMaps("nvi", '<Plug>RBibTeX',      'sb', ':call RMakePDF("bibtex", 0)')
+call RCreateMaps("nvi", '<Plug>RKnit',        'kn', ':call RSweave(1)')
+call RCreateMaps("nvi", '<Plug>RMakePDFK',    'kp', ':call RMakePDF("nobib", 1)')
+call RCreateMaps("nvi", '<Plug>RBibTeXK',     'kb', ':call RMakePDF("bibtex", 1)')
 call RCreateMaps("nvi", '<Plug>RIndent',      'si', ':call RnwToggleIndentSty()')
-call RCreateMaps("ni", '<Plug>RSendChunk',     'cc', ':call SendChunkToR("silent", "stay")')
-call RCreateMaps("ni", '<Plug>RESendChunk',    'ce', ':call SendChunkToR("echo", "stay")')
-call RCreateMaps("ni", '<Plug>RDSendChunk',    'cd', ':call SendChunkToR("silent", "down")')
-call RCreateMaps("ni", '<Plug>REDSendChunk',   'ca', ':call SendChunkToR("echo", "down")')
+call RCreateMaps("ni",  '<Plug>RSendChunk',   'cc', ':call SendChunkToR("silent", "stay")')
+call RCreateMaps("ni",  '<Plug>RESendChunk',  'ce', ':call SendChunkToR("echo", "stay")')
+call RCreateMaps("ni",  '<Plug>RDSendChunk',  'cd', ':call SendChunkToR("silent", "down")')
+call RCreateMaps("ni",  '<Plug>REDSendChunk', 'ca', ':call SendChunkToR("echo", "down")')
 nmap <buffer><silent> gn :call RnwNextChunk()<CR>
 nmap <buffer><silent> gN :call RnwPreviousChunk()<CR>
 

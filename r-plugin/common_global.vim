@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Sat Mar 24, 2012  08:10AM
+" Last Change: Wed Mar 28, 2012  10:38AM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -2193,6 +2193,9 @@ function MakeRMenu()
         call RCreateMenuItem("nvi", 'Command.Sweave\ (cur\ file)', '<Plug>RSweave', 'sw', ':call RSweave()')
         call RCreateMenuItem("nvi", 'Command.Sweave\ and\ PDF\ (cur\ file)', '<Plug>RMakePDF', 'sp', ':call RMakePDF("nobib")')
         call RCreateMenuItem("nvi", 'Command.Sweave,\ BibTeX\ and\ PDF\ (cur\ file)', '<Plug>RMakePDF', 'sb', ':call RMakePDF("bibtex")')
+        call RCreateMenuItem("nvi", 'Command.Knitr\ (cur\ file)', '<Plug>RSweave', 'kn', ':call RSweave()')
+        call RCreateMenuItem("nvi", 'Command.Knitr\ and\ PDF\ (cur\ file)', '<Plug>RMakePDF', 'kp', ':call RMakePDF("nobib")')
+        call RCreateMenuItem("nvi", 'Command.Knitr,\ BibTeX\ and\ PDF\ (cur\ file)', '<Plug>RMakePDF', 'kb', ':call RMakePDF("bibtex")')
     endif
     "-------------------------------
     menu R.Command.-Sep3- <nul>
