@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Wed Mar 28, 2012  10:38AM
+" Last Change: Wed Mar 28, 2012  12:53PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -137,7 +137,7 @@ function RCompleteArgs()
             let rkeyword = '^' . RGetKeyWord() . ';'
             call cursor(cpos[1], cpos[2])
             for omniL in flines
-                if omniL =~ rkeyword
+                if omniL =~ rkeyword && omniL =~ ";function;function;" 
                     let tmp1 = split(omniL, ';')
                     if len(tmp1) == 5
                         let info = tmp1[4]
@@ -156,7 +156,7 @@ function RCompleteArgs()
                     for id in range(len(argsL))
                         let newkey = '^' . argkey
                         let tmp2 = split(substitute(argsL[id], "^ *", '', ""), "=")
-                        if argkey == '' || tmp2[0] =~ newkey
+                        if (argkey == '' || tmp2[0] =~ newkey) && tmp2[0] !~ "No arguments"
                             if len(tmp2) == 2
                                 let tmp2[0] = tmp2[0] . "= "
                                 let tmp3 = {'word': tmp2[0], 'menu': tmp2[1]}
@@ -169,6 +169,9 @@ function RCompleteArgs()
                             call add(args, tmp3)
                         endif
                     endfor
+                    if argkey == '' && len(args) > 0
+                        call insert(args, {'word': ' ', 'menu': ''})
+                    endif
                     call complete(idx2, args)
                     return ''
                 endif
