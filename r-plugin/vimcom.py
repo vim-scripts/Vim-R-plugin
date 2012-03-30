@@ -67,6 +67,7 @@ def SendToR(aString):
     if received is None:
         vim.command("let g:rplugin_lastrpl = 'NOANSWER'")
     else:
+        received = received.replace("'", "")
         vim.command("let g:rplugin_lastrpl = '" + received + "'")
 
 

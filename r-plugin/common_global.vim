@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Fri Mar 30, 2012  05:29PM
+" Last Change: Fri Mar 30, 2012  06:31PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -180,14 +180,18 @@ function RCompleteArgs()
 
             " The function isn't in the omni list
             exe 'Py SendToR("vimcom:::vim.args(' . "'" . rkeyword0 . "', '" . argkey . "')" . '")'
-            if g:rplugin_vimcomport > 0 && g:rplugin_lastrpl != "NOT_EXISTS"
+            if g:rplugin_vimcomport > 0 && g:rplugin_lastrpl != "NOT_EXISTS" && g:rplugin_lastrpl != "NO_ARGS"
                 let args = []
                 let tmp = split(g:rplugin_lastrpl, '\t')
                 if(len(tmp) > 0)
                     for id in range(len(tmp))
                         let tmp2 = split(tmp[id], "=")
-                        let tmp2[0] = tmp2[0] . "= "
-                        call add(args,  {'word': tmp2[0], 'menu': tmp2[1]})
+                        if len(tmp2) > 1
+                            let tmp2[0] = tmp2[0] . "= "
+                            call add(args,  {'word': tmp2[0], 'menu': tmp2[1]})
+                        else
+                            call add(args,  {'word': tmp2[0], 'menu': ' '})
+                        endif
                     endfor
                     if argkey == '' && len(args) > 0
                         call insert(args, {'word': ' ', 'menu': ''})
