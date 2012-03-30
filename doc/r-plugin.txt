@@ -387,9 +387,9 @@ Command
   . Sweave (cur file)                                  \sw
   . Sweave and PDF (cur file)                          \sp
   . Sweave, BibTeX and PDF (cur file)                  \sb
-  . Knitr (cur file)                                   \kn
-  . Knitr and PDF (cur file)                           \kp
-  . Knitr, BibTeX and PDF (cur file)                   \kb
+  . Knit (cur file)                                    \kn
+  . Knit and PDF (cur file)                            \kp
+  . Knit, BibTeX and PDF (cur file)                    \kb
   --------------------------------------------------------
   . Build tags file (cur dir)                  :RBuildTags
 -----------------------------------------------------------
@@ -1282,6 +1282,9 @@ list of the names for custom key bindings:
    RESendMBlock              RListSpace               RCompleteArgs
    REDSendMBlock             RMakePDF
 <
+Note: The prefix RE means "echo"; RD, "cursor down"; RED, both "echo" and
+      "down".
+
 The completion of function arguments only happens in Insert mode. To customize
 its keybind you should put in your |vimrc| something as in the example:
 >
