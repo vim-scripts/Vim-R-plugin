@@ -38,6 +38,8 @@ def DiscoverVimComPort():
     if VimComPort >= 10050:
         VimComPort = 0
         vim.command("call RWarningMsg('VimCom Port not found.')")
+    else:
+        vim.command("let g:rplugin_vimcomport = " + str(VimComPort))
     return(VimComPort)
 
 

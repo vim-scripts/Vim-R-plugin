@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Wed Mar 28, 2012  12:53PM
+" Last Change: Fri Mar 30, 2012  11:55AM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -134,7 +134,8 @@ function RCompleteArgs()
         endif
         if np == 0
             call cursor(lnum, idx)
-            let rkeyword = '^' . RGetKeyWord() . ';'
+            let rkeyword0 = RGetKeyWord()
+            let rkeyword = '^' . rkeyword0 . ';'
             call cursor(cpos[1], cpos[2])
             for omniL in flines
                 if omniL =~ rkeyword && omniL =~ ";function;function;" 
@@ -176,6 +177,21 @@ function RCompleteArgs()
                     return ''
                 endif
             endfor
+
+            " The function isn't in the omni list
+            exe 'Py SendToR("vimcom:::vim.args(' . "'" . rkeyword0 . "', '" . argkey . "')" . '")'
+            if g:rplugin_vimcomport > 0 && g:rplugin_lastrpl != "NOT_EXISTS"
+                let args = []
+                let tmp = split(g:rplugin_lastrpl, '\t')
+                if(len(tmp) > 0)
+                    for id in range(len(tmp))
+                        call add(args,  {'word': tmp[id]})
+                    endfor
+                    call complete(idx2, args)
+                endif
+                return ''
+            endif
+
             break
         endif
         let idx -= 1
@@ -2951,6 +2967,7 @@ let g:rplugin_has_new_obj = 0
 let g:rplugin_objbr_port = 0
 let g:rplugin_myport = 0
 let g:rplugin_editor_port = 0
+let g:rplugin_vimcomport = 0
 let g:rplugin_ob_busy = 0
 
 call SetRPath()
