@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Fri Mar 30, 2012  11:33PM
+" Last Change: Sat Mar 31, 2012  12:54PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -135,36 +135,24 @@ function RCompleteArgs()
         if np == 0
             call cursor(lnum, idx)
             let rkeyword0 = RGetKeyWord()
-            let rkeyword = '^' . rkeyword0 . ';'
+            let rkeyword = '^' . rkeyword0 . "\x06"
             call cursor(cpos[1], cpos[2])
             for omniL in flines
-                if omniL =~ rkeyword && omniL =~ ";function;function;" 
-                    let tmp1 = split(omniL, ';')
-                    if len(tmp1) == 5
-                        let info = tmp1[4]
-                    else
-                        let tlen = len(tmp1)
-                        let info = tmp1[4]
-                        let i = 5
-                        while i < tlen
-                            let info = info . ';' . tmp1[i]
-                            let i += 1
-                        endwhile
-                    endif
-                    let info = substitute(info, "\t", '', "g")
-                    let argsL = split(info, ",")
+                if omniL =~ rkeyword && omniL =~ "\x06function\x06function\x06" 
+                    let tmp1 = split(omniL, "\x06")
+                    let info = tmp1[4]
+                    let argsL = split(info, "\x09")
                     let args = []
                     for id in range(len(argsL))
                         let newkey = '^' . argkey
-                        let tmp2 = split(substitute(argsL[id], "^ *", '', ""), "=")
+                        let tmp2 = split(argsL[id], "\x07")
                         if (argkey == '' || tmp2[0] =~ newkey) && tmp2[0] !~ "No arguments"
+                            if tmp2[0] != '...'
+                                let tmp2[0] = tmp2[0] . " = "
+                            endif
                             if len(tmp2) == 2
-                                let tmp2[0] = tmp2[0] . "= "
                                 let tmp3 = {'word': tmp2[0], 'menu': tmp2[1]}
                             else
-                                if tmp2[0] != '...'
-                                    let tmp2[0] = tmp2[0] . " = "
-                                endif
                                 let tmp3 = {'word': tmp2[0], 'menu': ''}
                             endif
                             call add(args, tmp3)
@@ -182,15 +170,15 @@ function RCompleteArgs()
             exe 'Py SendToR("vimcom:::vim.args(' . "'" . rkeyword0 . "', '" . argkey . "')" . '")'
             if g:rplugin_vimcomport > 0 && g:rplugin_lastrpl != "NOT_EXISTS" && g:rplugin_lastrpl != "NO_ARGS"
                 let args = []
-                let tmp = split(g:rplugin_lastrpl, '\t')
+                let tmp = split(g:rplugin_lastrpl, "\x09")
                 if(len(tmp) > 0)
                     for id in range(len(tmp))
-                        let tmp2 = split(tmp[id], "=")
+                        let tmp2 = split(tmp[id], "\x07")
+                        let tmp3 = tmp2[0] . " = "
                         if len(tmp2) > 1
-                            let tmp2[0] = tmp2[0] . "= "
-                            call add(args,  {'word': tmp2[0], 'menu': tmp2[1]})
+                            call add(args,  {'word': tmp3, 'menu': tmp2[1]})
                         else
-                            call add(args,  {'word': tmp2[0], 'menu': ' '})
+                            call add(args,  {'word': tmp3, 'menu': ' '})
                         endif
                     endfor
                     if argkey == '' && len(args) > 0
@@ -1555,7 +1543,7 @@ function RBuildSyntaxFile(what)
     let nf = 0
     let funlist = ""
     for line in g:rplugin_liblist
-        let obj = split(line, ";")
+        let obj = split(line, "\x06", 1)
         if obj[2] == "function"
             if obj[0] !~ '[[:punct:]]' || (obj[0] =~ '\.[a-zA-Z]' && obj[0] !~ '[[:punct:]][[:punct:]]')
                 let nf += 1
@@ -1836,7 +1824,7 @@ function BuildRHelpList()
         let s:list_of_objs = []
     endif
     for xx in g:rplugin_liblist
-        let xxx = split(xx, ";")
+        let xxx = split(xx, "\x06")
         if xxx[0] !~ '\$'
             call add(s:list_of_objs, xxx[0])
         endif
@@ -2836,7 +2824,7 @@ if g:vimrplugin_conqueplugin == 1
 endif
 
 " Are we in a Debian package? Is the plugin being running for the first time?
-let g:rplugin_omnifname = g:rplugin_uservimfiles . "/r-plugin/omniList"
+let g:rplugin_omnifname = g:rplugin_uservimfiles . "/r-plugin/omnils"
 if g:rplugin_home != g:rplugin_uservimfiles
     " Create r-plugin directory if it doesn't exist yet:
     if !isdirectory(g:rplugin_uservimfiles . "/r-plugin")
@@ -2859,13 +2847,13 @@ if !filereadable(g:rplugin_uservimfiles . "/r-plugin/functions.vim")
     endif
 endif
 
-" If there is no omniList, copy the default one
+" If there is no omnils, copy the default one
 if !filereadable(g:rplugin_omnifname)
-    if filereadable("/usr/share/vim/addons/r-plugin/omniList")
-        let omnilines = readfile("/usr/share/vim/addons/r-plugin/omniList")
+    if filereadable("/usr/share/vim/addons/r-plugin/omnils")
+        let omnilines = readfile("/usr/share/vim/addons/r-plugin/omnils")
     else
-        if filereadable(g:rplugin_home . "/r-plugin/omniList")
-            let omnilines = readfile(g:rplugin_home . "/r-plugin/omniList")
+        if filereadable(g:rplugin_home . "/r-plugin/omnils")
+            let omnilines = readfile(g:rplugin_home . "/r-plugin/omnils")
         else
             let omnilines = []
         endif

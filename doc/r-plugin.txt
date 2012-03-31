@@ -411,7 +411,7 @@ Edit
 -----------------------------------------------------------
 
 Syntax
-  . Build omniList (loaded packages)       :RUpdateObjList
+  . Build omnils (loaded packages)       :RUpdateObjList
 -----------------------------------------------------------
 
 Object Browser
@@ -1367,7 +1367,7 @@ directory after the installation:
    r-plugin/common_buffer.vim
    r-plugin/common_global.vim
    r-plugin/functions.vim
-   r-plugin/omniList
+   r-plugin/omnils
    r-plugin/r.snippets
    r-plugin/tex_indent.vim
    r-plugin/vimcom.py
@@ -1854,6 +1854,8 @@ the R syntax highlighted.
    for the patch).
  * Use Tmux to start the Object Browser beside the R console if
    vimrplugin_objbr_place =~ "console".
+ * The file r-plugin/omniList was renamed to r-plugin/omnils because its
+   field separator changed.
 
 111114 (2011-11-14)
  * Changed key binding for commenting/uncommenting code from \cc to \xx.

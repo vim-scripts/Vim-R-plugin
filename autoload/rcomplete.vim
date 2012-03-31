@@ -1,7 +1,7 @@
 " Vim completion script
 " Language:    R
 " Maintainer:  Jakson Alves de Aquino <jalvesaq@gmail.com>
-" Last Change: Tue Jan 18, 2011  10:11AM
+" Last Change: Sat Mar 31, 2012  12:42PM
 "
 
 fun! rcomplete#CompleteR(findstart, base)
@@ -29,21 +29,12 @@ fun! rcomplete#CompleteR(findstart, base)
       if line =~ newbase
         " Skip cols of data frames unless the user is really looking for them.
         if a:base !~ '\$' && line =~ '\$'
-          continue
+            continue
         endif
-	let tmp1 = split(line, ';')
-	if len(tmp1) == 5
-	  let info = tmp1[4]
-	else
-	  let tlen = len(tmp1)
-	  let info = tmp1[4]
-	  let i = 5
-	  while i < tlen
-	    let info = info . ';' . tmp1[i]
-	    let i += 1
-	  endwhile
-	endif
-	let info = substitute(info, "\t", "\n", "g")
+        let tmp1 = split(line, "\x06")"
+        let info = tmp1[4]
+        let info = substitute(info, "\t", ", ", "g")
+        let info = substitute(info, "\x07", " = ", "g")
 	let tmp2 = {'word': tmp1[0], 'menu': tmp1[1] . ' ' . tmp1[3], 'info': info}
 	call add(res, tmp2)
       endif

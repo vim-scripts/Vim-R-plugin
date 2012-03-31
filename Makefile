@@ -34,15 +34,15 @@ zip:
 	    mkdir -p vim-r-plugin-tmp/usr/share/vim/addons )
 	rm -f /tmp/vim-r-plugin-$(PLUGINVERSION).zip
 	# To make the distribution version of the plugin the files
-	# functions.vim.vanilla and omniList.vanilla must exist. To generate these
+	# functions.vim.vanilla and omnils.vanilla must exist. To generate these
 	# files, the Vim command :RUpdateObjList must be run with R vanilla running
 	# (that is, R with only the default libraries loaded) and, then, the files
-	# functions.vim and omniList must be renamed.
+	# functions.vim and omnils must be renamed.
 	( cd r-plugin ;\
 	    mv functions.vim functions.vim.current ;\
-	    mv omniList omniList.current ;\
+	    mv omnils omnils.current ;\
 	    cp functions.vim.vanilla functions.vim ;\
-	    cp omniList.vanilla omniList )
+	    cp omnils.vanilla omnils )
 	# Update the version date in doc/r-plugin.txt header and in the news
 	sed -i -e "s/^Version: [0-9].[0-9].[0-9]/Version: $(PLUGINVERSION)/" doc/r-plugin.txt
 	sed -i -e "s/^$(PLUGINVERSION) (201[0-9]-[0-9][0-9]-[0-9][0-9])$$/$(PLUGINVERSION) ($(PLUGINRELEASEDATE))/" doc/r-plugin.txt
@@ -51,7 +51,7 @@ zip:
 	    indent/rnoweb.vim indent/rhelp.vim autoload/rcomplete.vim ftplugin/r*.vim \
 	    syntax/rout.vim syntax/r.vim syntax/rhelp.vim syntax/rdoc.vim syntax/rbrowser.vim \
 	    doc/r-plugin.txt r-plugin/functions.vim r-plugin/vimcom.py \
-	    r-plugin/global_r_plugin.vim r-plugin/omniList r-plugin/windows.py \
+	    r-plugin/global_r_plugin.vim r-plugin/omnils r-plugin/windows.py \
 	    r-plugin/vimActivate.js r-plugin/tex_indent.vim r-plugin/r.snippets \
 	    r-plugin/common_buffer.vim r-plugin/common_global.vim \
 	    bitmaps/ricon.xbm bitmaps/ricon.png \
@@ -66,10 +66,10 @@ zip:
 	    bitmaps/RListSpace.png bitmaps/RListSpace.bmp \
 	    bitmaps/RClear.png bitmaps/RClear.bmp \
 	    bitmaps/RClearAll.png bitmaps/RClearAll.bmp
-	# Rename the functions.vim and omniList files
+	# Rename the functions.vim and omnils files
 	( cd $(PLUGINHOME)/r-plugin ;\
 	    mv functions.vim.current functions.vim ;\
-	    mv omniList.current omniList )
+	    mv omnils.current omnils )
 	# Unpack the tar.gz and create the zip file
 	(cd /tmp ;\
 	    tar -xvzf vimrplugintmpfile.tar.gz -C vim-r-plugin-tmp/usr/share/vim/addons > /dev/null ;\
