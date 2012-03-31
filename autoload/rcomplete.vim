@@ -1,7 +1,7 @@
 " Vim completion script
 " Language:    R
 " Maintainer:  Jakson Alves de Aquino <jalvesaq@gmail.com>
-" Last Change: Sat Mar 31, 2012  12:42PM
+" Last Change: Sat Mar 31, 2012  04:04PM
 "
 
 fun! rcomplete#CompleteR(findstart, base)
@@ -31,7 +31,7 @@ fun! rcomplete#CompleteR(findstart, base)
         if a:base !~ '\$' && line =~ '\$'
             continue
         endif
-        let tmp1 = split(line, "\x06")"
+        let tmp1 = split(line, "\x06", 1)
         let info = tmp1[4]
         let info = substitute(info, "\t", ", ", "g")
         let info = substitute(info, "\x07", " = ", "g")
