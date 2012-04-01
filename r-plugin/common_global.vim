@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Sat Mar 31, 2012  12:54PM
+" Last Change: Sun Apr 01, 2012  09:29AM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -135,8 +135,31 @@ function RCompleteArgs()
         if np == 0
             call cursor(lnum, idx)
             let rkeyword0 = RGetKeyWord()
+            let classfor = RGetClassFor(rkeyword0)
             let rkeyword = '^' . rkeyword0 . "\x06"
             call cursor(cpos[1], cpos[2])
+            exe 'Py SendToR("vimcom:::vim.args(' . "'" . rkeyword0 . "', '" . argkey . "', classfor = " . classfor . ")" . '")'
+            if g:rplugin_vimcomport > 0 && g:rplugin_lastrpl != "NOT_EXISTS" && g:rplugin_lastrpl != "NO_ARGS"
+                let args = []
+                let tmp = split(g:rplugin_lastrpl, "\x09")
+                if(len(tmp) > 0)
+                    for id in range(len(tmp))
+                        let tmp2 = split(tmp[id], "\x07")
+                        let tmp3 = tmp2[0] . " = "
+                        if len(tmp2) > 1
+                            call add(args,  {'word': tmp3, 'menu': tmp2[1]})
+                        else
+                            call add(args,  {'word': tmp3, 'menu': ' '})
+                        endif
+                    endfor
+                    if argkey == '' && len(args) > 0
+                        call insert(args, {'word': ' ', 'menu': ''})
+                    endif
+                    call complete(idx2, args)
+                endif
+                return ''
+            endif
+
             for omniL in flines
                 if omniL =~ rkeyword && omniL =~ "\x06function\x06function\x06" 
                     let tmp1 = split(omniL, "\x06")
@@ -165,29 +188,6 @@ function RCompleteArgs()
                     return ''
                 endif
             endfor
-
-            " The function isn't in the omni list
-            exe 'Py SendToR("vimcom:::vim.args(' . "'" . rkeyword0 . "', '" . argkey . "')" . '")'
-            if g:rplugin_vimcomport > 0 && g:rplugin_lastrpl != "NOT_EXISTS" && g:rplugin_lastrpl != "NO_ARGS"
-                let args = []
-                let tmp = split(g:rplugin_lastrpl, "\x09")
-                if(len(tmp) > 0)
-                    for id in range(len(tmp))
-                        let tmp2 = split(tmp[id], "\x07")
-                        let tmp3 = tmp2[0] . " = "
-                        if len(tmp2) > 1
-                            call add(args,  {'word': tmp3, 'menu': tmp2[1]})
-                        else
-                            call add(args,  {'word': tmp3, 'menu': ' '})
-                        endif
-                    endfor
-                    if argkey == '' && len(args) > 0
-                        call insert(args, {'word': ' ', 'menu': ''})
-                    endif
-                    call complete(idx2, args)
-                endif
-                return ''
-            endif
 
             break
         endif
