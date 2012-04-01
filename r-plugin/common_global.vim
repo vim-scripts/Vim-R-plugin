@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Sun Apr 01, 2012  11:20AM
+" Last Change: Sun Apr 01, 2012  12:36PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -182,9 +182,6 @@ function RCompleteArgs()
                             call add(args, tmp3)
                         endif
                     endfor
-                    if argkey == '' && len(args) > 0
-                        call insert(args, {'word': ' ', 'menu': ''})
-                    endif
                     call complete(idx2, args)
                     return ''
                 endif
