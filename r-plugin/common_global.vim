@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Sun Apr 01, 2012  09:36AM
+" Last Change: Sun Apr 01, 2012  11:20AM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -141,7 +141,8 @@ function RCompleteArgs()
             exe 'Py SendToR("vimcom:::vim.args(' . "'" . rkeyword0 . "', '" . argkey . "', classfor = " . classfor . ")" . '")'
             if g:rplugin_vimcomport > 0 && g:rplugin_lastrpl != "NOT_EXISTS" && g:rplugin_lastrpl != "NO_ARGS" && g:rplugin_lastrpl != "R is busy."
                 let args = []
-                let tmp = split(g:rplugin_lastrpl, "\x09")
+                let tmp0 = split(g:rplugin_lastrpl, "\x04")
+                let tmp = split(tmp0[0], "\x09")
                 if(len(tmp) > 0)
                     for id in range(len(tmp))
                         let tmp2 = split(tmp[id], "\x07")
@@ -152,8 +153,8 @@ function RCompleteArgs()
                             call add(args,  {'word': tmp3, 'menu': ' '})
                         endif
                     endfor
-                    if argkey == '' && len(args) > 0
-                        call insert(args, {'word': ' ', 'menu': ''})
+                    if len(args) > 0 && len(tmp0) > 1
+                        call add(args, {'word': ' ', 'menu': tmp0[1]})
                     endif
                     call complete(idx2, args)
                 endif
@@ -1536,7 +1537,7 @@ endfunction
 
 function RBuildSyntaxFile(what)
     call BuildROmniList("libraries", a:what)
-    sleep 1
+    sleep 100m
     let g:rplugin_liblist = readfile(g:rplugin_omnifname)
     call BuildRHelpList()
     let res = []
