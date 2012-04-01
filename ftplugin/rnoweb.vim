@@ -17,7 +17,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "
-" Last Change: Wed Mar 28, 2012  10:39AM
+" Last Change: Sun Apr 01, 2012  07:37PM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -115,7 +115,7 @@ function! RMakePDF(bibtex, knit)
     let pdfcmd = "vim.Sweave('" . expand("%:t") . "'"
 
     if a:knit
-        let pdfcmd = pdfcmd . ', knit = TRUE'
+        let pdfcmd = "require(knitr); " . pdfcmd . ', knit = TRUE'
     endif
 
     if g:vimrplugin_latexcmd != "pdflatex"
