@@ -1,7 +1,7 @@
 " Vim completion script
 " Language:    R
 " Maintainer:  Jakson Alves de Aquino <jalvesaq@gmail.com>
-" Last Change: Sat Mar 31, 2012  04:04PM
+" Last Change: Mon Apr 02, 2012  09:36AM
 "
 
 fun! rcomplete#CompleteR(findstart, base)
@@ -21,6 +21,12 @@ fun! rcomplete#CompleteR(findstart, base)
     if strlen(a:base) == 0
       return res
     endif
+
+    " We could use R to get the completions based on the running evironment.
+    " However, we would miss information stored on the omnils file: class of
+    " object and its package.
+    " exe 'Py SendToR("utils:::.win32consoleCompletion(' . "'" . a:base . "', " . strlen(a:base) . ')$comps")'
+
     let flines = g:rplugin_liblist + g:rplugin_globalenvlines
     " The char '$' at the end of 'a:base' is treated as end of line, and
     " the pattern is never found in 'line'.
