@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Sun Apr 01, 2012  12:36PM
+" Last Change: Sun Apr 01, 2012  11:12PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -2204,22 +2204,23 @@ function MakeRMenu()
     "----------------------------------------------------------------------------
     call RControlMenu()
     "-------------------------------
-    menu R.Command.-Sep1- <nul>
+    menu R.Command.-Sep4- <nul>
     if &filetype != "rdoc"
         call RCreateMenuItem("nvi", 'Command.Set\ working\ directory\ (cur\ file\ path)', '<Plug>RSetwd', 'rd', ':call RSetWD()')
     endif
     "-------------------------------
     if &filetype == "rnoweb" || g:vimrplugin_never_unmake_menu
-        menu R.Command.-Sep2- <nul>
+        menu R.Command.-Sep5- <nul>
         call RCreateMenuItem("nvi", 'Command.Sweave\ (cur\ file)', '<Plug>RSweave', 'sw', ':call RSweave()')
         call RCreateMenuItem("nvi", 'Command.Sweave\ and\ PDF\ (cur\ file)', '<Plug>RMakePDF', 'sp', ':call RMakePDF("nobib")')
         call RCreateMenuItem("nvi", 'Command.Sweave,\ BibTeX\ and\ PDF\ (cur\ file)', '<Plug>RMakePDF', 'sb', ':call RMakePDF("bibtex")')
+        menu R.Command.-Sep6- <nul>
         call RCreateMenuItem("nvi", 'Command.Knitr\ (cur\ file)', '<Plug>RSweave', 'kn', ':call RSweave()')
         call RCreateMenuItem("nvi", 'Command.Knitr\ and\ PDF\ (cur\ file)', '<Plug>RMakePDF', 'kp', ':call RMakePDF("nobib")')
         call RCreateMenuItem("nvi", 'Command.Knitr,\ BibTeX\ and\ PDF\ (cur\ file)', '<Plug>RMakePDF', 'kb', ':call RMakePDF("bibtex")')
     endif
     "-------------------------------
-    menu R.Command.-Sep3- <nul>
+    menu R.Command.-Sep7- <nul>
     if &filetype == "r" || &filetype == "rnoweb" || g:vimrplugin_never_unmake_menu
         nmenu <silent> R.Command.Build\ tags\ file\ (cur\ dir)<Tab>:RBuildTags :call SendCmdToR('rtags(ofile = "TAGS")')<CR>
         imenu <silent> R.Command.Build\ tags\ file\ (cur\ dir)<Tab>:RBuildTags <Esc>:call SendCmdToR('rtags(ofile = "TAGS")')<CR>a
@@ -2233,7 +2234,7 @@ function MakeRMenu()
     if &filetype == "r" || &filetype == "rnoweb" || &filetype == "rhelp" || g:vimrplugin_never_unmake_menu
         if g:vimrplugin_underscore == 1
             imenu <silent> R.Edit.Insert\ \"\ <-\ \"<Tab>_ <Esc>:call ReplaceUnderS()<CR>a
-            imenu <silent> R.Edit.Complete\ function\ name<Tab>^X^O <C-X><C-O>
+            imenu <silent> R.Edit.Complete\ object\ name<Tab>^X^O <C-X><C-O>
             if hasmapto("<Plug>RCompleteArgs", "i")
                 let boundkey = RIMapCmd("<Plug>RCompleteArgs")
                 exe "imenu <silent> R.Edit.Complete\\ function\\ arguments<Tab>" . boundkey . " " . boundkey
