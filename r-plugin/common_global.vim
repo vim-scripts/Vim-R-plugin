@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Sun Apr 01, 2012  11:12PM
+" Last Change: Mon Apr 02, 2012  11:44AM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -2215,9 +2215,9 @@ function MakeRMenu()
         call RCreateMenuItem("nvi", 'Command.Sweave\ and\ PDF\ (cur\ file)', '<Plug>RMakePDF', 'sp', ':call RMakePDF("nobib")')
         call RCreateMenuItem("nvi", 'Command.Sweave,\ BibTeX\ and\ PDF\ (cur\ file)', '<Plug>RMakePDF', 'sb', ':call RMakePDF("bibtex")')
         menu R.Command.-Sep6- <nul>
-        call RCreateMenuItem("nvi", 'Command.Knitr\ (cur\ file)', '<Plug>RSweave', 'kn', ':call RSweave()')
-        call RCreateMenuItem("nvi", 'Command.Knitr\ and\ PDF\ (cur\ file)', '<Plug>RMakePDF', 'kp', ':call RMakePDF("nobib")')
-        call RCreateMenuItem("nvi", 'Command.Knitr,\ BibTeX\ and\ PDF\ (cur\ file)', '<Plug>RMakePDF', 'kb', ':call RMakePDF("bibtex")')
+        call RCreateMenuItem("nvi", 'Command.Knit\ (cur\ file)', '<Plug>RSweave', 'kn', ':call RSweave()')
+        call RCreateMenuItem("nvi", 'Command.Knit\ and\ PDF\ (cur\ file)', '<Plug>RMakePDF', 'kp', ':call RMakePDF("nobib")')
+        call RCreateMenuItem("nvi", 'Command.Knit,\ BibTeX\ and\ PDF\ (cur\ file)', '<Plug>RMakePDF', 'kb', ':call RMakePDF("bibtex")')
     endif
     "-------------------------------
     menu R.Command.-Sep7- <nul>
