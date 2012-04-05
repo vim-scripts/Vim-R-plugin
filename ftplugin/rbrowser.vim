@@ -16,7 +16,7 @@
 "
 " Author: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          
-" Last Change: Thu Mar 15, 2012  10:48PM
+" Last Change: Thu Apr 05, 2012  08:42PM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -312,6 +312,9 @@ function! OBGetDeleteCmd(lnum)
     let obj = RBrowserGetName(1, a:lnum)
     if g:rplugin_curview == "GlobalEnv"
         if obj =~ '\$'
+            let cmd = obj . ' <- NULL'
+        elseif obj =~ '-\[\[[0-9]*\]\]'
+            let obj = substitute(obj, '-\(\[\[[0-9]*\]\]\)', '\1', '')
             let cmd = obj . ' <- NULL'
         else
             let cmd = 'rm(' . obj . ')'
