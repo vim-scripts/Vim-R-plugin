@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Mon Apr 02, 2012  11:44AM
+" Last Change: Thu Apr 05, 2012  10:01AM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -136,6 +136,7 @@ function RCompleteArgs()
             call cursor(lnum, idx)
             let rkeyword0 = RGetKeyWord()
             let classfor = RGetClassFor(rkeyword0)
+            let classfor = substitute(classfor, '"', '\\"', "g")
             let rkeyword = '^' . rkeyword0 . "\x06"
             call cursor(cpos[1], cpos[2])
             exe 'Py SendToR("vimcom:::vim.args(' . "'" . rkeyword0 . "', '" . argkey . "', classfor = " . classfor . ")" . '")'
