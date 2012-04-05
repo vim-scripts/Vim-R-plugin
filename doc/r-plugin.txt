@@ -396,7 +396,7 @@ Command
 
 Edit
   . Insert "<-"                                          _
-  . Complete function name                            ^X^O
+  . Complete object name                              ^X^O
   . Complete function arguments                       ^X^A
   --------------------------------------------------------
   . Indent (line)                                       ==
@@ -460,21 +460,28 @@ case:
    summary(x)
    summary(m)
 <
-When completing function names (CTRL-X CTRL-O) and function arguments (CTRL-X
+When completing object names (CTRL-X CTRL-O) and function arguments (CTRL-X
 CTRL-A) you have to press CTRL-N to go foward in the list and CTRL-P to go
 backward (see |popupmenu-completion|). Note: if using Vim in a terminal
 emulator, Tmux will capture the CTRL-A command. You have to do CTRL-A twice to
 pass a single CTRL-A to Vim.
 
+If R is not running or if it is running but is busy the completion will be
+based on information saved with the command |:RUpdateObjList|. Otherwise, the
+pop up menu for completion of function arguments will include an additional
+line with the name of the library where the function is (if the function name
+can be found in more than one library) and the function method (if what is
+being shown are the arguments of a method and not of the function itself).
+
 To get help on an R topic, type in Vim (Normal mode):
 >
    :Rhelp topic
 <
-The command may be abbreviated to  :Rh  and you can both press <Tab> to
+The command may be abbreviated to  :Rh  and you can either press <Tab> to
 trigger the autocompletion of R objects names or hit CTRL-D to list the
 possible completions (see |cmdline-completion| for details on the various ways
 of getting command-line completion). The list of objects used for
-autocompletion is the same one built by  |:RUpdateObjList|.
+completion is the same one built by |:RUpdateObjList|.
 
 
 4.2. Edition of rnoweb files~
@@ -1823,7 +1830,7 @@ the R syntax highlighted.
 							       *r-plugin-news*
 10. News~
 
-0.9.8 (2012-03-28)
+0.9.8 (2012-04-05)
 
  * Use the R package vimcom. The following options are now set on the vimcom R
    package and no longer in the Vim-R-plugin: allnames, open_df, and
