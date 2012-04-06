@@ -804,16 +804,15 @@ If you use the screen plugin with GNU Screen, individual lines may be sent
 duplicated to R on Mac OS X.
 
 
-5.7. R session is detached when GVim is closed (Linux/Unix only)~
+5.7. [Errno 98] Address already in use~
 
-If you launch GVim through a custom keyboard shortcut, the problem may be
-solved if you add -f as parameter to GVim. The R session also used to be
-detached when GVim is closed if you launched GVim by the command line in a
-terminal emulator, and, then, closed the terminal-emulator. In any case, to
-reattach to the R session, open a new terminal window and type:
->
-   screen -r
-<
+When deleting objects using the "d" command in the Object Browser, the message
+"[Errno 98] Address already in use" may appear. In this case, the Object
+Browser will not work properly until you stop using it and wait for the time
+set in 'updatetime' (four seconds, by default). Then, the Object Browser
+should be normal again. The "d" command is available only when running R on
+Tmux.
+
 
 ==============================================================================
 							    *r-plugin-options*
@@ -1830,7 +1829,7 @@ the R syntax highlighted.
 							       *r-plugin-news*
 10. News~
 
-0.9.8 (2012-04-05)
+0.9.8 (2012-04-06)
 
  * Use the R package vimcom. The following options are now set on the vimcom R
    package and no longer in the Vim-R-plugin: allnames, open_df, and
