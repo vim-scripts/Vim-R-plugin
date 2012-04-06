@@ -16,7 +16,7 @@
 "
 " Author: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          
-" Last Change: Thu Apr 05, 2012  08:42PM
+" Last Change: Thu Apr 05, 2012  10:51PM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -389,7 +389,7 @@ call writefile([], $VIMRPLUGIN_TMPDIR . "/liblist")
 
 au BufUnload <buffer> call ObBrBufUnload()
 
-function RKeepRunning()
+function! RKeepRunning()
     if g:rplugin_myport == 0
         Py StopServer()
         sleep 250m
