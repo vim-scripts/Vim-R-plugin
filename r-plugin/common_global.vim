@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Thu Apr 05, 2012  10:01AM
+" Last Change: Thu Apr 05, 2012  10:49PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -147,7 +147,11 @@ function RCompleteArgs()
                 if(len(tmp) > 0)
                     for id in range(len(tmp))
                         let tmp2 = split(tmp[id], "\x07")
-                        let tmp3 = tmp2[0] . " = "
+                        if tmp2[0] == '...'
+                            let tmp3 = tmp2[0]
+                        else
+                            let tmp3 = tmp2[0] . " = "
+                        endif
                         if len(tmp2) > 1
                             call add(args,  {'word': tmp3, 'menu': tmp2[1]})
                         else
