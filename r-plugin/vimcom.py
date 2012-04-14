@@ -23,7 +23,7 @@ def DiscoverVimComPort():
             vim.command("call RWarningMsg('VIMINSTANCEID not found.')")
             return
 
-    while correct_repl.find(repl) < 0 and VimComPort < 10050:
+    while repl.find(correct_repl) < 0 and VimComPort < 10050:
         VimComPort = VimComPort + 1
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.settimeout(0.1)
@@ -40,6 +40,8 @@ def DiscoverVimComPort():
         vim.command("call RWarningMsg('VimCom Port not found.')")
     else:
         vim.command("let g:rplugin_vimcomport = " + str(VimComPort))
+        if repl.find("0.9-1 ") != 0:
+            vim.command("call RWarningMsg('This version of Vim-R-plugin requires vimcom 0.9-1.')")
     return(VimComPort)
 
 
