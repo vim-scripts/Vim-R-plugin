@@ -16,7 +16,7 @@
 "
 " Author: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          
-" Last Change: Thu Apr 05, 2012  10:51PM
+" Last Change: Sat Apr 14, 2012  02:14PM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -41,6 +41,9 @@ runtime r-plugin/common_buffer.vim
 setlocal noswapfile
 setlocal buftype=nofile
 setlocal nowrap
+if g:vimrplugin_tmux && g:vimrplugin_screenplugin
+    let showmarks_enable = 0
+endif
 
 if !exists("g:rplugin_hasmenu")
     let g:rplugin_hasmenu = 0
