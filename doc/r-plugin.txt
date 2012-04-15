@@ -363,6 +363,8 @@ Send
   . Line                                                \l
   . Line (and down)                                     \d
   . Line (and new one)                                  \q
+  . Left part of line (cur)                       \r<Left>
+  . Right part of line (cur)                     \r<Right>
 -----------------------------------------------------------
 
 Command
@@ -1829,7 +1831,7 @@ the R syntax highlighted.
 							       *r-plugin-news*
 10. News~
 
-0.9.8 (2012-04-06)
+0.9.8 (2012-04-14)
 
  * Use the R package vimcom. The following options are now set on the vimcom R
    package and no longer in the Vim-R-plugin: allnames, open_df, and

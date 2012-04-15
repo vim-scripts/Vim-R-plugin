@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Sat Apr 07, 2012  08:42PM
+" Last Change: Sun Apr 15, 2012  11:10AM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -1399,6 +1399,20 @@ function SendLineToR(godown)
     endif
 endfunction
 
+function RSendPartOfLine(direction, correctpos)
+    let lin = getline(".")
+    let idx = col(".") - 1
+    if a:correctpos
+        call cursor(line("."), idx)
+    endif
+    if a:direction == "right"
+        let rcmd = strpart(lin, idx)
+    else
+        let rcmd = strpart(lin, 0, idx)
+    endif
+    call SendCmdToR(rcmd)
+endfunction
+
 " Clear the console screen
 function RClearConsole()
     if (has("win32") || has("win64")) && g:vimrplugin_conqueplugin == 0
@@ -2207,6 +2221,10 @@ function MakeRMenu()
     call RCreateMenuItem("ni0", 'Send.Line', '<Plug>RSendLine', 'l', ':call SendLineToR("stay")')
     call RCreateMenuItem("ni0", 'Send.Line\ (and\ down)', '<Plug>RDSendLine', 'd', ':call SendLineToR("down")')
     call RCreateMenuItem("i", 'Send.Line\ (and\ new\ one)', '<Plug>RSendLAndOpenNewOne', 'q', ':call SendLineToR("newline")')
+    call RCreateMenuItem("n", 'Send.Left\ part\ of\ line\ (cur)', '<Plug>RNLeftPart', 'r<Left>', ':call RSendPartOfLine("left", 0)')
+    call RCreateMenuItem("n", 'Send.Right\ part\ of\ line\ (cur)', '<Plug>RNRightPart', 'r<Right>', ':call RSendPartOfLine("right", 0)')
+    call RCreateMenuItem("i", 'Send.Left\ part\ of\ line\ (cur)', '<Plug>RILeftPart', 'r<Left>', 'l:call RSendPartOfLine("left", 1)')
+    call RCreateMenuItem("i", 'Send.Right\ part\ of\ line\ (cur)', '<Plug>RIRightPart', 'r<Right>', 'l:call RSendPartOfLine("right", 1)')
 
     "----------------------------------------------------------------------------
     " Control
@@ -2484,6 +2502,10 @@ function RCreateSendMaps()
     call RCreateMaps("ni0", '<Plug>RSendLine', 'l', ':call SendLineToR("stay")')
     call RCreateMaps('ni0', '<Plug>RDSendLine', 'd', ':call SendLineToR("down")')
     call RCreateMaps('i', '<Plug>RSendLAndOpenNewOne', 'q', ':call SendLineToR("newline")')
+    nmap <LocalLeader>r<Left> :call RSendPartOfLine("left", 0)<CR>
+    imap <LocalLeader>r<Left> <Esc>l:call RSendPartOfLine("left", 0)<CR>i
+    nmap <LocalLeader>r<Right> :call RSendPartOfLine("right", 0)<CR>
+    imap <LocalLeader>r<Right> <Esc>l:call RSendPartOfLine("right", 0)<CR>i
 
     " For compatibility with Johannes Ranke's plugin
     if g:vimrplugin_map_r == 1
