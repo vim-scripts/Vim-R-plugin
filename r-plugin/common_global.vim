@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Sun Apr 15, 2012  11:10AM
+" Last Change: Sun Apr 15, 2012  11:33AM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -1863,6 +1863,14 @@ function RLisObjs(arglead, cmdline, curpos)
     return lob
 endfunction
 
+function RSourceDirectory(...)
+    if a:1 == ""
+        call SendCmdToR("vim.srcdir()")
+    else
+        call SendCmdToR("vim.srcdir('" . a:1 . "')")
+    endif
+endfunction
+
 function RAskHelp(...)
     if a:1 == ""
         call SendCmdToR("help.start()")
@@ -2549,6 +2557,7 @@ endfunction
 command RUpdateObjList :call RBuildSyntaxFile("loaded")
 command RBuildTags :call SendCmdToR('rtags(ofile = "TAGS")')
 command -nargs=? -complete=customlist,RLisObjs Rhelp :call RAskHelp(<q-args>)
+command -nargs=? -complete=dir RSourceDir :call RSourceDirectory(<q-args>)
 
 "==========================================================================
 " Global variables

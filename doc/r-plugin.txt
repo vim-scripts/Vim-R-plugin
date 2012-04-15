@@ -485,6 +485,9 @@ possible completions (see |cmdline-completion| for details on the various ways
 of getting command-line completion). The list of objects used for
 completion is the same one built by |:RUpdateObjList|.
 
+You can source all .R files in a directory with the Normal mode command
+:RSourceDir, which accepts an optional argument (the directory to be sourced).
+
 
 4.2. Edition of rnoweb files~
 
