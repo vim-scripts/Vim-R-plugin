@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Sun Apr 15, 2012  11:33AM
+" Last Change: Sun Apr 15, 2012  11:27PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -1864,10 +1864,15 @@ function RLisObjs(arglead, cmdline, curpos)
 endfunction
 
 function RSourceDirectory(...)
-    if a:1 == ""
+    if has("win32") || has("win64")
+        let dir = substitute(a:1, '\\', '/', "g")
+    else
+        let dir = a:1
+    endif
+    if dir == ""
         call SendCmdToR("vim.srcdir()")
     else
-        call SendCmdToR("vim.srcdir('" . a:1 . "')")
+        call SendCmdToR("vim.srcdir('" . dir . "')")
     endif
 endfunction
 
