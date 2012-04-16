@@ -17,7 +17,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "
-" Last Change: Sun Apr 01, 2012  07:37PM
+" Last Change: Mon Apr 16, 2012  12:08AM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -112,7 +112,7 @@ endfunction
 function! RMakePDF(bibtex, knit)
     update
     call RSetWD()
-    let pdfcmd = "vim.Sweave('" . expand("%:t") . "'"
+    let pdfcmd = "vim.interlace('" . expand("%:t") . "'"
 
     if a:knit
         let pdfcmd = "require(knitr); " . pdfcmd . ', knit = TRUE'
