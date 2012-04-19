@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Sun Apr 15, 2012  11:27PM
+" Last Change: Thu Apr 19, 2012  08:35AM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -674,7 +674,7 @@ function StartR(whatr)
 endfunction
 
 function StartObjectBrowser()
-    if g:vimrplugin_screenplugin && g:vimrplugin_tmux
+    if g:vimrplugin_tmux && (g:vimrplugin_screenplugin || g:vimrplugin_external_ob)
 
         if g:rplugin_editor_port
             " This is the Object Browser
@@ -2935,7 +2935,7 @@ if has("win32") || has("win64") || vimrplugin_applescript
     " No external terminal emulator will be called, so any value is good
     let g:vimrplugin_term = "xterm"
 else
-    let s:terminals = ['gnome-terminal', 'konsole', 'xfce4-terminal', 'terminal', 'Eterm', 'rxvt', 'aterm', 'roxterm', 'xterm']
+    let s:terminals = ['gnome-terminal', 'konsole', 'xfce4-terminal', 'terminal', 'Eterm', 'rxvt', 'aterm', 'roxterm', 'terminator', 'xterm']
     if has('mac')
         let s:terminals = ['iTerm', 'Terminal.app'] + s:terminals
     endif
@@ -2968,6 +2968,10 @@ let g:rplugin_termcmd = g:vimrplugin_term . " -e"
 if g:vimrplugin_term == "gnome-terminal" || g:vimrplugin_term == "xfce4-terminal" || g:vimrplugin_term == "terminal"
     " Cannot set icon: http://bugzilla.gnome.org/show_bug.cgi?id=126081
     let g:rplugin_termcmd = g:vimrplugin_term . " --working-directory='" . expand("%:p:h") . "' --title R -e"
+endif
+
+if g:vimrplugin_term == "terminator"
+    let g:rplugin_termcmd = g:vimrplugin_term . " --working-directory='" . expand("%:p:h") . "' --title R -x"
 endif
 
 if g:vimrplugin_term == "konsole"
