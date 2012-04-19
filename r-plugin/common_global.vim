@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Thu Apr 19, 2012  08:35AM
+" Last Change: Thu Apr 19, 2012  09:13AM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -708,8 +708,13 @@ function StartObjectBrowser()
             if !exists("g:rplugin_edpane")
                 let g:rplugin_edpane = $TMUX_PANE
                 if strlen(g:rplugin_edpane) == 0
-                    echoer "Could not find the environment variable TMUX_PANE."
-                    return
+                    if g:vimrplugin_external_ob
+                        let g:rplugin_edpane = "none"
+                        let g:vimrplugin_objbr_place = substitute(g:vimrplugin_objbr_place, "script", "console", "g")
+                    else
+                        echoer "Could not find the environment variable TMUX_PANE."
+                        return
+                    endif
                 endif
             endif
 
@@ -1920,9 +1925,11 @@ function RAction(rcmd)
                         let pkg = ""
                     endif
                     if exists("b:this_is_ob")
-                        let slog = system("tmux set-buffer '" . "\<Esc>" . ':call ShowRDoc("' . rkeyword . '", "' . pkg . '", 0)' . "\<C-M>' && tmux paste-buffer -t " . g:rplugin_edpane . " && tmux select-pane -t " . g:rplugin_edpane)
-                        if v:shell_error
-                            call RWarningMsg(slog)
+                        if g:rplugin_edpane != "none"
+                            let slog = system("tmux set-buffer '" . "\<Esc>" . ':call ShowRDoc("' . rkeyword . '", "' . pkg . '", 0)' . "\<C-M>' && tmux paste-buffer -t " . g:rplugin_edpane . " && tmux select-pane -t " . g:rplugin_edpane)
+                            if v:shell_error
+                                call RWarningMsg(slog)
+                            endif
                         endif
                     else
                         call ShowRDoc(rkeyword, pkg, 0)
@@ -2636,6 +2643,7 @@ call RSetDefaultValue("g:vimrplugin_routnotab",         0)
 call RSetDefaultValue("g:vimrplugin_editor_w",         66)
 call RSetDefaultValue("g:vimrplugin_help_w",           46)
 call RSetDefaultValue("g:vimrplugin_objbr_w",          40)
+call RSetDefaultValue("g:vimrplugin_external_ob",       0)
 call RSetDefaultValue("g:vimrplugin_buildwait",        60)
 call RSetDefaultValue("g:vimrplugin_indent_commented",  1)
 call RSetDefaultValue("g:vimrplugin_by_vim_instance",   0)
