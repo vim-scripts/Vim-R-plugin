@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Thu Apr 19, 2012  09:13AM
+" Last Change: Thu Apr 19, 2012  11:21PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -634,6 +634,9 @@ function StartR(whatr)
                             \ 'set-window-option -g mode-keys vi',
                             \ 'set -g status off',
                             \ "set -g terminal-overrides 'xterm*:smcup@:rmcup@'"]
+                if g:vimrplugin_external_ob
+                    let cnflines = extend(cnflines, ['set -g mode-mouse on', 'set -g mouse-select-pane on', 'set -g mouse-resize-pane on'])
+                endif
                 call writefile(cnflines, tmxcnf)
                 let tmxcnf = "-f " . tmxcnf
             endif
@@ -944,7 +947,7 @@ function RObjBrowser()
 endfunction
 
 function RBrowserOpenCloseLists(status)
-    if g:vimrplugin_screenplugin && !exists("b:this_is_ob")
+    if g:vimrplugin_external_ob || (g:vimrplugin_screenplugin && !exists("b:this_is_ob"))
         let stt = a:status + 2
     else
         let stt = a:status
@@ -1101,7 +1104,7 @@ function SendCmdToR(cmd)
     " Send the command to R running in an external terminal emulator
     let str = substitute(cmd, "'", "'\\\\''", "g")
     if g:vimrplugin_tmux
-        let scmd = "tmux set-buffer '" . str . "\<C-M>' && tmux paste-buffer -t " . b:screensname
+        let scmd = "tmux set-buffer '" . str . "\<C-M>' && tmux paste-buffer -t " . b:screensname . '.0'
     else
         let scmd = 'screen -S ' . b:screensname . " -X stuff '" . str . "\<C-M>'"
     endif
@@ -1925,7 +1928,9 @@ function RAction(rcmd)
                         let pkg = ""
                     endif
                     if exists("b:this_is_ob")
-                        if g:rplugin_edpane != "none"
+                        if g:rplugin_edpane == "none"
+                            call RWarningMsg("Cmd not available.")
+                        else
                             let slog = system("tmux set-buffer '" . "\<Esc>" . ':call ShowRDoc("' . rkeyword . '", "' . pkg . '", 0)' . "\<C-M>' && tmux paste-buffer -t " . g:rplugin_edpane . " && tmux select-pane -t " . g:rplugin_edpane)
                             if v:shell_error
                                 call RWarningMsg(slog)
