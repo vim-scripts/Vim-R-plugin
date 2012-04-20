@@ -596,7 +596,7 @@ on the cursor line or the element of a list or data.frame. If the Object
 Browser is showing the libraries, the library currently on the cursor line is
 detached. The Object Browser may stop to be updated automatically for a few
 seconds if you press  d  many times quickly. Please, use a value greater than
-250 to set the time in miliseconds that the Object Browser should wait for R
+250 to set the time in milliseconds that the Object Browser should wait for R
 message that the object was already deleted (see |vimrplugin_ob_sleep|).
 
 
@@ -829,6 +829,7 @@ Tmux.
 |vimrplugin_rnowebchunk|       Convert '<' into '<<>>=\n@' in Rnoweb files
 |vimrplugin_objbr_place|       Placement of Object Browser
 |vimrplugin_objbr_w|           Initial width of Object Browser window
+|vimrplugin_external_ob|       Run Object Browser on external terminal
 |vimrplugin_objbr_sleep|       Time the Object Browser waits for R after "d"
 |vimrplugin_vimpager|          Use Vim to see R documentation
 |vimrplugin_editor_w|          Minimum width of R script buffer
@@ -871,7 +872,8 @@ list:
     6. rxvt, 
     7. aterm, 
     8. roxterm,
-    9. xterm.
+    9. terminator,
+   10. xterm.
 
 If Vim does not select your favorite terminal emulator, you may define it in 
 your |vimrc| by setting the variable vimrplugin_term, as shown below:
@@ -884,6 +886,7 @@ with the way your terminal emulator is called by the plugin, you may define in
 your |vimrc| the variable vimrplugin_term_cmd, as in the examples below:
 >
    let vimrplugin_term_cmd = "gnome-terminal --title R -e"
+   let vimrplugin_term_cmd = "terminator --title R -x"
    let vimrplugin_term_cmd = "/Applications/Utilities/iTerm.app/Contents/MacOS/iTerm -t R"
 <
 Please, look at the manual of your terminal emulator to know how to call it.
@@ -907,6 +910,7 @@ put in your |vimrc|:
 6.3. Object Browser options~
 						      *vimrplugin_objbr_place*
 							  *vimrplugin_objbr_w*
+						      *vimrplugin_external_ob*
 By default, the object browser will be created with 40 columns. The minimum
 width of the Object Browser window is 9 columns. You can change the object
 browser's default width by setting the value of |vimrplugin_objbr_w| in your
@@ -923,8 +927,13 @@ beside the R Console. Valid values for the Object Browser placement are
    let vimrplugin_objbr_place = "script,right"
    let vimrplugin_objbr_place = "console,left"
 <
+If vimrplugin_external_ob = 1 and R is running in an external terminal
+emulator and the communication with R is being established through Tmux, the
+Object Browser will be placed besides the R Console in the external terminal
+emulator. In this case, the command \rh will not work on the Object Browser.
+
 When deleting an object from the Object Browser (possible if running Vim under
-Tmux), the following option controls the time in miliseconds that the Object
+Tmux), the following option controls the time in milliseconds that the Object
 Browser will wait for R to send the message updating the list of objects:
 >
    let vimrplugin_ob_sleep = 250m
@@ -1665,7 +1674,8 @@ two options and some others:
        library(colorout)
        library(setwidth)
        options(vimcom.verbose = 1, vimcom.allnames = TRUE)
-       library(vimcom)
+       if(Sys.getenv("VIMRPLUGIN_TMPDIR") != "")
+	   library(vimcom)
        if(Sys.getenv("TERM") != "linux" && Sys.getenv("TERM") != "")
 	   setOutputColors256(verbose = FALSE)
        if(nchar(Sys.getenv("DISPLAY")) > 1){
@@ -1834,7 +1844,7 @@ the R syntax highlighted.
 							       *r-plugin-news*
 10. News~
 
-0.9.8 (2012-04-14)
+0.9.8 (2012-04-19)
 
  * Use the R package vimcom. The following options are now set on the vimcom R
    package and no longer in the Vim-R-plugin: allnames, open_df, and
@@ -1846,8 +1856,9 @@ the R syntax highlighted.
  * New command in normal and visual modes when on the Object Browser: "d"
    deletes objects and detach libraries. New option: vimrplugin_ob_sleep.
  * Add support to knitr package.
+ * New command  :RSourceDir  and new key bindings \r<Left> and \r<Right>.
    
-0.9.7 (2012-02-12)
+0.9.7 (2012-04-21)
 
  * Minor bug fixes.
 
