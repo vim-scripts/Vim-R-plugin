@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Thu Apr 19, 2012  11:21PM
+" Last Change: Sun Apr 29, 2012  12:39PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -2095,7 +2095,7 @@ function RControlMenu()
     "-------------------------------
     menu R.Command.-Sep1- <nul>
     call RCreateMenuItem("nvi", 'Command.Print\ (cur)', '<Plug>RObjectPr', 'rp', ':call RAction("print")')
-    call RCreateMenuItem("nvi", 'Command.Names\ (cur)', '<Plug>RObjectNames', 'rn', ':call RAction("names")')
+    call RCreateMenuItem("nvi", 'Command.Names\ (cur)', '<Plug>RObjectNames', 'rn', ':call RAction("vim.names")')
     call RCreateMenuItem("nvi", 'Command.Structure\ (cur)', '<Plug>RObjectStr', 'rt', ':call RAction("str")')
     "-------------------------------
     menu R.Command.-Sep2- <nul>
@@ -2120,7 +2120,7 @@ function RControlMaps()
     " Print, names, structure
     "-------------------------------------
     call RCreateMaps("nvi", '<Plug>RObjectPr',     'rp', ':call RAction("print")')
-    call RCreateMaps("nvi", '<Plug>RObjectNames',  'rn', ':call RAction("names")')
+    call RCreateMaps("nvi", '<Plug>RObjectNames',  'rn', ':call RAction("vim.names")')
     call RCreateMaps("nvi", '<Plug>RObjectStr',    'rt', ':call RAction("str")')
 
     " Arguments, example, help
@@ -2984,7 +2984,7 @@ if g:vimrplugin_term == "gnome-terminal" || g:vimrplugin_term == "xfce4-terminal
 endif
 
 if g:vimrplugin_term == "terminator"
-    let g:rplugin_termcmd = g:vimrplugin_term . " --working-directory='" . expand("%:p:h") . "' --title R -x"
+    let g:rplugin_termcmd = "terminator --working-directory='" . expand("%:p:h") . "' --title R -x"
 endif
 
 if g:vimrplugin_term == "konsole"
@@ -2997,7 +2997,7 @@ endif
 
 if g:vimrplugin_term == "roxterm"
     " Cannot set icon: http://bugzilla.gnome.org/show_bug.cgi?id=126081
-    let g:rplugin_termcmd = g:vimrplugin_term . " --directory='" . expand("%:p:h") . "' --title R -e"
+    let g:rplugin_termcmd = "roxterm --directory='" . expand("%:p:h") . "' --title R -e"
 endif
 
 if g:vimrplugin_term == "xterm" || g:vimrplugin_term == "uxterm"
