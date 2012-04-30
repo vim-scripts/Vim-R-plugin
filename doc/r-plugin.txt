@@ -587,6 +587,7 @@ any) used to classify the objects:
 	 Boolean	is.logical()
 	 Type		is.list()
 	 Function	is.function()
+	 Statement	isS4()
 
 When running in a terminal emulator under Tmux, the Object Browser will be
 updated automatically. One limitation is that objects made available by the
@@ -749,7 +750,16 @@ useful:
 							 *r-plugin-known-bugs*
 5. Known bugs and workarounds~
 
-5.1. R's source() issues~
+5.1. The Object Browser segfaults (Linux/Unix only)~
+
+If the Vim instance running the Object Browser crashes you may want to close
+all Vim instances and kill any Vim wandering around with the command (typed in
+a terminal emulator):
+>
+   killall -9 vim
+<
+
+5.2. R's source() issues~
 
 The R's source() function prints an extra new line between commands if the
 option echo = TRUE, and error messages and warning are printed only after the
@@ -757,14 +767,14 @@ entire code is sourced, which makes it more difficult to find errors in the
 code sent to R.
 
 
-5.2. The clipboard's content is lost (Windows only)~
+5.3. The clipboard's content is lost (Windows only)~
 
 On Windows, the plugin copies the command that will be sent to R into the
 clipboard. Thus, if you have anything in the clipboard it will be lost while
 using the plugin.
 
 
-5.3. The buffer name must be in the window title (Windows only)~
+5.4. The buffer name must be in the window title (Windows only)~
 
 On Windows the plugin tries to activate the "R Console" window, paste the
 command that is being sent to R, and, then, activate the GVim window. To
@@ -773,14 +783,14 @@ edited be in the GVim window title. This is the default if you have not set
 the option 'titlestring'.
 
 
-5.4. The menu may not reflect some of your custom key bindings~
+5.5. The menu may not reflect some of your custom key bindings~
 
 If you have created a custom key binding for the Vim-R-plugin, the menu in
 GVim will not always reflect the correct key binding if it is not the same for
 Normal, Visual and Insert modes.
 
 
-5.5. Syntactically correct code may be wrongly indented~
+5.6. Syntactically correct code may be wrongly indented~
 
 If the Vim-R-plugin indents your code wrongly you may get the correct
 indentation by adding braces and line breaks to it. Example:
@@ -803,13 +813,13 @@ indentation by adding braces and line breaks to it. Example:
     class(x) <- c(if(ordered) "ordered", "factor")
 <
 
-5.6. Commands are sent twice on Mac OS X~
+5.7. Commands are sent twice on Mac OS X~
 
 If you use the screen plugin with GNU Screen, individual lines may be sent
 duplicated to R on Mac OS X.
 
 
-5.7. [Errno 98] Address already in use~
+5.8. [Errno 98] Address already in use~
 
 When deleting objects using the "d" command in the Object Browser, the message
 "[Errno 98] Address already in use" may appear. In this case, the Object
@@ -1850,13 +1860,16 @@ the R syntax highlighted.
    package and no longer in the Vim-R-plugin: allnames, open_df, and
    open_list.
  * Automatic update of the Object Browser when running R in a Tmux session.
+ * New option, vimrplugin_external_ob, to open the Object Browser in a Tmux
+   pane in the external terminal running R.
  * New command  :Rhelp (thanks for Nir Atias for suggesting the new feature).
  * Remove the command  :RUpdateObjListAll  because Vim may not load the
    syntax file if it is too big.
  * New command in normal and visual modes when on the Object Browser: "d"
    deletes objects and detach libraries. New option: vimrplugin_ob_sleep.
  * Add support to knitr package.
- * New command  :RSourceDir  and new key bindings \r<Left> and \r<Right>.
+ * New command  :RSourceDir.
+ * New key bindings \r<Left> and \r<Right>.
    
 0.9.7 (2012-04-21)
 

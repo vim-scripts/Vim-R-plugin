@@ -16,7 +16,7 @@
 "
 " Author: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          
-" Last Change: Sat Apr 14, 2012  02:14PM
+" Last Change: Mon Apr 30, 2012  12:39PM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -229,9 +229,9 @@ function! RBrowserGetName(complete, lnum)
 
     " Is the object a top level one (curpos == 2)?
     if g:rplugin_curview == "libraries"
-        let delim = ['##', '{#', '[#', '(#', '"#', "'#", '%#', '=#']
+        let delim = ['##', '{#', '[#', '(#', '"#', "'#", '%#', '<#', '=#']
     else
-        let delim = ['{#', '[#', '(#', '"#', "'#", '%#', '=#']
+        let delim = ['{#', '[#', '(#', '"#', "'#", '%#', '<#', '=#']
     endif
     let word = substitute(line, '^\W*#\{-1,}\(.*\)\t.*', '\1', "")
 
