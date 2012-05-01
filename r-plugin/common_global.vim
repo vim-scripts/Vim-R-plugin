@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Sun Apr 29, 2012  12:39PM
+" Last Change: Tue May 01, 2012  01:25PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -1302,6 +1302,11 @@ function SendSelectionToR(e, m)
         return
     endif
     let lines = getline("'<", "'>")
+    let i = col("'<") - 1
+    let j = col("'>")
+    let lines[0] = strpart(lines[0], i)
+    let llen = len(lines) - 1
+    let lines[llen] = strpart(lines[llen], 0, j)
     let ok = RSourceLines(lines, a:e)
     if ok == 0
         return
