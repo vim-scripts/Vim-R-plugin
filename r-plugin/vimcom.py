@@ -40,8 +40,8 @@ def DiscoverVimComPort():
         vim.command("call RWarningMsg('VimCom Port not found.')")
     else:
         vim.command("let g:rplugin_vimcomport = " + str(VimComPort))
-        if repl.find("0.9-1 ") != 0:
-            vim.command("call RWarningMsg('This version of Vim-R-plugin requires vimcom 0.9-1.')")
+        if repl.find("0.9-2 ") != 0:
+            vim.command("call RWarningMsg('This version of Vim-R-plugin requires vimcom 0.9-2.')")
     return(VimComPort)
 
 
