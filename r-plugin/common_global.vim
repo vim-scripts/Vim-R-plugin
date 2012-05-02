@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Tue May 01, 2012  01:25PM
+" Last Change: Wed May 02, 2012  10:10AM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -1290,6 +1290,7 @@ function SendSelectionToR(e, m)
     endif
 
     let b:needsnewomnilist = 1
+
     if line("'<") == line("'>")
         let i = col("'<") - 1
         let j = col("'>") - i
@@ -1301,16 +1302,43 @@ function SendSelectionToR(e, m)
         endif
         return
     endif
+
     let lines = getline("'<", "'>")
-    let i = col("'<") - 1
-    let j = col("'>")
-    let lines[0] = strpart(lines[0], i)
-    let llen = len(lines) - 1
-    let lines[llen] = strpart(lines[llen], 0, j)
+
+    if visualmode() == "\<C-V>"
+        let lj = line("'<")
+        let cj = col("'<")
+        let lk = line("'>")
+        let ck = col("'>")
+        if cj > ck
+            let bb = ck - 1
+            let ee = cj - ck + 1
+        else
+            let bb = cj - 1
+            let ee = ck - cj + 1
+        endif
+        if cj > len(getline(lj)) || ck > len(getline(lk))
+            for idx in range(0, len(lines) - 1)
+                let lines[idx] = strpart(lines[idx], bb)
+            endfor
+        else
+            for idx in range(0, len(lines) - 1)
+                let lines[idx] = strpart(lines[idx], bb, ee)
+            endfor
+        endif
+    else
+        let i = col("'<") - 1
+        let j = col("'>")
+        let lines[0] = strpart(lines[0], i)
+        let llen = len(lines) - 1
+        let lines[llen] = strpart(lines[llen], 0, j)
+    endif
+
     let ok = RSourceLines(lines, a:e)
     if ok == 0
         return
     endif
+
     if a:m == "down"
         call GoDown()
     else
