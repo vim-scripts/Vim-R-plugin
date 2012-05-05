@@ -19,7 +19,7 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Thu Nov 10, 2011  01:35PM
+" Last Change: Mon Feb 27, 2012  12:45PM
 "
 " Please see doc/r-plugin.txt for usage details.
 "==========================================================================
@@ -97,6 +97,20 @@ if g:vimrplugin_by_vim_instance == 1
   endif
   unlet s:sname
 endif
+
+if g:rplugin_firstbuffer == ""
+    " The file global_r_plugin.vim was copied to ~/.vim/plugin
+    let g:rplugin_firstbuffer = expand("%:p")
+endif
+
+if g:vimrplugin_screenplugin
+    let s:uniquename = b:screensname . g:rplugin_firstbuffer
+else
+    let s:uniquename = b:screensname
+endif
+let s:uniquename = substitute(s:uniquename, '\W', '', 'g')
+let $VIMINSTANCEID = $VIMRPLUGIN_TMPDIR . "/" . s:uniquename . "-port"
+unlet s:uniquename
 
 let g:rplugin_lastft = &filetype
 

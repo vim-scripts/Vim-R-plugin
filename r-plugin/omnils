@@ -1,0 +1,2638 @@
+acffunctionfunctionstatsx	lag.maxNULL	typec("correlation", "covariance", "partial")	plotTRUE	na.action	demeanTRUE	...
+acf2ARfunctionfunctionstatsacf
+add1functionfunctionstatsobject	scope	...
+addmarginsfunctionfunctionstatsA	marginseq_along(dim(A))	FUN	quietFALSE
+add.scopefunctionfunctionstatsterms1	terms2
+aggregatefunctionfunctionstatsx	...
+aggregate.data.framefunctionfunctionstatsx	by	FUN	...	simplifyTRUE
+aggregate.defaultfunctionfunctionstatsx	...
+aggregate.tsfunctionfunctionstatsx	nfrequency1	FUN	ndeltat1	ts.epsgetOption("ts.eps")	...
+AICfunctionfunctionstatsobject	...	k2
+aliasfunctionfunctionstatsobject	...
+anovafunctionfunctionstatsobject	...
+anova.glmfunctionfunctionstatsobject	...	dispersionNULL	testNULL
+anova.glmlistfunctionfunctionstatsobject	...	dispersionNULL	testNULL
+anovalist.lmfunctionfunctionstatsobject	...	testNULL
+anova.lmfunctionfunctionstatsobject	...
+anova.lmlistfunctionfunctionstatsobject	...	scale0	test"F"
+anova.mlmfunctionfunctionstatsobject	...	testc("Pillai", "Wilks", "Hotelling-Lawley", "Roy", "Spherical")	Sigmadiag(nrow = p)	TThin.row(proj(M) - proj(X))	Mdiag(nrow = p)	X~0	idatadata.frame(index = seq_len(p))	tol1e-07
+ansari.testfunctionfunctionstatsx	...
+aovfunctionfunctionstatsformula	dataNULL	projectionsFALSE	qrTRUE	contrastsNULL	...
+approxfunctionfunctionstatsx	yNULL	xout	method"linear"	n50	yleft	yright	rule1	f0	ties
+approxfunfunctionfunctionstatsx	yNULL	method"linear"	yleft	yright	rule1	f0	ties
+arfunctionfunctionstatsx	aicTRUE	order.maxNULL	methodc("yule-walker", "burg", "ols", "mle", "yw")	na.action	seriesdeparse(substitute(x))	...
+ar.burgfunctionfunctionstatsx	...
+arimafunctionfunctionstatsx	orderc(0, 0, 0)	seasonallist(order = c(0, 0, 0), period = NA)	xregNULL	include.meanTRUE	transform.parsTRUE	fixedNULL	initNULL	methodc("CSS-ML", "ML", "CSS")	n.cond	optim.method"BFGS"	optim.controllist()	kappa1e+06
+arima0functionfunctionstatsx	orderc(0, 0, 0)	seasonallist(order = c(0, 0, 0), period = NA)	xregNULL	include.meanTRUE	delta0.01	transform.parsTRUE	fixedNULL	initNULL	methodc("ML", "CSS")	n.cond	optim.controllist()
+arima0.diagfunctionfunctionstats...
+arima.simfunctionfunctionstatsmodel	n	rand.gen	innovrand.gen(n, ...)	n.startNA	start.innovrand.gen(n.start, ...)	...
+ARMAacffunctionfunctionstatsarnumeric(0)	manumeric(0)	lag.max	pacfFALSE
+ARMAtoMAfunctionfunctionstatsarnumeric(0)	manumeric(0)	lag.max
+ar.mlefunctionfunctionstatsx	aicTRUE	order.maxNULL	na.action	demeanTRUE	seriesNULL	...
+ar.olsfunctionfunctionstatsx	aicTRUE	order.maxNULL	na.action	demeanTRUE	intercept	seriesNULL	...
+ar.ywfunctionfunctionstatsx	...
+as.dendrogramfunctionfunctionstatsobject	...
+as.distfunctionfunctionstatsm	diagFALSE	upperFALSE
+as.formulafunctionfunctionstatsobject	envparent.frame()
+as.hclustfunctionfunctionstatsx	...
+asOneSidedFormulafunctionfunctionstatsobject
+as.stepfunfunctionfunctionstatsx	...
+as.tsfunctionfunctionstatsx	...
+avefunctionfunctionstatsx	...	FUN
+bandwidth.kernelfunctionfunctionstatsk
+bartlett.testfunctionfunctionstatsx	...
+BICfunctionfunctionstatsobject	...
+binomialfunctionfunctionstatslink"logit"
+binom.testfunctionfunctionstatsx	n	p0.5	alternativec("two.sided", "less", "greater")	conf.level0.95
+biplotfunctionfunctionstatsx	...
+Box.testfunctionfunctionstatsx	lag1	typec("Box-Pierce", "Ljung-Box")	fitdf0
+bw.bcvfunctionfunctionstatsx	nb1000	lower0.1 * hmax	upper	tol0.1 * lower
+bw.nrdfunctionfunctionstatsx
+bw.nrd0functionfunctionstatsx
+bw.SJfunctionfunctionstatsx	nb1000	lower0.1 * hmax	upper	methodc("ste", "dpi")	tol0.1 * lower
+bw.ucvfunctionfunctionstatsx	nb1000	lower0.1 * hmax	upper	tol0.1 * lower
+Cfunctionfunctionstatsobject	contr	how.many	...
+cancorfunctionfunctionstatsx	y	xcenterTRUE	ycenterTRUE
+case.namesfunctionfunctionstatsobject	...
+ccffunctionfunctionstatsx	y	lag.maxNULL	typec("correlation", "covariance")	plotTRUE	na.action	...
+chisq.testfunctionfunctionstatsx	yNULL	correctTRUE	prep(1/length(x), length(x))	rescale.pFALSE	simulate.p.valueFALSE	B2000
+clearNamesfunctionfunctionstatsobject
+cmdscalefunctionfunctionstatsd	k2	eigFALSE	addFALSE	x.retFALSE
+coeffunctionfunctionstatsobject	...
+coefficientsfunctionfunctionstatsobject	...
+complete.casesfunctionfunctionstats...
+confintfunctionfunctionstatsobject	parm	level0.95	...
+confint.defaultfunctionfunctionstatsobject	parm	level0.95	...
+constrOptimfunctionfunctionstatstheta	f	grad	ui	ci	mu1e-04	controllist()	methodif (is.null(grad)) "Nelder-Mead" else "BFGS"	outer.iterations100	outer.eps1e-05	...	hessianFALSE
+contrastsfunctionfunctionstatsx	contrastsTRUE	sparseFALSE
+contrasts<-functionfunctionstatsx	how.many	value
+contr.helmertfunctionfunctionstatsn	contrastsTRUE	sparseFALSE
+contr.polyfunctionfunctionstatsn	scores1:n	contrastsTRUE	sparseFALSE
+contr.SASfunctionfunctionstatsn	contrastsTRUE	sparseFALSE
+contr.sumfunctionfunctionstatsn	contrastsTRUE	sparseFALSE
+contr.treatmentfunctionfunctionstatsn	base1	contrastsTRUE	sparseFALSE
+convolvefunctionfunctionstatsx	y	conjTRUE	typec("circular", "open", "filter")
+cooks.distancefunctionfunctionstatsmodel	...
+copheneticfunctionfunctionstatsx
+corfunctionfunctionstatsx	yNULL	use"everything"	methodc("pearson", "kendall", "spearman")
+cor.testfunctionfunctionstatsx	...
+covfunctionfunctionstatsx	yNULL	use"everything"	methodc("pearson", "kendall", "spearman")
+cov2corfunctionfunctionstatsV
+covratiofunctionfunctionstatsmodel	infllm.influence(model, do.coef = FALSE)	resweighted.residuals(model)
+cov.wtfunctionfunctionstatsx	wtrep(1/nrow(x), nrow(x))	corFALSE	centerTRUE	methodc("unbiased", "ML")
+cpgramfunctionfunctionstatsts	taper0.1	mainpaste("Series: ", deparse(substitute(ts)))	ci.col"blue"
+cutreefunctionfunctionstatstree	kNULL	hNULL
+cyclefunctionfunctionstatsx	...
+Dfunctionfunctionstatsexpr	name
+dbetafunctionfunctionstatsx	shape1	shape2	ncp0	logFALSE
+dbinomfunctionfunctionstatsx	size	prob	logFALSE
+dcauchyfunctionfunctionstatsx	location0	scale1	logFALSE
+dchisqfunctionfunctionstatsx	df	ncp0	logFALSE
+decomposefunctionfunctionstatsx	typec("additive", "multiplicative")	filterNULL
+delete.responsefunctionfunctionstatstermobj
+deltatfunctionfunctionstatsx	...
+dendrapplyfunctionfunctionstatsX	FUN	...
+densityfunctionfunctionstatsx	bw"nrd0"	adjust1	kernelc("gaussian", "epanechnikov", "rectangular", "triangular", "biweight", 	kernel    "cosine", "optcosine")	weightsNULL	window	width	give.RkernFALSE	n512	from	to	cut3	na.rmFALSE	...
+density.defaultfunctionfunctionstatsx	bw"nrd0"	adjust1	kernelc("gaussian", "epanechnikov", "rectangular", "triangular", "biweight", 	kernel    "cosine", "optcosine")	weightsNULL	window	width	give.RkernFALSE	n512	from	to	cut3	na.rmFALSE	...
+derivfunctionfunctionstatsexpr	namevec	function.argNULL	tag".expr"	hessianFALSE	...
+deriv3functionfunctionstatsexpr	namevec	function.argNULL	tag".expr"	hessianTRUE	...
+deriv3.defaultfunctionfunctionstatsexpr	namevec	function.argNULL	tag".expr"	hessianTRUE	...
+deriv3.formulafunctionfunctionstatsexpr	namevec	function.argNULL	tag".expr"	hessianTRUE	...
+deriv.defaultfunctionfunctionstatsexpr	namevec	function.argNULL	tag".expr"	hessianFALSE	...
+deriv.formulafunctionfunctionstatsexpr	namevec	function.argNULL	tag".expr"	hessianFALSE	...
+deviancefunctionfunctionstatsobject	...
+dexpfunctionfunctionstatsx	rate1	logFALSE
+dffunctionfunctionstatsx	df1	df2	ncp	logFALSE
+dfbetafunctionfunctionstatsmodel	...
+dfbetasfunctionfunctionstatsmodel	...
+dffitsfunctionfunctionstatsmodel	infllm.influence(model, do.coef = FALSE)	resweighted.residuals(model)
+df.kernelfunctionfunctionstatsk
+df.residualfunctionfunctionstatsobject	...
+dgammafunctionfunctionstatsx	shape	rate1	scale1/rate	logFALSE
+dgeomfunctionfunctionstatsx	prob	logFALSE
+dhyperfunctionfunctionstatsx	m	n	k	logFALSE
+diffinvfunctionfunctionstatsx	...
+diff.tsfunctionfunctionstatsx	lag1	differences1	...
+distfunctionfunctionstatsx	method"euclidean"	diagFALSE	upperFALSE	p2
+dlnormfunctionfunctionstatsx	meanlog0	sdlog1	logFALSE
+dlogisfunctionfunctionstatsx	location0	scale1	logFALSE
+dmultinomfunctionfunctionstatsx	sizeNULL	prob	logFALSE
+dnbinomfunctionfunctionstatsx	size	prob	mu	logFALSE
+dnormfunctionfunctionstatsx	mean0	sd1	logFALSE
+dpoisfunctionfunctionstatsx	lambda	logFALSE
+drop1functionfunctionstatsobject	scope	...
+drop.scopefunctionfunctionstatsterms1	terms2
+drop.termsfunctionfunctionstatstermobj	dropxNULL	keep.responseFALSE
+dsignrankfunctionfunctionstatsx	n	logFALSE
+dtfunctionfunctionstatsx	df	ncp	logFALSE
+dummy.coeffunctionfunctionstatsobject	...
+duniffunctionfunctionstatsx	min0	max1	logFALSE
+dweibullfunctionfunctionstatsx	shape	scale1	logFALSE
+dwilcoxfunctionfunctionstatsx	m	n	logFALSE
+ecdffunctionfunctionstatsx
+eff.aovlistfunctionfunctionstatsaovlist
+effectsfunctionfunctionstatsobject	...
+embedfunctionfunctionstatsx	dimension1
+endfunctionfunctionstatsx	...
+estVarfunctionfunctionstatsobject	...
+expand.model.framefunctionfunctionstatsmodel	extras	envirenvironment(formula(model))	na.expandFALSE
+extractAICfunctionfunctionstatsfit	scale	k2	...
+factanalfunctionfunctionstatsx	factors	dataNULL	covmatNULL	n.obsNA	subset	na.action	startNULL	scoresc("none", "regression", "Bartlett")	rotation"varimax"	controlNULL	...
+factor.scopefunctionfunctionstatsfactor	scope
+familyfunctionfunctionstatsobject	...
+fftfunctionfunctionstatsz	inverseFALSE
+filterfunctionfunctionstatsx	filter	methodc("convolution", "recursive")	sides2	circularFALSE	initNULL
+fisher.testfunctionfunctionstatsx	yNULL	workspace2e+05	hybridFALSE	controllist()	or1	alternative"two.sided"	conf.intTRUE	conf.level0.95	simulate.p.valueFALSE	B2000
+fittedfunctionfunctionstatsobject	...
+fitted.valuesfunctionfunctionstatsobject	...
+fivenumfunctionfunctionstatsx	na.rmTRUE
+fligner.testfunctionfunctionstatsx	...
+formulafunctionfunctionstatsx	...
+frequencyfunctionfunctionstatsx	...
+friedman.testfunctionfunctionstatsy	...
+ftablefunctionfunctionstatsx	...
+Gammafunctionfunctionstatslink"inverse"
+gaussianfunctionfunctionstatslink"identity"
+get_all_varsfunctionfunctionstatsformula	dataNULL	...
+getCallfunctionfunctionstatsx	...
+getInitialfunctionfunctionstatsobject	data	...
+glmfunctionfunctionstatsformula	family	data	weights	subset	na.action	startNULL	etastart	mustart	offset	controllist(...)	modelTRUE	method"glm.fit"	xFALSE	yTRUE	contrastsNULL	...
+glm.controlfunctionfunctionstatsepsilon1e-08	maxit25	traceFALSE
+glm.fitfunctionfunctionstatsx	y	weightsrep(1, nobs)	startNULL	etastartNULL	mustartNULL	offsetrep(0, nobs)	familygaussian()	controllist()	interceptTRUE
+glm.fit.nullfunctionfunctionstatsx	y	weights	startNULL	etastartNULL	mustartNULL	offset	familygaussian()	controlglm.control()	interceptFALSE
+hasTspfunctionfunctionstatsx
+hatfunctionfunctionstatsx	interceptTRUE
+hatvaluesfunctionfunctionstatsmodel	...
+hatvalues.lmfunctionfunctionstatsmodel	infllm.influence(model, do.coef = FALSE)	...
+hclustfunctionfunctionstatsd	method"complete"	membersNULL
+heatmapfunctionfunctionstatsx	RowvNULL	Colvif (symm) "Rowv" else NULL	distfun	hclustfun	reorderfunfunction(d, w) reorder(d, w)	add.expr	symmFALSE	revCidentical(Colv, "Rowv")	scalec("row", "column", "none")	na.rmTRUE	marginsc(5, 5)	ColSideColors	RowSideColors	cexRow0.2 + 1/log10(nr)	cexCol0.2 + 1/log10(nc)	labRowNULL	labColNULL	mainNULL	xlabNULL	ylabNULL	keep.dendroFALSE	verbosegetOption("verbose")	...
+HoltWintersfunctionfunctionstatsx	alphaNULL	betaNULL	gammaNULL	seasonalc("additive", "multiplicative")	start.periods2	l.startNULL	b.startNULL	s.startNULL	optim.startc(alpha = 0.3, beta = 0.1, gamma = 0.1)	optim.controllist()
+influencefunctionfunctionstatsmodel	...
+influence.measuresfunctionfunctionstatsmodel
+integratefunctionfunctionstatsf	lower	upper	...	subdivisions100	rel.tol.Machine$double.eps^0.25	abs.tol	stop.on.errorTRUE	keep.xyFALSE	auxNULL
+interaction.plotfunctionfunctionstatsx.factor	trace.factor	response	fun	typec("l", "p", "b", "o", "c")	legendTRUE	trace.labeldeparse(substitute(trace.factor))	fixedFALSE	xlabdeparse(substitute(x.factor))	ylab	ylimrange(cells, na.rm = TRUE)	ltync:1	col1	pchc(1L:9, 0, letters)	xpdNULL	leg.bgpar("bg")	leg.bty"n"	xtickFALSE	xaxtpar("xaxt")	axesTRUE	...
+inverse.gaussianfunctionfunctionstatslink"1/mu^2"
+IQRfunctionfunctionstatsx	na.rmFALSE	type7
+is.empty.modelfunctionfunctionstatsx
+is.leaffunctionfunctionstatsobject
+is.mtsfunctionfunctionstatsx
+isoregfunctionfunctionstatsx	yNULL
+is.stepfunfunctionfunctionstatsx
+is.tsfunctionfunctionstatsx
+is.tskernelfunctionfunctionstatsk
+KalmanForecastfunctionfunctionstatsn.ahead10	mod	fastTRUE
+KalmanLikefunctionfunctionstatsy	mod	nit0	fastTRUE
+KalmanRunfunctionfunctionstatsy	mod	nit0	fastTRUE
+KalmanSmoothfunctionfunctionstatsy	mod	nit0
+kernapplyfunctionfunctionstatsx	...
+kernelfunctionfunctionstatscoef	m2	r	name"unknown"
+kmeansfunctionfunctionstatsx	centers	iter.max10	nstart1	algorithmc("Hartigan-Wong", "Lloyd", "Forgy", "MacQueen")
+knotsfunctionfunctionstatsFn	...
+kruskal.testfunctionfunctionstatsx	...
+ksmoothfunctionfunctionstatsx	y	kernelc("box", "normal")	bandwidth0.5	range.xrange(x)	n.pointsmax(100, length(x))	x.points
+ks.testfunctionfunctionstatsx	y	...	alternativec("two.sided", "less", "greater")	exactNULL
+lagfunctionfunctionstatsx	...
+lag.plotfunctionfunctionstatsx	lags1	layoutNULL	set.lags1L:lags	mainNULL	asp1	diagTRUE	diag.col"gray"	type"p"	omaNULL	askNULL	do.lines(n <= 150)	labels	...
+linefunctionfunctionstatsx	yNULL
+lines.tsfunctionfunctionstatsx	...
+lmfunctionfunctionstatsformula	data	subset	weights	na.action	method"qr"	modelTRUE	xFALSE	yFALSE	qrTRUE	singular.okTRUE	contrastsNULL	offset	...
+lm.fitfunctionfunctionstatsx	y	offsetNULL	method"qr"	tol1e-07	singular.okTRUE	...
+lm.fit.nullfunctionfunctionstatsx	y	method"qr"	tol1e-07	...
+lm.influencefunctionfunctionstatsmodel	do.coefTRUE
+lm.wfitfunctionfunctionstatsx	y	w	offsetNULL	method"qr"	tol1e-07	singular.okTRUE	...
+lm.wfit.nullfunctionfunctionstatsx	y	w	method"qr"	tol1e-07	...
+loadingsfunctionfunctionstatsx
+loessfunctionfunctionstatsformula	data	weights	subset	na.action	modelFALSE	span0.75	enp.target	degree2	parametricFALSE	drop.squareFALSE	normalizeTRUE	familyc("gaussian", "symmetric")	methodc("loess", "model.frame")	controlloess.control(...)	...
+loess.controlfunctionfunctionstatssurfacec("interpolate", "direct")	statisticsc("approximate", "exact")	trace.hatc("exact", "approximate")	cell0.2	iterations4	...
+loess.smoothfunctionfunctionstatsx	y	span2/3	degree1	familyc("symmetric", "gaussian")	evaluation50	...
+logLikfunctionfunctionstatsobject	...
+loglinfunctionfunctionstatstable	margin	startrep(1, length(table))	fitFALSE	eps0.1	iter20	paramFALSE	printTRUE
+lowessfunctionfunctionstatsx	yNULL	f2/3	iter3	delta0.01 * diff(range(xy$x[o]))
+ls.diagfunctionfunctionstatsls.out
+lsfitfunctionfunctionstatsx	y	wtNULL	interceptTRUE	tolerance1e-07	ynameNULL
+ls.printfunctionfunctionstatsls.out	digits4	print.itTRUE
+madfunctionfunctionstatsx	centermedian(x)	constant1.4826	na.rmFALSE	lowFALSE	highFALSE
+mahalanobisfunctionfunctionstatsx	center	cov	invertedFALSE	...
+makeARIMAfunctionfunctionstatsphi	theta	Delta	kappa1e+06
+make.linkfunctionfunctionstatslink
+makepredictcallfunctionfunctionstatsvar	call
+manovafunctionfunctionstats...
+mantelhaen.testfunctionfunctionstatsx	yNULL	zNULL	alternativec("two.sided", "less", "greater")	correctTRUE	exactFALSE	conf.level0.95
+mauchley.testfunctionfunctionstats...
+mauchly.testfunctionfunctionstatsobject	...
+mcnemar.testfunctionfunctionstatsx	yNULL	correctTRUE
+medianfunctionfunctionstatsx	na.rmFALSE
+median.defaultfunctionfunctionstatsx	na.rmFALSE
+medpolishfunctionfunctionstatsx	eps0.01	maxiter10	trace.iterTRUE	na.rmFALSE
+model.extractfunctionfunctionstatsframe	component
+model.framefunctionfunctionstatsformula	dataNULL	subsetNULL	na.action	drop.unused.levelsFALSE	xlevNULL	...
+model.frame.aovlistfunctionfunctionstatsformula	dataNULL	...
+model.frame.defaultfunctionfunctionstatsformula	dataNULL	subsetNULL	na.action	drop.unused.levelsFALSE	xlevNULL	...
+model.frame.glmfunctionfunctionstatsformula	...
+model.frame.lmfunctionfunctionstatsformula	...
+model.matrixfunctionfunctionstatsobject	dataenvironment(object)	contrasts.argNULL	xlevNULL	...
+model.matrix.defaultfunctionfunctionstatsobject	dataenvironment(object)	contrasts.argNULL	xlevNULL	...
+model.matrix.lmfunctionfunctionstatsobject	...
+model.offsetfunctionfunctionstatsx
+model.responsefunctionfunctionstatsdata	type"any"
+model.tablesfunctionfunctionstatsx	...
+model.weightsfunctionfunctionstatsx
+monthplotfunctionfunctionstatsx	...
+mood.testfunctionfunctionstatsx	...
+mvfftfunctionfunctionstatsz	inverseFALSE
+na.actionfunctionfunctionstatsobject	...
+na.contiguousfunctionfunctionstatsobject	...
+na.excludefunctionfunctionstatsobject	...
+na.failfunctionfunctionstatsobject	...
+na.omitfunctionfunctionstatsobject	...
+na.passfunctionfunctionstatsobject	...
+napredictfunctionfunctionstatsomit	x	...
+naprintfunctionfunctionstatsx	...
+naresidfunctionfunctionstatsomit	x	...
+nextnfunctionfunctionstatsn	factorsc(2, 3, 5)
+nlmfunctionfunctionstatsf	p	...	hessianFALSE	typsizerep(1, length(p))	fscale1	print.level0	ndigit12	gradtol1e-06	stepmaxmax(1000 * sqrt(sum((p/typsize)^2)), 1000)	steptol1e-06	iterlim100	check.analyticalsTRUE
+nlminbfunctionfunctionstatsstart	objective	gradientNULL	hessianNULL	...	scale1	controllist()	lower-Inf	upperInf
+nlsfunctionfunctionstatsformula	dataparent.frame()	start	controlnls.control()	algorithmc("default", "plinear", "port")	traceFALSE	subset	weights	na.action	modelFALSE	lower-Inf	upperInf	...
+nls.controlfunctionfunctionstatsmaxiter50	tol1e-05	minFactor1/1024	printEvalFALSE	warnOnlyFALSE
+NLSstAsymptoticfunctionfunctionstatsxy
+NLSstClosestXfunctionfunctionstatsxy	yval
+NLSstLfAsymptotefunctionfunctionstatsxy
+NLSstRtAsymptotefunctionfunctionstatsxy
+nobsfunctionfunctionstatsobject	...
+numericDerivfunctionfunctionstatsexpr	theta	rhoparent.frame()	dir1
+offsetfunctionfunctionstatsobject
+oneway.testfunctionfunctionstatsformula	data	subset	na.action	var.equalFALSE
+optimfunctionfunctionstatspar	fn	grNULL	...	methodc("Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN", "Brent")	lower-Inf	upperInf	controllist()	hessianFALSE
+optimHessfunctionfunctionstatspar	fn	grNULL	...	controllist()
+optimisefunctionfunctionstatsf	interval	...	lowermin(interval)	uppermax(interval)	maximumFALSE	tol.Machine$double.eps^0.25
+optimizefunctionfunctionstatsf	interval	...	lowermin(interval)	uppermax(interval)	maximumFALSE	tol.Machine$double.eps^0.25
+order.dendrogramfunctionfunctionstatsx
+pacffunctionfunctionstatsx	lag.max	plot	na.action	...
+p.adjustfunctionfunctionstatsp	method	nlength(p)
+p.adjust.methodscharactercharacterstatsNot a function
+pairwise.prop.testfunctionfunctionstatsx	n	p.adjust.method	...
+pairwise.tablefunctionfunctionstatscompare.levels	level.names	p.adjust.method
+pairwise.t.testfunctionfunctionstatsx	g	p.adjust.method	pool.sd!paired	pairedFALSE	alternativec("two.sided", "less", "greater")	...
+pairwise.wilcox.testfunctionfunctionstatsx	g	p.adjust.method	pairedFALSE	...
+pbetafunctionfunctionstatsq	shape1	shape2	ncp0	lower.tailTRUE	log.pFALSE
+pbinomfunctionfunctionstatsq	size	prob	lower.tailTRUE	log.pFALSE
+pbirthdayfunctionfunctionstatsn	classes365	coincident2
+pcauchyfunctionfunctionstatsq	location0	scale1	lower.tailTRUE	log.pFALSE
+pchisqfunctionfunctionstatsq	df	ncp0	lower.tailTRUE	log.pFALSE
+pexpfunctionfunctionstatsq	rate1	lower.tailTRUE	log.pFALSE
+pffunctionfunctionstatsq	df1	df2	ncp	lower.tailTRUE	log.pFALSE
+pgammafunctionfunctionstatsq	shape	rate1	scale1/rate	lower.tailTRUE	log.pFALSE
+pgeomfunctionfunctionstatsq	prob	lower.tailTRUE	log.pFALSE
+phyperfunctionfunctionstatsq	m	n	k	lower.tailTRUE	log.pFALSE
+plclustfunctionfunctionstatstree	hang0.1	unitFALSE	levelFALSE	hmin0	squareTRUE	labelsNULL	plot.TRUE	axesTRUE	frame.plotFALSE	annTRUE	main""	subNULL	xlabNULL	ylab"Height"
+plnormfunctionfunctionstatsq	meanlog0	sdlog1	lower.tailTRUE	log.pFALSE
+plogisfunctionfunctionstatsq	location0	scale1	lower.tailTRUE	log.pFALSE
+plot.densityfunctionfunctionstatsx	mainNULL	xlabNULL	ylab"Density"	type"l"	zero.lineTRUE	...
+plot.ecdffunctionfunctionstatsx	...	ylab"Fn(x)"	verticalsFALSE	col.01line"gray70"	pch19
+plot.lmfunctionfunctionstatsx	whichc(1L:3L, 5L)	captionlist("Residuals vs Fitted", "Normal Q-Q", "Scale-Location", "Cook's distance", 	caption    "Residuals vs Leverage", expression("Cook's dist vs Leverage  " * 	caption        h[ii]/(1 - h[ii])))	panelif (add.smooth) panel.smooth else points	sub.captionNULL	main""	askprod(par("mfcol")) < length(which) && dev.interactive()	...	id.n3	labels.idnames(residuals(x))	cex.id0.75	qqlineTRUE	cook.levelsc(0.5, 1)	add.smoothgetOption("add.smooth")	label.posc(4, 2)	cex.caption1
+plot.mlmfunctionfunctionstatsx	...
+plot.specfunctionfunctionstatsx	addFALSE	ci0.95	logc("yes", "dB", "no")	xlab"frequency"	ylabNULL	type"l"	ci.col"blue"	ci.lty3	mainNULL	subNULL	plot.typec("marginal", "coherency", "phase")	...
+plot.spec.coherencyfunctionfunctionstatsx	ci0.95	xlab"frequency"	ylab"squared coherency"	ylimc(0, 1)	type"l"	mainNULL	ci.col"blue"	ci.lty3	...
+plot.spec.phasefunctionfunctionstatsx	ci0.95	xlab"frequency"	ylab"phase"	ylimc(-pi, pi)	type"l"	mainNULL	ci.col"blue"	ci.lty3	...
+plot.stepfunfunctionfunctionstatsx	xval	xlim	ylimrange(c(y, Fn.kn))	xlab"x"	ylab"f(x)"	mainNULL	addFALSE	verticalsTRUE	do.points(n < 1000)	pchpar("pch")	colpar("col")	col.points	cex.pointspar("cex")	col.hor	col.vert	ltypar("lty")	lwdpar("lwd")	...
+plot.tsfunctionfunctionstatsx	yNULL	plot.typec("multiple", "single")	xy.labels	xy.lines	panel	nc	yax.flipFALSE	mar.multic(0, 5.1, 0, if (yax.flip) 5.1 else 2.1)	oma.multic(6, 0, 5, 0)	axesTRUE	...
+plot.TukeyHSDfunctionfunctionstatsx	...
+pnbinomfunctionfunctionstatsq	size	prob	mu	lower.tailTRUE	log.pFALSE
+pnormfunctionfunctionstatsq	mean0	sd1	lower.tailTRUE	log.pFALSE
+poissonfunctionfunctionstatslink"log"
+poisson.testfunctionfunctionstatsx	T1	r1	alternativec("two.sided", "less", "greater")	conf.level0.95
+polyfunctionfunctionstatsx	...	degree1	coefsNULL	rawFALSE
+polymfunctionfunctionstats...	degree1	rawFALSE
+powerfunctionfunctionstatslambda1
+power.anova.testfunctionfunctionstatsgroupsNULL	nNULL	between.varNULL	within.varNULL	sig.level0.05	powerNULL
+power.prop.testfunctionfunctionstatsnNULL	p1NULL	p2NULL	sig.level0.05	powerNULL	alternativec("two.sided", "one.sided")	strictFALSE
+power.t.testfunctionfunctionstatsnNULL	deltaNULL	sd1	sig.level0.05	powerNULL	typec("two.sample", "one.sample", "paired")	alternativec("two.sided", "one.sided")	strictFALSE
+ppointsfunctionfunctionstatsn	aifelse(n <= 10, 3/8, 1/2)
+ppoisfunctionfunctionstatsq	lambda	lower.tailTRUE	log.pFALSE
+pprfunctionfunctionstatsx	...
+PP.testfunctionfunctionstatsx	lshortTRUE
+prcompfunctionfunctionstatsx	...
+predictfunctionfunctionstatsobject	...
+predict.glmfunctionfunctionstatsobject	newdataNULL	typec("link", "response", "terms")	se.fitFALSE	dispersionNULL	termsNULL	na.action	...
+predict.lmfunctionfunctionstatsobject	newdata	se.fitFALSE	scaleNULL	dfInf	intervalc("none", "confidence", "prediction")	level0.95	typec("response", "terms")	termsNULL	na.action	pred.varres.var/weights	weights1	...
+predict.mlmfunctionfunctionstatsobject	newdata	se.fitFALSE	na.action	...
+predict.polyfunctionfunctionstatsobject	newdata	...
+preplotfunctionfunctionstatsobject	...
+princompfunctionfunctionstatsx	...
+print.anovafunctionfunctionstatsx	digitsmax(getOption("digits") - 2, 3)	signif.starsgetOption("show.signif.stars")	...
+print.coefmatfunctionfunctionstatsx	digitsmax(3, getOption("digits") - 2)	signif.starsgetOption("show.signif.stars")	dig.tstmax(1, min(5, digits - 1))	cs.ind	tst.ind	zap.indinteger(0L)	P.valuesNULL	has.Pvalue	eps.Pvalue.Machine$double.eps	na.print""	...
+printCoefmatfunctionfunctionstatsx	digitsmax(3, getOption("digits") - 2)	signif.starsgetOption("show.signif.stars")	signif.legend	dig.tstmax(1, min(5, digits - 1))	cs.ind1:k	tst.indk + 1	zap.indinteger(0)	P.valuesNULL	has.Pvaluenc >= 4 && substr(colnames(x)[nc], 1, 3) == "Pr("	eps.Pvalue.Machine$double.eps	na.print"NA"	...
+print.densityfunctionfunctionstatsx	digitsNULL	...
+print.familyfunctionfunctionstatsx	...
+print.formulafunctionfunctionstatsx	showEnv!identical(e, .GlobalEnv)	...
+print.ftablefunctionfunctionstatsx	digitsgetOption("digits")	...
+print.glmfunctionfunctionstatsx	digitsmax(3, getOption("digits") - 3)	...
+print.inflfunctionfunctionstatsx	digitsmax(3, getOption("digits") - 4)	...
+print.integratefunctionfunctionstatsx	digitsgetOption("digits")	...
+print.lmfunctionfunctionstatsx	digitsmax(3, getOption("digits") - 3)	...
+print.logLikfunctionfunctionstatsx	digitsgetOption("digits")	...
+print.termsfunctionfunctionstatsx	...
+print.tsfunctionfunctionstatsx	calendar	...
+profilefunctionfunctionstatsfitted	...
+projfunctionfunctionstatsobject	...
+promaxfunctionfunctionstatsx	m4
+prop.testfunctionfunctionstatsx	n	pNULL	alternativec("two.sided", "less", "greater")	conf.level0.95	correctTRUE
+prop.trend.testfunctionfunctionstatsx	n	scoreseq_along(x)
+psignrankfunctionfunctionstatsq	n	lower.tailTRUE	log.pFALSE
+ptfunctionfunctionstatsq	df	ncp	lower.tailTRUE	log.pFALSE
+ptukeyfunctionfunctionstatsq	nmeans	df	nranges1	lower.tailTRUE	log.pFALSE
+puniffunctionfunctionstatsq	min0	max1	lower.tailTRUE	log.pFALSE
+pweibullfunctionfunctionstatsq	shape	scale1	lower.tailTRUE	log.pFALSE
+pwilcoxfunctionfunctionstatsq	m	n	lower.tailTRUE	log.pFALSE
+qbetafunctionfunctionstatsp	shape1	shape2	ncp0	lower.tailTRUE	log.pFALSE
+qbinomfunctionfunctionstatsp	size	prob	lower.tailTRUE	log.pFALSE
+qbirthdayfunctionfunctionstatsprob0.5	classes365	coincident2
+qcauchyfunctionfunctionstatsp	location0	scale1	lower.tailTRUE	log.pFALSE
+qchisqfunctionfunctionstatsp	df	ncp0	lower.tailTRUE	log.pFALSE
+qexpfunctionfunctionstatsp	rate1	lower.tailTRUE	log.pFALSE
+qffunctionfunctionstatsp	df1	df2	ncp	lower.tailTRUE	log.pFALSE
+qgammafunctionfunctionstatsp	shape	rate1	scale1/rate	lower.tailTRUE	log.pFALSE
+qgeomfunctionfunctionstatsp	prob	lower.tailTRUE	log.pFALSE
+qhyperfunctionfunctionstatsp	m	n	k	lower.tailTRUE	log.pFALSE
+qlnormfunctionfunctionstatsp	meanlog0	sdlog1	lower.tailTRUE	log.pFALSE
+qlogisfunctionfunctionstatsp	location0	scale1	lower.tailTRUE	log.pFALSE
+qnbinomfunctionfunctionstatsp	size	prob	mu	lower.tailTRUE	log.pFALSE
+qnormfunctionfunctionstatsp	mean0	sd1	lower.tailTRUE	log.pFALSE
+qpoisfunctionfunctionstatsp	lambda	lower.tailTRUE	log.pFALSE
+qqlinefunctionfunctionstatsy	dataxFALSE	...
+qqnormfunctionfunctionstatsy	ylim	main"Normal Q-Q Plot"	xlab"Theoretical Quantiles"	ylab"Sample Quantiles"	plot.itTRUE	dataxFALSE	...
+qqnorm.defaultfunctionfunctionstatsy	ylim	main"Normal Q-Q Plot"	xlab"Theoretical Quantiles"	ylab"Sample Quantiles"	plot.itTRUE	dataxFALSE	...
+qqplotfunctionfunctionstatsx	y	plot.itTRUE	xlabdeparse(substitute(x))	ylabdeparse(substitute(y))	...
+qsignrankfunctionfunctionstatsp	n	lower.tailTRUE	log.pFALSE
+qtfunctionfunctionstatsp	df	ncp	lower.tailTRUE	log.pFALSE
+qtukeyfunctionfunctionstatsp	nmeans	df	nranges1	lower.tailTRUE	log.pFALSE
+quade.testfunctionfunctionstatsy	...
+quantilefunctionfunctionstatsx	probsseq(0, 1, 0.25)	na.rmFALSE	namesTRUE	type7	...
+quantile.defaultfunctionfunctionstatsx	probsseq(0, 1, 0.25)	na.rmFALSE	namesTRUE	type7	...
+quasifunctionfunctionstatslink"identity"	variance"constant"
+quasibinomialfunctionfunctionstatslink"logit"
+quasipoissonfunctionfunctionstatslink"log"
+quniffunctionfunctionstatsp	min0	max1	lower.tailTRUE	log.pFALSE
+qweibullfunctionfunctionstatsp	shape	scale1	lower.tailTRUE	log.pFALSE
+qwilcoxfunctionfunctionstatsp	m	n	lower.tailTRUE	log.pFALSE
+r2dtablefunctionfunctionstatsn	r	c
+rbetafunctionfunctionstatsn	shape1	shape2	ncp0
+rbinomfunctionfunctionstatsn	size	prob
+rcauchyfunctionfunctionstatsn	location0	scale1
+rchisqfunctionfunctionstatsn	df	ncp0
+read.ftablefunctionfunctionstatsfile	sep""	quote"""	row.var.names	col.vars	skip0
+rect.hclustfunctionfunctionstatstree	kNULL	whichNULL	xNULL	hNULL	border2	clusterNULL
+reformulatefunctionfunctionstatstermlabels	responseNULL	interceptTRUE
+relevelfunctionfunctionstatsx	ref	...
+reorderfunctionfunctionstatsx	...
+replicationsfunctionfunctionstatsformula	dataNULL	na.action
+reshapefunctionfunctionstatsdata	varyingNULL	v.namesNULL	timevar"time"	idvar"id"	ids1L:NROW(data)	timesseq_along(varying[[1L]])	dropNULL	direction	new.row.namesNULL	sep"."	splitif (sep == "") {	split    list(regexp = "[A-Za-z][0-9]", include = TRUE)	split} else {	split    list(regexp = sep, include = FALSE, fixed = TRUE)	split}
+reshapeLongfunctionfunctionstatsx	jvars	ilevrow.names(x)	jlevnames(x)[jvars]	iname"reshape.i"	jname"reshape.j"	vname"reshape.v"
+reshapeWidefunctionfunctionstatsx	i	j	val	jnameslevels(j)
+residfunctionfunctionstatsobject	...
+residualsfunctionfunctionstatsobject	...
+residuals.defaultfunctionfunctionstatsobject	...
+residuals.glmfunctionfunctionstatsobject	typec("deviance", "pearson", "working", "response", "partial")	...
+residuals.lmfunctionfunctionstatsobject	typec("working", "response", "deviance", "pearson", "partial")	...
+rexpfunctionfunctionstatsn	rate1
+rffunctionfunctionstatsn	df1	df2	ncp
+rgammafunctionfunctionstatsn	shape	rate1	scale1/rate
+rgeomfunctionfunctionstatsn	prob
+rhyperfunctionfunctionstatsnn	m	n	k
+rlnormfunctionfunctionstatsn	meanlog0	sdlog1
+rlogisfunctionfunctionstatsn	location0	scale1
+rmultinomfunctionfunctionstatsn	size	prob
+rnbinomfunctionfunctionstatsn	size	prob	mu
+rnormfunctionfunctionstatsn	mean0	sd1
+rpoisfunctionfunctionstatsn	lambda
+rsignrankfunctionfunctionstatsnn	n
+rstandardfunctionfunctionstatsmodel	...
+rstandard.glmfunctionfunctionstatsmodel	inflinfluence(model, do.coef = FALSE)	typec("deviance", "pearson")	...
+rstandard.lmfunctionfunctionstatsmodel	infllm.influence(model, do.coef = FALSE)	sdsqrt(deviance(model)/df.residual(model))	...
+rstudentfunctionfunctionstatsmodel	...
+rstudent.glmfunctionfunctionstatsmodel	inflinfluence(model, do.coef = FALSE)	...
+rstudent.lmfunctionfunctionstatsmodel	infllm.influence(model, do.coef = FALSE)	resinfl$wt.res	...
+rtfunctionfunctionstatsn	df	ncp
+runiffunctionfunctionstatsn	min0	max1
+runmedfunctionfunctionstatsx	k	endrulec("median", "keep", "constant")	algorithmNULL	print.level0
+rweibullfunctionfunctionstatsn	shape	scale1
+rwilcoxfunctionfunctionstatsnn	m	n
+rWishartfunctionfunctionstatsn	df	Sigma
+scatter.smoothfunctionfunctionstatsx	yNULL	span2/3	degree1	familyc("symmetric", "gaussian")	xlabNULL	ylabNULL	ylimrange(y, prediction$y, na.rm = TRUE)	evaluation50	...
+screeplotfunctionfunctionstatsx	...
+sdfunctionfunctionstatsx	na.rmFALSE
+se.contrastfunctionfunctionstatsobject	...
+selfStartfunctionfunctionstatsmodel	initial	parameters	template
+setNamesfunctionfunctionstatsobject	nm
+shapiro.testfunctionfunctionstatsx
+simulatefunctionfunctionstatsobject	nsim1	seedNULL	...
+smoothfunctionfunctionstatsx	kindc("3RS3R", "3RSS", "3RSR", "3R", "3", "S")	twiceitFALSE	endrule"Tukey"	do.endsFALSE
+smoothEndsfunctionfunctionstatsy	k3
+smooth.splinefunctionfunctionstatsx	yNULL	wNULL	df	sparNULL	cvFALSE	all.knotsFALSE	nknotsNULL	keep.dataTRUE	df.offset0	penalty1	control.sparlist()	tol1e-06 * IQR(x)
+sortedXyDatafunctionfunctionstatsx	y	data
+spec.arfunctionfunctionstatsx	n.freq	orderNULL	plotTRUE	na.action	method"yule-walker"	...
+spec.pgramfunctionfunctionstatsx	spansNULL	kernelNULL	taper0.1	pad0	fastTRUE	demeanFALSE	detrendTRUE	plotTRUE	na.action	...
+spec.taperfunctionfunctionstatsx	p0.1
+spectrumfunctionfunctionstatsx	...	methodc("pgram", "ar")
+splinefunctionfunctionstatsx	yNULL	n3 * length(x)	method"fmm"	xminmin(x)	xmaxmax(x)	xout	ties
+splinefunfunctionfunctionstatsx	yNULL	methodc("fmm", "periodic", "natural", "monoH.FC")	ties
+splinefunHfunctionfunctionstatsx	y	m
+SSasympfunctionfunctionstatsinput	Asym	R0	lrc
+SSasympOfffunctionfunctionstatsinput	Asym	lrc	c0
+SSasympOrigfunctionfunctionstatsinput	Asym	lrc
+SSbiexpfunctionfunctionstatsinput	A1	lrc1	A2	lrc2
+SSDfunctionfunctionstatsobject	...
+SSfolfunctionfunctionstatsDose	input	lKe	lKa	lCl
+SSfplfunctionfunctionstatsinput	A	B	xmid	scal
+SSgompertzfunctionfunctionstatsx	Asym	b2	b3
+SSlogisfunctionfunctionstatsinput	Asym	xmid	scal
+SSmicmenfunctionfunctionstatsinput	Vm	K
+SSweibullfunctionfunctionstatsx	Asym	Drop	lrc	pwr
+startfunctionfunctionstatsx	...
+stat.anovafunctionfunctionstatstable	testc("Rao", "LRT", "Chisq", "F", "Cp")	scale	df.scale	n
+stepfunctionfunctionstatsobject	scope	scale0	directionc("both", "backward", "forward")	trace1	keepNULL	steps1000	k2	...
+stepfunfunctionfunctionstatsx	y	fas.numeric(right)	ties"ordered"	rightFALSE
+stlfunctionfunctionstatsx	s.window	s.degree0	t.windowNULL	t.degree1	l.windownextodd(period)	l.degree	s.jumpceiling(s.window/10)	t.jumpceiling(t.window/10)	l.jumpceiling(l.window/10)	robustFALSE	innerif (robust) 1 else 2	outerif (robust) 15 else 0	na.action
+StructTSfunctionfunctionstatsx	typec("level", "trend", "BSM")	initNULL	fixedNULL	optim.controlNULL
+summary.aovfunctionfunctionstatsobject	interceptFALSE	split	expand.splitTRUE	keep.zero.dfTRUE	...
+summary.aovlistfunctionfunctionstatsobject	...
+summary.glmfunctionfunctionstatsobject	dispersionNULL	correlationFALSE	symbolic.corFALSE	...
+summary.inflfunctionfunctionstatsobject	digitsmax(2, getOption("digits") - 5)	...
+summary.lmfunctionfunctionstatsobject	correlationFALSE	symbolic.corFALSE	...
+summary.manovafunctionfunctionstatsobject	testc("Pillai", "Wilks", "Hotelling-Lawley", "Roy")	interceptFALSE	tol1e-07	...
+summary.mlmfunctionfunctionstatsobject	...
+summary.stepfunfunctionfunctionstatsobject	...
+supsmufunctionfunctionstatsx	y	wtrep(1, n)	span"cv"	periodicFALSE	bass0
+symnumfunctionfunctionstatsx	cutpointsc(0.3, 0.6, 0.8, 0.9, 0.95)	symbolsif (numeric.x) c(" ", ".", ",", "+", "*", "B") else c(".", "|")	legendlength(symbols) >= 3	na"?"	eps1e-05	numeric.xis.numeric(x)	corrmissing(cutpoints) && numeric.x	show.maxif (corr) "1"	show.minNULL	abbr.colnames	lower.triangularcorr && is.numeric(x) && is.matrix(x)	diag.lower.tricorr && !is.null(show.max)
+termplotfunctionfunctionstatsmodel	dataNULL	envirenvironment(formula(model))	partial.residFALSE	rugFALSE	termsNULL	seFALSE	xlabsNULL	ylabsNULL	mainNULL	col.term2	lwd.term1.5	col.se"orange"	lty.se2	lwd.se1	col.res"gray"	cex1	pchpar("pch")	col.smth"darkred"	lty.smth2	span.smth2/3	askdev.interactive() && nb.fig < n.tms	use.factor.levelsTRUE	smoothNULL	ylim"common"	...
+termsfunctionfunctionstatsx	...
+terms.aovlistfunctionfunctionstatsx	...
+terms.defaultfunctionfunctionstatsx	...
+terms.formulafunctionfunctionstatsx	specialsNULL	abbNULL	dataNULL	neg.outTRUE	keep.orderFALSE	simplifyFALSE	...	allowDotAsNameFALSE
+terms.termsfunctionfunctionstatsx	...
+timefunctionfunctionstatsx	...
+toeplitzfunctionfunctionstatsx
+tsfunctionfunctionstatsdataNA	start1	endnumeric(0)	frequency1	deltat1	ts.epsgetOption("ts.eps")	classif (nseries > 1) c("mts", "ts") else "ts"	namesif (!is.null(dimnames(data))) colnames(data) else paste("Series", 	names    seq(nseries))
+tsdiagfunctionfunctionstatsobject	gof.lag	...
+ts.intersectfunctionfunctionstats...	dframeFALSE
+tspfunctionfunctionstatsx
+tsp<-functionfunctionstatsx	value
+ts.plotfunctionfunctionstats...	gparslist()
+tsSmoothfunctionfunctionstatsobject	...
+ts.unionfunctionfunctionstats...	dframeFALSE
+t.testfunctionfunctionstatsx	...
+TukeyHSDfunctionfunctionstatsx	which	orderedFALSE	conf.level0.95	...
+TukeyHSD.aovfunctionfunctionstatsx	whichseq_along(tabs)	orderedFALSE	conf.level0.95	...
+unirootfunctionfunctionstatsf	interval	...	lowermin(interval)	uppermax(interval)	f.lowerf(lower, ...)	f.upperf(upper, ...)	tol.Machine$double.eps^0.25	maxiter1000
+updatefunctionfunctionstatsobject	formula.	...	evaluateTRUE
+update.defaultfunctionfunctionstatsobject	formula.	...	evaluateTRUE
+update.formulafunctionfunctionstatsold	new	...
+varfunctionfunctionstatsx	yNULL	na.rmFALSE	use
+variable.namesfunctionfunctionstatsobject	...
+varimaxfunctionfunctionstatsx	normalizeTRUE	eps1e-05
+var.testfunctionfunctionstatsx	...
+vcovfunctionfunctionstatsobject	...
+weighted.meanfunctionfunctionstatsx	w	...
+weighted.residualsfunctionfunctionstatsobj	drop0TRUE
+weightsfunctionfunctionstatsobject	...
+wilcox.testfunctionfunctionstatsx	...
+windowfunctionfunctionstatsx	...
+window<-functionfunctionstatsx	...	value
+write.ftablefunctionfunctionstatsx	file""	quoteTRUE	appendFALSE	digitsgetOption("digits")
+xtabsfunctionfunctionstatsformula~.	dataparent.frame()	subset	sparseFALSE	na.action	excludec(NA, NaN)	drop.unused.levelsFALSE
+ablinefunctionfunctiongraphicsaNULL	bNULL	hNULL	vNULL	regNULL	coefNULL	untfFALSE	...
+arrowsfunctionfunctiongraphicsx0	y0	x1	y1	length0.25	angle30	code2	colpar("fg")	ltypar("lty")	lwdpar("lwd")	...
+assocplotfunctionfunctiongraphicsx	colc("black", "red")	space0.3	mainNULL	xlabNULL	ylabNULL
+axisfunctionfunctiongraphicsside	atNULL	labelsTRUE	tickTRUE	lineNA	posNA	outerFALSE	fontNA	lty"solid"	lwd1	lwd.ticks	colNULL	col.ticksNULL	hadjNA	padjNA	...
+AxisfunctionfunctiongraphicsxNULL	atNULL	...	side	labelsNULL
+axis.Datefunctionfunctiongraphicsside	x	at	format	labelsTRUE	...
+axis.POSIXctfunctionfunctiongraphicsside	x	at	format	labelsTRUE	...
+axTicksfunctionfunctiongraphicsside	axpNULL	usrNULL	logNULL	nintLogNULL
+barplotfunctionfunctiongraphicsheight	width1	spaceNULL	names.argNULL	legend.textNULL	besideFALSE	horizFALSE	densityNULL	angle45	colNULL	borderpar("fg")	mainNULL	subNULL	xlabNULL	ylabNULL	xlimNULL	ylimNULL	xpdTRUE	log""	axesTRUE	axisnamesTRUE	cex.axispar("cex.axis")	cex.namespar("cex.axis")	insideTRUE	plotTRUE	axis.lty0	offset0	addFALSE	args.legendNULL	...
+barplot.defaultfunctionfunctiongraphicsheight	width1	spaceNULL	names.argNULL	legend.textNULL	besideFALSE	horizFALSE	densityNULL	angle45	colNULL	borderpar("fg")	mainNULL	subNULL	xlabNULL	ylabNULL	xlimNULL	ylimNULL	xpdTRUE	log""	axesTRUE	axisnamesTRUE	cex.axispar("cex.axis")	cex.namespar("cex.axis")	insideTRUE	plotTRUE	axis.lty0	offset0	addFALSE	args.legendNULL	...
+boxfunctionfunctiongraphicswhich"plot"	lty"solid"	...
+boxplotfunctionfunctiongraphicsx	...	range1.5	widthNULL	varwidthFALSE	notchFALSE	outlineTRUE	names	plotTRUE	borderpar("fg")	colNULL	log""	parslist(boxwex = 0.8, staplewex = 0.5, outwex = 0.5)	horizontalFALSE	addFALSE	atNULL
+boxplot.defaultfunctionfunctiongraphicsx	...	range1.5	widthNULL	varwidthFALSE	notchFALSE	outlineTRUE	names	plotTRUE	borderpar("fg")	colNULL	log""	parslist(boxwex = 0.8, staplewex = 0.5, outwex = 0.5)	horizontalFALSE	addFALSE	atNULL
+boxplot.matrixfunctionfunctiongraphicsx	use.colsTRUE	...
+bxpfunctionfunctiongraphicsz	notchFALSE	widthNULL	varwidthFALSE	outlineTRUE	notch.frac0.5	log""	borderpar("fg")	parsNULL	frame.plot	horizontalFALSE	addFALSE	atNULL	show.namesNULL	...
+cdplotfunctionfunctiongraphicsx	...
+clipfunctionfunctiongraphicsx1	x2	y1	y2
+close.screenfunctionfunctiongraphicsn	all.screensFALSE
+co.intervalsfunctionfunctiongraphicsx	number6	overlap0.5
+contourfunctionfunctiongraphicsxseq(0, 1, length.out = nrow(z))	yseq(0, 1, length.out = ncol(z))	z	nlevels10	levelspretty(zlim, nlevels)	labelsNULL	xlimrange(x, finite = TRUE)	ylimrange(y, finite = TRUE)	zlimrange(z, finite = TRUE)	labcex0.6	drawlabelsTRUE	method"flattest"	vfont	axesTRUE	frame.plot	colpar("fg")	ltypar("lty")	lwdpar("lwd")	addFALSE	...
+contour.defaultfunctionfunctiongraphicsxseq(0, 1, length.out = nrow(z))	yseq(0, 1, length.out = ncol(z))	z	nlevels10	levelspretty(zlim, nlevels)	labelsNULL	xlimrange(x, finite = TRUE)	ylimrange(y, finite = TRUE)	zlimrange(z, finite = TRUE)	labcex0.6	drawlabelsTRUE	method"flattest"	vfont	axesTRUE	frame.plot	colpar("fg")	ltypar("lty")	lwdpar("lwd")	addFALSE	...
+coplotfunctionfunctiongraphicsformula	data	given.values	panel	rows	columns	show.givenTRUE	colpar("fg")	pchpar("pch")	bar.bgc(num = gray(0.8), fac = gray(0.95))	xlabc(x.name, paste("Given :", a.name))	ylabc(y.name, paste("Given :", b.name))	subscriptsFALSE	axlabelsfunction(f) abbreviate(levels(f))	number6	overlap0.5	xlim	ylim	...
+curvefunctionfunctiongraphicsexpr	fromNULL	toNULL	n101	addFALSE	type"l"	xname"x"	xlab	ylabNULL	logNULL	xlimNULL	...
+dotchartfunctionfunctiongraphicsx	labelsNULL	groupsNULL	gdataNULL	cexpar("cex")	pch21	gpch21	bgpar("bg")	colorpar("fg")	gcolorpar("fg")	lcolor"gray"	xlimrange(x[is.finite(x)])	mainNULL	xlabNULL	ylabNULL	...
+erase.screenfunctionfunctiongraphicsn
+filled.contourfunctionfunctiongraphicsxseq(0, 1, length.out = nrow(z))	yseq(0, 1, length.out = ncol(z))	z	xlimrange(x, finite = TRUE)	ylimrange(y, finite = TRUE)	zlimrange(z, finite = TRUE)	levelspretty(zlim, nlevels)	nlevels20	color.palette	colcolor.palette(length(levels) - 1)	plot.title	plot.axes	key.title	key.axes	aspNA	xaxs"i"	yaxs"i"	las1	axesTRUE	frame.plot	...
+fourfoldplotfunctionfunctiongraphicsx	colorc("#99CCFF", "#6699CC")	conf.level0.95	stdc("margins", "ind.max", "all.max")	marginc(1, 2)	space0.2	mainNULL	mfrowNULL	mfcolNULL
+framefunctionfunctiongraphics
+grconvertXfunctionfunctiongraphicsx	from"user"	to"user"
+grconvertYfunctionfunctiongraphicsy	from"user"	to"user"
+gridfunctionfunctiongraphicsnxNULL	ny	col"lightgray"	lty"dotted"	lwdpar("lwd")	equilogsTRUE
+histfunctionfunctiongraphicsx	breaks"Sturges"	freqNULL	probability!freq	include.lowestTRUE	rightTRUE	densityNULL	angle45	colNULL	borderNULL	mainpaste("Histogram of", xname)	xlimrange(breaks)	ylimNULL	xlab	ylab	axesTRUE	plotTRUE	labelsFALSE	nclassNULL	warn.unusedTRUE	...
+hist.defaultfunctionfunctiongraphicsx	breaks"Sturges"	freqNULL	probability!freq	include.lowestTRUE	rightTRUE	densityNULL	angle45	colNULL	borderNULL	mainpaste("Histogram of", xname)	xlimrange(breaks)	ylimNULL	xlab	ylab	axesTRUE	plotTRUE	labelsFALSE	nclassNULL	warn.unusedTRUE	...
+identifyfunctionfunctiongraphicsx	...
+imagefunctionfunctiongraphicsxseq(0, 1, length.out = nrow(z))	yseq(0, 1, length.out = ncol(z))	z	zlimrange(z[is.finite(z)])	xlimrange(x)	ylimrange(y)	colheat.colors(12)	addFALSE	xaxs"i"	yaxs"i"	xlab	ylab	breaks	oldstyleFALSE	useRaster	...
+image.defaultfunctionfunctiongraphicsxseq(0, 1, length.out = nrow(z))	yseq(0, 1, length.out = ncol(z))	z	zlimrange(z[is.finite(z)])	xlimrange(x)	ylimrange(y)	colheat.colors(12)	addFALSE	xaxs"i"	yaxs"i"	xlab	ylab	breaks	oldstyleFALSE	useRaster	...
+layoutfunctionfunctiongraphicsmat	widthsrep(1, ncol(mat))	heightsrep(1, nrow(mat))	respectFALSE
+layout.showfunctionfunctiongraphicsn1
+lcmfunctionfunctiongraphicsx
+legendfunctionfunctiongraphicsx	yNULL	legend	fillNULL	colpar("col")	border"black"	lty	lwd	pch	angle45	densityNULL	bty"o"	bgpar("bg")	box.lwdpar("lwd")	box.ltypar("lty")	box.colpar("fg")	pt.bgNA	cex1	pt.cex	pt.lwd	xjust0	yjust1	x.intersp1	y.intersp1	adjc(0, 0.5)	text.widthNULL	text.colpar("col")	text.fontNULL	mergedo.lines && has.pch	traceFALSE	plotTRUE	ncol1	horizFALSE	titleNULL	inset0	xpd	title.col	title.adj0.5	seg.len2
+linesfunctionfunctiongraphicsx	yNULL	type"l"	...
+lines.defaultfunctionfunctiongraphicsx	yNULL	type"l"	...
+locatorfunctionfunctiongraphicsn512	type"n"	...
+matlinesfunctionfunctiongraphicsx	y	type"l"	lty1:5	lwd1	pchNULL	col1:6	...
+matplotfunctionfunctiongraphicsx	y	type"p"	lty1:5	lwd1	lendpar("lend")	pchNULL	col1:6	cexNULL	bgNA	xlabNULL	ylabNULL	xlimNULL	ylimNULL	...	addFALSE	verbosegetOption("verbose")
+matpointsfunctionfunctiongraphicsx	y	type"p"	lty1:5	lwd1	pchNULL	col1:6	...
+mosaicplotfunctionfunctiongraphicsx	...
+mtextfunctionfunctiongraphicstext	side3	line0	outerFALSE	atNA	adjNA	padjNA	cexNA	colNA	fontNA	...
+pairsfunctionfunctiongraphicsx	labels	panel	...	lower.panel	upper.panel	diag.panelNULL	text.panel	label.pos0.5 + has.diag/3	cex.labelsNULL	font.labels1	row1attopTRUE	gap1
+pairs.defaultfunctionfunctiongraphicsx	labels	panel	...	lower.panel	upper.panel	diag.panelNULL	text.panel	label.pos0.5 + has.diag/3	cex.labelsNULL	font.labels1	row1attopTRUE	gap1
+panel.smoothfunctionfunctiongraphicsx	y	colpar("col")	bgNA	pchpar("pch")	cex1	col.smooth"red"	span2/3	iter3	...
+parfunctionfunctiongraphics...	no.readonlyFALSE
+perspfunctionfunctiongraphicsx	...
+piefunctionfunctiongraphicsx	labelsnames(x)	edges200	radius0.8	clockwiseFALSE	init.angleif (clockwise) 90 else 0	densityNULL	angle45	colNULL	borderNULL	ltyNULL	mainNULL	...
+piechartfunctionfunctiongraphicsx	labelsnames(x)	edges200	radius0.8	densityNULL	angle45	colNULL	mainNULL	...
+plotfunctionfunctiongraphicsx	yNULL	type"p"	xlimNULL	ylimNULL	log""	mainNULL	subNULL	xlabNULL	ylabNULL	annpar("ann")	axesTRUE	frame.plot	panel.firstNULL	panel.lastNULL	aspNA	...
+plot.defaultfunctionfunctiongraphicsx	yNULL	type"p"	xlimNULL	ylimNULL	log""	mainNULL	subNULL	xlabNULL	ylabNULL	annpar("ann")	axesTRUE	frame.plot	panel.firstNULL	panel.lastNULL	aspNA	...
+plot.designfunctionfunctiongraphicsx	yNULL	fun	dataNULL	...	ylimNULL	xlab"Factors"	ylabNULL	mainNULL	askNULL	xaxtpar("xaxt")	axesTRUE	xtickFALSE
+plot.functionfunctionfunctiongraphicsx	y0	to1	from	xlimNULL	ylabNULL	...
+plot.newfunctionfunctiongraphics
+plot.windowfunctionfunctiongraphicsxlim	ylim	log""	aspNA	...
+plot.xyfunctionfunctiongraphicsxy	type	pchpar("pch")	ltypar("lty")	colpar("col")	bgNA	cex1	lwdpar("lwd")	...
+pointsfunctionfunctiongraphicsx	yNULL	type"p"	...
+points.defaultfunctionfunctiongraphicsx	yNULL	type"p"	...
+polygonfunctionfunctiongraphicsx	yNULL	densityNULL	angle45	borderNULL	colNA	ltypar("lty")	...	fillOddEvenFALSE
+polypathfunctionfunctiongraphicsx	yNULL	borderNULL	colNA	ltypar("lty")	rule"winding"	...
+rasterImagefunctionfunctiongraphicsimage	xleft	ybottom	xright	ytop	angle0	interpolateTRUE	...
+rectfunctionfunctiongraphicsxleft	ybottom	xright	ytop	densityNULL	angle45	colNA	borderNULL	ltypar("lty")	lwdpar("lwd")	...
+rugfunctionfunctiongraphicsx	ticksize0.03	side1	lwd0.5	colpar("fg")	quietgetOption("warn") < 0	...
+screenfunctionfunctiongraphicsn	newTRUE
+segmentsfunctionfunctiongraphicsx0	y0	x1	y1	colpar("fg")	ltypar("lty")	lwdpar("lwd")	...
+smoothScatterfunctionfunctiongraphicsx	yNULL	nbin128	bandwidth	colrampcolorRampPalette(c("white", blues9))	nrpoints100	pch"."	cex1	col"black"	transformationfunction(x) x^0.25	postPlotHook	xlabNULL	ylabNULL	xlim	ylim	xaxspar("xaxs")	yaxspar("yaxs")	...
+spineplotfunctionfunctiongraphicsx	...
+split.screenfunctionfunctiongraphicsfigs	screen	eraseTRUE
+starsfunctionfunctiongraphicsx	fullTRUE	scaleTRUE	radiusTRUE	labelsdimnames(x)[[1L]]	locationsNULL	nrowNULL	ncolNULL	len1	key.locNULL	key.labelsdimnames(x)[[2L]]	key.xpdTRUE	xlimNULL	ylimNULL	flip.labelsNULL	draw.segmentsFALSE	col.segments1L:n.seg	col.starsNA	col.linesNA	axesFALSE	frame.plot	mainNULL	subNULL	xlab""	ylab""	cex0.8	lwd0.25	ltypar("lty")	xpdFALSE	marpmin(par("mar"), 1.1 + c(2 * axes + (xlab != ""), 2 * axes + 	mar    (ylab != ""), 1, 0))	addFALSE	plotTRUE	...
+stemfunctionfunctiongraphicsx	scale1	width80	atom1e-08
+strheightfunctionfunctiongraphicss	units"user"	cexNULL	fontNULL	vfontNULL	...
+stripchartfunctionfunctiongraphicsx	...
+strwidthfunctionfunctiongraphicss	units"user"	cexNULL	fontNULL	vfontNULL	...
+sunflowerplotfunctionfunctiongraphicsx	...
+symbolsfunctionfunctiongraphicsx	yNULL	circles	squares	rectangles	stars	thermometers	boxplots	inchesTRUE	addFALSE	fgpar("col")	bgNA	xlabNULL	ylabNULL	mainNULL	xlimNULL	ylimNULL	...
+textfunctionfunctiongraphicsx	yNULL	labelsseq_along(x)	adjNULL	posNULL	offset0.5	vfontNULL	cex1	colNULL	fontNULL	...
+text.defaultfunctionfunctiongraphicsx	yNULL	labelsseq_along(x)	adjNULL	posNULL	offset0.5	vfontNULL	cex1	colNULL	fontNULL	...
+titlefunctionfunctiongraphicsmainNULL	subNULL	xlabNULL	ylabNULL	lineNA	outerFALSE	...
+xinchfunctionfunctiongraphicsx1	warn.logTRUE
+xsplinefunctionfunctiongraphicsx	yNULL	shape0	openTRUE	repEndsTRUE	drawTRUE	borderpar("fg")	colNA	...
+xyinchfunctionfunctiongraphicsxy1	warn.logTRUE
+yinchfunctionfunctiongraphicsy1	warn.logTRUE
+adjustcolorfunctionfunctiongrDevicescol	alpha.f1	red.f1	green.f1	blue.f1	offsetc(0, 0, 0, 0)	transformdiag(c(red.f, green.f, blue.f, alpha.f))
+as.graphicsAnnotfunctionfunctiongrDevicesx
+as.rasterfunctionfunctiongrDevicesx	...
+axisTicksfunctionfunctiongrDevicesusr	log	axpNULL	nint5
+bitmapfunctionfunctiongrDevicesfile	type"png16m"	height7	width7	res72	units"in"	pointsize	taaNA	gaaNA	...
+blues9charactercharactergrDevicesNot a function
+bmpfunctionfunctiongrDevicesfilename"Rplot%03d.bmp"	width480	height480	units"px"	pointsize12	bg"white"	resNA	...	typec("cairo", "Xlib", "quartz")	antialias
+boxplot.statsfunctionfunctiongrDevicesx	coef1.5	do.confTRUE	do.outTRUE
+cairo_pdffunctionfunctiongrDevicesfilenameif (onefile) "Rplots.pdf" else "Rplot%03d.pdf"	width7	height7	pointsize12	onefileFALSE	family"sans"	bg"white"	antialiasc("default", "none", "gray", "subpixel")
+cairo_psfunctionfunctiongrDevicesfilenameif (onefile) "Rplots.ps" else "Rplot%03d.ps"	width7	height7	pointsize12	onefileFALSE	family"sans"	bg"white"	antialiasc("default", "none", "gray", "subpixel")
+check.optionsfunctionfunctiongrDevicesnew	name.opt	resetFALSE	assign.optFALSE	envir	check.attributesc("mode", "length")	override.checkFALSE
+chullfunctionfunctiongrDevicesx	yNULL
+CIDFontfunctionfunctiongrDevicesfamily	cmap	cmapEncoding	pdfresource""
+cmfunctionfunctiongrDevicesx
+cm.colorsfunctionfunctiongrDevicesn	alpha1
+col2rgbfunctionfunctiongrDevicescol	alphaFALSE
+colorConverterfunctionfunctiongrDevicestoXYZ	fromXYZ	name	whiteNULL
+colorRampfunctionfunctiongrDevicescolors	bias1	spacec("rgb", "Lab")	interpolatec("linear", "spline")
+colorRampPalettefunctionfunctiongrDevicescolors	...
+colorsfunctionfunctiongrDevices
+colorspaceslistlistgrDevicesNot a function
+colorspaces$XYZcolorConverter grDevicesNot a function
+colorspaces$Apple RGBunknown grDevicesNot a function
+colorspaces$sRGBRGBcolorConverter grDevicesNot a function
+colorspaces$CIE RGBunknown grDevicesNot a function
+colorspaces$LabcolorConverter grDevicesNot a function
+colorspaces$LuvcolorConverter grDevicesNot a function
+coloursfunctionfunctiongrDevices
+contourLinesfunctionfunctiongrDevicesxseq(0, 1, length.out = nrow(z))	yseq(0, 1, length.out = ncol(z))	z	nlevels10	levelspretty(range(z, na.rm = TRUE), nlevels)
+convertColorfunctionfunctiongrDevicescolor	from	to	from.ref.whiteNULL	to.ref.whiteNULL	scale.in1	scale.out1	clipTRUE
+densColsfunctionfunctiongrDevicesx	yNULL	nbin128	bandwidth	colrampcolorRampPalette(blues9[-(1:3)])
+dev2bitmapfunctionfunctiongrDevicesfile	type"png16m"	height7	width7	res72	units"in"	pointsize	...	methodc("postscript", "pdf")	taaNA	gaaNA
+devAskNewPagefunctionfunctiongrDevicesaskNULL
+dev.capabilitiesfunctionfunctiongrDeviceswhatNULL
+dev.capturefunctionfunctiongrDevicesnativeFALSE
+dev.controlfunctionfunctiongrDevicesdisplaylistc("inhibit", "enable")
+dev.copyfunctionfunctiongrDevicesdevice	...	whichdev.next()
+dev.copy2epsfunctionfunctiongrDevices...
+dev.copy2pdffunctionfunctiongrDevices...	out.type"pdf"
+dev.curfunctionfunctiongrDevices
+dev.flushfunctionfunctiongrDevices
+dev.holdfunctionfunctiongrDevices
+deviceIsInteractivefunctionfunctiongrDevicesnameNULL
+dev.interactivefunctionfunctiongrDevicesorNoneFALSE
+dev.listfunctionfunctiongrDevices
+dev.newfunctionfunctiongrDevices...
+dev.nextfunctionfunctiongrDeviceswhichdev.cur()
+dev.offfunctionfunctiongrDeviceswhichdev.cur()
+dev.prevfunctionfunctiongrDeviceswhichdev.cur()
+dev.printfunctionfunctiongrDevicesdevice	...
+dev.setfunctionfunctiongrDeviceswhichdev.next()
+dev.sizefunctionfunctiongrDevicesunitsc("in", "cm", "px")
+embedFontsfunctionfunctiongrDevicesfile	format	outfile	fontpaths""	options""
+extendrangefunctionfunctiongrDevicesx	rrange(x, na.rm = TRUE)	f0.05
+getGraphicsEventfunctionfunctiongrDevicesprompt"Waiting for input"	onMouseDownNULL	onMouseMoveNULL	onMouseUpNULL	onKeybdNULL	consolePrompt
+getGraphicsEventEnvfunctionfunctiongrDeviceswhichdev.cur()
+graphics.offfunctionfunctiongrDevices
+grayfunctionfunctiongrDeviceslevel
+gray.colorsfunctionfunctiongrDevicesn	start0.3	end0.9	gamma2.2
+greyfunctionfunctiongrDeviceslevel
+grey.colorsfunctionfunctiongrDevicesn	start0.3	end0.9	gamma2.2
+hclfunctionfunctiongrDevicesh0	c35	l85	alpha1	fixupTRUE
+heat.colorsfunctionfunctiongrDevicesn	alpha1
+HersheylistlistgrDevicesNot a function
+Hershey$typefacecharactercharactergrDevicesNot a function
+Hershey$fontindexcharactercharactergrDevicesNot a function
+Hershey$allowedmatrixnumericgrDevicesNot a function
+hsvfunctionfunctiongrDevicesh1	s1	v1	alpha1
+is.rasterfunctionfunctiongrDevicesx
+jpegfunctionfunctiongrDevicesfilename"Rplot%03d.jpeg"	width480	height480	units"px"	pointsize12	quality75	bg"white"	resNA	...	typec("cairo", "Xlib", "quartz")	antialias
+make.rgbfunctionfunctiongrDevicesred	green	blue	nameNULL	white"D65"	gamma2.2
+n2mfrowfunctionfunctiongrDevicesnr.plots
+nclass.FDfunctionfunctiongrDevicesx
+nclass.scottfunctionfunctiongrDevicesx
+nclass.SturgesfunctionfunctiongrDevicesx
+palettefunctionfunctiongrDevicesvalue
+pdffunctionfunctiongrDevicesfileifelse(onefile, "Rplots.pdf", "Rplot%03d.pdf")	width	height	onefile	family	title	fonts	version	paper	encoding	bg	fg	pointsize	pagecentre	colormodel	useDingbats	useKerning	fillOddEven	maxRasters	compress
+pdfFontsfunctionfunctiongrDevices...
+pdf.optionsfunctionfunctiongrDevices...	resetFALSE
+pictexfunctionfunctiongrDevicesfile"Rplots.tex"	width5	height4	debugFALSE	bg"white"	fg"black"
+pngfunctionfunctiongrDevicesfilename"Rplot%03d.png"	width480	height480	units"px"	pointsize12	bg"white"	resNA	...	typec("cairo", "cairo-png", "Xlib", "quartz")	antialias
+postscriptfunctionfunctiongrDevicesfileifelse(onefile, "Rplots.ps", "Rplot%03d.ps")	onefile	family	title	fonts	encoding	bg	fg	width	height	horizontal	pointsize	paper	pagecentre	print.it	command	colormodel	useKerning	fillOddEven
+postscriptFontfunctionfunctiongrDevicesfamily	metrics	encoding"default"
+postscriptFontsfunctionfunctiongrDevices...
+ps.optionsfunctionfunctiongrDevices...	resetFALSE	override.checkFALSE
+quartzfunctionfunctiongrDevicestitle	width	height	pointsize	family	fontsmooth	antialias	type	fileNULL	bg	canvas	dpi
+quartzFontfunctionfunctiongrDevicesfamily
+quartzFontsfunctionfunctiongrDevices...
+quartz.optionsfunctionfunctiongrDevices...	resetFALSE
+rainbowfunctionfunctiongrDevicesn	s1	v1	start0	endmax(1, n - 1)/n	alpha1
+recordGraphicsfunctionfunctiongrDevicesexpr	list	env
+recordPlotfunctionfunctiongrDevices
+replayPlotfunctionfunctiongrDevicesx
+rgbfunctionfunctiongrDevicesred	green	blue	alpha	namesNULL	maxColorValue1
+rgb2hsvfunctionfunctiongrDevicesr	gNULL	bNULL	maxColorValue255
+savePlotfunctionfunctiongrDevicesfilenamepaste("Rplot", type, sep = ".")	typec("png", "jpeg", "tiff", "bmp")	devicedev.cur()
+setEPSfunctionfunctiongrDevices...
+setGraphicsEventEnvfunctionfunctiongrDeviceswhichdev.cur()	env
+setGraphicsEventHandlersfunctionfunctiongrDeviceswhichdev.cur()	...
+setPSfunctionfunctiongrDevices...
+svgfunctionfunctiongrDevicesfilenameif (onefile) "Rplots.svg" else "Rplot%03d.svg"	width7	height7	pointsize12	onefileFALSE	family"sans"	bg"white"	antialiasc("default", "none", "gray", "subpixel")
+terrain.colorsfunctionfunctiongrDevicesn	alpha1
+tifffunctionfunctiongrDevicesfilename"Rplot%03d.tiff"	width480	height480	units"px"	pointsize12	compressionc("none", "rle", "lzw", "jpeg", "zip")	bg"white"	resNA	...	typec("cairo", "Xlib", "quartz")	antialias
+topo.colorsfunctionfunctiongrDevicesn	alpha1
+trans3dfunctionfunctiongrDevicesx	y	z	pmat
+Type1FontfunctionfunctiongrDevicesfamily	metrics	encoding"default"
+x11functionfunctiongrDevicesdisplay""	width	height	pointsize	gamma	bg	canvas	fonts	family	xpos	ypos	title	type	antialias
+X11functionfunctiongrDevicesdisplay""	width	height	pointsize	gamma	bg	canvas	fonts	family	xpos	ypos	title	type	antialias
+X11FontfunctionfunctiongrDevicesfont
+X11FontsfunctionfunctiongrDevices...
+X11.optionsfunctionfunctiongrDevices...	resetFALSE
+xfigfunctionfunctiongrDevicesfileifelse(onefile, "Rplots.fig", "Rplot%03d.fig")	onefileFALSE	encoding"none"	paper"default"	horizontalTRUE	width0	height0	family"Helvetica"	pointsize12	bg"transparent"	fg"black"	pagecentreTRUE	defaultfontFALSE	textspecialFALSE
+xy.coordsfunctionfunctiongrDevicesx	yNULL	xlabNULL	ylabNULL	logNULL	recycleFALSE
+xyTablefunctionfunctiongrDevicesx	yNULL	digits
+xyz.coordsfunctionfunctiongrDevicesx	yNULL	zNULL	xlabNULL	ylabNULL	zlabNULL	logNULL	recycleFALSE
+?functionfunctionutilse1	e2
+adistfunctionfunctionutilsx	yNULL	costsNULL	countsFALSE	fixedTRUE	partial!fixed	ignore.caseFALSE	useBytesFALSE
+alarmfunctionfunctionutils
+aproposfunctionfunctionutilswhat	whereFALSE	ignore.caseTRUE	mode"any"
+aregexecfunctionfunctionutilspattern	text	max.distance0.1	costsNULL	ignore.caseFALSE	fixedFALSE	useBytesFALSE
+argsAnywherefunctionfunctionutilsx
+aspellfunctionfunctionutilsfiles	filter	controllist()	encoding"unknown"	programNULL
+aspell_package_Rd_filesfunctionfunctionutilsdir	dropc("\\author", "\\references")	controllist()	programNULL
+aspell_package_vignettesfunctionfunctionutilsdir	controllist()	programNULL
+aspell_write_personal_dictionary_filefunctionfunctionutilsx	out	language"en"	programNULL
+as.personfunctionfunctionutilsx
+as.personListfunctionfunctionutilsx
+as.relistablefunctionfunctionutilsx
+as.romanfunctionfunctionutilsx
+assignInMyNamespacefunctionfunctionutilsx	value
+assignInNamespacefunctionfunctionutilsx	value	ns	pos-1	enviras.environment(pos)
+available.packagesfunctionfunctionutilscontriburlcontrib.url(getOption("repos"), type)	method	fieldsNULL	typegetOption("pkgType")	filtersNULL
+bibentryfunctionfunctionutilsbibtype	textVersionNULL	headerNULL	footerNULL	keyNULL	...	otherlist()	mheaderNULL	mfooterNULL
+browseEnvfunctionfunctionutilsenvir	pattern	excludepatt"^last\.warning"	html.Platform$OS.type != "mac"	expandedTRUE	propertiesNULL	mainNULL	debugMeFALSE
+browseURLfunctionfunctionutilsurl	browsergetOption("browser")	encodeIfNeededFALSE
+browseVignettesfunctionfunctionutilspackageNULL	lib.locNULL	allTRUE
+bug.reportfunctionfunctionutilssubject""	address	file"R.bug.report"	packageNULL	lib.locNULL	...
+capture.outputfunctionfunctionutils...	fileNULL	appendFALSE
+checkCRANfunctionfunctionutilsmethod
+chooseBioCmirrorfunctionfunctionutilsgraphicsgetOption("menu.graphics")
+chooseCRANmirrorfunctionfunctionutilsgraphicsgetOption("menu.graphics")
+citationfunctionfunctionutilspackage"base"	lib.locNULL	autoNULL
+citEntryfunctionfunctionutilsentry	textVersion	headerNULL	footerNULL	...
+citFooterfunctionfunctionutils...
+citHeaderfunctionfunctionutils...
+close.socketfunctionfunctionutilssocket	...
+combnfunctionfunctionutilsx	m	FUNNULL	simplifyTRUE	...
+compareVersionfunctionfunctionutilsa	b
+contrib.urlfunctionfunctionutilsrepos	typegetOption("pkgType")
+count.fieldsfunctionfunctionutilsfile	sep""	quote""'"	skip0	blank.lines.skipTRUE	comment.char"#"
+CRAN.packagesfunctionfunctionutilsCRANgetOption("repos")	method	contriburlcontrib.url(CRAN)
+create.postfunctionfunctionutilsinstructionscharacter()	description"post"	subject""	methodgetOption("mailer")	address"the relevant mailing list"	ccaddressgetOption("ccaddress", "")	filename"R.post"	infocharacter()
+datafunctionfunctionutils...	listcharacter()	packageNULL	lib.locNULL	verbosegetOption("verbose")	envir
+dataentryfunctionfunctionutilsdata	modes
+data.entryfunctionfunctionutils...	ModesNULL	NamesNULL
+defunctionfunctionutils...	Modeslist()	NamesNULL
+debuggerfunctionfunctionutilsdump
+demofunctionfunctionutilstopic	packageNULL	lib.locNULL	character.onlyFALSE	verbosegetOption("verbose")	echoTRUE	askgetOption("demo.ask")
+de.ncolsfunctionfunctionutilsinlist
+de.restorefunctionfunctionutilsinlist	ncols	coltypes	argnames	args
+de.setupfunctionfunctionutilsilist	list.names	incols
+download.filefunctionfunctionutilsurl	destfile	method	quietFALSE	mode"w"	cacheOKTRUE	extragetOption("download.file.extra")
+download.packagesfunctionfunctionutilspkgs	destdir	availableNULL	reposgetOption("repos")	contriburlcontrib.url(repos, type)	method	typegetOption("pkgType")	...
+dump.framesfunctionfunctionutilsdumpto"last.dump"	to.fileFALSE
+editfunctionfunctionutilsname	...
+emacsfunctionfunctionutilsnameNULL	file""
+examplefunctionfunctionutilstopic	packageNULL	lib.locNULL	character.onlyFALSE	give.linesFALSE	localFALSE	echoTRUE	verbosegetOption("verbose")	setRNGFALSE	askgetOption("example.ask")	prompt.prefixabbreviate(topic, 6)
+file.editfunctionfunctionutils...	title	editorgetOption("editor")	fileEncoding""
+file_testfunctionfunctionutilsop	x	y
+findfunctionfunctionutilswhat	mode"any"	numericFALSE	simple.wordsTRUE
+findLineNumfunctionfunctionutilssrcfile	line	nameonlyTRUE	envirparent.frame()	lastenv
+fixfunctionfunctionutilsx	...
+fixInNamespacefunctionfunctionutilsx	ns	pos-1	enviras.environment(pos)	...
+flush.consolefunctionfunctionutils
+formatOLfunctionfunctionutilsx	type"arabic"	offset0	start1	width0.9 * getOption("width")
+formatULfunctionfunctionutilsx	label"*"	offset0	width0.9 * getOption("width")
+getAnywherefunctionfunctionutilsx
+getCRANmirrorsfunctionfunctionutilsallFALSE	local.onlyFALSE
+getFromNamespacefunctionfunctionutilsx	ns	pos-1	enviras.environment(pos)
+getS3methodfunctionfunctionutilsf	class	optionalFALSE
+getSrcDirectoryfunctionfunctionutilsx	uniqueTRUE
+getSrcFilenamefunctionfunctionutilsx	full.namesFALSE	uniqueTRUE
+getSrcLocationfunctionfunctionutilsx	whichc("line", "column", "byte", "parse")	firstTRUE
+getSrcreffunctionfunctionutilsx
+getTxtProgressBarfunctionfunctionutilspb
+glob2rxfunctionfunctionutilspattern	trim.headFALSE	trim.tailTRUE
+headfunctionfunctionutilsx	...
+head.matrixfunctionfunctionutilsx	...
+helpfunctionfunctionutilstopic	packageNULL	lib.locNULL	verbosegetOption("verbose")	try.all.packagesgetOption("help.try.all.packages")	help_typegetOption("help_type")
+help.requestfunctionfunctionutilssubject""	address"r-help@R-project.org"	file"R.help.request"	...
+help.searchfunctionfunctionutilspattern	fieldsc("alias", "concept", "title")	apropos	keyword	whatis	ignore.caseTRUE	packageNULL	lib.locNULL	help.dbgetOption("help.db")	verbosegetOption("verbose")	rebuildFALSE	agrepNULL	use_UTF8FALSE	typesgetOption("help.search.types")
+help.startfunctionfunctionutilsupdateFALSE	gui"irrelevant"	browsergetOption("browser")	remoteNULL
+historyfunctionfunctionutilsmax.show25	reverseFALSE	pattern	...
+installed.packagesfunctionfunctionutilslib.locNULL	priorityNULL	noCacheFALSE	fieldsNULL	subarch.Platform$r_arch
+install.packagesfunctionfunctionutilspkgs	lib	reposgetOption("repos")	contriburlcontrib.url(repos, type)	method	availableNULL	destdirNULL	dependenciesNA	typegetOption("pkgType")	configure.argsgetOption("configure.args")	configure.varsgetOption("configure.vars")	cleanFALSE	NcpusgetOption("Ncpus", 1L)	libs_onlyFALSE	INSTALL_opts	...
+is.relistablefunctionfunctionutilsx
+limitedLabelsfunctionfunctionutilsvalue	maxwidthgetOption("width") - 5L
+loadhistoryfunctionfunctionutilsfile".Rhistory"
+localeToCharsetfunctionfunctionutilslocaleSys.getlocale("LC_CTYPE")
+lsf.strfunctionfunctionutilspos-1	envir	...
+ls.strfunctionfunctionutilspos-1	name	envir	all.namesFALSE	pattern	mode"any"
+maintainerfunctionfunctionutilspkg
+make.packages.htmlfunctionfunctionutilslib.loc.libPaths()	tempFALSE	verboseTRUE	docdirR.home("doc")
+makeRweaveLatexCodeRunnerfunctionfunctionutilsevalFunc
+make.socketfunctionfunctionutilshost"localhost"	port	failTRUE	serverFALSE
+memory.limitfunctionfunctionutilssizeNA
+memory.sizefunctionfunctionutilsmaxFALSE
+menufunctionfunctionutilschoices	graphicsFALSE	titleNULL
+methodsfunctionfunctionutilsgeneric.function	class
+mirror2htmlfunctionfunctionutilsmirrorsNULL	file"mirrors.html"	head"mirrors-head.html"	foot"mirrors-foot.html"
+modifyListfunctionfunctionutilsx	val
+new.packagesfunctionfunctionutilslib.locNULL	reposgetOption("repos")	contriburlcontrib.url(repos, type)	instPkgsinstalled.packages(lib.loc = lib.loc)	method	availableNULL	askFALSE	...	typegetOption("pkgType")
+newsfunctionfunctionutilsquery	package"R"	lib.locNULL	formatNULL	readerNULL	dbNULL
+nslfunctionfunctionutilshostname
+object.sizefunctionfunctionutilsx
+old.packagesfunctionfunctionutilslib.locNULL	reposgetOption("repos")	contriburlcontrib.url(repos, type)	instPkgsinstalled.packages(lib.loc = lib.loc)	method	availableNULL	checkBuiltFALSE	typegetOption("pkgType")
+package.contentsfunctionfunctionutilspkg	lib.locNULL
+packageDescriptionfunctionfunctionutilspkg	lib.locNULL	fieldsNULL	dropTRUE	encoding""
+package.skeletonfunctionfunctionutilsname"anRpackage"	listcharacter()	environment	path"."	forceFALSE	namespaceTRUE	code_filescharacter()
+packageStatusfunctionfunctionutilslib.locNULL	repositoriesNULL	method	typegetOption("pkgType")
+packageVersionfunctionfunctionutilspkg	lib.locNULL
+pagefunctionfunctionutilsx	methodc("dput", "print")	...
+personfunctionfunctionutilsgivenNULL	familyNULL	middleNULL	emailNULL	roleNULL	commentNULL	firstNULL	lastNULL
+personListfunctionfunctionutils...
+picofunctionfunctionutilsnameNULL	file""
+promptfunctionfunctionutilsobject	filenameNULL	nameNULL	...
+promptDatafunctionfunctionutilsobject	filenameNULL	nameNULL
+promptPackagefunctionfunctionutilspackage	lib.locNULL	filenameNULL	nameNULL	finalFALSE
+rc.getOptionfunctionfunctionutilsname
+rc.optionsfunctionfunctionutils...
+rc.settingsfunctionfunctionutilsops	ns	args	func	ipck	S3	data	help	argdb	files
+rc.statusfunctionfunctionutils
+readCitationFilefunctionfunctionutilsfile	metaNULL
+read.csvfunctionfunctionutilsfile	headerTRUE	sep","	quote"""	dec"."	fillTRUE	comment.char""	...
+read.csv2functionfunctionutilsfile	headerTRUE	sep";"	quote"""	dec","	fillTRUE	comment.char""	...
+read.delimfunctionfunctionutilsfile	headerTRUE	sep"	"	quote"""	dec"."	fillTRUE	comment.char""	...
+read.delim2functionfunctionutilsfile	headerTRUE	sep"	"	quote"""	dec","	fillTRUE	comment.char""	...
+read.DIFfunctionfunctionutilsfile	headerFALSE	dec"."	row.names	col.names	as.is!stringsAsFactors	na.strings"NA"	colClassesNA	nrows-1	skip0	check.namesTRUE	blank.lines.skipTRUE	stringsAsFactorsdefault.stringsAsFactors()	transposeFALSE
+read.fortranfunctionfunctionutilsfile	format	...	as.isTRUE	colClassesNA
+read.fwffunctionfunctionutilsfile	widths	headerFALSE	sep"	"	skip0	row.names	col.names	n-1	buffersize2000	...
+read.socketfunctionfunctionutilssocket	maxlen256	loopFALSE
+read.tablefunctionfunctionutilsfile	headerFALSE	sep""	quote""'"	dec"."	row.names	col.names	as.is!stringsAsFactors	na.strings"NA"	colClassesNA	nrows-1	skip0	check.namesTRUE	fill!blank.lines.skip	strip.whiteFALSE	blank.lines.skipTRUE	comment.char"#"	allowEscapesFALSE	flushFALSE	stringsAsFactorsdefault.stringsAsFactors()	fileEncoding""	encoding"unknown"	text
+recoverfunctionfunctionutils
+relistfunctionfunctionutilsflesh	skeletonattr(flesh, "skeleton")
+remove.packagesfunctionfunctionutilspkgs	lib
+removeSourcefunctionfunctionutilsfn
+Rproffunctionfunctionutilsfilename"Rprof.out"	appendFALSE	interval0.02	memory.profilingFALSE
+Rprofmemfunctionfunctionutilsfilename"Rprofmem.out"	appendFALSE	threshold0
+RShowDocfunctionfunctionutilswhat	typec("pdf", "html", "txt")	package
+RSiteSearchfunctionfunctionutilsstring	restrictc("functions", "vignettes", "views")	formatc("normal", "short")	sortbyc("score", "date:late", "date:early", "subject", "subject:descending", 	sortby    "from", "from:descending", "size", "size:descending")	matchesPerPage20
+rtagsfunctionfunctionutilspath"."	pattern"\.[RrSs]$"	recursiveFALSE	srclist.files(path = path, pattern = pattern, full.names = TRUE, 	src    recursive = recursive)	keep.reNULL	ofile""	appendFALSE	verbosegetOption("verbose")
+Rtanglefunctionfunctionutils
+RtangleSetupfunctionfunctionutilsfile	syntax	outputNULL	annotateTRUE	splitFALSE	quietFALSE	...
+RtangleWritedocfunctionfunctionutilsobject	chunk
+RweaveChunkPrefixfunctionfunctionutilsoptions
+RweaveEvalWithOptfunctionfunctionutilsexpr	options
+RweaveLatexfunctionfunctionutils
+RweaveLatexFinishfunctionfunctionutilsobject	errorFALSE
+RweaveLatexOptionsfunctionfunctionutilsoptions
+RweaveLatexSetupfunctionfunctionutilsfile	syntax	outputNULL	quietFALSE	debugFALSE	stylepath	...
+RweaveLatexWritedocfunctionfunctionutilsobject	chunk
+RweaveTryStopfunctionfunctionutilserr	options
+savehistoryfunctionfunctionutilsfile".Rhistory"
+select.listfunctionfunctionutilschoices	preselectNULL	multipleFALSE	titleNULL	graphicsgetOption("menu.graphics")
+sessionInfofunctionfunctionutilspackageNULL
+setBreakpointfunctionfunctionutilssrcfile	line	nameonlyTRUE	envirparent.frame()	lastenv	verboseTRUE	tracer	printFALSE	clearFALSE	...
+setRepositoriesfunctionfunctionutilsgraphicsgetOption("menu.graphics")	indNULL	addURLscharacter()
+setTxtProgressBarfunctionfunctionutilspb	value	titleNULL	labelNULL
+stackfunctionfunctionutilsx	...
+Stanglefunctionfunctionutilsfile	driverRtangle()	syntaxgetOption("SweaveSyntax")	encoding""	...
+strfunctionfunctionutilsobject	...
+strOptionsfunctionfunctionutilsstrict.width"no"	digits.d3	vec.len4	formatNumfunction(x, ...) format(x, trim = TRUE, drop0trailing = TRUE, 	formatNum    ...)
+summaryRproffunctionfunctionutilsfilename"Rprof.out"	chunksize5000	memoryc("none", "both", "tseries", "stats")	index2	diffTRUE	excludeNULL
+Sweavefunctionfunctionutilsfile	driverRweaveLatex()	syntaxgetOption("SweaveSyntax")	encoding""	...
+SweaveHooksfunctionfunctionutilsoptions	runFALSE	envir
+SweaveSyntaxLatexSweaveSyntaxlistutilsNot a function
+SweaveSyntaxLatex$doccharactercharacterutilsNot a function
+SweaveSyntaxLatex$codecharactercharacterutilsNot a function
+SweaveSyntaxLatex$coderefcharactercharacterutilsNot a function
+SweaveSyntaxLatex$docoptcharactercharacterutilsNot a function
+SweaveSyntaxLatex$docexprcharactercharacterutilsNot a function
+SweaveSyntaxLatex$extensioncharactercharacterutilsNot a function
+SweaveSyntaxLatex$syntaxnamecharactercharacterutilsNot a function
+SweaveSyntaxLatex$inputcharactercharacterutilsNot a function
+SweaveSyntaxLatex$translist utilsNot a function
+SweaveSyntaxNowebSweaveSyntaxlistutilsNot a function
+SweaveSyntaxNoweb$doccharactercharacterutilsNot a function
+SweaveSyntaxNoweb$codecharactercharacterutilsNot a function
+SweaveSyntaxNoweb$coderefcharactercharacterutilsNot a function
+SweaveSyntaxNoweb$docoptcharactercharacterutilsNot a function
+SweaveSyntaxNoweb$docexprcharactercharacterutilsNot a function
+SweaveSyntaxNoweb$extensioncharactercharacterutilsNot a function
+SweaveSyntaxNoweb$syntaxnamecharactercharacterutilsNot a function
+SweaveSyntaxNoweb$inputcharactercharacterutilsNot a function
+SweaveSyntaxNoweb$translist utilsNot a function
+SweaveSyntConvfunctionfunctionutilsfile	syntax	outputNULL
+tailfunctionfunctionutilsx	...
+tail.matrixfunctionfunctionutilsx	addrownumsTRUE	...
+tarfunctionfunctionutilstarfile	filesNULL	compressionc("none", "gzip", "bzip2", "xz")	compression_level6	tarSys.getenv("tar")	extra_flags""
+timestampfunctionfunctionutilsstampdate()	prefix"##------ "	suffix" ------##"	quietFALSE
+toBibtexfunctionfunctionutilsobject	...
+toLatexfunctionfunctionutilsobject	...
+txtProgressBarfunctionfunctionutilsmin0	max1	initial0	char"="	widthNA	title	label	style1	file""
+type.convertfunctionfunctionutilsx	na.strings"NA"	as.isFALSE	dec"."
+unstackfunctionfunctionutilsx	...
+untarfunctionfunctionutilstarfile	filesNULL	listFALSE	exdir"."	compressedNA	extrasNULL	verboseFALSE	tarSys.getenv("TAR")
+unzipfunctionfunctionutilszipfile	filesNULL	listFALSE	overwriteTRUE	junkpathsFALSE	exdir"."	unzip"internal"	setTimesFALSE
+update.packagesfunctionfunctionutilslib.locNULL	reposgetOption("repos")	contriburlcontrib.url(repos, type)	method	instlibNULL	askTRUE	availableNULL	oldPkgsNULL	...	checkBuiltFALSE	typegetOption("pkgType")
+update.packageStatusfunctionfunctionutilsobject	lib.loclevels(object$inst$LibPath)	repositorieslevels(object$avail$Repository)	...
+upgradefunctionfunctionutilsobject	...
+URLdecodefunctionfunctionutilsURL
+URLencodefunctionfunctionutilsURL	reservedFALSE
+url.showfunctionfunctionutilsurl	title	filetempfile()	delete.fileTRUE	method	...
+vifunctionfunctionutilsnameNULL	file""
+Viewfunctionfunctionutilsx	title
+vignettefunctionfunctionutilstopic	packageNULL	lib.locNULL	allTRUE
+write.csvfunctionfunctionutils...
+write.csv2functionfunctionutils...
+write.socketfunctionfunctionutilssocket	string
+write.tablefunctionfunctionutilsx	file""	appendFALSE	quoteTRUE	sep" "	eol"\n"	na"NA"	dec"."	row.namesTRUE	col.namesTRUE	qmethodc("escape", "double")	fileEncoding""
+wsbrowserfunctionfunctionutilsIDS	IsRoot	IsContainer	ItemsPerContainer	ParentID	NAMES	TYPES	DIMS	expandedTRUE	kind"HTML"	main"R Workspace"	propertieslist()	browsergetOption("browser")
+xeditfunctionfunctionutilsnameNULL	file""
+xemacsfunctionfunctionutilsnameNULL	file""
+zipfunctionfunctionutilszipfile	files	flags"-r9X"	extras""	zipSys.getenv("R_ZIPCMD", "zip")
+zip.file.extractfunctionfunctionutilsfile	zipname"R.zip"	unzipgetOption("unzip")	dirtempdir()
+ability.covlistlistdatasetsNot a function
+ability.cov$covmatrixnumericdatasetsNot a function
+ability.cov$centernumericnumericdatasetsNot a function
+ability.cov$n.obsnumericnumericdatasetsNot a function
+airmilestsnumericdatasetsNot a function
+AirPassengerstsnumericdatasetsNot a function
+airqualitydata.framedata.framedatasetsNot a function
+airquality$OzoneintegernumericdatasetsNot a function
+airquality$Solar.RintegernumericdatasetsNot a function
+airquality$WindnumericnumericdatasetsNot a function
+airquality$TempintegernumericdatasetsNot a function
+airquality$MonthintegernumericdatasetsNot a function
+airquality$DayintegernumericdatasetsNot a function
+anscombedata.framedata.framedatasetsNot a function
+anscombe$x1numericnumericdatasetsNot a function
+anscombe$x2numericnumericdatasetsNot a function
+anscombe$x3numericnumericdatasetsNot a function
+anscombe$x4numericnumericdatasetsNot a function
+anscombe$y1numericnumericdatasetsNot a function
+anscombe$y2numericnumericdatasetsNot a function
+anscombe$y3numericnumericdatasetsNot a function
+anscombe$y4numericnumericdatasetsNot a function
+attenudata.framedata.framedatasetsNot a function
+attenu$eventnumericnumericdatasetsNot a function
+attenu$magnumericnumericdatasetsNot a function
+attenu$stationfactorfactordatasetsNot a function
+attenu$distnumericnumericdatasetsNot a function
+attenu$accelnumericnumericdatasetsNot a function
+attitudedata.framedata.framedatasetsNot a function
+attitude$ratingnumericnumericdatasetsNot a function
+attitude$complaintsnumericnumericdatasetsNot a function
+attitude$privilegesnumericnumericdatasetsNot a function
+attitude$learningnumericnumericdatasetsNot a function
+attitude$raisesnumericnumericdatasetsNot a function
+attitude$criticalnumericnumericdatasetsNot a function
+attitude$advancenumericnumericdatasetsNot a function
+austrestsnumericdatasetsNot a function
+beaver1data.framedata.framedatasetsNot a function
+beaver1$daynumericnumericdatasetsNot a function
+beaver1$timenumericnumericdatasetsNot a function
+beaver1$tempnumericnumericdatasetsNot a function
+beaver1$activnumericnumericdatasetsNot a function
+beaver2data.framedata.framedatasetsNot a function
+beaver2$daynumericnumericdatasetsNot a function
+beaver2$timenumericnumericdatasetsNot a function
+beaver2$tempnumericnumericdatasetsNot a function
+beaver2$activnumericnumericdatasetsNot a function
+BJsalestsnumericdatasetsNot a function
+BJsales.leadtsnumericdatasetsNot a function
+BODdata.framedata.framedatasetsNot a function
+BOD$TimenumericnumericdatasetsNot a function
+BOD$demandnumericnumericdatasetsNot a function
+carsdata.framedata.framedatasetsNot a function
+cars$speednumericnumericdatasetsNot a function
+cars$distnumericnumericdatasetsNot a function
+ChickWeightnfnGroupedDatadata.framedatasetsNot a function
+ChickWeight$weightnumericnumericdatasetsNot a function
+ChickWeight$TimenumericnumericdatasetsNot a function
+ChickWeight$ChickorderedfactordatasetsNot a function
+ChickWeight$DietfactorfactordatasetsNot a function
+chickwtsdata.framedata.framedatasetsNot a function
+chickwts$weightnumericnumericdatasetsNot a function
+chickwts$feedfactorfactordatasetsNot a function
+co2tsnumericdatasetsNot a function
+CO2nfnGroupedDatadata.framedatasetsNot a function
+CO2$PlantorderedfactordatasetsNot a function
+CO2$TypefactorfactordatasetsNot a function
+CO2$TreatmentfactorfactordatasetsNot a function
+CO2$concnumericnumericdatasetsNot a function
+CO2$uptakenumericnumericdatasetsNot a function
+crimtabtablenumericdatasetsNot a function
+discoveriestsnumericdatasetsNot a function
+DNasenfnGroupedDatadata.framedatasetsNot a function
+DNase$RunorderedfactordatasetsNot a function
+DNase$concnumericnumericdatasetsNot a function
+DNase$densitynumericnumericdatasetsNot a function
+esophdata.framedata.framedatasetsNot a function
+esoph$agegporderedfactordatasetsNot a function
+esoph$alcgporderedfactordatasetsNot a function
+esoph$tobgporderedfactordatasetsNot a function
+esoph$ncasesnumericnumericdatasetsNot a function
+esoph$ncontrolsnumericnumericdatasetsNot a function
+euronumericnumericdatasetsNot a function
+euro.crossmatrixnumericdatasetsNot a function
+eurodistdistnumericdatasetsNot a function
+EuStockMarketsmtsnumericdatasetsNot a function
+faithfuldata.framedata.framedatasetsNot a function
+faithful$eruptionsnumericnumericdatasetsNot a function
+faithful$waitingnumericnumericdatasetsNot a function
+fdeathstsnumericdatasetsNot a function
+Formaldehydedata.framedata.framedatasetsNot a function
+Formaldehyde$carbnumericnumericdatasetsNot a function
+Formaldehyde$optdennumericnumericdatasetsNot a function
+freenydata.framedata.framedatasetsNot a function
+freeny$ytsnumericdatasetsNot a function
+freeny$lag.quarterly.revenuenumericnumericdatasetsNot a function
+freeny$price.indexnumericnumericdatasetsNot a function
+freeny$income.levelnumericnumericdatasetsNot a function
+freeny$market.potentialnumericnumericdatasetsNot a function
+freeny.xmatrixnumericdatasetsNot a function
+freeny.ytsnumericdatasetsNot a function
+HairEyeColortablenumericdatasetsNot a function
+Harman23.corlistlistdatasetsNot a function
+Harman23.cor$covmatrixnumericdatasetsNot a function
+Harman23.cor$centernumericnumericdatasetsNot a function
+Harman23.cor$n.obsnumericnumericdatasetsNot a function
+Harman74.corlistlistdatasetsNot a function
+Harman74.cor$covmatrixnumericdatasetsNot a function
+Harman74.cor$centernumericnumericdatasetsNot a function
+Harman74.cor$n.obsnumericnumericdatasetsNot a function
+IndomethnfnGroupedDatadata.framedatasetsNot a function
+Indometh$SubjectorderedfactordatasetsNot a function
+Indometh$timenumericnumericdatasetsNot a function
+Indometh$concnumericnumericdatasetsNot a function
+infertdata.framedata.framedatasetsNot a function
+infert$educationfactorfactordatasetsNot a function
+infert$agenumericnumericdatasetsNot a function
+infert$paritynumericnumericdatasetsNot a function
+infert$inducednumericnumericdatasetsNot a function
+infert$casenumericnumericdatasetsNot a function
+infert$spontaneousnumericnumericdatasetsNot a function
+infert$stratumintegernumericdatasetsNot a function
+infert$pooled.stratumnumericnumericdatasetsNot a function
+InsectSpraysdata.framedata.framedatasetsNot a function
+InsectSprays$countnumericnumericdatasetsNot a function
+InsectSprays$sprayfactorfactordatasetsNot a function
+irisdata.framedata.framedatasetsNot a function
+iris$Sepal.LengthnumericnumericdatasetsNot a function
+iris$Sepal.WidthnumericnumericdatasetsNot a function
+iris$Petal.LengthnumericnumericdatasetsNot a function
+iris$Petal.WidthnumericnumericdatasetsNot a function
+iris$SpeciesfactorfactordatasetsNot a function
+iris3arraynumericdatasetsNot a function
+islandsnumericnumericdatasetsNot a function
+JohnsonJohnsontsnumericdatasetsNot a function
+LakeHurontsnumericdatasetsNot a function
+ldeathstsnumericdatasetsNot a function
+lhtsnumericdatasetsNot a function
+LifeCycleSavingsdata.framedata.framedatasetsNot a function
+LifeCycleSavings$srnumericnumericdatasetsNot a function
+LifeCycleSavings$pop15numericnumericdatasetsNot a function
+LifeCycleSavings$pop75numericnumericdatasetsNot a function
+LifeCycleSavings$dpinumericnumericdatasetsNot a function
+LifeCycleSavings$ddpinumericnumericdatasetsNot a function
+LoblollynfnGroupedDatadata.framedatasetsNot a function
+Loblolly$heightnumericnumericdatasetsNot a function
+Loblolly$agenumericnumericdatasetsNot a function
+Loblolly$SeedorderedfactordatasetsNot a function
+longleydata.framedata.framedatasetsNot a function
+longley$GNP.deflatornumericnumericdatasetsNot a function
+longley$GNPnumericnumericdatasetsNot a function
+longley$UnemployednumericnumericdatasetsNot a function
+longley$Armed.ForcesnumericnumericdatasetsNot a function
+longley$PopulationnumericnumericdatasetsNot a function
+longley$YearintegernumericdatasetsNot a function
+longley$EmployednumericnumericdatasetsNot a function
+lynxtsnumericdatasetsNot a function
+mdeathstsnumericdatasetsNot a function
+morleydata.framedata.framedatasetsNot a function
+morley$ExptintegernumericdatasetsNot a function
+morley$RunintegernumericdatasetsNot a function
+morley$SpeedintegernumericdatasetsNot a function
+mtcarsdata.framedata.framedatasetsNot a function
+mtcars$mpgnumericnumericdatasetsNot a function
+mtcars$cylnumericnumericdatasetsNot a function
+mtcars$dispnumericnumericdatasetsNot a function
+mtcars$hpnumericnumericdatasetsNot a function
+mtcars$dratnumericnumericdatasetsNot a function
+mtcars$wtnumericnumericdatasetsNot a function
+mtcars$qsecnumericnumericdatasetsNot a function
+mtcars$vsnumericnumericdatasetsNot a function
+mtcars$amnumericnumericdatasetsNot a function
+mtcars$gearnumericnumericdatasetsNot a function
+mtcars$carbnumericnumericdatasetsNot a function
+nhtemptsnumericdatasetsNot a function
+NiletsnumericdatasetsNot a function
+nottemtsnumericdatasetsNot a function
+occupationalStatustablenumericdatasetsNot a function
+OrangenfnGroupedDatadata.framedatasetsNot a function
+Orange$TreeorderedfactordatasetsNot a function
+Orange$agenumericnumericdatasetsNot a function
+Orange$circumferencenumericnumericdatasetsNot a function
+OrchardSpraysdata.framedata.framedatasetsNot a function
+OrchardSprays$decreasenumericnumericdatasetsNot a function
+OrchardSprays$rowposnumericnumericdatasetsNot a function
+OrchardSprays$colposnumericnumericdatasetsNot a function
+OrchardSprays$treatmentfactorfactordatasetsNot a function
+PlantGrowthdata.framedata.framedatasetsNot a function
+PlantGrowth$weightnumericnumericdatasetsNot a function
+PlantGrowth$groupfactorfactordatasetsNot a function
+precipnumericnumericdatasetsNot a function
+presidentstsnumericdatasetsNot a function
+pressuredata.framedata.framedatasetsNot a function
+pressure$temperaturenumericnumericdatasetsNot a function
+pressure$pressurenumericnumericdatasetsNot a function
+Puromycindata.framedata.framedatasetsNot a function
+Puromycin$concnumericnumericdatasetsNot a function
+Puromycin$ratenumericnumericdatasetsNot a function
+Puromycin$statefactorfactordatasetsNot a function
+quakesdata.framedata.framedatasetsNot a function
+quakes$latnumericnumericdatasetsNot a function
+quakes$longnumericnumericdatasetsNot a function
+quakes$depthintegernumericdatasetsNot a function
+quakes$magnumericnumericdatasetsNot a function
+quakes$stationsintegernumericdatasetsNot a function
+randudata.framedata.framedatasetsNot a function
+randu$xnumericnumericdatasetsNot a function
+randu$ynumericnumericdatasetsNot a function
+randu$znumericnumericdatasetsNot a function
+riversnumericnumericdatasetsNot a function
+rockdata.framedata.framedatasetsNot a function
+rock$areaintegernumericdatasetsNot a function
+rock$perinumericnumericdatasetsNot a function
+rock$shapenumericnumericdatasetsNot a function
+rock$permnumericnumericdatasetsNot a function
+SeatbeltsmtsnumericdatasetsNot a function
+sleepdata.framedata.framedatasetsNot a function
+sleep$extranumericnumericdatasetsNot a function
+sleep$groupfactorfactordatasetsNot a function
+sleep$IDfactorfactordatasetsNot a function
+stacklossdata.framedata.framedatasetsNot a function
+stackloss$Air.FlownumericnumericdatasetsNot a function
+stackloss$Water.TempnumericnumericdatasetsNot a function
+stackloss$Acid.Conc.numericnumericdatasetsNot a function
+stackloss$stack.lossnumericnumericdatasetsNot a function
+stack.lossnumericnumericdatasetsNot a function
+stack.xmatrixnumericdatasetsNot a function
+state.abbcharactercharacterdatasetsNot a function
+state.areanumericnumericdatasetsNot a function
+state.centerlistlistdatasetsNot a function
+state.center$xnumericnumericdatasetsNot a function
+state.center$ynumericnumericdatasetsNot a function
+state.divisionfactorfactordatasetsNot a function
+state.namecharactercharacterdatasetsNot a function
+state.regionfactorfactordatasetsNot a function
+state.x77matrixnumericdatasetsNot a function
+sunspot.monthtsnumericdatasetsNot a function
+sunspotstsnumericdatasetsNot a function
+sunspot.yeartsnumericdatasetsNot a function
+swissdata.framedata.framedatasetsNot a function
+swiss$FertilitynumericnumericdatasetsNot a function
+swiss$AgriculturenumericnumericdatasetsNot a function
+swiss$ExaminationintegernumericdatasetsNot a function
+swiss$EducationintegernumericdatasetsNot a function
+swiss$CatholicnumericnumericdatasetsNot a function
+swiss$Infant.MortalitynumericnumericdatasetsNot a function
+TheophnfnGroupedDatadata.framedatasetsNot a function
+Theoph$SubjectorderedfactordatasetsNot a function
+Theoph$WtnumericnumericdatasetsNot a function
+Theoph$DosenumericnumericdatasetsNot a function
+Theoph$TimenumericnumericdatasetsNot a function
+Theoph$concnumericnumericdatasetsNot a function
+TitanictablenumericdatasetsNot a function
+ToothGrowthdata.framedata.framedatasetsNot a function
+ToothGrowth$lennumericnumericdatasetsNot a function
+ToothGrowth$suppfactorfactordatasetsNot a function
+ToothGrowth$dosenumericnumericdatasetsNot a function
+treeringtsnumericdatasetsNot a function
+treesdata.framedata.framedatasetsNot a function
+trees$GirthnumericnumericdatasetsNot a function
+trees$HeightnumericnumericdatasetsNot a function
+trees$VolumenumericnumericdatasetsNot a function
+UCBAdmissionstablenumericdatasetsNot a function
+UKDriverDeathstsnumericdatasetsNot a function
+UKgastsnumericdatasetsNot a function
+USAccDeathstsnumericdatasetsNot a function
+USArrestsdata.framedata.framedatasetsNot a function
+USArrests$MurdernumericnumericdatasetsNot a function
+USArrests$AssaultintegernumericdatasetsNot a function
+USArrests$UrbanPopintegernumericdatasetsNot a function
+USArrests$RapenumericnumericdatasetsNot a function
+USJudgeRatingsdata.framedata.framedatasetsNot a function
+USJudgeRatings$CONTnumericnumericdatasetsNot a function
+USJudgeRatings$INTGnumericnumericdatasetsNot a function
+USJudgeRatings$DMNRnumericnumericdatasetsNot a function
+USJudgeRatings$DILGnumericnumericdatasetsNot a function
+USJudgeRatings$CFMGnumericnumericdatasetsNot a function
+USJudgeRatings$DECInumericnumericdatasetsNot a function
+USJudgeRatings$PREPnumericnumericdatasetsNot a function
+USJudgeRatings$FAMInumericnumericdatasetsNot a function
+USJudgeRatings$ORALnumericnumericdatasetsNot a function
+USJudgeRatings$WRITnumericnumericdatasetsNot a function
+USJudgeRatings$PHYSnumericnumericdatasetsNot a function
+USJudgeRatings$RTENnumericnumericdatasetsNot a function
+USPersonalExpenditurematrixnumericdatasetsNot a function
+uspoptsnumericdatasetsNot a function
+VADeathsmatrixnumericdatasetsNot a function
+volcanomatrixnumericdatasetsNot a function
+warpbreaksdata.framedata.framedatasetsNot a function
+warpbreaks$breaksnumericnumericdatasetsNot a function
+warpbreaks$woolfactorfactordatasetsNot a function
+warpbreaks$tensionfactorfactordatasetsNot a function
+womendata.framedata.framedatasetsNot a function
+women$heightnumericnumericdatasetsNot a function
+women$weightnumericnumericdatasetsNot a function
+WorldPhonesmatrixnumericdatasetsNot a function
+WWWusagetsnumericdatasetsNot a function
+etags2ctagsfunctionfunctionvimcometagsfile	ctagsfile
+vim.bolfunctionfunctionvimcomomnilist	what"loaded"	allnamesFALSE
+vim.helpfunctionfunctionvimcomtopic	w	classfor	package
+vim.interlacefunctionfunctionvimcomrnowebfile	latexcmd"pdflatex"	bibtexFALSE	knitFALSE	...
+vim.list.argsfunctionfunctionvimcomff
+vim.namesfunctionfunctionvimcomx
+vim.plotfunctionfunctionvimcomx
+vim.printfunctionfunctionvimcomobject	classfor
+vim.srcdirfunctionfunctionvimcomdr"."
+ColorOutfunctionfunctioncolorout
+noColorOutfunctionfunctioncolorout
+setOutputColorsfunctionfunctioncoloroutnormal2	number3	negnum3	string6	const5	stderror4	warnc(1, 0, 1)	errorc(1, 7)	verboseTRUE
+setOutputColors256functionfunctioncoloroutnormal40	number214	negnum209	string85	const35	stderror33	warnc(1, 0, 1)	errorc(1, 15)	verboseTRUE
+show256Colorsfunctionfunctioncoloroutoutfile"/tmp/table256.html"
+@<-functionfunctionmethodsobject	name	value
+addNextMethodfunctionfunctionmethodsmethod	f"<unknown>"	mlist	optionalFALSE	envir
+allGenericsfunctionfunctionmethods...
+allNamesfunctionfunctionmethodsx
+Arithfunctionfunctionmethodse1	e2
+asfunctionfunctionmethodsobject	Class	strictTRUE	extpossibleExtends(thisClass, Class)
+as<-functionfunctionmethodsobject	Class	value
+asMethodDefinitionfunctionfunctionmethodsdef	signaturelist(.anyClassName)	sealedFALSE	fdef
+assignClassDeffunctionfunctionmethodsClass	def	where	forceFALSE
+assignMethodsMetaDatafunctionfunctionmethodsf	value	fdef	where	deflt
+balanceMethodsListfunctionfunctionmethodsmlist	args	checkTRUE
+body<-functionfunctionmethodsfun	envirenvironment(fun)	value
+cacheGenericsMetaDatafunctionfunctionmethodsf	fdef	attachTRUE	wheretopenv(parent.frame())	package	methods
+cacheMetaDatafunctionfunctionmethodswhere	attachTRUE	searchWhereas.environment(where)	doCheckTRUE
+cacheMethodfunctionfunctionmethodsf	sig	def	argsnames(sig)	fdef	inheritedFALSE
+callGenericfunctionfunctionmethods...
+callNextMethodfunctionfunctionmethods...
+canCoercefunctionfunctionmethodsobject	Class
+cbind2functionfunctionmethodsx	y	...
+checkSlotAssignmentfunctionfunctionmethodsobj	name	value
+classesToAMfunctionfunctionmethodsclasses	includeSubclassesFALSE	abbreviate2
+classLabelfunctionfunctionmethodsClass
+classMetaNamefunctionfunctionmethodsname
+classNamefunctionfunctionmethodsclass	package
+coercefunctionfunctionmethodsfrom	to	strictTRUE
+coerce<-functionfunctionmethodsfrom	to	value
+Comparefunctionfunctionmethodse1	e2
+completeClassDefinitionfunctionfunctionmethodsClass	ClassDefgetClassDef(Class)	where	doExtendsTRUE
+completeExtendsfunctionfunctionmethodsClassDef	class2	extensionDef	where
+completeSubclassesfunctionfunctionmethodsclassDef	class2	extensionDef	where	classDef2getClassDef(class2, where)
+Complexfunctionfunctionmethodsz
+conformMethodfunctionfunctionmethodssignature	mnames	fnames	f"<unspecified>"	fdef	method
+defaultDumpNamefunctionfunctionmethodsgeneric	signature
+defaultPrototypefunctionfunctionmethods
+doPrimitiveMethodfunctionfunctionmethodsname	def	callsys.call(sys.parent())	evsys.frame(sys.parent(2))
+dumpMethodfunctionfunctionmethodsf	signaturecharacter()	filedefaultDumpName(f, signature)	wheretopenv(parent.frame())	defgetMethod(f, signature, where = where, optional = TRUE)
+dumpMethodsfunctionfunctionmethodsf	file""	signatureNULL	methodsfindMethods(f, where = where)	wheretopenv(parent.frame())
+elfunctionfunctionmethodsobject	where
+el<-functionfunctionmethods
+elNamedfunctionfunctionmethodsx	name	mustFindFALSE
+elNamed<-functionfunctionmethodsx	name	value
+empty.dumpfunctionfunctionmethods
+emptyMethodsListfunctionfunctionmethodsmlist	thisClass"ANY"	sublistlist()
+evalOnLoadfunctionfunctionmethodsexpr	wheretopenv(parent.frame())	aname""
+evalqOnLoadfunctionfunctionmethodsexpr	wheretopenv(parent.frame())	aname""
+evalSourcefunctionfunctionmethodssource	package""	lockTRUE	cacheFALSE
+existsFunctionfunctionfunctionmethodsf	genericTRUE	wheretopenv(parent.frame())
+existsMethodfunctionfunctionmethodsf	signaturecharacter()	wheretopenv(parent.frame())
+extendsfunctionfunctionmethodsclass1	class2	maybeTRUE	fullInfoFALSE
+finalDefaultMethodfunctionfunctionmethodsmethod
+findClassfunctionfunctionmethodsClass	wheretopenv(parent.frame())	unique""
+findFunctionfunctionfunctionmethodsf	genericTRUE	wheretopenv(parent.frame())
+findMethodfunctionfunctionmethodsf	signature	wheretopenv(parent.frame())
+findMethodsfunctionfunctionmethodsf	where	classescharacter()	inheritedFALSE	package""
+findMethodSignaturesfunctionfunctionmethods...	targetTRUE	methodsfindMethods(...)
+findUniquefunctionfunctionmethodswhat	message	wheretopenv(parent.frame())
+fixPre1.8functionfunctionmethodsnames	wheretopenv(parent.frame())
+formalArgsfunctionfunctionmethodsdef
+functionBodyfunctionfunctionmethodsfunsys.function(sys.parent())
+functionBody<-functionfunctionmethodsfun	envirenvironment(fun)	value
+generic.skeletonfunctionfunctionmethodsname	fdef	fdefault
+getAccessfunctionfunctionmethodsClassDef
+getAllMethodsfunctionfunctionmethodsf	fdef	wheretopenv(parent.frame())
+getAllSuperClassesfunctionfunctionmethodsClassDef	simpleOnlyTRUE
+getClassfunctionfunctionmethodsClass	.ForceFALSE	where.classEnv(Class, topenv(parent.frame()), FALSE)
+getClassDeffunctionfunctionmethodsClass	wheretopenv(parent.frame())	packagepackageSlot(Class)	inheritsTRUE
+getClassesfunctionfunctionmethodswhere.externalCallerEnv()	inheritsmissing(where)
+getClassNamefunctionfunctionmethodsClassDef
+getClassPackagefunctionfunctionmethodsClassDef
+getDataPartfunctionfunctionmethodsobject
+getExtendsfunctionfunctionmethodsClassDef
+getFunctionfunctionfunctionmethodsname	genericTRUE	mustFindTRUE	wheretopenv(parent.frame())
+getGenericfunctionfunctionmethodsf	mustFindFALSE	where	package""
+getGenericsfunctionfunctionmethodswhere	searchFormFALSE
+getGroupfunctionfunctionmethodsfdef	recursiveFALSE	wheretopenv(parent.frame())
+getGroupMembersfunctionfunctionmethodsgroup	recursiveFALSE	characterTRUE
+getLoadActionsfunctionfunctionmethodswheretopenv(parent.frame())
+getMethodfunctionfunctionmethodsf	signaturecharacter()	wheretopenv(parent.frame())	optionalFALSE	mlist	fdef
+getMethodsfunctionfunctionmethodsf	wheretopenv(parent.frame())	tableFALSE
+getMethodsForDispatchfunctionfunctionmethodsfdef	inheritedFALSE
+getMethodsMetaDatafunctionfunctionmethodsf	wheretopenv(parent.frame())
+getPackageNamefunctionfunctionmethodswheretopenv(parent.frame())	createTRUE
+getPropertiesfunctionfunctionmethodsClassDef
+getPrototypefunctionfunctionmethodsClassDef
+getRefClassfunctionfunctionmethodsClass	wheretopenv(parent.frame())
+getSlotsfunctionfunctionmethodsx
+getSubclassesfunctionfunctionmethodsClassDef
+getValidityfunctionfunctionmethodsClassDef
+getVirtualfunctionfunctionmethodsClassDef
+hasArgfunctionfunctionmethodsname
+hasLoadActionfunctionfunctionmethodsaname	wheretopenv(parent.frame())
+hasMethodfunctionfunctionmethodsf	signaturecharacter()	where.genEnv(f, topenv(parent.frame()))
+hasMethodsfunctionfunctionmethodsf	where	package""
+implicitGenericfunctionfunctionmethodsname	wheretopenv(parent.frame())	genericgetGeneric(name, where = where)
+inheritedSlotNamesfunctionfunctionmethodsClass	wheretopenv(parent.frame())
+initFieldArgsfunctionfunctionmethods.Object	classDef	selfEnv	...
+initializefunctionfunctionmethods.Object	...
+initRefFieldsfunctionfunctionmethods.Object	classDef	selfEnv	args
+insertMethodfunctionfunctionmethodsmlist	signature	args	def	cacheOnlyFALSE
+insertSourcefunctionfunctionmethodssource	package""	functionsallPlainObjects()	methods(if (missing(functions)) allMethodTables() else NULL)	forcemissing(functions) & missing(methods)
+isfunctionfunctionmethodsobject	class2
+isClassfunctionfunctionmethodsClass	formalTRUE	wheretopenv(parent.frame())
+isClassDeffunctionfunctionmethodsobject
+isClassUnionfunctionfunctionmethodsClass
+isGenericfunctionfunctionmethodsf	wheretopenv(parent.frame())	fdefNULL	getNameFALSE
+isGrammarSymbolfunctionfunctionmethodssymbol
+isGroupfunctionfunctionmethodsf	wheretopenv(parent.frame())	fdefgetGeneric(f, where = where)
+isSealedClassfunctionfunctionmethodsClass	wheretopenv(parent.frame())
+isSealedMethodfunctionfunctionmethodsf	signature	fdefgetGeneric(f, FALSE, where = where)	wheretopenv(parent.frame())
+isVirtualClassfunctionfunctionmethodsClass	wheretopenv(parent.frame())
+isXS3ClassfunctionfunctionmethodsclassDef
+kroneckerfunctionfunctionmethodsX	Y	FUN"*"	make.dimnamesFALSE	...
+languageElfunctionfunctionmethodsobject	which
+languageEl<-functionfunctionmethodsobject	which	value
+linearizeMlistfunctionfunctionmethodsmlist	inheritedTRUE
+listFromMethodsfunctionfunctionmethodsgeneric	where	table
+listFromMlistfunctionfunctionmethodsmlist	prefixlist()	sigs.TRUE	methods.TRUE
+loadMethodfunctionfunctionmethodsmethod	fname	envir
+Logicfunctionfunctionmethodse1	e2
+makeClassRepresentationfunctionfunctionmethodsname	slotslist()	superClassescharacter()	prototypeNULL	package	validityNULL	accesslist()	version.newExternalptr()	sealedFALSE	virtualNA	where
+makeExtendsfunctionfunctionmethodsClass	to	coerceNULL	testNULL	replaceNULL	bycharacter()	package	slotsgetSlots(classDef1)	classDef1getClass(Class)	classDef2
+makeGenericfunctionfunctionmethodsf	fdef	fdefault	grouplist()	valueClasscharacter()	packagegetPackageName(environment(fdef))	signatureNULL	genericFunctionNULL	simpleInheritanceOnlyNULL
+makeMethodsListfunctionfunctionmethodsobject	level1
+makePrototypeFromClassDeffunctionfunctionmethodsslots	ClassDef	extends	where
+makeStandardGenericfunctionfunctionmethodsf	fdef
+matchSignaturefunctionfunctionmethodssignature	fun	wherebaseenv()
+Mathfunctionfunctionmethodsx
+Math2functionfunctionmethodsx	digits
+mergeMethodsfunctionfunctionmethodsm1	m2	genericLabelcharacter()
+metaNameUndofunctionfunctionmethodsstrings	prefix	searchFormFALSE
+MethodAddCoercefunctionfunctionmethodsmethod	argName	thisClass	methodClass
+methodSignatureMatrixfunctionfunctionmethodsobject	sigSlotsc("target", "defined")
+method.skeletonfunctionfunctionmethodsgeneric	signature	file	externalFALSE	wheretopenv(parent.frame())
+MethodsListfunctionfunctionmethods.ArgName	...
+MethodsListSelectfunctionfunctionmethodsf	env	mlistNULL	fEnvif (is(fdef, "genericFunction")) environment(fdef) else baseenv()	finalDefaultfinalDefaultMethod(mlist)	evalArgsTRUE	useInheritedTRUE	fdefgetGeneric(f, where = env)	resetAllowedTRUE
+methodsPackageMetaNamefunctionfunctionmethodsprefix	name	package""
+missingArgfunctionfunctionmethodssymbol	envirparent.frame()	evalFALSE
+mlistMetaNamefunctionfunctionmethodsname""	package""
+multipleClassesfunctionfunctionmethodsdetailsFALSE
+newfunctionfunctionmethodsClass	...
+newBasicfunctionfunctionmethodsClass	...
+newClassRepresentationfunctionfunctionmethods...
+newEmptyObjectfunctionfunctionmethods
+Opsfunctionfunctionmethodse1	e2
+packageSlotfunctionfunctionmethodsobject
+packageSlot<-functionfunctionmethodsobject	value
+possibleExtendsfunctionfunctionmethodsclass1	class2	ClassDef1getClassDef(class1)	ClassDef2getClassDef(class2, where = .classEnv(ClassDef1))
+prohibitGenericfunctionfunctionmethodsname	wheretopenv(parent.frame())
+promptClassfunctionfunctionmethodsclName	filenameNULL	type"class"	keywords"classes"	wheretopenv(parent.frame())	generatorName
+promptMethodsfunctionfunctionmethodsf	filenameNULL	methods
+prototypefunctionfunctionmethods...
+Quotefunctionfunctionmethods
+rbind2functionfunctionmethodsx	y	...
+reconcilePropertiesAndPrototypefunctionfunctionmethodsname	properties	prototype	superClasses	where
+registerImplicitGenericsfunctionfunctionmethodswhat.ImplicitGenericsTable(where)	wheretopenv(parent.frame())
+rematchDefinitionfunctionfunctionmethodsdefinition	generic	mnames	fnames	signature
+removeClassfunctionfunctionmethodsClass	wheretopenv(parent.frame())
+removeGenericfunctionfunctionmethodsf	wheretopenv(parent.frame())
+removeMethodfunctionfunctionmethodsf	signaturecharacter()	wheretopenv(parent.frame())
+removeMethodsfunctionfunctionmethodsf	wheretopenv(parent.frame())	allmissing(where)
+removeMethodsObjectfunctionfunctionmethodsf	wheretopenv(parent.frame())
+representationfunctionfunctionmethods...
+requireMethodsfunctionfunctionmethodsfunctions	signature	message""	wheretopenv(parent.frame())
+resetClassfunctionfunctionmethodsClass	classDef	where
+resetGenericfunctionfunctionmethodsf	fdefgetGeneric(f, where = where)	mlistgetMethodsForDispatch(fdef)	wheretopenv(parent.frame())	defltfinalDefaultMethod(mlist)
+S3Classfunctionfunctionmethodsobject
+S3Class<-functionfunctionmethodsobject	value
+S3Partfunctionfunctionmethodsobject	strictS3FALSE	S3Class
+S3Part<-functionfunctionmethodsobject	strictS3FALSE	needClass.S3Class(object)	value
+sealClassfunctionfunctionmethodsClass	wheretopenv(parent.frame())
+seemsS4Objectfunctionfunctionmethodsobject
+selectMethodfunctionfunctionmethodsf	signature	optionalFALSE	useInheritedTRUE	mlistif (!is.null(fdef)) getMethodsForDispatch(fdef)	fdefgetGeneric(f, !optional)	verboseFALSE	doCacheFALSE	returnAllFALSE
+selectSuperClassesfunctionfunctionmethodsClass	dropVirtualFALSE	namesOnlyTRUE	directOnlyTRUE	simpleOnly	wheretopenv(parent.frame())
+sessionDatafunctionfunctionmethods
+setAsfunctionfunctionmethodsfrom	to	def	replaceNULL	wheretopenv(parent.frame())
+setClassfunctionfunctionmethodsClass	representationlist()	prototypeNULL	containscharacter()	validityNULL	accesslist()	wheretopenv(parent.frame())	version.newExternalptr()	sealedFALSE	packagegetPackageName(where)	S3methodsFALSE
+setClassUnionfunctionfunctionmethodsname	memberscharacter()	wheretopenv(parent.frame())
+setDataPartfunctionfunctionmethodsobject	value	checkTRUE
+setGenericfunctionfunctionmethodsname	defNULL	grouplist()	valueClasscharacter()	wheretopenv(parent.frame())	packageNULL	signatureNULL	useAsDefaultNULL	genericFunctionNULL	simpleInheritanceOnlyNULL
+setGenericImplicitfunctionfunctionmethodsname	wheretopenv(parent.frame())	restoreTRUE
+setGroupGenericfunctionfunctionmethodsname	defNULL	grouplist()	valueClasscharacter()	knownMemberslist()	packagegetPackageName(where)	wheretopenv(parent.frame())
+setIsfunctionfunctionmethodsclass1	class2	testNULL	coerceNULL	replaceNULL	bycharacter()	wheretopenv(parent.frame())	classDefgetClass(class1, TRUE, where = where)	extensionObjectNULL	doCompleteTRUE
+setLoadActionfunctionfunctionmethodsaction	aname""	wheretopenv(parent.frame())
+setLoadActionsfunctionfunctionmethods...	.wheretopenv(parent.frame())
+setMethodfunctionfunctionmethodsf	signaturecharacter()	definition	wheretopenv(parent.frame())	valueClassNULL	sealedFALSE
+setOldClassfunctionfunctionmethodsClasses	prototypeNULL	wheretopenv(parent.frame())	testFALSE	S4Class
+setPackageNamefunctionfunctionmethodspkg	env
+setPrimitiveMethodsfunctionfunctionmethodsf	fdef	code	generic	mlistget(".Methods", envir = environment(generic))
+setRefClassfunctionfunctionmethodsClass	fieldscharacter()	containscharacter()	methodslist()	wheretopenv(parent.frame())	...
+setReplaceMethodfunctionfunctionmethodsf	...	wheretopenv(parent.frame())
+setValidityfunctionfunctionmethodsClass	method	wheretopenv(parent.frame())
+showfunctionfunctionmethodsobject
+showClassfunctionfunctionmethodsClass	completeTRUE	propertiesAreCalled"Slots"
+showDefaultfunctionfunctionmethodsobject	oldMethodsTRUE
+showExtendsfunctionfunctionmethodsext	printTostdout()
+showMethodsfunctionfunctionmethodsfcharacter()	wheretopenv(parent.frame())	classesNULL	includeDefsFALSE	inherited!includeDefs	showEmpty	printTostdout()	fdefgetGeneric(f, where = where)
+showMlistfunctionfunctionmethodsmlist	includeDefsTRUE	inheritedTRUE	classesNULL	useArgNamesTRUE	printTostdout()
+signaturefunctionfunctionmethods...
+SignatureMethodfunctionfunctionmethodsnames	signature	definition
+sigToEnvfunctionfunctionmethodssignature	generic
+slotfunctionfunctionmethodsobject	name
+slot<-functionfunctionmethodsobject	name	checkTRUE	value
+slotNamesfunctionfunctionmethodsx
+slotsFromS3functionfunctionmethodsobject
+substituteDirectfunctionfunctionmethodsobject	frameparent.frame()	cleanFunctionTRUE
+substituteFunctionArgsfunctionfunctionmethodsdef	newArgs	argsformalArgs(def)	silentFALSE	functionName"a function"
+Summaryfunctionfunctionmethodsx	...	na.rmFALSE
+superClassDepthfunctionfunctionmethodsClassDef	soFarClassDef@className	simpleOnlyTRUE
+testInheritedMethodsfunctionfunctionmethodsf	signatures	testTRUE	virtualFALSE	groupMethodsTRUE	where
+testVirtualfunctionfunctionmethodsproperties	extends	prototype	where
+traceOfffunctionfunctionmethodswhat
+traceOnfunctionfunctionmethodswhat	tracer	exitNULL
+tryNewfunctionfunctionmethodsClass	where
+trySilentfunctionfunctionmethodsexpr
+unRematchDefinitionfunctionfunctionmethodsdefinition
+validObjectfunctionfunctionmethodsobject	testFALSE	completeFALSE
+validSlotNamesfunctionfunctionmethodsnames
+^functionfunctionbase
+~functionfunctionbase
+<functionfunctionbase
+<<-functionfunctionbase
+<=functionfunctionbase
+<-functionfunctionbase
+=functionfunctionbase
+==functionfunctionbase
+>functionfunctionbase
+>=functionfunctionbase
+|functionfunctionbase
+||functionfunctionbase
+-functionfunctionbase
+:functionfunctionbase
+::functionfunctionbasepkg	name
+:::functionfunctionbasepkg	name
+!functionfunctionbase
+!=functionfunctionbase
+/functionfunctionbase
+(functionfunctionbase
+[functionfunctionbase
+[<-functionfunctionbase
+[[functionfunctionbase
+[[<-functionfunctionbase
+{functionfunctionbase
+@functionfunctionbase
+$functionfunctionbase
+$<-functionfunctionbase
+*functionfunctionbase
+&functionfunctionbase
+&&functionfunctionbase
+%/%functionfunctionbase
+%*%functionfunctionbase
+%%functionfunctionbase
++functionfunctionbase
+abbreviatefunctionfunctionbasenames.arg	use.classesTRUE	dotFALSE	strictFALSE	methodc("left.kept", "both.sides")
+absfunctionfunctionbase
+acosfunctionfunctionbase
+acoshfunctionfunctionbase
+addNAfunctionfunctionbasex	ifanyFALSE
+addTaskCallbackfunctionfunctionbasef	dataNULL	namecharacter()
+agrepfunctionfunctionbasepattern	x	max.distance0.1	costsNULL	ignore.caseFALSE	valueFALSE	fixedTRUE	useBytesFALSE
+alistfunctionfunctionbase...
+allfunctionfunctionbase
+all.equalfunctionfunctionbasetarget	current	...
+all.equal.characterfunctionfunctionbasetarget	current	check.attributesTRUE	...
+all.equal.defaultfunctionfunctionbasetarget	current	...
+all.equal.factorfunctionfunctionbasetarget	current	check.attributesTRUE	...
+all.equal.formulafunctionfunctionbasetarget	current	...
+all.equal.languagefunctionfunctionbasetarget	current	...
+all.equal.listfunctionfunctionbasetarget	current	check.attributesTRUE	...
+all.equal.numericfunctionfunctionbasetarget	current	tolerance.Machine$double.eps^0.5	scaleNULL	check.attributesTRUE	...
+all.equal.POSIXctfunctionfunctionbasetarget	current	...	scale1
+all.equal.rawfunctionfunctionbasetarget	current	check.attributesTRUE	...
+all.namesfunctionfunctionbaseexpr	functionsTRUE	max.names-1L	uniqueFALSE
+all.varsfunctionfunctionbaseexpr	functionsFALSE	max.names-1L	uniqueTRUE
+anyfunctionfunctionbase
+anyDuplicatedfunctionfunctionbasex	incomparablesFALSE	fromLastFALSE	...
+anyDuplicated.arrayfunctionfunctionbasex	incomparablesFALSE	fromLastFALSE	...
+anyDuplicated.data.framefunctionfunctionbasex	incomparablesFALSE	fromLastFALSE	...
+anyDuplicated.defaultfunctionfunctionbasex	incomparablesFALSE	fromLastFALSE	...
+anyDuplicated.matrixfunctionfunctionbasex	incomparablesFALSE	fromLastFALSE	...
+apermfunctionfunctionbasea	permNULL	resizeTRUE	...
+aperm.defaultfunctionfunctionbasea	permNULL	resizeTRUE	...
+aperm.tablefunctionfunctionbasea	permNULL	resizeTRUE	keep.classTRUE	...
+appendfunctionfunctionbasex	values	afterlength(x)
+applyfunctionfunctionbaseX	MARGIN	FUN	...
+Argfunctionfunctionbase
+argsfunctionfunctionbasename
+arrayfunctionfunctionbasedataNA	dimlength(data)	dimnamesNULL
+arrayIndfunctionfunctionbaseind	.dim	.dimnamesNULL	useNamesFALSE
+as.arrayfunctionfunctionbasex	...
+as.array.defaultfunctionfunctionbasex	...
+as.callfunctionfunctionbase
+as.characterfunctionfunctionbasex	...
+as.character.conditionfunctionfunctionbasex	...
+as.character.Datefunctionfunctionbasex	...
+as.character.defaultfunctionfunctionbasex	...
+as.character.errorfunctionfunctionbasex	...
+as.character.factorfunctionfunctionbasex	...
+as.character.hexmodefunctionfunctionbasex	...
+as.character.numeric_versionfunctionfunctionbasex	...
+as.character.octmodefunctionfunctionbasex	...
+as.character.POSIXtfunctionfunctionbasex	...
+as.character.srcreffunctionfunctionbasex	useSourceTRUE	...
+as.complexfunctionfunctionbase
+as.data.framefunctionfunctionbasex	...
+as.data.frame.arrayfunctionfunctionbasex	row.namesNULL	optionalFALSE	...
+as.data.frame.AsIsfunctionfunctionbasex	row.namesNULL	optionalFALSE	...
+as.data.frame.characterfunctionfunctionbasex	...	stringsAsFactorsdefault.stringsAsFactors()
+as.data.frame.complexfunctionfunctionbasex	row.namesNULL	optionalFALSE	...	nmpaste(deparse(substitute(x), width.cutoff = 500L), collapse = " ")
+as.data.frame.data.framefunctionfunctionbasex	row.namesNULL	...
+as.data.frame.Datefunctionfunctionbasex	row.namesNULL	optionalFALSE	...	nmpaste(deparse(substitute(x), width.cutoff = 500L), collapse = " ")
+as.data.frame.defaultfunctionfunctionbasex	...
+as.data.frame.difftimefunctionfunctionbasex	row.namesNULL	optionalFALSE	...	nmpaste(deparse(substitute(x), width.cutoff = 500L), collapse = " ")
+as.data.frame.factorfunctionfunctionbasex	row.namesNULL	optionalFALSE	...	nmpaste(deparse(substitute(x), width.cutoff = 500L), collapse = " ")
+as.data.frame.integerfunctionfunctionbasex	row.namesNULL	optionalFALSE	...	nmpaste(deparse(substitute(x), width.cutoff = 500L), collapse = " ")
+as.data.frame.listfunctionfunctionbasex	row.namesNULL	optionalFALSE	...	stringsAsFactorsdefault.stringsAsFactors()
+as.data.frame.logicalfunctionfunctionbasex	row.namesNULL	optionalFALSE	...	nmpaste(deparse(substitute(x), width.cutoff = 500L), collapse = " ")
+as.data.frame.matrixfunctionfunctionbasex	row.namesNULL	optionalFALSE	...	stringsAsFactorsdefault.stringsAsFactors()
+as.data.frame.model.matrixfunctionfunctionbasex	row.namesNULL	optionalFALSE	...
+as.data.frame.numericfunctionfunctionbasex	row.namesNULL	optionalFALSE	...	nmpaste(deparse(substitute(x), width.cutoff = 500L), collapse = " ")
+as.data.frame.numeric_versionfunctionfunctionbasex	row.namesNULL	optionalFALSE	...	nmpaste(deparse(substitute(x), width.cutoff = 500L), collapse = " ")
+as.data.frame.orderedfunctionfunctionbasex	row.namesNULL	optionalFALSE	...	nmpaste(deparse(substitute(x), width.cutoff = 500L), collapse = " ")
+as.data.frame.POSIXctfunctionfunctionbasex	row.namesNULL	optionalFALSE	...	nmpaste(deparse(substitute(x), width.cutoff = 500L), collapse = " ")
+as.data.frame.POSIXltfunctionfunctionbasex	row.namesNULL	optionalFALSE	...
+as.data.frame.rawfunctionfunctionbasex	row.namesNULL	optionalFALSE	...	nmpaste(deparse(substitute(x), width.cutoff = 500L), collapse = " ")
+as.data.frame.tablefunctionfunctionbasex	row.namesNULL	...	responseName"Freq"	stringsAsFactorsTRUE
+as.data.frame.tsfunctionfunctionbasex	...
+as.data.frame.vectorfunctionfunctionbasex	row.namesNULL	optionalFALSE	...	nmpaste(deparse(substitute(x), width.cutoff = 500L), collapse = " ")
+as.Datefunctionfunctionbasex	...
+as.Date.characterfunctionfunctionbasex	format""	...
+as.Date.datefunctionfunctionbasex	...
+as.Date.datesfunctionfunctionbasex	...
+as.Date.defaultfunctionfunctionbasex	...
+as.Date.factorfunctionfunctionbasex	...
+as.Date.numericfunctionfunctionbasex	origin	...
+as.Date.POSIXctfunctionfunctionbasex	tz"UTC"	...
+as.Date.POSIXltfunctionfunctionbasex	...
+as.difftimefunctionfunctionbasetim	format"%X"	units"auto"
+as.doublefunctionfunctionbase
+as.double.difftimefunctionfunctionbasex	units"auto"	...
+as.double.POSIXltfunctionfunctionbasex	...
+as.environmentfunctionfunctionbase
+as.expressionfunctionfunctionbasex	...
+as.expression.defaultfunctionfunctionbasex	...
+as.factorfunctionfunctionbasex
+as.functionfunctionfunctionbasex	envirparent.frame()	...
+as.function.defaultfunctionfunctionbasex	envirparent.frame()	...
+as.hexmodefunctionfunctionbasex
+asinfunctionfunctionbase
+asinhfunctionfunctionbase
+as.integerfunctionfunctionbase
+[.AsIsfunctionfunctionbasex	i	...
+as.listfunctionfunctionbasex	...
+as.list.data.framefunctionfunctionbasex	...
+as.list.Datefunctionfunctionbasex	...
+as.list.defaultfunctionfunctionbasex	...
+as.list.environmentfunctionfunctionbasex	all.namesFALSE	...
+as.list.factorfunctionfunctionbasex	...
+as.list.functionfunctionfunctionbasex	...
+as.list.numeric_versionfunctionfunctionbasex	...
+as.list.POSIXctfunctionfunctionbasex	...
+as.logicalfunctionfunctionbase
+as.logical.factorfunctionfunctionbasex	...
+as.matrixfunctionfunctionbasex	...
+as.matrix.data.framefunctionfunctionbasex	rownames.forceNA	...
+as.matrix.defaultfunctionfunctionbasex	...
+as.matrix.noquotefunctionfunctionbasex	...
+as.matrix.POSIXltfunctionfunctionbasex	...
+as.namefunctionfunctionbasex
+asNamespacefunctionfunctionbasens	base.OKTRUE
+as.nullfunctionfunctionbasex	...
+as.null.defaultfunctionfunctionbasex	...
+as.numericfunctionfunctionbase
+as.numeric_versionfunctionfunctionbasex
+as.octmodefunctionfunctionbasex
+as.orderedfunctionfunctionbasex
+as.package_versionfunctionfunctionbasex
+as.pairlistfunctionfunctionbasex
+as.POSIXctfunctionfunctionbasex	tz""	...
+as.POSIXct.datefunctionfunctionbasex	...
+as.POSIXct.Datefunctionfunctionbasex	...
+as.POSIXct.datesfunctionfunctionbasex	...
+as.POSIXct.defaultfunctionfunctionbasex	tz""	...
+as.POSIXct.numericfunctionfunctionbasex	tz""	origin	...
+as.POSIXct.POSIXltfunctionfunctionbasex	tz""	...
+as.POSIXltfunctionfunctionbasex	tz""	...
+as.POSIXlt.characterfunctionfunctionbasex	tz""	format	...
+as.POSIXlt.datefunctionfunctionbasex	...
+as.POSIXlt.Datefunctionfunctionbasex	...
+as.POSIXlt.datesfunctionfunctionbasex	...
+as.POSIXlt.defaultfunctionfunctionbasex	tz""	...
+as.POSIXlt.factorfunctionfunctionbasex	...
+as.POSIXlt.numericfunctionfunctionbasex	tz""	origin	...
+as.POSIXlt.POSIXctfunctionfunctionbasex	tz""	...
+as.qrfunctionfunctionbasex
+as.rawfunctionfunctionbase
+as.realfunctionfunctionbase
+asS3functionfunctionbaseobject	flagTRUE	completeTRUE
+asS4functionfunctionbaseobject	flagTRUE	completeTRUE
+assignfunctionfunctionbasex	value	pos-1	enviras.environment(pos)	inheritsFALSE	immediateTRUE
+as.singlefunctionfunctionbasex	...
+as.single.defaultfunctionfunctionbasex	...
+as.symbolfunctionfunctionbasex
+as.tablefunctionfunctionbasex	...
+as.table.defaultfunctionfunctionbasex	...
+as.vectorfunctionfunctionbasex	mode"any"
+as.vector.factorfunctionfunctionbasex	mode"any"
+atanfunctionfunctionbase
+atan2functionfunctionbasey	x
+atanhfunctionfunctionbase
+attachfunctionfunctionbasewhat	pos2	namedeparse(substitute(what))	warn.conflictsTRUE
+attachNamespacefunctionfunctionbasens	pos2	dataPathNULL	dependsNULL
+attrfunctionfunctionbase
+attr<-functionfunctionbase
+attr.all.equalfunctionfunctionbasetarget	current	check.attributesTRUE	check.namesTRUE	...
+attributesfunctionfunctionbase
+attributes<-functionfunctionbase
+autoloadfunctionfunctionbasename	package	resetFALSE	...
+autoloaderfunctionfunctionbasename	package	...
+backsolvefunctionfunctionbaser	x	kncol(r)	upper.triTRUE	transposeFALSE
+baseenvfunctionfunctionbase
+basenamefunctionfunctionbasepath
+besselIfunctionfunctionbasex	nu	expon.scaledFALSE
+besselJfunctionfunctionbasex	nu
+besselKfunctionfunctionbasex	nu	expon.scaledFALSE
+besselYfunctionfunctionbasex	nu
+betafunctionfunctionbasea	b
+bindingIsActivefunctionfunctionbasesym	env
+bindingIsLockedfunctionfunctionbasesym	env
+bindtextdomainfunctionfunctionbasedomain	dirnameNULL
+bodyfunctionfunctionbasefunsys.function(sys.parent())
+body<-functionfunctionbasefun	envirenvironment(fun)	value
+bquotefunctionfunctionbaseexpr	whereparent.frame()
+breakflow-controlflow-controlbaseNot a function
+browserfunctionfunctionbase
+browserConditionfunctionfunctionbase
+browserSetDebugfunctionfunctionbase
+browserTextfunctionfunctionbase
+builtinsfunctionfunctionbaseinternalFALSE
+byfunctionfunctionbasedata	INDICES	FUN	...	simplifyTRUE
+by.data.framefunctionfunctionbasedata	INDICES	FUN	...	simplifyTRUE
+by.defaultfunctionfunctionbasedata	INDICES	FUN	...	simplifyTRUE
+bzfilefunctionfunctionbasedescription	open""	encodinggetOption("encoding")	compression9
+cfunctionfunctionbase
+callfunctionfunctionbase
+callCCfunctionfunctionbasefun
+capabilitiesfunctionfunctionbasewhatNULL
+casefoldfunctionfunctionbasex	upperFALSE
+catfunctionfunctionbase...	file""	sep" "	fillFALSE	labelsNULL	appendFALSE
+categoryfunctionfunctionbase...
+cbindfunctionfunctionbase...	deparse.level1
+cbind.data.framefunctionfunctionbase...	deparse.level1
+c.Datefunctionfunctionbase...	recursiveFALSE
+ceilingfunctionfunctionbase
+characterfunctionfunctionbase
+char.expandfunctionfunctionbaseinput	target	nomatchstop("no match")
+charmatchfunctionfunctionbasex	table
+charToRawfunctionfunctionbasex
+chartrfunctionfunctionbaseold	new	x
+check_tzonesfunctionfunctionbase...
+cholfunctionfunctionbasex	pivotFALSE	LINPACK	...
+chol2invfunctionfunctionbasex	sizeNCOL(x)	LINPACKFALSE
+chol.defaultfunctionfunctionbasex	pivotFALSE	LINPACK	...
+choosefunctionfunctionbasen	k
+classfunctionfunctionbase
+class<-functionfunctionbase
+closefunctionfunctionbasecon	...
+closeAllConnectionsfunctionfunctionbase
+close.connectionfunctionfunctionbasecon	type"rw"	...
+close.srcfilefunctionfunctionbasecon	...
+close.srcfilealiasfunctionfunctionbasecon	...
+c.noquotefunctionfunctionbase...	recursiveFALSE
+c.numeric_versionfunctionfunctionbase...	recursiveFALSE
+colfunctionfunctionbasex	as.factorFALSE
+colMeansfunctionfunctionbasex	na.rmFALSE
+colnamesfunctionfunctionbasex	do.NULLTRUE	prefix"col"
+colnames<-functionfunctionbasex	value
+colSumsfunctionfunctionbasex	na.rmFALSE
+commandArgsfunctionfunctionbasetrailingOnlyFALSE
+commentfunctionfunctionbasex
+comment<-functionfunctionbasex	value
+complexfunctionfunctionbaserealnumeric()	imaginarynumeric()	modulus1	argument0
+computeRestartsfunctionfunctionbasecondNULL
+conditionCallfunctionfunctionbasec
+conditionCall.conditionfunctionfunctionbasec
+conditionMessagefunctionfunctionbasec
+conditionMessage.conditionfunctionfunctionbasec
+conflictsfunctionfunctionbasewheresearch()	detailFALSE
+Conjfunctionfunctionbase
+contributorsfunctionfunctionbase
+cosfunctionfunctionbase
+coshfunctionfunctionbase
+c.POSIXctfunctionfunctionbase...	recursiveFALSE
+c.POSIXltfunctionfunctionbase...	recursiveFALSE
+crossprodfunctionfunctionbasex	yNULL
+Cstack_infofunctionfunctionbase
+cummaxfunctionfunctionbase
+cumminfunctionfunctionbase
+cumprodfunctionfunctionbase
+cumsumfunctionfunctionbase
+cutfunctionfunctionbasex	breaks	labelsNULL	include.lowestFALSE	rightTRUE	dig.lab3	ordered_resultFALSE	...
+cut.Datefunctionfunctionbasex	breaks	labelsNULL	start.on.mondayTRUE	rightFALSE	...
+cut.defaultfunctionfunctionbasex	breaks	labelsNULL	include.lowestFALSE	rightTRUE	dig.lab3	ordered_resultFALSE	...
+cut.POSIXtfunctionfunctionbasex	breaks	labelsNULL	start.on.mondayTRUE	rightFALSE	...
+data.classfunctionfunctionbasex
+[<-.data.framefunctionfunctionbasex	i	j	value
+[.data.framefunctionfunctionbasex	i	j	dropif (missing(i)) TRUE else length(cols) == 1
+[[<-.data.framefunctionfunctionbasex	i	j	value
+[[.data.framefunctionfunctionbasex	...	exactTRUE
+$<-.data.framefunctionfunctionbasex	name	value
+data.framefunctionfunctionbase...	row.namesNULL	check.rowsFALSE	check.namesTRUE	stringsAsFactorsdefault.stringsAsFactors()
+data.matrixfunctionfunctionbaseframe	rownames.forceNA
+datefunctionfunctionbase
+-.Datefunctionfunctionbasee1	e2
+[<-.Datefunctionfunctionbasex	...	value
+[.Datefunctionfunctionbasex	...	dropTRUE
+[[.Datefunctionfunctionbasex	...	dropTRUE
++.Datefunctionfunctionbasee1	e2
+debugfunctionfunctionbasefun	text""	conditionNULL
+debugoncefunctionfunctionbasefun	text""	conditionNULL
+default.stringsAsFactorsfunctionfunctionbase
+delayedAssignfunctionfunctionbasex	value	eval.envparent.frame(1)	assign.envparent.frame(1)
+deparsefunctionfunctionbaseexpr	backtickmode(expr) %in% c("call", "expression", "(", "function")	controlc("keepInteger", "showAttributes", "keepNA")	nlines-1L
+detfunctionfunctionbasex	...
+detachfunctionfunctionbasename	pos2	unloadFALSE	character.onlyFALSE	forceFALSE
+determinantfunctionfunctionbasex	logarithmTRUE	...
+determinant.matrixfunctionfunctionbasex	logarithmTRUE	...
+dgetfunctionfunctionbasefile
+diagfunctionfunctionbasex1	nrow	ncol
+diag<-functionfunctionbasex	value
+difffunctionfunctionbasex	...
+diff.Datefunctionfunctionbasex	...
+diff.defaultfunctionfunctionbasex	...
+diff.POSIXtfunctionfunctionbasex	...
+difftimefunctionfunctionbasetime1	time2	tz	unitsc("auto", "secs", "mins", "hours", "days", "weeks")
+/.difftimefunctionfunctionbasee1	e2
+[.difftimefunctionfunctionbasex	...	dropTRUE
+*.difftimefunctionfunctionbasee1	e2
+digammafunctionfunctionbase
+dimfunctionfunctionbase
+dim<-functionfunctionbase
+dim.data.framefunctionfunctionbasex
+dimnamesfunctionfunctionbase
+dimnames<-functionfunctionbase
+dimnames<-.data.framefunctionfunctionbasex	value
+dimnames.data.framefunctionfunctionbasex
+dirfunctionfunctionbasepath"."	patternNULL	all.filesFALSE	full.namesFALSE	recursiveFALSE	ignore.caseFALSE	include.dirsFALSE
+dir.createfunctionfunctionbasepath	showWarningsTRUE	recursiveFALSE	mode"0777"
+dirnamefunctionfunctionbasepath
+$.DLLInfofunctionfunctionbasex	name
+do.callfunctionfunctionbasewhat	args	quoteFALSE	envirparent.frame()
+doublefunctionfunctionbase
+dputfunctionfunctionbasex	file""	controlc("keepNA", "keepInteger", "showAttributes")
+dQuotefunctionfunctionbasex
+dropfunctionfunctionbasex
+droplevelsfunctionfunctionbasex	...
+droplevels.data.framefunctionfunctionbasex	exceptNULL	...
+droplevels.factorfunctionfunctionbasex	...
+dumpfunctionfunctionbaselist	file"dumpdata.R"	appendFALSE	control"all"	envirparent.frame()	evaluateTRUE
+duplicatedfunctionfunctionbasex	incomparablesFALSE	fromLastFALSE	...
+duplicated.arrayfunctionfunctionbasex	incomparablesFALSE	fromLastFALSE	...
+duplicated.data.framefunctionfunctionbasex	incomparablesFALSE	fromLastFALSE	...
+duplicated.defaultfunctionfunctionbasex	incomparablesFALSE	fromLastFALSE	...
+duplicated.matrixfunctionfunctionbasex	incomparablesFALSE	fromLastFALSE	...
+duplicated.numeric_versionfunctionfunctionbasex	incomparablesFALSE	...
+duplicated.POSIXltfunctionfunctionbasex	incomparablesFALSE	...
+dyn.loadfunctionfunctionbasex	localTRUE	nowTRUE	...
+dyn.unloadfunctionfunctionbasex
+eapplyfunctionfunctionbaseenv	FUN	...	all.namesFALSE	USE.NAMESTRUE
+eigenfunctionfunctionbasex	symmetric	only.valuesFALSE	EISPACKFALSE
+emptyenvfunctionfunctionbase
+enc2nativefunctionfunctionbase
+enc2utf8functionfunctionbase
+encodeStringfunctionfunctionbasex	quote""	na.encodeTRUE	justifyc("left", "right", "centre", "none")
+Encodingfunctionfunctionbasex
+Encoding<-functionfunctionbasex	value
+enquotefunctionfunctionbasecl
+environmentfunctionfunctionbasefunNULL
+environment<-functionfunctionbase
+environmentIsLockedfunctionfunctionbaseenv
+environmentNamefunctionfunctionbaseenv
+env.profilefunctionfunctionbaseenv
+evalfunctionfunctionbaseexpr	envirparent.frame()	enclosif (is.list(envir) || is.pairlist(envir)) parent.frame() else baseenv()
+eval.parentfunctionfunctionbaseexpr	n1
+evalqfunctionfunctionbaseexpr	envirparent.frame()	enclosif (is.list(envir) || is.pairlist(envir)) parent.frame() else baseenv()
+existsfunctionfunctionbasex	where-1	envirif (missing(frame)) as.environment(where) else sys.frame(frame)	frame	mode"any"	inheritsTRUE
+expfunctionfunctionbase
+expand.gridfunctionfunctionbase...	KEEP.OUT.ATTRSTRUE	stringsAsFactorsTRUE
+expm1functionfunctionbase
+expressionfunctionfunctionbase
+FlogicallogicalbaseNot a function
+factorfunctionfunctionbasexcharacter()	levels	labels	excludeNA	orderedis.ordered(x)
+[<-.factorfunctionfunctionbasex	...	value
+[.factorfunctionfunctionbasex	...	dropFALSE
+[[<-.factorfunctionfunctionbasex	...	value
+[[.factorfunctionfunctionbasex	...
+factorialfunctionfunctionbasex
+fifofunctionfunctionbasedescription	open""	blockingFALSE	encodinggetOption("encoding")
+filefunctionfunctionbasedescription""	open""	blockingTRUE	encodinggetOption("encoding")	rawFALSE
+file.accessfunctionfunctionbasenames	mode0
+file.appendfunctionfunctionbasefile1	file2
+file.choosefunctionfunctionbasenewFALSE
+file.copyfunctionfunctionbasefrom	to	overwrite	recursiveFALSE	copy.modeTRUE
+file.createfunctionfunctionbase...	showWarningsTRUE
+file.existsfunctionfunctionbase...
+file.infofunctionfunctionbase...
+file.linkfunctionfunctionbasefrom	to
+file.pathfunctionfunctionbase...	fsep.Platform$file.sep
+file.removefunctionfunctionbase...
+file.renamefunctionfunctionbasefrom	to
+file.showfunctionfunctionbase...	headerrep("", nfiles)	title"R Information"	delete.fileFALSE	pagergetOption("pager")	encoding""
+file.symlinkfunctionfunctionbasefrom	to
+Filterfunctionfunctionbasef	x
+Findfunctionfunctionbasef	x	rightFALSE	nomatchNULL
+findIntervalfunctionfunctionbasex	vec	rightmost.closedFALSE	all.insideFALSE
+find.packagefunctionfunctionbasepackageNULL	lib.locNULL	quietFALSE	verbosegetOption("verbose")
+findPackageEnvfunctionfunctionbaseinfo
+findRestartfunctionfunctionbasename	condNULL
+floorfunctionfunctionbase
+flushfunctionfunctionbasecon
+flush.connectionfunctionfunctionbasecon
+forflow-controlflow-controlbaseNot a function
+forcefunctionfunctionbasex
+formalsfunctionfunctionbasefunsys.function(sys.parent())
+formals<-functionfunctionbasefun	envirenvironment(fun)	value
+formatfunctionfunctionbasex	trimFALSE	digitsNULL	justifyc("left", "right", "centre", "none")	widthNULL	na.encodeTRUE	scientificNA	big.mark""	small.mark""	decimal.mark"."	zero.printNULL	drop0trailingFALSE	...
+format.AsIsfunctionfunctionbasex	width12	...
+formatCfunctionfunctionbasex	digitsNULL	widthNULL	formatNULL	flag""	modeNULL	big.mark""	small.mark""	decimal.mark"."	preserve.width"individual"	zero.printNULL	drop0trailingFALSE
+format.data.framefunctionfunctionbasex	...	justify"none"
+format.Datefunctionfunctionbasex	...
+format.defaultfunctionfunctionbasex	trimFALSE	digitsNULL	justifyc("left", "right", "centre", "none")	widthNULL	na.encodeTRUE	scientificNA	big.mark""	small.mark""	decimal.mark"."	zero.printNULL	drop0trailingFALSE	...
+format.difftimefunctionfunctionbasex	...
+formatDLfunctionfunctionbasex	y	stylec("table", "list")	width0.9 * getOption("width")	indentNULL
+format.factorfunctionfunctionbasex	...
+format.hexmodefunctionfunctionbasex	widthNULL	upper.caseFALSE	...
+format.infofunctionfunctionbasex	digitsNULL
+format.libraryIQRfunctionfunctionbasex	...
+format.numeric_versionfunctionfunctionbasex	...
+format.octmodefunctionfunctionbasex	widthNULL	...
+format.packageInfofunctionfunctionbasex	...
+format.POSIXctfunctionfunctionbasex	format""	tz""	usetzFALSE	...
+format.POSIXltfunctionfunctionbasex	format""	usetzFALSE	...
+format.pvalfunctionfunctionbasepv	digitsmax(1, getOption("digits") - 2)	eps.Machine$double.eps	na.form"NA"	...
+format.summaryDefaultfunctionfunctionbasex	...
+forwardsolvefunctionfunctionbasel	x	kncol(l)	upper.triFALSE	transposeFALSE
+functionfunctionfunctionbase
+gammafunctionfunctionbase
+gammaCodyfunctionfunctionbasex
+gcfunctionfunctionbaseverbosegetOption("verbose")	resetFALSE
+gcinfofunctionfunctionbaseverbose
+gc.timefunctionfunctionbase
+gctorturefunctionfunctionbaseonTRUE
+gctorture2functionfunctionbasestep	wait	inhibit_releaseFALSE
+getfunctionfunctionbasex	pos-1	enviras.environment(pos)	mode"any"	inheritsTRUE
+getAllConnectionsfunctionfunctionbase
+getCallingDLLfunctionfunctionbasefsys.function(-1)	doStopFALSE
+getCallingDLLefunctionfunctionbasee
+getCConverterDescriptionsfunctionfunctionbase
+getCConverterStatusfunctionfunctionbase
+getConnectionfunctionfunctionbasewhat
+getDLLRegisteredRoutinesfunctionfunctionbasedll	addNamesTRUE
+getDLLRegisteredRoutines.characterfunctionfunctionbasedll	addNamesTRUE
+getDLLRegisteredRoutines.DLLInfofunctionfunctionbasedll	addNamesTRUE
+getElementfunctionfunctionbaseobject	name
+geterrmessagefunctionfunctionbase
+getExportedValuefunctionfunctionbasens	name
+getHookfunctionfunctionbasehookName
+getLoadedDLLsfunctionfunctionbase
+getNamespacefunctionfunctionbasename
+getNamespaceExportsfunctionfunctionbasens
+getNamespaceImportsfunctionfunctionbasens
+getNamespaceInfofunctionfunctionbasens	which
+getNamespaceNamefunctionfunctionbasens
+getNamespaceUsersfunctionfunctionbasens
+getNamespaceVersionfunctionfunctionbasens
+getNativeSymbolInfofunctionfunctionbasename	PACKAGE	unlistTRUE	withRegistrationInfoFALSE
+getNumCConvertersfunctionfunctionbase
+getOptionfunctionfunctionbasex	defaultNULL
+getRversionfunctionfunctionbase
+getSrcLinesfunctionfunctionbasesrcfile	first	last
+getTaskCallbackNamesfunctionfunctionbase
+gettextfunctionfunctionbase...	domainNULL
+gettextffunctionfunctionbasefmt	...	domainNULL
+getwdfunctionfunctionbase
+glfunctionfunctionbasen	k	lengthn * k	labels1:n	orderedFALSE
+globalenvfunctionfunctionbase
+gregexprfunctionfunctionbasepattern	text	ignore.caseFALSE	perlFALSE	fixedFALSE	useBytesFALSE
+grepfunctionfunctionbasepattern	x	ignore.caseFALSE	perlFALSE	valueFALSE	fixedFALSE	useBytesFALSE	invertFALSE
+greplfunctionfunctionbasepattern	x	ignore.caseFALSE	perlFALSE	fixedFALSE	useBytesFALSE
+grepRawfunctionfunctionbasepattern	x	ignore.caseFALSE	valueFALSE	fixedFALSE	allFALSE	invertFALSE
+gsubfunctionfunctionbasepattern	replacement	x	ignore.caseFALSE	perlFALSE	fixedFALSE	useBytesFALSE
+gzconfunctionfunctionbasecon	level6	allowNonCompressedTRUE
+gzfilefunctionfunctionbasedescription	open""	encodinggetOption("encoding")	compression6
+|.hexmodefunctionfunctionbasea	b
+!.hexmodefunctionfunctionbasea
+[.hexmodefunctionfunctionbasex	i
+&.hexmodefunctionfunctionbasea	b
+Ifunctionfunctionbasex
+iconvfunctionfunctionbasex	from""	to""	subNA	markTRUE	toRawFALSE
+iconvlistfunctionfunctionbase
+icuSetCollatefunctionfunctionbase...
+identicalfunctionfunctionbasex	y	num.eqTRUE	single.NATRUE	attrib.as.setTRUE	ignore.bytecodeTRUE
+identityfunctionfunctionbasex
+ifflow-controlflow-controlbaseNot a function
+ifelsefunctionfunctionbasetest	yes	no
+Imfunctionfunctionbase
+importIntoEnvfunctionfunctionbaseimpenv	impnames	expenv	expnames
+%in%functionfunctionbasex	table
+inheritsfunctionfunctionbasex	what	whichFALSE
+integerfunctionfunctionbase
+interactionfunctionfunctionbase...	dropFALSE	sep"."	lex.orderFALSE
+interactivefunctionfunctionbase
+intersectfunctionfunctionbasex	y
+intToBitsfunctionfunctionbasex
+intToUtf8functionfunctionbasex	multipleFALSE
+inverse.rlefunctionfunctionbasex	...
+invisiblefunctionfunctionbase
+invokeRestartfunctionfunctionbaser	...
+invokeRestartInteractivelyfunctionfunctionbaser
+is.arrayfunctionfunctionbase
+is.atomicfunctionfunctionbase
+isattyfunctionfunctionbasecon
+isBaseNamespacefunctionfunctionbasens
+is.callfunctionfunctionbase
+is.characterfunctionfunctionbase
+is.complexfunctionfunctionbase
+is.data.framefunctionfunctionbasex
+isdebuggedfunctionfunctionbasefun
+is.doublefunctionfunctionbase
+is.elementfunctionfunctionbaseel	set
+is.environmentfunctionfunctionbase
+is.expressionfunctionfunctionbase
+is.factorfunctionfunctionbasex
+is.finitefunctionfunctionbase
+is.functionfunctionfunctionbase
+isIncompletefunctionfunctionbasecon
+is.infinitefunctionfunctionbase
+is.integerfunctionfunctionbase
+is.languagefunctionfunctionbase
+is.listfunctionfunctionbase
+is.loadedfunctionfunctionbasesymbol	PACKAGE""	type""
+is.logicalfunctionfunctionbase
+is.matrixfunctionfunctionbase
+is.nafunctionfunctionbase
+is.na<-functionfunctionbasex	value
+is.na.data.framefunctionfunctionbasex
+is.na<-.defaultfunctionfunctionbasex	value
+is.na<-.factorfunctionfunctionbasex	value
+is.namefunctionfunctionbase
+isNamespacefunctionfunctionbasens
+is.nanfunctionfunctionbase
+is.na.numeric_versionfunctionfunctionbasex
+is.na.POSIXltfunctionfunctionbasex
+is.nullfunctionfunctionbase
+is.numericfunctionfunctionbase
+is.numeric.Datefunctionfunctionbasex
+is.numeric.difftimefunctionfunctionbasex
+is.numeric.POSIXtfunctionfunctionbasex
+is.numeric_versionfunctionfunctionbasex
+is.objectfunctionfunctionbase
+ISOdatefunctionfunctionbaseyear	month	day	hour12	min0	sec0	tz"GMT"
+ISOdatetimefunctionfunctionbaseyear	month	day	hour	min	sec	tz""
+isOpenfunctionfunctionbasecon	rw""
+is.orderedfunctionfunctionbasex
+is.package_versionfunctionfunctionbasex
+is.pairlistfunctionfunctionbase
+is.primitivefunctionfunctionbasex
+is.qrfunctionfunctionbasex
+is.Rfunctionfunctionbase
+is.rawfunctionfunctionbase
+is.realfunctionfunctionbase
+is.recursivefunctionfunctionbase
+isRestartfunctionfunctionbasex
+isS4functionfunctionbaseobject
+isSeekablefunctionfunctionbasecon
+is.singlefunctionfunctionbase
+is.symbolfunctionfunctionbase
+isSymmetricfunctionfunctionbaseobject	...
+isSymmetric.matrixfunctionfunctionbaseobject	tol100 * .Machine$double.eps	...
+is.tablefunctionfunctionbasex
+isTRUEfunctionfunctionbasex
+is.unsortedfunctionfunctionbasex	na.rmFALSE	strictlyFALSE
+is.vectorfunctionfunctionbasex	mode"any"
+jitterfunctionfunctionbasex	factor1	amountNULL
+julianfunctionfunctionbasex	...
+julian.Datefunctionfunctionbasex	originas.Date("1970-01-01")	...
+julian.POSIXtfunctionfunctionbasex	originas.POSIXct("1970-01-01", tz = "GMT")	...
+kappafunctionfunctionbasez	exactFALSE	normNULL	methodc("qr", "direct")	...
+kappa.defaultfunctionfunctionbasez	exactFALSE	normNULL	methodc("qr", "direct")	...
+kappa.lmfunctionfunctionbasez	...
+kappa.qrfunctionfunctionbasez	...
+kappa.trifunctionfunctionbasez	exactFALSE	LINPACKTRUE	normNULL	...
+kroneckerfunctionfunctionbaseX	Y	FUN"*"	make.dimnamesFALSE	...
+l10n_infofunctionfunctionbase
+labelsfunctionfunctionbaseobject	...
+labels.defaultfunctionfunctionbaseobject	...
+lapplyfunctionfunctionbaseX	FUN	...
+La.svdfunctionfunctionbasex	numin(n, p)	nvmin(n, p)
+lazyLoadfunctionfunctionbasefilebase	envirparent.frame()	filter
+lazyLoadDBexecfunctionfunctionbasefilebase	fun	filter
+lazyLoadDBfetchfunctionfunctionbase
+lbetafunctionfunctionbasea	b
+lchoosefunctionfunctionbasen	k
+lengthfunctionfunctionbase
+length<-functionfunctionbase
+length<-.factorfunctionfunctionbasex	value
+length.POSIXltfunctionfunctionbasex
+letterscharactercharacterbaseNot a function
+LETTERScharactercharacterbaseNot a function
+levelsfunctionfunctionbasex
+levels<-functionfunctionbase
+levels.defaultfunctionfunctionbasex
+levels<-.factorfunctionfunctionbasex	value
+lfactorialfunctionfunctionbasex
+lgammafunctionfunctionbase
+libraryfunctionfunctionbasepackage	help	pos2	lib.locNULL	character.onlyFALSE	logical.returnFALSE	warn.conflictsTRUE	quietlyFALSE	keep.sourcegetOption("keep.source.pkgs")	verbosegetOption("verbose")
+library.dynamfunctionfunctionbasechname	package	lib.loc	verbosegetOption("verbose")	file.ext.Platform$dynlib.ext	...
+library.dynam.unloadfunctionfunctionbasechname	libpath	verbosegetOption("verbose")	file.ext.Platform$dynlib.ext
+licencefunctionfunctionbase
+licensefunctionfunctionbase
+listfunctionfunctionbase
+list2envfunctionfunctionbasex	envirNULL	parentparent.frame()	hash(length(x) > 100)	sizemax(29L, length(x))
+list.dirsfunctionfunctionbasepath"."	full.namesTRUE	recursiveTRUE
+list.filesfunctionfunctionbasepath"."	patternNULL	all.filesFALSE	full.namesFALSE	recursiveFALSE	ignore.caseFALSE	include.dirsFALSE
+[.listoffunctionfunctionbasex	i	...
+loadfunctionfunctionbasefile	envirparent.frame()
+loadedNamespacesfunctionfunctionbase
+loadingNamespaceInfofunctionfunctionbase
+loadNamespacefunctionfunctionbasepackage	lib.locNULL	keep.sourcegetOption("keep.source.pkgs")	partialFALSE
+localfunctionfunctionbaseexpr	envirnew.env()
+lockBindingfunctionfunctionbasesym	env
+lockEnvironmentfunctionfunctionbaseenv	bindingsFALSE
+logfunctionfunctionbase
+log10functionfunctionbase
+log1pfunctionfunctionbase
+log2functionfunctionbase
+logbfunctionfunctionbasex	baseexp(1)
+logicalfunctionfunctionbase
+lower.trifunctionfunctionbasex	diagFALSE
+lsfunctionfunctionbasename	pos-1	enviras.environment(pos)	all.namesFALSE	pattern
+makeActiveBindingfunctionfunctionbasesym	fun	env
+make.namesfunctionfunctionbasenames	uniqueFALSE	allow_TRUE
+make.uniquefunctionfunctionbasenames	sep"."
+manglePackageNamefunctionfunctionbasepkgName	pkgVersion
+Mapfunctionfunctionbasef	...
+mapplyfunctionfunctionbaseFUN	...	MoreArgsNULL	SIMPLIFYTRUE	USE.NAMESTRUE
+margin.tablefunctionfunctionbasex	marginNULL
+matchfunctionfunctionbasex	table	incomparablesNULL
+match.argfunctionfunctionbasearg	choices	several.okFALSE
+match.callfunctionfunctionbasedefinitionNULL	callsys.call(sys.parent())	expand.dotsTRUE
+match.funfunctionfunctionbaseFUN	descendTRUE
+Math.data.framefunctionfunctionbasex	...
+Math.Datefunctionfunctionbasex	...
+Math.difftimefunctionfunctionbasex	...
+Math.factorfunctionfunctionbasex	...
+Math.POSIXtfunctionfunctionbasex	...
+mat.or.vecfunctionfunctionbasenr	nc
+matrixfunctionfunctionbasedataNA	nrow1	ncol1	byrowFALSE	dimnamesNULL
+maxfunctionfunctionbase
+max.colfunctionfunctionbasem	ties.methodc("random", "first", "last")
+meanfunctionfunctionbasex	trim0	na.rmFALSE	...
+mean.data.framefunctionfunctionbasex	...
+mean.Datefunctionfunctionbasex	...
+mean.defaultfunctionfunctionbasex	trim0	na.rmFALSE	...
+mean.difftimefunctionfunctionbasex	...
+mean.POSIXctfunctionfunctionbasex	...
+mean.POSIXltfunctionfunctionbasex	...
+memCompressfunctionfunctionbasefrom	typec("gzip", "bzip2", "xz", "none")
+memDecompressfunctionfunctionbasefrom	typec("unknown", "gzip", "bzip2", "xz", "none")	asCharFALSE
+mem.limitsfunctionfunctionbasensizeNA	vsizeNA
+memory.profilefunctionfunctionbase
+mergefunctionfunctionbasex	y	...
+merge.data.framefunctionfunctionbasex	y	byintersect(names(x), names(y))	by.x	by.y	allFALSE	all.x	all.y	sortTRUE	suffixesc(".x", ".y")	incomparablesNULL	...
+merge.defaultfunctionfunctionbasex	y	...
+messagefunctionfunctionbase...	domainNULL	appendLFTRUE
+mgetfunctionfunctionbasex	envir	mode"any"	ifnotfoundlist(function(x) stop(paste0("value for '", x, "' not found"), 	ifnotfound    call. = FALSE))	inheritsFALSE
+minfunctionfunctionbase
+missingfunctionfunctionbase
+Modfunctionfunctionbase
+modefunctionfunctionbasex
+mode<-functionfunctionbasex	value
+month.abbcharactercharacterbaseNot a function
+month.namecharactercharacterbaseNot a function
+monthsfunctionfunctionbasex	abbreviate
+months.Datefunctionfunctionbasex	abbreviateFALSE
+months.POSIXtfunctionfunctionbasex	abbreviateFALSE
+mostattributes<-functionfunctionbaseobj	value
+namesfunctionfunctionbase
+names<-functionfunctionbase
+namespaceExportfunctionfunctionbasens	vars
+namespaceImportfunctionfunctionbaseself	...
+namespaceImportClassesfunctionfunctionbaseself	ns	vars
+namespaceImportFromfunctionfunctionbaseself	ns	vars	generics	packages
+namespaceImportMethodsfunctionfunctionbaseself	ns	vars
+names<-.POSIXltfunctionfunctionbasex	value
+names.POSIXltfunctionfunctionbasex
+nargsfunctionfunctionbase
+ncharfunctionfunctionbasex	type"chars"	allowNAFALSE
+ncolfunctionfunctionbasex
+NCOLfunctionfunctionbasex
+Negatefunctionfunctionbasef
+new.envfunctionfunctionbasehashTRUE	parentparent.frame()
+nextflow-controlflow-controlbaseNot a function
+NextMethodfunctionfunctionbasegenericNULL	objectNULL	...
+ngettextfunctionfunctionbasen	msg1	msg2	domainNULL
+nlevelsfunctionfunctionbasex
+noquotefunctionfunctionbaseobj
+[.noquotefunctionfunctionbasex	...
+normfunctionfunctionbasex	typec("O", "I", "F", "M")
+normalizePathfunctionfunctionbasepath	winslash"\"	mustWorkNA
+nrowfunctionfunctionbasex
+NROWfunctionfunctionbasex
+numericfunctionfunctionbase
+[.numeric_versionfunctionfunctionbasex	i	j
+[[<-.numeric_versionfunctionfunctionbasex	...	value
+[[.numeric_versionfunctionfunctionbasex	...	exactNA
+numeric_versionfunctionfunctionbasex	strictTRUE
+nzcharfunctionfunctionbase
+%o%functionfunctionbaseX	Y
+objectsfunctionfunctionbasename	pos-1	enviras.environment(pos)	all.namesFALSE	pattern
+|.octmodefunctionfunctionbasea	b
+!.octmodefunctionfunctionbasea
+[.octmodefunctionfunctionbasex	i
+&.octmodefunctionfunctionbasea	b
+oldClassfunctionfunctionbase
+oldClass<-functionfunctionbase
+on.exitfunctionfunctionbase
+openfunctionfunctionbasecon	...
+open.connectionfunctionfunctionbasecon	open"r"	blockingTRUE	...
+open.srcfilefunctionfunctionbasecon	line	...
+open.srcfilealiasfunctionfunctionbasecon	line	...
+open.srcfilecopyfunctionfunctionbasecon	line	...
+Ops.data.framefunctionfunctionbasee1	e2NULL
+Ops.Datefunctionfunctionbasee1	e2
+Ops.difftimefunctionfunctionbasee1	e2
+Ops.factorfunctionfunctionbasee1	e2
+Ops.numeric_versionfunctionfunctionbasee1	e2
+Ops.orderedfunctionfunctionbasee1	e2
+Ops.POSIXtfunctionfunctionbasee1	e2
+optionsfunctionfunctionbase...
+orderfunctionfunctionbase...	na.lastTRUE	decreasingFALSE
+orderedfunctionfunctionbasex	...
+outerfunctionfunctionbaseX	Y	FUN"*"	...
+packageEventfunctionfunctionbasepkgname	eventc("onLoad", "attach", "detach", "onUnload")
+packageHasNamespacefunctionfunctionbasepackage	package.lib
+packageStartupMessagefunctionfunctionbase...	domainNULL	appendLFTRUE
+$.package_versionfunctionfunctionbasex	name
+package_versionfunctionfunctionbasex	strictTRUE
+packBitsfunctionfunctionbasex	typec("raw", "integer")
+pairlistfunctionfunctionbase...
+parent.envfunctionfunctionbaseenv
+parent.env<-functionfunctionbaseenv	value
+parent.framefunctionfunctionbasen1
+parsefunctionfunctionbasefile""	nNULL	textNULL	prompt"?"	srcfileNULL	encoding"unknown"
+parseNamespaceFilefunctionfunctionbasepackage	package.lib	mustExistTRUE
+pastefunctionfunctionbase...	sep" "	collapseNULL
+paste0functionfunctionbase...	collapseNULL
+path.expandfunctionfunctionbasepath
+path.packagefunctionfunctionbasepackageNULL	quietFALSE
+pinumericnumericbaseNot a function
+pipefunctionfunctionbasedescription	open""	encodinggetOption("encoding")
+pmatchfunctionfunctionbasex	table	duplicates.okFALSE
+pmaxfunctionfunctionbase...	na.rmFALSE
+pmax.intfunctionfunctionbase...	na.rmFALSE
+pminfunctionfunctionbase...	na.rmFALSE
+pmin.intfunctionfunctionbase...	na.rmFALSE
+polyrootfunctionfunctionbasez
+Positionfunctionfunctionbasef	x	rightFALSE
+[<-.POSIXctfunctionfunctionbasex	...	value
+[.POSIXctfunctionfunctionbasex	...	dropTRUE
+[[.POSIXctfunctionfunctionbasex	...	dropTRUE
+[<-.POSIXltfunctionfunctionbasex	i	value
+[.POSIXltfunctionfunctionbasex	...	dropTRUE
+-.POSIXtfunctionfunctionbasee1	e2
++.POSIXtfunctionfunctionbasee1	e2
+pos.to.envfunctionfunctionbase
+prettyfunctionfunctionbasex	n5	min.nn%/%3	shrink.sml0.75	high.u.bias1.5	u5.bias0.5 + 1.5 * high.u.bias	eps.correct0	...
+pretty.defaultfunctionfunctionbasex	n5	min.nn%/%3	shrink.sml0.75	high.u.bias1.5	u5.bias0.5 + 1.5 * high.u.bias	eps.correct0	...
+prettyNumfunctionfunctionbasex	big.mark""	small.mark""	decimal.mark"."	preserve.widthc("common", "individual", "none")	zero.printNULL	drop0trailingFALSE	is.cmplxNA	...
+printfunctionfunctionbasex	digitsNULL	quoteTRUE	na.printNULL	print.gapNULL	rightFALSE	maxNULL	useSourceTRUE	...
+print.AsIsfunctionfunctionbasex	...
+print.byfunctionfunctionbasex	...	vsep
+print.conditionfunctionfunctionbasex	...
+print.connectionfunctionfunctionbasex	...
+print.data.framefunctionfunctionbasex	...	digitsNULL	quoteFALSE	rightTRUE	row.namesTRUE
+print.Datefunctionfunctionbasex	maxNULL	...
+print.defaultfunctionfunctionbasex	digitsNULL	quoteTRUE	na.printNULL	print.gapNULL	rightFALSE	maxNULL	useSourceTRUE	...
+print.difftimefunctionfunctionbasex	digitsgetOption("digits")	...
+print.DLLInfofunctionfunctionbasex	...
+print.DLLInfoListfunctionfunctionbasex	...
+print.DLLRegisteredRoutinesfunctionfunctionbasex	...
+print.factorfunctionfunctionbasex	quoteFALSE	max.levelsNULL	widthgetOption("width")	...
+print.functionfunctionfunctionbasex	useSourceTRUE	...
+print.hexmodefunctionfunctionbasex	...
+print.libraryIQRfunctionfunctionbasex	...
+print.listoffunctionfunctionbasex	...
+print.NativeRoutineListfunctionfunctionbasex	...
+print.noquotefunctionfunctionbasex	...
+print.numeric_versionfunctionfunctionbasex	...
+print.octmodefunctionfunctionbasex	...
+print.packageInfofunctionfunctionbasex	...
+print.POSIXctfunctionfunctionbasex	...
+print.POSIXltfunctionfunctionbasex	...
+print.proc_timefunctionfunctionbasex	...
+print.restartfunctionfunctionbasex	...
+print.rlefunctionfunctionbasex	digitsgetOption("digits")	prefix""	...
+print.simple.listfunctionfunctionbasex	...
+print.srcfilefunctionfunctionbasex	...
+print.srcreffunctionfunctionbasex	useSourceTRUE	...
+print.summaryDefaultfunctionfunctionbasex	...
+print.summary.tablefunctionfunctionbasex	digitsmax(1, getOption("digits") - 3)	...
+print.tablefunctionfunctionbasex	digitsgetOption("digits")	quoteFALSE	na.print""	zero.print"0"	justify"none"	...
+print.warningsfunctionfunctionbasex	...
+prmatrixfunctionfunctionbasex	rowlabdn[[1]]	collabdn[[2]]	quoteTRUE	rightFALSE	na.printNULL	...
+proc.timefunctionfunctionbase
+prodfunctionfunctionbase
+prop.tablefunctionfunctionbasex	marginNULL
+psigammafunctionfunctionbasex
+pushBackfunctionfunctionbasedata	connection	newLineTRUE
+pushBackLengthfunctionfunctionbaseconnection
+qfunctionfunctionbasesave"default"	status0	runLastTRUE
+qrfunctionfunctionbasex	tol1e-07	LAPACKFALSE	...
+qr.coeffunctionfunctionbaseqr	y
+qr.defaultfunctionfunctionbasex	tol1e-07	LAPACKFALSE	...
+qr.fittedfunctionfunctionbaseqr	y	kqr$rank
+qr.Qfunctionfunctionbaseqr	completeFALSE	Dvecrep.int(if (cmplx) 1 + (0+0i) else 1, if (complete) dqr[1] else min(dqr))
+qr.qtyfunctionfunctionbaseqr	y
+qr.qyfunctionfunctionbaseqr	y
+qr.Rfunctionfunctionbaseqr	completeFALSE
+qr.residfunctionfunctionbaseqr	y
+qr.solvefunctionfunctionbasea	b	tol1e-07
+qr.Xfunctionfunctionbaseqr	completeFALSE	ncolif (complete) nrow(R) else min(dim(R))
+quartersfunctionfunctionbasex	abbreviate
+quarters.Datefunctionfunctionbasex	...
+quarters.POSIXtfunctionfunctionbasex	...
+quitfunctionfunctionbasesave"default"	status0	runLastTRUE
+quotefunctionfunctionbase
+rangefunctionfunctionbase...	na.rmFALSE	finiteFALSE
+range.defaultfunctionfunctionbase...	na.rmFALSE	finiteFALSE
+rankfunctionfunctionbasex	na.lastTRUE	ties.methodc("average", "first", "random", "max", "min")
+rapplyfunctionfunctionbaseobject	f	classes"ANY"	defltNULL	howc("unlist", "replace", "list")	...
+rawfunctionfunctionbase
+rawConnectionfunctionfunctionbaseobject	open"r"
+rawConnectionValuefunctionfunctionbasecon
+rawShiftfunctionfunctionbasex	n
+rawToBitsfunctionfunctionbasex
+rawToCharfunctionfunctionbasex	multipleFALSE
+rbindfunctionfunctionbase...	deparse.level1
+rbind.data.framefunctionfunctionbase...	deparse.level1
+rcondfunctionfunctionbasex	normc("O", "I", "1")	triangularFALSE	...
+Refunctionfunctionbase
+readBinfunctionfunctionbasecon	what	signedTRUE	endian.Platform$endian
+readCharfunctionfunctionbasecon	nchars	useBytesFALSE
+read.dcffunctionfunctionbasefile	fieldsNULL	allFALSE	keep.whiteNULL
+readlinefunctionfunctionbaseprompt""
+readLinesfunctionfunctionbaseconstdin()	n-1L	okTRUE	warnTRUE	encoding"unknown"
+readRDSfunctionfunctionbasefile	refhookNULL
+readRenvironfunctionfunctionbasepath
+realfunctionfunctionbase
+Recallfunctionfunctionbase...
+Reducefunctionfunctionbasef	x	init	rightFALSE	accumulateFALSE
+regexecfunctionfunctionbasepattern	text	ignore.caseFALSE	fixedFALSE	useBytesFALSE
+regexprfunctionfunctionbasepattern	text	ignore.caseFALSE	perlFALSE	fixedFALSE	useBytesFALSE
+reg.finalizerfunctionfunctionbasee	f	onexitFALSE
+registerS3methodfunctionfunctionbasegenname	class	method	envirparent.frame()
+registerS3methodsfunctionfunctionbaseinfo	package	env
+regmatchesfunctionfunctionbasex	m	invertFALSE
+regmatches<-functionfunctionbasex	m	invertFALSE	value
+removefunctionfunctionbase...	listcharacter()	pos-1	enviras.environment(pos)	inheritsFALSE
+removeCConverterfunctionfunctionbaseid
+removeTaskCallbackfunctionfunctionbaseid
+repfunctionfunctionbase
+rep.Datefunctionfunctionbasex	...
+repeatflow-controlflow-controlbaseNot a function
+rep.factorfunctionfunctionbasex	...
+rep.intfunctionfunctionbasex	times
+replacefunctionfunctionbasex	list	values
+replicatefunctionfunctionbasen	expr	simplify"array"
+rep.numeric_versionfunctionfunctionbasex	...
+rep.POSIXctfunctionfunctionbasex	...
+rep.POSIXltfunctionfunctionbasex	...
+requirefunctionfunctionbasepackage	lib.locNULL	quietlyFALSE	warn.conflictsTRUE	keep.sourcegetOption("keep.source.pkgs")	character.onlyFALSE
+requireNamespacefunctionfunctionbasepackage	...	quietlyFALSE
+restartDescriptionfunctionfunctionbaser
+restartFormalsfunctionfunctionbaser
+retracememfunctionfunctionbase
+returnfunctionfunctionbase
+revfunctionfunctionbasex
+rev.defaultfunctionfunctionbasex
+R.homefunctionfunctionbasecomponent"home"
+rlefunctionfunctionbasex
+rmfunctionfunctionbase...	listcharacter()	pos-1	enviras.environment(pos)	inheritsFALSE
+RNGkindfunctionfunctionbasekindNULL	normal.kindNULL
+RNGversionfunctionfunctionbasevstr
+roundfunctionfunctionbase
+round.Datefunctionfunctionbasex	...
+round.POSIXtfunctionfunctionbasex	unitsc("secs", "mins", "hours", "days")
+rowfunctionfunctionbasex	as.factorFALSE
+rowMeansfunctionfunctionbasex	na.rmFALSE
+rownamesfunctionfunctionbasex	do.NULLTRUE	prefix"row"
+row.namesfunctionfunctionbasex
+row.names<-functionfunctionbasex	value
+rownames<-functionfunctionbasex	value
+row.names<-.data.framefunctionfunctionbasex	value
+row.names.data.framefunctionfunctionbasex
+row.names<-.defaultfunctionfunctionbasex	value
+row.names.defaultfunctionfunctionbasex
+rowsumfunctionfunctionbasex	group	reorderTRUE	na.rmFALSE	...
+rowsum.data.framefunctionfunctionbasex	group	reorderTRUE	na.rmFALSE	...
+rowsum.defaultfunctionfunctionbasex	group	reorderTRUE	na.rmFALSE	...
+rowSumsfunctionfunctionbasex	na.rmFALSE
+R_system_versionfunctionfunctionbasex	strictTRUE
+R.versionsimple.listlistbaseNot a function
+R.version$platformcharactercharacterbaseNot a function
+R.version$archcharactercharacterbaseNot a function
+R.version$oscharactercharacterbaseNot a function
+R.version$systemcharactercharacterbaseNot a function
+R.version$statuscharactercharacterbaseNot a function
+R.version$majorcharactercharacterbaseNot a function
+R.version$minorcharactercharacterbaseNot a function
+R.version$yearcharactercharacterbaseNot a function
+R.version$monthcharactercharacterbaseNot a function
+R.version$daycharactercharacterbaseNot a function
+R.version$svn revunknown baseNot a function
+R.version$languagecharactercharacterbaseNot a function
+R.version$version.stringcharactercharacterbaseNot a function
+R.version$nicknamecharactercharacterbaseNot a function
+R.Versionfunctionfunctionbase
+R.version.stringcharactercharacterbaseNot a function
+samplefunctionfunctionbasex	size	replaceFALSE	probNULL
+sample.intfunctionfunctionbasen	size	replaceFALSE	probNULL
+sapplyfunctionfunctionbaseX	FUN	...	simplifyTRUE	USE.NAMESTRUE
+savefunctionfunctionbase...	listcharacter()	filestop("'file' must be specified")	asciiFALSE	versionNULL	envirparent.frame()	compress!ascii	compression_level	eval.promisesTRUE	precheckTRUE
+save.imagefunctionfunctionbasefile".RData"	versionNULL	asciiFALSE	compress!ascii	safeTRUE
+saveRDSfunctionfunctionbaseobject	file""	asciiFALSE	versionNULL	compressTRUE	refhookNULL
+scalefunctionfunctionbasex	centerTRUE	scaleTRUE
+scale.defaultfunctionfunctionbasex	centerTRUE	scaleTRUE
+scanfunctionfunctionbasefile""	whatdouble()	nmax-1L	n-1L	sep""	quoteif (identical(sep, "\n")) "" else "'\""	dec"."	na.strings"NA"	flushFALSE	fillFALSE	strip.whiteFALSE	quietFALSE	blank.lines.skipTRUE	multi.lineTRUE	comment.char""	allowEscapesFALSE	fileEncoding""	encoding"unknown"	text
+searchfunctionfunctionbase
+searchpathsfunctionfunctionbase
+seekfunctionfunctionbasecon	...
+seek.connectionfunctionfunctionbasecon	whereNA	origin"start"	rw""	...
+seqfunctionfunctionbasefrom1	to1	by((to - from)/(length.out - 1))	length.outNULL	along.withNULL	...
+seq_alongfunctionfunctionbase
+seq.Datefunctionfunctionbasefrom	to	by	length.outNULL	along.withNULL	...
+seq.defaultfunctionfunctionbasefrom1	to1	by((to - from)/(length.out - 1))	length.outNULL	along.withNULL	...
+seq.intfunctionfunctionbase
+seq_lenfunctionfunctionbase
+seq.POSIXtfunctionfunctionbasefrom	to	by	length.outNULL	along.withNULL	...
+sequencefunctionfunctionbasenvec
+serializefunctionfunctionbaseobject	connection	asciiFALSE	xdrTRUE	versionNULL	refhookNULL
+setCConverterStatusfunctionfunctionbaseid	status
+setdifffunctionfunctionbasex	y
+setequalfunctionfunctionbasex	y
+setHookfunctionfunctionbasehookName	value	actionc("append", "prepend", "replace")
+setNamespaceInfofunctionfunctionbasens	which	val
+set.seedfunctionfunctionbaseseed	kindNULL	normal.kindNULL
+setSessionTimeLimitfunctionfunctionbasecpuInf	elapsedInf
+setTimeLimitfunctionfunctionbasecpuInf	elapsedInf	transientFALSE
+setwdfunctionfunctionbasedir
+showConnectionsfunctionfunctionbaseallFALSE
+shQuotefunctionfunctionbasestring	typec("sh", "csh", "cmd")
+signfunctionfunctionbase
+signalConditionfunctionfunctionbasecond
+signiffunctionfunctionbase
+simpleConditionfunctionfunctionbasemessage	callNULL
+simpleErrorfunctionfunctionbasemessage	callNULL
+[.simple.listfunctionfunctionbasex	i	...
+simpleMessagefunctionfunctionbasemessage	callNULL
+simpleWarningfunctionfunctionbasemessage	callNULL
+simplify2arrayfunctionfunctionbasex	higherTRUE
+sinfunctionfunctionbase
+singlefunctionfunctionbase
+sinhfunctionfunctionbase
+sinkfunctionfunctionbasefileNULL	appendFALSE	typec("output", "message")	splitFALSE
+sink.numberfunctionfunctionbasetypec("output", "message")
+slice.indexfunctionfunctionbasex	MARGIN
+socketConnectionfunctionfunctionbasehost"localhost"	port	serverFALSE	blockingFALSE	open"a+"	encodinggetOption("encoding")	timeoutgetOption("timeout")
+socketSelectfunctionfunctionbasesocklist	writeFALSE	timeoutNULL
+solvefunctionfunctionbasea	b	tolifelse(LINPACK, 1e-07, .Machine$double.eps)	LINPACKFALSE	...
+solve.defaultfunctionfunctionbasea	b	tolifelse(LINPACK, 1e-07, .Machine$double.eps)	LINPACKFALSE	...
+solve.qrfunctionfunctionbasea	b	...
+sortfunctionfunctionbasex	decreasingFALSE	na.lastNA	...
+sort.defaultfunctionfunctionbasex	decreasingFALSE	na.lastNA	...
+sort.intfunctionfunctionbasex	partialNULL	na.lastNA	decreasingFALSE	methodc("shell", "quick")	index.returnFALSE
+sort.listfunctionfunctionbasex	partialNULL	na.lastTRUE	decreasingFALSE	methodc("shell", "quick", "radix")
+sort.POSIXltfunctionfunctionbasex	decreasingFALSE	na.lastNA	...
+sourcefunctionfunctionbasefile	localFALSE	echo	print.eval	verbosegetOption("verbose")	prompt.echogetOption("prompt")	max.deparse.length150	chdirFALSE	encodinggetOption("encoding")	continue.echogetOption("continue")	skip.echo0	keep.sourcegetOption("keep.source")
+splitfunctionfunctionbasex	f	dropFALSE	...
+split<-functionfunctionbasex	f	dropFALSE	...	value
+split<-.data.framefunctionfunctionbasex	f	dropFALSE	...	value
+split.data.framefunctionfunctionbasex	f	dropFALSE	...
+split.Datefunctionfunctionbasex	f	dropFALSE	...
+split<-.defaultfunctionfunctionbasex	f	dropFALSE	...	value
+split.defaultfunctionfunctionbasex	f	dropFALSE	...
+split.POSIXctfunctionfunctionbasex	f	dropFALSE	...
+sprintffunctionfunctionbasefmt	...
+sqrtfunctionfunctionbase
+sQuotefunctionfunctionbasex
+srcfilefunctionfunctionbasefilename	encodinggetOption("encoding")	Enc"unknown"
+srcfilealiasfunctionfunctionbasefilename	srcfile
+srcfilecopyfunctionfunctionbasefilename	lines	timestampSys.time()	isFileFALSE
+srcreffunctionfunctionbasesrcfile	lloc
+standardGenericfunctionfunctionbase
+stderrfunctionfunctionbase
+stdinfunctionfunctionbase
+stdoutfunctionfunctionbase
+stopfunctionfunctionbase...	call.TRUE	domainNULL
+stopifnotfunctionfunctionbase...
+storage.modefunctionfunctionbasex
+storage.mode<-functionfunctionbase
+strftimefunctionfunctionbasex	format""	tz""	usetzFALSE	...
+strptimefunctionfunctionbasex	format	tz""
+strsplitfunctionfunctionbasex	split	fixedFALSE	perlFALSE	useBytesFALSE
+strtoifunctionfunctionbasex
+strtrimfunctionfunctionbasex	width
+structurefunctionfunctionbase.Data	...
+strwrapfunctionfunctionbasex	width0.9 * getOption("width")	indent0	exdent0	prefix""	simplifyTRUE	initial
+subfunctionfunctionbasepattern	replacement	x	ignore.caseFALSE	perlFALSE	fixedFALSE	useBytesFALSE
+subsetfunctionfunctionbasex	subset	...
+subset.data.framefunctionfunctionbasex	subset	select	dropFALSE	...
+subset.defaultfunctionfunctionbasex	subset	...
+subset.matrixfunctionfunctionbasex	subset	select	dropFALSE	...
+substitutefunctionfunctionbase
+substrfunctionfunctionbasex	start	stop
+substr<-functionfunctionbasex	start	stop	value
+substringfunctionfunctionbasetext	first
+substring<-functionfunctionbasetext	first	value
+sumfunctionfunctionbase
+summaryfunctionfunctionbaseobject	...	digitsmax(3, getOption("digits") - 3)
+summary.connectionfunctionfunctionbaseobject	...
+summary.data.framefunctionfunctionbaseobject	maxsum7	digitsmax(3, getOption("digits") - 3)	...
+Summary.data.framefunctionfunctionbase...	na.rm
+summary.Datefunctionfunctionbaseobject	digits12	...
+Summary.Datefunctionfunctionbase...	na.rm
+summary.defaultfunctionfunctionbaseobject	...	digitsmax(3, getOption("digits") - 3)
+Summary.difftimefunctionfunctionbase...	na.rm
+summary.factorfunctionfunctionbaseobject	maxsum100	...
+Summary.factorfunctionfunctionbase...	na.rm
+summary.matrixfunctionfunctionbaseobject	...
+Summary.numeric_versionfunctionfunctionbase...	na.rm
+Summary.orderedfunctionfunctionbase...	na.rm
+summary.POSIXctfunctionfunctionbaseobject	digits15	...
+Summary.POSIXctfunctionfunctionbase...	na.rm
+summary.POSIXltfunctionfunctionbaseobject	digits15	...
+Summary.POSIXltfunctionfunctionbase...	na.rm
+summary.srcfilefunctionfunctionbaseobject	...
+summary.srcreffunctionfunctionbaseobject	useSourceFALSE	...
+summary.tablefunctionfunctionbaseobject	...
+suppressMessagesfunctionfunctionbaseexpr
+suppressPackageStartupMessagesfunctionfunctionbaseexpr
+suppressWarningsfunctionfunctionbaseexpr
+svdfunctionfunctionbasex	numin(n, p)	nvmin(n, p)	LINPACKFALSE
+sweepfunctionfunctionbasex	MARGIN	STATS	FUN"-"	check.marginTRUE	...
+switchfunctionfunctionbase
+sys.callfunctionfunctionbase
+sys.callsfunctionfunctionbase
+Sys.chmodfunctionfunctionbasepaths	mode"0777"	use_umaskTRUE
+Sys.Datefunctionfunctionbase
+sys.framefunctionfunctionbase
+sys.framesfunctionfunctionbase
+sys.functionfunctionfunctionbase
+Sys.getenvfunctionfunctionbasexNULL	unset""	namesNA
+Sys.getlocalefunctionfunctionbasecategory"LC_ALL"
+Sys.getpidfunctionfunctionbase
+Sys.globfunctionfunctionbasepaths	dirmarkFALSE
+Sys.infofunctionfunctionbase
+sys.load.imagefunctionfunctionbasename	quiet
+Sys.localeconvfunctionfunctionbase
+sys.nframefunctionfunctionbase
+sys.on.exitfunctionfunctionbase
+sys.parentfunctionfunctionbase
+sys.parentsfunctionfunctionbase
+Sys.readlinkfunctionfunctionbasepaths
+sys.save.imagefunctionfunctionbasename
+Sys.setenvfunctionfunctionbase...
+Sys.setFileTimefunctionfunctionbasepath	time
+Sys.setlocalefunctionfunctionbasecategory"LC_ALL"	locale""
+Sys.sleepfunctionfunctionbasetime
+sys.sourcefunctionfunctionbasefile	envirbaseenv()	chdirFALSE	keep.sourcegetOption("keep.source.pkgs")
+sys.statusfunctionfunctionbase
+systemfunctionfunctionbasecommand	internFALSE	ignore.stdoutFALSE	ignore.stderrFALSE	waitTRUE	inputNULL	show.output.on.consoleTRUE	minimizedFALSE	invisibleTRUE
+system2functionfunctionbasecommand	argscharacter()	stdout""	stderr""	stdin""	inputNULL	envcharacter()	waitTRUE	minimizedFALSE	invisibleTRUE
+system.filefunctionfunctionbase...	package"base"	lib.locNULL	mustWorkFALSE
+system.timefunctionfunctionbaseexpr	gcFirstTRUE
+Sys.timefunctionfunctionbase
+Sys.timezonefunctionfunctionbase
+Sys.umaskfunctionfunctionbasemodeNA
+Sys.unsetenvfunctionfunctionbasex
+Sys.whichfunctionfunctionbasenames
+tfunctionfunctionbasex
+TlogicallogicalbaseNot a function
+tablefunctionfunctionbase...	excludeif (useNA == "no") c(NA, NaN)	useNAc("no", "ifany", "always")	dnnlist.names(...)	deparse.level1
+tabulatefunctionfunctionbasebin	nbinsmax(1L, bin, na.rm = TRUE)
+tanfunctionfunctionbase
+tanhfunctionfunctionbase
+tapplyfunctionfunctionbaseX	INDEX	FUNNULL	...	simplifyTRUE
+taskCallbackManagerfunctionfunctionbasehandlerslist()	registeredFALSE	verboseFALSE
+tcrossprodfunctionfunctionbasex	yNULL
+t.data.framefunctionfunctionbasex
+t.defaultfunctionfunctionbasex
+tempdirfunctionfunctionbase
+tempfilefunctionfunctionbasepattern"file"	tmpdirtempdir()	fileext""
+testPlatformEquivalencefunctionfunctionbasebuilt	run
+textConnectionfunctionfunctionbaseobject	open"r"	localFALSE	encodingc("", "bytes", "UTF-8")
+textConnectionValuefunctionfunctionbasecon
+tolowerfunctionfunctionbasex
+topenvfunctionfunctionbaseenvirparent.frame()	matchThisEnvgetOption("topLevelEnvironment")
+toStringfunctionfunctionbasex	widthNULL	...
+toString.defaultfunctionfunctionbasex	widthNULL	...
+toupperfunctionfunctionbasex
+tracefunctionfunctionbasewhat	tracer	exit	at	print	signature	wheretopenv(parent.frame())	editFALSE
+tracebackfunctionfunctionbasexNULL	max.linesgetOption("deparse.max.lines")
+tracememfunctionfunctionbase
+tracingStatefunctionfunctionbaseonNULL
+transformfunctionfunctionbase_data	...
+transform.data.framefunctionfunctionbase_data	...
+transform.defaultfunctionfunctionbase_data	...
+trigammafunctionfunctionbase
+truncfunctionfunctionbase
+truncatefunctionfunctionbasecon	...
+truncate.connectionfunctionfunctionbasecon	...
+trunc.Datefunctionfunctionbasex	...
+trunc.POSIXtfunctionfunctionbasex	unitsc("secs", "mins", "hours", "days")	...
+tryfunctionfunctionbaseexpr	silentFALSE
+tryCatchfunctionfunctionbaseexpr	...	finally
+typeoffunctionfunctionbasex
+unclassfunctionfunctionbase
+undebugfunctionfunctionbasefun
+unionfunctionfunctionbasex	y
+uniquefunctionfunctionbasex	incomparablesFALSE	fromLastFALSE	...
+unique.arrayfunctionfunctionbasex	incomparablesFALSE	MARGIN1	fromLastFALSE	...
+unique.data.framefunctionfunctionbasex	incomparablesFALSE	fromLastFALSE	...
+unique.defaultfunctionfunctionbasex	incomparablesFALSE	fromLastFALSE	...
+unique.matrixfunctionfunctionbasex	incomparablesFALSE	MARGIN1	fromLastFALSE	...
+unique.numeric_versionfunctionfunctionbasex	incomparablesFALSE	...
+unique.POSIXltfunctionfunctionbasex	incomparablesFALSE	...
+unitsfunctionfunctionbasex
+units<-functionfunctionbasex	value
+units<-.difftimefunctionfunctionbasex	value
+units.difftimefunctionfunctionbasex
+unix.timefunctionfunctionbaseexpr	gcFirstTRUE
+unlinkfunctionfunctionbasex	recursiveFALSE	forceFALSE
+unlistfunctionfunctionbasex	recursiveTRUE	use.namesTRUE
+unloadNamespacefunctionfunctionbasens
+unlockBindingfunctionfunctionbasesym	env
+unnamefunctionfunctionbaseobj	forceFALSE
+unserializefunctionfunctionbaseconnection	refhookNULL
+unsplitfunctionfunctionbasevalue	f	dropFALSE
+untracefunctionfunctionbasewhat	signatureNULL	wheretopenv(parent.frame())
+untracememfunctionfunctionbase
+unzfunctionfunctionbasedescription	filename	open""	encodinggetOption("encoding")
+upper.trifunctionfunctionbasex	diagFALSE
+urlfunctionfunctionbasedescription	open""	blockingTRUE	encodinggetOption("encoding")
+UseMethodfunctionfunctionbase
+utf8ToIntfunctionfunctionbasex
+vapplyfunctionfunctionbaseX	FUN	FUN.VALUE	...	USE.NAMESTRUE
+vectorfunctionfunctionbasemode"logical"
+VectorizefunctionfunctionbaseFUN	vectorize.args	SIMPLIFYTRUE	USE.NAMESTRUE
+versionsimple.listlistbaseNot a function
+version$platformcharactercharacterbaseNot a function
+version$archcharactercharacterbaseNot a function
+version$oscharactercharacterbaseNot a function
+version$systemcharactercharacterbaseNot a function
+version$statuscharactercharacterbaseNot a function
+version$majorcharactercharacterbaseNot a function
+version$minorcharactercharacterbaseNot a function
+version$yearcharactercharacterbaseNot a function
+version$monthcharactercharacterbaseNot a function
+version$daycharactercharacterbaseNot a function
+version$svn revunknown baseNot a function
+version$languagecharactercharacterbaseNot a function
+version$version.stringcharactercharacterbaseNot a function
+version$nicknamecharactercharacterbaseNot a function
+warningfunctionfunctionbase...	call.TRUE	immediate.FALSE	domainNULL
+warningsfunctionfunctionbase...
+weekdaysfunctionfunctionbasex	abbreviate
+weekdays.Datefunctionfunctionbasex	abbreviateFALSE
+weekdays.POSIXtfunctionfunctionbasex	abbreviateFALSE
+whichfunctionfunctionbasex	arr.indFALSE	useNamesTRUE
+which.maxfunctionfunctionbasex
+which.minfunctionfunctionbasex
+whileflow-controlflow-controlbaseNot a function
+withfunctionfunctionbasedata	expr	...
+withCallingHandlersfunctionfunctionbaseexpr	...
+with.defaultfunctionfunctionbasedata	expr	...
+withinfunctionfunctionbasedata	expr	...
+within.data.framefunctionfunctionbasedata	expr	...
+within.listfunctionfunctionbasedata	expr	...
+withRestartsfunctionfunctionbaseexpr	...
+withVisiblefunctionfunctionbasex
+writefunctionfunctionbasex	file"data"	ncolumnsif (is.character(x)) 1 else 5	appendFALSE	sep" "
+writeBinfunctionfunctionbaseobject	con	endian.Platform$endian	useBytesFALSE
+writeCharfunctionfunctionbaseobject	con	ncharsnchar(object, type = "chars")	eos""	useBytesFALSE
+write.dcffunctionfunctionbasex	file""	appendFALSE	indent0.1 * getOption("width")	width0.9 * getOption("width")	keep.whiteNULL
+writeLinesfunctionfunctionbasetext	constdout()	sep"\n"	useBytesFALSE
+%x%functionfunctionbaseX	Y
+xorfunctionfunctionbasex	y
+xor.hexmodefunctionfunctionbasea	b
+xor.octmodefunctionfunctionbasea	b
+xpdrows.data.framefunctionfunctionbasex	old.rows	new.rows
+xtfrmfunctionfunctionbasex
+xtfrm.AsIsfunctionfunctionbasex
+xtfrm.Datefunctionfunctionbasex
+xtfrm.defaultfunctionfunctionbasex
+xtfrm.difftimefunctionfunctionbasex
+xtfrm.factorfunctionfunctionbasex
+xtfrm.numeric_versionfunctionfunctionbasex
+xtfrm.POSIXctfunctionfunctionbasex
+xtfrm.POSIXltfunctionfunctionbasex
+xtfrm.Survfunctionfunctionbasex
+xzfilefunctionfunctionbasedescription	open""	encodinggetOption("encoding")	compression6
+zapsmallfunctionfunctionbasex	digitsgetOption("digits")

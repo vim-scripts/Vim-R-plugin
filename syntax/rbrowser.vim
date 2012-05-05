@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:	Object browser of Vim-R-plugin
 " Maintainer:	Jakson Alves de Aquino (jalvesaq@gmail.com)
-" Last Change:	Mon Feb 21, 2011  06:44PM
+" Last Change:	Mon Apr 30, 2012  12:41PM
 
 if exists("b:current_syntax")
   finish
@@ -20,7 +20,7 @@ if has("conceal")
   syn match rbrowserList	"\[#.*\t" contains=rbrowserDelim,rbrowserTab
   syn match rbrowserLogical	"%#.*\t" contains=rbrowserDelim,rbrowserTab
   syn match rbrowserLibrary	"##.*\t" contains=rbrowserDelim,rbrowserTab
-  syn match rbrowserRepeat	"!#.*\t" contains=rbrowserDelim,rbrowserTab
+  syn match rbrowserS4  	"<#.*\t" contains=rbrowserDelim,rbrowserTab
   syn match rbrowserUnknown	"=#.*\t" contains=rbrowserDelim,rbrowserTab
 else
   syn match rbrowserNumeric	"{.*\t" contains=rbrowserDelim,rbrowserTab
@@ -30,20 +30,13 @@ else
   syn match rbrowserList	"\[.*\t" contains=rbrowserDelim,rbrowserTab
   syn match rbrowserLogical	"%.*\t" contains=rbrowserDelim,rbrowserTab
   syn match rbrowserLibrary	"#.*\t" contains=rbrowserDelim,rbrowserTab
-  syn match rbrowserRepeat	"!.*\t" contains=rbrowserDelim,rbrowserTab
+  syn match rbrowserS4	        "<.*\t" contains=rbrowserDelim,rbrowserTab
   syn match rbrowserUnknown	"=.*\t" contains=rbrowserDelim,rbrowserTab
 endif
 syn match rbrowserEnv		"^.GlobalEnv "
 syn match rbrowserEnv		"^Libraries "
 syn match rbrowserLink		" Libraries$"
 syn match rbrowserLink		" .GlobalEnv$"
-syn match rbrowserWarn		"^Warning:"
-syn match rbrowserWarn		"^The following"
-syn match rbrowserWarn		"^library is loaded"
-syn match rbrowserWarn		"^but is not in the"
-syn match rbrowserWarn		"^libraries are loaded"
-syn match rbrowserWarn		"^but are not in the"
-syn match rbrowserWarn		"^omniList:"
 syn match rbrowserTreePart	"├─"
 syn match rbrowserTreePart	"└─"
 syn match rbrowserTreePart	"│" 
@@ -55,9 +48,9 @@ endif
 
 syn match rbrowserTab contained "\t"
 if has("conceal")
-  syn match rbrowserDelim contained /'#\|"#\|(#\|\[#\|{#\|%#\|##\|!#\|=#/ conceal
+  syn match rbrowserDelim contained /'#\|"#\|(#\|\[#\|{#\|%#\|##\|<#\|=#/ conceal
 else
-  syn match rbrowserDelim contained /'\|"\|(\|\[\|{\|%\|#\|!\|=/
+  syn match rbrowserDelim contained /'\|"\|(\|\[\|{\|%\|#\|<\|=/
 endif
 
 hi def link rbrowserEnv		Statement
@@ -69,7 +62,7 @@ hi def link rbrowserLibrary	PreProc
 hi def link rbrowserLink	Comment
 hi def link rbrowserLogical	Boolean
 hi def link rbrowserFunction	Function
-hi def link rbrowserRepeat	Repeat
+hi def link rbrowserS4  	Statement
 hi def link rbrowserUnknown	Normal
 hi def link rbrowserWarn	WarningMsg
 hi def link rbrowserTreePart	Comment

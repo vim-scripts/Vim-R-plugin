@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Tue Dec 13, 2011  08:44AM
+" Last Change: Wed May 02, 2012  10:10AM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -120,6 +120,10 @@ function RCompleteArgs()
         let argkey = RGetKeyWord()
         let idx2 = cpos[2] - strlen(argkey)
     endif
+    if b:needsnewomnilist == 1
+      call BuildROmniList("GlobalEnv", "none")
+    endif
+    let flines = g:rplugin_globalenvlines + g:rplugin_liblist
     let np = 1
     let nl = 0
     while np != 0 && nl < 10
@@ -130,36 +134,58 @@ function RCompleteArgs()
         endif
         if np == 0
             call cursor(lnum, idx)
-            let rkeyword = '^' . RGetKeyWord() . ';'
+            let rkeyword0 = RGetKeyWord()
+            let classfor = RGetClassFor(rkeyword0)
+            let classfor = substitute(classfor, '"', '\\"', "g")
+            let rkeyword = '^' . rkeyword0 . "\x06"
             call cursor(cpos[1], cpos[2])
-            for omniL in g:rplugin_liblist
-                if omniL =~ rkeyword
-                    let tmp1 = split(omniL, ';')
-                    if len(tmp1) == 5
-                        let info = tmp1[4]
-                    else
-                        let tlen = len(tmp1)
-                        let info = tmp1[4]
-                        let i = 5
-                        while i < tlen
-                            let info = info . ';' . tmp1[i]
-                            let i += 1
-                        endwhile
+            if classfor == ""
+                exe 'Py SendToR("vimcom:::vim.args(' . "'" . rkeyword0 . "', '" . argkey . "')" . '")'
+            else
+                exe 'Py SendToR("vimcom:::vim.args(' . "'" . rkeyword0 . "', '" . argkey . "', classfor = " . classfor . ")" . '")'
+            endif
+            if g:rplugin_vimcomport > 0 && g:rplugin_lastrpl != "NOT_EXISTS" && g:rplugin_lastrpl != "NO_ARGS" && g:rplugin_lastrpl != "R is busy." && g:rplugin_lastrpl != "NOANSWER"
+                let args = []
+                let tmp0 = split(g:rplugin_lastrpl, "\x04")
+                let tmp = split(tmp0[0], "\x09")
+                if(len(tmp) > 0)
+                    for id in range(len(tmp))
+                        let tmp2 = split(tmp[id], "\x07")
+                        if tmp2[0] == '...'
+                            let tmp3 = tmp2[0]
+                        else
+                            let tmp3 = tmp2[0] . " = "
+                        endif
+                        if len(tmp2) > 1
+                            call add(args,  {'word': tmp3, 'menu': tmp2[1]})
+                        else
+                            call add(args,  {'word': tmp3, 'menu': ' '})
+                        endif
+                    endfor
+                    if len(args) > 0 && len(tmp0) > 1
+                        call add(args, {'word': ' ', 'menu': tmp0[1]})
                     endif
-                    let info = substitute(info, "\t", '', "g")
-                    let argsL = split(info, ",")
+                    call complete(idx2, args)
+                endif
+                return ''
+            endif
+
+            for omniL in flines
+                if omniL =~ rkeyword && omniL =~ "\x06function\x06function\x06" 
+                    let tmp1 = split(omniL, "\x06")
+                    let info = tmp1[4]
+                    let argsL = split(info, "\x09")
                     let args = []
                     for id in range(len(argsL))
                         let newkey = '^' . argkey
-                        let tmp2 = split(substitute(argsL[id], "^ *", '', ""), "=")
-                        if argkey == '' || tmp2[0] =~ newkey
+                        let tmp2 = split(argsL[id], "\x07")
+                        if (argkey == '' || tmp2[0] =~ newkey) && tmp2[0] !~ "No arguments"
+                            if tmp2[0] != '...'
+                                let tmp2[0] = tmp2[0] . " = "
+                            endif
                             if len(tmp2) == 2
-                                let tmp2[0] = tmp2[0] . "= "
                                 let tmp3 = {'word': tmp2[0], 'menu': tmp2[1]}
                             else
-                                if tmp2[0] != '...'
-                                    let tmp2[0] = tmp2[0] . " = "
-                                endif
                                 let tmp3 = {'word': tmp2[0], 'menu': ''}
                             endif
                             call add(args, tmp3)
@@ -169,6 +195,7 @@ function RCompleteArgs()
                     return ''
                 endif
             endfor
+
             break
         endif
         let idx -= 1
@@ -454,18 +481,23 @@ endfunction
 
 " Start R
 function StartR(whatr)
+    call writefile([], $VIMRPLUGIN_TMPDIR . "/object_browser")
+    call writefile([], $VIMRPLUGIN_TMPDIR . "/liblist")
+
+    if !exists("b:rplugin_R")
+        call SetRPath()
+    endif
+
     " Change to buffer's directory before starting R
     lcd %:p:h
 
     if a:whatr =~ "vanilla"
-        let g:rplugin_r_args = "--vanilla"
+        let b:rplugin_r_args = "--vanilla"
     else
         if a:whatr =~ "custom"
             call inputsave()
-            let g:rplugin_r_args = input('Enter parameters for R: ')
+            let b:rplugin_r_args = input('Enter parameters for R: ')
             call inputrestore()
-        else
-            let g:rplugin_r_args = g:vimrplugin_r_args
         endif
     endif
 
@@ -475,8 +507,8 @@ function StartR(whatr)
         else
             let rcmd = "/Applications/R.app"
         endif
-        if g:rplugin_r_args != " "
-            let rcmd = rcmd . " " . g:rplugin_r_args
+        if b:rplugin_r_args != " "
+            let rcmd = rcmd . " " . b:rplugin_r_args
         endif
         let rlog = system("open " . rcmd)
         if v:shell_error
@@ -488,22 +520,29 @@ function StartR(whatr)
 
     if has("win32") || has("win64")
         if g:vimrplugin_conqueplugin == 0
-            exe s:py . " StartRPy()"
+            Py StartRPy()
             lcd -
             return
         else
-            let g:rplugin_R = "Rterm.exe"
+            let b:rplugin_R = "Rterm.exe"
         endif
     endif
 
-    if g:rplugin_r_args == " "
-        let rcmd = g:rplugin_R
+    if b:rplugin_r_args == " "
+        let rcmd = b:rplugin_R
     else
-        let rcmd = g:rplugin_R . " " . g:rplugin_r_args
+        let rcmd = b:rplugin_R . " " . b:rplugin_r_args
     endif
 
     if g:vimrplugin_screenplugin
-        let rcmd = "VIMRPLUGIN_TMPDIR=" . $VIMRPLUGIN_TMPDIR . " " . rcmd
+        if $TERM =~ "screen"
+            if g:vimrplugin_tmux
+                call system("tmux set-environment VIMRPLUGIN_TMPDIR " . $VIMRPLUGIN_TMPDIR)
+                call system("tmux set-environment VIMINSTANCEID " . $VIMINSTANCEID)
+            else
+                let rcmd = "VIMRPLUGIN_TMPDIR=" . $VIMRPLUGIN_TMPDIR . " " . rcmd
+            endif
+        endif
         if g:vimrplugin_tmux == 0 && g:vimrplugin_noscreenrc == 0 && exists("g:ScreenShellScreenInitArgs")
             let g:ScreenShellScreenInitArgs = RWriteScreenRC()
         endif
@@ -574,7 +613,7 @@ function StartR(whatr)
         unlet g:tmp_conque_bufname
         unlet g:tmp_objbrtitle
 
-        exe "setlocal syntax=rout"
+        setlocal syntax=rout
         exe "sil noautocmd sb " . g:rplugin_curbuf
         exe "set switchbuf=" . savesb
         if savewd
@@ -595,6 +634,9 @@ function StartR(whatr)
                             \ 'set-window-option -g mode-keys vi',
                             \ 'set -g status off',
                             \ "set -g terminal-overrides 'xterm*:smcup@:rmcup@'"]
+                if g:vimrplugin_external_ob
+                    let cnflines = extend(cnflines, ['set -g mode-mouse on', 'set -g mouse-select-pane on', 'set -g mouse-resize-pane on'])
+                endif
                 call writefile(cnflines, tmxcnf)
                 let tmxcnf = "-f " . tmxcnf
             endif
@@ -634,70 +676,129 @@ function StartR(whatr)
     echon
 endfunction
 
-" Open an Object Browser window
-function RObjBrowser()
-    " Only opens the Object Browser if R is running
-    if g:vimrplugin_screenplugin && !exists("g:ScreenShellSend") && !exists("b:myservername")
-        return
-    endif
-    if g:vimrplugin_conqueplugin && !exists("b:conque_bufname")
-        return
-    endif
+function StartObjectBrowser()
+    if g:vimrplugin_tmux && (g:vimrplugin_screenplugin || g:vimrplugin_external_ob)
 
-    " R builds the Object Browser contents.
-    let lockfile = $VIMRPLUGIN_TMPDIR . "/objbrowser" . "lock"
-    call writefile(["Wait!"], lockfile)
-    if g:vimrplugin_allnames == 1
-        call SendCmdToR('source("' . g:rplugin_home . '/r-plugin/vimbrowser.R") ; .vim.browser(TRUE)')
-    else
-        call SendCmdToR('source("' . g:rplugin_home . '/r-plugin/vimbrowser.R") ; .vim.browser()')
-    endif
-    sleep 50m
-    let i = 0 
-    while filereadable(lockfile)
-        let i = i + 1
-        sleep 50m
-        if i == 40
-            call delete(lockfile)
-            call RWarningMsg("No longer waiting for Object Browser to finish...")
-            if exists("g:rplugin_r_output")
-                echo g:rplugin_r_output
-            endif
-            sleep 2
+        if g:rplugin_editor_port
+            " This is the Object Browser
+            Py VimClient("EXPR call RObjBrowser()")
+            let g:rplugin_running_objbr = 0
             return
         endif
-    endwhile
 
-    let g:rplugin_origbuf = bufname("%")
-
-    " Start the object browser in a new vim instance on a Tmux pane:
-    if g:vimrplugin_screenplugin && g:vimrplugin_objbr_place =~ "console"
-        let objbr = $VIMRPLUGIN_TMPDIR . "/objbrowser"
-        let i = 1
-        while !filereadable(objbr)
+        if g:rplugin_myport == 0
+            let g:rplugin_myport1 = 6005
+            let g:rplugin_myport2 = 6100
+            Py RunServer()
             sleep 100m
-            if i == 20
-                return
-            endif
-        endwhile
-
-        " This is the Object Browser
-        if exists("b:myservername")
-            if remote_expr(b:myservername, "mode()") != "n"
-                call remote_send(b:myservername, "<Esc>")
-            endif
-            call remote_expr(b:myservername, "RObjBrowser()")
-            return
+            let ii = 0
+            while ii < 10 && g:rplugin_myport == 0
+                Py vim.command("let g:rplugin_myport = " + str(MyPort))
+                let ii = ii + 1
+                sleep 100m
+            endwhile
         endif
 
         " Start the Object Browser if it doesn't exist yet
-        let slist = serverlist()
-        if slist !~ "OBJBROWSER"
+        if g:rplugin_objbr_port == 0
+            let objbrowserfile = $VIMRPLUGIN_TMPDIR . "/objbrowserInit"
+            if exists("g:ScreenShellSession")
+                let tmxs = " -S " . g:ScreenShellSession . " "
+            else
+                let tmxs = " "
+            endif
+
+            if !exists("g:rplugin_edpane")
+                let g:rplugin_edpane = $TMUX_PANE
+                if strlen(g:rplugin_edpane) == 0
+                    if g:vimrplugin_external_ob
+                        let g:rplugin_edpane = "none"
+                        let g:vimrplugin_objbr_place = substitute(g:vimrplugin_objbr_place, "script", "console", "g")
+                    else
+                        echoer "Could not find the environment variable TMUX_PANE."
+                        return
+                    endif
+                endif
+            endif
+
+            call delete($VIMRPLUGIN_TMPDIR . "/rpane")
+            Py SendToR("\001Tmux pane")
+            let ii = 0
+            while !filereadable($VIMRPLUGIN_TMPDIR . "/rpane") && ii < 20
+                let ii = ii + 1
+                sleep 50m
+            endwhile
+            if !filereadable($VIMRPLUGIN_TMPDIR . "/rpane")
+                echoer "The number of the R Tmux pane is unknown."
+                return
+            endif
+            let xx = readfile($VIMRPLUGIN_TMPDIR . "/rpane")
+            let g:rplugin_rpane = xx[0]
+            if g:rplugin_rpane !~ "%[0-9]"
+                echoer 'The number of the R Tmux pane is invalid: "' . g:rplugin_rpane . '"'
+                unlet g:rplugin_rpane
+                return
+            endif
+
+            call writefile([
+                        \ 'call writefile([$TMUX_PANE], $VIMRPLUGIN_TMPDIR . "/objbrpane")',
+                        \ 'let b:this_is_ob = 1',
+                        \ 'let g:rplugin_editor_port = ' . g:rplugin_myport ,
+                        \ 'let g:rplugin_edpane = "' . g:rplugin_edpane . '"',
+                        \ 'let g:rplugin_rpane = "' . g:rplugin_rpane . '"',
+                        \ 'let b:objbrtitle = "' . b:objbrtitle . '"',
+                        \ 'let b:screensname = "' . b:screensname . '"',
+                        \ 'let b:rscript_buffer = "' . bufname("%") . '"',
+                        \ 'set filetype=rbrowser',
+                        \ 'let $VIMINSTANCEID="' . $VIMINSTANCEID . '"',
+                        \ 'setlocal modifiable',
+                        \ 'set shortmess=atI',
+                        \ 'set rulerformat=%3(%l%)',
+                        \ 'set noruler',
+                        \ 'let curline = line(".")',
+                        \ 'let curcol = col(".")',
+                        \ 'normal! ggdG',
+                        \ 'setlocal nomodified',
+                        \ 'call cursor(curline, curcol)',
+                        \ 'exe "PyFile " . g:rplugin_home . "/r-plugin/vimcom.py"',
+                        \ 'Py OtherPort = ' . g:rplugin_myport ,
+                        \ 'let g:rplugin_myport1 = 5005',
+                        \ 'let g:rplugin_myport2 = 5100',
+                        \ 'sleep 250m',
+                        \ 'function! RBrSendToR(cmd)',
+                        \ '    let scmd = "tmux set-buffer '. "'" . '" . a:cmd . "\<C-M>' . "'" . ' && tmux' . tmxs . 'paste-buffer -t ' . g:rplugin_rpane . '"',
+                        \ '    let rlog = system(scmd)',
+                        \ '    if v:shell_error',
+                        \ '        let rlog = substitute(rlog, "\n", " ", "g")',
+                        \ '        let rlog = substitute(rlog, "\r", " ", "g")',
+                        \ '        call RWarningMsg(rlog)',
+                        \ '        return 0',
+                        \ '    endif',
+                        \ 'endfunction',
+                        \ 'Py RunServer()',
+                        \ 'sleep 100m',
+                        \ 'let ii = 0',
+                        \ 'while ii < 10 && g:rplugin_myport == 0',
+                        \ '  Py vim.command("let g:rplugin_myport = " + str(MyPort))',
+                        \ '  let ii = ii + 1',
+                        \ '  sleep 100m',
+                        \ 'endwhile',
+                        \ 'Py VimClient("EXPR let g:rplugin_objbr_port = " + str(MyPort))',
+                        \ 'sleep 200m',
+                        \ 'Py VimClient("EXPR Py OtherPort = " + str(MyPort))',
+                        \ 'call UpdateOB("GlobalEnv")',
+                        \ 'redraw'], objbrowserfile)
+
             if g:vimrplugin_objbr_place =~ "left"
-                " Get the R Console width:
-                let conw = system("tmux list-panes | cat")
-                let conw = substitute(conw, '.*\n1: \[\([0-9]*\)x.*', '\1', "")
-                let panewidth = conw - g:vimrplugin_objbr_w
+                let panw = system("tmux list-panes | cat")
+                if g:vimrplugin_objbr_place =~ "console"
+                    " Get the R Console width:
+                    let panw = substitute(panw, '.*\n1: \[\([0-9]*\)x.*', '\1', "")
+                else
+                    " Get the Vim with
+                    let panw = substitute(panw, '.*0: \[\([0-9]*\)x.*', '\1', "")
+                endif
+                let panewidth = panw - g:vimrplugin_objbr_w
                 " Just to be safe: If the above code doesn't work as expected
                 " and we get a spurious value:
                 if panewidth < 40 || panewidth > 180
@@ -706,53 +807,57 @@ function RObjBrowser()
             else
                 let panewidth = g:vimrplugin_objbr_w
             endif
-            let cmd = "tmux split-window -d -h -l " . panewidth . ' -t 1 "vim --servername OBJBROWSER"'
+            if g:vimrplugin_objbr_place =~ "console"
+                let cmd = "tmux split-window -d -h -l " . panewidth . " -t " . g:rplugin_rpane . ' "vim -c ' . "'source " . objbrowserfile . "'" . '"'
+            else
+                let cmd = "tmux split-window -d -h -l " . panewidth . " -t " . g:rplugin_edpane . ' "vim -c ' . "'source " . objbrowserfile . "'" . '"'
+            endif
+
+            call delete($VIMRPLUGIN_TMPDIR . "/objbrpane")
+
             let rlog = system(cmd)
             if v:shell_error
                 let rlog = substitute(rlog, '\n', ' ', 'g')
                 let rlog = substitute(rlog, '\r', ' ', 'g')
                 call RWarningMsg(rlog)
+                let g:rplugin_running_objbr = 0
                 return 0
             endif
+
+            let ii = 0
+            while !filereadable($VIMRPLUGIN_TMPDIR . "/objbrpane") && ii < 20
+                let ii = ii + 1
+                sleep 50m
+            endwhile
+            if !filereadable($VIMRPLUGIN_TMPDIR . "/objbrpane")
+                echoer "The Tmux pane number of the Object Browser is unknown."
+                return
+            endif
+            let xx = readfile($VIMRPLUGIN_TMPDIR . "/objbrpane")
+            let g:rplugin_obpane = xx[0]
+            if g:rplugin_obpane !~ "%[0-9]"
+                echoer 'The number of the Object Browser Tmux pane is invalid: "' . g:rplugin_obpane . '"'
+                unlet g:rplugin_obpane
+                return
+            endif
+
             if g:vimrplugin_objbr_place =~ "left"
-                call system("tmux swap-pane -d -s 1 -t 2")
+                if g:vimrplugin_objbr_place =~ "console"
+                    call system("tmux swap-pane -d -s " . g:rplugin_rpane . " -t " . g:rplugin_obpane)
+                else
+                    call system("tmux swap-pane -d -s " . g:rplugin_edpane . " -t " . g:rplugin_obpane)
+                endif
             endif
+            let ii = 0
+            echohl WarningMsg
+            echo "Please, wait..."
+            echohl Normal
+            while g:rplugin_objbr_port == 0 && ii < 10
+                sleep 200m
+                let ii = ii + 1
+            endwhile
+            echon "\r               "
         endif
-
-        let objbrowserfile = $VIMRPLUGIN_TMPDIR . "/objbrowserInit"
-        call writefile([
-                    \ 'let b:objbrtitle = "' . b:objbrtitle . '"',
-                    \ 'let b:screensname = "' . b:screensname . '"',
-                    \ 'let b:rscript_buffer = "' . bufname("%") . '"',
-                    \ 'let b:myservername = "' . v:servername . '"',
-                    \ 'set filetype=rbrowser',
-                    \ 'setlocal modifiable',
-                    \ 'set shortmess=atI',
-                    \ 'set rulerformat=%3(%l%)',
-                    \ 'set noruler',
-                    \ 'let curline = line(".")',
-                    \ 'let curcol = col(".")',
-                    \ 'normal! ggDjdG',
-                    \ 'source ' . objbr,
-                    \ 'call RBrowserFillCloseList()',
-                    \ 'call RBrowserFill(0)',
-                    \ 'setlocal nomodified',
-                    \ 'call cursor(curline, curcol)',
-                    \ 'redraw'], objbrowserfile)
-
-        " Wait while Vim starts
-        let idx = 0
-        while idx < 20
-            sleep 300m
-            let slist = serverlist()
-            if slist =~ "OBJBROWSER"
-                break
-            endif
-            let idx = idx + 1
-        endwhile
-
-        call remote_send("OBJBROWSER", ":source " . objbrowserfile . "<CR>")
-        call remote_send("OBJBROWSER", ":echon<CR>")
         return
     endif
 
@@ -802,43 +907,73 @@ function RObjBrowser()
         unlet g:tmp_objbrtitle
         unlet g:tmp_screensname
         unlet g:tmp_curbufname
-
+        exe "PyFile " . g:rplugin_home . "/r-plugin/vimcom.py"
+        Py SendToR("\003GlobalEnv")
+        Py SendToR("\004Libraries")
+        call UpdateOB("GlobalEnv")
     endif
-
-
-    let objbr = $VIMRPLUGIN_TMPDIR . "/objbrowser"
-    let i = 1
-    while !filereadable(objbr)
-        sleep 100m
-        if i == 20
-            exe "sb " . g:rplugin_origbuf
-            exe "set switchbuf=" . savesb
-            return
-        endif
-    endwhile
-    setlocal modifiable
-    let curline = line(".")
-    let curcol = col(".")
-    normal! ggdG
-    exe "source " . objbr
-    if exists("b:libdict")
-        unlet b:libdict
-    endif
-    call RBrowserFillCloseList()
-    call RBrowserFill(0)
-    setlocal nomodified
-    call cursor(curline, curcol)
-    redraw
-    exe "sb " . g:rplugin_origbuf
-    exe "set switchbuf=" . savesb
 endfunction
 
-function RObjBrowserOCLists(status)
-    if exists("*RBrowserOpenCloseLists")
-        call RBrowserOpenCloseLists(a:status)
-    elseif serverlist() =~ "OBJBROWSER"
-        call remote_expr("OBJBROWSER", "RBrowserOpenCloseLists(" . a:status . ")")
-        call remote_send("OBJBROWSER", ":redraw<CR>:echon ' '<CR>")
+" Open an Object Browser window
+function RObjBrowser()
+    if !has("python") && !has("python3")
+        call RWarningMsg("Python support is required to run the Object Browser.")
+        return
+    endif
+
+    " Only opens the Object Browser if R is running
+    if g:vimrplugin_screenplugin && !exists("g:ScreenShellSend")
+        return
+    endif
+    if g:vimrplugin_conqueplugin && !exists("b:conque_bufname")
+        return
+    endif
+    if g:rplugin_running_objbr == 1
+        " Called twice due to BufEnter event
+        return
+    endif
+
+    let g:rplugin_running_objbr = 1
+
+    call StartObjectBrowser()
+    Py SendToR("\003GlobalEnv")
+    Py SendToR("\004Libraries")
+    if exists("*UpdateOB")
+        call UpdateOB("GlobalEnv")
+        call UpdateOB("libraries")
+    endif
+    let g:rplugin_running_objbr = 0
+    return
+endfunction
+
+function RBrowserOpenCloseLists(status)
+    if g:vimrplugin_external_ob || (g:vimrplugin_screenplugin && !exists("b:this_is_ob"))
+        let stt = a:status + 2
+    else
+        let stt = a:status
+    endif
+
+    let switchedbuf = 0
+    if buflisted("Object_Browser") && g:rplugin_curbuf != "Object_Browser"
+        let savesb = &switchbuf
+        set switchbuf=useopen,usetab
+        sil noautocmd sb Object_Browser
+        let switchedbuf = 1
+    endif
+
+    exe 'Py SendToR("' . "\006" . stt . '")'
+
+    if exists("g:rplugin_curview")
+        if g:rplugin_curview == "GlobalEnv"
+            call UpdateOB("GlobalEnv")
+        else
+            call UpdateOB("libraries")
+        endif
+    endif
+
+    if switchedbuf
+        exe "sil noautocmd sb " . g:rplugin_curbuf
+        exe "set switchbuf=" . savesb
     endif
 endfunction
 
@@ -864,6 +999,7 @@ endfunction
 
 " Called by the Object Browser when running remotely:
 function RGetRemoteCmd(cmd)
+    call RWarningMsg(a:cmd)
     call SendCmdToR(a:cmd)
     echon
 endfunction
@@ -884,25 +1020,22 @@ function SendCmdToR(cmd)
         for i in range(0, slen)
             let str = str . printf("\\x%02X", char2nr(cmd[i]))
         endfor
-        exe s:py . " SendToRPy(b'" . str . "')"
+        exe "Py" . " SendToRPy(b'" . str . "')"
         silent exe '!start WScript "' . g:rplugin_jspath . '" "' . expand("%") . '"'
         " call RestoreClipboardPy()
         return 1
     endif
 
     if g:vimrplugin_screenplugin
-        if !exists("g:ScreenShellSend")
-            if exists("b:myservername")
-                if remote_expr(b:myservername, "mode()") != "n"
-                    call remote_send(b:myservername, "<Esc>")
-                endif
-                call remote_expr(b:myservername, "RGetRemoteCmd('" . a:cmd . "')")
-                return 1
-            endif
+        if !exists("g:ScreenShellSend") && !exists("*RBrSendToR")
             call RWarningMsg("Did you already start R?")
             return 0
         endif
-        call g:ScreenShellSend(cmd)
+        if exists("g:ScreenShellSend")
+            call g:ScreenShellSend(cmd)
+        else
+            call RBrSendToR(cmd)
+        endif
         return 1
     elseif g:vimrplugin_conqueplugin
         if !exists("b:conque_bufname")
@@ -971,7 +1104,7 @@ function SendCmdToR(cmd)
     " Send the command to R running in an external terminal emulator
     let str = substitute(cmd, "'", "'\\\\''", "g")
     if g:vimrplugin_tmux
-        let scmd = "tmux set-buffer '" . str . "\<C-M>' && tmux paste-buffer -t " . b:screensname
+        let scmd = "tmux set-buffer '" . str . "\<C-M>' && tmux paste-buffer -t " . b:screensname . '.0'
     else
         let scmd = 'screen -S ' . b:screensname . " -X stuff '" . str . "\<C-M>'"
     endif
@@ -1157,6 +1290,7 @@ function SendSelectionToR(e, m)
     endif
 
     let b:needsnewomnilist = 1
+
     if line("'<") == line("'>")
         let i = col("'<") - 1
         let j = col("'>") - i
@@ -1168,11 +1302,43 @@ function SendSelectionToR(e, m)
         endif
         return
     endif
+
     let lines = getline("'<", "'>")
+
+    if visualmode() == "\<C-V>"
+        let lj = line("'<")
+        let cj = col("'<")
+        let lk = line("'>")
+        let ck = col("'>")
+        if cj > ck
+            let bb = ck - 1
+            let ee = cj - ck + 1
+        else
+            let bb = cj - 1
+            let ee = ck - cj + 1
+        endif
+        if cj > len(getline(lj)) || ck > len(getline(lk))
+            for idx in range(0, len(lines) - 1)
+                let lines[idx] = strpart(lines[idx], bb)
+            endfor
+        else
+            for idx in range(0, len(lines) - 1)
+                let lines[idx] = strpart(lines[idx], bb, ee)
+            endfor
+        endif
+    else
+        let i = col("'<") - 1
+        let j = col("'>")
+        let lines[0] = strpart(lines[0], i)
+        let llen = len(lines) - 1
+        let lines[llen] = strpart(lines[llen], 0, j)
+    endif
+
     let ok = RSourceLines(lines, a:e)
     if ok == 0
         return
     endif
+
     if a:m == "down"
         call GoDown()
     else
@@ -1252,7 +1418,7 @@ function SendLineToR(godown)
         if getline(1) =~ '^The topic'
             let topic = substitute(line, '.*::', '', "")
             let package = substitute(line, '::.*', '', "")
-            call ShowRDoc(topic, package)
+            call ShowRDoc(topic, package, 1)
             return
         endif
         if search("^Examples:$", "bncW") == 0
@@ -1274,10 +1440,24 @@ function SendLineToR(godown)
     endif
 endfunction
 
+function RSendPartOfLine(direction, correctpos)
+    let lin = getline(".")
+    let idx = col(".") - 1
+    if a:correctpos
+        call cursor(line("."), idx)
+    endif
+    if a:direction == "right"
+        let rcmd = strpart(lin, idx)
+    else
+        let rcmd = strpart(lin, 0, idx)
+    endif
+    call SendCmdToR(rcmd)
+endfunction
+
 " Clear the console screen
 function RClearConsole()
     if (has("win32") || has("win64")) && g:vimrplugin_conqueplugin == 0
-        exe s:py . " RClearConsolePy()"
+        Py RClearConsolePy()
         silent exe '!start WScript "' . g:rplugin_jspath . '" "' . expand("%") . '"'
     else
         call SendCmdToR("\014")
@@ -1305,20 +1485,48 @@ endfunction
 
 " Quit R
 function RQuit(how)
-    if serverlist() =~ "OBJBROWSER"
-        call remote_send("OBJBROWSER", ":q<CR>")
-        sleep 500m
+    if g:rplugin_objbr_port
+        Py VimClient("FINISH")
+        sleep 200m
+        Py OtherPort = 0
+    endif
+    if g:rplugin_myport
+        Py StopServer()
+        sleep 200m
     endif
 
-    if a:how == "save"
-        call SendCmdToR('quit(save = "yes")')
-        sleep 1
+    if bufloaded(b:objbrtitle)
+        exe "bunload! " . b:objbrtitle
+        sleep 150m
+    endif
+
+    if exists("b:quit_command")
+        call SendCmdToR(b:quit_command)
     else
-        call SendCmdToR('quit(save = "no")')
+        if a:how == "save"
+            call SendCmdToR('quit(save = "yes")')
+            sleep 1
+        else
+            call SendCmdToR('quit(save = "no")')
+        endif
+    endif
+    sleep 250m
+
+    if g:rplugin_objbr_port
+        " check if the pane still exists before trying to kill it because the
+        " user may have already closed the Object Browser manually.
+        let plst = system("tmux list-panes | cat")
+        if plst =~ g:rplugin_obpane
+            call system("tmux kill-pane -t " . g:rplugin_obpane)
+        endif
+        let g:rplugin_objbr_port = 0
         sleep 250m
     endif
-    if g:vimrplugin_screenplugin && exists(':ScreenQuit')
-        ScreenQuit
+
+    if g:vimrplugin_screenplugin
+        if exists(':ScreenQuit')
+            ScreenQuit
+        endif
     elseif g:vimrplugin_conqueplugin
         sleep 200m
         exe "sil bdelete " . b:conque_bufname
@@ -1334,9 +1542,6 @@ function RQuit(how)
         endif
     endif
 
-    if bufloaded(b:objbrtitle)
-        exe "bunload! " . b:objbrtitle
-    endif
 endfunction
 
 " Tell R to create a list of objects file listing all currently available
@@ -1348,9 +1553,7 @@ function BuildROmniList(env, what)
     else
         let rtf = g:rplugin_omnifname
     endif
-    let lockfile = rtf . ".locked"
-    call writefile(["Wait!"], lockfile)
-    let omnilistcmd = 'source("' . g:rplugin_home . '/r-plugin/build_omniList.R") ; .vim.bol("' . rtf . '"'
+    let omnilistcmd = 'vim.bol("' . rtf . '"'
     if a:env == "libraries" && a:what == "installed"
         let omnilistcmd = omnilistcmd . ', what = "installed"'
     endif
@@ -1358,49 +1561,51 @@ function BuildROmniList(env, what)
         let omnilistcmd = omnilistcmd . ', allnames = TRUE'
     endif
     let omnilistcmd = omnilistcmd . ')'
-    let ok = SendCmdToR(omnilistcmd)
-    if ok == 0
-        return
-    endif
 
-    " Wait while R is writing the list of objects into the file
-    sleep 50m
-    let i = 0 
-    let s = 0
-    while filereadable(lockfile)
-        let s = s + 1
-        if s == 4 && a:env !~ "GlobalEnv"
-            let s = 0
-            let i = i + 1
-            let k = g:vimrplugin_buildwait - i
-            let themsg = "\rPlease, wait! [" . i . ":" . k . "]"
-            echon themsg
-        endif
-        sleep 250m
-        if i == g:vimrplugin_buildwait
-            call delete(lockfile)
-            call RWarningMsg("No longer waiting. See  :h vimrplugin_buildwait  for details.")
+    call delete($VIMRPLUGIN_TMPDIR . "/vimbol_finished")
+    if a:env =~ "GlobalEnv"
+        exe "Py SendToR('" . omnilistcmd . "')"
+        if g:rplugin_lastrpl == "R is busy."
+            call RWarningMsg("R is busy.")
+            let b:needsnewomnilist = 1
+            sleep 800m
             return
         endif
+        sleep 20m
+    else
+        echohl WarningMsg
+        echo "Please, wait..."
+        echohl Normal
+        call SendCmdToR(omnilistcmd)
+        sleep 2
+    endif
+    let ii = 0
+    while !filereadable($VIMRPLUGIN_TMPDIR . "/vimbol_finished") && ii < g:vimrplugin_buildwait
+        let ii += 1
+        sleep
     endwhile
+    echon "\r               "
+    if ii == g:vimrplugin_buildwait
+        call RWarningMsg("No longer waiting...")
+        return
+    endif
 
     if a:env == "GlobalEnv"
         let g:rplugin_globalenvlines = readfile(g:rplugin_globalenvfname)
     endif
-    if i > 2
-        echon "\rFinished in " . i . " seconds."
-    endif
+    echon
 endfunction
 
 function RBuildSyntaxFile(what)
     call BuildROmniList("libraries", a:what)
-    sleep 1
+    sleep 100m
     let g:rplugin_liblist = readfile(g:rplugin_omnifname)
+    call BuildRHelpList()
     let res = []
     let nf = 0
     let funlist = ""
     for line in g:rplugin_liblist
-        let obj = split(line, ";")
+        let obj = split(line, "\x06", 1)
         if obj[2] == "function"
             if obj[0] !~ '[[:punct:]]' || (obj[0] =~ '\.[a-zA-Z]' && obj[0] !~ '[[:punct:]][[:punct:]]')
                 let nf += 1
@@ -1427,13 +1632,10 @@ function RBuildSyntaxFile(what)
         exe "runtime syntax/r.vim"
         exe "sb " . b:objbrtitle
         exe "set switchbuf=" . savesb
-        if g:rplugin_curview == "libraries"
-            unlet b:libdict
-            call RBrowserShowLibs(0)
-        endif
+        call UpdateOB("libraries")
     else
         unlet b:current_syntax
-        exe "runtime syntax/r.vim"
+        runtime syntax/r.vim
     endif
 endfunction
 
@@ -1542,12 +1744,21 @@ function RGetClassFor(rkeyword)
             let classfor = substitute(classfor, ' .*', '', "")
         endif
     endif
+    if classfor =~ "^'" && classfor =~ "'$"
+        let classfor = substitute(classfor, "^'", '"', "")
+        let classfor = substitute(classfor, "'$", '"', "")
+    endif
     return classfor
 endfunction
 
 " Show R's help doc in Vim's buffer
 " (based  on pydoc plugin)
-function ShowRDoc(rkeyword, package)
+function ShowRDoc(rkeyword, package, getclass)
+    if !has("python") && !has("python3")
+        call RWarningMsg("Python support is required to see R documentation on Vim.")
+        return
+    endif
+
     if filewritable(g:rplugin_docfile)
         call delete(g:rplugin_docfile)
     endif
@@ -1559,7 +1770,7 @@ function ShowRDoc(rkeyword, package)
         exe "sb " . b:rscript_buffer
         exe "set switchbuf=" . savesb
     else
-        if a:package == ""
+        if a:getclass
             let classfor = RGetClassFor(a:rkeyword)
         endif
     endif
@@ -1582,28 +1793,30 @@ function ShowRDoc(rkeyword, package)
 
     call SetRTextWidth()
 
-    call writefile(['Wait...'], g:rplugin_docfile . "lock")
-    if classfor == ""
-        if a:package == ""
-            call SendCmdToR("source('" . g:rplugin_home . "/r-plugin/vimhelp.R') ; .vim.help('" . a:rkeyword . "', " . g:rplugin_htw . "L)")
-        else
-            call SendCmdToR("source('" . g:rplugin_home . "/r-plugin/vimhelp.R') ; .vim.help('" . a:rkeyword . "', " . g:rplugin_htw . "L, package = '" . a:package . "')")
-        endif
+    let g:rplugin_lastrpl = "R did not reply."
+    if classfor == "" && a:package == ""
+        exe 'Py SendToR("vim.help(' . "'" . a:rkeyword . "', " . g:rplugin_htw . 'L)")'
+    elseif a:package != ""
+        exe 'Py SendToR("vim.help(' . "'" . a:rkeyword . "', " . g:rplugin_htw . "L, package='" . a:package  . "')". '")'
     else
-        call SendCmdToR("source('" . g:rplugin_home . "/r-plugin/vimhelp.R') ; .vim.help('" . a:rkeyword . "', " . g:rplugin_htw . "L, " . classfor . ")")
+        let classfor = substitute(classfor, '"', '\\"', "g")
+        exe 'Py SendToR("vim.help(' . "'" . a:rkeyword . "', " . g:rplugin_htw . "L, '" . classfor . "')". '")'
     endif
-    sleep 50m
-
-    let i = 0
-    while filereadable(g:rplugin_docfile . "lock") && i < 40
-        sleep 50m
-        let i += 1
-    endwhile
-    if i == 40
-        echohl WarningMsg
-        echomsg "Waited too much time..."
-        echohl Normal
-        return
+    if g:rplugin_lastrpl != "VIMHELP"
+        if g:rplugin_lastrpl =~ "^MULTILIB"
+            echo "The topic '" . a:rkeyword . "' was found in more than one library:"
+            let libs = split(g:rplugin_lastrpl)
+            for idx in range(1, len(libs) - 1)
+                echo idx . " : " . libs[idx]
+            endfor
+            let chn = input("Please, select one of them: ")
+            if chn > 0 && chn < len(libs)
+                exe 'Py SendToR("vim.help(' . "'" . a:rkeyword . "', " . g:rplugin_htw . "L, package='" . libs[chn] . "')" . '")'
+            endif
+        else
+            call RWarningMsg(g:rplugin_lastrpl)
+            return
+        endif
     endif
 
     " Local variables that must be inherited by the rdoc buffer
@@ -1665,6 +1878,55 @@ function ShowRDoc(rkeyword, package)
     normal! ggdd
     setlocal nomodified
     setlocal nomodifiable
+    redraw
+endfunction
+
+function BuildRHelpList()
+    if !exists("s:list_of_objs")
+        let s:list_of_objs = []
+    endif
+    for xx in g:rplugin_liblist
+        let xxx = split(xx, "\x06")
+        if xxx[0] !~ '\$'
+            call add(s:list_of_objs, xxx[0])
+        endif
+    endfor
+endfunction
+
+function RLisObjs(arglead, cmdline, curpos)
+    let lob = []
+    let rkeyword = '^' . a:arglead
+    for xx in s:list_of_objs
+        if xx =~ rkeyword
+            call add(lob, xx)
+        endif
+    endfor
+    return lob
+endfunction
+
+function RSourceDirectory(...)
+    if has("win32") || has("win64")
+        let dir = substitute(a:1, '\\', '/', "g")
+    else
+        let dir = a:1
+    endif
+    if dir == ""
+        call SendCmdToR("vim.srcdir()")
+    else
+        call SendCmdToR("vim.srcdir('" . dir . "')")
+    endif
+endfunction
+
+function RAskHelp(...)
+    if a:1 == ""
+        call SendCmdToR("help.start()")
+        return
+    endif
+    if g:vimrplugin_vimpager != "no"
+        call ShowRDoc(a:1, "", 0)
+    else
+        call SendCmdToR("help(" . a:1. ")")
+    endif
 endfunction
 
 function PrintRObject(rkeyword)
@@ -1676,23 +1938,43 @@ function PrintRObject(rkeyword)
     if classfor == ""
         call SendCmdToR("print(" . a:rkeyword . ")")
     else
-        call SendCmdToR('source("' . g:rplugin_home . '/r-plugin/vimprint.R") ; .vim.print("' . a:rkeyword . '", ' . classfor . ")")
+        call SendCmdToR('vim.print("' . a:rkeyword . '", ' . classfor . ")")
     endif
 endfunction
 
 " Call R functions for the word under cursor
 function RAction(rcmd)
     if &filetype == "rbrowser"
-        let rkeyword = RBrowserGetName(1)
+        let rkeyword = RBrowserGetName(1, line("."))
     else
         let rkeyword = RGetKeyWord()
     endif
     if strlen(rkeyword) > 0
         if a:rcmd == "help"
-            if g:vimrplugin_vimpager != "no"
-                call ShowRDoc(rkeyword, "")
-            else
+            if g:vimrplugin_vimpager == "no"
                 call SendCmdToR("help(" . rkeyword . ")")
+            else
+                if bufname("%") =~ "Object_Browser" || exists("*RBrSendToR")
+                    if g:rplugin_curview == "libraries"
+                        let pkg = RBGetPkgName()
+                    else
+                        let pkg = ""
+                    endif
+                    if exists("b:this_is_ob")
+                        if g:rplugin_edpane == "none"
+                            call RWarningMsg("Cmd not available.")
+                        else
+                            let slog = system("tmux set-buffer '" . "\<Esc>" . ':call ShowRDoc("' . rkeyword . '", "' . pkg . '", 0)' . "\<C-M>' && tmux paste-buffer -t " . g:rplugin_edpane . " && tmux select-pane -t " . g:rplugin_edpane)
+                            if v:shell_error
+                                call RWarningMsg(slog)
+                            endif
+                        endif
+                    else
+                        call ShowRDoc(rkeyword, pkg, 0)
+                    endif
+                    return
+                endif
+                call ShowRDoc(rkeyword, "", 1)
             endif
             return
         endif
@@ -1702,16 +1984,23 @@ function RAction(rcmd)
         endif
         let rfun = a:rcmd
         if a:rcmd == "args" && g:vimrplugin_listmethods == 1
-            let rfun = "source('" . g:rplugin_home . "/r-plugin/specialfuns.R') ; .vim.list.args"
+            let rfun = "vim.list.args"
         endif
         if a:rcmd == "plot" && g:vimrplugin_specialplot == 1
-            let rfun = "source('" . g:rplugin_home . "/r-plugin/specialfuns.R') ; .vim.plot"
+            let rfun = "vim.plot"
         endif
-        let raction = rfun . "(" . rkeyword . ")"
-        let ok = SendCmdToR(raction)
-        if ok == 0
+        if a:rcmd == "plotsumm"
+            if g:vimrplugin_specialplot == 1
+                let raction = "vim.plot(" . rkeyword . "); summary(" . rkeyword . ")"
+            else
+                let raction = "plot(" . rkeyword . "); summary(" . rkeyword . ")"
+            endif
+            call SendCmdToR(raction)
             return
         endif
+
+        let raction = rfun . "(" . rkeyword . ")"
+        call SendCmdToR(raction)
     endif
 endfunction
 
@@ -1839,7 +2128,7 @@ function RControlMenu()
     "-------------------------------
     menu R.Command.-Sep1- <nul>
     call RCreateMenuItem("nvi", 'Command.Print\ (cur)', '<Plug>RObjectPr', 'rp', ':call RAction("print")')
-    call RCreateMenuItem("nvi", 'Command.Names\ (cur)', '<Plug>RObjectNames', 'rn', ':call RAction("names")')
+    call RCreateMenuItem("nvi", 'Command.Names\ (cur)', '<Plug>RObjectNames', 'rn', ':call RAction("vim.names")')
     call RCreateMenuItem("nvi", 'Command.Structure\ (cur)', '<Plug>RObjectStr', 'rt', ':call RAction("str")')
     "-------------------------------
     menu R.Command.-Sep2- <nul>
@@ -1850,7 +2139,7 @@ function RControlMenu()
     menu R.Command.-Sep3- <nul>
     call RCreateMenuItem("nvi", 'Command.Summary\ (cur)', '<Plug>RSummary', 'rs', ':call RAction("summary")')
     call RCreateMenuItem("nvi", 'Command.Plot\ (cur)', '<Plug>RPlot', 'rg', ':call RAction("plot")')
-    call RCreateMenuItem("nvi", 'Command.Plot\ and\ summary\ (cur)', '<Plug>RSPlot', 'rb', ':call RAction("plot")<CR>:call RAction("summary")')
+    call RCreateMenuItem("nvi", 'Command.Plot\ and\ summary\ (cur)', '<Plug>RSPlot', 'rb', ':call RAction("plotsumm")')
     let g:rplugin_hasmenu = 1
 endfunction
 
@@ -1864,7 +2153,7 @@ function RControlMaps()
     " Print, names, structure
     "-------------------------------------
     call RCreateMaps("nvi", '<Plug>RObjectPr',     'rp', ':call RAction("print")')
-    call RCreateMaps("nvi", '<Plug>RObjectNames',  'rn', ':call RAction("names")')
+    call RCreateMaps("nvi", '<Plug>RObjectNames',  'rn', ':call RAction("vim.names")')
     call RCreateMaps("nvi", '<Plug>RObjectStr',    'rt', ':call RAction("str")')
 
     " Arguments, example, help
@@ -1877,18 +2166,13 @@ function RControlMaps()
     "-------------------------------------
     call RCreateMaps("nvi", '<Plug>RSummary',      'rs', ':call RAction("summary")')
     call RCreateMaps("nvi", '<Plug>RPlot',         'rg', ':call RAction("plot")')
-    call RCreateMaps("nvi", '<Plug>RSPlot',        'rb', ':call RAction("plot")<CR>:call RAction("summary")')
+    call RCreateMaps("nvi", '<Plug>RSPlot',        'rb', ':call RAction("plotsumm")')
 
     " Build list of objects for omni completion
     "-------------------------------------
     call RCreateMaps("nvi", '<Plug>RUpdateObjBrowser', 'ro', ':call RObjBrowser()')
-    if &filetype == "rbrowser"
-        call RCreateMaps("nvi", '<Plug>ROpenLists',        'r=', ':call RBrowserOpenCloseLists(1)')
-        call RCreateMaps("nvi", '<Plug>RCloseLists',       'r-', ':call RBrowserOpenCloseLists(0)')
-    else
-        call RCreateMaps("nvi", '<Plug>ROpenLists',        'r=', ':call RObjBrowserOCLists(1)')
-        call RCreateMaps("nvi", '<Plug>RCloseLists',       'r-', ':call RObjBrowserOCLists(0)')
-    endif
+    call RCreateMaps("nvi", '<Plug>ROpenLists',        'r=', ':call RBrowserOpenCloseLists(1)')
+    call RCreateMaps("nvi", '<Plug>RCloseLists',       'r-', ':call RBrowserOpenCloseLists(0)')
 endfunction
 
 
@@ -1948,7 +2232,7 @@ function MakeRMenu()
     call RCreateMenuItem("nvi", 'Start/Close.Start\ R\ (custom)', '<Plug>RCustomStart', 'rc', ':call StartR("custom")')
     "-------------------------------
     menu R.Start/Close.-Sep1- <nul>
-    call RCreateMenuItem("nvi", 'Start/Close.Close\ R\ (no\ save)', '<Plug>RClose', 'rq', ":call SendCmdToR('quit(save = \"no\")')")
+    call RCreateMenuItem("nvi", 'Start/Close.Close\ R\ (no\ save)', '<Plug>RClose', 'rq', ":call RQuit('no')")
 
     "----------------------------------------------------------------------------
     " Send
@@ -1995,25 +2279,33 @@ function MakeRMenu()
     call RCreateMenuItem("ni0", 'Send.Line', '<Plug>RSendLine', 'l', ':call SendLineToR("stay")')
     call RCreateMenuItem("ni0", 'Send.Line\ (and\ down)', '<Plug>RDSendLine', 'd', ':call SendLineToR("down")')
     call RCreateMenuItem("i", 'Send.Line\ (and\ new\ one)', '<Plug>RSendLAndOpenNewOne', 'q', ':call SendLineToR("newline")')
+    call RCreateMenuItem("n", 'Send.Left\ part\ of\ line\ (cur)', '<Plug>RNLeftPart', 'r<Left>', ':call RSendPartOfLine("left", 0)')
+    call RCreateMenuItem("n", 'Send.Right\ part\ of\ line\ (cur)', '<Plug>RNRightPart', 'r<Right>', ':call RSendPartOfLine("right", 0)')
+    call RCreateMenuItem("i", 'Send.Left\ part\ of\ line\ (cur)', '<Plug>RILeftPart', 'r<Left>', 'l:call RSendPartOfLine("left", 1)')
+    call RCreateMenuItem("i", 'Send.Right\ part\ of\ line\ (cur)', '<Plug>RIRightPart', 'r<Right>', 'l:call RSendPartOfLine("right", 1)')
 
     "----------------------------------------------------------------------------
     " Control
     "----------------------------------------------------------------------------
     call RControlMenu()
     "-------------------------------
-    menu R.Command.-Sep1- <nul>
+    menu R.Command.-Sep4- <nul>
     if &filetype != "rdoc"
         call RCreateMenuItem("nvi", 'Command.Set\ working\ directory\ (cur\ file\ path)', '<Plug>RSetwd', 'rd', ':call RSetWD()')
     endif
     "-------------------------------
     if &filetype == "rnoweb" || g:vimrplugin_never_unmake_menu
-        menu R.Command.-Sep2- <nul>
+        menu R.Command.-Sep5- <nul>
         call RCreateMenuItem("nvi", 'Command.Sweave\ (cur\ file)', '<Plug>RSweave', 'sw', ':call RSweave()')
         call RCreateMenuItem("nvi", 'Command.Sweave\ and\ PDF\ (cur\ file)', '<Plug>RMakePDF', 'sp', ':call RMakePDF("nobib")')
         call RCreateMenuItem("nvi", 'Command.Sweave,\ BibTeX\ and\ PDF\ (cur\ file)', '<Plug>RMakePDF', 'sb', ':call RMakePDF("bibtex")')
+        menu R.Command.-Sep6- <nul>
+        call RCreateMenuItem("nvi", 'Command.Knit\ (cur\ file)', '<Plug>RSweave', 'kn', ':call RSweave()')
+        call RCreateMenuItem("nvi", 'Command.Knit\ and\ PDF\ (cur\ file)', '<Plug>RMakePDF', 'kp', ':call RMakePDF("nobib")')
+        call RCreateMenuItem("nvi", 'Command.Knit,\ BibTeX\ and\ PDF\ (cur\ file)', '<Plug>RMakePDF', 'kb', ':call RMakePDF("bibtex")')
     endif
     "-------------------------------
-    menu R.Command.-Sep3- <nul>
+    menu R.Command.-Sep7- <nul>
     if &filetype == "r" || &filetype == "rnoweb" || g:vimrplugin_never_unmake_menu
         nmenu <silent> R.Command.Build\ tags\ file\ (cur\ dir)<Tab>:RBuildTags :call SendCmdToR('rtags(ofile = "TAGS")')<CR>
         imenu <silent> R.Command.Build\ tags\ file\ (cur\ dir)<Tab>:RBuildTags <Esc>:call SendCmdToR('rtags(ofile = "TAGS")')<CR>a
@@ -2027,7 +2319,7 @@ function MakeRMenu()
     if &filetype == "r" || &filetype == "rnoweb" || &filetype == "rhelp" || g:vimrplugin_never_unmake_menu
         if g:vimrplugin_underscore == 1
             imenu <silent> R.Edit.Insert\ \"\ <-\ \"<Tab>_ <Esc>:call ReplaceUnderS()<CR>a
-            imenu <silent> R.Edit.Complete\ function\ name<Tab>^X^O <C-X><C-O>
+            imenu <silent> R.Edit.Complete\ object\ name<Tab>^X^O <C-X><C-O>
             if hasmapto("<Plug>RCompleteArgs", "i")
                 let boundkey = RIMapCmd("<Plug>RCompleteArgs")
                 exe "imenu <silent> R.Edit.Complete\\ function\\ arguments<Tab>" . boundkey . " " . boundkey
@@ -2061,8 +2353,6 @@ function MakeRMenu()
     "----------------------------------------------------------------------------
     nmenu <silent> R.Syntax.Build\ omniList\ (loaded)<Tab>:RUpdateObjList :call RBuildSyntaxFile("loaded")<CR>
     imenu <silent> R.Syntax.Build\ omniList\ (loaded)<Tab>:RUpdateObjList <Esc>:call RBuildSyntaxFile("loaded")<CR>a
-    nmenu <silent> R.Syntax.Build\ omniList\ (installed)<Tab>:RUpdateObjListAll :call RBuildSyntaxFile("installed")<CR>
-    imenu <silent> R.Syntax.Build\ omniList\ (installed)<Tab>:RUpdateObjListAll <Esc>:call RBuildSyntaxFile("installed")<CR>a
 
     "----------------------------------------------------------------------------
     " Help
@@ -2115,7 +2405,7 @@ function MakeRMenu()
     amenu R.Help\ (plugin).FAQ\ and\ tips.Jump\ to\ function\ definitions :help r-plugin-tagsfile<CR>
     amenu R.Help\ (plugin).News :help r-plugin-news<CR>
 
-    amenu R.Help\ (R) :call SendCmdToR("help.start()")<CR>
+    amenu R.Help\ (R)<Tab>:Rhelp :call SendCmdToR("help.start()")<CR>
     let g:rplugin_hasmenu = 1
 
     "----------------------------------------------------------------------------
@@ -2123,7 +2413,7 @@ function MakeRMenu()
     "----------------------------------------------------------------------------
     " Buttons
     amenu <silent> ToolBar.RStart :call StartR("R")<CR>
-    amenu <silent> ToolBar.RClose :call SendCmdToR('quit(save = "no")')<CR>
+    amenu <silent> ToolBar.RClose :call RQuit('no')<CR>
     "---------------------------
     if &filetype == "r" || g:vimrplugin_never_unmake_menu
         nmenu <silent> ToolBar.RSendFile :call SendFileToR("echo")<CR>
@@ -2270,6 +2560,10 @@ function RCreateSendMaps()
     call RCreateMaps("ni0", '<Plug>RSendLine', 'l', ':call SendLineToR("stay")')
     call RCreateMaps('ni0', '<Plug>RDSendLine', 'd', ':call SendLineToR("down")')
     call RCreateMaps('i', '<Plug>RSendLAndOpenNewOne', 'q', ':call SendLineToR("newline")')
+    nmap <LocalLeader>r<Left> :call RSendPartOfLine("left", 0)<CR>
+    imap <LocalLeader>r<Left> <Esc>l:call RSendPartOfLine("left", 0)<CR>i
+    nmap <LocalLeader>r<Right> :call RSendPartOfLine("right", 0)<CR>
+    imap <LocalLeader>r<Right> <Esc>l:call RSendPartOfLine("right", 0)<CR>i
 
     " For compatibility with Johannes Ranke's plugin
     if g:vimrplugin_map_r == 1
@@ -2293,9 +2587,27 @@ function RBufEnter()
     endif
 endfunction
 
+function SetRPath()
+    if exists("g:vimrplugin_r_path")
+        if isdirectory(g:vimrplugin_r_path)
+            let b:rplugin_R = g:vimrplugin_r_path . "/R"
+        else
+            let b:rplugin_R = g:vimrplugin_r_path
+        endif
+    else
+        let b:rplugin_R = "R"
+    endif
+    if !exists("g:vimrplugin_r_args")
+        let b:rplugin_r_args = " "
+    else
+        let b:rplugin_r_args = g:vimrplugin_r_args
+    endif
+endfunction
+
 command RUpdateObjList :call RBuildSyntaxFile("loaded")
-command RUpdateObjListAll :call RBuildSyntaxFile("installed")
 command RBuildTags :call SendCmdToR('rtags(ofile = "TAGS")')
+command -nargs=? -complete=customlist,RLisObjs Rhelp :call RAskHelp(<q-args>)
+command -nargs=? -complete=dir RSourceDir :call RSourceDirectory(<q-args>)
 
 "==========================================================================
 " Global variables
@@ -2353,8 +2665,6 @@ let g:rplugin_globalenvfname = $VIMRPLUGIN_TMPDIR . "/GlobalEnvList"
 
 " Variables whose default value is fixed
 call RSetDefaultValue("g:vimrplugin_map_r",             0)
-call RSetDefaultValue("g:vimrplugin_open_df",           1)
-call RSetDefaultValue("g:vimrplugin_open_list",         0)
 call RSetDefaultValue("g:vimrplugin_allnames",          0)
 call RSetDefaultValue("g:vimrplugin_underscore",        1)
 call RSetDefaultValue("g:vimrplugin_rnowebchunk",       1)
@@ -2371,7 +2681,8 @@ call RSetDefaultValue("g:vimrplugin_routnotab",         0)
 call RSetDefaultValue("g:vimrplugin_editor_w",         66)
 call RSetDefaultValue("g:vimrplugin_help_w",           46)
 call RSetDefaultValue("g:vimrplugin_objbr_w",          40)
-call RSetDefaultValue("g:vimrplugin_buildwait",       120)
+call RSetDefaultValue("g:vimrplugin_external_ob",       0)
+call RSetDefaultValue("g:vimrplugin_buildwait",        60)
 call RSetDefaultValue("g:vimrplugin_indent_commented",  1)
 call RSetDefaultValue("g:vimrplugin_by_vim_instance",   0)
 call RSetDefaultValue("g:vimrplugin_never_unmake_menu", 0)
@@ -2379,12 +2690,23 @@ call RSetDefaultValue("g:vimrplugin_vimpager",       "'tab'")
 call RSetDefaultValue("g:vimrplugin_latexcmd", "'pdflatex'")
 call RSetDefaultValue("g:vimrplugin_objbr_place", "'script,right'")
 
-" Old default value.
-"if has("gui_running") || !has("clientserver")
-"    call RSetDefaultValue("g:vimrplugin_objbr_place", "'script,right'")
-"else
-"    call RSetDefaultValue("g:vimrplugin_objbr_place", "'console,right'")
-"endif
+
+" python has priority over python3, unless ConqueTerm_PyVersion == 3
+if has("python3") && exists("g:ConqueTerm_PyVersion") && g:ConqueTerm_PyVersion == 3
+    command! -nargs=+ Py :py3 <args>
+    command! -nargs=+ PyFile :py3file <args>
+elseif has("python")
+    command! -nargs=+ Py :py <args>
+    command! -nargs=+ PyFile :pyfile <args>
+elseif has("python3")
+    command! -nargs=+ Py :py3 <args>
+    command! -nargs=+ PyFile :py3file <args>
+else
+    command! -nargs=+ Py :
+    command! -nargs=+ PyFile :
+endif
+
+exe "PyFile " . g:rplugin_home . "/r-plugin/vimcom.py"
 
 " ^K (\013) cleans from cursor to the right and ^U (\025) cleans from cursor
 " to the left. However, ^U causes a beep if there is nothing to clean. The
@@ -2457,11 +2779,6 @@ if g:vimrplugin_screenplugin
     " xterm-256color. See   :h r-plugin-tips 
     if g:vimrplugin_tmux
         let g:ScreenImpl = 'Tmux'
-        let s:tmuxversion = system("tmux -V")
-        let s:tmuxversion = substitute(s:tmuxversion, '.*tmux \([0-9]\.[0-9]\).*', '\1', '')
-        if strlen(s:tmuxversion) != 3
-            let s:tmuxversion = "1.0"
-        endif
         if g:vimrplugin_notmuxconf == 0
             if $DISPLAY != "" || $TERM =~ "xterm"
                 let g:ScreenShellTmuxInitArgs = "-2"
@@ -2473,13 +2790,10 @@ if g:vimrplugin_screenplugin
                         \ 'bind-key C-a send-prefix',
                         \ 'set-window-option -g mode-keys vi',
                         \ 'set -g status off',
-                        \ "set -g terminal-overrides 'xterm*:smcup@:rmcup@'"]
-            if s:tmuxversion >= "1.5"
-                let cnflines += [
-                            \ 'set -g mode-mouse on',
-                            \ 'set -g mouse-select-pane on',
-                            \ 'set -g mouse-resize-pane on']
-            endif
+                        \ "set -g terminal-overrides 'xterm*:smcup@:rmcup@'",
+                        \ 'set -g mode-mouse on',
+                        \ 'set -g mouse-select-pane on',
+                        \ 'set -g mouse-resize-pane on']
             call writefile(cnflines, tmxcnf)
             let g:ScreenShellTmuxInitArgs = g:ScreenShellTmuxInitArgs . " -f " . tmxcnf
         endif
@@ -2488,35 +2802,23 @@ if g:vimrplugin_screenplugin
     endif
 endif
 
+let s:tmuxversion = system("tmux -V")
+let s:tmuxversion = substitute(s:tmuxversion, '.*tmux \([0-9]\.[0-9]\).*', '\1', '')
+if strlen(s:tmuxversion) != 3
+    let s:tmuxversion = "1.0"
+endif
+if g:vimrplugin_tmux && s:tmuxversion < "1.5"
+    call RWarningMsgInp("Vim-R-plugin requires Tmux >= 1.5")
+    let g:rplugin_failed = 1
+    finish
+endif
+unlet s:tmuxversion
+
 if g:vimrplugin_screenplugin
-    " Future: Remove this Tmux version test on 2014
-    if g:vimrplugin_tmux
-        if s:tmuxversion == "1.0" && g:ScreenVersion > "1.4"
-            call RWarningMsgInp("Tmux <= 1.3 requires Screen plugin <= 1.4. You should either upgrade Tmux or downgrade the Screen plugin.")
-        endif
-        if s:tmuxversion < "1.5" && g:ScreenVersion < "1.5"
-            call RWarningMsgInp("Vim-R-plugin requires Screen plugin >= 1.5")
-            let g:rplugin_failed = 1
-            finish
-        endif
-    elseif g:ScreenVersion < "1.5"
+    if g:ScreenVersion < "1.5"
         call RWarningMsgInp("Vim-R-plugin requires Screen plugin >= 1.5")
         let g:rplugin_failed = 1
         finish
-    endif
-endif
-
-" To run the Object Browser beside R Console with Tmux, Vim must have the
-" +clientserver feature and the X server must be running.
-if g:vimrplugin_screenplugin && g:vimrplugin_objbr_place =~ "console"
-    if $DISPLAY == "" || g:vimrplugin_tmux == 0
-        let g:vimrplugin_objbr_place = substitute(g:vimrplugin_objbr_place, "console", "script", "")
-    elseif !has("clientserver")
-        " Cannot use RWarningMsgInp because the message would be visible but
-        " Vim would wait for <Enter> when R was started.
-        call RWarningMsg("Your Vim was not compiled with the 'clientserver' feature. You will not be able to start the Object Browser beside the R Console.")
-        sleep 1
-        let g:vimrplugin_objbr_place = substitute(g:vimrplugin_objbr_place, "console", "script", "")
     endif
 endif
 
@@ -2524,21 +2826,8 @@ endif
 let g:rplugin_globalenvlines = []
 
 if has("win32") || has("win64")
-    " python has priority over python3, unless ConqueTerm_PyVersion == 3
-    if has("python")
-        let s:py = "py"
-    else
-        if has("python3")
-            let s:py = "py3"
-        else
-            let s:py = ""
-        endif
-    endif
-    if has("python3") && exists("g:ConqueTerm_PyVersion") && g:ConqueTerm_PyVersion == 3
-        let s:py = "py3"
-    endif
 
-    if s:py == ""
+    if !has("python") && !has("python3")
         redir => s:vimversion
         silent version
         redir END
@@ -2566,18 +2855,18 @@ if has("win32") || has("win64")
         finish
     endif
     let rplugin_pywin32 = 1
-    exe s:py . "file " . substitute(g:rplugin_home, " ", '\ ', "g") . '\r-plugin\windows.py' 
+    exe "PyFile " . substitute(g:rplugin_home, " ", '\ ', "g") . '\r-plugin\windows.py' 
     if rplugin_pywin32 == 0
         let g:rplugin_failed = 1
         finish
     endif
     let g:rplugin_jspath = g:rplugin_home . "\\r-plugin\\vimActivate.js"
     if !exists("g:rplugin_rpathadded")
-        if exists("g:vimrplugin_r_path")
+        if exists("g:vimrplugin_r_path") && isdirectory(g:vimrplugin_r_path)
             let $PATH = g:vimrplugin_r_path . ";" . $PATH
-            let g:rplugin_Rgui = g:vimrplugin_r_path . "\\Rgui.exe"
+            let b:rplugin_Rgui = g:vimrplugin_r_path . "\\Rgui.exe"
         else
-            exe s:py . " GetRPathPy()"
+            Py GetRPathPy()
             if s:rinstallpath == "Not found"
                 call RWarningMsgInp("Could not find R path in Windows Registry. Please, either install R or set the value of 'vimrplugin_r_path'.")
                 let g:rplugin_failed = 1
@@ -2589,20 +2878,22 @@ if has("win32") || has("win64")
                 endif
                 if g:vimrplugin_i386
                     let $PATH = s:rinstallpath . '\bin\i386;' . $PATH
-                    let g:rplugin_Rgui = s:rinstallpath . '\bin\i386\Rgui.exe'
+                    let b:rplugin_Rgui = s:rinstallpath . '\bin\i386\Rgui.exe'
                 else
                     let $PATH = s:rinstallpath . '\bin\x64;' . $PATH
-                    let g:rplugin_Rgui = s:rinstallpath . '\bin\x64\Rgui.exe'
+                    let b:rplugin_Rgui = s:rinstallpath . '\bin\x64\Rgui.exe'
                 endif
             else
                 let $PATH = s:rinstallpath . '\bin;' . $PATH
-                let g:rplugin_Rgui = s:rinstallpath . '\bin\Rgui.exe'
+                let b:rplugin_Rgui = s:rinstallpath . '\bin\Rgui.exe'
             endif
             unlet s:rinstallpath
         endif
         let g:rplugin_rpathadded = 1
     endif
-    let g:rplugin_R = "Rgui.exe"
+    if !exists("b:rplugin_R")
+        let b:rplugin_R = "Rgui.exe"
+    endif
     let g:vimrplugin_term_cmd = "none"
     let g:vimrplugin_term = "none"
     let g:vimrplugin_noscreenrc = 1
@@ -2611,15 +2902,6 @@ if has("win32") || has("win64")
     endif
     if !exists("g:vimrplugin_sleeptime")
         let g:vimrplugin_sleeptime = 0.02
-    endif
-else
-    if exists("g:vimrplugin_r_path")
-        let g:rplugin_R = g:vimrplugin_r_path . "/R"
-    else
-        let g:rplugin_R = "R"
-    endif
-    if !exists("g:vimrplugin_r_args")
-        let g:vimrplugin_r_args = " "
     endif
 endif
 
@@ -2632,7 +2914,7 @@ if g:vimrplugin_conqueplugin == 1
 endif
 
 " Are we in a Debian package? Is the plugin being running for the first time?
-let g:rplugin_omnifname = g:rplugin_uservimfiles . "/r-plugin/omniList"
+let g:rplugin_omnifname = g:rplugin_uservimfiles . "/r-plugin/omnils"
 if g:rplugin_home != g:rplugin_uservimfiles
     " Create r-plugin directory if it doesn't exist yet:
     if !isdirectory(g:rplugin_uservimfiles . "/r-plugin")
@@ -2655,13 +2937,13 @@ if !filereadable(g:rplugin_uservimfiles . "/r-plugin/functions.vim")
     endif
 endif
 
-" If there is no omniList, copy the default one
+" If there is no omnils, copy the default one
 if !filereadable(g:rplugin_omnifname)
-    if filereadable("/usr/share/vim/addons/r-plugin/omniList")
-        let omnilines = readfile("/usr/share/vim/addons/r-plugin/omniList")
+    if filereadable("/usr/share/vim/addons/r-plugin/omnils")
+        let omnilines = readfile("/usr/share/vim/addons/r-plugin/omnils")
     else
-        if filereadable(g:rplugin_home . "/r-plugin/omniList")
-            let omnilines = readfile(g:rplugin_home . "/r-plugin/omniList")
+        if filereadable(g:rplugin_home . "/r-plugin/omnils")
+            let omnilines = readfile(g:rplugin_home . "/r-plugin/omnils")
         else
             let omnilines = []
         endif
@@ -2671,13 +2953,14 @@ if !filereadable(g:rplugin_omnifname)
 endif
 
 " Minimum width for the Object Browser
-if g:vimrplugin_objbr_w < 9
-    let g:vimrplugin_objbr_w = 9
+if g:vimrplugin_objbr_w < 10
+    let g:vimrplugin_objbr_w = 10
 endif
 
 " Keeps the libraries object list in memory to avoid the need of reading the file
 " repeatedly:
 let g:rplugin_liblist = readfile(g:rplugin_omnifname)
+call BuildRHelpList()
 
 
 " Control the menu 'R' and the tool bar buttons
@@ -2698,7 +2981,7 @@ if has("win32") || has("win64") || vimrplugin_applescript
     " No external terminal emulator will be called, so any value is good
     let g:vimrplugin_term = "xterm"
 else
-    let s:terminals = ['gnome-terminal', 'konsole', 'xfce4-terminal', 'terminal', 'Eterm', 'rxvt', 'aterm', 'roxterm', 'xterm']
+    let s:terminals = ['gnome-terminal', 'konsole', 'xfce4-terminal', 'terminal', 'Eterm', 'rxvt', 'aterm', 'roxterm', 'terminator', 'xterm']
     if has('mac')
         let s:terminals = ['iTerm', 'Terminal.app'] + s:terminals
     endif
@@ -2733,6 +3016,10 @@ if g:vimrplugin_term == "gnome-terminal" || g:vimrplugin_term == "xfce4-terminal
     let g:rplugin_termcmd = g:vimrplugin_term . " --working-directory='" . expand("%:p:h") . "' --title R -e"
 endif
 
+if g:vimrplugin_term == "terminator"
+    let g:rplugin_termcmd = "terminator --working-directory='" . expand("%:p:h") . "' --title R -x"
+endif
+
 if g:vimrplugin_term == "konsole"
     let g:rplugin_termcmd = "konsole --workdir '" . expand("%:p:h") . "' --icon " . g:rplugin_home . "/bitmaps/ricon.png -e"
 endif
@@ -2743,7 +3030,7 @@ endif
 
 if g:vimrplugin_term == "roxterm"
     " Cannot set icon: http://bugzilla.gnome.org/show_bug.cgi?id=126081
-    let g:rplugin_termcmd = g:vimrplugin_term . " --directory='" . expand("%:p:h") . "' --title R -e"
+    let g:rplugin_termcmd = "roxterm --directory='" . expand("%:p:h") . "' --title R -e"
 endif
 
 if g:vimrplugin_term == "xterm" || g:vimrplugin_term == "uxterm"
@@ -2755,8 +3042,14 @@ if exists("g:vimrplugin_term_cmd")
     let g:rplugin_termcmd = g:vimrplugin_term_cmd
 endif
 
+function FinalActions()
+    Py StopServer()
+    sleep 200m
+endfunction
+
 augroup RBufControl
     au BufEnter * let g:rplugin_curbuf = bufname("%")
+    au VimLeavePre * call FinalActions()
 augroup END
 
 if has("gui_running")
@@ -2764,6 +3057,18 @@ if has("gui_running")
         au BufEnter * call RBufEnter()
     augroup END
 endif
+
+let g:rplugin_firstbuffer = expand("%:p")
+let g:rplugin_running_objbr = 0
+let g:rplugin_has_new_lib = 0
+let g:rplugin_has_new_obj = 0
+let g:rplugin_objbr_port = 0
+let g:rplugin_myport = 0
+let g:rplugin_editor_port = 0
+let g:rplugin_vimcomport = 0
+let g:rplugin_ob_busy = 0
+
+call SetRPath()
 
 " Debugging code:
 if g:vimrplugin_screenplugin && g:vimrplugin_conqueplugin

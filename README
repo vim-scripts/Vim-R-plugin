@@ -7,38 +7,15 @@ Development code: https://github.com/jcfaria/Vim-R-plugin
 
 MAIN FEATURES:
 
-  * Syntax highlighting for R code, including:
-      - Special characters in strings.
-      - Functions of all installed packages (must be updated manually).
-      - Special highlighting for R output (.Rout files).
-      - Spell check only strings and comments.
-      - Fold code when foldmethod=syntax.
-  * Syntax highlighting for RHelp syntax.
-  * Smart indentation for R syntax.
-  * Smart indentation for RHelp syntax.
-  * Integrated communication with R:
-      - Start/Close R.
-      - Send lines, selection, paragraphs, functions, blocks, entire file.
-      - Send commands with the object under cursor as argument: help, args,
-	plot, print, str, summary, example, names.
-      - Send to R the Sweave and pdflatex commands.
-      - Run R inside a Vim's buffer.
-  * Omni completion (auto-completion) for R objects (.GlobalEnv and installed
-    packages. The list of installed packages must be updated manually.
-  * Ability to see R's documentation in a Vim's buffer:
-      - Automatic calculation of the best layout of the R documentation buffer
-	(split the window either horizontally or vertically according to the
-	available room).
-      - Automatic formating of the text to fit the panel width.
-      - Send code and commands to R (useful to run examples).
-      - Jump to another R documentation.
-      - Syntax highlighting of R documentation.
-  * Object Browser (.GlobalEnv and loaded packages; must be updated manually):
-      - Send commands with the object under cursor as argument.
-      - Call R's help() with the object under cursor as argument.
-      - Syntax highlighting of the Object Browser.
+  * Communication with R.
+  * Omni completion (auto-completion) for R objects.
+  * Ability to see R's documentation in a Vim's buffer.
+  * Object Browser.
+  * Syntax highlighting for R and RHelp code.
+  * Smart indentation for R and RHelp syntax.
   * Most of the plugin's behavior is customizable.
 
+    For a detailed list of features, see: http://www.lepem.ufc.br/jaa/r-plugin.html#r-plugin-features
 
 USE:
 
