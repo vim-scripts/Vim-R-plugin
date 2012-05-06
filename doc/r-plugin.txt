@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 0.9.7
+Version: 0.9.8
 For Vim version 7.3
 
  1. Overview                                    |r-plugin-overview|
@@ -1853,6 +1853,10 @@ the R syntax highlighted.
 ==============================================================================
 							       *r-plugin-news*
 10. News~
+
+0.9.8 (2012-05-00)
+
+ * Nothing yet.
 
 0.9.7 (2012-05-04)
 
