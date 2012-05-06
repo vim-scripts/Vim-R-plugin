@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Wed May 02, 2012  10:10AM
+" Last Change: Sun May 06, 2012  09:57AM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -623,6 +623,11 @@ function StartR(whatr)
         endif
     else
         if g:vimrplugin_tmux
+            if $TMUX_PANE != ""
+                call RWarningMsg("Cannot start R in an external terminal when running Vim in a Tmux session.")
+                lcd -
+                return
+            endif
             if g:vimrplugin_notmuxconf
                 let tmxcnf = " "
             else
