@@ -15,7 +15,7 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Sun May 06, 2012  09:57AM
+" Last Change: Sun May 06, 2012  10:54PM
 "
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
@@ -535,6 +535,7 @@ function StartR(whatr)
     endif
 
     if g:vimrplugin_screenplugin
+        let tmuxenv = ""
         if $TERM =~ "screen"
             if g:vimrplugin_tmux
                 call system("tmux set-environment VIMRPLUGIN_TMPDIR " . $VIMRPLUGIN_TMPDIR)
@@ -623,11 +624,13 @@ function StartR(whatr)
         endif
     else
         if g:vimrplugin_tmux
-            if $TMUX_PANE != ""
-                call RWarningMsg("Cannot start R in an external terminal when running Vim in a Tmux session.")
-                lcd -
-                return
+
+            " Start the terminal emulator even if inside a Tmux session
+            if $TMUX != ""
+                let tmuxenv = $TMUX
+                let $TMUX = ""
             endif
+
             if g:vimrplugin_notmuxconf
                 let tmxcnf = " "
             else
@@ -673,6 +676,9 @@ function StartR(whatr)
             call RWarningMsg(rlog)
             lcd -
             return
+        endif
+        if tmuxenv != ""
+            let $TMUX = tmuxenv
         endif
     endif
 
