@@ -15,8 +15,6 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "          
-" Last Change: Sun May 06, 2012  11:32PM
-"
 " Purposes of this file: Create all functions and commands and set the
 " value of all global variables and some buffer variables.for r,
 " rnoweb, rhelp, rdoc, and rbrowser files
@@ -628,6 +626,9 @@ function StartR(whatr)
             if $TMUX != ""
                 let tmuxenv = $TMUX
                 let $TMUX = ""
+                call system('export VIMRPLUGIN_TMPDIR=' . $VIMRPLUGIN_TMPDIR)
+                call system('export VIMINSTANCEID=' . $VIMINSTANCEID)
+                call system('tmux set-option -ga update-environment " VIMRPLUGIN_TMPDIR  VIMINSTANCEID"')
             endif
 
             if g:vimrplugin_notmuxconf
