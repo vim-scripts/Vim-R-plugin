@@ -127,7 +127,7 @@ following dependencies:
    Vim >= 7.3 with Python support.
    Tmux >= 1.5:     http://tmux.sourceforge.net
    Screen plugin:   http://www.vim.org/scripts/script.php?script_id=2711
-   vimcom >= 0.9-2: An R package.
+   vimcom >= 0.9-3: An R package.
 
    Recommends:~
    ncurses-term:  http://invisible-island.net/ncurses
@@ -220,7 +220,7 @@ to install external dependencies:
       find the file that matches exactly the version of Python that you
       installed.
 
-    * vimcom >= 0.9-2: An R package. You can install it with the R command
+    * vimcom >= 0.9-3: An R package. You can install it with the R command
       install.packages("vimcom"). The vimcom package creates a server on R to
       allow the communication with Vim. You certainly will want to put
       the following lines in your Rprofile (usually at ~/Documents/.Rprofile):
@@ -827,6 +827,13 @@ Browser will not work properly until you stop using it and wait for the time
 set in 'updatetime' (four seconds, by default). Then, the Object Browser
 should be normal again. The "d" command is available only when running R on
 Tmux.
+
+
+5.9. "VimCom port not found" on OpenBSD~
+
+When the loopback interface has both IPv4 and IPv6 addresses vimcom loads ok
+but apparently does not listen on the IPv4 address (127.0.0.1), only on the
+IPv6 one (fe80::1).
 
 
 ==============================================================================
