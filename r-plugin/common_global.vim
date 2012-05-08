@@ -628,7 +628,7 @@ function StartR(whatr)
                 let $TMUX = ""
                 call system('export VIMRPLUGIN_TMPDIR=' . $VIMRPLUGIN_TMPDIR)
                 call system('export VIMINSTANCEID=' . $VIMINSTANCEID)
-                call system('tmux set-option -ga update-environment " VIMRPLUGIN_TMPDIR  VIMINSTANCEID"')
+                call system('tmux set-option -ga update-environment " TMUX_PANE VIMRPLUGIN_TMPDIR  VIMINSTANCEID"')
             endif
 
             if g:vimrplugin_notmuxconf
