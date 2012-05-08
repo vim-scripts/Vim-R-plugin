@@ -721,7 +721,11 @@ function StartObjectBrowser()
             endif
 
             if !exists("g:rplugin_edpane")
-                let g:rplugin_edpane = $TMUX_PANE
+                if g:vimrplugin_screenplugin == 0
+                    let g:rplugin_edpane = "none"
+                else
+                    let g:rplugin_edpane = $TMUX_PANE
+                endif
                 if strlen(g:rplugin_edpane) == 0
                     if g:vimrplugin_external_ob
                         let g:rplugin_edpane = "none"
