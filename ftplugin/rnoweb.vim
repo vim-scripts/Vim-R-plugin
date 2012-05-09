@@ -17,7 +17,6 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "
-" Last Change: Mon Apr 16, 2012  12:08AM
 "==========================================================================
 
 " Only do this when not yet done for this buffer

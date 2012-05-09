@@ -19,8 +19,6 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Mon Feb 13, 2012  08:39AM
-"
 " Please see doc/r-plugin.txt for usage details.
 "==========================================================================
 

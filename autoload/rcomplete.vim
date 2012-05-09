@@ -1,7 +1,6 @@
 " Vim completion script
 " Language:    R
 " Maintainer:  Jakson Alves de Aquino <jalvesaq@gmail.com>
-" Last Change: Mon Apr 02, 2012  09:36AM
 "
 
 fun! rcomplete#CompleteR(findstart, base)

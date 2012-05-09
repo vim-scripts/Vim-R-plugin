@@ -1,7 +1,6 @@
 " Vim syntax file
 " Language:	Test version of R documentation
 " Maintainer:	Jakson A. Aquino <jalvesaq@gmail.com>
-" Last Change:	Sun Nov 20, 2011  06:36PM
 
 if exists("b:current_syntax")
   finish
