@@ -125,6 +125,10 @@ function! RMakePDF(bibtex, knit)
         let pdfcmd = pdfcmd . ", bibtex = TRUE"
     endif
 
+    if g:vimrplugin_openpdf == 0
+        let pdfcmd = pdfcmd . ", view = FALSE"
+    endif
+
     if a:knit
         if exists("g:vimrplugin_knitargs")
             let pdfcmd = pdfcmd . ", " . g:vimrplugin_knitargs
