@@ -628,7 +628,7 @@ function StartR(whatr)
                 let $TMUX = ""
                 call system('export VIMRPLUGIN_TMPDIR=' . $VIMRPLUGIN_TMPDIR)
                 call system('export VIMINSTANCEID=' . $VIMINSTANCEID)
-                call system('tmux set-option -ga update-environment " TMUX_PANE VIMRPLUGIN_TMPDIR  VIMINSTANCEID"')
+                call system('tmux set-option -ga update-environment " TMUX_PANE VIMRPLUGIN_TMPDIR VIMINSTANCEID"')
             endif
 
             if g:vimrplugin_notmuxconf
@@ -2706,6 +2706,27 @@ call RSetDefaultValue("g:vimrplugin_vimpager",       "'tab'")
 call RSetDefaultValue("g:vimrplugin_latexcmd", "'pdflatex'")
 call RSetDefaultValue("g:vimrplugin_objbr_place", "'script,right'")
 
+" Look for invalid options
+let objbrplace = split(g:vimrplugin_objbr_place, ",")
+let obpllen = len(objbrplace) - 1
+if obpllen > 1
+    call RWarningMsgInp("Too many options for vimrplugin_objbr_place.")
+    let g:rplugin_failed = 1
+    finish
+endif
+for idx in range(0, obpllen)
+    if objbrplace[idx] != "console" && objbrplace[idx] != "script" && objbrplace[idx] != "left" && objbrplace[idx] != "right"
+        call RWarningMsgInp("Invalid option for vimrplugin_objbr_place: " . objbrplace[idx])
+        let g:rplugin_failed = 1
+        finish
+    endif
+endfor
+unlet objbrplace
+unlet obpllen
+
+if g:vimrplugin_external_ob == 1
+    let g:vimrplugin_objbr_place = substitute(g:vimrplugin_objbr_place, "script", "console", "")
+endif
 
 " python has priority over python3, unless ConqueTerm_PyVersion == 3
 if has("python3") && exists("g:ConqueTerm_PyVersion") && g:ConqueTerm_PyVersion == 3
