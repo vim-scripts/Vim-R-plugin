@@ -181,6 +181,10 @@ function! RSweave(knit)
     endif
 endfunction
 
+function! ROpenPDF()
+    call SendCmdToR('vim.openpdf("' . expand("%:t:r") . ".pdf" . '")')
+endfunction
+
 if g:vimrplugin_rnowebchunk == 1
     " Write code chunk in rnoweb files
     imap <buffer><silent> < <Esc>:call RWriteChunk()<CR>a
@@ -202,6 +206,7 @@ call RCreateMaps("nvi", '<Plug>RBibTeX',      'sb', ':call RMakePDF("bibtex", 0)
 call RCreateMaps("nvi", '<Plug>RKnit',        'kn', ':call RSweave(1)')
 call RCreateMaps("nvi", '<Plug>RMakePDFK',    'kp', ':call RMakePDF("nobib", 1)')
 call RCreateMaps("nvi", '<Plug>RBibTeXK',     'kb', ':call RMakePDF("bibtex", 1)')
+call RCreateMaps("nvi", '<Plug>ROpenPDF',     'op', ':call ROpenPDF()')
 call RCreateMaps("nvi", '<Plug>RIndent',      'si', ':call RnwToggleIndentSty()')
 call RCreateMaps("ni",  '<Plug>RSendChunk',   'cc', ':call SendChunkToR("silent", "stay")')
 call RCreateMaps("ni",  '<Plug>RESendChunk',  'ce', ':call SendChunkToR("echo", "stay")')

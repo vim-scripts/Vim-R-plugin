@@ -2327,6 +2327,8 @@ function MakeRMenu()
         else
             call RCreateMenuItem("nvi", 'Command.Knit,\ BibTeX\ and\ PDF\ (cur\ file)', '<Plug>RMakePDF', 'kb', ':call RMakePDF("bibtex", 1)')
         endif
+        menu R.Command.-Sep61- <nul>
+        call RCreateMenuItem("nvi", 'Command.Open\ PDF\ (cur\ file)', '<Plug>ROpenPDF', 'op', ':call ROpenPDF()')
     endif
     "-------------------------------
     menu R.Command.-Sep7- <nul>
@@ -2692,7 +2694,7 @@ call RSetDefaultValue("g:vimrplugin_map_r",             0)
 call RSetDefaultValue("g:vimrplugin_allnames",          0)
 call RSetDefaultValue("g:vimrplugin_underscore",        1)
 call RSetDefaultValue("g:vimrplugin_rnowebchunk",       1)
-call RSetDefaultValue("g:vimrplugin_openpdf",           1)
+call RSetDefaultValue("g:vimrplugin_openpdf",           0)
 call RSetDefaultValue("g:vimrplugin_i386",              0)
 call RSetDefaultValue("g:vimrplugin_screenvsplit",      0)
 call RSetDefaultValue("g:vimrplugin_conquevsplit",      0)
