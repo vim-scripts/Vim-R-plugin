@@ -1300,6 +1300,10 @@ the X server) you may want to put in your |vimrc|:
        let vimrplugin_openpdf = 1
    endif
 <
+Note: If the pdf is already open, some pdf readers will automatically update
+the pdf; others will lock the pdf file and prevent R from successfully
+compiling it again.
+
 
 ==============================================================================
 						       *r-plugin-key-bindings*
