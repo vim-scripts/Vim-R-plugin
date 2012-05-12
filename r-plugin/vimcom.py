@@ -126,7 +126,9 @@ def VimServer():
                                     vim.command("sleep 1")
 
         except Exception as errmsg:
-            vim.command("call RWarningMsg('Server failed to read data: " + str(errmsg) + "')")
+            errstr = str(errmsg)
+            errstr = errstr.replace("'", '"')
+            vim.command("call RWarningMsg('Server failed to read data: " + errstr + "')")
             MyPort = 0
             try:
                 sock.shutdown(socket.SHUT_RD)
@@ -144,8 +146,10 @@ def VimServer():
                 sock = socket.socket( socket.AF_INET, socket.SOCK_DGRAM )
                 sock.bind( (UDP_IP,MyPort) )
             except Exception as errmsg:
+                errstr = str(errmsg)
+                errstr = errstr.replace("'", '"')
                 vim.command("let g:rplugin_myport = 0")
-                vim.command("call RWarningMsg('" + str(errmsg) + "')")
+                vim.command("call RWarningMsg('" + errstr + "')")
                 pass
 
 def RunServer():
