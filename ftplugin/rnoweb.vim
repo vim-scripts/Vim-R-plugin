@@ -182,7 +182,46 @@ function! RSweave(knit)
 endfunction
 
 function! ROpenPDF()
-    call SendCmdToR('vim.openpdf("' . expand("%:t:r") . ".pdf" . '")')
+    if has("win32") || has("win64")
+        exe 'Py OpenPDF("' . expand("%:t:r") . '.pdf")'
+        return
+    endif
+
+    if !exists("g:rplugin_pdfviewer")
+        let g:rplugin_pdfviewer = "none"
+        if has("gui_macvim") || has("gui_mac") || has("mac") || has("macunix")
+            if $R_PDFVIEWER == ""
+                let pdfvl = ["open"]
+            else
+                let pdfvl = [$R_PDFVIEWER, "open"]
+            endif
+        else
+            if $R_PDFVIEWER == ""
+                let pdfvl = ["xdg-open"]
+            else
+                let pdfvl = [$R_PDFVIEWER, "xdg-open"]
+            endif
+        endif
+        " List from R configure script:
+        let pdfvl += ["evince", "okular", "xpdf", "gv", "gnome-gv", "ggv", "kpdf", "gpdf", "kghostview,", "acroread", "acroread4"]
+        for prog in pdfvl
+            if executable(prog)
+                let g:rplugin_pdfviewer = prog
+                break
+            endif
+        endfor
+    endif
+
+    if g:rplugin_pdfviewer == "none"
+        call SendCmdToR('vim.openpdf("' . expand("%:t:r") . ".pdf" . '")')
+    else
+        let openlog = system(g:rplugin_pdfviewer . " '" . expand("%:t:r") . ".pdf" . "'")
+        if v:shell_error
+            let rlog = substitute(openlog, "\n", " ", "g")
+            let rlog = substitute(openlog, "\r", " ", "g")
+            call RWarningMsg(openlog)
+        endif
+    endif
 endfunction
 
 if g:vimrplugin_rnowebchunk == 1
