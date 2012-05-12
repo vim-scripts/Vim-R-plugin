@@ -120,4 +120,13 @@ def StartRPy():
     else:
         vim.command("echoerr 'File ' . g:rplugin_Rgui . ' not found.'")
 
+def OpenPDF(fn):
+    try:
+        os.startfile(fn)
+    except Exception as errmsg:
+        errstr = str(errmsg)
+        errstr = errstr.replace("'", '"')
+        vim.command("call RWarningMsg('" + errstr + "')")
+        pass
+
 # vim: sw=4 tabstop=4 expandtab
