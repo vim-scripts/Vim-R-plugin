@@ -133,14 +133,12 @@ function! RMakePDF(bibtex, knit)
         let pdfcmd = pdfcmd . ", view = FALSE"
     endif
 
-    if a:knit
-        if exists("g:vimrplugin_knitargs")
-            let pdfcmd = pdfcmd . ", " . g:vimrplugin_knitargs
-        endif
-    else
-        if exists("g:vimrplugin_sweaveargs")
-            let pdfcmd = pdfcmd . ", " . g:vimrplugin_sweaveargs
-        endif
+    if g:vimrplugin_openpdf_quietly
+        let pdfcmd = pdfcmd . ", pdfquiet = TRUE"
+    endif
+
+    if a:knit == 0 && exists("g:vimrplugin_sweaveargs")
+        let pdfcmd = pdfcmd . ", " . g:vimrplugin_sweaveargs
     endif
 
     let pdfcmd = pdfcmd . ")"
@@ -213,7 +211,11 @@ function! ROpenPDF()
     endif
 
     if g:rplugin_pdfviewer == "none"
-        call SendCmdToR('vim.openpdf("' . expand("%:t:r") . ".pdf" . '")')
+        if g:vimrplugin_openpdf_quietly
+            call SendCmdToR('vim.openpdf("' . expand("%:t:r") . ".pdf" . '", TRUE)')
+        else
+            call SendCmdToR('vim.openpdf("' . expand("%:t:r") . ".pdf" . '")')
+        endif
     else
         let openlog = system(g:rplugin_pdfviewer . " '" . expand("%:t:r") . ".pdf" . "'")
         if v:shell_error
