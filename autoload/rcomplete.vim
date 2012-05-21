@@ -21,11 +21,6 @@ fun! rcomplete#CompleteR(findstart, base)
       return res
     endif
 
-    " We could use R to get the completions based on the running evironment.
-    " However, we would miss information stored on the omnils file: class of
-    " object and its package.
-    " exe 'Py SendToR("utils:::.win32consoleCompletion(' . "'" . a:base . "', " . strlen(a:base) . ')$comps")'
-
     let flines = g:rplugin_liblist + g:rplugin_globalenvlines
     " The char '$' at the end of 'a:base' is treated as end of line, and
     " the pattern is never found in 'line'.
@@ -44,6 +39,17 @@ fun! rcomplete#CompleteR(findstart, base)
 	call add(res, tmp2)
       endif
     endfor
+
+    " When we use R to get the completions based on the running evironment we
+    " miss information stored on the omnils file: class of object and its
+    " package.
+    "    if len(g:rplugin_liblist) == 0 && len(res) == 0
+    "        exe 'Py SendToR("utils:::.win32consoleCompletion(' . "'" . a:base . "', " . strlen(a:base) . ')$comps")'
+    "        if strlen(g:rplugin_lastrpl) > 0
+    "            let res = split(g:rplugin_lastrpl)
+    "        endif
+    "    endif
+
     return res
   endif
 endfun
