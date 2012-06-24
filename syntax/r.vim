@@ -3,7 +3,7 @@
 " Maintainer:	      Jakson Aquino <jalvesaq@gmail.com>
 " Former Maintainers: Vaidotas Zemlys <zemlys@gmail.com>
 " 		      Tom Payne <tom@tompayne.org>
-" Last Change:	      Mon Feb 27, 2012  10:45AM
+" Last Change:	      Sun Jun 24, 2012  12:14AM
 " Filenames:	      *.R *.r *.Rhistory *.Rt
 " 
 " NOTE: The highlighting of R functions is defined in the
@@ -106,7 +106,7 @@ syn match rOperator    '*'
 syn match rOperator    '+'
 syn match rOperator    '='
 syn match rOperator    "[|!<>^~`/:]"
-syn match rOperator    "%\{2}\|%\*%\|%\/%\|%in%\|%o%\|%x%"
+syn match rOperator    "%\{2}\|%\S*%"
 syn match rOpError  '*\{3}'
 syn match rOpError  '//'
 syn match rOpError  '&&&'
