@@ -147,8 +147,8 @@ following dependencies:
 >
    install.packages(c("vimcom", "colorout", "setwidth"))
 <
-   You certainly will want to put something like the following in your
-   ~/.Rprofile:
+   You certainly will want to put something like the following at the end of
+   your ~/.Rprofile:
 >
    if(interactive()){
        library(colorout)
@@ -222,8 +222,9 @@ to install external dependencies:
 
     * vimcom >= 0.9-3: An R package. You can install it with the R command
       install.packages("vimcom"). The vimcom package creates a server on R to
-      allow the communication with Vim. You certainly will want to put
-      the following lines in your Rprofile (usually at ~/Documents/.Rprofile):
+      allow the communication with Vim. You certainly will want to put the
+      following lines at the end of your Rprofile (usually at
+      ~/Documents/.Rprofile):
 >
       if(interactive()){
 	  library(vimcom)
@@ -565,8 +566,7 @@ The updating is automatic only if the Object Browser is running in a separate
 Tmux panel. The Object Browser has two views: .GlobalEnv and Libraries. If you
 either press <Enter> or double click (GVim or Vim with 'mouse' set to "a") on
 the first line of the Object Browser it will toggle the view between the
-objects in .GlobalEnv and the currently loaded libraries (but only libraries
-loaded when |:RUpdateObjList| was run will be shown).
+objects in .GlobalEnv and the currently loaded libraries.
 
 In the .GlobalEnv view, if an object has the attribute "label", it will also
 be displayed. Please, see the R help for package vimcom for some options to
@@ -597,9 +597,10 @@ any) used to classify the objects:
 When running in a terminal emulator under Tmux, the Object Browser will be
 updated automatically. One limitation is that objects made available by the
 command data() may not have their classes recognized in the GlobalEnv view.
-Also, when running under Tmux, the Normal mode command  d  deletes the object
-on the cursor line or the element of a list or data.frame. If the Object
-Browser is showing the libraries, the library currently on the cursor line is
+
+When running under Tmux, the Normal mode command  d  deletes the object on the
+cursor line or the element of a list or data.frame. If the Object Browser is
+showing the libraries, the library currently under the cursor line is
 detached. The Object Browser may stop to be updated automatically for a few
 seconds if you press  d  many times quickly. Please, use a value greater than
 250 to set the time in milliseconds that the Object Browser should wait for R
@@ -954,7 +955,8 @@ beside the R Console. Valid values for the Object Browser placement are
 If vimrplugin_external_ob = 1 and R is running in an external terminal
 emulator and the communication with R is being established through Tmux, the
 Object Browser will be placed besides the R Console in the external terminal
-emulator. In this case, the command \rh will not work on the Object Browser.
+emulator. In this case, the command <LocalLeader>rh will not work on the
+Object Browser.
 
 When deleting an object from the Object Browser (possible if running Vim under
 Tmux), the following option controls the time in milliseconds that the Object
@@ -1303,10 +1305,10 @@ the pdf; others will lock the pdf file and prevent R from successfully
 compiling it again.
 
 The application used to open the pdf may not be the same when the pdf is open
-by R (when vimrplugin_openpdf = 1) and when you open it manually with \op key
-binding. If you are using Linux/Unix, you can change the pdf reader by setting
-the value of the environment variable $R_PDFVIEWER. This will affect both Vim
-and R.
+by R (when vimrplugin_openpdf = 1) and when you open it manually with
+<LocalLeader>op key binding. If you are using Linux/Unix, you can change the
+pdf reader by setting the value of the environment variable $R_PDFVIEWER. This
+will affect both Vim and R.
 
 On Linux/Unix, when vimrplugin_openpdf = 1, the application used to open the
 pdf may be quite verbose, printing many lines of useless diagnostic messages
@@ -1898,7 +1900,7 @@ the R syntax highlighted.
 							       *r-plugin-news*
 10. News~
 
-0.9.8 (2012-05-12)
+0.9.8 (2012-06-27)
 
  * Open PDF automatically after processing rnoweb file if
    vimrplugin_openpdf = 1 (thanks to Tomaz Ficko for suggesting the feature).
