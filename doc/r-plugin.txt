@@ -1813,7 +1813,16 @@ If you want to disable the syntax highlight of R functions edit the file
 file.
 
 
-9.20. Integration with the Conque Shell plugin~
+9.20. Tips for knitr users~
+								       *knitr*
+If you are using knitr with option cache=TRUE, you may want from time to time
+to delete all objects in R workspace and all files in the cache directory. If
+you want to use <LocalLeader>kr in Normal mode for this, put in your |vimrc|:
+>
+   nmap <LocalLeader>kr :call SendCmdToR('rm(list=ls(all.names=TRUE)); unlink("cache/*")')<CR>
+<
+
+9.21. Integration with the Conque Shell plugin~
 							     *r-plugin-conque*
 In addition to being integrated with the screen.vim plugin the Vim-R-plugin
 can also use the Conque Shell plugin, but the Conque Shell still has some
@@ -1900,13 +1909,15 @@ the R syntax highlighted.
 							       *r-plugin-news*
 10. News~
 
-0.9.8 (2012-06-27)
+0.9.8 (2012-06-29)
 
  * Open PDF automatically after processing rnoweb file if
    vimrplugin_openpdf = 1 (thanks to Tomaz Ficko for suggesting the feature).
    Open it quietly if vimrplugin_openpdf_quietly = 1.
    Open it manually with \op.
  * Remove option vimrplugin_knitargs.
+ * Start last R if there is more than one installed on Windows (thanks to Alex
+   Zvoleff for reporting the bug and writing the patch).
 
 0.9.7 (2012-05-04)
 
