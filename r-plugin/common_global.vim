@@ -1816,7 +1816,7 @@ function ShowRDoc(rkeyword, package, getclass)
         exe 'Py SendToR("vim.help(' . "'" . a:rkeyword . "', " . g:rplugin_htw . "L, package='" . a:package  . "')". '")'
     else
         let classfor = substitute(classfor, '"', '\\"', "g")
-        exe 'Py SendToR("vim.help(' . "'" . a:rkeyword . "', " . g:rplugin_htw . "L, '" . classfor . "')". '")'
+        exe 'Py SendToR("vim.help(' . "'" . a:rkeyword . "', " . g:rplugin_htw . "L, " . classfor . ")". '")'
     endif
     if g:rplugin_lastrpl != "VIMHELP"
         if g:rplugin_lastrpl =~ "^MULTILIB"
