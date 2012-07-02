@@ -36,7 +36,7 @@ set cpo&vim
 " Don't do this if called by ../r-plugin/global_r_plugin.vim
 if &filetype == "r"
     setlocal commentstring=#%s
-    setlocal comments=b:#,b:##,b:###
+    setlocal comments=b:#,b:##,b:###,b:#'
 endif
 
 " Source scripts common to R, Rnoweb, Rhelp and rdoc files:
