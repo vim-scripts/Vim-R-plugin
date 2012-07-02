@@ -523,8 +523,8 @@ should do the following:
 The command :RUpdateObjList in addition to creating a list of function names
 to be highlighted also creates a file containing a list of objects for omni
 completion (|compl-omni|) including all objects currently in R's workspace,
-with the exception of the .GlobalEnv objects. These two lists are stored
-permanently in the ~/.vim/r-plugin directory.
+except the .GlobalEnv objects. These two lists are stored permanently in the
+~/.vim/r-plugin directory.
 
 The command  :RUpdateObjList  waits 60 seconds to R finish building the list.
 If this time is not enough to your system, please, set a different value of
@@ -623,6 +623,14 @@ after the last character in the line. If you are running <LocalLeader>; over a
 selection of lines, the comments will be aligned according to the longest
 line.
 
+While typing comments the leader comment string is automatically added to new
+lines when you reach 'textwidth' but not when you press <Enter>. Please, read
+the Vim help about 'formatoptions' and |fo-table|. For example, you can add the
+following line to your |vimrc| if you want the comment string being added
+after <Enter>:
+>
+   autocmd FileType r setlocal formatoptions-=t formatoptions+=croql
+<
 
 4.7. Build a tags file to jump to function definitions~
 								 *:RBuildTags*
