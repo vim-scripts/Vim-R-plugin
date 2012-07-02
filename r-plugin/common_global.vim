@@ -2963,7 +2963,7 @@ if has("win32") || has("win64")
     if !exists("g:rplugin_rpathadded")
         if exists("g:vimrplugin_r_path") && isdirectory(g:vimrplugin_r_path)
             let $PATH = g:vimrplugin_r_path . ";" . $PATH
-            let b:rplugin_Rgui = g:vimrplugin_r_path . "\\Rgui.exe"
+            let g:rplugin_Rgui = g:vimrplugin_r_path . "\\Rgui.exe"
         else
             Py GetRPathPy()
             if s:rinstallpath == "Not found"
@@ -2977,14 +2977,14 @@ if has("win32") || has("win64")
                 endif
                 if g:vimrplugin_i386
                     let $PATH = s:rinstallpath . '\bin\i386;' . $PATH
-                    let b:rplugin_Rgui = s:rinstallpath . '\bin\i386\Rgui.exe'
+                    let g:rplugin_Rgui = s:rinstallpath . '\bin\i386\Rgui.exe'
                 else
                     let $PATH = s:rinstallpath . '\bin\x64;' . $PATH
-                    let b:rplugin_Rgui = s:rinstallpath . '\bin\x64\Rgui.exe'
+                    let g:rplugin_Rgui = s:rinstallpath . '\bin\x64\Rgui.exe'
                 endif
             else
                 let $PATH = s:rinstallpath . '\bin;' . $PATH
-                let b:rplugin_Rgui = s:rinstallpath . '\bin\Rgui.exe'
+                let g:rplugin_Rgui = s:rinstallpath . '\bin\Rgui.exe'
             endif
             unlet s:rinstallpath
         endif
