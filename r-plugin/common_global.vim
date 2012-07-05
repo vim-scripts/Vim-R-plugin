@@ -250,6 +250,9 @@ function RComment(mode)
     if &filetype == "rnoweb" && RnwIsInRCode() == 0
         let isRcode = 0
     endif
+    if &filetype == "rrst" && RrstIsInRCode() == 0
+        let isRcode = 0
+    endif
     if &filetype == "rhelp"
         let lastsection = search('^\\[a-z]*{', "bncW")
         let secname = getline(lastsection)
@@ -1160,7 +1163,11 @@ endfunction
 
 " Send sources to R
 function RSourceLines(lines, e)
-    call writefile(a:lines, b:rsource)
+    let lines = a:lines
+    if &filetype == "rrst"
+        let lines = map(copy(lines), 'substitute(v:val, "^\\.\\. \\?", "", "")')
+    endif
+    call writefile(lines, b:rsource)
     if a:e == "echo"
         if exists("g:vimrplugin_maxdeparse")
             let rcmd = 'source("' . b:rsource . '", echo=TRUE, max.deparse=' . g:vimrplugin_maxdeparse . ')'
@@ -1194,6 +1201,10 @@ function SendMBlockToR(e, m)
     endif
     if &filetype == "rdoc" && search("^Examples:$", "bncW") == 0
         call RWarningMsg('Not in the "Examples" section.')
+        return
+    endif
+    if &filetype == "rrst" && RrstIsInRCode() == 0
+        call RWarningMsg("Not inside an R code chunk.")
         return
     endif
 
@@ -1241,6 +1252,10 @@ function SendFunctionToR(e, m)
     endif
     if &filetype == "rdoc" && search("^Examples:$", "bncW") == 0
         call RWarningMsg('Not in the "Examples" section.')
+        return
+    endif
+    if &filetype == "rrst" && RrstIsInRCode() == 0
+        call RWarningMsg("Not inside an R code chunk.")
         return
     endif
 
@@ -1302,6 +1317,10 @@ function SendSelectionToR(e, m)
     endif
     if &filetype == "rdoc" && search("^Examples:$", "bncW") == 0
         call RWarningMsg('Not in the "Examples" section.')
+        return
+    endif
+    if &filetype == "rrst" && RrstIsInRCode() == 0
+        call RWarningMsg("Not inside an R code chunk.")
         return
     endif
 
@@ -1372,6 +1391,10 @@ function SendParagraphToR(e, m)
         call RWarningMsg('Not in the "Examples" section.')
         return
     endif
+    if &filetype == "rrst" && RrstIsInRCode() == 0
+        call RWarningMsg("Not inside an R code chunk.")
+        return
+    endif
 
     let b:needsnewomnilist = 1
     let i = line(".")
@@ -1439,6 +1462,14 @@ function SendLineToR(godown)
         endif
         if search("^Examples:$", "bncW") == 0
             call RWarningMsg('Not in the "Examples" section.')
+            return
+        endif
+    endif
+
+    if &filetype == "rrst"
+        let line = substitute(line, "^\\.\\. \\?", "", "")
+        if RrstIsInRCode() == 0
+            call RWarningMsg("Not inside an R code chunk.")
             return
         endif
     endif
@@ -2273,6 +2304,14 @@ function MakeRMenu()
         call RCreateMenuItem("ni", 'Send.Chunk\ (cur,\ echo\ and\ down)', '<Plug>REDSendChunk', 'ca', ':call SendChunkToR("echo", "down")')
     endif
     "-------------------------------
+    if &filetype == "rrst" || g:vimrplugin_never_unmake_menu
+        menu R.Send.-Sep2- <nul>
+        call RCreateMenuItem("ni", 'Send.Chunk\ (cur)', '<Plug>RSendChunk', 'cc', ':call SendChunkToR("silent", "stay")')
+        call RCreateMenuItem("ni", 'Send.Chunk\ (cur,\ echo)', '<Plug>RESendChunk', 'ce', ':call SendChunkToR("echo", "stay")')
+        call RCreateMenuItem("ni", 'Send.Chunk\ (cur,\ down)', '<Plug>RDSendChunk', 'cd', ':call SendChunkToR("silent", "down")')
+        call RCreateMenuItem("ni", 'Send.Chunk\ (cur,\ echo\ and\ down)', '<Plug>REDSendChunk', 'ca', ':call SendChunkToR("echo", "down")')
+    endif
+    "-------------------------------
     menu R.Send.-Sep3- <nul>
     call RCreateMenuItem("ni", 'Send.Function\ (cur)', '<Plug>RSendFunction', 'ff', ':call SendFunctionToR("silent", "stay")')
     call RCreateMenuItem("ni", 'Send.Function\ (cur,\ echo)', '<Plug>RESendFunction', 'fe', ':call SendFunctionToR("echo", "stay")')
@@ -2331,6 +2370,12 @@ function MakeRMenu()
         call RCreateMenuItem("nvi", 'Command.Open\ PDF\ (cur\ file)', '<Plug>ROpenPDF', 'op', ':call ROpenPDF()')
     endif
     "-------------------------------
+    if &filetype == "rrst" || g:vimrplugin_never_unmake_menu
+        menu R.Command.-Sep5- <nul>
+        call RCreateMenuItem("nvi", 'Command.Knit\ (cur\ file)', '<Plug>RKnit', 'kn', ':call RSweave()')
+        call RCreateMenuItem("nvi", 'Command.Knit\ and\ PDF\ (cur\ file)', '<Plug>RMakePDF', 'kp', ':call RMakePDF("nobib")')
+    endif
+    "-------------------------------
     menu R.Command.-Sep7- <nul>
     if &filetype == "r" || &filetype == "rnoweb" || g:vimrplugin_never_unmake_menu
         nmenu <silent> R.Command.Build\ tags\ file\ (cur\ dir)<Tab>:RBuildTags :call SendCmdToR('rtags(ofile = "TAGS")')<CR>
@@ -2342,7 +2387,7 @@ function MakeRMenu()
     "----------------------------------------------------------------------------
     " Edit
     "----------------------------------------------------------------------------
-    if &filetype == "r" || &filetype == "rnoweb" || &filetype == "rhelp" || g:vimrplugin_never_unmake_menu
+    if &filetype == "r" || &filetype == "rnoweb" || &filetype == "rrst" || &filetype == "rhelp" || g:vimrplugin_never_unmake_menu
         if g:vimrplugin_underscore == 1
             imenu <silent> R.Edit.Insert\ \"\ <-\ \"<Tab>_ <Esc>:call ReplaceUnderS()<CR>a
             imenu <silent> R.Edit.Complete\ object\ name<Tab>^X^O <C-X><C-O>
@@ -2366,6 +2411,11 @@ function MakeRMenu()
             menu R.Edit.-Sep73- <nul>
             nmenu <silent> R.Edit.Go\ (next\ R\ chunk)<Tab>gn :call RnwNextChunk()<CR>
             nmenu <silent> R.Edit.Go\ (previous\ R\ chunk)<Tab>gN :call RnwPreviousChunk()<CR>
+        endif
+        if &filetype == "rrst" || g:vimrplugin_never_unmake_menu
+            menu R.Edit.-Sep73- <nul>
+            nmenu <silent> R.Edit.Go\ (next\ R\ chunk)<Tab>gn :call RrstNextChunk()<CR>
+            nmenu <silent> R.Edit.Go\ (previous\ R\ chunk)<Tab>gN :call RrstPreviousChunk()<CR>
         endif
     endif
 
@@ -2600,7 +2650,7 @@ endfunction
 function RBufEnter()
     if &filetype != g:rplugin_lastft
         call UnMakeRMenu()
-        if &filetype == "r" || &filetype == "rnoweb" || &filetype == "rdoc" || &filetype == "rbrowser" || &filetype == "rhelp"
+        if &filetype == "r" || &filetype == "rnoweb" || &filetype == "rrst" || &filetype == "rdoc" || &filetype == "rbrowser" || &filetype == "rhelp"
             if &filetype == "rbrowser"
                 call MakeRBrowserMenu()
             else

@@ -111,7 +111,7 @@ endfunction
 function! RMakePDF(bibtex, knit)
     update
     call RSetWD()
-    let pdfcmd = "vim.interlace('" . expand("%:t") . "'"
+    let pdfcmd = "vim.interlace.rnoweb('" . expand("%:t") . "'"
 
     if a:knit
         let pdfcmd = "require(knitr); " . pdfcmd . ', knit = TRUE'
