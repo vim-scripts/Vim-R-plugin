@@ -3,7 +3,7 @@
 " Maintainer:	      Jakson Aquino <jalvesaq@gmail.com>
 " Former Maintainers: Vaidotas Zemlys <zemlys@gmail.com>
 " 		      Tom Payne <tom@tompayne.org>
-" Last Change:	      Sun Jun 24, 2012  12:14AM
+" Last Change:	      Fri Jul 06, 2012  09:15AM
 " Filenames:	      *.R *.r *.Rhistory *.Rt
 " 
 " NOTE: The highlighting of R functions is defined in the
@@ -30,7 +30,15 @@ endif
 syn case match
 
 " Comment
-syn match rComment contains=@Spell "\#.*"
+syn match rComment contains=@Spell "#.*"
+
+" Roxygen
+syn match rOKeyword contained "@\(param\|return\|name\|rdname\|examples\|include\)"
+syn match rOKeyword contained "@\(S3method\|TODO\|aliases\|alias\|assignee\|author\|callGraphDepth\|callGraph\)"
+syn match rOKeyword contained "@\(callGraphPrimitives\|concept\|exportClass\|exportMethod\|exportPattern\|export\|formals\)"
+syn match rOKeyword contained "@\(format\|importClassesFrom\|importFrom\|importMethodsFrom\|import\|keywords\)"
+syn match rOKeyword contained "@\(method\|nord\|note\|references\|seealso\|setClass\|slot\|source\|title\|usage\)"
+syn match rOComment contains=@Spell,rOKeyword "#'.*"
 
 if &filetype == "rhelp"
   " string enclosed in double quotes
@@ -172,6 +180,7 @@ hi def link rArrow       Statement
 hi def link rBoolean     Boolean
 hi def link rBraceError  Error
 hi def link rComment     Comment
+hi def link rOComment    Comment
 hi def link rComplex     Number
 hi def link rConditional Conditional
 hi def link rConstant    Constant
@@ -198,6 +207,7 @@ hi def link rStatement   Statement
 hi def link rString      String
 hi def link rStrError    Error
 hi def link rType        Type
+hi def link rOKeyword    Title
 
 let b:current_syntax="r"
 
