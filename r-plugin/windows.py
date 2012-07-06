@@ -88,7 +88,7 @@ def GetRPathPy():
             vim.command("let s:rinstallpath =  'Not found'")
 
 def StartRPy():
-    rpath = vim.eval("b:rplugin_Rgui")
+    rpath = vim.eval("g:rplugin_Rgui")
     rargs = ['"' + rpath + '"']
     r_args = vim.eval("b:rplugin_r_args")
     if r_args != " ":
