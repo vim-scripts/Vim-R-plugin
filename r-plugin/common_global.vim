@@ -104,6 +104,30 @@ function ReplaceUnderS()
     endif
 endfunction
 
+function! CompleteChunkOptions(base)
+    let rr = []
+    if strlen(a:base) == 0
+      return rr
+    endif
+    let newbase = '^' . substitute(a:base, "\\$$", "", "")
+    let ktopt = ["aniopts=;'controls.loop'", "autodep=;FALSE", "background=;'#F7F7F7'", "cache.path=;'cache/'",
+          \ "cache=;FALSE", "child=; ", "comment=;'##'", "dependson=;NULL", "dev.args=; ", "dev=; ", "dpi=;100",
+          \ "dpi=;72", "engine=; ", "error=;TRUE", "eval=;TRUE", "external=;TRUE", "fig.align=; ",
+          \ "fig.caption=; ", "fig.ext=; ", "fig.height=;7", "fig.keep=;'high|none|all|first|last'",
+          \ "fig.lp=;'fig:'", "fig.path=; ", "fig.pos=; ", "fig.scap=; ", "fig.show=;'asis|hold|animate'",
+          \ "fig.width=;7", "highlight=;TRUE", "include=;TRUE", "interval=;1", "out.extra=; ", "out.height=; ",
+          \ "out.width=; ", "prompt=;FALSE", "ref.label=; ", "resize.height=; ", "resize.width=; ",
+          \ "results=;'markup|asis|hide'", "sanitize=;FALSE", "size=;'normalsize'", "split=;FALSE", "tidy=;TRUE", "warning=;TRUE"]
+    for kopt in ktopt
+      if kopt =~ newbase
+        let tmp1 = split(kopt, ";")
+        let tmp2 = {'word': tmp1[0], 'menu': tmp1[1]}
+        call add(rr, tmp2)
+      endif
+    endfor
+    return rr
+endfunction
+
 function RCompleteArgs()
     let lnum = line(".")
     let line = getline(".")
@@ -117,6 +141,11 @@ function RCompleteArgs()
     else
         let argkey = RGetKeyWord()
         let idx2 = cpos[2] - strlen(argkey)
+    endif
+    if (&filetype == "rnoweb" && line =~ "^<<.*>>=$") || (&filetype == "rmd" && line =~ "^``` *{r.*}$") || (&filetype == "rrst" && line =~ "^.. {r.*}$")
+      call cursor(cpos[1], cpos[2])
+      call complete(idx2, CompleteChunkOptions(argkey))
+      return ''
     endif
     if b:needsnewomnilist == 1
       call BuildROmniList("GlobalEnv", "none")

@@ -472,7 +472,9 @@ When completing object names (CTRL-X CTRL-O) and function arguments (CTRL-X
 CTRL-A) you have to press CTRL-N to go foward in the list and CTRL-P to go
 backward (see |popupmenu-completion|). Note: if using Vim in a terminal
 emulator, Tmux will capture the CTRL-A command. You have to do CTRL-A twice to
-pass a single CTRL-A to Vim.
+pass a single CTRL-A to Vim. For rnoweb, rmd and rrst file types, CTRL-X
+CTRL-A can also be used to complete knitr chunk options if the cursor is
+inside the chunk header.
 
 If R is not running or if it is running but is busy the completion will be
 based on information saved with the command |:RUpdateObjList|. Otherwise, the
@@ -1929,6 +1931,8 @@ the R syntax highlighted.
    Zvoleff for reporting the bug and writing the patch).
  * Alex Zvoleff added support to Rrst file type.
  * michelk added support to rmd file type.
+ * For rnoweb, rmd and rrst file types, CTRL-X CTRL-A completes knitr chunk
+   options if the cursor is inside the chunk header.
 
 0.9.7 (2012-05-04)
 
