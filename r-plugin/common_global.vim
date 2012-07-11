@@ -253,6 +253,9 @@ function RComment(mode)
     if &filetype == "rrst" && RrstIsInRCode() == 0
         let isRcode = 0
     endif
+    if &filetype == "rmd" && RmdIsInRCode() == 0
+        let isRcode = 0
+    endif
     if &filetype == "rhelp"
         let lastsection = search('^\\[a-z]*{', "bncW")
         let secname = getline(lastsection)
@@ -1167,6 +1170,9 @@ function RSourceLines(lines, e)
     if &filetype == "rrst"
         let lines = map(copy(lines), 'substitute(v:val, "^\\.\\. \\?", "", "")')
     endif
+    if &filetype == "rmd"
+        let lines = map(copy(lines), 'substitute(v:val, "^\\`\\`\\?", "", "")')
+    endif
     call writefile(lines, b:rsource)
     if a:e == "echo"
         if exists("g:vimrplugin_maxdeparse")
@@ -1204,6 +1210,10 @@ function SendMBlockToR(e, m)
         return
     endif
     if &filetype == "rrst" && RrstIsInRCode() == 0
+        call RWarningMsg("Not inside an R code chunk.")
+        return
+    endif
+    if &filetype == "rmd" && RmdIsInRCode() == 0
         call RWarningMsg("Not inside an R code chunk.")
         return
     endif
@@ -1255,6 +1265,10 @@ function SendFunctionToR(e, m)
         return
     endif
     if &filetype == "rrst" && RrstIsInRCode() == 0
+        call RWarningMsg("Not inside an R code chunk.")
+        return
+    endif
+    if &filetype == "rmd" && RmdIsInRCode() == 0
         call RWarningMsg("Not inside an R code chunk.")
         return
     endif
@@ -1320,6 +1334,10 @@ function SendSelectionToR(e, m)
         return
     endif
     if &filetype == "rrst" && RrstIsInRCode() == 0
+        call RWarningMsg("Not inside an R code chunk.")
+        return
+    endif
+    if &filetype == "rmd" && RmdIsInRCode() == 0
         call RWarningMsg("Not inside an R code chunk.")
         return
     endif
@@ -1392,6 +1410,10 @@ function SendParagraphToR(e, m)
         return
     endif
     if &filetype == "rrst" && RrstIsInRCode() == 0
+        call RWarningMsg("Not inside an R code chunk.")
+        return
+    endif
+    if &filetype == "rmd" && RmdIsInRCode() == 0
         call RWarningMsg("Not inside an R code chunk.")
         return
     endif
@@ -1469,6 +1491,13 @@ function SendLineToR(godown)
     if &filetype == "rrst"
         let line = substitute(line, "^\\.\\. \\?", "", "")
         if RrstIsInRCode() == 0
+            call RWarningMsg("Not inside an R code chunk.")
+            return
+        endif
+    endif
+    if &filetype == "rmd"
+        let line = substitute(line, "^\\`\\`\\?", "", "")
+        if RmdIsInRCode() == 0
             call RWarningMsg("Not inside an R code chunk.")
             return
         endif
@@ -2416,6 +2445,11 @@ function MakeRMenu()
             menu R.Edit.-Sep73- <nul>
             nmenu <silent> R.Edit.Go\ (next\ R\ chunk)<Tab>gn :call RrstNextChunk()<CR>
             nmenu <silent> R.Edit.Go\ (previous\ R\ chunk)<Tab>gN :call RrstPreviousChunk()<CR>
+        endif
+        if &filetype == "rmd" || g:vimrplugin_never_unmake_menu
+            menu R.Edit.-Sep73- <nul>
+            nmenu <silent> R.Edit.Go\ (next\ R\ chunk)<Tab>gn :call RmdNextChunk()<CR>
+            nmenu <silent> R.Edit.Go\ (previous\ R\ chunk)<Tab>gN :call RmdPreviousChunk()<CR>
         endif
     endif
 

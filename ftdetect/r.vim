@@ -17,3 +17,5 @@ autocmd BufNewFile,BufRead *.Rout.fail set ft=rout
 autocmd BufNewFile,BufRead *.Rrst set ft=rrst
 autocmd BufNewFile,BufRead *.rrst set ft=rrst
 
+autocmd BufNewFile,BufRead *.Rmd set ft=rmd
+autocmd BufNewFile,BufRead *.rmd set ft=rmd

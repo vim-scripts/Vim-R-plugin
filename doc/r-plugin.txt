@@ -1513,10 +1513,11 @@ in your R script. The plugin may be downloaded from:
    http://www.vim.org/scripts/script.php?script_id=2540
 
 The snipMate plugin does not come with snippets for R, but you can copy the
-r.snippets that ships with the Vim-R-plugin (look at the r-plugin directory)
-to the snippets directory. The file has only a few snippets, but it will help
-you to get started. If you usually edit rnoweb files, you may also want to
-create an rnoweb.snippet by concatenating both tex.snippets and r.snippets.
+files r.snippets and rmd.snippets that ship with the Vim-R-plugin (look at the
+r-plugin directory) to the snippets directory. The files have only a few
+snippets, but they will help you to get started. If you usually edit rnoweb
+files, you may also want to create an rnoweb.snippet by concatenating both
+tex.snippets and r.snippets.
 
 
 9.5. Easier key bindings for most used commands~
@@ -1917,7 +1918,7 @@ the R syntax highlighted.
 							       *r-plugin-news*
 10. News~
 
-0.9.8 (2012-06-29)
+0.9.8 (2012-07-11)
 
  * Open PDF automatically after processing rnoweb file if
    vimrplugin_openpdf = 1 (thanks to Tomaz Ficko for suggesting the feature).
@@ -1926,6 +1927,8 @@ the R syntax highlighted.
  * Remove option vimrplugin_knitargs.
  * Start last R if there is more than one installed on Windows (thanks to Alex
    Zvoleff for reporting the bug and writing the patch).
+ * Alex Zvoleff added support to Rrst file type.
+ * michelk added support to rmd file type.
 
 0.9.7 (2012-05-04)
 

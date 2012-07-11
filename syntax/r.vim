@@ -3,7 +3,7 @@
 " Maintainer:	      Jakson Aquino <jalvesaq@gmail.com>
 " Former Maintainers: Vaidotas Zemlys <zemlys@gmail.com>
 " 		      Tom Payne <tom@tompayne.org>
-" Last Change:	      Fri Jul 06, 2012  09:15AM
+" Last Change:	      Wed Jul 11, 2012  07:31AM
 " Filenames:	      *.R *.r *.Rhistory *.Rt
 " 
 " NOTE: The highlighting of R functions is defined in the
@@ -113,7 +113,11 @@ syn match rOperator    '-'
 syn match rOperator    '*'
 syn match rOperator    '+'
 syn match rOperator    '='
-syn match rOperator    "[|!<>^~`/:]"
+if &filetype == "rmd"
+  syn match rOperator    "[|!<>^~/:]"
+else
+  syn match rOperator    "[|!<>^~`/:]"
+endif
 syn match rOperator    "%\{2}\|%\S*%"
 syn match rOpError  '*\{3}'
 syn match rOpError  '//'
@@ -167,7 +171,9 @@ endif
 syn keyword rType array category character complex double function integer list logical matrix numeric vector data.frame 
 
 " Name of object with spaces
-syn region rNameWSpace start="`" end="`"
+if &filetype != "rmd"
+  syn region rNameWSpace start="`" end="`"
+endif
 
 if &filetype == "rhelp"
   syn match rhPreProc "^#ifdef.*" 
