@@ -1,6 +1,6 @@
 " markdown Text with R statements
 " Language: markdown with R code chunks
-" Last Change: Wed Jul 11, 2012  07:53AM
+" Last Change: Wed Jul 11, 2012  12:16PM
 
 " for portability
 if version < 600
@@ -12,26 +12,54 @@ endif
 " load all of pandoc info
 runtime syntax/pandoc.vim
 if exists("b:current_syntax")
+    let rmdIsPandoc = 1
     unlet b:current_syntax
+else
+    let rmdIsPandoc = 0
+    runtime syntax/markdown.vim
+    if exists("b:current_syntax")
+        unlet b:current_syntax
+    endif
 endif
-
-syntax match rmdPattern "^```\_s" contained
-hi def link rmdPattern Keyword
-syntax match rmdrEndblock "^```[ ]*$" contained
-hi def link rmdrEndblock Keyword
-syntax match rmdrBlockname "^```[ ]*{r *}" contained
-hi def link rmdrBlockname Special
 
 " load all of the r syntax highlighting rules into @R
 syntax include @R syntax/r.vim
-syntax region rmdr start="^```[ ]*{r .*}$" end="^```$" contains=@R, rmdrBlockname, rmdrEndblock, rmdPattern keepend transparent fold
+if exists("b:current_syntax")
+    unlet b:current_syntax
+endif
+syntax match rmdChunkDelim "^```{r" contained
+syntax match rmdChunkDelim "}$" contained
+syntax match rmdChunkDelim "^```$" contained
+syntax region rmdChunk start="^``` *{r.*}$" end="^```$" contains=@R,rmdChunkDelim keepend transparent fold
 
-" TODO: Code below doesn't work
 " also match and syntax highlight in-line R code
-syntax match rmdrInlineStart "`r "
-hi def link rmdrInlineStart Keyword
-syntax match rmdrInlineAccent "`" contained
-hi def link rmdrInlineAccent String
-syntax region rmdrInline start="`r[ ]"  end="`" contains=@R, rmdrInlineStart, rmdrInlineAccent keepend
+syntax match rmdEndInline "`" contained
+syntax match rmdBeginInline "`r " contained
+syntax region rmdrInline start="`r "  end="`" contains=@R,rmdBeginInline,rmdEndInline keepend transparent
+
+
+if rmdIsPandoc == 0
+    " LaTeX
+    syntax include @LaTeX syntax/tex.vim
+    if exists("b:current_syntax")
+        unlet b:current_syntax
+    endif
+    " Inline
+    syntax match rmdLaTeXInlDelim "\$"
+    syntax match rmdLaTeXInlDelim "\\\$"
+    syn region texMathZoneX	matchgroup=Delimiter start="\$" skip="\\\\\|\\\$"	matchgroup=Delimiter end="\$" end="%stopzone\>"	contains=@texMathZoneGroup
+    " Region
+    syntax match rmdLaTeXRegDelim "\$\$" contained
+    syntax match rmdLaTeXRegDelim "\$\$latex$" contained
+    syntax region rmdLaTeXRegion start="^\$\$" skip="\\\$" end="^\$\$" contains=@LaTeX,rmdLaTeXSt,rmdLaTeXRegDelim keepend 
+    hi def link rmdLaTeXSt Statement
+    hi def link rmdLaTeXInlDelim Special
+    hi def link rmdLaTeXRegDelim Special
+endif
+
+hi def link rmdChunkDelim Special
+hi def link rmdrBlockname Special
+hi def link rmdBeginInline Special
+hi def link rmdEndInline Special
 
 let b:current_syntax = "rmd"
