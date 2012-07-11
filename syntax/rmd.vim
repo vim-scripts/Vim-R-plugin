@@ -1,6 +1,6 @@
 " markdown Text with R statements
 " Language: markdown with R code chunks
-" Last Change: Wednesday, 2012-07-11
+" Last Change: Wed Jul 11, 2012  07:53AM
 
 " for portability
 if version < 600
@@ -11,7 +11,9 @@ endif
 
 " load all of pandoc info
 runtime syntax/pandoc.vim
-unlet b:current_syntax
+if exists("b:current_syntax")
+    unlet b:current_syntax
+endif
 
 syntax match rmdPattern "^```\_s" contained
 hi def link rmdPattern Keyword
