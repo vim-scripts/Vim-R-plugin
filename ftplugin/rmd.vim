@@ -95,11 +95,11 @@ function! RmdNextChunk() range
     return
 endfunction
 
-function! RMakePDF()
+function! RMakePDF(t)
     update
     call RSetWD()
     let pdfcmd = "vim.interlace.rmd('" . expand("%:t") . "'"
-    let pdfcmd = "require(knitr);" . pdfcmd
+    let pdfcmd = "require(knitr);" . pdfcmd . ", pdfout = '" . a:t  . "'"
     if exists("g:vimrplugin_rmdcompiler")
         let pdfcmd = pdfcmd . ", compiler='" . g:vimrplugin_rmdcompiler . "'"
     endif
@@ -109,8 +109,8 @@ function! RMakePDF()
     if exists("g:vimrplugin_rmd2pdfpath")
         pdfcmd = pdfcmd . ", rmd2pdfpath='" . g:vimrplugin_rmd2pdf_path . "'"
     endif
-    if exists("g:vimrplugin_rmd2pdfargs")
-        let pdfcmd = pdfcmd . ", " . g:vimrplugin_rmd2pdfargs
+    if exists("g:vimrplugin_pandoc_args")
+        let pdfcmd = pdfcmd . ", pandoc_args = '" . g:vimrplugin_pandoc_args . "'"
     endif
     let pdfcmd = pdfcmd . ")"
     let b:needsnewomnilist = 1
@@ -157,7 +157,8 @@ call RCreateMaps("nvi", '<Plug>RSetwd',        'rd', ':call RSetWD()')
 
 " Only .Rmd files use these functions:
 call RCreateMaps("nvi", '<Plug>RKnit',        'kn', ':call RKnit()')
-call RCreateMaps("nvi", '<Plug>RMakePDFK',    'kp', ':call RMakePDF()')
+call RCreateMaps("nvi", '<Plug>RMakePDFK',    'kp', ':call RMakePDF("latex")')
+call RCreateMaps("nvi", '<Plug>RMakePDFK',    'ks', ':call RMakePDF("beamer")')
 call RCreateMaps("nvi", '<Plug>RIndent',      'si', ':call RmdToggleIndentSty()')
 call RCreateMaps("ni",  '<Plug>RSendChunk',   'cc', ':call SendChunkToR("silent", "stay")')
 call RCreateMaps("ni",  '<Plug>RESendChunk',  'ce', ':call SendChunkToR("echo", "stay")')

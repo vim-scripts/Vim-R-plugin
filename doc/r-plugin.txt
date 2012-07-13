@@ -394,6 +394,7 @@ Command
   --------------------------------------------------------
   . Knit (cur file)                                    \kn
   . Knit and PDF (cur file)                            \kp
+  . Knit and Beamer PDF (cur file) (Only Rmd)          \ks
   . Knit and PDF (cur file, verbose) (Windows)         \kv
   . Knit, BibTeX and PDF (cur file) (Linux/Unix)       \kb
   --------------------------------------------------------
@@ -1832,6 +1833,12 @@ you want to use <LocalLeader>kr in Normal mode for this, put in your |vimrc|:
 >
    nmap <LocalLeader>kr :call SendCmdToR('rm(list=ls(all.names=TRUE)); unlink("cache/*")')<CR>
 <
+When generating pdfs out of Rmd-files, you can send options to pandoc. State
+them in your vimrc. For example
+
+   let vimrplugin_pandoc_args = "--toc -V lang=german"
+
+will produce a german document with a table of contents.
 
 9.21. Integration with the Conque Shell plugin~
 							     *r-plugin-conque*
