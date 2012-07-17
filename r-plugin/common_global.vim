@@ -142,7 +142,7 @@ function RCompleteArgs()
         let argkey = RGetKeyWord()
         let idx2 = cpos[2] - strlen(argkey)
     endif
-    if (&filetype == "rnoweb" && line =~ "^<<.*>>=$") || (&filetype == "rmd" && line =~ "^``` *{r.*}$") || (&filetype == "rrst" && line =~ "^.. {r.*}$")
+    if (&filetype == "rnoweb" && line =~ "^<<.*>>=$") || (&filetype == "rmd" && line =~ "^``` *{r.*}$") || (&filetype == "rrst" && line =~ "^.. {r.*}$") || (&filetype == "r" && line =~ "^#\+")
       call cursor(cpos[1], cpos[2])
       call complete(idx2, CompleteChunkOptions(argkey))
       return ''
