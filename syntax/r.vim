@@ -40,6 +40,7 @@ syn match rOKeyword contained "@\(format\|importClassesFrom\|importFrom\|importM
 syn match rOKeyword contained "@\(method\|nord\|note\|references\|seealso\|setClass\|slot\|source\|title\|usage\)"
 syn match rOComment contains=@Spell,rOKeyword "#'.*"
 
+
 if &filetype == "rhelp"
   " string enclosed in double quotes
   syn region rString contains=rSpecial,@Spell start=/"/ skip=/\\\\\|\\"/ end=/"/

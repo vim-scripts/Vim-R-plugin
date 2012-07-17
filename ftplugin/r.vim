@@ -83,6 +83,13 @@ function! ShowRout()
     endif
 endfunction
 
+" Sweave the current buffer content
+function! RSpin()
+    update
+    let b:needsnewomnilist = 1
+    call RSetWD()
+    call SendCmdToR('require(knitr); spin("' . expand("%:t") . '")')
+endfunction
 
 "==========================================================================
 " Key bindings and menu items
@@ -94,6 +101,10 @@ call RCreateEditMaps()
 call RCreateMaps("ni", '<Plug>RSendFile',     'aa', ':call SendFileToR("silent")')
 call RCreateMaps("ni", '<Plug>RESendFile',    'ae', ':call SendFileToR("echo")')
 call RCreateMaps("ni", '<Plug>RShowRout',     'ao', ':call ShowRout()')
+
+" Knitr::spin
+" -------------------------------------
+call RCreateMaps("ni", '<Plug>RSpinFile',     'ks', ':call RSpin()')
 
 call RCreateSendMaps()
 call RControlMaps()

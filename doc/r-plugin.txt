@@ -393,6 +393,7 @@ Command
   . Sweave, BibTeX and PDF (cur file) (Linux/Unix)     \sb
   --------------------------------------------------------
   . Knit (cur file)                                    \kn
+  . Spin (cur file)                                    \ks
   . Knit and PDF (cur file)                            \kp
   . Knit and Beamer PDF (cur file) (Only Rmd)          \ks
   . Knit and PDF (cur file, verbose) (Windows)         \kv
