@@ -48,9 +48,9 @@ function! RmdIsInRCode()
     let curline = line(".")
     let chunkline = search("^```[ ]*{r", "bncW")
     call cursor(chunkline)
-    let docline = search("^```", "bncW")
+    let docline = search("^```$", "ncW")
     call cursor(curline)
-    if chunkline > docline
+    if 0 < chunkline && chunkline < curline && curline < docline
         return 1
     else
         return 0
