@@ -3145,7 +3145,7 @@ if has("win32") || has("win64") || vimrplugin_applescript
 else
     let s:terminals = ['gnome-terminal', 'konsole', 'xfce4-terminal', 'terminal', 'Eterm', 'rxvt', 'aterm', 'roxterm', 'terminator', 'xterm']
     if has('mac')
-        let s:terminals = ['iTerm', 'Terminal.app'] + s:terminals
+        let s:terminals = ['iTerm', 'Terminal', 'Terminal.app'] + s:terminals
     endif
     if exists("g:vimrplugin_term")
         if !executable(g:vimrplugin_term)

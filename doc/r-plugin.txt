@@ -916,6 +916,7 @@ If Vim does not select your favorite terminal emulator, you may define it in
 your |vimrc| by setting the variable vimrplugin_term, as shown below:
 >
    let vimrplugin_term = "xterm"
+   let vimrplugin_term = "/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
 <
 							 *vimrplugin_term_cmd*
 If your terminal emulator is not listed above, or if you are not satisfied
