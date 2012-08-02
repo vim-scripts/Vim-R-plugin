@@ -895,6 +895,7 @@ IPv6 one (fe80::1).
 |vimrplugin_ca_ck|             Add ^A^K to the beginning of commands.
 |vimrplugin_openpdf|           Open PDF after processing rnoweb file.
 |vimrplugin_openpdf_quietly|   Open PDF quietly.
+|vimrplugin_insert_mode_cmds|  Allow R commands in insert mode.
 
 
 6.1. Terminal emulator (Linux/Unix only)~
@@ -1325,11 +1326,24 @@ will affect both Vim and R.
 
 On Linux/Unix, when vimrplugin_openpdf = 1, the application used to open the
 pdf may be quite verbose, printing many lines of useless diagnostic messages
-in the R Console. Put the following in you |vimrc| to inhibit these messages
+in the R Console. Put the following in your |vimrc| to inhibit these messages
 (and all useful error messages):
 >
    let vimrplugin_openpdf_quietly = 1
 <
+6.24. Allow R commands in insert mode~
+						 *Vimrplugin_insert_mode_cmds*
+Vim-R commands are designed to work in insert mode as well as normal mode.
+However, depending on your <LocalLeader>, this can make it very difficult to
+write R packages or Sweave files.  For example, if <LocalLeader> is set to the
+'\' character, typing '\dQuote' in a .Rd file tries to send the command!
+
+The option vimrplugin_insert_mode_cmds disables commands in insert mode.  To
+use it, add the following in your |vimrc|:
+>
+   let g:vimrplugin_insert_mode_cmds = 0       
+<
+The default value is 1, for consistency with earlier versions.
 
 ==============================================================================
 						       *r-plugin-key-bindings*

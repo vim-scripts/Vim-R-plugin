@@ -2312,7 +2312,7 @@ function RCreateMaps(type, plug, combo, target)
             exec 'vnoremap <buffer><silent> <LocalLeader>' . a:combo . ' <Esc>' . tg
         endif
     endif
-    if a:type =~ "i"
+    if g:vimrplugin_insert_mode_cmds == 1 && a:type =~ "i"
         if hasmapto(a:plug, "i")
             exec 'inoremap <buffer><silent> ' . a:plug . ' <Esc>' . tg . il
         else
@@ -2830,6 +2830,7 @@ call RSetDefaultValue("g:vimrplugin_never_unmake_menu", 0)
 call RSetDefaultValue("g:vimrplugin_vimpager",       "'tab'")
 call RSetDefaultValue("g:vimrplugin_latexcmd", "'pdflatex'")
 call RSetDefaultValue("g:vimrplugin_objbr_place", "'script,right'")
+call RSetDefaultValue("g:vimrplugin_insert_mode_cmds",  1)
 
 " Look for invalid options
 let objbrplace = split(g:vimrplugin_objbr_place, ",")
