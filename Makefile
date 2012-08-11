@@ -120,6 +120,8 @@ deb:
 	  - ftplugin/rdoc.vim\n\
 	  - ftplugin/rhelp.vim\n\
 	  - ftplugin/rnoweb.vim\n\
+	  - ftplugin/rmd.vim\n\
+	  - ftplugin/rrst.vim\n\
 	  - indent/r.vim\n\
 	  - indent/rnoweb.vim\n\
 	  - indent/rhelp.vim\n\
