@@ -143,9 +143,11 @@ following dependencies:
    The vimcom package creates a server on R to allow the communication with
    Vim, the colorout package colorizes the R output and the setwidth package
    adjusts the value of options("width") whenever the terminal is resized.
-   They can be installed from within R:
+   They can be installed from within R. The colorout package is available at
+   http://www.lepem.ufc.br/jaa/colorout.html while setwidth and vimcom can be
+   installed as usual:
 >
-   install.packages(c("vimcom", "colorout", "setwidth"))
+   install.packages(c("vimcom", "setwidth"))
 <
    You certainly will want to put something like the following at the end of
    your ~/.Rprofile:
@@ -395,7 +397,7 @@ Command
   . Knit (cur file)                                    \kn
   . Spin (cur file)                                    \ks
   . Knit and PDF (cur file)                            \kp
-  . Knit and Beamer PDF (cur file) (Only Rmd)          \ks
+  . Knit and Beamer PDF (cur file) (Only Rmd)          \kl
   . Knit and PDF (cur file, verbose) (Windows)         \kv
   . Knit, BibTeX and PDF (cur file) (Linux/Unix)       \kb
   --------------------------------------------------------
@@ -767,6 +769,12 @@ useful:
 ==============================================================================
 							 *r-plugin-known-bugs*
 5. Known bugs and workarounds~
+
+The bugs that are known to exist but that will not be fixed are listed in this
+section. Some of them can not be fixed because they depend on either R or Vim
+missing features; others would be very time consuming to fix without breaking
+anything.
+
 
 5.1. The Object Browser segfaults (Linux/Unix only)~
 
@@ -1464,6 +1472,8 @@ directory after the installation:
    ftplugin/rnoweb.vim
    ftplugin/r.vim
    ftplugin/rbrowser.vim
+   ftplugin/rmd.vim
+   ftplugin/rrst.vim
    indent/r.vim
    indent/rhelp.vim
    indent/rnoweb.vim
