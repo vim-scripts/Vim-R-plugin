@@ -1186,7 +1186,7 @@ function RGetKeyWord()
         let i -= 1
     endwhile
     let save_keyword = &iskeyword
-    setlocal iskeyword=@,48-57,_,.,$
+    setlocal iskeyword=@,48-57,_,.,$,@-@
     let rkeyword = expand("<cword>")
     exe "setlocal iskeyword=" . save_keyword
     call setpos(".", save_cursor)
