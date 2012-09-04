@@ -129,7 +129,7 @@ following dependencies:
    Screen plugin:   http://www.vim.org/scripts/script.php?script_id=2711
    vimcom >= 0.9-3: An R package.
 
-   Recommends:~
+   Suggests:~
    ncurses-term:  http://invisible-island.net/ncurses
    colorout:      An R package.
    setwidth:      An R package.
@@ -141,7 +141,14 @@ following dependencies:
    the scope of this documentation.
    
    The vimcom package creates a server on R to allow the communication with
-   Vim, the colorout package colorizes the R output and the setwidth package
+   Vim. The package is not used to send commands from Vim to R, but it is
+   necessary to open R documentation in Vim's buffer, run the Object Browser,
+   run either Sweave() or knit() on the document being edited. It also has
+   some functions called by Vim such as vim.plot(), vim.print(), and
+   vim.bol(). This last one is required to build the data base used in
+   omnicompletion.
+   
+   The colorout package colorizes the R output and the setwidth package
    adjusts the value of options("width") whenever the terminal is resized.
    They can be installed from within R. The colorout package is available at
    http://www.lepem.ufc.br/jaa/colorout.html while setwidth and vimcom can be
