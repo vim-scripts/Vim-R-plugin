@@ -1205,12 +1205,12 @@ function RSourceLines(lines, e)
     call writefile(lines, b:rsource)
     if a:e == "echo"
         if exists("g:vimrplugin_maxdeparse")
-            let rcmd = 'source("' . b:rsource . '", echo=TRUE, max.deparse=' . g:vimrplugin_maxdeparse . ')'
+            let rcmd = 'base::source("' . b:rsource . '", echo=TRUE, max.deparse=' . g:vimrplugin_maxdeparse . ')'
         else
-            let rcmd = 'source("' . b:rsource . '", echo=TRUE)'
+            let rcmd = 'base::source("' . b:rsource . '", echo=TRUE)'
         endif
     else
-        let rcmd = 'source("' . b:rsource . '")'
+        let rcmd = 'base::source("' . b:rsource . '")'
     endif
     let ok = SendCmdToR(rcmd)
     return ok
@@ -2905,8 +2905,8 @@ endif
 
 if has("win32") || has("win64")
     call RSetDefaultValue("g:vimrplugin_conquesleep", 200)
-    let vimrplugin_screenplugin = 0
-    let vimrplugin_tmux = 0
+    let g:vimrplugin_screenplugin = 0
+    let g:vimrplugin_tmux = 0
 else
     call RSetDefaultValue("g:vimrplugin_conquesleep", 100)
 endif
