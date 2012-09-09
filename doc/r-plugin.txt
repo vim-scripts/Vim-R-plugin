@@ -745,6 +745,9 @@ A sample detachable session could be:
     Tmux session:
       tmux attach
 
+See |vimrplugin_only_in_tmux| if you always prefer starting Tmux before
+starting Vim, but sometimes forget to start Tmux.
+
 
 4.9. GNU Screen usage~
 							     *r-plugin-screen*
@@ -1186,6 +1189,7 @@ If you want to use your own ~/.screenrc, put in your vimrc:
 						     *vimrplugin_screenplugin*
 						     *vimrplugin_screenvsplit*
 							     *vimrplugin_tmux*
+						     *vimrplugin_only_in_tmux*
 The screen.vim plugin supports both GNU Screen and Tmux, but only Tmux allows
 you to split the terminal vertically (that is, to have the panels side by
 side). Also, the automatic updating of the Object Browser is enabled only when
@@ -1217,6 +1221,15 @@ the terminal in two regions and will run R in one of them. Using both plugins
 at the same time is especially useful for users who may prefer to use Vim and
 R in a terminal emulator, rather than using the graphical interface provided
 by GVim.
+
+If you prefer to use the plugin in a terminal emulator in a Tmux session, you
+may prefer to start Tmux before Vim (see |r-plugin-tmux|). In this case, you
+may want to set the value of |vimrplugin_only_in_tmux| as below:
+>
+   let vimrplugin_only_in_tmux = 1
+<
+With the above option, the Vim-R-plugin will not start R if not running in a
+Tmux session, and it will warn you about that.
 
 If you have the screen.vim plugin installed but prefer do not integrate it
 with the Vim-R-plugin you will need to add the following to your |vimrc|:
@@ -1873,7 +1886,19 @@ them in your vimrc. For example
 
 will produce a german document with a table of contents.
 
-9.21. Integration with the Conque Shell plugin~
+9.21. Start Tmux and Vim at once~
+
+If you always prefer to run Tmux before running Vim you may want to put in
+your ~/.bashrc:
+>
+   function tvim(){ tmux new-session "vim $@" ; }
+<
+Then you will be able to start Vim inside a Tmux session by typing:
+>
+   tvim filename.R
+<
+
+9.22. Integration with the Conque Shell plugin~
 							     *r-plugin-conque*
 In addition to being integrated with the screen.vim plugin the Vim-R-plugin
 can also use the Conque Shell plugin, but the Conque Shell still has some

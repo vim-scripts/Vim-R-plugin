@@ -568,6 +568,13 @@ function StartR(whatr)
     endif
 
     if g:vimrplugin_screenplugin
+        if g:vimrplugin_only_in_tmux && g:vimrplugin_tmux
+            if $TMUX_PANE == ""
+                call RWarningMsg("Not inside Tmux.")
+                return
+            endif
+        endif
+
         if $TERM =~ "screen"
             if g:vimrplugin_tmux
                 call system("tmux set-environment VIMRPLUGIN_TMPDIR " . $VIMRPLUGIN_TMPDIR)
@@ -2818,6 +2825,7 @@ call RSetDefaultValue("g:vimrplugin_specialplot",       0)
 call RSetDefaultValue("g:vimrplugin_nosingler",         0)
 call RSetDefaultValue("g:vimrplugin_noscreenrc",        0)
 call RSetDefaultValue("g:vimrplugin_notmuxconf",        0)
+call RSetDefaultValue("g:vimrplugin_only_in_tmux",      0)
 call RSetDefaultValue("g:vimrplugin_routnotab",         0) 
 call RSetDefaultValue("g:vimrplugin_editor_w",         66)
 call RSetDefaultValue("g:vimrplugin_help_w",           46)
