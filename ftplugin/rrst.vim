@@ -18,7 +18,7 @@
 "          Jose Claudio Faria
 "          Alex Zvoleff
 "
-" Last Change: July 2, 2012  2:30PM
+" Last Change: Tue Sep 11, 2012  04:57PM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -97,7 +97,6 @@ function! RMakePDF()
     update
     call RSetWD()
     let pdfcmd = "vim.interlace.rrst('" . expand("%:t") . "'"
-    let pdfcmd = "require(knitr);" . pdfcmd
     if exists("g:vimrplugin_rrstcompiler")
         let pdfcmd = pdfcmd . ", compiler='" . g:vimrplugin_rrstcompiler . "'"
     endif

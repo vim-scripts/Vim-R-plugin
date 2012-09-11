@@ -99,7 +99,7 @@ function! RMakePDF(t)
     update
     call RSetWD()
     let pdfcmd = "vim.interlace.rmd('" . expand("%:t") . "'"
-    let pdfcmd = "require(knitr);" . pdfcmd . ", pdfout = '" . a:t  . "'"
+    let pdfcmd = pdfcmd . ", pdfout = '" . a:t  . "'"
     if exists("g:vimrplugin_rmdcompiler")
         let pdfcmd = pdfcmd . ", compiler='" . g:vimrplugin_rmdcompiler . "'"
     endif

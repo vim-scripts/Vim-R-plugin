@@ -114,7 +114,7 @@ function! RMakePDF(bibtex, knit)
     let pdfcmd = "vim.interlace.rnoweb('" . expand("%:t") . "'"
 
     if a:knit
-        let pdfcmd = "require(knitr); " . pdfcmd . ', knit = TRUE'
+        let pdfcmd = pdfcmd . ', knit = TRUE'
     endif
 
     if g:vimrplugin_latexcmd != "pdflatex"
