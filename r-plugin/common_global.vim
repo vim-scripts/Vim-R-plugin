@@ -1747,7 +1747,7 @@ function RBuildSyntaxFile(what)
         call UpdateOB("libraries")
     else
         unlet b:current_syntax
-        runtime syntax/r.vim
+        exe "set filetype=" . &filetype
     endif
 endfunction
 
