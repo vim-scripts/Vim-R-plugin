@@ -1677,6 +1677,11 @@ function BuildROmniList(env, what)
     call delete($VIMRPLUGIN_TMPDIR . "/vimbol_finished")
     if a:env =~ "GlobalEnv"
         exe "Py SendToR('" . omnilistcmd . "')"
+        if g:rplugin_vimcomport == 0
+            sleep 500m
+            let b:needsnewomnilist = 1
+            return
+        endif
         if g:rplugin_lastrpl == "R is busy."
             call RWarningMsg("R is busy.")
             let b:needsnewomnilist = 1
@@ -3237,6 +3242,7 @@ let g:rplugin_objbr_port = 0
 let g:rplugin_myport = 0
 let g:rplugin_editor_port = 0
 let g:rplugin_vimcomport = 0
+let g:rplugin_lastrpl = ""
 let g:rplugin_ob_busy = 0
 
 call SetRPath()
