@@ -119,7 +119,7 @@ function! CompleteChunkOptions(base)
                 \ "fig.show=;'asis|hold|animate'", "dev=; ", "dev.args=; ", "fig.ext=; ",
                 \ "dpi=;72", "fig.width=;7", "fig.height=;7", "out.width=;'7in'",
                 \ "out.height='7in'", "out.extra=; ", "resize.width=; ", "resize.height=; ",
-                \ "fig.align=; ", "fig.env=;'figure'", "fig.cap=;''", "fig.scap=;''",
+                \ "fig.align=;'left|right|center'", "fig.env=;'figure'", "fig.cap=;''", "fig.scap=;''",
                 \ "fig.lp=;'fig:'", "fig.pos=;''", "external=;TRUE", "sanitize=;FALSE",
                 \ "interval=;1", "aniopts=;'controls.loop'", "ref.label=; ", "child=; ",
                 \ "engine=; ", "opts.label=''"]
@@ -460,6 +460,12 @@ function GoDown()
         let fc = curline[0]
         if fc == '@'
             call RnwNextChunk()
+            return
+        endif
+    elseif &filetype == "rmd"
+        let curline = getline(".")
+        if curline =~ '^```$'
+            call RmdNextChunk()
             return
         endif
     endif
@@ -1537,6 +1543,12 @@ function SendLineToR(godown)
         endif
     endif
     if &filetype == "rmd"
+        if line =~ "^```$"
+            if a:godown =~ "down"
+                call GoDown()
+            endif
+            return
+        endif
         let line = substitute(line, "^\\`\\`\\?", "", "")
         if RmdIsInRCode() == 0
             call RWarningMsg("Not inside an R code chunk.")
@@ -1583,7 +1595,7 @@ endfunction
 
 " Remove all objects
 function RClearAll()
-    let ok = SendCmdToR("rm(list=ls())")
+    call SendCmdToR("rm(list=ls())")
     sleep 500m
     call RClearConsole()
 endfunction
@@ -1594,10 +1606,7 @@ function RSetWD()
     if has("win32") || has("win64")
         let wdcmd = substitute(wdcmd, "\\", "/", "g")
     endif
-    let ok = SendCmdToR(wdcmd)
-    if ok == 0
-        return
-    endif
+    call SendCmdToR(wdcmd)
 endfunction
 
 " Quit R
@@ -2424,14 +2433,16 @@ function MakeRMenu()
         call RCreateMenuItem("nvi", 'Command.Set\ working\ directory\ (cur\ file\ path)', '<Plug>RSetwd', 'rd', ':call RSetWD()')
     endif
     "-------------------------------
-    if &filetype == "rnoweb" || g:vimrplugin_never_unmake_menu
-        menu R.Command.-Sep5- <nul>
-        call RCreateMenuItem("nvi", 'Command.Sweave\ (cur\ file)', '<Plug>RSweave', 'sw', ':call RSweave(0)')
-        call RCreateMenuItem("nvi", 'Command.Sweave\ and\ PDF\ (cur\ file)', '<Plug>RMakePDF', 'sp', ':call RMakePDF("nobib", 0)')
-        if has("win32") || has("win64")
-            call RCreateMenuItem("nvi", 'Command.Sweave\ and\ PDF\ (cur\ file,\ verbose)', '<Plug>RMakePDF', 'sv', ':call RMakePDF("verbose", 0)')
-        else
-            call RCreateMenuItem("nvi", 'Command.Sweave,\ BibTeX\ and\ PDF\ (cur\ file)', '<Plug>RMakePDF', 'sb', ':call RMakePDF("bibtex", 0)')
+    if &filetype == "rnoweb" || &filetype == "rmd" || &filetype == "rrst" || g:vimrplugin_never_unmake_menu
+        if &filetype == "rnoweb" || g:vimrplugin_never_unmake_menu
+            menu R.Command.-Sep5- <nul>
+            call RCreateMenuItem("nvi", 'Command.Sweave\ (cur\ file)', '<Plug>RSweave', 'sw', ':call RSweave(0)')
+            call RCreateMenuItem("nvi", 'Command.Sweave\ and\ PDF\ (cur\ file)', '<Plug>RMakePDF', 'sp', ':call RMakePDF("nobib", 0)')
+            if has("win32") || has("win64")
+                call RCreateMenuItem("nvi", 'Command.Sweave\ and\ PDF\ (cur\ file,\ verbose)', '<Plug>RMakePDF', 'sv', ':call RMakePDF("verbose", 0)')
+            else
+                call RCreateMenuItem("nvi", 'Command.Sweave,\ BibTeX\ and\ PDF\ (cur\ file)', '<Plug>RMakePDF', 'sb', ':call RMakePDF("bibtex", 0)')
+            endif
         endif
         menu R.Command.-Sep6- <nul>
         call RCreateMenuItem("nvi", 'Command.Knit\ (cur\ file)', '<Plug>RSweave', 'kn', ':call RSweave(1)')
@@ -2440,6 +2451,10 @@ function MakeRMenu()
             call RCreateMenuItem("nvi", 'Command.Knit\ and\ PDF\ (cur\ file,\ verbose)', '<Plug>RMakePDF', 'kv', ':call RMakePDF("verbose", 1)')
         else
             call RCreateMenuItem("nvi", 'Command.Knit,\ BibTeX\ and\ PDF\ (cur\ file)', '<Plug>RMakePDF', 'kb', ':call RMakePDF("bibtex", 1)')
+        endif
+        if &filetype == "rmd" || g:vimrplugin_never_unmake_menu
+            call RCreateMenuItem("nvi", 'Command.Knit\ and\ HTML\ (cur\ file)', '<Plug>RMakeHTML', 'kh', ':call RMakeHTML("html")')
+            call RCreateMenuItem("nvi", 'Command.Knit\ and\ ODT\ (cur\ file)', '<Plug>RMakeODT', 'ko', ':call RMakeHTML("odt")')
         endif
         menu R.Command.-Sep61- <nul>
         call RCreateMenuItem("nvi", 'Command.Open\ PDF\ (cur\ file)', '<Plug>ROpenPDF', 'op', ':call ROpenPDF()')
@@ -2826,6 +2841,7 @@ call RSetDefaultValue("g:vimrplugin_underscore",        1)
 call RSetDefaultValue("g:vimrplugin_rnowebchunk",       1)
 call RSetDefaultValue("g:vimrplugin_openpdf",           0)
 call RSetDefaultValue("g:vimrplugin_openpdf_quietly",   0)
+call RSetDefaultValue("g:vimrplugin_openhtml",          0)
 call RSetDefaultValue("g:vimrplugin_i386",              0)
 call RSetDefaultValue("g:vimrplugin_screenvsplit",      0)
 call RSetDefaultValue("g:vimrplugin_conquevsplit",      0)

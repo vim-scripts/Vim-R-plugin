@@ -21,12 +21,19 @@
 "==========================================================================
 
 " Only do this when not yet done for this buffer
-if exists("b:did_rmd_ftplugin") || exists("disable_r_ftplugin")
+if exists("b:did_rmd_ftplugin") || exists("disable_r_ftplugin") || exists("b:did_ftplugin")
     finish
 endif
 
 " Don't load another plugin for this buffer
 let b:did_rmd_ftplugin = 1
+
+runtime! ftplugin/html.vim ftplugin/html_*.vim ftplugin/html/*.vim
+unlet! b:did_ftplugin
+
+setlocal comments=fb:*,fb:-,fb:+,n:> commentstring=>\ %s
+setlocal formatoptions+=tcqln
+setlocal formatlistpat=^\\s*\\d\\+\\.\\s\\+\\\|^\\s*[-*+]\\s\\+
 
 let s:cpo_save = &cpo
 set cpo&vim
@@ -63,7 +70,7 @@ function! RmdPreviousChunk() range
     for var in range(1, chunk)
         let curline = line(".")
         if RmdIsInRCode()
-            let i = search("^``` [ ]*{r", "bnW")
+            let i = search("^```[ ]*{r", "bnW")
             if i != 0
                 call cursor(i-1, 1)
             endif
@@ -95,9 +102,37 @@ function! RmdNextChunk() range
     return
 endfunction
 
-function! RMakePDF(t)
-    update
+function! RMakeHTML(t)
     call RSetWD()
+    update
+    let rcmd = 'require(knitr); knit2html("' . expand("%:t") . '", options = "")'
+    if a:t == "odt"
+        if g:rplugin_has_soffice == 0
+            if executable("soffice")
+                let g:rplugin_has_soffice = 1
+            else
+                call RWarningMsg("Is Libre Office installed? Cannot convert into ODT: 'soffice' not found.")
+            endif
+        endif
+        let rcmd = rcmd . '; system("soffice --invisible --convert-to odt ' . expand("%:r:t") . '.html")'
+    endif
+    if g:vimrplugin_openhtml && a:t == "html"
+        let rcmd = rcmd . '; browseURL("' . expand("%:r:t") . '.html")'
+    endif
+    call SendCmdToR(rcmd)
+endfunction
+
+function! RMakePDF(t)
+    if g:rplugin_has_pandoc == 0
+        if executable("pandoc")
+            let g:rplugin_has_pandoc = 1
+        else
+            call RWarningMsg("Cannot convert into PDF: 'pandoc' not found.")
+            return
+        endif
+    endif
+    call RSetWD()
+    update
     let pdfcmd = "vim.interlace.rmd('" . expand("%:t") . "'"
     let pdfcmd = pdfcmd . ", pdfout = '" . a:t  . "'"
     if exists("g:vimrplugin_rmdcompiler")
@@ -113,11 +148,7 @@ function! RMakePDF(t)
         let pdfcmd = pdfcmd . ", pandoc_args = '" . g:vimrplugin_pandoc_args . "'"
     endif
     let pdfcmd = pdfcmd . ")"
-    let b:needsnewomnilist = 1
-    let ok = SendCmdToR(pdfcmd)
-    if ok == 0
-        return
-    endif
+    call SendCmdToR(pdfcmd)
 endfunction  
 
 " Send Rmd chunk to R
@@ -159,7 +190,8 @@ call RCreateMaps("nvi", '<Plug>RSetwd',        'rd', ':call RSetWD()')
 call RCreateMaps("nvi", '<Plug>RKnit',        'kn', ':call RKnit()')
 call RCreateMaps("nvi", '<Plug>RMakePDFK',    'kp', ':call RMakePDF("latex")')
 call RCreateMaps("nvi", '<Plug>RMakePDFK',    'kl', ':call RMakePDF("beamer")')
-call RCreateMaps("nvi", '<Plug>RIndent',      'si', ':call RmdToggleIndentSty()')
+call RCreateMaps("nvi", '<Plug>RMakeHTML',    'kh', ':call RMakeHTML("html")')
+call RCreateMaps("nvi", '<Plug>RMakeODT',     'ko', ':call RMakeHTML("odt")')
 call RCreateMaps("ni",  '<Plug>RSendChunk',   'cc', ':call SendChunkToR("silent", "stay")')
 call RCreateMaps("ni",  '<Plug>RESendChunk',  'ce', ':call SendChunkToR("echo", "stay")')
 call RCreateMaps("ni",  '<Plug>RDSendChunk',  'cd', ':call SendChunkToR("silent", "down")')
@@ -172,5 +204,15 @@ if has("gui_running")
     call MakeRMenu()
 endif
 
+let g:rplugin_has_pandoc = 0
+let g:rplugin_has_soffice = 0
+
 let &cpo = s:cpo_save
 unlet s:cpo_save
+
+if exists('b:undo_ftplugin')
+  let b:undo_ftplugin .= "|setl cms< com< fo< flp<"
+else
+  let b:undo_ftplugin = "setl cms< com< fo< flp<"
+endif
+
