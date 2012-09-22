@@ -34,6 +34,7 @@ unlet! b:did_ftplugin
 setlocal comments=fb:*,fb:-,fb:+,n:> commentstring=>\ %s
 setlocal formatoptions+=tcqln
 setlocal formatlistpat=^\\s*\\d\\+\\.\\s\\+\\\|^\\s*[-*+]\\s\\+
+setlocal iskeyword=@,48-57,_,.
 
 let s:cpo_save = &cpo
 set cpo&vim
