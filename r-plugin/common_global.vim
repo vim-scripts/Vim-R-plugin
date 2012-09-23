@@ -2593,6 +2593,7 @@ function MakeRMenu()
     if &filetype == "r" || g:vimrplugin_never_unmake_menu
         nmenu <silent> ToolBar.RSendFile :call SendFileToR("echo")<CR>
         imenu <silent> ToolBar.RSendFile <Esc>:call SendFileToR("echo")<CR>
+        let g:rplugin_hasRSFbutton = 1
     endif
     nmenu <silent> ToolBar.RSendBlock :call SendMBlockToR("echo", "down")<CR>
     imenu <silent> ToolBar.RSendBlock <Esc>:call SendMBlockToR("echo", "down")<CR>
@@ -2643,8 +2644,9 @@ function UnMakeRMenu()
         aunmenu ToolBar.RSendParagraph
         aunmenu ToolBar.RSendFunction
         aunmenu ToolBar.RSendBlock
-        if g:rplugin_lastft == "r"
+        if g:rplugin_hasRSFbutton
             aunmenu ToolBar.RSendFile
+            let g:rplugin_hasRSFbutton = 0
         endif
         aunmenu ToolBar.RClose
         aunmenu ToolBar.RStart
@@ -3270,6 +3272,7 @@ let g:rplugin_editor_port = 0
 let g:rplugin_vimcomport = 0
 let g:rplugin_lastrpl = ""
 let g:rplugin_ob_busy = 0
+let g:rplugin_hasRSFbutton = 0
 
 call SetRPath()
 
