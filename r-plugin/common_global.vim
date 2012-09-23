@@ -1595,7 +1595,11 @@ endfunction
 
 " Remove all objects
 function RClearAll()
-    call SendCmdToR("rm(list=ls())")
+    if g:vimrplugin_rmhidden
+        call SendCmdToR("rm(list=ls(all.names = TRUE))")
+    else
+        call SendCmdToR("rm(list=ls())")
+    endif
     sleep 500m
     call RClearConsole()
 endfunction
@@ -2837,6 +2841,7 @@ let g:rplugin_globalenvfname = $VIMRPLUGIN_TMPDIR . "/GlobalEnvList"
 " Variables whose default value is fixed
 call RSetDefaultValue("g:vimrplugin_map_r",             0)
 call RSetDefaultValue("g:vimrplugin_allnames",          0)
+call RSetDefaultValue("g:vimrplugin_rmhidden",          1)
 call RSetDefaultValue("g:vimrplugin_underscore",        1)
 call RSetDefaultValue("g:vimrplugin_rnowebchunk",       1)
 call RSetDefaultValue("g:vimrplugin_openpdf",           0)

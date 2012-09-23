@@ -902,7 +902,6 @@ IPv6 one (fe80::1).
 |vimrplugin_screenvsplit|      Split the window vertically (screen plugin)
 |vimrplugin_tmux|              Choose between Tmux and GNU Screen
 |vimrplugin_applescript|       Use osascript in Mac OS X.
-|vimrplugin_allnames|          Show names which begin with a dot
 |vimrplugin_listmethods|       Do .vim.list.args() instead of args()
 |vimrplugin_specialplot|       Do .vim.plot() instead of plot()
 |vimrplugin_maxdeparse|        Argument to R args() function
@@ -915,6 +914,8 @@ IPv6 one (fe80::1).
 |vimrplugin_openpdf_quietly|   Open PDF quietly.
 |vimrplugin_openhtml|          Open PDF quietly.
 |vimrplugin_insert_mode_cmds|  Allow R commands in insert mode.
+|vimrplugin_allnames|          Show names which begin with a dot
+|vimrplugin_rmhidden|          Remove hidden objects from R workspace.
 
 
 6.1. Terminal emulator (Linux/Unix only)~
@@ -1381,6 +1382,20 @@ use it, add the following in your |vimrc|:
    let g:vimrplugin_insert_mode_cmds = 0       
 <
 The default value is 1, for consistency with earlier versions.
+
+6.25. Show/remove hidden objects~
+							 *vimrplugin_allnames*
+							 *vimrplugin_rmhidden*
+Hidden objects are not included in the list of objects for omni completion. If
+you prefer to include them, put in your |vimrc|:
+>
+   let g:vimrplugin_allnames = 1
+<
+Hidden objects are removed from R workspace when you do <LocalLeader>rm. If
+you prefer to remove only visible objects, put in your |vimrc|:
+>
+   let g:vimrplugin_rmhidden = 0
+<
 
 ==============================================================================
 						       *r-plugin-key-bindings*
@@ -1994,7 +2009,7 @@ the R syntax highlighted.
 							       *r-plugin-news*
 10. News~
 
-0.9.8 (2012-07-11)
+0.9.8 (2012-09-23)
 
  * Open PDF automatically after processing rnoweb file if
    vimrplugin_openpdf = 1 (thanks to Tomaz Ficko for suggesting the feature).
@@ -2009,6 +2024,7 @@ the R syntax highlighted.
  * michelk added support to rmd file type.
  * For rnoweb, rmd and rrst file types, CTRL-X CTRL-A completes knitr chunk
    options if the cursor is inside the chunk header.
+ * New option: vimrplugin_rmhidden.
 
 0.9.7 (2012-05-04)
 
