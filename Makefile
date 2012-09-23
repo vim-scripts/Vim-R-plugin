@@ -47,9 +47,10 @@ zip:
 	sed -i -e "s/^Version: [0-9].[0-9].[0-9]/Version: $(PLUGINVERSION)/" doc/r-plugin.txt
 	sed -i -e "s/^$(PLUGINVERSION) (201[0-9]-[0-9][0-9]-[0-9][0-9])$$/$(PLUGINVERSION) ($(PLUGINRELEASEDATE))/" doc/r-plugin.txt
 	# Create a tar.gz file
-	tar -cvzf /tmp/vimrplugintmpfile.tar.gz ftdetect/r.vim indent/r.vim \
-	    indent/rnoweb.vim indent/rhelp.vim autoload/rcomplete.vim ftplugin/r*.vim \
-	    syntax/rout.vim syntax/r.vim syntax/rhelp.vim syntax/rdoc.vim syntax/rbrowser.vim \
+	tar -cvzf /tmp/vimrplugintmpfile.tar.gz ftdetect/r.vim indent/r.vim indent/rmd.vim \
+	    indent/rrst.vim indent/rnoweb.vim indent/rhelp.vim autoload/rcomplete.vim ftplugin/r*.vim \
+	    syntax/rout.vim syntax/r.vim syntax/rhelp.vim syntax/rmd.vim \
+	    syntax/rrst.vim syntax/rdoc.vim syntax/rbrowser.vim \
 	    doc/r-plugin.txt r-plugin/functions.vim r-plugin/vimcom.py \
 	    r-plugin/global_r_plugin.vim r-plugin/omnils r-plugin/windows.py \
 	    r-plugin/vimActivate.js r-plugin/tex_indent.vim r-plugin/r.snippets \
@@ -125,6 +126,8 @@ deb:
 	  - indent/r.vim\n\
 	  - indent/rnoweb.vim\n\
 	  - indent/rhelp.vim\n\
+	  - indent/rmd.vim\n\
+	  - indent/rrst.vim\n\
 	  - r-plugin/common_buffer.vim\n\
 	  - r-plugin/common_global.vim\n\
 	  - r-plugin/vimcom.py\n\
@@ -133,6 +136,8 @@ deb:
 	  - syntax/r.vim\n\
 	  - syntax/rdoc.vim\n\
 	  - syntax/rout.vim\n\
+	  - syntax/rmd.vim\n\
+	  - syntax/rrst.vim\n\
 	  - syntax/rhelp.vim\n\
 	  - syntax/rbrowser.vim\n\
 	" > /tmp/vim-r-plugin-tmp/usr/share/vim/registry/vim-r-plugin.yaml
