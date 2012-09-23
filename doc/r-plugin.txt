@@ -1521,6 +1521,8 @@ directory after the installation:
    indent/r.vim
    indent/rhelp.vim
    indent/rnoweb.vim
+   indent/rmd.vim
+   indent/rrst.vim
    r-plugin/common_buffer.vim
    r-plugin/common_global.vim
    r-plugin/functions.vim
@@ -1533,6 +1535,8 @@ directory after the installation:
    syntax/rbrowser.vim
    syntax/rout.vim
    syntax/r.vim
+   syntax/rmd.vim
+   syntax/rrst.vim
 
 
 ==============================================================================

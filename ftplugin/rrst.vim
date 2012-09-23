@@ -18,7 +18,7 @@
 "          Jose Claudio Faria
 "          Alex Zvoleff
 "
-" Last Change: Tue Sep 11, 2012  04:57PM
+" Last Change: Sun Sep 23, 2012  07:39PM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -37,6 +37,11 @@ runtime r-plugin/common_global.vim
 if exists("g:rplugin_failed")
     finish
 endif
+
+setlocal comments=fb:*,fb:-,fb:+,n:> commentstring=>\ %s
+setlocal formatoptions+=tcqln
+setlocal formatlistpat=^\\s*\\d\\+\\.\\s\\+\\\|^\\s*[-*+]\\s\\+
+setlocal iskeyword=@,48-57,_,.
 
 " Some buffer variables common to R, Rrst, Rnoweb, Rhelp and Rdoc need to be 
 " defined after the global ones:
