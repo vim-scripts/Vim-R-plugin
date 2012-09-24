@@ -1,7 +1,7 @@
 " reStructured Text with R statements
 " Language: reST with R code chunks
 " Maintainer: Alex Zvoleff, azvoleff@mail.sdsu.edu
-" Last Change: Wed Jul 11, 2012  01:46PM
+" Last Change: Mon Sep 24, 2012  09:05AM
 
 " for portability
 if version < 600
@@ -18,8 +18,7 @@ unlet b:current_syntax
 syntax include @R syntax/r.vim
 
 " highlight R chunks
-syntax match rrstChunkDelim "^\.\. {r" contained
-syntax match rrstChunkDelim "}$" contained
+syntax match rrstChunkDelim "^\.\. {r .*}$" contained
 syntax match rrstChunkDelim "^\.\. \.\.$" contained
 syntax region rrstChunk start="^\.\. {r.*}$" end="^\.\. \.\.$" contains=@R,rrstChunkDelim keepend transparent fold
 
