@@ -18,7 +18,7 @@
 "          Jose Claudio Faria
 "          Alex Zvoleff
 "
-" Last Change: Sun Sep 23, 2012  07:39PM
+" Last Change: Mon Sep 24, 2012  08:43AM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -98,9 +98,48 @@ function! RrstNextChunk() range
     return
 endfunction
 
-function! RMakePDF()
+function! RMakeHTMLrrst(t)
+    call RSetWD()
+    update
+    if g:rplugin_has_rst2pdf == 0
+        if executable("rst2pdf")
+            let g:rplugin_has_rst2pdf = 1
+        else
+            call RWarningMsg("Is 'rst2pdf' application installed? Cannot convert into HTML/ODT: 'rst2pdf' executable not found.")
+            return
+        endif
+    endif
+
+    let rcmd = 'require(knitr)'
+    if g:vimrplugin_strict_rst
+        let rcmd = rcmd . '; render_rst(strict=TRUE)'
+    endif
+    let rcmd = rcmd . '; knit("' . expand("%:t") . '")'
+    
+    if a:t == "odt"
+        let rcmd = rcmd . '; system("rst2odt ' . expand("%:r:t") . ".rst " . expand("%:r:t") . '.odt")'
+    else
+        let rcmd = rcmd . '; system("rst2html ' . expand("%:r:t") . ".rst " . expand("%:r:t") . '.html")'
+    endif
+
+    if g:vimrplugin_openhtml && a:t == "html"
+        let rcmd = rcmd . '; browseURL("' . expand("%:r:t") . '.html")'
+    endif
+    call SendCmdToR(rcmd)
+endfunction
+
+function! RMakePDFrrst()
     update
     call RSetWD()
+    if g:rplugin_has_rst2pdf == 0
+        if executable("rst2pdf")
+            let g:rplugin_has_rst2pdf = 1
+        else
+            call RWarningMsg("Is 'rst2pdf' application installed? Cannot convert into PDF: 'rst2pdf' executable not found.")
+            return
+        endif
+    endif
+
     let pdfcmd = "vim.interlace.rrst('" . expand("%:t") . "'"
     if exists("g:vimrplugin_rrstcompiler")
         let pdfcmd = pdfcmd . ", compiler='" . g:vimrplugin_rrstcompiler . "'"
@@ -123,7 +162,7 @@ function! RMakePDF()
 endfunction  
 
 " Send Rrst chunk to R
-function! SendChunkToR(e, m)
+function! SendRrstChunkToR(e, m)
     if RrstIsInRCode() == 0
         call RWarningMsg("Not inside an R code chunk.")
         return
@@ -140,14 +179,6 @@ function! SendChunkToR(e, m)
     endif  
 endfunction
 
-" knit the current buffer content
-function! RKnit()
-    update
-    let b:needsnewomnilist = 1
-    call RSetWD()
-    call SendCmdToR('require(knitr); knit("' . expand("%:t") . '")')
-endfunction
-
 "==========================================================================
 " Key bindings and menu items
 
@@ -159,12 +190,14 @@ call RCreateMaps("nvi", '<Plug>RSetwd',        'rd', ':call RSetWD()')
 
 " Only .Rrst files use these functions:
 call RCreateMaps("nvi", '<Plug>RKnit',        'kn', ':call RKnit()')
-call RCreateMaps("nvi", '<Plug>RMakePDFK',    'kp', ':call RMakePDF()')
+call RCreateMaps("nvi", '<Plug>RMakePDFK',    'kp', ':call RMakePDFrrst()')
+call RCreateMaps("nvi", '<Plug>RMakeHTML',    'kh', ':call RMakeHTMLrrst("html")')
+call RCreateMaps("nvi", '<Plug>RMakeODT',     'ko', ':call RMakeHTMLrrst("odt")')
 call RCreateMaps("nvi", '<Plug>RIndent',      'si', ':call RrstToggleIndentSty()')
-call RCreateMaps("ni",  '<Plug>RSendChunk',   'cc', ':call SendChunkToR("silent", "stay")')
-call RCreateMaps("ni",  '<Plug>RESendChunk',  'ce', ':call SendChunkToR("echo", "stay")')
-call RCreateMaps("ni",  '<Plug>RDSendChunk',  'cd', ':call SendChunkToR("silent", "down")')
-call RCreateMaps("ni",  '<Plug>REDSendChunk', 'ca', ':call SendChunkToR("echo", "down")')
+call RCreateMaps("ni",  '<Plug>RSendChunk',   'cc', ':call SendRrstChunkToR("silent", "stay")')
+call RCreateMaps("ni",  '<Plug>RESendChunk',  'ce', ':call SendRrstChunkToR("echo", "stay")')
+call RCreateMaps("ni",  '<Plug>RDSendChunk',  'cd', ':call SendRrstChunkToR("silent", "down")')
+call RCreateMaps("ni",  '<Plug>REDSendChunk', 'ca', ':call SendRrstChunkToR("echo", "down")')
 nmap <buffer><silent> gn :call RrstNextChunk()<CR>
 nmap <buffer><silent> gN :call RrstPreviousChunk()<CR>
 
@@ -172,6 +205,8 @@ nmap <buffer><silent> gN :call RrstPreviousChunk()<CR>
 if has("gui_running")
     call MakeRMenu()
 endif
+
+let g:rplugin_has_rst2pdf = 0
 
 let &cpo = s:cpo_save
 unlet s:cpo_save
