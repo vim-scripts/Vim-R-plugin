@@ -168,15 +168,11 @@ function! SendChunkToR(e, m)
 endfunction
 
 " Sweave the current buffer content
-function! RSweave(knit)
+function! RSweave()
     update
     let b:needsnewomnilist = 1
     call RSetWD()
-    if a:knit
-        call SendCmdToR('require(knitr); knit("' . expand("%:t") . '")')
-    else
-        call SendCmdToR('Sweave("' . expand("%:t") . '")')
-    endif
+    call SendCmdToR('Sweave("' . expand("%:t") . '")')
 endfunction
 
 function! ROpenPDF()
@@ -241,10 +237,10 @@ call RControlMaps()
 call RCreateMaps("nvi", '<Plug>RSetwd',        'rd', ':call RSetWD()')
 
 " Only .Rnw files use these functions:
-call RCreateMaps("nvi", '<Plug>RSweave',      'sw', ':call RSweave(0)')
+call RCreateMaps("nvi", '<Plug>RSweave',      'sw', ':call RSweave()')
 call RCreateMaps("nvi", '<Plug>RMakePDF',     'sp', ':call RMakePDF("nobib", 0)')
 call RCreateMaps("nvi", '<Plug>RBibTeX',      'sb', ':call RMakePDF("bibtex", 0)')
-call RCreateMaps("nvi", '<Plug>RKnit',        'kn', ':call RSweave(1)')
+call RCreateMaps("nvi", '<Plug>RKnit',        'kn', ':call RKnit()')
 call RCreateMaps("nvi", '<Plug>RMakePDFK',    'kp', ':call RMakePDF("nobib", 1)')
 call RCreateMaps("nvi", '<Plug>RBibTeXK',     'kb', ':call RMakePDF("bibtex", 1)')
 call RCreateMaps("nvi", '<Plug>ROpenPDF',     'op', ':call ROpenPDF()')

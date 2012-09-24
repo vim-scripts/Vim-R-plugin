@@ -1674,6 +1674,14 @@ function RQuit(how)
 
 endfunction
 
+" knit the current buffer content
+function! RKnit()
+    update
+    let b:needsnewomnilist = 1
+    call RSetWD()
+    call SendCmdToR('require(knitr); knit("' . expand("%:t") . '")')
+endfunction
+
 " Tell R to create a list of objects file listing all currently available
 " objects in its environment. The file is necessary for omni completion.
 function BuildROmniList(env, what)
@@ -2440,7 +2448,7 @@ function MakeRMenu()
     if &filetype == "rnoweb" || &filetype == "rmd" || &filetype == "rrst" || g:vimrplugin_never_unmake_menu
         if &filetype == "rnoweb" || g:vimrplugin_never_unmake_menu
             menu R.Command.-Sep5- <nul>
-            call RCreateMenuItem("nvi", 'Command.Sweave\ (cur\ file)', '<Plug>RSweave', 'sw', ':call RSweave(0)')
+            call RCreateMenuItem("nvi", 'Command.Sweave\ (cur\ file)', '<Plug>RSweave', 'sw', ':call RSweave()')
             call RCreateMenuItem("nvi", 'Command.Sweave\ and\ PDF\ (cur\ file)', '<Plug>RMakePDF', 'sp', ':call RMakePDF("nobib", 0)')
             if has("win32") || has("win64")
                 call RCreateMenuItem("nvi", 'Command.Sweave\ and\ PDF\ (cur\ file,\ verbose)', '<Plug>RMakePDF', 'sv', ':call RMakePDF("verbose", 0)')
@@ -2449,7 +2457,7 @@ function MakeRMenu()
             endif
         endif
         menu R.Command.-Sep6- <nul>
-        call RCreateMenuItem("nvi", 'Command.Knit\ (cur\ file)', '<Plug>RSweave', 'kn', ':call RSweave(1)')
+        call RCreateMenuItem("nvi", 'Command.Knit\ (cur\ file)', '<Plug>RKnit', 'kn', ':call RKnit()')
         call RCreateMenuItem("nvi", 'Command.Knit\ and\ PDF\ (cur\ file)', '<Plug>RMakePDF', 'kp', ':call RMakePDF("nobib", 1)')
         if has("win32") || has("win64")
             call RCreateMenuItem("nvi", 'Command.Knit\ and\ PDF\ (cur\ file,\ verbose)', '<Plug>RMakePDF', 'kv', ':call RMakePDF("verbose", 1)')
@@ -2466,7 +2474,7 @@ function MakeRMenu()
     "-------------------------------
     if &filetype == "rrst" || g:vimrplugin_never_unmake_menu
         menu R.Command.-Sep5- <nul>
-        call RCreateMenuItem("nvi", 'Command.Knit\ (cur\ file)', '<Plug>RKnit', 'kn', ':call RSweave()')
+        call RCreateMenuItem("nvi", 'Command.Knit\ (cur\ file)', '<Plug>RKnit', 'kn', ':call RKnit()')
         call RCreateMenuItem("nvi", 'Command.Knit\ and\ PDF\ (cur\ file)', '<Plug>RMakePDF', 'kp', ':call RMakePDF("nobib")')
     endif
     "-------------------------------
@@ -2846,6 +2854,7 @@ call RSetDefaultValue("g:vimrplugin_allnames",          0)
 call RSetDefaultValue("g:vimrplugin_rmhidden",          1)
 call RSetDefaultValue("g:vimrplugin_underscore",        1)
 call RSetDefaultValue("g:vimrplugin_rnowebchunk",       1)
+call RSetDefaultValue("g:vimrplugin_strict_rst",        1)
 call RSetDefaultValue("g:vimrplugin_openpdf",           0)
 call RSetDefaultValue("g:vimrplugin_openpdf_quietly",   0)
 call RSetDefaultValue("g:vimrplugin_openhtml",          0)

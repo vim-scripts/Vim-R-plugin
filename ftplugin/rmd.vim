@@ -103,7 +103,7 @@ function! RmdNextChunk() range
     return
 endfunction
 
-function! RMakeHTML(t)
+function! RMakeHTMLrmd(t)
     call RSetWD()
     update
     let rcmd = 'require(knitr); knit2html("' . expand("%:t") . '", options = "")'
@@ -123,7 +123,7 @@ function! RMakeHTML(t)
     call SendCmdToR(rcmd)
 endfunction
 
-function! RMakePDF(t)
+function! RMakePDFrmd(t)
     if g:rplugin_has_pandoc == 0
         if executable("pandoc")
             let g:rplugin_has_pandoc = 1
@@ -153,7 +153,7 @@ function! RMakePDF(t)
 endfunction  
 
 " Send Rmd chunk to R
-function! SendChunkToR(e, m)
+function! SendRmdChunkToR(e, m)
     if RmdIsInRCode() == 0
         call RWarningMsg("Not inside an R code chunk.")
         return
@@ -170,14 +170,6 @@ function! SendChunkToR(e, m)
     endif  
 endfunction
 
-" knit the current buffer content
-function! RKnit()
-    update
-    let b:needsnewomnilist = 1
-    call RSetWD()
-    call SendCmdToR('require(knitr); knit("' . expand("%:t") . '")')
-endfunction
-
 "==========================================================================
 " Key bindings and menu items
 
@@ -189,14 +181,14 @@ call RCreateMaps("nvi", '<Plug>RSetwd',        'rd', ':call RSetWD()')
 
 " Only .Rmd files use these functions:
 call RCreateMaps("nvi", '<Plug>RKnit',        'kn', ':call RKnit()')
-call RCreateMaps("nvi", '<Plug>RMakePDFK',    'kp', ':call RMakePDF("latex")')
-call RCreateMaps("nvi", '<Plug>RMakePDFK',    'kl', ':call RMakePDF("beamer")')
-call RCreateMaps("nvi", '<Plug>RMakeHTML',    'kh', ':call RMakeHTML("html")')
-call RCreateMaps("nvi", '<Plug>RMakeODT',     'ko', ':call RMakeHTML("odt")')
-call RCreateMaps("ni",  '<Plug>RSendChunk',   'cc', ':call SendChunkToR("silent", "stay")')
-call RCreateMaps("ni",  '<Plug>RESendChunk',  'ce', ':call SendChunkToR("echo", "stay")')
-call RCreateMaps("ni",  '<Plug>RDSendChunk',  'cd', ':call SendChunkToR("silent", "down")')
-call RCreateMaps("ni",  '<Plug>REDSendChunk', 'ca', ':call SendChunkToR("echo", "down")')
+call RCreateMaps("nvi", '<Plug>RMakePDFK',    'kp', ':call RMakePDFrmd("latex")')
+call RCreateMaps("nvi", '<Plug>RMakePDFK',    'kl', ':call RMakePDFrmd("beamer")')
+call RCreateMaps("nvi", '<Plug>RMakeHTML',    'kh', ':call RMakeHTMLrmd("html")')
+call RCreateMaps("nvi", '<Plug>RMakeODT',     'ko', ':call RMakeHTMLrmd("odt")')
+call RCreateMaps("ni",  '<Plug>RSendChunk',   'cc', ':call SendRmdChunkToR("silent", "stay")')
+call RCreateMaps("ni",  '<Plug>RESendChunk',  'ce', ':call SendRmdChunkToR("echo", "stay")')
+call RCreateMaps("ni",  '<Plug>RDSendChunk',  'cd', ':call SendRmdChunkToR("silent", "down")')
+call RCreateMaps("ni",  '<Plug>REDSendChunk', 'ca', ':call SendRmdChunkToR("echo", "down")')
 nmap <buffer><silent> gn :call RmdNextChunk()<CR>
 nmap <buffer><silent> gN :call RmdPreviousChunk()<CR>
 
