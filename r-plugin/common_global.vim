@@ -2929,7 +2929,15 @@ exe "PyFile " . g:rplugin_home . "/r-plugin/vimcom.py"
 call RSetDefaultValue("g:vimrplugin_ca_ck", 0)
 
 if has("gui_macvim") || has("gui_mac") || has("mac") || has("macunix")
-    call RSetDefaultValue("g:vimrplugin_applescript", 1)
+    let g:rplugin_r64app = 0
+    if isdirectory("/Applications/R64.app")
+        call RSetDefaultValue("g:vimrplugin_applescript", 1)
+        let g:rplugin_r64app = 1
+    elseif isdirectory("/Applications/R.app")
+        call RSetDefaultValue("g:vimrplugin_applescript", 1)
+    else
+        call RSetDefaultValue("g:vimrplugin_applescript", 0)
+    endif
 else
     call RSetDefaultValue("g:vimrplugin_applescript", 0)
 endif
@@ -2941,11 +2949,6 @@ else
     let g:vimrplugin_screenplugin = 0
     let g:vimrplugin_conqueplugin = 0
     let g:vimrplugin_tmux = 0
-    if isdirectory("/Applications/R64.app")
-        let g:rplugin_r64app = 1
-    else
-        let g:rplugin_r64app = 0
-    endif
 endif
 
 " The screen.vim plugin only works on terminal emulators
