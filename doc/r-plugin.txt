@@ -1095,8 +1095,8 @@ If you are using a 64 bit Windows or a 64 bit Mac OS X, but prefer to run the
 Vim will run the first R executable in the path. You can set an alternative R
 path in your |vimrc| as in the examples:
 >
-   let vimrplugin_r_path = "/path/2/my/preferred/R/version/bin"
-   let vimrplugin_r_path = "C:\\Program Files\\R\\R-2.12.0\\i386\\bin"
+   let vimrplugin_r_path = "/path/to/my/preferred/R/version/bin"
+   let vimrplugin_r_path = "C:\\Program Files\\R\\R-2.15.1\\bin\\i386"
 >
 On Windows, Vim will try to find the R install path in the Windows Registry.
 
@@ -1242,9 +1242,14 @@ with the Vim-R-plugin you will need to add the following to your |vimrc|:
 
 6.16. Integration with AppleScript (OS X only)~
 							*vimrplugin_applescript*
-In Mac OS X, the plugin will try to send commands to R gui using AppleScript
-if running the GUI version of MacVim. If you prefer to have R running in an
-external terminal emulator, put in your |vimrc|:
+In Mac OS X, the plugin will try to send commands to R gui using AppleScript.
+If you prefer to run R and Vim in the same terminal emulator split in two
+regions (Vim and R), put in your |vimrc|:
+>
+   let vimrplugin_applescript = 0
+<
+If you prefer to have R running in an external terminal emulator, put in your
+|vimrc|:
 >
    let vimrplugin_applescript = 0
    let vimrplugin_screenplugin = 0
