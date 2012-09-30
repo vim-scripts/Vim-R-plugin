@@ -208,12 +208,12 @@ function! ROpenPDF()
 
     if g:rplugin_pdfviewer == "none"
         if g:vimrplugin_openpdf_quietly
-            call SendCmdToR('vim.openpdf("' . expand("%:t:r") . ".pdf" . '", TRUE)')
+            call SendCmdToR('vim.openpdf("' . expand("%:p:r") . ".pdf" . '", TRUE)')
         else
-            call SendCmdToR('vim.openpdf("' . expand("%:t:r") . ".pdf" . '")')
+            call SendCmdToR('vim.openpdf("' . expand("%:p:r") . ".pdf" . '")')
         endif
     else
-        let openlog = system(g:rplugin_pdfviewer . " '" . expand("%:t:r") . ".pdf" . "'")
+        let openlog = system(g:rplugin_pdfviewer . " '" . expand("%:p:r") . ".pdf" . "'")
         if v:shell_error
             let rlog = substitute(openlog, "\n", " ", "g")
             let rlog = substitute(openlog, "\r", " ", "g")
