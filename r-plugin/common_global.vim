@@ -120,19 +120,19 @@ function! CompleteChunkOptions()
     else
         let newbase = '^' . substitute(base, "\\$$", "", "")
     endif
-    let ktopt = ["eval=;TRUE", "echo=;TRUE", "results=;'markup|asis|hide'",
-                \ "warning=;TRUE", "error=;TRUE", "message=;TRUE", "split=;FALSE",
-                \ "include=;TRUE", "tidy=;TRUE", "prompt=;FALSE", "comment=;'##'",
-                \ "highlight=;TRUE", "size=;'normalsize'", "background=;'#F7F7F7'",
-                \ "cache=;FALSE", "cache.path=;'cache/'", "dependson=;''", "autodep=;FALSE",
-                \ "fig.path=; ", "fig.keep=;'high|none|all|first|last'",
-                \ "fig.show=;'asis|hold|animate'", "dev=; ", "dev.args=; ", "fig.ext=; ",
-                \ "dpi=;72", "fig.width=;7", "fig.height=;7", "out.width=;'7in'",
-                \ "out.height=;'7in'", "out.extra=; ", "resize.width=; ", "resize.height=; ",
-                \ "fig.align=;'left|right|center'", "fig.env=;'figure'", "fig.cap=;''", "fig.scap=;''",
-                \ "fig.lp=;'fig:'", "fig.pos=;''", "external=;TRUE", "sanitize=;FALSE",
-                \ "interval=;1", "aniopts=;'controls.loop'", "ref.label=; ", "child=; ",
-                \ "engine=; ", "opts.label=;''"]
+    let ktopt = ["aniopts=;'controls.loop'", "autodep=;FALSE", "background=;'#F7F7F7'",
+                \ "cache.path=;'cache/'", "cache=;FALSE", "child=; ", "comment=;'##'",
+                \ "dependson=;''", "dev.args=; ", "dev=; ", "dpi=;72", "echo=;TRUE",
+                \ "engine=; ", "error=;TRUE", "eval=;TRUE", "external=;TRUE",
+                \ "fig.align=;'left|right|center'", "fig.cap=;''", "fig.env=;'figure'",
+                \ "fig.ext=; ", "fig.height=;7", "fig.keep=;'high|none|all|first|last'",
+                \ "fig.lp=;'fig:'", "fig.path=; ", "fig.pos=;''", "fig.scap=;''",
+                \ "fig.show=;'asis|hold|animate'", "fig.width=;7", "highlight=;TRUE",
+                \ "include=;TRUE", "interval=;1", "message=;TRUE", "opts.label=;''",
+                \ "out.extra=; ", "out.height=;'7in'", "out.width=;'7in'",
+                \ "prompt=;FALSE", "ref.label=; ", "resize.height=; ",
+                \ "resize.width=; ", "results=;'markup|asis|hide'", "sanitize=;FALSE",
+                \ "size=;'normalsize'", "split=;FALSE", "tidy=;TRUE", "warning=;TRUE"]
     for kopt in ktopt
       if kopt =~ newbase
         let tmp1 = split(kopt, ";")
