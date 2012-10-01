@@ -107,9 +107,10 @@ endfunction
 function! CompleteChunkOptions(base)
     let rr = []
     if strlen(a:base) == 0
-      return rr
+        let newbase = '.'
+    else
+        let newbase = '^' . substitute(a:base, "\\$$", "", "")
     endif
-    let newbase = '^' . substitute(a:base, "\\$$", "", "")
     let ktopt = ["eval=;TRUE", "echo=;TRUE", "results=;'markup|asis|hide'",
                 \ "warning=;TRUE", "error=;TRUE", "message=;TRUE", "split=;FALSE",
                 \ "include=;TRUE", "tidy=;TRUE", "prompt=;FALSE", "comment=;'##'",
@@ -118,11 +119,11 @@ function! CompleteChunkOptions(base)
                 \ "fig.path=; ", "fig.keep=;'high|none|all|first|last'",
                 \ "fig.show=;'asis|hold|animate'", "dev=; ", "dev.args=; ", "fig.ext=; ",
                 \ "dpi=;72", "fig.width=;7", "fig.height=;7", "out.width=;'7in'",
-                \ "out.height='7in'", "out.extra=; ", "resize.width=; ", "resize.height=; ",
+                \ "out.height=;'7in'", "out.extra=; ", "resize.width=; ", "resize.height=; ",
                 \ "fig.align=;'left|right|center'", "fig.env=;'figure'", "fig.cap=;''", "fig.scap=;''",
                 \ "fig.lp=;'fig:'", "fig.pos=;''", "external=;TRUE", "sanitize=;FALSE",
                 \ "interval=;1", "aniopts=;'controls.loop'", "ref.label=; ", "child=; ",
-                \ "engine=; ", "opts.label=''"]
+                \ "engine=; ", "opts.label=;''"]
     for kopt in ktopt
       if kopt =~ newbase
         let tmp1 = split(kopt, ";")
