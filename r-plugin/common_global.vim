@@ -104,12 +104,21 @@ function ReplaceUnderS()
     endif
 endfunction
 
-function! CompleteChunkOptions(base)
+function! CompleteChunkOptions()
+    let cline = getline(".")
+    let cpos = getpos(".")
+    let idx1 = cpos[2] - 2
+    let idx2 = cpos[2] - 1
+    while cline[idx1] =~ '\w'
+        let idx1 -= 1
+    endwhile
+    let idx1 += 1
+    let base = strpart(cline, idx1, idx2 - idx1)
     let rr = []
-    if strlen(a:base) == 0
+    if strlen(base) == 0
         let newbase = '.'
     else
-        let newbase = '^' . substitute(a:base, "\\$$", "", "")
+        let newbase = '^' . substitute(base, "\\$$", "", "")
     endif
     let ktopt = ["eval=;TRUE", "echo=;TRUE", "results=;'markup|asis|hide'",
                 \ "warning=;TRUE", "error=;TRUE", "message=;TRUE", "split=;FALSE",
@@ -131,12 +140,16 @@ function! CompleteChunkOptions(base)
         call add(rr, tmp2)
       endif
     endfor
-    return rr
+    call complete(idx1 + 1, rr)
 endfunction
 
 function RCompleteArgs()
-    let lnum = line(".")
     let line = getline(".")
+    if (&filetype == "rnoweb" && line =~ "^<<.*>>=$") || (&filetype == "rmd" && line =~ "^``` *{r.*}$") || (&filetype == "rrst" && line =~ "^.. {r.*}$") || (&filetype == "r" && line =~ "^#\+")
+        call CompleteChunkOptions()
+      return ''
+    endif
+    let lnum = line(".")
     let cpos = getpos(".")
     let idx = cpos[2] - 2
     let idx2 = cpos[2] - 2
@@ -147,11 +160,6 @@ function RCompleteArgs()
     else
         let argkey = RGetKeyWord()
         let idx2 = cpos[2] - strlen(argkey)
-    endif
-    if (&filetype == "rnoweb" && line =~ "^<<.*>>=$") || (&filetype == "rmd" && line =~ "^``` *{r.*}$") || (&filetype == "rrst" && line =~ "^.. {r.*}$") || (&filetype == "r" && line =~ "^#\+")
-      call cursor(cpos[1], cpos[2])
-      call complete(idx2, CompleteChunkOptions(argkey))
-      return ''
     endif
     if b:needsnewomnilist == 1
       call BuildROmniList("GlobalEnv", "none")
