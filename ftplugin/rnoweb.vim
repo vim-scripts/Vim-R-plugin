@@ -158,6 +158,7 @@ function! SendChunkToR(e, m)
     let chunkline = search("^<<", "bncW") + 1
     let docline = search("^@", "ncW") - 1
     let lines = getline(chunkline, docline)
+    let b:needsnewomnilist = 1
     let ok = RSourceLines(lines, a:e)
     if ok == 0
         return

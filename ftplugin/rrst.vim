@@ -18,7 +18,6 @@
 "          Jose Claudio Faria
 "          Alex Zvoleff
 "
-" Last Change: Mon Sep 24, 2012  08:43AM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -125,6 +124,7 @@ function! RMakeHTMLrrst(t)
     if g:vimrplugin_openhtml && a:t == "html"
         let rcmd = rcmd . '; browseURL("' . expand("%:r:t") . '.html")'
     endif
+    let b:needsnewomnilist = 1
     call SendCmdToR(rcmd)
 endfunction
 
@@ -170,6 +170,7 @@ function! SendRrstChunkToR(e, m)
     let chunkline = search("^\\.\\. {r", "bncW") + 1
     let docline = search("^\\.\\. \\.\\.", "ncW") - 1
     let lines = getline(chunkline, docline)
+    let b:needsnewomnilist = 1
     let ok = RSourceLines(lines, a:e)
     if ok == 0
         return
