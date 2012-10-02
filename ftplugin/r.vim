@@ -33,20 +33,20 @@ let b:did_r_ftplugin = 1
 let s:cpo_save = &cpo
 set cpo&vim
 
-" Don't do this if called by ../r-plugin/global_r_plugin.vim
+" Don't do this if called by ../r-plugin/common_global.vim
 if &filetype == "r"
     setlocal commentstring=#%s
     setlocal comments=b:#,b:##,b:###,b:#'
 endif
 
-" Source scripts common to R, Rnoweb, Rhelp and rdoc files:
+" Source scripts common to R, Rnoweb, Rhelp, Rmd, Rrst and rdoc files:
 runtime r-plugin/common_global.vim
 if exists("g:rplugin_failed")
     finish
 endif
 
-" Some buffer variables common to R, Rnoweb, Rhelp and rdoc files need be
-" defined after the global ones:
+" Some buffer variables common to R, Rnoweb, Rhelp, Rmd, Rrst and rdoc files
+" need be defined after the global ones:
 runtime r-plugin/common_buffer.vim
 
 " Run R CMD BATCH on current file and load the resulting .Rout in a split
@@ -83,7 +83,7 @@ function! ShowRout()
     endif
 endfunction
 
-" Sweave the current buffer content
+" Convert R script into Rmd and, then, into md.
 function! RSpin()
     update
     let b:needsnewomnilist = 1
