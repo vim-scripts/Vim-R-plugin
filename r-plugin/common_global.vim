@@ -162,7 +162,7 @@ function RCompleteArgs()
         let idx2 = cpos[2] - strlen(argkey)
     endif
     if b:needsnewomnilist == 1
-      call BuildROmniList("GlobalEnv", "none")
+      call BuildROmniList("GlobalEnv", "")
     endif
     let flines = g:rplugin_globalenvlines + g:rplugin_liblist
     let np = 1
@@ -1693,16 +1693,16 @@ endfunction
 
 " Tell R to create a list of objects file listing all currently available
 " objects in its environment. The file is necessary for omni completion.
-function BuildROmniList(env, what)
+function BuildROmniList(env, packlist)
     if a:env =~ "GlobalEnv"
         let rtf = g:rplugin_globalenvfname
         let b:needsnewomnilist = 0
     else
-        let rtf = g:rplugin_omnifname
+        let rtf = g:rplugin_omnidname
     endif
     let omnilistcmd = 'vim.bol("' . rtf . '"'
-    if a:env == "libraries" && a:what == "installed"
-        let omnilistcmd = omnilistcmd . ', what = "installed"'
+    if a:packlist != ""
+        let omnilistcmd = omnilistcmd . ", packlist=" . a:packlist
     endif
     if g:vimrplugin_allnames == 1
         let omnilistcmd = omnilistcmd . ', allnames = TRUE'
@@ -1748,10 +1748,27 @@ function BuildROmniList(env, what)
     echon
 endfunction
 
-function RBuildSyntaxFile(what)
-    call BuildROmniList("libraries", a:what)
+function RFillLibList()
+    let g:rplugin_liblist = []
+    if isdirectory(g:rplugin_uservimfiles . "/r-plugin/objlist")
+        let dirls = split(glob(g:rplugin_uservimfiles . "/r-plugin/objlist/omnils_*"), "\n")
+        for omf in dirls
+            let g:rplugin_liblist = g:rplugin_liblist + readfile(omf)
+        endfor
+    else
+        call RWarningMsg('"'. g:rplugin_uservimfiles . "r-plugin/objlist" . '" is not a directory.')
+    endif
+endfunction
+
+function RBuildSyntaxFile(...)
+    if a:0 == 0
+        let packls = ""
+    else
+        let packls = 'c("' . join(split(a:1), '", "') . '")'
+    endif
+    call BuildROmniList("libraries", packls)
     sleep 100m
-    let g:rplugin_liblist = readfile(g:rplugin_omnifname)
+    call RFillLibList()
     call BuildRHelpList()
     let res = []
     let nf = 0
@@ -2543,8 +2560,8 @@ function MakeRMenu()
     "----------------------------------------------------------------------------
     " Syntax
     "----------------------------------------------------------------------------
-    nmenu <silent> R.Syntax.Build\ omniList\ (loaded)<Tab>:RUpdateObjList :call RBuildSyntaxFile("loaded")<CR>
-    imenu <silent> R.Syntax.Build\ omniList\ (loaded)<Tab>:RUpdateObjList <Esc>:call RBuildSyntaxFile("loaded")<CR>a
+    nmenu <silent> R.Syntax.Build\ omniList\ (loaded)<Tab>:RUpdateObjList :call RBuildSyntaxFile()<CR>
+    imenu <silent> R.Syntax.Build\ omniList\ (loaded)<Tab>:RUpdateObjList <Esc>:call RBuildSyntaxFile()<CR>a
 
     "----------------------------------------------------------------------------
     " Help
@@ -2798,7 +2815,8 @@ function SetRPath()
     endif
 endfunction
 
-command RUpdateObjList :call RBuildSyntaxFile("loaded")
+command RUpdateObjList :call RBuildSyntaxFile()
+command -nargs=+ RAddLibToList :call RBuildSyntaxFile(<q-args>)
 command RBuildTags :call SendCmdToR('rtags(ofile = "TAGS")')
 command -nargs=? -complete=customlist,RLisObjs Rhelp :call RAskHelp(<q-args>)
 command -nargs=? -complete=dir RSourceDir :call RSourceDirectory(<q-args>)
@@ -3138,8 +3156,8 @@ if g:vimrplugin_conqueplugin == 1
     endif
 endif
 
-" Are we in a Debian package? Is the plugin being running for the first time?
-let g:rplugin_omnifname = g:rplugin_uservimfiles . "/r-plugin/omnils"
+" Are we in a Debian package? Is the plugin running for the first time?
+let g:rplugin_omnidname = g:rplugin_uservimfiles . "/r-plugin/objlist/"
 if g:rplugin_home != g:rplugin_uservimfiles
     " Create r-plugin directory if it doesn't exist yet:
     if !isdirectory(g:rplugin_uservimfiles . "/r-plugin")
@@ -3162,21 +3180,6 @@ if !filereadable(g:rplugin_uservimfiles . "/r-plugin/functions.vim")
     endif
 endif
 
-" If there is no omnils, copy the default one
-if !filereadable(g:rplugin_omnifname)
-    if filereadable("/usr/share/vim/addons/r-plugin/omnils")
-        let omnilines = readfile("/usr/share/vim/addons/r-plugin/omnils")
-    else
-        if filereadable(g:rplugin_home . "/r-plugin/omnils")
-            let omnilines = readfile(g:rplugin_home . "/r-plugin/omnils")
-        else
-            let omnilines = []
-        endif
-    endif
-    call writefile(omnilines, g:rplugin_omnifname)
-    unlet omnilines
-endif
-
 " Minimum width for the Object Browser
 if g:vimrplugin_objbr_w < 10
     let g:vimrplugin_objbr_w = 10
@@ -3184,7 +3187,7 @@ endif
 
 " Keeps the libraries object list in memory to avoid the need of reading the file
 " repeatedly:
-let g:rplugin_liblist = readfile(g:rplugin_omnifname)
+call RFillLibList()
 call BuildRHelpList()
 
 

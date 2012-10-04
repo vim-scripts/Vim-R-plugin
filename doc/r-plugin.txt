@@ -36,7 +36,7 @@ The latest stable version of this plugin is available at:
     http://www.vim.org/scripts/script.php?script_id=2628
 
 Feedback is welcomed. Please submit bug reports and feature requests to the
-developers, we are very interested in what you like and what you would like to
+developers; we are very interested in what you like and what you would like to
 see in future releases. Do not like a feature? Tell us and we may add an
 option to disable it. Cryptic error message are bugs... Please report them.
 The plugin should emit useful warnings if you do things it was not programmed
@@ -53,8 +53,8 @@ to deal with.
       - Special highlighting for R output (.Rout files).
       - Spell check only strings and comments.
       - Fold code when foldmethod=syntax.
-  * Syntax highlighting for RHelp syntax.
-  * Smart indentation for R, RHelp and Rnoweb syntax.
+  * Syntax highlighting for RHelp, RMarkdown and RreStructuredText.
+  * Smart indentation for R, RHelp, Rnoweb, RMarkdown and RreStructuredText.
   * Integrated communication with R:
       - Start/Close R.
       - Send lines, selection, paragraphs, functions, blocks, entire file.
@@ -64,6 +64,7 @@ to deal with.
   * Omni completion (auto-completion) for R objects (.GlobalEnv and installed
     packages). The list of installed packages must be updated manually.
   * Auto-completion of function arguments.
+  * Auto-completion of knitr chunk options.
   * Ability to see R's documentation in a Vim's buffer:
       - Automatic calculation of the best layout of the R documentation buffer
 	(split the window either horizontally or vertically according to the
@@ -78,6 +79,7 @@ to deal with.
       - Syntax highlighting of the Object Browser.
   * Most of the plugin's behavior is customizable.
 
+For screenshots see: http://www.lepem.ufc.br/jaa/vim-r-plugin.html
 
 ==============================================================================
 						       *r-plugin-installation*
@@ -546,8 +548,19 @@ If this time is not enough to your system, please, set a different value of
 You should run  :RUpdateObjList  whenever you upgrade R since some functions
 are removed and new ones are added at each new R version.
 
+If have already run  :RUpdateObjList  and now want to add the objects of
+specific libraries to both the list of objects for omnicompletion and the list
+of functions for syntax highlight you can use the Vim command  :RAddLibToList.
+Example:
+>
+   :RAddLibToList foreign Matrix
+<
 Note: If you have too many loaded packages Vim may be unable to load the list
-of functions for syntax highlight.
+of functions for syntax highlight. If you want to remove the objects of
+specific libraries, please, delete the corresponding files from
+~/.vim/r-plugin/objlist/ directory (the directory may be at a different
+location if you are using a plugin management system like vim-addons or
+pathogen).
 
 
 4.4. Omni completion~
@@ -565,11 +578,11 @@ complete the name of a data.frame, the columns are not shown. But when the
 data.frame name is already complete, and you have inserted the '$' symbol,
 omni completion will show the column names.
 
-Vim uses two files: one for the objects of .GlobalEnv and the other for all
-other objects. The .GlobalEnv list is stored in the /tmp/r-plugin-yourlogin
-directory and, thus, is deleted after each reboot. The other file is stored in
-~/.vim/r-plugin and remains available until you manually rebuild it with the
-command: |:RUpdateObjList|.
+Vim uses one for the objects of .GlobalEnv and a list of files for all other
+objects. The .GlobalEnv list is stored in the /tmp/r-plugin-yourlogin
+directory and, thus, is deleted after each reboot. The other files are stored
+in ~/.vim/r-plugin/objlist/ and remain available until you manually delete
+them.
 
 
 4.5. The Object Browser~
@@ -1060,7 +1073,7 @@ option in your |vimrc|:
 >
    let vimrplugin_nosingler = 1
 <
-If you prefer that each Vim instance calls its own R process and all of the
+If you prefer that each Vim instance calls its own R process and all the
 instance's buffers send code to this R process while other Vim instances send
 code to other R processes then put the following in your |vimrc|:
 >
@@ -1539,7 +1552,7 @@ directory after the installation:
    r-plugin/common_buffer.vim
    r-plugin/common_global.vim
    r-plugin/functions.vim
-   r-plugin/omnils
+   r-plugin/objlist/
    r-plugin/r.snippets
    r-plugin/tex_indent.vim
    r-plugin/vimcom.py
@@ -2026,23 +2039,25 @@ the R syntax highlighted.
 							       *r-plugin-news*
 10. News~
 
-0.9.8 (2012-09-23)
+0.9.8 (2012-10-04)
 
- * Open PDF automatically after processing rnoweb file if
+ * Open PDF automatically after processing Rnoweb file if
    vimrplugin_openpdf = 1 (thanks to Tomaz Ficko for suggesting the feature).
    Open it quietly if vimrplugin_openpdf_quietly = 1.
    Open it manually with \op.
- * Open HTML automatically after processing either rmd or rsst file if
+ * Open HTML automatically after processing either Rmd or Rrst file if
    vimrplugin_openhtml = 1. Generate strict rst code if
    vimrplugin_strict_rst = 1.
  * Remove option vimrplugin_knitargs.
  * Start last R if there is more than one installed on Windows (thanks to Alex
    Zvoleff for reporting the bug and writing the patch).
  * Alex Zvoleff added support to Rrst file type.
- * michelk added support to rmd file type.
- * For rnoweb, rmd and rrst file types, CTRL-X CTRL-A completes knitr chunk
+ * michelk added support to Rmd file type.
+ * For Rnoweb, Rmd and Rrst file types, CTRL-X CTRL-A completes knitr chunk
    options if the cursor is inside the chunk header.
  * New option: vimrplugin_rmhidden.
+ * New command  :RAddLibToList  to add the objects of specific libraries to
+   omnicompletion.
 
 0.9.7 (2012-05-04)
 
