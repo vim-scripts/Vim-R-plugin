@@ -21,6 +21,10 @@ fun! rcomplete#CompleteR(findstart, base)
       return res
     endif
 
+    if len(g:rplugin_liblist) == 0
+        call add(res, {'word': a:base, 'menu': "(List is empty. Run  :RUpdateObjList)"})
+    endif
+
     let flines = g:rplugin_liblist + g:rplugin_globalenvlines
     " The char '$' at the end of 'a:base' is treated as end of line, and
     " the pattern is never found in 'line'.
