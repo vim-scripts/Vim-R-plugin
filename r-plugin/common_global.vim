@@ -109,7 +109,7 @@ function! CompleteChunkOptions()
     let cpos = getpos(".")
     let idx1 = cpos[2] - 2
     let idx2 = cpos[2] - 1
-    while cline[idx1] =~ '\w'
+    while cline[idx1] =~ '\w' || cline[idx1] == '.' || cline[idx1] == '_'
         let idx1 -= 1
     endwhile
     let idx1 += 1
@@ -158,7 +158,12 @@ function RCompleteArgs()
         let idx2 = cpos[2]
         let argkey = ''
     else
-        let argkey = RGetKeyWord()
+        let idx1 = idx2
+        while line[idx1] =~ '\w' || line[idx1] == '.' || line[idx1] == '_'
+            let idx1 -= 1
+        endwhile
+        let idx1 += 1
+        let argkey = strpart(line, idx1, idx2 - idx1 + 1)
         let idx2 = cpos[2] - strlen(argkey)
     endif
     if b:needsnewomnilist == 1
@@ -1755,8 +1760,6 @@ function RFillLibList()
         for omf in dirls
             let g:rplugin_liblist = g:rplugin_liblist + readfile(omf)
         endfor
-    else
-        call RWarningMsg('"'. g:rplugin_uservimfiles . "r-plugin/objlist" . '" is not a directory.')
     endif
 endfunction
 
