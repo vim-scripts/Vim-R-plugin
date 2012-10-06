@@ -53,8 +53,8 @@ zip:
 	    r-plugin/objlist/omnils_base r-plugin/objlist/omnils_colorout \
 	    r-plugin/objlist/omnils_datasets r-plugin/objlist/omnils_graphics \
 	    r-plugin/objlist/omnils_grDevices r-plugin/objlist/omnils_methods \
-	    r-plugin/objlist/omnils_setwidth r-plugin/objlist/omnils_stats \
-	    r-plugin/objlist/omnils_utils r-plugin/objlist/omnils_vimcom \
+	    r-plugin/objlist/omnils_stats r-plugin/objlist/omnils_utils \
+	    r-plugin/objlist/omnils_vimcom r-plugin/objlist/README \
 	    r-plugin/vimActivate.js r-plugin/tex_indent.vim r-plugin/r.snippets \
 	    r-plugin/common_buffer.vim r-plugin/common_global.vim \
 	    bitmaps/ricon.xbm bitmaps/ricon.png \
