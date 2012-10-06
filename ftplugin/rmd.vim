@@ -109,13 +109,18 @@ function! RMakeHTMLrmd(t)
     let rcmd = 'require(knitr); knit2html("' . expand("%:t") . '", options = "")'
     if a:t == "odt"
         if g:rplugin_has_soffice == 0
-            if executable("soffice")
+            if has("win32") || has("win64")
+                let soffbin = "soffice.exe"
+            else
+                let soffbin = "soffice"
+            endif
+            if executable(soffbin)
                 let g:rplugin_has_soffice = 1
             else
-                call RWarningMsg("Is Libre Office installed? Cannot convert into ODT: 'soffice' not found.")
+                call RWarningMsg("Is Libre Office installed? Cannot convert into ODT: '" . soffbin . "' not found.")
             endif
         endif
-        let rcmd = rcmd . '; system("soffice --invisible --convert-to odt ' . expand("%:r:t") . '.html")'
+        let rcmd = rcmd . '; system("' . soffbin . ' --invisible --convert-to odt ' . expand("%:r:t") . '.html")'
     endif
     if g:vimrplugin_openhtml && a:t == "html"
         let rcmd = rcmd . '; browseURL("' . expand("%:r:t") . '.html")'
