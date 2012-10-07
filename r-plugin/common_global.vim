@@ -182,6 +182,7 @@ function RCompleteArgs()
             call cursor(lnum, idx)
             let rkeyword0 = RGetKeyWord()
             let classfor = RGetClassFor(rkeyword0)
+            let classfor = substitute(classfor, '\\', "", "g")
             let classfor = substitute(classfor, '"', '\\"', "g")
             let rkeyword = '^' . rkeyword0 . "\x06"
             call cursor(cpos[1], cpos[2])
@@ -1971,6 +1972,7 @@ function ShowRDoc(rkeyword, package, getclass)
     elseif a:package != ""
         exe 'Py SendToR("vim.help(' . "'" . a:rkeyword . "', " . g:rplugin_htw . "L, package='" . a:package  . "')". '")'
     else
+        let classfor = substitute(classfor, '\\', "", "g")
         let classfor = substitute(classfor, '"', '\\"', "g")
         exe 'Py SendToR("vim.help(' . "'" . a:rkeyword . "', " . g:rplugin_htw . "L, " . classfor . ")". '")'
     endif
