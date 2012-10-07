@@ -190,7 +190,7 @@ function RCompleteArgs()
             else
                 exe 'Py SendToR("vimcom:::vim.args(' . "'" . rkeyword0 . "', '" . argkey . "', classfor = " . classfor . ")" . '")'
             endif
-            if g:rplugin_vimcomport > 0 && g:rplugin_lastrpl != "NOT_EXISTS" && g:rplugin_lastrpl != "NO_ARGS" && g:rplugin_lastrpl != "R is busy." && g:rplugin_lastrpl != "NOANSWER"
+            if g:rplugin_vimcomport > 0 && g:rplugin_lastrpl != "NOT_EXISTS" && g:rplugin_lastrpl != "NO_ARGS" && g:rplugin_lastrpl != "R is busy." && g:rplugin_lastrpl != "NOANSWER" && g:rplugin_lastrpl != "INVALID"
                 let args = []
                 let tmp0 = split(g:rplugin_lastrpl, "\x04")
                 let tmp = split(tmp0[0], "\x09")
