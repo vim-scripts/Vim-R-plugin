@@ -191,8 +191,11 @@ function RCompleteArgs()
             else
                 exe 'Py SendToR("vimcom:::vim.args(' . "'" . rkeyword0 . "', '" . argkey . "', classfor = " . classfor . ")" . '")'
             endif
-            if g:rplugin_vimcomport > 0 && g:rplugin_lastrpl != "NOT_EXISTS" && g:rplugin_lastrpl != "NO_ARGS" && g:rplugin_lastrpl != "R is busy." && g:rplugin_lastrpl != "NOANSWER" && g:rplugin_lastrpl != "INVALID"
+            if g:rplugin_vimcomport > 0 && g:rplugin_lastrpl != "NOT_EXISTS" && g:rplugin_lastrpl != "NO_ARGS" && g:rplugin_lastrpl != "R is busy." && g:rplugin_lastrpl != "NOANSWER" && g:rplugin_lastrpl != "INVALID" && g:rplugin_lastrpl != ""
                 let args = []
+                if g:rplugin_lastrpl[0] == "\x04" && len(split(g:rplugin_lastrpl, "\x04")) == 1
+                    return ''
+                endif
                 let tmp0 = split(g:rplugin_lastrpl, "\x04")
                 let tmp = split(tmp0[0], "\x09")
                 if(len(tmp) > 0)
@@ -220,6 +223,9 @@ function RCompleteArgs()
             for omniL in flines
                 if omniL =~ rkeyword && omniL =~ "\x06function\x06function\x06" 
                     let tmp1 = split(omniL, "\x06")
+                    if len(tmp1) < 5
+                        return ''
+                    endif
                     let info = tmp1[4]
                     let argsL = split(info, "\x09")
                     let args = []
