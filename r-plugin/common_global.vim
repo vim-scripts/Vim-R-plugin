@@ -1785,7 +1785,7 @@ function RBuildSyntaxFile(...)
     let funlist = ""
     for line in g:rplugin_liblist
         let obj = split(line, "\x06", 1)
-        if obj[2] == "function"
+        if obj[2] == "function" && obj[0] !~ '%'
             if obj[0] !~ '[[:punct:]]' || (obj[0] =~ '\.[a-zA-Z]' && obj[0] !~ '[[:punct:]][[:punct:]]')
                 let nf += 1
                 let funlist = funlist . " " . obj[0]
