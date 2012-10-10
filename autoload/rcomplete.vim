@@ -5,8 +5,7 @@
 
 fun! rcomplete#CompleteR(findstart, base)
   if a:findstart
-    return match(getline('.')[: (col('.') - 1)], '[[:alnum:].\\]\+$')
-    " return match(getline('.')[: (col('.') - 1)], '[^[:alnum:].$][[:alnum:].$]*$')
+    return match(getline('.')[: (col('.') - 2)], '[[:alnum:].\\]\+$')
   else
     if b:needsnewomnilist == 1
       call BuildROmniList("GlobalEnv", "none")
