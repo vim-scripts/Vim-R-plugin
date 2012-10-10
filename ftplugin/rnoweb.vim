@@ -30,8 +30,10 @@ let b:did_rnoweb_ftplugin = 1
 let s:cpo_save = &cpo
 set cpo&vim
 
-" Enables Vim-Latex-Suite if it is installed
+" Enables Vim-Latex-Suite, LaTeX-Box if installed
 runtime ftplugin/tex_latexSuite.vim
+runtime ftplugin/tex_LatexBox.vim
+let b:main_tex_file = expand("%:p:r") . ".tex"
 
 " Enable syntax highlight of LaTeX errors in R Console (if using Conque
 " Shell)
