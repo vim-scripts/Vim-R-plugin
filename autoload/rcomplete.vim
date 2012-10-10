@@ -5,13 +5,8 @@
 
 fun! rcomplete#CompleteR(findstart, base)
   if a:findstart
-    " locate the start of the word
-    let line = getline('.')
-    let start = col('.') - 1
-    while start > 0 && (line[start - 1] =~ '\a' || line[start - 1] =~ '\.' || line[start - 1] =~ '\$' || line[start - 1] =~ '\d')
-      let start -= 1
-    endwhile
-    return start
+    return match(getline('.')[: (col('.') - 1)], '[[:alnum:].\\]\+$')
+    " return match(getline('.')[: (col('.') - 1)], '[^[:alnum:].$][[:alnum:].$]*$')
   else
     if b:needsnewomnilist == 1
       call BuildROmniList("GlobalEnv", "none")
