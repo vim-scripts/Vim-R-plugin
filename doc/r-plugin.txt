@@ -310,7 +310,9 @@ on the toolbar:
 
 You may be interested in installing additional general plugins to get
 functionality not provided by this file type plugin. ShowMarks and snipMate
-are particularly interesting. Please read |r-plugin-tips| for details.
+are particularly interesting. If you edit Rnoweb files, you may want to try
+LaTeX-Box for omnicompletion of LaTeX code (the .tex file must already have
+been compiled). Please read |r-plugin-tips| for details.
 
 
 ==============================================================================
@@ -524,6 +526,7 @@ mode:
 
 4.3. Omni completion and the highlighting of functions~
 							     *:RUpdateObjList*
+							      *:RAddLibToList*
 The plugin adds some features to the default syntax highlight of R code. One
 such feature is the highlight of R functions. However, only functions that
 R loads by default are highlighted. To add functions of other libraries, you
@@ -2039,7 +2042,7 @@ the R syntax highlighted.
 							       *r-plugin-news*
 10. News~
 
-0.9.8 (2012-10-04)
+0.9.8 (2012-10-07)
 
  * Open PDF automatically after processing Rnoweb file if
    vimrplugin_openpdf = 1 (thanks to Tomaz Ficko for suggesting the feature).
@@ -2056,8 +2059,10 @@ the R syntax highlighted.
  * For Rnoweb, Rmd and Rrst file types, CTRL-X CTRL-A completes knitr chunk
    options if the cursor is inside the chunk header.
  * New option: vimrplugin_rmhidden.
+ * New option: vimrplugin_insert_mode_cmds (thanks to Charles R. Hogg III).
  * New command  :RAddLibToList  to add the objects of specific libraries to
    omnicompletion.
+ * Thanks to genrich and NagatoPain for other bug fixes and code improvements.
 
 0.9.7 (2012-05-04)
 
