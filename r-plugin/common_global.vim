@@ -77,7 +77,7 @@ function ReplaceUnderS()
     else
         let j = col(".")
         let s = getline(".")
-        if j > 3 && s[j-3] == "<" && s[j-2] == "-" && s[j-1] == " "
+        if g:vimrplugin_assign_map == "_" && j > 3 && s[j-3] == "<" && s[j-2] == "-" && s[j-1] == " "
             exe "normal! 3h3xr_"
             return
         endif
@@ -2527,15 +2527,15 @@ function MakeRMenu()
     " Edit
     "----------------------------------------------------------------------------
     if &filetype == "r" || &filetype == "rnoweb" || &filetype == "rrst" || &filetype == "rhelp" || g:vimrplugin_never_unmake_menu
-        if g:vimrplugin_underscore == 1
-            imenu <silent> R.Edit.Insert\ \"\ <-\ \"<Tab>_ <Esc>:call ReplaceUnderS()<CR>a
-            imenu <silent> R.Edit.Complete\ object\ name<Tab>^X^O <C-X><C-O>
-            if hasmapto("<Plug>RCompleteArgs", "i")
-                let boundkey = RIMapCmd("<Plug>RCompleteArgs")
-                exe "imenu <silent> R.Edit.Complete\\ function\\ arguments<Tab>" . boundkey . " " . boundkey
-            else
-                imenu <silent> R.Edit.Complete\ function\ arguments<Tab>^X^A <C-X><C-A>
-            endif
+        if g:vimrplugin_assign == 1
+            silent exe 'imenu <silent> R.Edit.Insert\ \"\ <-\ \"<Tab>' . g:vimrplugin_assign_map . ' <Esc>:call ReplaceUnderS()<CR>a'
+        endif
+        imenu <silent> R.Edit.Complete\ object\ name<Tab>^X^O <C-X><C-O>
+        if hasmapto("<Plug>RCompleteArgs", "i")
+            let boundkey = RIMapCmd("<Plug>RCompleteArgs")
+            exe "imenu <silent> R.Edit.Complete\\ function\\ arguments<Tab>" . boundkey . " " . boundkey
+        else
+            imenu <silent> R.Edit.Complete\ function\ arguments<Tab>^X^A <C-X><C-A>
         endif
         menu R.Edit.-Sep71- <nul>
         nmenu <silent> R.Edit.Indent\ (line)<Tab>== ==
@@ -2585,7 +2585,7 @@ function MakeRMenu()
     amenu R.Help\ (plugin).How\ the\ plugin\ works :help r-plugin-functioning<CR>
     amenu R.Help\ (plugin).Known\ bugs\ and\ workarounds :help r-plugin-known-bugs<CR>
 
-    amenu R.Help\ (plugin).Options.Underscore\ and\ Rnoweb\ code :help vimrplugin_underscore<CR>
+    amenu R.Help\ (plugin).Options.Assignment\ operator\ and\ Rnoweb\ code :help vimrplugin_assign<CR>
     amenu R.Help\ (plugin).Options.Object\ Browser :help vimrplugin_objbr_place<CR>
     amenu R.Help\ (plugin).Options.Vim\ as\ pager\ for\ R\ help :help vimrplugin_vimpager<CR>
     if !has("gui_win32")
@@ -2738,8 +2738,8 @@ function RCreateEditMaps()
     call RCreateMaps("ni", '<Plug>RRightComment',   ';', ':call MovePosRCodeComment("normal")')
     call RCreateMaps("v", '<Plug>RRightComment',    ';', ':call MovePosRCodeComment("selection")')
     " Replace 'underline' with '<-'
-    if g:vimrplugin_underscore == 1
-        imap <buffer><silent> _ <Esc>:call ReplaceUnderS()<CR>a
+    if g:vimrplugin_assign == 1
+        silent exe 'imap <buffer><silent> ' . g:vimrplugin_assign_map . ' <Esc>:call ReplaceUnderS()<CR>a'
     endif
     if hasmapto("<Plug>RCompleteArgs", "i")
         imap <buffer><silent> <Plug>RCompleteArgs <C-R>=RCompleteArgs()<CR>
@@ -2886,11 +2886,17 @@ endif
 let g:rplugin_docfile = $VIMRPLUGIN_TMPDIR . "/Rdoc"
 let g:rplugin_globalenvfname = $VIMRPLUGIN_TMPDIR . "/GlobalEnvList"
 
+" Old name of vimrplugin_assign option
+if exists("g:vimrplugin_underscore")
+    let g:vimrplugin_assign = g:vimrplugin_underscore
+endif
+
 " Variables whose default value is fixed
 call RSetDefaultValue("g:vimrplugin_map_r",             0)
 call RSetDefaultValue("g:vimrplugin_allnames",          0)
 call RSetDefaultValue("g:vimrplugin_rmhidden",          1)
-call RSetDefaultValue("g:vimrplugin_underscore",        1)
+call RSetDefaultValue("g:vimrplugin_assign",            1)
+call RSetDefaultValue("g:vimrplugin_assign_map",    "'_'")
 call RSetDefaultValue("g:vimrplugin_rnowebchunk",       1)
 call RSetDefaultValue("g:vimrplugin_strict_rst",        1)
 call RSetDefaultValue("g:vimrplugin_openpdf",           0)
@@ -2919,6 +2925,7 @@ call RSetDefaultValue("g:vimrplugin_vimpager",       "'tab'")
 call RSetDefaultValue("g:vimrplugin_latexcmd", "'pdflatex'")
 call RSetDefaultValue("g:vimrplugin_objbr_place", "'script,right'")
 call RSetDefaultValue("g:vimrplugin_insert_mode_cmds",  1)
+
 
 " Look for invalid options
 let objbrplace = split(g:vimrplugin_objbr_place, ",")

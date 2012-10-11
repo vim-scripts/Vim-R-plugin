@@ -310,9 +310,9 @@ on the toolbar:
 
 You may be interested in installing additional general plugins to get
 functionality not provided by this file type plugin. ShowMarks and snipMate
-are particularly interesting. If you edit Rnoweb files, you may want to try
-LaTeX-Box for omnicompletion of LaTeX code (the .tex file must already have
-been compiled). Please read |r-plugin-tips| for details.
+are particularly interesting. Please read |r-plugin-tips| for details. If you
+edit Rnoweb files, you may want to try LaTeX-Box for omnicompletion of LaTeX
+code.
 
 
 ==============================================================================
@@ -465,7 +465,7 @@ syntax highlighting is off (see |:syn-on| and |:syn-off|). If necessary, it is
 possible to insert an actual underscore into your file by typing a second
 underscore. This behavior is similar to the EMACS ESS mode some users may be
 familiar with and is enabled by default. You have to change the value of
-|vimrplugin_underscore| to disable underscore replacement.
+|vimrplugin_assign| to disable underscore replacement.
 
 When you press <LocalLeader>rh, the plugin shows the help for the function
 under the cursor. The plugin also checks the class of the object passed as
@@ -894,7 +894,8 @@ IPv6 one (fe80::1).
 
 |vimrplugin_term|              External terminal to be used
 |vimrplugin_term_cmd|          Complete command to open an external terminal
-|vimrplugin_underscore|        Convert '_' into ' <- '
+|vimrplugin_assign|            Convert '_' into ' <- '
+|vimrplugin_assign_map|        Choose what to convert into ' <- '
 |vimrplugin_rnowebchunk|       Convert '<' into '<<>>=\n@' in Rnoweb files
 |vimrplugin_objbr_place|       Placement of Object Browser
 |vimrplugin_objbr_w|           Initial width of Object Browser window
@@ -969,14 +970,23 @@ Please, look at the manual of your terminal emulator to know how to call it.
 The last argument must be the one which precedes the command to be executed.
 
 
-6.2. Underscore and Rnoweb completion of code block~
-						       *vimrplugin_underscore*
+6.2. Assignment operator and Rnoweb completion of code block~
+							   *vimrplugin_assign*
+						       *vimrplugin_assign_map*
 						      *vimrplugin_rnowebchunk*
 While editing R code, '_' is replaced with ' <- '. To disable this feature,
 put in your |vimrc|:
 >
-   let vimrplugin_underscore = 0
+   let vimrplugin_assign = 0
 <
+If want to bind other keys to be replaced by ' <- ', set the value of
+|vimrplugin_assign_map| in your |vimrc|, as in the example below which
+emulates RStudio behavior (may only works on GVim):
+>
+   let vimrplugin_assign_map = "<M-->"
+<
+Note: You can't map <C-=>, as StatET does.
+
 In Rnoweb files, a '<' is replaced with '<<>>=\n@'. To disable this feature,
 put in your |vimrc|:
 >
@@ -2063,6 +2073,8 @@ the R syntax highlighted.
  * New command  :RAddLibToList  to add the objects of specific libraries to
    omnicompletion.
  * Thanks to genrich and NagatoPain for other bug fixes and code improvements.
+ * New option: vimrplugin_assign_map. The option vimrplugin_underscore was
+   renamed to vimrplugin_assign
 
 0.9.7 (2012-05-04)
 
