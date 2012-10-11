@@ -1456,28 +1456,89 @@ The above example shows how to change key binding used to start R from
 
 Only the custom key bindings for Normal mode are shown in Vim's menu, but you
 can type |:map| to see the complete list of current mappings, and below is the
-list of the names for custom key bindings:
->
-   RBibTeX                   RSendChunk               RObjectNames
-   RClearAll                 RDSendChunk              RObjectPr
-   RClearConsole             RESendChunk              RObjectStr
-   RClose                    REDSendChunk             RPlot
-   RCommentLine              RSendParagraph           RSPlot
-   RCustomStart              RDSendParagraph          RSaveClose
-   RSendFunction             RESendParagraph          RSetwd
-   RDSendFunction            REDSendParagraph         RShowArgs
-   RESendFunction            RSendSelection           RShowEx
-   REDSendFunction           RDSendSelection          RShowRout
-   RSendLine                 RESendSelection          RStart
-   RDSendLine                REDSendSelection         RSummary
-   RSendLAndOpenNewOne       RSendFile                RSweave
-   RSendMBlock               RESendFile               RUpdateObjBrowser
-   RDSendMBlock              RHelp                    RVanillaStart
-   RESendMBlock              RListSpace               RCompleteArgs
-   REDSendMBlock             RMakePDF
-<
-Note: The prefix RE means "echo"; RD, "cursor down"; RED, both "echo" and
-      "down".
+list of the names for custom key bindings (the prefix RE means "echo";
+RD, "cursor down"; RED, both "echo" and "down"):
+
+   Star/Close R~
+   RStart
+   RVanillaStart
+   RCustomStart
+   RClose
+   RSaveClose
+
+   Clear R console~
+   RClearAll
+   RClearConsole
+
+   Edit R code~
+   RCommentLine
+   RRightComment
+   RCompleteArgs
+   RIndent
+
+   Send line or part of it to R~
+   RSendLine
+   RDSendLine
+   RSendLAndOpenNewOne
+   RNLeftPart
+   RNRightPart
+   RILeftPart
+   RIRightPart
+
+   Send code to R console~
+   RSendSelection
+   RESendSelection
+   RDSendSelection
+   REDSendSelection
+   RSendMBlock
+   RESendMBlock
+   RDSendMBlock
+   REDSendMBlock
+   RSendParagraph
+   RESendParagraph
+   RDSendParagraph
+   REDSendParagraph
+   RSendFunction
+   RESendFunction
+   RDSendFunction
+   REDSendFunction
+   RSendFile
+   RESendFile
+
+   Send command to R~
+   RHelp
+   RPlot
+   RSPlot
+   RShowArgs
+   RShowEx
+   RShowRout
+   RObjectNames
+   RObjectPr
+   RObjectStr
+   RSetwd
+   RSummary
+   RListSpace
+
+   Support to Rnoweb, Rmd, Rrst~
+   RSendChunk
+   RDSendChunk
+   RESendChunk
+   REDSendChunk
+   RBibTeX
+   RBibTeXK
+   RSweave
+   RKnit
+   RMakeHTML
+   RMakeODT
+   RMakePDF
+   RMakePDFK
+   ROpenPDF
+   RSpinFile
+
+   Object browser~
+   RUpdateObjBrowser
+   ROpenLists
+   RCloseLists
 
 The completion of function arguments only happens in Insert mode. To customize
 its keybind you should put in your |vimrc| something as in the example:
