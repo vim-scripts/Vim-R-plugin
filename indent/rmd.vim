@@ -2,7 +2,7 @@
 " Language:	Rmd
 " Author:	Jakson Alves de Aquino <jalvesaq@gmail.com>
 " URL:		http://www.vim.org/scripts/script.php?script_id=2628
-" Last Change:	Sun Sep 23, 2012  08:04PM
+" Last Change:	Thu Oct 11, 2012  10:54PM
 
 
 " Only load this indent file when no other was loaded.
@@ -36,7 +36,7 @@ function GetMdIndent()
 endfunction
 
 function GetRmdIndent()
-    if getline(".") =~ '^```{r .*}$'
+    if getline(".") =~ '^```{r .*}$' || getline(".") =~ '^```$'
 	return 0
     endif
     if search('^```{r', "bncW") > search('^```$', "bncW")
