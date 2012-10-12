@@ -1,6 +1,6 @@
 " markdown Text with R statements
 " Language: markdown with R code chunks
-" Last Change: Mon Oct 01, 2012  03:34PM
+" Last Change: Thu Oct 11, 2012  10:44PM
 
 " for portability
 if version < 600
@@ -27,7 +27,13 @@ syntax include @R syntax/r.vim
 if exists("b:current_syntax")
     unlet b:current_syntax
 endif
-syntax match rmdChunkDelim "^```{r.*}$" contained
+if exists("g:rmd_syn_hl_chunk")
+    " highlight R code inside chunk header
+    syntax match rmdChunkDelim "^```{r" contained
+    syntax match rmdChunkDelim "}$" contained
+else
+    syntax match rmdChunkDelim "^```{r.*}$" contained
+endif
 syntax match rmdChunkDelim "^```$" contained
 syntax region rmdChunk start="^``` *{r.*}$" end="^```$" contains=@R,rmdChunkDelim keepend transparent fold
 
