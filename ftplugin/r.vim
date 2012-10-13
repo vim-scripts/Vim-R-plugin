@@ -83,7 +83,7 @@ function! ShowRout()
     endif
 endfunction
 
-" Convert R script into Rmd and, then, into md.
+" Convert R script into Rmd, md and, then, html.
 function! RSpin()
     update
     let b:needsnewomnilist = 1
