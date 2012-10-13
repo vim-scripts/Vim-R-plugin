@@ -111,6 +111,12 @@ endfunction
 
 " Sweave and compile the current buffer content
 function! RMakePDF(bibtex, knit)
+    if g:rplugin_vimcomport == 0
+        exe "Py DiscoverVimComPort()"
+        if g:rplugin_vimcomport == 0
+            return
+        endif
+    endif
     update
     call RSetWD()
     let pdfcmd = "vim.interlace.rnoweb('" . expand("%:t") . "'"

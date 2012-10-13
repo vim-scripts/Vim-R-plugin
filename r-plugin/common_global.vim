@@ -1771,6 +1771,12 @@ function RFillLibList()
 endfunction
 
 function RBuildSyntaxFile(...)
+    if g:rplugin_vimcomport == 0
+        exe "Py DiscoverVimComPort()"
+        if g:rplugin_vimcomport == 0
+            return
+        endif
+    endif
     if a:0 == 0
         let packls = ""
     else

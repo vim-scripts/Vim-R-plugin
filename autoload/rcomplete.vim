@@ -12,7 +12,7 @@ fun! rcomplete#CompleteR(findstart, base)
     return match(getline('.')[: (col('.') - 2)], '[[:alnum:].\\]\+$')
   else
     if b:needsnewomnilist == 1
-      call BuildROmniList("GlobalEnv", "none")
+      call BuildROmniList("GlobalEnv", "")
     endif
     let res = []
     if strlen(a:base) == 0

@@ -129,6 +129,12 @@ function! RMakeHTMLrmd(t)
 endfunction
 
 function! RMakePDFrmd(t)
+    if g:rplugin_vimcomport == 0
+        exe "Py DiscoverVimComPort()"
+        if g:rplugin_vimcomport == 0
+            return
+        endif
+    endif
     if g:rplugin_has_pandoc == 0
         if executable("pandoc")
             let g:rplugin_has_pandoc = 1

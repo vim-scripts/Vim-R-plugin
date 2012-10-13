@@ -129,6 +129,12 @@ function! RMakeHTMLrrst(t)
 endfunction
 
 function! RMakePDFrrst()
+    if g:rplugin_vimcomport == 0
+        exe "Py DiscoverVimComPort()"
+        if g:rplugin_vimcomport == 0
+            return
+        endif
+    endif
     update
     call RSetWD()
     if g:rplugin_has_rst2pdf == 0
