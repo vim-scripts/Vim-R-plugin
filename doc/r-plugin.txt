@@ -1831,7 +1831,18 @@ line where the statement immediately above started. Of course someone may
 develop a better algorithm in the future.
 
 
-9.10. Automatically close parenthesis~
+9.10. Highlight chunk header as R code~
+
+By default, Vim will highlight chunk headers of RMarkdown and
+RreStructuredText with a single color. When the code is processed by knitr,
+chunk headers should contain valid R code and, thus, you may want to highlight
+them as such. You can do this by putting in your |vimrc|:
+>
+   let rrst_syn_hl_chunk = 1
+   let rmd_syn_hl_chunk = 1
+<
+
+9.11. Automatically close parenthesis~
 
 Some people want Vim automatically inserting a closing parenthesis, bracket or
 brace when an open one has being typed. The page below explains how to achieve
@@ -1840,7 +1851,7 @@ this goal:
    http://vim.wikia.com/wiki/Automatically_append_closing_characters
 
 
-9.11. Automatic line breaks~
+9.12. Automatic line breaks~
 
 By default, Vim breaks lines when you are typing if you reach the column
 defined by the 'textwidth' option. If you prefer that Vim does not break the R
@@ -1849,7 +1860,7 @@ code automatically, breaking only comment lines, put in your |vimrc|:
    autocmd FileType r setlocal formatoptions=cq
 <
 
-9.12. Vim with 256 colors in a terminal emulator (Linux/Unix only)~
+9.13. Vim with 256 colors in a terminal emulator (Linux/Unix only)~
 
 If you want 256 colors support in Vim, install the package ncurses-term. Then
 put in your ~/.bashrc:
@@ -1876,7 +1887,7 @@ download and copy them to ~/.vim/colors. You may use the command
 |:colorscheme| to try them all before setting your preference in your |vimrc|.
 
 
-9.13. Run your Makefile from within R~
+9.14. Run your Makefile from within R~
 
 Do you have many Rnoweb files included in a master tex or Rnoweb file and use
 a Makefile to build the pdf? You may consider it useful to put the following
@@ -1885,7 +1896,7 @@ line in your |vimrc|:
    nmap <LocalLeader>sm :update<CR>:call SendCmdToR('system("make")')<CR>
 <
 
-9.14. Group windows with compiz~
+9.15. Group windows with compiz~
 
 If you are using Compiz, it may be easier to work with the plugin if the
 various related windows (editor, terminal, and graphics window) are grouped
@@ -1894,7 +1905,7 @@ You may need CompizConfig Settings Manager installed to enable this feature
 (look at the "Window Management" section for "Group and Tab Windows").
 
 
-9.15. Why do I have to updated the Object Browser manually?~
+9.16. Why do I have to updated the Object Browser manually?~
 
 It is because Vim and R run as separate processes and, thus, it is not
 possible to Vim to know whether R is busy or not. If R was running as part of
@@ -1906,7 +1917,7 @@ the Vim-R-plugin did this, the use of Vim would be blocked until R finished
 its processing. 
 
 
-9.16. Edit your ~/.Rprofile~
+9.17. Edit your ~/.Rprofile~
 
 You may want to edit your ~/.Rprofile. Two common options are the use of GVim
 as the text editor and the use of Vim as pager. Example for Linux with these
@@ -1958,7 +1969,7 @@ An example for Windows:
    }
 <
 
-9.17. Debugging R functions~
+9.18. Debugging R functions~
 
 The Vim-R-Plugin does not have debugging facilities, but you may want to use
 the R package "debug":
@@ -1978,7 +1989,7 @@ on top" or a similar option provided by your desktop manager.
 There is also the R package "edtdbg" which aims to integrate R debugging
 facilities with Vim.
 
-9.18. Turn the R-plugin into a global plugin~
+9.19. Turn the R-plugin into a global plugin~
 							     *r-plugin-global*
 The Vim-R-plugin is a file type plugin. If you want its functionality
 available for all file types, then go to your ~/.vim/plugin directory and
@@ -1992,14 +2003,14 @@ On Windows, you probably will have to make a copy of the file to the
 ~/vimfiles/plugin directory.
 
 
-9.19. Disable syntax highlight of R functions~
+9.20. Disable syntax highlight of R functions~
 
 If you want to disable the syntax highlight of R functions edit the file
 ~/.vim/r-plugin/functions.vim and delete all lines, but do not delete the
 file.
 
 
-9.20. Tips for knitr users~
+9.21. Tips for knitr users~
 								       *knitr*
 If you are using knitr with option cache=TRUE, you may want from time to time
 to delete all objects in R workspace and all files in the cache directory. If
@@ -2014,7 +2025,7 @@ them in your vimrc. For example
 
 will produce a german document with a table of contents.
 
-9.21. Start Tmux and Vim at once~
+9.22. Start Tmux and Vim at once~
 
 If you always prefer to run Tmux before running Vim you may want to put in
 your ~/.bashrc:
@@ -2026,7 +2037,7 @@ Then you will be able to start Vim inside a Tmux session by typing:
    tvim filename.R
 <
 
-9.22. Integration with the Conque Shell plugin~
+9.23. Integration with the Conque Shell plugin~
 							     *r-plugin-conque*
 In addition to being integrated with the screen.vim plugin the Vim-R-plugin
 can also use the Conque Shell plugin, but the Conque Shell still has some

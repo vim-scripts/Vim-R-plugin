@@ -1,7 +1,11 @@
 " reStructured Text with R statements
 " Language: reST with R code chunks
 " Maintainer: Alex Zvoleff, azvoleff@mail.sdsu.edu
-" Last Change: Thu Oct 11, 2012  10:42PM
+" Last Change: Sat Oct 13, 2012  07:28AM
+"
+" CONFIGURATION:
+"   To highlight chunk headers as R code, put in your vimrc:
+"   let rrst_syn_hl_chunk = 1
 
 " for portability
 if version < 600

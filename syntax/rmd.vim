@@ -1,6 +1,10 @@
 " markdown Text with R statements
 " Language: markdown with R code chunks
-" Last Change: Thu Oct 11, 2012  10:44PM
+" Last Change: Sat Oct 13, 2012  07:29AM
+"
+" CONFIGURATION:
+"   To highlight chunk headers as R code, put in your vimrc:
+"   let rmd_syn_hl_chunk = 1
 
 " for portability
 if version < 600
