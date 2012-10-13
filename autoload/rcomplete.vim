@@ -1,31 +1,27 @@
 " Vim completion script
 " Language:    R
 " Maintainer:  Jakson Alves de Aquino <jalvesaq@gmail.com>
-" Last Change: Mon Apr 02, 2012  09:36AM
 "
 
 fun! rcomplete#CompleteR(findstart, base)
+  if &filetype == "rnoweb" && RnwIsInRCode() == 0 && exists("*LatexBox_Complete")
+      let texbegin = LatexBox_Complete(a:findstart, a:base)
+      return texbegin
+  endif
   if a:findstart
-    " locate the start of the word
-    let line = getline('.')
-    let start = col('.') - 1
-    while start > 0 && (line[start - 1] =~ '\a' || line[start - 1] =~ '\.' || line[start - 1] =~ '\$' || line[start - 1] =~ '\d')
-      let start -= 1
-    endwhile
-    return start
+    return match(getline('.')[: (col('.') - 2)], '[[:alnum:].\\]\+$')
   else
     if b:needsnewomnilist == 1
-      call BuildROmniList("GlobalEnv", "none")
+      call BuildROmniList("GlobalEnv", "")
     endif
     let res = []
     if strlen(a:base) == 0
       return res
     endif
 
-    " We could use R to get the completions based on the running evironment.
-    " However, we would miss information stored on the omnils file: class of
-    " object and its package.
-    " exe 'Py SendToR("utils:::.win32consoleCompletion(' . "'" . a:base . "', " . strlen(a:base) . ')$comps")'
+    if len(g:rplugin_liblist) == 0
+        call add(res, {'word': a:base, 'menu': " [ List is empty. Run  :RUpdateObjList ]"})
+    endif
 
     let flines = g:rplugin_liblist + g:rplugin_globalenvlines
     " The char '$' at the end of 'a:base' is treated as end of line, and
@@ -45,6 +41,17 @@ fun! rcomplete#CompleteR(findstart, base)
 	call add(res, tmp2)
       endif
     endfor
+
+    " When we use R to get the completions based on the running evironment we
+    " miss information stored on the omnils file: class of object and its
+    " package.
+    "    if len(g:rplugin_liblist) == 0 && len(res) == 0
+    "        exe 'Py SendToR("utils:::.win32consoleCompletion(' . "'" . a:base . "', " . strlen(a:base) . ')$comps")'
+    "        if strlen(g:rplugin_lastrpl) > 0
+    "            let res = split(g:rplugin_lastrpl)
+    "        endif
+    "    endif
+
     return res
   endif
 endfun

@@ -19,8 +19,6 @@
 "          
 "          Based on previous work by Johannes Ranke
 "
-" Last Change: Fri Feb 17, 2012  08:38AM
-"
 " Please see doc/r-plugin.txt for usage details.
 "==========================================================================
 
@@ -35,20 +33,20 @@ let b:did_r_ftplugin = 1
 let s:cpo_save = &cpo
 set cpo&vim
 
-" Don't do this if called by ../r-plugin/global_r_plugin.vim
+" Don't do this if called by ../r-plugin/common_global.vim
 if &filetype == "r"
     setlocal commentstring=#%s
-    setlocal comments=b:#,b:##,b:###
+    setlocal comments=b:#,b:##,b:###,b:#'
 endif
 
-" Source scripts common to R, Rnoweb, Rhelp and rdoc files:
+" Source scripts common to R, Rnoweb, Rhelp, Rmd, Rrst and rdoc files:
 runtime r-plugin/common_global.vim
 if exists("g:rplugin_failed")
     finish
 endif
 
-" Some buffer variables common to R, Rnoweb, Rhelp and rdoc files need be
-" defined after the global ones:
+" Some buffer variables common to R, Rnoweb, Rhelp, Rmd, Rrst and rdoc files
+" need be defined after the global ones:
 runtime r-plugin/common_buffer.vim
 
 " Run R CMD BATCH on current file and load the resulting .Rout in a split
@@ -85,6 +83,13 @@ function! ShowRout()
     endif
 endfunction
 
+" Convert R script into Rmd, md and, then, html.
+function! RSpin()
+    update
+    let b:needsnewomnilist = 1
+    call RSetWD()
+    call SendCmdToR('require(knitr); spin("' . expand("%:t") . '")')
+endfunction
 
 "==========================================================================
 " Key bindings and menu items
@@ -96,6 +101,10 @@ call RCreateEditMaps()
 call RCreateMaps("ni", '<Plug>RSendFile',     'aa', ':call SendFileToR("silent")')
 call RCreateMaps("ni", '<Plug>RESendFile',    'ae', ':call SendFileToR("echo")')
 call RCreateMaps("ni", '<Plug>RShowRout',     'ao', ':call ShowRout()')
+
+" Knitr::spin
+" -------------------------------------
+call RCreateMaps("ni", '<Plug>RSpinFile',     'ks', ':call RSpin()')
 
 call RCreateSendMaps()
 call RControlMaps()

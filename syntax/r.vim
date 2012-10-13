@@ -3,7 +3,7 @@
 " Maintainer:	      Jakson Aquino <jalvesaq@gmail.com>
 " Former Maintainers: Vaidotas Zemlys <zemlys@gmail.com>
 " 		      Tom Payne <tom@tompayne.org>
-" Last Change:	      Mon Feb 27, 2012  10:45AM
+" Last Change:	      Wed Jul 11, 2012  01:28PM
 " Filenames:	      *.R *.r *.Rhistory *.Rt
 " 
 " NOTE: The highlighting of R functions is defined in the
@@ -30,7 +30,16 @@ endif
 syn case match
 
 " Comment
-syn match rComment contains=@Spell "\#.*"
+syn match rComment contains=@Spell "#.*"
+
+" Roxygen
+syn match rOKeyword contained "@\(param\|return\|name\|rdname\|examples\|include\)"
+syn match rOKeyword contained "@\(S3method\|TODO\|aliases\|alias\|assignee\|author\|callGraphDepth\|callGraph\)"
+syn match rOKeyword contained "@\(callGraphPrimitives\|concept\|exportClass\|exportMethod\|exportPattern\|export\|formals\)"
+syn match rOKeyword contained "@\(format\|importClassesFrom\|importFrom\|importMethodsFrom\|import\|keywords\)"
+syn match rOKeyword contained "@\(method\|nord\|note\|references\|seealso\|setClass\|slot\|source\|title\|usage\)"
+syn match rOComment contains=@Spell,rOKeyword "#'.*"
+
 
 if &filetype == "rhelp"
   " string enclosed in double quotes
@@ -105,8 +114,12 @@ syn match rOperator    '-'
 syn match rOperator    '*'
 syn match rOperator    '+'
 syn match rOperator    '='
-syn match rOperator    "[|!<>^~`/:]"
-syn match rOperator    "%\{2}\|%\*%\|%\/%\|%in%\|%o%\|%x%"
+if &filetype != "rmd" && &filetype != "rrst"
+  syn match rOperator    "[|!<>^~/:]"
+else
+  syn match rOperator    "[|!<>^~`/:]"
+endif
+syn match rOperator    "%\{2}\|%\S*%"
 syn match rOpError  '*\{3}'
 syn match rOpError  '//'
 syn match rOpError  '&&&'
@@ -159,7 +172,9 @@ endif
 syn keyword rType array category character complex double function integer list logical matrix numeric vector data.frame 
 
 " Name of object with spaces
-syn region rNameWSpace start="`" end="`"
+if &filetype != "rmd" && &filetype != "rrst"
+  syn region rNameWSpace start="`" end="`"
+endif
 
 if &filetype == "rhelp"
   syn match rhPreProc "^#ifdef.*" 
@@ -172,6 +187,7 @@ hi def link rArrow       Statement
 hi def link rBoolean     Boolean
 hi def link rBraceError  Error
 hi def link rComment     Comment
+hi def link rOComment    Comment
 hi def link rComplex     Number
 hi def link rConditional Conditional
 hi def link rConstant    Constant
@@ -198,6 +214,7 @@ hi def link rStatement   Statement
 hi def link rString      String
 hi def link rStrError    Error
 hi def link rType        Type
+hi def link rOKeyword    Title
 
 let b:current_syntax="r"
 

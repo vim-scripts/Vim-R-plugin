@@ -68,8 +68,14 @@ def GetRPathPy():
     kHandle = None
     try:
         kHandle = win32api.RegOpenKeyEx(win32con.HKEY_LOCAL_MACHINE, keyName, 0, win32con.KEY_READ)
+        rVersion, reserved, kclass, lastwrite = win32api.RegEnumKeyEx(kHandle)[-1]
+        keyName = keyName + "\\" + rVersion
+        kHandle = win32api.RegOpenKeyEx(win32con.HKEY_LOCAL_MACHINE, keyName, 0, win32con.KEY_READ)
     except:
         try:
+            kHandle = win32api.RegOpenKeyEx(win32con.HKEY_CURRENT_USER, keyName, 0, win32con.KEY_READ)
+            rVersion, reserved, kclass, lastwrite = win32api.RegEnumKeyEx(kHandle)[-1]
+            keyName = keyName + "\\" + rVersion
             kHandle = win32api.RegOpenKeyEx(win32con.HKEY_CURRENT_USER, keyName, 0, win32con.KEY_READ)
         except:
             vim.command("let s:rinstallpath =  'Not found'")
@@ -82,7 +88,7 @@ def GetRPathPy():
             vim.command("let s:rinstallpath =  'Not found'")
 
 def StartRPy():
-    rpath = vim.eval("b:rplugin_Rgui")
+    rpath = vim.eval("g:rplugin_Rgui")
     rargs = ['"' + rpath + '"']
     r_args = vim.eval("b:rplugin_r_args")
     if r_args != " ":
@@ -119,5 +125,14 @@ def StartRPy():
         os.spawnv(os.P_NOWAIT, rpath, rargs)
     else:
         vim.command("echoerr 'File ' . g:rplugin_Rgui . ' not found.'")
+
+def OpenPDF(fn):
+    try:
+        os.startfile(fn)
+    except Exception as errmsg:
+        errstr = str(errmsg)
+        errstr = errstr.replace("'", '"')
+        vim.command("call RWarningMsg('" + errstr + "')")
+        pass
 
 # vim: sw=4 tabstop=4 expandtab

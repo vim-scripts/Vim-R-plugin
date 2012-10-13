@@ -8,11 +8,11 @@ Development code: https://github.com/jcfaria/Vim-R-plugin
 MAIN FEATURES:
 
   * Communication with R.
-  * Omni completion (auto-completion) for R objects.
+  * Omni completion (auto-completion) for R objects and function arguments.
   * Ability to see R's documentation in a Vim's buffer.
   * Object Browser.
-  * Syntax highlighting for R and RHelp code.
-  * Smart indentation for R and RHelp syntax.
+  * Syntax highlighting for R, RHelp, RMarkdown and RreStructuredText code.
+  * Smart indentation for R, RHelp, RMarkdown and RreStructuredText syntax.
   * Most of the plugin's behavior is customizable.
 
     For a detailed list of features, see: http://www.lepem.ufc.br/jaa/r-plugin.html#r-plugin-features

@@ -17,7 +17,6 @@
 " Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
 "          Jose Claudio Faria
 "
-" Last Change: Mon Apr 16, 2012  12:08AM
 "==========================================================================
 
 " Only do this when not yet done for this buffer
@@ -31,8 +30,10 @@ let b:did_rnoweb_ftplugin = 1
 let s:cpo_save = &cpo
 set cpo&vim
 
-" Enables Vim-Latex-Suite if it is installed
+" Enables Vim-Latex-Suite, LaTeX-Box if installed
 runtime ftplugin/tex_latexSuite.vim
+runtime ftplugin/tex_LatexBox.vim
+let b:main_tex_file = expand("%:p")
 
 " Enable syntax highlight of LaTeX errors in R Console (if using Conque
 " Shell)
@@ -110,12 +111,18 @@ endfunction
 
 " Sweave and compile the current buffer content
 function! RMakePDF(bibtex, knit)
+    if g:rplugin_vimcomport == 0
+        exe "Py DiscoverVimComPort()"
+        if g:rplugin_vimcomport == 0
+            return
+        endif
+    endif
     update
     call RSetWD()
-    let pdfcmd = "vim.interlace('" . expand("%:t") . "'"
+    let pdfcmd = "vim.interlace.rnoweb('" . expand("%:t") . "'"
 
     if a:knit
-        let pdfcmd = "require(knitr); " . pdfcmd . ', knit = TRUE'
+        let pdfcmd = pdfcmd . ', knit = TRUE'
     endif
 
     if g:vimrplugin_latexcmd != "pdflatex"
@@ -126,14 +133,20 @@ function! RMakePDF(bibtex, knit)
         let pdfcmd = pdfcmd . ", bibtex = TRUE"
     endif
 
-    if a:knit
-        if exists("g:vimrplugin_knitargs")
-            let pdfcmd = pdfcmd . ", " . g:vimrplugin_knitargs
-        endif
-    else
-        if exists("g:vimrplugin_sweaveargs")
-            let pdfcmd = pdfcmd . ", " . g:vimrplugin_sweaveargs
-        endif
+    if a:bibtex == "verbose"
+        let pdfcmd = pdfcmd . ", quiet = FALSE"
+    endif
+
+    if g:vimrplugin_openpdf == 0
+        let pdfcmd = pdfcmd . ", view = FALSE"
+    endif
+
+    if g:vimrplugin_openpdf_quietly
+        let pdfcmd = pdfcmd . ", pdfquiet = TRUE"
+    endif
+
+    if a:knit == 0 && exists("g:vimrplugin_sweaveargs")
+        let pdfcmd = pdfcmd . ", " . g:vimrplugin_sweaveargs
     endif
 
     let pdfcmd = pdfcmd . ")"
@@ -153,6 +166,7 @@ function! SendChunkToR(e, m)
     let chunkline = search("^<<", "bncW") + 1
     let docline = search("^@", "ncW") - 1
     let lines = getline(chunkline, docline)
+    let b:needsnewomnilist = 1
     let ok = RSourceLines(lines, a:e)
     if ok == 0
         return
@@ -163,14 +177,57 @@ function! SendChunkToR(e, m)
 endfunction
 
 " Sweave the current buffer content
-function! RSweave(knit)
+function! RSweave()
     update
     let b:needsnewomnilist = 1
     call RSetWD()
-    if a:knit
-        call SendCmdToR('require(knitr); knit("' . expand("%:t") . '")')
+    call SendCmdToR('Sweave("' . expand("%:t") . '")')
+endfunction
+
+function! ROpenPDF()
+    if has("win32") || has("win64")
+        exe 'Py OpenPDF("' . expand("%:t:r") . '.pdf")'
+        return
+    endif
+
+    if !exists("g:rplugin_pdfviewer")
+        let g:rplugin_pdfviewer = "none"
+        if has("gui_macvim") || has("gui_mac") || has("mac") || has("macunix")
+            if $R_PDFVIEWER == ""
+                let pdfvl = ["open"]
+            else
+                let pdfvl = [$R_PDFVIEWER, "open"]
+            endif
+        else
+            if $R_PDFVIEWER == ""
+                let pdfvl = ["xdg-open"]
+            else
+                let pdfvl = [$R_PDFVIEWER, "xdg-open"]
+            endif
+        endif
+        " List from R configure script:
+        let pdfvl += ["evince", "okular", "xpdf", "gv", "gnome-gv", "ggv", "kpdf", "gpdf", "kghostview,", "acroread", "acroread4"]
+        for prog in pdfvl
+            if executable(prog)
+                let g:rplugin_pdfviewer = prog
+                break
+            endif
+        endfor
+    endif
+
+    if g:rplugin_pdfviewer == "none"
+        if g:vimrplugin_openpdf_quietly
+            call SendCmdToR('vim.openpdf("' . expand("%:p:r") . ".pdf" . '", TRUE)')
+        else
+            call SendCmdToR('vim.openpdf("' . expand("%:p:r") . ".pdf" . '")')
+        endif
     else
-        call SendCmdToR('Sweave("' . expand("%:t") . '")')
+        let openlog = system(g:rplugin_pdfviewer . " '" . expand("%:p:r") . ".pdf" . "'")
+        if v:shell_error
+            let rlog = substitute(openlog, "\n", " ", "g")
+            let rlog = substitute(openlog, "\r", " ", "g")
+            call RWarningMsg(openlog)
+        endif
     endif
 endfunction
 
@@ -189,12 +246,13 @@ call RControlMaps()
 call RCreateMaps("nvi", '<Plug>RSetwd',        'rd', ':call RSetWD()')
 
 " Only .Rnw files use these functions:
-call RCreateMaps("nvi", '<Plug>RSweave',      'sw', ':call RSweave(0)')
+call RCreateMaps("nvi", '<Plug>RSweave',      'sw', ':call RSweave()')
 call RCreateMaps("nvi", '<Plug>RMakePDF',     'sp', ':call RMakePDF("nobib", 0)')
 call RCreateMaps("nvi", '<Plug>RBibTeX',      'sb', ':call RMakePDF("bibtex", 0)')
-call RCreateMaps("nvi", '<Plug>RKnit',        'kn', ':call RSweave(1)')
+call RCreateMaps("nvi", '<Plug>RKnit',        'kn', ':call RKnit()')
 call RCreateMaps("nvi", '<Plug>RMakePDFK',    'kp', ':call RMakePDF("nobib", 1)')
 call RCreateMaps("nvi", '<Plug>RBibTeXK',     'kb', ':call RMakePDF("bibtex", 1)')
+call RCreateMaps("nvi", '<Plug>ROpenPDF',     'op', ':call ROpenPDF()')
 call RCreateMaps("nvi", '<Plug>RIndent',      'si', ':call RnwToggleIndentSty()')
 call RCreateMaps("ni",  '<Plug>RSendChunk',   'cc', ':call SendChunkToR("silent", "stay")')
 call RCreateMaps("ni",  '<Plug>RESendChunk',  'ce', ':call SendChunkToR("echo", "stay")')

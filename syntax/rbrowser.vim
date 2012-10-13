@@ -1,7 +1,6 @@
 " Vim syntax file
 " Language:	Object browser of Vim-R-plugin
 " Maintainer:	Jakson Alves de Aquino (jalvesaq@gmail.com)
-" Last Change:	Mon Apr 30, 2012  12:41PM
 
 if exists("b:current_syntax")
   finish

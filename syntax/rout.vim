@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:    R output Files
 " Maintainer:  Jakson Aquino <jalvesaq@gmail.com>
-" Last Change: Sun May 22, 2011  08:43AM
+" Last Change: Fri Jul 06, 2012  12:33PM
 "
 
 " Version Clears: {{{1
@@ -79,7 +79,6 @@ if v:lang =~ "^de"
 endif
 
 if v:lang =~ "^es"
-  syn match routError	"^Error.*"
   syn match routWarn	"^Aviso.*"
 endif
 
@@ -98,6 +97,12 @@ if v:lang =~ "^nn"
   syn match routWarn	"^Åtvaring.*"
 endif
 
+if v:lang =~ "^pl"
+    syn match routError	"^BŁĄD.*"
+    syn match routError	"^Błąd.*"
+    syn match routWarn	"^Ostrzeżenie.*"
+endif
+
 if v:lang =~ "^pt_BR"
   syn match routError	"^Erro.*"
   syn match routWarn	"^Aviso.*"
@@ -106,6 +111,11 @@ endif
 if v:lang =~ "^ru"
   syn match routError	"^Ошибка.*"
   syn match routWarn	"^Предупреждение.*"
+endif
+
+if v:lang =~ "^tr"
+    syn match routError	"^Hata.*"
+    syn match routWarn	"^Uyarı.*"
 endif
 
 " LaTeX errors
