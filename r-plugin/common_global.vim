@@ -3229,7 +3229,7 @@ let s:all_marks = "abcdefghijklmnopqrstuvwxyz"
 call writefile([], g:rplugin_globalenvfname)
 
 " Choose a terminal (code adapted from screen.vim)
-if has("win32") || has("win64") || vimrplugin_applescript
+if has("win32") || has("win64") || g:vimrplugin_applescript || $DISPLAY == "" || g:vimrplugin_screenplugin
     " No external terminal emulator will be called, so any value is good
     let g:vimrplugin_term = "xterm"
 else
