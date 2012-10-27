@@ -9,7 +9,12 @@ fun! rcomplete#CompleteR(findstart, base)
       return texbegin
   endif
   if a:findstart
-    return match(getline('.')[: (col('.') - 2)], '[[:alnum:].\\]\+$')
+    let line = getline('.')
+    let start = col('.') - 1
+    while start > 0 && (line[start - 1] =~ '\w' || line[start - 1] =~ '\.' || line[start - 1] =~ '\$')
+      let start -= 1
+    endwhile
+    return start
   else
     if b:needsnewomnilist == 1
       call BuildROmniList("GlobalEnv", "")
