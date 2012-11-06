@@ -584,12 +584,12 @@ function StartR(whatr)
     endif
 
     if has("win32") || has("win64")
-        if g:vimrplugin_conqueplugin == 0
+        if g:vimrplugin_conqueplugin || g:vimrplugin_vimshell
+            let b:rplugin_R = "Rterm.exe"
+        else
             Py StartRPy()
             lcd -
             return
-        else
-            let b:rplugin_R = "Rterm.exe"
         endif
     endif
 
@@ -628,6 +628,14 @@ function StartR(whatr)
         else
             exec 'ScreenShell ' . rcmd
         endif
+    elseif g:vimrplugin_vimshell
+        if has("win32") || has("win64")
+            exe "VimShellInteractive " . rcmd . " --ess"
+        else
+            exe "VimShellInteractive " . rcmd
+        endif
+        lcd -
+        return
     elseif g:vimrplugin_conqueplugin
         if exists("b:conque_bufname")
             if bufloaded(substitute(b:conque_bufname, "\\", "", "g"))
@@ -1105,14 +1113,18 @@ function SendCmdToR(cmd)
 
     if (has("win32") || has("win64")) && g:vimrplugin_conqueplugin == 0
         let cmd = cmd . "\n"
-        let slen = len(cmd)
-        let str = ""
-        for i in range(0, slen)
-            let str = str . printf("\\x%02X", char2nr(cmd[i]))
-        endfor
-        exe "Py" . " SendToRPy(b'" . str . "')"
-        silent exe '!start WScript "' . g:rplugin_jspath . '" "' . expand("%") . '"'
-        " call RestoreClipboardPy()
+        if g:vimrplugin_vimshell
+            exe "VimShellSendString " . cmd
+        else
+            let slen = len(cmd)
+            let str = ""
+            for i in range(0, slen)
+                let str = str . printf("\\x%02X", char2nr(cmd[i]))
+            endfor
+            exe "Py" . " SendToRPy(b'" . str . "')"
+            silent exe '!start WScript "' . g:rplugin_jspath . '" "' . expand("%") . '"'
+            " call RestoreClipboardPy()
+        endif
         return 1
     endif
 
@@ -1172,6 +1184,11 @@ function SendCmdToR(cmd)
         " jump back to code buffer
         exe "sil noautocmd sb " . g:rplugin_curbuf
         exe "set switchbuf=" . savesb
+        return 1
+    endif
+
+    if g:vimrplugin_vimshell
+        call vimshell#interactive#send(cmd)
         return 1
     endif
 
@@ -2912,6 +2929,7 @@ call RSetDefaultValue("g:vimrplugin_i386",              0)
 call RSetDefaultValue("g:vimrplugin_screenvsplit",      0)
 call RSetDefaultValue("g:vimrplugin_conquevsplit",      0)
 call RSetDefaultValue("g:vimrplugin_conqueplugin",      0)
+call RSetDefaultValue("g:vimrplugin_vimshell",          0)
 call RSetDefaultValue("g:vimrplugin_listmethods",       0)
 call RSetDefaultValue("g:vimrplugin_specialplot",       0)
 call RSetDefaultValue("g:vimrplugin_nosingler",         0)
@@ -2932,6 +2950,14 @@ call RSetDefaultValue("g:vimrplugin_latexcmd", "'pdflatex'")
 call RSetDefaultValue("g:vimrplugin_objbr_place", "'script,right'")
 call RSetDefaultValue("g:vimrplugin_insert_mode_cmds",  1)
 
+if g:vimrplugin_vimshell
+    if !exists("g:vimshell_environment_term")
+        let g:vimrplugin_vimshell = 0
+    endif
+    let g:vimrplugin_screenplugin = 0
+    let g:vimrplugin_conqueplugin = 0
+    let g:vimrplugin_applescript = 0
+endif
 
 " Look for invalid options
 let objbrplace = split(g:vimrplugin_objbr_place, ",")
@@ -3094,7 +3120,7 @@ let g:rplugin_globalenvlines = []
 
 if has("win32") || has("win64")
 
-    if !has("python") && !has("python3")
+    if !has("python") && !has("python3") && g:vimrplugin_vimshell == 0
         redir => s:vimversion
         silent version
         redir END
@@ -3134,27 +3160,29 @@ if has("win32") || has("win64")
             let g:rplugin_Rgui = g:vimrplugin_r_path . "\\Rgui.exe"
         else
             Py GetRPathPy()
-            if s:rinstallpath == "Not found"
-                call RWarningMsgInp("Could not find R path in Windows Registry. Please, either install R or set the value of 'vimrplugin_r_path'.")
-                let g:rplugin_failed = 1
-                finish
-            endif
-            if isdirectory(s:rinstallpath . '\bin\i386')
-                if !isdirectory(s:rinstallpath . '\bin\x64')
-                    let g:vimrplugin_i386 = 1
+            if exists("s:rinstallpath")
+                if s:rinstallpath == "Not found"
+                    call RWarningMsgInp("Could not find R path in Windows Registry. Please, either install R or set the value of 'vimrplugin_r_path'.")
+                    let g:rplugin_failed = 1
+                    finish
                 endif
-                if g:vimrplugin_i386
-                    let $PATH = s:rinstallpath . '\bin\i386;' . $PATH
-                    let g:rplugin_Rgui = s:rinstallpath . '\bin\i386\Rgui.exe'
+                if isdirectory(s:rinstallpath . '\bin\i386')
+                    if !isdirectory(s:rinstallpath . '\bin\x64')
+                        let g:vimrplugin_i386 = 1
+                    endif
+                    if g:vimrplugin_i386
+                        let $PATH = s:rinstallpath . '\bin\i386;' . $PATH
+                        let g:rplugin_Rgui = s:rinstallpath . '\bin\i386\Rgui.exe'
+                    else
+                        let $PATH = s:rinstallpath . '\bin\x64;' . $PATH
+                        let g:rplugin_Rgui = s:rinstallpath . '\bin\x64\Rgui.exe'
+                    endif
                 else
-                    let $PATH = s:rinstallpath . '\bin\x64;' . $PATH
-                    let g:rplugin_Rgui = s:rinstallpath . '\bin\x64\Rgui.exe'
+                    let $PATH = s:rinstallpath . '\bin;' . $PATH
+                    let g:rplugin_Rgui = s:rinstallpath . '\bin\Rgui.exe'
                 endif
-            else
-                let $PATH = s:rinstallpath . '\bin;' . $PATH
-                let g:rplugin_Rgui = s:rinstallpath . '\bin\Rgui.exe'
+                unlet s:rinstallpath
             endif
-            unlet s:rinstallpath
         endif
         let g:rplugin_rpathadded = 1
     endif
