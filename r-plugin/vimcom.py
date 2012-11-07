@@ -60,7 +60,7 @@ def SendToR(aString):
     try:
         sock.connect((HOST, VimComPort))
         sock.send(aString)
-        received = sock.recv(1024)
+        received = sock.recv(5012)
     except:
         pass
     finally:
