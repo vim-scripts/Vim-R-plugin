@@ -1102,7 +1102,41 @@ function RGetRemoteCmd(cmd)
     echon
 endfunction
 
+function RFormatCode() range
+    if g:rplugin_vimcomport == 0
+        exe "Py DiscoverVimComPort()"
+        if g:rplugin_vimcomport == 0
+            return
+        endif
+    endif
+    let lns = getline(a:firstline, a:lastline)
+    call writefile(lns, $VIMRPLUGIN_TMPDIR . "/unformatted_code")
+    let wco = &textwidth
+    if wco == 0
+        let wco = 78
+    elseif wco < 20
+        let wco = 20
+    elseif wco > 180
+        let wco = 180
+    endif
+    exe "Py SendToR('formatR::tidy.source(\"" . $VIMRPLUGIN_TMPDIR . "/unformatted_code" . "\", file = \"" . $VIMRPLUGIN_TMPDIR . "/formatted_code\", width.cutoff = " . wco . ")')"
+    if g:rplugin_lastrpl == "R is busy." || g:rplugin_lastrpl == "UNKNOWN" || g:rplugin_lastrpl =~ "^Error" || g:rplugin_lastrpl == "INVALID" || g:rplugin_lastrpl == "ERROR" || g:rplugin_lastrpl == "EMPTY"
+        call RWarningMsg(g:rplugin_lastrpl)
+        return
+    endif
+    let lns = readfile($VIMRPLUGIN_TMPDIR . "/formatted_code")
+    silent exe a:firstline . "," . a:lastline . "delete"
+    call append(a:firstline - 1, lns)
+    echo (a:lastline - a:firstline + 1) . " lines formatted."
+endfunction
+
 function RInsert(cmd)
+    if g:rplugin_vimcomport == 0
+        exe "Py DiscoverVimComPort()"
+        if g:rplugin_vimcomport == 0
+            return
+        endif
+    endif
     exe "Py SendToR('paste(capture.output(" . a:cmd . "), collapse = \"\\\\n\")')"
     if g:rplugin_lastrpl == "R is busy." || g:rplugin_lastrpl == "UNKNOWN" || g:rplugin_lastrpl =~ "^Error" || g:rplugin_lastrpl == "INVALID" || g:rplugin_lastrpl == "ERROR" || g:rplugin_lastrpl == "EMPTY" || g:rplugin_lastrpl == "RTYPE"
         call RWarningMsg(g:rplugin_lastrpl)
@@ -2860,7 +2894,8 @@ endfunction
 
 command RUpdateObjList :call RBuildSyntaxFile()
 command -nargs=+ RAddLibToList :call RBuildSyntaxFile(<q-args>)
-command -nargs=1 Rinsert :call RInsert(<q-args>)
+command -nargs=1 -complete=customlist,RLisObjs Rinsert :call RInsert(<q-args>)
+command -range=% Rformat <line1>,<line2>:call RFormatCode()
 command RBuildTags :call SendCmdToR('rtags(ofile = "TAGS")')
 command -nargs=? -complete=customlist,RLisObjs Rhelp :call RAskHelp(<q-args>)
 command -nargs=? -complete=dir RSourceDir :call RSourceDirectory(<q-args>)

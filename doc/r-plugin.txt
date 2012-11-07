@@ -280,6 +280,8 @@ you may prefer to install the Debian package available at:
 
    http://www.lepem.ufc.br/jaa/vim-r-plugin.html
 
+Did you see the message "VimCom port not found"? This means that R is not
+running, the vimcom package is not installed, or R was not started by Vim.
 
 3.4. General instructions II (optional steps)~
 
@@ -420,7 +422,6 @@ Edit
   . Insert "<-"                                          _
   . Complete object name                              ^X^O
   . Complete function arguments                       ^X^A
-  . Insert output of R command                    :Rinsert
   --------------------------------------------------------
   . Indent (line)                                       ==
   . Indent (selected lines)                              =
@@ -519,6 +520,14 @@ Vim:
 >
    :Rinsert dput(levels(var))
 <
+The output inserted by  :Rinsert  is limited to 5012 characters.
+
+The command  :Rformat  call the function tidy.source() of formatR package to
+format either the entire buffer or the selected lines. The value of the
+"width.cutoff" argument is set to the buffer's 'textwidth' if it is not
+outside the range 20-180. Se R help on "tidy.source" for details on how to
+control the function behavior.
+
 
 4.2. Edition of rnoweb files~
 
@@ -2132,9 +2141,9 @@ the R syntax highlighted.
 							       *r-plugin-news*
 10. News~
 
-0.9.9 (2012-11-06)
+0.9.9 (2012-11-07)
 
- * New command:  :Rinsert.
+ * New commands:  :Rinsert  and  :Rformat.
 
 0.9.8 (2012-10-13)
 
