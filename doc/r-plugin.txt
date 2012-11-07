@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 0.9.8
+Version: 0.9.9
 For Vim version 7.3
 
  1. Overview                                    |r-plugin-overview|
@@ -420,6 +420,7 @@ Edit
   . Insert "<-"                                          _
   . Complete object name                              ^X^O
   . Complete function arguments                       ^X^A
+  . Insert output of R command                    :Rinsert
   --------------------------------------------------------
   . Indent (line)                                       ==
   . Indent (selected lines)                              =
@@ -510,6 +511,14 @@ completion is the same one built by |:RUpdateObjList|.
 You can source all .R files in a directory with the Normal mode command
 :RSourceDir, which accepts an optional argument (the directory to be sourced).
 
+The command  :Rinsert <cmd>  inserts one or more lines with the output of the
+R command sent to R. By using this command we can avoid the need of copying
+and pasting the output R from its console to Vim. For example, to insert the
+output of "dput(levels(var))", where "var" is a factor vector, we could do in
+Vim:
+>
+   :Rinsert dput(levels(var))
+<
 
 4.2. Edition of rnoweb files~
 
@@ -2122,6 +2131,10 @@ the R syntax highlighted.
 ==============================================================================
 							       *r-plugin-news*
 10. News~
+
+0.9.9 (2012-11-06)
+
+ * New command:  :Rinsert.
 
 0.9.8 (2012-10-13)
 

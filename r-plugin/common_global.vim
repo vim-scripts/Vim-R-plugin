@@ -1102,6 +1102,11 @@ function RGetRemoteCmd(cmd)
     echon
 endfunction
 
+function RInsert(cmd)
+    exe "Py SendToR('paste(capture.output(" . a:cmd . "), collapse = \"\\\\n\")')"
+    call append(".", split(g:rplugin_lastrpl, "\n"))
+endfunction
+
 " Function to send commands
 " return 0 on failure and 1 on success
 function SendCmdToR(cmd)
@@ -2851,6 +2856,7 @@ endfunction
 
 command RUpdateObjList :call RBuildSyntaxFile()
 command -nargs=+ RAddLibToList :call RBuildSyntaxFile(<q-args>)
+command -nargs=1 Rinsert :call RInsert(<q-args>)
 command RBuildTags :call SendCmdToR('rtags(ofile = "TAGS")')
 command -nargs=? -complete=customlist,RLisObjs Rhelp :call RAskHelp(<q-args>)
 command -nargs=? -complete=dir RSourceDir :call RSourceDirectory(<q-args>)
