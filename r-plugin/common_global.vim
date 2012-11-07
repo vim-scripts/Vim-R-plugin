@@ -1104,7 +1104,11 @@ endfunction
 
 function RInsert(cmd)
     exe "Py SendToR('paste(capture.output(" . a:cmd . "), collapse = \"\\\\n\")')"
-    call append(".", split(g:rplugin_lastrpl, "\n"))
+    if g:rplugin_lastrpl == "R is busy." || g:rplugin_lastrpl == "UNKNOWN" || g:rplugin_lastrpl =~ "^Error" || g:rplugin_lastrpl == "INVALID" || g:rplugin_lastrpl == "ERROR" || g:rplugin_lastrpl == "EMPTY" || g:rplugin_lastrpl == "RTYPE"
+        call RWarningMsg(g:rplugin_lastrpl)
+    else
+        call append(".", split(g:rplugin_lastrpl, "\n"))
+    endif
 endfunction
 
 " Function to send commands
