@@ -612,7 +612,8 @@ The updating is automatic only if the Object Browser is running in a separate
 Tmux panel. The Object Browser has two views: .GlobalEnv and Libraries. If you
 either press <Enter> or double click (GVim or Vim with 'mouse' set to "a") on
 the first line of the Object Browser it will toggle the view between the
-objects in .GlobalEnv and the currently loaded libraries.
+objects in .GlobalEnv and the currently loaded libraries. The Object Browser
+requires the |+conceal| feature, otherwise list items will be misaligned.
 
 In the .GlobalEnv view, if an object has the attribute "label", it will also
 be displayed. Please, see the R help for package vimcom for some options to
@@ -2141,7 +2142,7 @@ the R syntax highlighted.
 							       *r-plugin-news*
 10. News~
 
-0.9.9 (2012-11-07)
+0.9.9 (2012-11-08)
 
  * New commands:  :Rinsert  and  :Rformat.
 

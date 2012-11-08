@@ -393,6 +393,7 @@ au BufUnload <buffer> call ObBrBufUnload()
 
 function! RKeepRunning()
     if g:rplugin_myport == 0
+        call add(g:rplugin_errlist, "RKeepRunning in action.")
         Py StopServer()
         sleep 250m
         Py RunServer()
@@ -405,6 +406,9 @@ if $TMUX_PANE != ""
     autocmd CursorHold <buffer> call RKeepRunning()
     nmap <buffer><silent> d :call OBDelete()<CR>
     vmap <buffer><silent> d <Esc>:call OBMultiDelete()<CR>
+    " Don't load problematic plugins
+    let loaded_nerd_tree = 1
+    let loaded_showmarks = 1
 endif
 
 let s:envstring = tolower($LC_MESSAGES . $LC_ALL . $LANG)

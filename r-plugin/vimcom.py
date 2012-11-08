@@ -7,7 +7,7 @@ import re
 VimComPort = 0
 OtherPort = 0
 MyPort = 0
-sock = None
+srvrsckt = None
 th = None
 FinishNow = False
 
@@ -75,7 +75,7 @@ def SendToR(aString):
 
 
 def VimServer():
-    global sock
+    global srvrsckt
     global MyPort
     global FinishNow
     UDP_IP = "127.0.0.1"
@@ -85,14 +85,14 @@ def VimServer():
     while True and MyPort < PortLim:
         try:
             MyPort += 1
-            sock = socket.socket( socket.AF_INET, socket.SOCK_DGRAM )
-            sock.bind( (UDP_IP,MyPort) )
+            srvrsckt = socket.socket( socket.AF_INET, socket.SOCK_DGRAM )
+            srvrsckt.bind( (UDP_IP, MyPort) )
         except:
             continue
         else:
             break
 
-    if sock == None:
+    if srvrsckt == None:
         MyPort = 0
         vim.command("call RWarningMsg('Could not bind to any port.')")
         return
@@ -102,7 +102,7 @@ def VimServer():
 
     while FinishNow == False:
         try:
-            data, addr = sock.recvfrom( 1024 ) # buffer size is 1024 bytes
+            data, addr = srvrsckt.recvfrom( 1024 ) # buffer size is 1024 bytes
             if vim.eval("g:rplugin_ob_busy") == "1":
                 data = ""
             if re.match("EXPR ", data):
@@ -132,20 +132,22 @@ def VimServer():
             vim.command("call RWarningMsg('Server failed to read data: " + errstr + "')")
             MyPort = 0
             try:
-                sock.shutdown(socket.SHUT_RD)
+                srvrsckt.shutdown(socket.SHUT_RD)
             except:
+                vim.command("call add(g:rplugin_errlist, 'Failed to shutdown 1.')")
                 pass
-            sock.close()
+            srvrsckt.close()
             return
         try:
-            sock.shutdown(socket.SHUT_RD)
+            srvrsckt.shutdown(socket.SHUT_RD)
         except:
+            vim.command("call add(g:rplugin_errlist, 'Failed to shutdown 2.')")
             pass
-        sock.close()
+        srvrsckt.close()
         if FinishNow == False:
             try:
-                sock = socket.socket( socket.AF_INET, socket.SOCK_DGRAM )
-                sock.bind( (UDP_IP,MyPort) )
+                srvrsckt = socket.socket( socket.AF_INET, socket.SOCK_DGRAM )
+                srvrsckt.bind( (UDP_IP, MyPort) )
             except Exception as errmsg:
                 errstr = str(errmsg)
                 errstr = errstr.replace("'", '"')
@@ -161,9 +163,10 @@ def RunServer():
     th.start()
 
 def StopServer():
-    global sock
+    global srvrsckt
     global MyPort
     global FinishNow
+    global th
     FinishNow = True
     if VimComPort:
         SendToR("\x08Stop Updating Info")
@@ -174,16 +177,19 @@ def StopServer():
     if MyPort == 0:
         return
     try:
-        sock.shutdown(socket.SHUT_RD)
+        srvrsckt.shutdown(socket.SHUT_RD)
     except:
+        vim.command("call add(g:rplugin_errlist, 'Failed to shutdown 3.')")
         pass
     try:
-        sock.close()
+        srvrsckt.close()
     except:
+        vim.command("call add(g:rplugin_errlist, 'Failed to close socket.')")
         pass
     try:
         th.join(0.3)
     except:
+        vim.command("call add(g:rplugin_errlist, 'Failed to join.')")
         pass
     MyPort = 0
 

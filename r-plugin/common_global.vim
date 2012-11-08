@@ -820,6 +820,8 @@ function StartObjectBrowser()
             endif
 
             call delete($VIMRPLUGIN_TMPDIR . "/rpane")
+            call delete($VIMRPLUGIN_TMPDIR . "/object_browser")
+
             Py SendToR("\001Tmux pane")
             let ii = 0
             while !filereadable($VIMRPLUGIN_TMPDIR . "/rpane") && ii < 20
@@ -862,7 +864,6 @@ function StartObjectBrowser()
                         \ 'Py OtherPort = ' . g:rplugin_myport ,
                         \ 'let g:rplugin_myport1 = 5005',
                         \ 'let g:rplugin_myport2 = 5100',
-                        \ 'sleep 250m',
                         \ 'function! RBrSendToR(cmd)',
                         \ '    let scmd = "tmux set-buffer '. "'" . '" . a:cmd . "\<C-M>' . "'" . ' && tmux' . tmxs . 'paste-buffer -t ' . g:rplugin_rpane . '"',
                         \ '    let rlog = system(scmd)',
@@ -873,18 +874,25 @@ function StartObjectBrowser()
                         \ '        return 0',
                         \ '    endif',
                         \ 'endfunction',
+                        \ 'sleep 250m',
                         \ 'Py RunServer()',
-                        \ 'sleep 100m',
+                        \ 'sleep 50m',
                         \ 'let ii = 0',
                         \ 'while ii < 10 && g:rplugin_myport == 0',
                         \ '  Py vim.command("let g:rplugin_myport = " + str(MyPort))',
                         \ '  let ii = ii + 1',
                         \ '  sleep 100m',
                         \ 'endwhile',
-                        \ 'Py VimClient("EXPR let g:rplugin_objbr_port = " + str(MyPort))',
-                        \ 'sleep 200m',
-                        \ 'Py VimClient("EXPR Py OtherPort = " + str(MyPort))',
-                        \ 'call UpdateOB("GlobalEnv")',
+                        \ 'sleep 50m',
+                        \ 'let jj = 0',
+                        \ 'while !filereadable("'. $VIMRPLUGIN_TMPDIR . '/object_browser"' . ') && jj < 40',
+                        \ '  let jj = jj + 1',
+                        \ '  sleep 50m',
+                        \ 'endwhile',
+                        \ 'Py VimClient("EXPR let g:rplugin_objbr_port = " + str(MyPort) + " | Py OtherPort = " + str(MyPort))',
+                        \ 'sleep 50m',
+                        \ 'call setline(1, ".GlobalEnv | Libraries")',
+                        \ 'exe "silent read ' . $VIMRPLUGIN_TMPDIR . '/object_browser"',
                         \ 'redraw'], objbrowserfile)
 
             if g:vimrplugin_objbr_place =~ "left"
@@ -3394,6 +3402,7 @@ let g:rplugin_vimcomport = 0
 let g:rplugin_lastrpl = ""
 let g:rplugin_ob_busy = 0
 let g:rplugin_hasRSFbutton = 0
+let g:rplugin_errlist = []
 
 call SetRPath()
 
