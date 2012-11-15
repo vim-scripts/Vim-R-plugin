@@ -820,9 +820,6 @@ function StartObjectBrowser()
             endif
         endif
 
-        call delete($VIMRPLUGIN_TMPDIR . "/rpane")
-        call delete($VIMRPLUGIN_TMPDIR . "/object_browser")
-
         Py SendToVimCom("\001Tmux pane")
         let ii = 0
         while !filereadable($VIMRPLUGIN_TMPDIR . "/rpane") && ii < 20
@@ -841,7 +838,6 @@ function StartObjectBrowser()
             return
         endif
 
-        exe 'Py SendToVimCom("\007' . g:rplugin_obsname . '")'
 
         if v:servername == ""
             let myservername = '""'
@@ -880,11 +876,9 @@ function StartObjectBrowser()
                     \ '        return 0',
                     \ '    endif',
                     \ 'endfunction',
-                    \ 'sleep 250m',
-                    \ 'while !filereadable("'. $VIMRPLUGIN_TMPDIR . '/object_browser"' . ') && jj < 40',
-                    \ '  let jj = jj + 1',
-                    \ '  sleep 50m',
-                    \ 'endwhile',
+                    \ 'Py SendToVimCom("\003GlobalEnv")',
+                    \ 'Py SendToVimCom("\004Libraries")',
+                    \ "exe 'Py SendToVimCom(\"\007' . v:servername . '\")'",
                     \ 'call setline(1, ".GlobalEnv | Libraries")',
                     \ 'exe "silent read ' . $VIMRPLUGIN_TMPDIR . '/object_browser"',
                     \ 'redraw'], objbrowserfile)
@@ -949,16 +943,25 @@ function StartObjectBrowser()
                 call system("tmux swap-pane -d -s " . g:rplugin_edpane . " -t " . g:rplugin_obpane)
             endif
         endif
-        let ii = 0
-        echohl WarningMsg
-        echo "Please, wait..."
-        echohl Normal
-        echon "\r               "
+        if $DISPLAY == ""
+            call RWarningMsg("The X Window system is required to automatically update the Objetc Browser.")
+        endif
         return
     endif
 
-    if v:servername != "" && g:vimrplugin_conqueplugin == 0
-        exe 'Py SendToVimCom("\007' . v:servername . '")'
+    let wmsg = ""
+    if g:vimrplugin_conqueplugin
+        let wmsg = "The Object Browser is not automatically updated under Conque Shell."
+    else
+        if v:servername == ""
+            if $DISPLAY == "" && !(has("win32") || has("win64"))
+                let wmsg = "The X Window system is required to automatically update the Objetc Browser."
+            else
+                let wmsg ="The Object Browser will not be automatically updated because Vim's client/server was not started."
+            endif
+        else
+            exe 'Py SendToVimCom("\007' . v:servername . '")'
+        endif
     endif
 
     " Either load or reload the Object Browser
@@ -966,6 +969,7 @@ function StartObjectBrowser()
     set switchbuf=useopen,usetab
     if bufloaded(b:objbrtitle)
         exe "sb " . b:objbrtitle
+        let wmsg = ""
     else
         " Copy the values of some local variables that will be inherited
         let g:tmp_objbrtitle = b:objbrtitle
@@ -1012,23 +1016,20 @@ function StartObjectBrowser()
         Py SendToVimCom("\004Libraries")
         call UpdateOB("GlobalEnv")
     endif
+    if wmsg != ""
+        call RWarningMsg(wmsg)
+    endif
 endfunction
 
 " Open an Object Browser window
 function RObjBrowser()
-    if $DISPLAY == ""
-        if !(has("win32") || has("win64"))
-            call RWarningMsg("The X Window system is required to run the Objetc Browser.")
-            return
-        endif
-    endif
     if !has("python") && !has("python3")
         call RWarningMsg("Python support is required to run the Object Browser.")
         return
     endif
 
     " Only opens the Object Browser if R is running
-    if g:vimrplugin_screenplugin && !exists("g:ScreenShellSend")
+    if g:vimrplugin_screenplugin && !exists("g:ScreenShellSend") && !exists("b:this_is_ob")
         return
     endif
     if g:vimrplugin_conqueplugin && !exists("b:conque_bufname")
@@ -1041,12 +1042,13 @@ function RObjBrowser()
 
     let g:rplugin_running_objbr = 1
 
-    call StartObjectBrowser()
-    Py SendToVimCom("\003GlobalEnv")
-    Py SendToVimCom("\004Libraries")
+    if !exists("b:this_is_ob")
+        call StartObjectBrowser()
+    endif
     if exists("*UpdateOB")
-        call UpdateOB("GlobalEnv")
-        call UpdateOB("libraries")
+        Py SendToVimCom("\003GlobalEnv")
+        Py SendToVimCom("\004Libraries")
+        call UpdateOB("both")
     endif
     let g:rplugin_running_objbr = 0
     return
@@ -3062,7 +3064,7 @@ if has("gui_macvim") || has("gui_mac") || has("mac") || has("macunix")
         call RSetDefaultValue("g:vimrplugin_applescript", 0)
     endif
 else
-    call RSetDefaultValue("g:vimrplugin_applescript", 0)
+    let g:vimrplugin_applescript = 0
 endif
 
 if g:vimrplugin_applescript
