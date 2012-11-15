@@ -780,7 +780,7 @@ endfunction
 function StartObjectBrowser()
     if g:vimrplugin_tmux && (g:vimrplugin_screenplugin || g:vimrplugin_external_ob)
 
-        if exists("b:this_is_ob")
+        if b:rplugin_extern_ob
             " This is the Object Browser
             let g:rplugin_running_objbr = 0
             return
@@ -847,7 +847,6 @@ function StartObjectBrowser()
 
         call writefile([
                     \ 'call writefile([$TMUX_PANE], $VIMRPLUGIN_TMPDIR . "/objbrpane")',
-                    \ 'let b:this_is_ob = 1',
                     \ 'let g:rplugin_editor_sname = ' . myservername,
                     \ 'let g:rplugin_edpane = "' . g:rplugin_edpane . '"',
                     \ 'let g:rplugin_rpane = "' . g:rplugin_rpane . '"',
@@ -856,6 +855,7 @@ function StartObjectBrowser()
                     \ 'let b:rscript_buffer = "' . bufname("%") . '"',
                     \ 'set filetype=rbrowser',
                     \ 'let $VIMINSTANCEID="' . $VIMINSTANCEID . '"',
+                    \ 'let b:rplugin_extern_ob = 1',
                     \ 'setlocal modifiable',
                     \ 'set shortmess=atI',
                     \ 'set rulerformat=%3(%l%)',
@@ -878,7 +878,7 @@ function StartObjectBrowser()
                     \ 'endfunction',
                     \ 'Py SendToVimCom("\003GlobalEnv")',
                     \ 'Py SendToVimCom("\004Libraries")',
-                    \ "exe 'Py SendToVimCom(\"\007' . v:servername . '\")'",
+                    \ "exe 'Py SendToVimCom(\"\\x07' . v:servername . '\")'",
                     \ 'call setline(1, ".GlobalEnv | Libraries")',
                     \ 'exe "silent read ' . $VIMRPLUGIN_TMPDIR . '/object_browser"',
                     \ 'redraw'], objbrowserfile)
@@ -1029,7 +1029,7 @@ function RObjBrowser()
     endif
 
     " Only opens the Object Browser if R is running
-    if g:vimrplugin_screenplugin && !exists("g:ScreenShellSend") && !exists("b:this_is_ob")
+    if g:vimrplugin_screenplugin && !exists("g:ScreenShellSend") && !b:rplugin_extern_ob
         return
     endif
     if g:vimrplugin_conqueplugin && !exists("b:conque_bufname")
@@ -1042,7 +1042,7 @@ function RObjBrowser()
 
     let g:rplugin_running_objbr = 1
 
-    if !exists("b:this_is_ob")
+    if !b:rplugin_extern_ob
         call StartObjectBrowser()
     endif
     if exists("*UpdateOB")
@@ -1055,10 +1055,12 @@ function RObjBrowser()
 endfunction
 
 function RBrowserOpenCloseLists(status)
-    if g:vimrplugin_external_ob || (g:vimrplugin_screenplugin && !exists("b:this_is_ob"))
-        let stt = a:status + 2
-    else
+    " Avoid possibly freezing cross messages between Vim and R
+    if exists("g:rplugin_curview") && v:servername != ""
+        Py SendToVimCom("\x08Stop updating info.")
         let stt = a:status
+    else
+        let stt = a:status + 2
     endif
 
     let switchedbuf = 0
@@ -1072,16 +1074,15 @@ function RBrowserOpenCloseLists(status)
     exe 'Py SendToVimCom("' . "\006" . stt . '")'
 
     if exists("g:rplugin_curview")
-        if g:rplugin_curview == "GlobalEnv"
-            call UpdateOB("GlobalEnv")
-        else
-            call UpdateOB("libraries")
-        endif
+        call UpdateOB("both")
     endif
 
     if switchedbuf
         exe "sil noautocmd sb " . g:rplugin_curbuf
         exe "set switchbuf=" . savesb
+    endif
+    if exists("g:rplugin_curview") && v:servername != ""
+        exe 'Py SendToVimCom("\007' . v:servername . '")'
     endif
 endfunction
 
@@ -1103,13 +1104,6 @@ function RScrollTerm()
 
     exe "sil noautocmd sb " . g:rplugin_curbuf
     exe "set switchbuf=" . savesb
-endfunction
-
-" Called by the Object Browser when running remotely:
-function RGetRemoteCmd(cmd)
-    call RWarningMsg(a:cmd)
-    call SendCmdToR(a:cmd)
-    echon
 endfunction
 
 function RFormatCode() range
@@ -2205,7 +2199,7 @@ function RAction(rcmd)
                     else
                         let pkg = ""
                     endif
-                    if exists("b:this_is_ob")
+                    if b:rplugin_extern_ob
                         if g:rplugin_edpane == "none"
                             call RWarningMsg("Cmd not available.")
                         else

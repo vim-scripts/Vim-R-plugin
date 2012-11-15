@@ -817,16 +817,7 @@ missing features; others would be very time consuming to fix without breaking
 anything.
 
 
-5.1. The Object Browser segfaults~
-
-If the Vim instance running the Object Browser crashes you may want to close
-all Vim instances and kill any Vim wandering around with the command (typed in
-a terminal emulator):
->
-   killall -9 vim
-<
-
-5.2. R's source() issues~
+5.1. R's source() issues~
 
 The R's source() function prints an extra new line between commands if the
 option echo = TRUE, and error messages and warning are printed only after the
@@ -834,26 +825,27 @@ entire code is sourced, which makes it more difficult to find errors in the
 code sent to R.
 
 
-5.3. The clipboard's content is lost (Windows only)~
+5.2. The clipboard's content is lost (Windows only)~
 
 On Windows, the plugin copies the command that will be sent to R into the
 clipboard. Thus, if you have anything in the clipboard it will be lost while
 using the plugin.
 
 
-5.4. The menu may not reflect some of your custom key bindings~
+5.3. The menu may not reflect some of your custom key bindings~
 
 If you have created a custom key binding for the Vim-R-plugin, the menu in
 GVim will not always reflect the correct key binding if it is not the same for
 Normal, Visual and Insert modes.
 
 
-5.5. Syntactically correct code may be wrongly indented~
+5.4. Syntactically correct code may be wrongly indented~
 
 If the Vim-R-plugin indents your code wrongly you may get the correct
-indentation by adding braces and line breaks to it. Example:
+indentation by adding braces and line breaks to it. For example, try to
+indent the code below:
 >
-    # This code will be wrongly indented
+    # This code will be wrongly indented:
 
     levels(x) <- ## nl == nL or 1
         if (nl == nL) as.character(labels)
@@ -861,7 +853,7 @@ indentation by adding braces and line breaks to it. Example:
     class(x) <- c(if(ordered) "ordered", "factor")
 
 
-    # But this one will be correctly indented
+    # But this one will be correctly indented:
 
     levels(x) <- ## nl == nL or 1
 	if (nl == nL)
@@ -871,13 +863,13 @@ indentation by adding braces and line breaks to it. Example:
     class(x) <- c(if(ordered) "ordered", "factor")
 <
 
-5.6. Commands are sent twice on Mac OS X~
+5.5. Commands are sent twice on Mac OS X~
 
 If you use the screen plugin with GNU Screen, individual lines may be sent
 duplicated to R on Mac OS X.
 
 
-5.7. "VimCom port not found" on OpenBSD~
+5.6. "VimCom port not found" on OpenBSD~
 
 When the loopback interface has both IPv4 and IPv6 addresses vimcom loads ok
 but apparently does not listen on the IPv4 address (127.0.0.1), only on the
@@ -1891,7 +1883,7 @@ You may need CompizConfig Settings Manager installed to enable this feature
 (look at the "Window Management" section for "Group and Tab Windows").
 
 
-9.17. Edit your ~/.Rprofile~
+9.16. Edit your ~/.Rprofile~
 
 You may want to edit your ~/.Rprofile. Two common options are the use of GVim
 as the text editor and the use of Vim as pager. Example for Linux with these
@@ -1943,7 +1935,7 @@ An example for Windows:
    }
 <
 
-9.18. Debugging R functions~
+9.17. Debugging R functions~
 
 The Vim-R-Plugin does not have debugging facilities, but you may want to use
 the R package "debug":
@@ -1963,7 +1955,7 @@ on top" or a similar option provided by your desktop manager.
 There is also the R package "edtdbg" which aims to integrate R debugging
 facilities with Vim.
 
-9.19. Turn the R-plugin into a global plugin~
+9.18. Turn the R-plugin into a global plugin~
 							     *r-plugin-global*
 The Vim-R-plugin is a file type plugin. If you want its functionality
 available for all file types, then go to your ~/.vim/plugin directory and
@@ -1977,14 +1969,14 @@ On Windows, you probably will have to make a copy of the file to the
 ~/vimfiles/plugin directory.
 
 
-9.20. Disable syntax highlight of R functions~
+9.19. Disable syntax highlight of R functions~
 
 If you want to disable the syntax highlight of R functions edit the file
 ~/.vim/r-plugin/functions.vim and delete all lines, but do not delete the
 file.
 
 
-9.21. Tips for knitr users~
+9.20. Tips for knitr users~
 								       *knitr*
 If you are using knitr with option cache=TRUE, you may want from time to time
 to delete all objects in R workspace and all files in the cache directory. If
@@ -1999,7 +1991,7 @@ them in your vimrc. For example
 
 will produce a german document with a table of contents.
 
-9.22. Start Tmux and Vim at once~
+9.21. Start Tmux and Vim at once~
 
 If you always prefer to run Tmux before running Vim you may want to put in
 your ~/.bashrc:
@@ -2011,7 +2003,7 @@ Then you will be able to start Vim inside a Tmux session by typing:
    tvim filename.R
 <
 
-9.23. Integration with the Conque Shell plugin~
+9.22. Integration with the Conque Shell plugin~
 							     *r-plugin-conque*
 In addition to being integrated with the screen.vim plugin the Vim-R-plugin
 can also use the Conque Shell plugin, but the Conque Shell still has some
@@ -2093,8 +2085,8 @@ we were typing commands directly in the Console it would be beneficial to have
 the R syntax highlighted.
 
 
-9.24. Integration with vimshell~
-
+9.23. Integration with vimshell~
+							   *r-plugin-vimshell*
 Vimshell is still under development, but if you want to integrate it with the
 Vim-R-plugin, put in your |vimrc|:
 >
@@ -2102,6 +2094,12 @@ Vim-R-plugin, put in your |vimrc|:
    let vimrplugin_ca_ck = 0
    let vimrplugin_applescript = 0
    let vimrplugin_vimshell = 1
+<
+If you want the automatic updating of the Object Browser even if running Vim
+in a terminal emulator, you have to start Vim with the |--servername|
+argument. Example:
+>
+   vim --servername OBJBR file.R
 <
 
 ==============================================================================

@@ -33,6 +33,9 @@ endif
 " not created yet or is outdated.
 let b:needsnewomnilist = 0
 
+" This isn't the Object Browser running externally
+let b:rplugin_extern_ob = 0
+
 " Set the name of the Object Browser caption if not set yet
 let s:tnr = tabpagenr()
 if !exists("b:objbrtitle")

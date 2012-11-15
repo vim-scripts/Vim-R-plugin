@@ -66,9 +66,6 @@ function! UpdateOB(what)
     if g:rplugin_curview != wht
         return
     endif
-    if g:rplugin_ob_busy
-        return
-    endif
 
     let g:rplugin_switchedbuf = 0
     if $TMUX_PANE == ""
@@ -342,20 +339,23 @@ function! OBGetDeleteCmd(lnum)
 endfunction
 
 function! OBSendDeleteCmd(cmd)
-    let g:rplugin_ob_busy = 1
+    Py SendToVimCom("\x08Stop updating info.")
     if exists("*RBrSendToR")
         call RBrSendToR(a:cmd)
     else
         call SendCmdToR(a:cmd)
     endif
-    sleep 250m
-    let g:rplugin_ob_busy = 0
-    call UpdateOB(g:rplugin_curview)
-    sleep 10m
+    if g:rplugin_curview == "GlobalEnv"
+        Py SendToVimCom("\003GlobalEnv")
+    else
+        Py SendToVimCom("\004Libraries")
+    endif
+    call UpdateOB("both")
+    exe 'Py SendToVimCom("\x07' . v:servername . '")'
 endfunction
 
 function! OBDelete()
-    if g:rplugin_ob_busy || line(".") < 3
+    if line(".") < 3
         return
     endif
     let cmd = OBGetDeleteCmd(line("."))
@@ -363,9 +363,6 @@ function! OBDelete()
 endfunction
 
 function! OBMultiDelete()
-    if g:rplugin_ob_busy
-        return
-    endif
     let fline = line("'<")
     let eline = line("'>")
     if fline < 3
@@ -405,7 +402,7 @@ call writefile([], $VIMRPLUGIN_TMPDIR . "/liblist")
 
 
 if $TMUX_PANE == ""
-    au BufUnload <buffer> exe 'Py SendToVimCom("\x08Stop updating info.")'
+    au BufUnload <buffer> Py SendToVimCom("\x08Stop updating info.")
 else
     au BufUnload <buffer> call ObBrBufUnload()
     " Don't load problematic plugins
