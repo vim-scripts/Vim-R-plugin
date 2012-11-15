@@ -108,6 +108,7 @@ else
 endif
 let s:uniquename = substitute(s:uniquename, '\W', '', 'g')
 let $VIMINSTANCEID = $VIMRPLUGIN_TMPDIR . "/" . s:uniquename . "-port"
+let g:rplugin_obsname = toupper(substitute(substitute(expand("%:r"), '\W', '', 'g'), "_", "", "g"))
 unlet s:uniquename
 
 let g:rplugin_lastft = &filetype

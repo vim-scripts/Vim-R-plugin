@@ -181,15 +181,16 @@ show how the plugin will work on Linux in different conditions:
    Vim                               Condition~
    ------------------------------    -------------------------------------
    Screen plugin (Tmux)              default on Linux 
-   Screen plugin (GNU Screen)        vimrplugin_tmux = 0 or Tmux not found
+   Screen plugin (GNU Screen)        vimrplugin_tmux = 0
    Tmux (external terminal)          vimrplugin_screenplugin = 0
-   GNU Screen (external terminal)    vimrplugin_screenplugin = 0 and no Tmux
+   GNU Screen (external terminal)    vimrplugin_screenplugin = 0 and
+                                                 vimrplugin_tmux = 0
 
 
    GVim                              Condition~
    ------------------------------    -------------------------------------
    Tmux (external terminal)          default on Linux
-   GNU Screen (external terminal)    vimrplugin_tmux = 0 or Tmux not found
+   GNU Screen (external terminal)    vimrplugin_tmux = 0
 
 
 Note: On Mac OS X the plugin will use AppleScript in both Vim and GVim unless
@@ -613,7 +614,8 @@ Tmux panel. The Object Browser has two views: .GlobalEnv and Libraries. If you
 either press <Enter> or double click (GVim or Vim with 'mouse' set to "a") on
 the first line of the Object Browser it will toggle the view between the
 objects in .GlobalEnv and the currently loaded libraries. The Object Browser
-requires the |+conceal| feature, otherwise list items will be misaligned.
+requires the |+clientserver| feature to be automatically updated and the
+|+conceal| feature to correctly align list items.
 
 In the .GlobalEnv view, if an object has the attribute "label", it will also
 be displayed. Please, see the R help for package vimcom for some options to
@@ -641,17 +643,12 @@ any) used to classify the objects:
 	 Function	is.function()
 	 Statement	isS4()
 
-When running in a terminal emulator under Tmux, the Object Browser will be
-updated automatically. One limitation is that objects made available by the
-command data() may not have their classes recognized in the GlobalEnv view.
+One limitation is that objects made available by the command data() may not
+have their classes recognized in the GlobalEnv view.
 
-When running under Tmux, the Normal mode command  d  deletes the object on the
-cursor line or the element of a list or data.frame. If the Object Browser is
-showing the libraries, the library currently under the cursor line is
-detached. The Object Browser may stop to be updated automatically for a few
-seconds if you press  d  many times quickly. Please, use a value greater than
-250 to set the time in milliseconds that the Object Browser should wait for R
-message that the object was already deleted (see |vimrplugin_ob_sleep|).
+The Normal mode command  d  deletes the object on the cursor line or the
+element of a list or data.frame. If the Object Browser is showing the
+libraries, the library currently under the cursor line is detached.
 
 
 4.6. Commenting and uncommenting lines~
@@ -820,7 +817,7 @@ missing features; others would be very time consuming to fix without breaking
 anything.
 
 
-5.1. The Object Browser segfaults (Linux/Unix only)~
+5.1. The Object Browser segfaults~
 
 If the Vim instance running the Object Browser crashes you may want to close
 all Vim instances and kill any Vim wandering around with the command (typed in
@@ -844,23 +841,14 @@ clipboard. Thus, if you have anything in the clipboard it will be lost while
 using the plugin.
 
 
-5.4. The buffer name must be in the window title (Windows only)~
-
-On Windows the plugin tries to activate the "R Console" window, paste the
-command that is being sent to R, and, then, activate the GVim window. To
-activate the GVim window the plugin requires that the name of the file being
-edited be in the GVim window title. This is the default if you have not set
-the option 'titlestring'.
-
-
-5.5. The menu may not reflect some of your custom key bindings~
+5.4. The menu may not reflect some of your custom key bindings~
 
 If you have created a custom key binding for the Vim-R-plugin, the menu in
 GVim will not always reflect the correct key binding if it is not the same for
 Normal, Visual and Insert modes.
 
 
-5.6. Syntactically correct code may be wrongly indented~
+5.5. Syntactically correct code may be wrongly indented~
 
 If the Vim-R-plugin indents your code wrongly you may get the correct
 indentation by adding braces and line breaks to it. Example:
@@ -883,23 +871,13 @@ indentation by adding braces and line breaks to it. Example:
     class(x) <- c(if(ordered) "ordered", "factor")
 <
 
-5.7. Commands are sent twice on Mac OS X~
+5.6. Commands are sent twice on Mac OS X~
 
 If you use the screen plugin with GNU Screen, individual lines may be sent
 duplicated to R on Mac OS X.
 
 
-5.8. [Errno 98] Address already in use~
-
-When deleting objects using the "d" command in the Object Browser, the message
-"[Errno 98] Address already in use" may appear. In this case, the Object
-Browser will not work properly until you stop using it and wait for the time
-set in 'updatetime' (four seconds, by default). Then, the Object Browser
-should be normal again. The "d" command is available only when running R on
-Tmux.
-
-
-5.9. "VimCom port not found" on OpenBSD~
+5.7. "VimCom port not found" on OpenBSD~
 
 When the loopback interface has both IPv4 and IPv6 addresses vimcom loads ok
 but apparently does not listen on the IPv4 address (127.0.0.1), only on the
@@ -918,7 +896,6 @@ IPv6 one (fe80::1).
 |vimrplugin_objbr_place|       Placement of Object Browser
 |vimrplugin_objbr_w|           Initial width of Object Browser window
 |vimrplugin_external_ob|       Run Object Browser on external terminal
-|vimrplugin_objbr_sleep|       Time the Object Browser waits for R after "d"
 |vimrplugin_vimpager|          Use Vim to see R documentation
 |vimrplugin_editor_w|          Minimum width of R script buffer
 |vimrplugin_help_w|            Desired width of R documentation buffer
@@ -1036,14 +1013,6 @@ emulator and the communication with R is being established through Tmux, the
 Object Browser will be placed besides the R Console in the external terminal
 emulator. In this case, the command <LocalLeader>rh will not work on the
 Object Browser.
-
-When deleting an object from the Object Browser (possible if running Vim under
-Tmux), the following option controls the time in milliseconds that the Object
-Browser will wait for R to send the message updating the list of objects:
->
-   let vimrplugin_ob_sleep = 250m
-<
-You should increase this value if the "[Errno 98]" message appears frequently.
 
 
 6.4. Vim as pager for R help~
@@ -1239,11 +1208,10 @@ If you want to use your own ~/.screenrc, put in your vimrc:
 						     *vimrplugin_only_in_tmux*
 The screen.vim plugin supports both GNU Screen and Tmux, but only Tmux allows
 you to split the terminal vertically (that is, to have the panels side by
-side). Also, the automatic updating of the Object Browser is enabled only when
-running R in a Tmux session. Please read |screen-intro| and
-|screen-shell-vertical| for details. By default, the Vim-R-plugin will tell
-the screen.vim plugin to split the terminal horizontally. If you prefer to
-split it vertically put in your |vimrc|:
+side). Please read |screen-intro| and |screen-shell-vertical| for details. By
+default, the Vim-R-plugin will tell the screen.vim plugin to split the
+terminal horizontally. If you prefer to split it vertically put in your
+|vimrc|:
 >
    let vimrplugin_screenvsplit = 1
    let g:ScreenImpl = 'Tmux'
@@ -1923,18 +1891,6 @@ You may need CompizConfig Settings Manager installed to enable this feature
 (look at the "Window Management" section for "Group and Tab Windows").
 
 
-9.16. Why do I have to updated the Object Browser manually?~
-
-It is because Vim and R run as separate processes and, thus, it is not
-possible to Vim to know whether R is busy or not. If R was running as part of
-the text editor, as happens with RStudio, JGR, RKward, and others, which are
-linked to libR.so, it would be possible to wait for R to finish processing a
-command before sending to it a command to rebuild the list of objects for the
-Object Browser. This command should be sent after each line sent to R. But if
-the Vim-R-plugin did this, the use of Vim would be blocked until R finished
-its processing. 
-
-
 9.17. Edit your ~/.Rprofile~
 
 You may want to edit your ~/.Rprofile. Two common options are the use of GVim
@@ -2080,8 +2036,8 @@ programming writes patches to Vim source code and the patches are accepted by
 the Vim developer.
 
 In addition to these two limitations, the automatic update of the Object
-Browser only works when running Vim under Tmux. Anyway, if you want to try the
-Conque Shell, install it from
+Browser is disabled when Conque Shell is active because the cursor placement
+becomes unstable. Anyway, if you want to try the Conque Shell, install it from
 
    http://www.vim.org/scripts/script.php?script_id=2771
 
@@ -2137,14 +2093,25 @@ we were typing commands directly in the Console it would be beneficial to have
 the R syntax highlighted.
 
 
+9.24. Integration with vimshell~
+
+Vimshell is still under development, but if you want to integrate it with the
+Vim-R-plugin, put in your |vimrc|:
+>
+   let vimrplugin_screenplugin = 0
+   let vimrplugin_ca_ck = 0
+   let vimrplugin_applescript = 0
+   let vimrplugin_vimshell = 1
+<
 
 ==============================================================================
 							       *r-plugin-news*
 10. News~
 
-0.9.9 (2012-11-08)
+0.9.9 (2012-11-14)
 
  * New commands:  :Rinsert  and  :Rformat.
+ * Automatically update the Object Browser in GVim.
 
 0.9.8 (2012-10-13)
 

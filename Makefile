@@ -55,7 +55,7 @@ zip:
 	    r-plugin/objlist/omnils_grDevices r-plugin/objlist/omnils_methods \
 	    r-plugin/objlist/omnils_stats r-plugin/objlist/omnils_utils \
 	    r-plugin/objlist/omnils_vimcom r-plugin/objlist/README \
-	    r-plugin/vimActivate.js r-plugin/tex_indent.vim r-plugin/r.snippets \
+	    r-plugin/tex_indent.vim r-plugin/r.snippets \
 	    r-plugin/common_buffer.vim r-plugin/common_global.vim \
 	    bitmaps/ricon.xbm bitmaps/ricon.png \
 	    bitmaps/RStart.png bitmaps/RStart.bmp \
@@ -166,7 +166,7 @@ deb:
 	unzip /tmp/vim-r-plugin-$(PLUGINVERSION).zip -d /tmp/vim-r-plugin-tmp/usr/share/vim/addons
 	# Delete the files unnecessary in a Debian system
 	(cd /tmp/vim-r-plugin-tmp/usr/share/vim/addons ;\
-	    rm bitmaps/*.bmp r-plugin/windows.py r-plugin/vimActivate.js )
+	    rm bitmaps/*.bmp r-plugin/windows.py )
 	# Add a comment to r-plugin.txt
 	(cd /tmp/vim-r-plugin-tmp/usr/share/vim/addons ;\
 	    sed -e 's/3.2.1. Unix (Linux, OS X, etc.)./3.2.1. Unix (Linux, OS X, etc.)~\n\nNote: If the plugin was installed from the Debian package, then the\ninstallation is finished and you should now read sections 3.3 and 3.4./' -i doc/r-plugin.txt )

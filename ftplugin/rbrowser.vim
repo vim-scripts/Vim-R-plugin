@@ -58,24 +58,35 @@ let g:rplugin_curview = "GlobalEnv"
 
 
 function! UpdateOB(what)
-    if g:rplugin_curview != a:what
+    if a:what == "both"
+        let wht = g:rplugin_curview
+    else
+        let wht = a:what
+    endif
+    if g:rplugin_curview != wht
         return
     endif
     if g:rplugin_ob_busy
         return
     endif
-    redir => s:bufl
-    silent buffers
-    redir END
-    if exists("g:rplugin_curbuf") && g:rplugin_curbuf != "Object_Browser" && g:rplugin_editor_port == 0 && s:bufl =~ "Object_Browser"
-        let savesb = &switchbuf
-        set switchbuf=useopen,usetab
-        sil noautocmd sb Object_Browser
-        let g:rplugin_switchedbuf = 1
-    else
-        let g:rplugin_switchedbuf = 0
+
+    let g:rplugin_switchedbuf = 0
+    if $TMUX_PANE == ""
+        redir => s:bufl
+        silent buffers
+        redir END
+        if s:bufl !~ "Object_Browser"
+            return
+        endif
+        if exists("g:rplugin_curbuf") && g:rplugin_curbuf != "Object_Browser"
+            let savesb = &switchbuf
+            set switchbuf=useopen,usetab
+            sil noautocmd sb Object_Browser
+            let g:rplugin_switchedbuf = 1
+        endif
     endif
-    set modifiable
+
+    setlocal modifiable
     let curline = line(".")
     let curcol = col(".")
     if !exists("curline")
@@ -85,7 +96,7 @@ function! UpdateOB(what)
         let curcol = 1
     endif
     sil normal! ggdG
-    if a:what == "GlobalEnv"
+    if wht == "GlobalEnv"
         call setline(1, ".GlobalEnv | Libraries")
         exe "silent read " . $VIMRPLUGIN_TMPDIR . "/object_browser"
     else
@@ -93,7 +104,7 @@ function! UpdateOB(what)
         exe "silent read " . $VIMRPLUGIN_TMPDIR . "/liblist"
     endif
     call cursor(curline, curcol)
-    set nomodifiable
+    setlocal nomodifiable
     redraw
     if g:rplugin_switchedbuf
         exe "sil noautocmd sb " . g:rplugin_curbuf
@@ -117,7 +128,7 @@ function! RBrowserDoubleClick()
     " Toggle state of list or data.frame: open X closed
     let key = RBrowserGetName(1, line("."))
     if g:rplugin_curview == "GlobalEnv"
-        exe 'Py SendToR("' . "\005" . '-' . substitute(key, '\$', '-', "g") . '")'
+        exe 'Py SendToVimCom("' . "\005" . '-' . substitute(key, '\$', '-', "g") . '")'
         call UpdateOB("GlobalEnv")
     else
         let key = substitute(key, '\$', '-', "g") 
@@ -125,7 +136,7 @@ function! RBrowserDoubleClick()
         if key !~ "^package:"
             let key = "package:" . RBGetPkgName() . '-' . key
         endif
-        exe 'Py SendToR("' . "\005" . key . '")'
+        exe 'Py SendToVimCom("' . "\005" . key . '")'
         call UpdateOB("libraries")
     endif
 endfunction
@@ -298,10 +309,9 @@ function! MakeRBrowserMenu()
 endfunction
 
 function! ObBrBufUnload()
-    Py StopServer()
     call delete($VIMRPLUGIN_TMPDIR . "/object_browser")
     call delete($VIMRPLUGIN_TMPDIR . "/liblist")
-    if g:rplugin_editor_port
+    if exists("g:rplugin_editor_sname")
         call system("tmux select-pane -t " . g:rplugin_edpane)
     endif
 endfunction
@@ -333,7 +343,11 @@ endfunction
 
 function! OBSendDeleteCmd(cmd)
     let g:rplugin_ob_busy = 1
-    call RBrSendToR(a:cmd)
+    if exists("*RBrSendToR")
+        call RBrSendToR(a:cmd)
+    else
+        call SendCmdToR(a:cmd)
+    endif
     sleep 250m
     let g:rplugin_ob_busy = 0
     call UpdateOB(g:rplugin_curview)
@@ -341,7 +355,7 @@ function! OBSendDeleteCmd(cmd)
 endfunction
 
 function! OBDelete()
-    if g:rplugin_ob_busy || line(".") < 3 || g:rplugin_myport == 0
+    if g:rplugin_ob_busy || line(".") < 3
         return
     endif
     let cmd = OBGetDeleteCmd(line("."))
@@ -349,7 +363,7 @@ function! OBDelete()
 endfunction
 
 function! OBMultiDelete()
-    if g:rplugin_ob_busy || g:rplugin_myport == 0
+    if g:rplugin_ob_busy
         return
     endif
     let fline = line("'<")
@@ -389,27 +403,18 @@ endif
 call writefile([], $VIMRPLUGIN_TMPDIR . "/object_browser")
 call writefile([], $VIMRPLUGIN_TMPDIR . "/liblist")
 
-au BufUnload <buffer> call ObBrBufUnload()
 
-function! RKeepRunning()
-    if g:rplugin_myport == 0
-        call add(g:rplugin_errlist, "RKeepRunning in action.")
-        Py StopServer()
-        sleep 250m
-        Py RunServer()
-        echon
-    endif
-endfunction
-
-if $TMUX_PANE != ""
-    set updatetime=3200
-    autocmd CursorHold <buffer> call RKeepRunning()
-    nmap <buffer><silent> d :call OBDelete()<CR>
-    vmap <buffer><silent> d <Esc>:call OBMultiDelete()<CR>
+if $TMUX_PANE == ""
+    au BufUnload <buffer> exe 'Py SendToVimCom("\x08Stop updating info.")'
+else
+    au BufUnload <buffer> call ObBrBufUnload()
     " Don't load problematic plugins
     let loaded_nerd_tree = 1
     let loaded_showmarks = 1
 endif
+
+nmap <buffer><silent> d :call OBDelete()<CR>
+vmap <buffer><silent> d <Esc>:call OBMultiDelete()<CR>
 
 let s:envstring = tolower($LC_MESSAGES . $LC_ALL . $LANG)
 if s:envstring =~ "utf-8" || s:envstring =~ "utf8"

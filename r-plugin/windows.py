@@ -3,12 +3,15 @@ import os
 import string
 import time
 import vim
+RConsole = 0
+cdata = None
 
 try:
     import win32api
-    import win32clipboard as w
+    import win32clipboard
     import win32com.client
     import win32con
+    import win32gui
 except ImportError:
     import platform
     myPyVersion = platform.python_version()
@@ -16,54 +19,68 @@ except ImportError:
     vim.command("call RWarningMsgInp('Please install PyWin32. The Python version being used is: " + myPyVersion + " (" + myArch[0] + ")')")
     vim.command("let rplugin_pywin32 = 0")
 
+def RaiseRConsole():
+    global RConsole
+    if RConsole == 0:
+        RConsole = win32gui.FindWindow(None, "R Console")
+        if RConsole == 0:
+            RConsole = win32gui.FindWindow(None, "R Console (64-bit)")
+            if RConsole == 0:
+                RConsole = win32gui.FindWindow(None, "R Console (32-bit)")
+                if RConsole == 0:
+                    vim.command("call RWarningMsg('Could not find R Console.')")
+                    return False
+    win32gui.SetForegroundWindow(RConsole)
 
-def SendToRPy(aString):
-    # backup the clipboard content (if text)
-    w.OpenClipboard(0)
-    if w.IsClipboardFormatAvailable(w.CF_TEXT):
-        cdata = w.GetClipboardData()
+def VimSaveClipBoard():
+    global cdata
+    win32clipboard.OpenClipboard(0)
+    if win32clipboard.IsClipboardFormatAvailable(win32clipboard.CF_TEXT):
+        cdata = win32clipboard.GetClipboardData()
     else:
         cdata = None
-    w.CloseClipboard()
+    win32clipboard.CloseClipboard()
 
+def SendToRConsole(aString):
+    SendToVimCom("\x09" + win32gui.GetWindowText(win32gui.GetForegroundWindow()))
     finalString = aString.decode("latin-1")
-
+    win32clipboard.OpenClipboard(0)
+    win32clipboard.EmptyClipboard()
+    win32clipboard.SetClipboardText(finalString)
+    win32clipboard.CloseClipboard()
     sleepTime = float(vim.eval("g:vimrplugin_sleeptime"))
-    w.OpenClipboard(0)
-    w.EmptyClipboard()
-    w.SetClipboardText(finalString)
-    w.CloseClipboard()
+    RaiseRConsole()
+    time.sleep(sleepTime)
+    win32api.keybd_event(win32con.VK_CONTROL, 0, 0, 0)
+    win32api.keybd_event(ord('V'), 0, win32con.KEYEVENTF_EXTENDEDKEY | 0, 0) 
+    time.sleep(0.05)
+    win32api.keybd_event(ord('V'), 0, win32con.KEYEVENTF_EXTENDEDKEY | win32con.KEYEVENTF_KEYUP, 0)
+    win32api.keybd_event(win32con.VK_CONTROL, 0, win32con.KEYEVENTF_KEYUP, 0)
+    time.sleep(0.05)
+    SendToVimCom("\x0ARaise GVim window.")
 
-    shell = win32com.client.Dispatch("WScript.Shell")
-    ok = shell.AppActivate("R Console")
-    if ok:
-        time.sleep(sleepTime)
-        shell.SendKeys("^v")
-        time.sleep(sleepTime)
-    else:
-        vim.command("call RWarningMsg('Is R running?')")
-        time.sleep(1)
-    
-def RestoreClipboardPy():
+def VimRestoreClipboard():
+    global cdata
     if cdata:
-        w.OpenClipboard(0)
-        w.EmptyClipboard()
-        w.SetClipboardText(cdata)
-        w.CloseClipboard()
+        win32clipboard.OpenClipboard(0)
+        win32clipboard.EmptyClipboard()
+        win32clipboard.SetClipboardText(cdata)
+        win32clipboard.CloseClipboard()
 
 def RClearConsolePy():
-
+    SendToVimCom("\x09" + win32gui.GetWindowText(win32gui.GetForegroundWindow()))
     sleepTime = string.atof(vim.eval("g:vimrplugin_sleeptime"))
-    shell = win32com.client.Dispatch("WScript.Shell")
-    ok = shell.AppActivate("R Console")
-    if ok:
-        shell.SendKeys("^l")
-        time.sleep(sleepTime)
-    else:
-        vim.command("call RWarningMsg('Is R running?')")
-        time.sleep(1)
+    RaiseRConsole()
+    time.sleep(sleepTime)
+    win32api.keybd_event(win32con.VK_CONTROL, 0, 0, 0)
+    win32api.keybd_event(ord('L'), 0, win32con.KEYEVENTF_EXTENDEDKEY | 0, 0) 
+    time.sleep(0.05)
+    win32api.keybd_event(ord('L'), 0, win32con.KEYEVENTF_EXTENDEDKEY | win32con.KEYEVENTF_KEYUP, 0)
+    win32api.keybd_event(win32con.VK_CONTROL, 0, win32con.KEYEVENTF_KEYUP, 0)
+    time.sleep(0.05)
+    SendToVimCom("\x0ARaise GVim window.")
 
-def GetRPathPy():
+def GetRPath():
     keyName = "SOFTWARE\\R-core\\R"
     kHandle = None
     try:
@@ -135,4 +152,4 @@ def OpenPDF(fn):
         vim.command("call RWarningMsg('" + errstr + "')")
         pass
 
-# vim: sw=4 tabstop=4 expandtab
+

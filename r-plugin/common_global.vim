@@ -187,9 +187,9 @@ function RCompleteArgs()
             let rkeyword = '^' . rkeyword0 . "\x06"
             call cursor(cpos[1], cpos[2])
             if classfor == ""
-                exe 'Py SendToR("vimcom:::vim.args(' . "'" . rkeyword0 . "', '" . argkey . "')" . '")'
+                exe 'Py SendToVimCom("vimcom:::vim.args(' . "'" . rkeyword0 . "', '" . argkey . "')" . '")'
             else
-                exe 'Py SendToR("vimcom:::vim.args(' . "'" . rkeyword0 . "', '" . argkey . "', classfor = " . classfor . ")" . '")'
+                exe 'Py SendToVimCom("vimcom:::vim.args(' . "'" . rkeyword0 . "', '" . argkey . "', classfor = " . classfor . ")" . '")'
             endif
             if g:rplugin_vimcomport > 0 && g:rplugin_lastrpl != "NOT_EXISTS" && g:rplugin_lastrpl != "NO_ARGS" && g:rplugin_lastrpl != "R is busy." && g:rplugin_lastrpl != "NOANSWER" && g:rplugin_lastrpl != "INVALID" && g:rplugin_lastrpl != ""
                 let args = []
@@ -730,7 +730,14 @@ function StartR(whatr)
                 call writefile(cnflines, tmxcnf)
                 let tmxcnf = "-f " . tmxcnf
             endif
-            call system("tmux has-session -t" . b:screensname)
+            if $DISPLAY == ""
+                if !(has("win32") || has("win64"))
+                    call RWarningMsg("The X Window system is required to run R in an external terminal.")
+                    lcd -
+                    return
+                endif
+            endif
+            call system("tmux has-session -t " . b:screensname)
             if v:shell_error
                 if g:rplugin_termcmd =~ "gnome-terminal" || g:rplugin_termcmd =~ "xfce4-terminal" || g:rplugin_termcmd =~ "terminal" || g:rplugin_termcmd =~ "iterm"
                     let opencmd = printf("%s 'tmux -2 %s new-session -s %s \"%s\"' &", g:rplugin_termcmd, tmxcnf, b:screensname, rcmd)
@@ -773,198 +780,185 @@ endfunction
 function StartObjectBrowser()
     if g:vimrplugin_tmux && (g:vimrplugin_screenplugin || g:vimrplugin_external_ob)
 
-        if g:rplugin_editor_port
+        if exists("b:this_is_ob")
             " This is the Object Browser
-            Py VimClient("EXPR call RObjBrowser()")
             let g:rplugin_running_objbr = 0
             return
         endif
 
-        if g:rplugin_myport == 0
-            let g:rplugin_myport1 = 6005
-            let g:rplugin_myport2 = 6100
-            Py RunServer()
-            sleep 100m
-            let ii = 0
-            while ii < 10 && g:rplugin_myport == 0
-                Py vim.command("let g:rplugin_myport = " + str(MyPort))
-                let ii = ii + 1
-                sleep 100m
-            endwhile
+        " Don't start the Object Browser if it already exists
+        if exists("g:rplugin_obpane")
+            let plst = system("tmux list-panes | cat")
+            if plst =~ g:rplugin_obpane
+                return
+            endif
+            unlet g:rplugin_obpane
+        endif
+        sleep 250m
+
+        let objbrowserfile = $VIMRPLUGIN_TMPDIR . "/objbrowserInit"
+        if exists("g:ScreenShellSession")
+            let tmxs = " -S " . g:ScreenShellSession . " "
+        else
+            let tmxs = " "
         endif
 
-        " Start the Object Browser if it doesn't exist yet
-        if g:rplugin_objbr_port == 0
-            let objbrowserfile = $VIMRPLUGIN_TMPDIR . "/objbrowserInit"
-            if exists("g:ScreenShellSession")
-                let tmxs = " -S " . g:ScreenShellSession . " "
+        if !exists("g:rplugin_edpane")
+            if g:vimrplugin_screenplugin == 0
+                let g:rplugin_edpane = "none"
             else
-                let tmxs = " "
+                let g:rplugin_edpane = $TMUX_PANE
             endif
-
-            if !exists("g:rplugin_edpane")
-                if g:vimrplugin_screenplugin == 0
+            if strlen(g:rplugin_edpane) == 0
+                if g:vimrplugin_external_ob
                     let g:rplugin_edpane = "none"
+                    let g:vimrplugin_objbr_place = substitute(g:vimrplugin_objbr_place, "script", "console", "g")
                 else
-                    let g:rplugin_edpane = $TMUX_PANE
-                endif
-                if strlen(g:rplugin_edpane) == 0
-                    if g:vimrplugin_external_ob
-                        let g:rplugin_edpane = "none"
-                        let g:vimrplugin_objbr_place = substitute(g:vimrplugin_objbr_place, "script", "console", "g")
-                    else
-                        echoer "Could not find the environment variable TMUX_PANE."
-                        return
-                    endif
+                    echoer "Could not find the environment variable TMUX_PANE."
+                    return
                 endif
             endif
-
-            call delete($VIMRPLUGIN_TMPDIR . "/rpane")
-            call delete($VIMRPLUGIN_TMPDIR . "/object_browser")
-
-            Py SendToR("\001Tmux pane")
-            let ii = 0
-            while !filereadable($VIMRPLUGIN_TMPDIR . "/rpane") && ii < 20
-                let ii = ii + 1
-                sleep 50m
-            endwhile
-            if !filereadable($VIMRPLUGIN_TMPDIR . "/rpane")
-                echoer "The number of the R Tmux pane is unknown."
-                return
-            endif
-            let xx = readfile($VIMRPLUGIN_TMPDIR . "/rpane")
-            let g:rplugin_rpane = xx[0]
-            if g:rplugin_rpane !~ "%[0-9]"
-                echoer 'The number of the R Tmux pane is invalid: "' . g:rplugin_rpane . '"'
-                unlet g:rplugin_rpane
-                return
-            endif
-
-            call writefile([
-                        \ 'call writefile([$TMUX_PANE], $VIMRPLUGIN_TMPDIR . "/objbrpane")',
-                        \ 'let b:this_is_ob = 1',
-                        \ 'let g:rplugin_editor_port = ' . g:rplugin_myport ,
-                        \ 'let g:rplugin_edpane = "' . g:rplugin_edpane . '"',
-                        \ 'let g:rplugin_rpane = "' . g:rplugin_rpane . '"',
-                        \ 'let b:objbrtitle = "' . b:objbrtitle . '"',
-                        \ 'let b:screensname = "' . b:screensname . '"',
-                        \ 'let b:rscript_buffer = "' . bufname("%") . '"',
-                        \ 'set filetype=rbrowser',
-                        \ 'let $VIMINSTANCEID="' . $VIMINSTANCEID . '"',
-                        \ 'setlocal modifiable',
-                        \ 'set shortmess=atI',
-                        \ 'set rulerformat=%3(%l%)',
-                        \ 'set noruler',
-                        \ 'let curline = line(".")',
-                        \ 'let curcol = col(".")',
-                        \ 'normal! ggdG',
-                        \ 'setlocal nomodified',
-                        \ 'call cursor(curline, curcol)',
-                        \ 'exe "PyFile " . g:rplugin_home . "/r-plugin/vimcom.py"',
-                        \ 'Py OtherPort = ' . g:rplugin_myport ,
-                        \ 'let g:rplugin_myport1 = 5005',
-                        \ 'let g:rplugin_myport2 = 5100',
-                        \ 'function! RBrSendToR(cmd)',
-                        \ '    let scmd = "tmux set-buffer '. "'" . '" . a:cmd . "\<C-M>' . "'" . ' && tmux' . tmxs . 'paste-buffer -t ' . g:rplugin_rpane . '"',
-                        \ '    let rlog = system(scmd)',
-                        \ '    if v:shell_error',
-                        \ '        let rlog = substitute(rlog, "\n", " ", "g")',
-                        \ '        let rlog = substitute(rlog, "\r", " ", "g")',
-                        \ '        call RWarningMsg(rlog)',
-                        \ '        return 0',
-                        \ '    endif',
-                        \ 'endfunction',
-                        \ 'sleep 250m',
-                        \ 'Py RunServer()',
-                        \ 'sleep 50m',
-                        \ 'let ii = 0',
-                        \ 'while ii < 10 && g:rplugin_myport == 0',
-                        \ '  Py vim.command("let g:rplugin_myport = " + str(MyPort))',
-                        \ '  let ii = ii + 1',
-                        \ '  sleep 100m',
-                        \ 'endwhile',
-                        \ 'sleep 50m',
-                        \ 'let jj = 0',
-                        \ 'while !filereadable("'. $VIMRPLUGIN_TMPDIR . '/object_browser"' . ') && jj < 40',
-                        \ '  let jj = jj + 1',
-                        \ '  sleep 50m',
-                        \ 'endwhile',
-                        \ 'Py VimClient("EXPR let g:rplugin_objbr_port = " + str(MyPort) + " | Py OtherPort = " + str(MyPort))',
-                        \ 'sleep 50m',
-                        \ 'call setline(1, ".GlobalEnv | Libraries")',
-                        \ 'exe "silent read ' . $VIMRPLUGIN_TMPDIR . '/object_browser"',
-                        \ 'redraw'], objbrowserfile)
-
-            if g:vimrplugin_objbr_place =~ "left"
-                let panw = system("tmux list-panes | cat")
-                if g:vimrplugin_objbr_place =~ "console"
-                    " Get the R Console width:
-                    let panw = substitute(panw, '.*\n1: \[\([0-9]*\)x.*', '\1', "")
-                else
-                    " Get the Vim with
-                    let panw = substitute(panw, '.*0: \[\([0-9]*\)x.*', '\1', "")
-                endif
-                let panewidth = panw - g:vimrplugin_objbr_w
-                " Just to be safe: If the above code doesn't work as expected
-                " and we get a spurious value:
-                if panewidth < 40 || panewidth > 180
-                    let panewidth = 80
-                endif
-            else
-                let panewidth = g:vimrplugin_objbr_w
-            endif
-            if g:vimrplugin_objbr_place =~ "console"
-                let cmd = "tmux split-window -d -h -l " . panewidth . " -t " . g:rplugin_rpane . ' "vim -c ' . "'source " . objbrowserfile . "'" . '"'
-            else
-                let cmd = "tmux split-window -d -h -l " . panewidth . " -t " . g:rplugin_edpane . ' "vim -c ' . "'source " . objbrowserfile . "'" . '"'
-            endif
-
-            call delete($VIMRPLUGIN_TMPDIR . "/objbrpane")
-
-            let rlog = system(cmd)
-            if v:shell_error
-                let rlog = substitute(rlog, '\n', ' ', 'g')
-                let rlog = substitute(rlog, '\r', ' ', 'g')
-                call RWarningMsg(rlog)
-                let g:rplugin_running_objbr = 0
-                return 0
-            endif
-
-            let ii = 0
-            while !filereadable($VIMRPLUGIN_TMPDIR . "/objbrpane") && ii < 20
-                let ii = ii + 1
-                sleep 50m
-            endwhile
-            if !filereadable($VIMRPLUGIN_TMPDIR . "/objbrpane")
-                echoer "The Tmux pane number of the Object Browser is unknown."
-                return
-            endif
-            let xx = readfile($VIMRPLUGIN_TMPDIR . "/objbrpane")
-            let g:rplugin_obpane = xx[0]
-            if g:rplugin_obpane !~ "%[0-9]"
-                echoer 'The number of the Object Browser Tmux pane is invalid: "' . g:rplugin_obpane . '"'
-                unlet g:rplugin_obpane
-                return
-            endif
-
-            if g:vimrplugin_objbr_place =~ "left"
-                if g:vimrplugin_objbr_place =~ "console"
-                    call system("tmux swap-pane -d -s " . g:rplugin_rpane . " -t " . g:rplugin_obpane)
-                else
-                    call system("tmux swap-pane -d -s " . g:rplugin_edpane . " -t " . g:rplugin_obpane)
-                endif
-            endif
-            let ii = 0
-            echohl WarningMsg
-            echo "Please, wait..."
-            echohl Normal
-            while g:rplugin_objbr_port == 0 && ii < 10
-                sleep 200m
-                let ii = ii + 1
-            endwhile
-            echon "\r               "
         endif
+
+        call delete($VIMRPLUGIN_TMPDIR . "/rpane")
+        call delete($VIMRPLUGIN_TMPDIR . "/object_browser")
+
+        Py SendToVimCom("\001Tmux pane")
+        let ii = 0
+        while !filereadable($VIMRPLUGIN_TMPDIR . "/rpane") && ii < 20
+            let ii = ii + 1
+            sleep 50m
+        endwhile
+        if !filereadable($VIMRPLUGIN_TMPDIR . "/rpane")
+            echoer "The number of the R Tmux pane is unknown."
+            return
+        endif
+        let xx = readfile($VIMRPLUGIN_TMPDIR . "/rpane")
+        let g:rplugin_rpane = xx[0]
+        if g:rplugin_rpane !~ "%[0-9]"
+            echoer 'The number of the R Tmux pane is invalid: "' . g:rplugin_rpane . '"'
+            unlet g:rplugin_rpane
+            return
+        endif
+
+        exe 'Py SendToVimCom("\007' . g:rplugin_obsname . '")'
+
+        if v:servername == ""
+            let myservername = '""'
+        else
+            let myservername = v:servername
+        endif
+
+        call writefile([
+                    \ 'call writefile([$TMUX_PANE], $VIMRPLUGIN_TMPDIR . "/objbrpane")',
+                    \ 'let b:this_is_ob = 1',
+                    \ 'let g:rplugin_editor_sname = ' . myservername,
+                    \ 'let g:rplugin_edpane = "' . g:rplugin_edpane . '"',
+                    \ 'let g:rplugin_rpane = "' . g:rplugin_rpane . '"',
+                    \ 'let b:objbrtitle = "' . b:objbrtitle . '"',
+                    \ 'let b:screensname = "' . b:screensname . '"',
+                    \ 'let b:rscript_buffer = "' . bufname("%") . '"',
+                    \ 'set filetype=rbrowser',
+                    \ 'let $VIMINSTANCEID="' . $VIMINSTANCEID . '"',
+                    \ 'setlocal modifiable',
+                    \ 'set shortmess=atI',
+                    \ 'set rulerformat=%3(%l%)',
+                    \ 'set noruler',
+                    \ 'let curline = line(".")',
+                    \ 'let curcol = col(".")',
+                    \ 'normal! ggdG',
+                    \ 'setlocal nomodified',
+                    \ 'call cursor(curline, curcol)',
+                    \ 'exe "PyFile " . g:rplugin_home . "/r-plugin/vimcom.py"',
+                    \ 'function! RBrSendToR(cmd)',
+                    \ '    let scmd = "tmux set-buffer '. "'" . '" . a:cmd . "\<C-M>' . "'" . ' && tmux' . tmxs . 'paste-buffer -t ' . g:rplugin_rpane . '"',
+                    \ '    let rlog = system(scmd)',
+                    \ '    if v:shell_error',
+                    \ '        let rlog = substitute(rlog, "\n", " ", "g")',
+                    \ '        let rlog = substitute(rlog, "\r", " ", "g")',
+                    \ '        call RWarningMsg(rlog)',
+                    \ '        return 0',
+                    \ '    endif',
+                    \ 'endfunction',
+                    \ 'sleep 250m',
+                    \ 'while !filereadable("'. $VIMRPLUGIN_TMPDIR . '/object_browser"' . ') && jj < 40',
+                    \ '  let jj = jj + 1',
+                    \ '  sleep 50m',
+                    \ 'endwhile',
+                    \ 'call setline(1, ".GlobalEnv | Libraries")',
+                    \ 'exe "silent read ' . $VIMRPLUGIN_TMPDIR . '/object_browser"',
+                    \ 'redraw'], objbrowserfile)
+
+        if g:vimrplugin_objbr_place =~ "left"
+            let panw = system("tmux list-panes | cat")
+            if g:vimrplugin_objbr_place =~ "console"
+                " Get the R Console width:
+                let panw = substitute(panw, '.*\n1: \[\([0-9]*\)x.*', '\1', "")
+            else
+                " Get the Vim with
+                let panw = substitute(panw, '.*0: \[\([0-9]*\)x.*', '\1', "")
+            endif
+            let panewidth = panw - g:vimrplugin_objbr_w
+            " Just to be safe: If the above code doesn't work as expected
+            " and we get a spurious value:
+            if panewidth < 40 || panewidth > 180
+                let panewidth = 80
+            endif
+        else
+            let panewidth = g:vimrplugin_objbr_w
+        endif
+        if g:vimrplugin_objbr_place =~ "console"
+            let obpane = g:rplugin_rpane
+        else
+            let obpane = g:rplugin_edpane
+        endif
+        let cmd = "tmux split-window -d -h -l " . panewidth . " -t " . obpane . ' "vim --servername ' . g:rplugin_obsname. ' -c ' . "'source " . objbrowserfile . "'" . '"'
+
+        call delete($VIMRPLUGIN_TMPDIR . "/objbrpane")
+
+        let rlog = system(cmd)
+        if v:shell_error
+            let rlog = substitute(rlog, '\n', ' ', 'g')
+            let rlog = substitute(rlog, '\r', ' ', 'g')
+            call RWarningMsg(rlog)
+            let g:rplugin_running_objbr = 0
+            return 0
+        endif
+
+        let ii = 0
+        while !filereadable($VIMRPLUGIN_TMPDIR . "/objbrpane") && ii < 20
+            let ii = ii + 1
+            sleep 50m
+        endwhile
+        if !filereadable($VIMRPLUGIN_TMPDIR . "/objbrpane")
+            echoer "The Tmux pane number of the Object Browser is unknown."
+            return
+        endif
+        let xx = readfile($VIMRPLUGIN_TMPDIR . "/objbrpane")
+        let g:rplugin_obpane = xx[0]
+        if g:rplugin_obpane !~ "%[0-9]"
+            echoer 'The number of the Object Browser Tmux pane is invalid: "' . g:rplugin_obpane . '"'
+            unlet g:rplugin_obpane
+            return
+        endif
+
+        if g:vimrplugin_objbr_place =~ "left"
+            if g:vimrplugin_objbr_place =~ "console"
+                call system("tmux swap-pane -d -s " . g:rplugin_rpane . " -t " . g:rplugin_obpane)
+            else
+                call system("tmux swap-pane -d -s " . g:rplugin_edpane . " -t " . g:rplugin_obpane)
+            endif
+        endif
+        let ii = 0
+        echohl WarningMsg
+        echo "Please, wait..."
+        echohl Normal
+        echon "\r               "
         return
+    endif
+
+    if v:servername != "" && g:vimrplugin_conqueplugin == 0
+        exe 'Py SendToVimCom("\007' . v:servername . '")'
     endif
 
     " Either load or reload the Object Browser
@@ -1014,14 +1008,20 @@ function StartObjectBrowser()
         unlet g:tmp_screensname
         unlet g:tmp_curbufname
         exe "PyFile " . g:rplugin_home . "/r-plugin/vimcom.py"
-        Py SendToR("\003GlobalEnv")
-        Py SendToR("\004Libraries")
+        Py SendToVimCom("\003GlobalEnv")
+        Py SendToVimCom("\004Libraries")
         call UpdateOB("GlobalEnv")
     endif
 endfunction
 
 " Open an Object Browser window
 function RObjBrowser()
+    if $DISPLAY == ""
+        if !(has("win32") || has("win64"))
+            call RWarningMsg("The X Window system is required to run the Objetc Browser.")
+            return
+        endif
+    endif
     if !has("python") && !has("python3")
         call RWarningMsg("Python support is required to run the Object Browser.")
         return
@@ -1042,8 +1042,8 @@ function RObjBrowser()
     let g:rplugin_running_objbr = 1
 
     call StartObjectBrowser()
-    Py SendToR("\003GlobalEnv")
-    Py SendToR("\004Libraries")
+    Py SendToVimCom("\003GlobalEnv")
+    Py SendToVimCom("\004Libraries")
     if exists("*UpdateOB")
         call UpdateOB("GlobalEnv")
         call UpdateOB("libraries")
@@ -1067,7 +1067,7 @@ function RBrowserOpenCloseLists(status)
         let switchedbuf = 1
     endif
 
-    exe 'Py SendToR("' . "\006" . stt . '")'
+    exe 'Py SendToVimCom("' . "\006" . stt . '")'
 
     if exists("g:rplugin_curview")
         if g:rplugin_curview == "GlobalEnv"
@@ -1127,7 +1127,7 @@ function RFormatCode() range
     elseif wco > 180
         let wco = 180
     endif
-    exe "Py SendToR('formatR::tidy.source(\"" . $VIMRPLUGIN_TMPDIR . "/unformatted_code" . "\", file = \"" . $VIMRPLUGIN_TMPDIR . "/formatted_code\", width.cutoff = " . wco . ")')"
+    exe "Py SendToVimCom('formatR::tidy.source(\"" . $VIMRPLUGIN_TMPDIR . "/unformatted_code" . "\", file = \"" . $VIMRPLUGIN_TMPDIR . "/formatted_code\", width.cutoff = " . wco . ")')"
     if g:rplugin_lastrpl == "R is busy." || g:rplugin_lastrpl == "UNKNOWN" || g:rplugin_lastrpl =~ "^Error" || g:rplugin_lastrpl == "INVALID" || g:rplugin_lastrpl == "ERROR" || g:rplugin_lastrpl == "EMPTY"
         call RWarningMsg(g:rplugin_lastrpl)
         return
@@ -1145,7 +1145,7 @@ function RInsert(cmd)
             return
         endif
     endif
-    exe "Py SendToR('paste(capture.output(" . a:cmd . "), collapse = \"\\\\n\")')"
+    exe "Py SendToVimCom('paste(capture.output(" . a:cmd . "), collapse = \"\\\\n\")')"
     if g:rplugin_lastrpl == "R is busy." || g:rplugin_lastrpl == "UNKNOWN" || g:rplugin_lastrpl =~ "^Error" || g:rplugin_lastrpl == "INVALID" || g:rplugin_lastrpl == "ERROR" || g:rplugin_lastrpl == "EMPTY" || g:rplugin_lastrpl == "RTYPE"
         call RWarningMsg(g:rplugin_lastrpl)
     else
@@ -1172,9 +1172,9 @@ function SendCmdToR(cmd)
             for i in range(0, slen)
                 let str = str . printf("\\x%02X", char2nr(cmd[i]))
             endfor
-            exe "Py" . " SendToRPy(b'" . str . "')"
-            silent exe '!start WScript "' . g:rplugin_jspath . '" "' . expand("%") . '"'
-            " call RestoreClipboardPy()
+            " Py VimSaveClipBoard()
+            exe "Py" . " SendToRConsole(b'" . str . "')"
+            " Py VimRestoreClipboard()
         endif
         return 1
     endif
@@ -1674,9 +1674,8 @@ endfunction
 
 " Clear the console screen
 function RClearConsole()
-    if (has("win32") || has("win64")) && g:vimrplugin_conqueplugin == 0
+    if (has("win32") || has("win64")) && g:vimrplugin_conqueplugin == 0 && g:vimrplugin_vimshell == 0
         Py RClearConsolePy()
-        silent exe '!start WScript "' . g:rplugin_jspath . '" "' . expand("%") . '"'
     else
         call SendCmdToR("\014")
     endif
@@ -1704,16 +1703,6 @@ endfunction
 
 " Quit R
 function RQuit(how)
-    if g:rplugin_objbr_port
-        Py VimClient("FINISH")
-        sleep 200m
-        Py OtherPort = 0
-    endif
-    if g:rplugin_myport
-        Py StopServer()
-        sleep 200m
-    endif
-
     if bufloaded(b:objbrtitle)
         exe "bunload! " . b:objbrtitle
         sleep 150m
@@ -1731,14 +1720,14 @@ function RQuit(how)
     endif
     sleep 250m
 
-    if g:rplugin_objbr_port
-        " check if the pane still exists before trying to kill it because the
-        " user may have already closed the Object Browser manually.
+    " check if the pane still exists before trying to kill it because the
+    " user may have already closed the Object Browser manually.
+    if exists("g:rplugin_obpane")
         let plst = system("tmux list-panes | cat")
         if plst =~ g:rplugin_obpane
             call system("tmux kill-pane -t " . g:rplugin_obpane)
+            unlet g:rplugin_obpane
         endif
-        let g:rplugin_objbr_port = 0
         sleep 250m
     endif
 
@@ -1791,7 +1780,7 @@ function BuildROmniList(env, packlist)
 
     call delete($VIMRPLUGIN_TMPDIR . "/vimbol_finished")
     if a:env =~ "GlobalEnv"
-        exe "Py SendToR('" . omnilistcmd . "')"
+        exe "Py SendToVimCom('" . omnilistcmd . "')"
         if g:rplugin_vimcomport == 0
             sleep 500m
             let b:needsnewomnilist = 1
@@ -2048,13 +2037,13 @@ function ShowRDoc(rkeyword, package, getclass)
 
     let g:rplugin_lastrpl = "R did not reply."
     if classfor == "" && a:package == ""
-        exe 'Py SendToR("vim.help(' . "'" . a:rkeyword . "', " . g:rplugin_htw . 'L)")'
+        exe 'Py SendToVimCom("vim.help(' . "'" . a:rkeyword . "', " . g:rplugin_htw . 'L)")'
     elseif a:package != ""
-        exe 'Py SendToR("vim.help(' . "'" . a:rkeyword . "', " . g:rplugin_htw . "L, package='" . a:package  . "')". '")'
+        exe 'Py SendToVimCom("vim.help(' . "'" . a:rkeyword . "', " . g:rplugin_htw . "L, package='" . a:package  . "')". '")'
     else
         let classfor = substitute(classfor, '\\', "", "g")
         let classfor = substitute(classfor, '"', '\\"', "g")
-        exe 'Py SendToR("vim.help(' . "'" . a:rkeyword . "', " . g:rplugin_htw . "L, " . classfor . ")". '")'
+        exe 'Py SendToVimCom("vim.help(' . "'" . a:rkeyword . "', " . g:rplugin_htw . "L, " . classfor . ")". '")'
     endif
     if g:rplugin_lastrpl != "VIMHELP"
         if g:rplugin_lastrpl =~ "^MULTILIB"
@@ -2065,7 +2054,7 @@ function ShowRDoc(rkeyword, package, getclass)
             endfor
             let chn = input("Please, select one of them: ")
             if chn > 0 && chn < len(libs)
-                exe 'Py SendToR("vim.help(' . "'" . a:rkeyword . "', " . g:rplugin_htw . "L, package='" . libs[chn] . "')" . '")'
+                exe 'Py SendToVimCom("vim.help(' . "'" . a:rkeyword . "', " . g:rplugin_htw . "L, package='" . libs[chn] . "')" . '")'
             endif
         else
             call RWarningMsg(g:rplugin_lastrpl)
@@ -2780,7 +2769,7 @@ function SpaceForRGrDevice()
     let l:sr = &splitright
     set splitright
     37vsplit Space_for_Graphics
-    set nomodifiable
+    setlocal nomodifiable
     setlocal noswapfile
     set buftype=nofile
     set nowrap
@@ -3003,15 +2992,6 @@ call RSetDefaultValue("g:vimrplugin_latexcmd", "'pdflatex'")
 call RSetDefaultValue("g:vimrplugin_objbr_place", "'script,right'")
 call RSetDefaultValue("g:vimrplugin_insert_mode_cmds",  1)
 
-if g:vimrplugin_vimshell
-    if !exists("g:vimshell_environment_term")
-        let g:vimrplugin_vimshell = 0
-    endif
-    let g:vimrplugin_screenplugin = 0
-    let g:vimrplugin_conqueplugin = 0
-    let g:vimrplugin_applescript = 0
-endif
-
 " Look for invalid options
 let objbrplace = split(g:vimrplugin_objbr_place, ",")
 let obpllen = len(objbrplace) - 1
@@ -3058,6 +3038,19 @@ exe "PyFile " . g:rplugin_home . "/r-plugin/vimcom.py"
 " circumstances.
 call RSetDefaultValue("g:vimrplugin_ca_ck", 0)
 
+" ========================================================================
+" Set default mean of communication with R
+
+if has('gui_running')
+    let g:vimrplugin_screenplugin = 0
+endif
+
+if has("win32") || has("win64")
+    let g:vimrplugin_screenplugin = 0
+    let g:vimrplugin_applescript = 0
+    let g:vimrplugin_tmux = 0
+endif
+
 if has("gui_macvim") || has("gui_mac") || has("mac") || has("macunix")
     let g:rplugin_r64app = 0
     if isdirectory("/Applications/R64.app")
@@ -3072,101 +3065,128 @@ else
     call RSetDefaultValue("g:vimrplugin_applescript", 0)
 endif
 
-if g:vimrplugin_applescript == 0
-    call RSetDefaultValue("g:vimrplugin_screenplugin", 1)
-    call RSetDefaultValue("g:vimrplugin_tmux", 1)
-else
+if g:vimrplugin_applescript
+    let g:vimrplugin_vimshell = 0
     let g:vimrplugin_screenplugin = 0
     let g:vimrplugin_conqueplugin = 0
     let g:vimrplugin_tmux = 0
+else
+    call RSetDefaultValue("g:vimrplugin_screenplugin", 1)
+    call RSetDefaultValue("g:vimrplugin_tmux", 1)
 endif
 
-" The screen.vim plugin only works on terminal emulators
-if has('gui_running')
-    let g:vimrplugin_screenplugin = 0
+if g:vimrplugin_screenplugin
+    let g:vimrplugin_vimshell = 0
+    let g:vimrplugin_conqueplugin = 0
+    let g:vimrplugin_applescript = 0
 endif
+
+if g:vimrplugin_vimshell
+    if !exists("g:vimshell_environment_term")
+        let g:vimrplugin_vimshell = 0
+    endif
+    let g:vimrplugin_screenplugin = 0
+    let g:vimrplugin_conqueplugin = 0
+    let g:vimrplugin_applescript = 0
+    let g:vimrplugin_tmux = 0
+endif
+
+if g:vimrplugin_conqueplugin
+    let g:vimrplugin_screenplugin = 0
+    let g:vimrplugin_vimshell = 0
+    let g:vimrplugin_applescript = 0
+    let g:vimrplugin_tmux = 0
+endif
+
+" ========================================================================
 
 if has("win32") || has("win64")
     call RSetDefaultValue("g:vimrplugin_conquesleep", 200)
-    let g:vimrplugin_screenplugin = 0
-    let g:vimrplugin_tmux = 0
 else
     call RSetDefaultValue("g:vimrplugin_conquesleep", 100)
 endif
 
-if g:vimrplugin_applescript == 0 && !(has("win32") || has("win64"))
-    let s:hastmux = executable('tmux')
-    let s:hasscreen = executable('screen')
-    if s:hastmux == 0 && s:hasscreen == 0 && g:vimrplugin_conqueplugin == 0
-        call RWarningMsgInp("Please, install the 'Tmux' application to enable the Vim-R-plugin.")
-        let g:rplugin_failed = 1
-        finish
-    endif
-    if s:hastmux == 0 && s:hasscreen == 1
-        let g:vimrplugin_tmux = 0
-    endif
-    if g:vimrplugin_tmux == 0 && s:hasscreen == 0 && g:vimrplugin_conqueplugin == 0
-        call RWarningMsgInp("The value of vimrplugin_tmux = 0 but the GNU Screen application was not found.")
-        let g:rplugin_failed = 1
-        finish
-    endif
-endif
-
-
+" Check whether vim's screen plugin is OK
 if g:vimrplugin_screenplugin
-    let g:vimrplugin_conqueplugin = 0
     if !exists("g:ScreenVersion")
         call RWarningMsgInp("Please, either install the screen plugin (http://www.vim.org/scripts/script.php?script_id=2711) (recommended) or put 'let vimrplugin_screenplugin = 0' in your vimrc.")
         let g:rplugin_failed = 1
         finish
     endif
-
-    " To get 256 colors you have to set the $TERM environment variable to
-    " xterm-256color. See   :h r-plugin-tips 
-    if g:vimrplugin_tmux
-        let g:ScreenImpl = 'Tmux'
-        if g:vimrplugin_notmuxconf == 0
-            if $DISPLAY != "" || $TERM =~ "xterm"
-                let g:ScreenShellTmuxInitArgs = "-2"
-            endif
-            let tmxcnf = $VIMRPLUGIN_TMPDIR . "/tmux.conf"
-            let cnflines = [
-                        \ 'set-option -g prefix C-a',
-                        \ 'unbind-key C-b',
-                        \ 'bind-key C-a send-prefix',
-                        \ 'set-window-option -g mode-keys vi',
-                        \ 'set -g status off',
-                        \ "set -g terminal-overrides 'xterm*:smcup@:rmcup@'",
-                        \ 'set -g mode-mouse on',
-                        \ 'set -g mouse-select-pane on',
-                        \ 'set -g mouse-resize-pane on']
-            call writefile(cnflines, tmxcnf)
-            let g:ScreenShellTmuxInitArgs = g:ScreenShellTmuxInitArgs . " -f " . tmxcnf
-        endif
-    else
-        let g:ScreenImpl = 'GnuScreen'
-    endif
-endif
-
-let s:tmuxversion = system("tmux -V")
-let s:tmuxversion = substitute(s:tmuxversion, '.*tmux \([0-9]\.[0-9]\).*', '\1', '')
-if strlen(s:tmuxversion) != 3
-    let s:tmuxversion = "1.0"
-endif
-if g:vimrplugin_tmux && s:tmuxversion < "1.5"
-    call RWarningMsgInp("Vim-R-plugin requires Tmux >= 1.5")
-    let g:rplugin_failed = 1
-    finish
-endif
-unlet s:tmuxversion
-
-if g:vimrplugin_screenplugin
     if g:ScreenVersion < "1.5"
         call RWarningMsgInp("Vim-R-plugin requires Screen plugin >= 1.5")
         let g:rplugin_failed = 1
         finish
     endif
 endif
+
+" Check whether Tmux is OK
+if g:vimrplugin_tmux
+    let s:hastmux = executable('tmux')
+    if s:hastmux == 0
+        call RWarningMsgInp("Please, install the 'Tmux' application to enable the Vim-R-plugin.")
+        let g:rplugin_failed = 1
+        finish
+    endif
+    unlet s:hastmux
+
+    let s:tmuxversion = system("tmux -V")
+    let s:tmuxversion = substitute(s:tmuxversion, '.*tmux \([0-9]\.[0-9]\).*', '\1', '')
+    if strlen(s:tmuxversion) != 3
+        let s:tmuxversion = "1.0"
+    endif
+    if g:vimrplugin_tmux && s:tmuxversion < "1.5"
+        call RWarningMsgInp("Vim-R-plugin requires Tmux >= 1.5")
+        let g:rplugin_failed = 1
+        finish
+    endif
+    unlet s:tmuxversion
+
+    let g:ScreenImpl = 'Tmux'
+
+    " To get 256 colors you have to set the $TERM environment variable to
+    " xterm-256color. See   :h r-plugin-tips 
+    if g:vimrplugin_notmuxconf == 0
+        if $DISPLAY != "" || $TERM =~ "xterm"
+            let g:ScreenShellTmuxInitArgs = "-2"
+        endif
+        let tmxcnf = $VIMRPLUGIN_TMPDIR . "/tmux.conf"
+        let cnflines = [
+                    \ 'set-option -g prefix C-a',
+                    \ 'unbind-key C-b',
+                    \ 'bind-key C-a send-prefix',
+                    \ 'set-window-option -g mode-keys vi',
+                    \ 'set -g status off',
+                    \ "set -g terminal-overrides 'xterm*:smcup@:rmcup@'",
+                    \ 'set -g mode-mouse on',
+                    \ 'set -g mouse-select-pane on',
+                    \ 'set -g mouse-resize-pane on']
+        call writefile(cnflines, tmxcnf)
+        let g:ScreenShellTmuxInitArgs = g:ScreenShellTmuxInitArgs . " -f " . tmxcnf
+    endif
+endif
+
+" Check whether GNU Screen is OK
+if g:vimrplugin_screenplugin && g:vimrplugin_tmux == 0
+    let g:ScreenImpl = 'GnuScreen'
+    let s:hasscreen = executable('screen')
+    if s:hasscreen == 0
+        call RWarningMsgInp("The value of vimrplugin_tmux = 0 but the GNU Screen application was not found.")
+        let g:rplugin_failed = 1
+        finish
+    endif
+    unlet s:hasscreen
+endif
+
+"Check whether Conque Shell is OK
+if g:vimrplugin_conqueplugin == 1
+    if !exists("g:ConqueTerm_Version") || (exists("g:ConqueTerm_Version") && g:ConqueTerm_Version < 230)
+        let g:vimrplugin_conqueplugin = 0
+        call RWarningMsgInp("You are using Conque Shell plugin " . g:ConqueTerm_Version . ". Vim-R-plugin requires Conque Shell >= 2.3")
+        finish
+    endif
+endif
+
 
 " Start with an empty list of objects in the workspace
 let g:rplugin_globalenvlines = []
@@ -3206,13 +3226,12 @@ if has("win32") || has("win64")
         let g:rplugin_failed = 1
         finish
     endif
-    let g:rplugin_jspath = g:rplugin_home . "\\r-plugin\\vimActivate.js"
     if !exists("g:rplugin_rpathadded")
         if exists("g:vimrplugin_r_path") && isdirectory(g:vimrplugin_r_path)
             let $PATH = g:vimrplugin_r_path . ";" . $PATH
             let g:rplugin_Rgui = g:vimrplugin_r_path . "\\Rgui.exe"
         else
-            Py GetRPathPy()
+            Py GetRPath()
             if exists("s:rinstallpath")
                 if s:rinstallpath == "Not found"
                     call RWarningMsgInp("Could not find R path in Windows Registry. Please, either install R or set the value of 'vimrplugin_r_path'.")
@@ -3250,14 +3269,6 @@ if has("win32") || has("win64")
     endif
     if !exists("g:vimrplugin_sleeptime")
         let g:vimrplugin_sleeptime = 0.02
-    endif
-endif
-
-if g:vimrplugin_conqueplugin == 1
-    if !exists("g:ConqueTerm_Version") || (exists("g:ConqueTerm_Version") && g:ConqueTerm_Version < 230)
-        let g:vimrplugin_conqueplugin = 0
-        call RWarningMsgInp("You are using Conque Shell plugin " . g:ConqueTerm_Version . ". Vim-R-plugin requires Conque Shell >= 2.3")
-        finish
     endif
 endif
 
@@ -3375,14 +3386,8 @@ if exists("g:vimrplugin_term_cmd")
     let g:rplugin_termcmd = g:vimrplugin_term_cmd
 endif
 
-function FinalActions()
-    Py StopServer()
-    sleep 200m
-endfunction
-
 augroup RBufControl
     au BufEnter * let g:rplugin_curbuf = bufname("%")
-    au VimLeavePre * call FinalActions()
 augroup END
 
 if has("gui_running")
@@ -3395,9 +3400,6 @@ let g:rplugin_firstbuffer = expand("%:p")
 let g:rplugin_running_objbr = 0
 let g:rplugin_has_new_lib = 0
 let g:rplugin_has_new_obj = 0
-let g:rplugin_objbr_port = 0
-let g:rplugin_myport = 0
-let g:rplugin_editor_port = 0
 let g:rplugin_vimcomport = 0
 let g:rplugin_lastrpl = ""
 let g:rplugin_ob_busy = 0

@@ -47,16 +47,6 @@ fun! rcomplete#CompleteR(findstart, base)
       endif
     endfor
 
-    " When we use R to get the completions based on the running evironment we
-    " miss information stored on the omnils file: class of object and its
-    " package.
-    "    if len(g:rplugin_liblist) == 0 && len(res) == 0
-    "        exe 'Py SendToR("utils:::.win32consoleCompletion(' . "'" . a:base . "', " . strlen(a:base) . ')$comps")'
-    "        if strlen(g:rplugin_lastrpl) > 0
-    "            let res = split(g:rplugin_lastrpl)
-    "        endif
-    "    endif
-
     return res
   endif
 endfun

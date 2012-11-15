@@ -1,15 +1,9 @@
 
 import socket
 import vim
-import threading
 import os
 import re
 VimComPort = 0
-OtherPort = 0
-MyPort = 0
-srvrsckt = None
-th = None
-FinishNow = False
 
 def DiscoverVimComPort():
     global VimComPort
@@ -41,12 +35,13 @@ def DiscoverVimComPort():
         vim.command("call RWarningMsg('VimCom port not found.')")
     else:
         vim.command("let g:rplugin_vimcomport = " + str(VimComPort))
-        if repl.find("0.9-3 ") != 0:
-            vim.command("call RWarningMsg('This version of Vim-R-plugin requires vimcom 0.9-3.')")
+        if repl.find("0.9-4") != 0:
+            vim.command("call RWarningMsg('This version of Vim-R-plugin requires vimcom 0.9-4.')")
+            vim.command("sleep 1")
     return(VimComPort)
 
 
-def SendToR(aString):
+def SendToVimCom(aString):
     HOST = "localhost"
     global VimComPort
     if VimComPort == 0:
@@ -73,130 +68,4 @@ def SendToR(aString):
         received = received.replace("'", "' . \"'\" . '")
         vim.command("let g:rplugin_lastrpl = '" + received + "'")
 
-
-def VimServer():
-    global srvrsckt
-    global MyPort
-    global FinishNow
-    UDP_IP = "127.0.0.1"
-    MyPort = int(vim.eval("g:rplugin_myport1"))
-    PortLim = int(vim.eval("g:rplugin_myport2"))
-
-    while True and MyPort < PortLim:
-        try:
-            MyPort += 1
-            srvrsckt = socket.socket( socket.AF_INET, socket.SOCK_DGRAM )
-            srvrsckt.bind( (UDP_IP, MyPort) )
-        except:
-            continue
-        else:
-            break
-
-    if srvrsckt == None:
-        MyPort = 0
-        vim.command("call RWarningMsg('Could not bind to any port.')")
-        return
-    else:
-        vim.command("let g:rplugin_myport = " + str(MyPort))
-        SendToR("\007" + str(MyPort))
-
-    while FinishNow == False:
-        try:
-            data, addr = srvrsckt.recvfrom( 1024 ) # buffer size is 1024 bytes
-            if vim.eval("g:rplugin_ob_busy") == "1":
-                data = ""
-            if re.match("EXPR ", data):
-                vim.command("silent exe '" + re.sub("^EXPR ", "", data) + "'")
-            else:
-                if re.match("^G", data):
-                    vim.command("call UpdateOB('GlobalEnv')")
-                else:
-                    if re.match("^L", data):
-                        vim.command("call UpdateOB('libraries')")
-                    else:
-                        if re.match("^B", data):
-                            vim.command("call UpdateOB('GlobalEnv')")
-                            vim.command("call UpdateOB('libraries')")
-                        else:
-                            if re.match("^FINISH", data):
-                                FinishNow = True
-                                MyPort = 0
-                            else:
-                                if data != "":
-                                    vim.command("call RWarningMsg('Strange string received: " + '"' + data + '"' + "')")
-                                    vim.command("sleep 1")
-
-        except Exception as errmsg:
-            errstr = str(errmsg)
-            errstr = errstr.replace("'", '"')
-            vim.command("call RWarningMsg('Server failed to read data: " + errstr + "')")
-            MyPort = 0
-            try:
-                srvrsckt.shutdown(socket.SHUT_RD)
-            except:
-                vim.command("call add(g:rplugin_errlist, 'Failed to shutdown 1.')")
-                pass
-            srvrsckt.close()
-            return
-        try:
-            srvrsckt.shutdown(socket.SHUT_RD)
-        except:
-            vim.command("call add(g:rplugin_errlist, 'Failed to shutdown 2.')")
-            pass
-        srvrsckt.close()
-        if FinishNow == False:
-            try:
-                srvrsckt = socket.socket( socket.AF_INET, socket.SOCK_DGRAM )
-                srvrsckt.bind( (UDP_IP, MyPort) )
-            except Exception as errmsg:
-                errstr = str(errmsg)
-                errstr = errstr.replace("'", '"')
-                vim.command("let g:rplugin_myport = 0")
-                vim.command("call RWarningMsg('" + errstr + "')")
-                pass
-
-def RunServer():
-    global th
-    global FinishNow
-    FinishNow = False
-    th = threading.Thread(target=VimServer)
-    th.start()
-
-def StopServer():
-    global srvrsckt
-    global MyPort
-    global FinishNow
-    global th
-    FinishNow = True
-    if VimComPort:
-        SendToR("\x08Stop Updating Info")
-    vim.command("let g:rplugin_myport = 0")
-    ft = vim.eval("&filetype")
-    if ft == "rbrowser":
-        VimClient("EXPR let g:rplugin_objbr_port = 0 | let g:vimrplugin_objbr_w = " + vim.eval("&columns"))
-    if MyPort == 0:
-        return
-    try:
-        srvrsckt.shutdown(socket.SHUT_RD)
-    except:
-        vim.command("call add(g:rplugin_errlist, 'Failed to shutdown 3.')")
-        pass
-    try:
-        srvrsckt.close()
-    except:
-        vim.command("call add(g:rplugin_errlist, 'Failed to close socket.')")
-        pass
-    try:
-        th.join(0.3)
-    except:
-        vim.command("call add(g:rplugin_errlist, 'Failed to join.')")
-        pass
-    MyPort = 0
-
-def VimClient(msg):
-    if OtherPort == 0:
-        return
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.sendto(msg, ("127.0.0.1", OtherPort))
-    sock.close()
 
