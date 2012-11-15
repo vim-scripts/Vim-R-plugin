@@ -842,7 +842,7 @@ function StartObjectBrowser()
         if v:servername == ""
             let myservername = '""'
         else
-            let myservername = v:servername
+            let myservername = '"' . v:servername . '"'
         endif
 
         call writefile([
