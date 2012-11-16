@@ -351,7 +351,9 @@ function! OBSendDeleteCmd(cmd)
         Py SendToVimCom("\004Libraries")
     endif
     call UpdateOB("both")
-    exe 'Py SendToVimCom("\x07' . v:servername . '")'
+    if v:servername != ""
+        exe 'Py SendToVimCom("\x07' . v:servername . '")'
+    endif
 endfunction
 
 function! OBDelete()

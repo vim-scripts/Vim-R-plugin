@@ -99,7 +99,7 @@ if g:vimrplugin_by_vim_instance == 1
   unlet s:sname
 endif
 
-if g:rplugin_firstbuffer == ""
+if exists("g:rplugin_firstbuffer") && g:rplugin_firstbuffer == ""
     " The file global_r_plugin.vim was copied to ~/.vim/plugin
     let g:rplugin_firstbuffer = expand("%:p")
 endif
@@ -111,7 +111,11 @@ else
 endif
 let s:uniquename = substitute(s:uniquename, '\W', '', 'g')
 let $VIMINSTANCEID = $VIMRPLUGIN_TMPDIR . "/" . s:uniquename . "-port"
-let g:rplugin_obsname = toupper(substitute(substitute(expand("%:r"), '\W', '', 'g'), "_", "", "g"))
+if has("clientserver")
+    let g:rplugin_obsname_arg = "--servername " . toupper(substitute(substitute(expand("%:r"), '\W', '', 'g'), "_", "", "g"))
+else
+    let g:rplugin_obsname_arg = " "
+endif
 unlet s:uniquename
 
 let g:rplugin_lastft = &filetype

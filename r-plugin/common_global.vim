@@ -566,7 +566,7 @@ function StartR(whatr)
         endif
     endif
 
-    if g:vimrplugin_applescript && g:vimrplugin_screenplugin == 0 && g:vimrplugin_conqueplugin == 0
+    if g:vimrplugin_applescript
         if g:rplugin_r64app && g:vimrplugin_i386 == 0
             let rcmd = "/Applications/R64.app"
         else
@@ -600,11 +600,9 @@ function StartR(whatr)
     endif
 
     if g:vimrplugin_screenplugin
-        if g:vimrplugin_only_in_tmux && g:vimrplugin_tmux
-            if $TMUX_PANE == ""
-                call RWarningMsg("Not inside Tmux.")
-                return
-            endif
+        if g:vimrplugin_only_in_tmux && g:vimrplugin_tmux && $TMUX_PANE == ""
+            call RWarningMsg("Not inside Tmux.")
+            return
         endif
 
         if $TERM =~ "screen"
@@ -703,13 +701,12 @@ function StartR(whatr)
         endif
     else
         if g:vimrplugin_tmux
-
+            call system('export VIMRPLUGIN_TMPDIR=' . $VIMRPLUGIN_TMPDIR)
+            call system('export VIMINSTANCEID=' . $VIMINSTANCEID)
             " Start the terminal emulator even if inside a Tmux session
             if $TMUX != ""
                 let tmuxenv = $TMUX
                 let $TMUX = ""
-                call system('export VIMRPLUGIN_TMPDIR=' . $VIMRPLUGIN_TMPDIR)
-                call system('export VIMINSTANCEID=' . $VIMINSTANCEID)
                 call system('tmux set-option -ga update-environment " TMUX_PANE VIMRPLUGIN_TMPDIR VIMINSTANCEID"')
             endif
 
@@ -731,14 +728,13 @@ function StartR(whatr)
                 let tmxcnf = "-f " . tmxcnf
             endif
             if $DISPLAY == ""
-                if !(has("win32") || has("win64"))
-                    call RWarningMsg("The X Window system is required to run R in an external terminal.")
-                    lcd -
-                    return
-                endif
+                call RWarningMsg("The X Window system is required to run R in an external terminal.")
+                lcd -
+                return
             endif
             call system("tmux has-session -t " . b:screensname)
             if v:shell_error
+                let rcmd = "VIMRPLUGIN_TMPDIR=" . $VIMRPLUGIN_TMPDIR . " VIMINSTANCEID=" . $VIMINSTANCEID . " " . rcmd
                 if g:rplugin_termcmd =~ "gnome-terminal" || g:rplugin_termcmd =~ "xfce4-terminal" || g:rplugin_termcmd =~ "terminal" || g:rplugin_termcmd =~ "iterm"
                     let opencmd = printf("%s 'tmux -2 %s new-session -s %s \"%s\"' &", g:rplugin_termcmd, tmxcnf, b:screensname, rcmd)
                 else
@@ -752,6 +748,16 @@ function StartR(whatr)
                 endif
             endif
         else
+            if $DISPLAY == ""
+                call RWarningMsg("The X Window system is required to run R in an external terminal.")
+                lcd -
+                return
+            endif
+            if !executable("screen")
+                call RWarningMsgInp("The value of vimrplugin_tmux = 0 but the GNU Screen application was not found.")
+                lcd -
+                return
+            endif
             let scrrc = RWriteScreenRC()
             " Some terminals want quotes (see screen.vim)
             if g:rplugin_termcmd =~ "gnome-terminal" || g:rplugin_termcmd =~ "xfce4-terminal" || g:rplugin_termcmd =~ "terminal" || g:rplugin_termcmd =~ "iterm"
@@ -878,7 +884,9 @@ function StartObjectBrowser()
                     \ 'endfunction',
                     \ 'Py SendToVimCom("\003GlobalEnv")',
                     \ 'Py SendToVimCom("\004Libraries")',
-                    \ "exe 'Py SendToVimCom(\"\\x07' . v:servername . '\")'",
+                    \ 'if v:servername != ""',
+                    \ "    exe 'Py SendToVimCom(\"\\x07' . v:servername . '\")'",
+                    \ 'endif',
                     \ 'call setline(1, ".GlobalEnv | Libraries")',
                     \ 'exe "silent read ' . $VIMRPLUGIN_TMPDIR . '/object_browser"',
                     \ 'redraw'], objbrowserfile)
@@ -906,7 +914,7 @@ function StartObjectBrowser()
         else
             let obpane = g:rplugin_edpane
         endif
-        let cmd = "tmux split-window -d -h -l " . panewidth . " -t " . obpane . ' "vim --servername ' . g:rplugin_obsname. ' -c ' . "'source " . objbrowserfile . "'" . '"'
+        let cmd = "tmux split-window -d -h -l " . panewidth . " -t " . obpane . ' "vim ' . g:rplugin_obsname_arg . ' -c ' . "'source " . objbrowserfile . "'" . '"'
 
         call delete($VIMRPLUGIN_TMPDIR . "/objbrpane")
 
@@ -943,8 +951,12 @@ function StartObjectBrowser()
                 call system("tmux swap-pane -d -s " . g:rplugin_edpane . " -t " . g:rplugin_obpane)
             endif
         endif
-        if $DISPLAY == ""
-            call RWarningMsg("The X Window system is required to automatically update the Objetc Browser.")
+        if !has("clientserver")
+            call RWarningMsg("The +clientserver feature is required to automatically update the Object Browser.")
+        else
+            if $DISPLAY == ""
+                call RWarningMsg("The X Window system is required to automatically update the Object Browser.")
+            endif
         endif
         return
     endif
@@ -954,10 +966,14 @@ function StartObjectBrowser()
         let wmsg = "The Object Browser is not automatically updated under Conque Shell."
     else
         if v:servername == ""
-            if $DISPLAY == "" && !(has("win32") || has("win64"))
-                let wmsg = "The X Window system is required to automatically update the Objetc Browser."
+            if !has("clientserver")
+                let wmsg = "The +clientserver feature is required to automatically update the Object Browser."
             else
-                let wmsg ="The Object Browser will not be automatically updated because Vim's client/server was not started."
+                if $DISPLAY == "" && !(has("win32") || has("win64"))
+                    let wmsg = "The X Window system is required to automatically update the Object Browser."
+                else
+                    let wmsg ="The Object Browser will not be automatically updated because Vim's client/server was not started."
+                endif
             endif
         else
             exe 'Py SendToVimCom("\007' . v:servername . '")'
@@ -1239,7 +1255,7 @@ function SendCmdToR(cmd)
         return 1
     endif
 
-    if g:vimrplugin_applescript && g:vimrplugin_screenplugin == 0 && g:vimrplugin_conqueplugin == 0
+    if g:vimrplugin_applescript
         if g:rplugin_r64app && g:vimrplugin_i386 == 0
             let rcmd = "R64"
         else
@@ -2967,6 +2983,9 @@ call RSetDefaultValue("g:vimrplugin_i386",              0)
 call RSetDefaultValue("g:vimrplugin_screenvsplit",      0)
 call RSetDefaultValue("g:vimrplugin_conquevsplit",      0)
 call RSetDefaultValue("g:vimrplugin_conqueplugin",      0)
+call RSetDefaultValue("g:vimrplugin_screenplugin",      1)
+call RSetDefaultValue("g:vimrplugin_vimshell",          0)
+call RSetDefaultValue("g:vimrplugin_tmux",              1)
 call RSetDefaultValue("g:vimrplugin_vimshell",          0)
 call RSetDefaultValue("g:vimrplugin_listmethods",       0)
 call RSetDefaultValue("g:vimrplugin_specialplot",       0)
@@ -3005,10 +3024,6 @@ for idx in range(0, obpllen)
 endfor
 unlet objbrplace
 unlet obpllen
-
-if g:vimrplugin_external_ob == 1
-    let g:vimrplugin_objbr_place = substitute(g:vimrplugin_objbr_place, "script", "console", "")
-endif
 
 " python has priority over python3, unless ConqueTerm_PyVersion == 3
 if has("python3") && exists("g:ConqueTerm_PyVersion") && g:ConqueTerm_PyVersion == 3
@@ -3066,9 +3081,7 @@ if g:vimrplugin_applescript
     let g:vimrplugin_screenplugin = 0
     let g:vimrplugin_conqueplugin = 0
     let g:vimrplugin_tmux = 0
-else
-    call RSetDefaultValue("g:vimrplugin_screenplugin", 1)
-    call RSetDefaultValue("g:vimrplugin_tmux", 1)
+    let g:vimrplugin_only_in_tmux = 0
 endif
 
 if g:vimrplugin_screenplugin
@@ -3078,13 +3091,11 @@ if g:vimrplugin_screenplugin
 endif
 
 if g:vimrplugin_vimshell
-    if !exists("g:vimshell_environment_term")
-        let g:vimrplugin_vimshell = 0
-    endif
     let g:vimrplugin_screenplugin = 0
     let g:vimrplugin_conqueplugin = 0
     let g:vimrplugin_applescript = 0
     let g:vimrplugin_tmux = 0
+    let g:vimrplugin_only_in_tmux = 0
 endif
 
 if g:vimrplugin_conqueplugin
@@ -3092,9 +3103,19 @@ if g:vimrplugin_conqueplugin
     let g:vimrplugin_vimshell = 0
     let g:vimrplugin_applescript = 0
     let g:vimrplugin_tmux = 0
+    let g:vimrplugin_only_in_tmux = 0
 endif
 
 " ========================================================================
+
+if !g:vimrplugin_tmux
+    let g:vimrplugin_external_ob = 0
+endif
+
+if g:vimrplugin_external_ob == 1
+    let g:vimrplugin_objbr_place = substitute(g:vimrplugin_objbr_place, "script", "console", "")
+endif
+
 
 if has("win32") || has("win64")
     call RSetDefaultValue("g:vimrplugin_conquesleep", 200)
@@ -3118,13 +3139,14 @@ endif
 
 " Check whether Tmux is OK
 if g:vimrplugin_tmux
-    let s:hastmux = executable('tmux')
-    if s:hastmux == 0
+    if !exists("g:ScreenShellTmuxInitArgs")
+        let g:ScreenShellTmuxInitArgs = " "
+    endif
+    if !executable('tmux')
         call RWarningMsgInp("Please, install the 'Tmux' application to enable the Vim-R-plugin.")
         let g:rplugin_failed = 1
         finish
     endif
-    unlet s:hastmux
 
     let s:tmuxversion = system("tmux -V")
     let s:tmuxversion = substitute(s:tmuxversion, '.*tmux \([0-9]\.[0-9]\).*', '\1', '')
@@ -3144,7 +3166,7 @@ if g:vimrplugin_tmux
     " xterm-256color. See   :h r-plugin-tips 
     if g:vimrplugin_notmuxconf == 0
         if $DISPLAY != "" || $TERM =~ "xterm"
-            let g:ScreenShellTmuxInitArgs = "-2"
+            let g:ScreenShellTmuxInitArgs .= "-2"
         endif
         let tmxcnf = $VIMRPLUGIN_TMPDIR . "/tmux.conf"
         let cnflines = [
@@ -3158,27 +3180,39 @@ if g:vimrplugin_tmux
                     \ 'set -g mouse-select-pane on',
                     \ 'set -g mouse-resize-pane on']
         call writefile(cnflines, tmxcnf)
-        let g:ScreenShellTmuxInitArgs = g:ScreenShellTmuxInitArgs . " -f " . tmxcnf
+        let g:ScreenShellTmuxInitArgs .= " -f " . tmxcnf
     endif
 endif
 
 " Check whether GNU Screen is OK
-if g:vimrplugin_screenplugin && g:vimrplugin_tmux == 0
+if g:vimrplugin_screenplugin && !g:vimrplugin_tmux
     let g:ScreenImpl = 'GnuScreen'
-    let s:hasscreen = executable('screen')
-    if s:hasscreen == 0
+    if !executable('screen')
         call RWarningMsgInp("The value of vimrplugin_tmux = 0 but the GNU Screen application was not found.")
         let g:rplugin_failed = 1
         finish
     endif
-    unlet s:hasscreen
+endif
+
+"Check whether Vim Shell is OK
+if g:vimrplugin_vimshell
+    if !exists("g:vimshell_environment_term")
+        call RWarningMsgInp("Vim-R-plugin: You are trying to use Vim Shell plugin which is not installed.")
+        let g:rplugin_failed = 1
+        finish
+    endif
 endif
 
 "Check whether Conque Shell is OK
 if g:vimrplugin_conqueplugin == 1
-    if !exists("g:ConqueTerm_Version") || (exists("g:ConqueTerm_Version") && g:ConqueTerm_Version < 230)
-        let g:vimrplugin_conqueplugin = 0
+    if !exists("g:ConqueTerm_Version")
+        call RWarningMsgInp("Vim-R-plugin: You are trying to use Conque Shell plugin which is either too old or not installed.")
+        let g:rplugin_failed = 1
+        finish
+    endif
+    if exists("g:ConqueTerm_Version") && g:ConqueTerm_Version < 230
         call RWarningMsgInp("You are using Conque Shell plugin " . g:ConqueTerm_Version . ". Vim-R-plugin requires Conque Shell >= 2.3")
+        let g:rplugin_failed = 1
         finish
     endif
 endif
@@ -3403,18 +3437,4 @@ let g:rplugin_hasRSFbutton = 0
 let g:rplugin_errlist = []
 
 call SetRPath()
-
-" Debugging code:
-if g:vimrplugin_screenplugin && g:vimrplugin_conqueplugin
-    echoerr "Error number 1"
-endif
-if g:vimrplugin_screenplugin && g:vimrplugin_applescript
-    echoerr "Error number 2"
-endif
-if g:vimrplugin_conqueplugin && g:vimrplugin_applescript
-    echoerr "Error number 3"
-endif
-if g:vimrplugin_screenplugin && has("gui_running")
-    echoerr "Error number 4"
-endif
 
