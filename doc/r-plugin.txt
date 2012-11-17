@@ -35,12 +35,12 @@ The latest stable version of this plugin is available at:
 
     http://www.vim.org/scripts/script.php?script_id=2628
 
-Feedback is welcomed. Please submit bug reports and feature requests to the
-developers; we are very interested in what you like and what you would like to
-see in future releases. Do not like a feature? Tell us and we may add an
-option to disable it. Cryptic error message are bugs... Please report them.
-The plugin should emit useful warnings if you do things it was not programmed
-to deal with.
+Feedback is welcomed. Please submit bug reports to the developers. Do not like
+a feature? Tell us and we may add an option to disable it. The plugin should
+emit useful warnings if you do things it was not programmed to deal with.
+Cryptic error message are bugs... Please report them at:
+
+    https://github.com/jcfaria/Vim-R-plugin/issues
 
 
 ==============================================================================
@@ -184,7 +184,7 @@ show how the plugin will work on Linux in different conditions:
    Screen plugin (GNU Screen)        vimrplugin_tmux = 0
    Tmux (external terminal)          vimrplugin_screenplugin = 0
    GNU Screen (external terminal)    vimrplugin_screenplugin = 0 and
-                                                 vimrplugin_tmux = 0
+                                             vimrplugin_tmux = 0
 
 
    GVim                              Condition~
@@ -1182,7 +1182,7 @@ example show how to adjust the value of sleeptime in your |vimrc|:
 						       *vimrplugin_noscreenrc*
 						       *vimrplugin_notmuxconf*
 GVim (or Vim running R in an external terminal emulator) runs Tmux with a
-specially built configuration file. It also overwrite the value of
+specially built configuration file. It also appends some arguments to
 |g:ScreenShellTmuxInitArgs|. If you want to use your own ~/.tmux.conf and
 |g:ScreenShellTmuxInitArgs|, put in your |vimrc|:
 >
@@ -1221,17 +1221,10 @@ application, put in your |vimrc|:
 >
    let vimrplugin_tmux = 0
 <
-If Tmux is not installed, the Vim-R-plugin will use GNU Screen.
-
 Start Vim and do the command <LocalLeader>rf. The screen.vim plugin will split
-the terminal in two regions and will run R in one of them. Using both plugins
-at the same time is especially useful for users who may prefer to use Vim and
-R in a terminal emulator, rather than using the graphical interface provided
-by GVim.
-
-If you prefer to use the plugin in a terminal emulator in a Tmux session, you
-may prefer to start Tmux before Vim (see |r-plugin-tmux|). In this case, you
-may want to set the value of |vimrplugin_only_in_tmux| as below:
+the terminal in two regions and will run R in one of them. If you always
+prefer to start Tmux before Vim (see |r-plugin-tmux|) you may want to set the
+value of |vimrplugin_only_in_tmux| as below:
 >
    let vimrplugin_only_in_tmux = 1
 <
@@ -1623,7 +1616,8 @@ directory after the installation:
 
 9.1. Is it possible to stop R from within Vim?~
 
-Sorry, it is not possible. You have to press ^C into R's terminal emulator.
+Sorry, it is not possible. The plugin can only send the quit() command. If you
+want to stop R, you have to press ^C into R's terminal emulator.
 
 
 9.2. Html help and custom pager~
@@ -1639,14 +1633,14 @@ and in your |vimrc| (see |vimrplugin_vimpager|):
 
 9.3. How do marked blocks work?~
 							  *r-plugin-showmarks*
-Vim allows several marks (bookmarks). The most commonly used marks are the
-lowercase alphabet letters. If the cursor is between any two marks, the plugin
-will send the lines between them to R. If the cursor is above the first mark,
-the plugin will send from the beginning of the file to the mark. If the cursor
-is below the last mark, the plugin will send from the mark to the end of the
-file. The mark above the cursor is included and the mark below is excluded
-from the block to be sent to R. To create a mark, press m<letter> in Normal
-mode.
+Vim allows you to put several marks (bookmarks) in buffers. The most commonly
+used marks are the lowercase alphabet letters. If the cursor is between any
+two marks, the plugin will send the lines between them to R. If the cursor is
+above the first mark, the plugin will send from the beginning of the file to
+the mark. If the cursor is below the last mark, the plugin will send from the
+mark to the end of the file. The mark above the cursor is included and the
+mark below is excluded from the block to be sent to R. To create a mark, press
+m<letter> in Normal mode.
 
 We recommended the use of ShowMarks plugin which show what lines have marks
 defined. The plugin is available at:
@@ -2106,7 +2100,7 @@ argument. Example:
 							       *r-plugin-news*
 10. News~
 
-0.9.9 (2012-11-14)
+0.9.9 (2012-11-17)
 
  * New commands:  :Rinsert  and  :Rformat.
  * Automatically update the Object Browser in GVim.
