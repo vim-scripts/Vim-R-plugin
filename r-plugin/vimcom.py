@@ -4,8 +4,10 @@ import vim
 import os
 import re
 VimComPort = 0
+PortWarn = False
 
 def DiscoverVimComPort():
+    global PortWarn
     global VimComPort
     HOST = "localhost"
     VimComPort = 9998
@@ -32,9 +34,12 @@ def DiscoverVimComPort():
     if VimComPort >= 10050:
         VimComPort = 0
         vim.command("let g:rplugin_vimcomport = 0")
-        vim.command("call RWarningMsg('VimCom port not found.')")
+        if not PortWarn:
+            vim.command("call RWarningMsg('VimCom port not found.')")
+        PortWarn = True
     else:
         vim.command("let g:rplugin_vimcomport = " + str(VimComPort))
+        PortWarn = False
         if repl.find("0.9-4") != 0:
             vim.command("call RWarningMsg('This version of Vim-R-plugin requires vimcom 0.9-4.')")
             vim.command("sleep 1")
