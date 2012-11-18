@@ -1009,10 +1009,10 @@ function StartObjectBrowser()
         else
             set nosplitright
         endif
-        exe "vsplit " . b:objbrtitle
+        sil exe "vsplit " . b:objbrtitle
         let &splitright = l:sr
-        exe "vertical resize " . g:vimrplugin_objbr_w
-        set filetype=rbrowser
+        sil exe "vertical resize " . g:vimrplugin_objbr_w
+        sil set filetype=rbrowser
 
         " Inheritance of some local variables
         if g:vimrplugin_conqueplugin == 1
@@ -1089,7 +1089,9 @@ function RBrowserOpenCloseLists(status)
 
     exe 'Py SendToVimCom("' . "\006" . stt . '")'
 
-    if exists("g:rplugin_curview")
+    if g:rplugin_lastrpl == "R is busy."
+        call RWarningMsg("R is busy.")
+    elseif exists("g:rplugin_curview")
         call UpdateOB("both")
     endif
 
@@ -1168,6 +1170,7 @@ endfunction
 " Function to send commands
 " return 0 on failure and 1 on success
 function SendCmdToR(cmd)
+    Py SendToVimCom("\x09Set R as busy.")
     if g:vimrplugin_ca_ck
         let cmd = "\001" . "\013" . a:cmd
     else
@@ -1184,9 +1187,7 @@ function SendCmdToR(cmd)
             for i in range(0, slen)
                 let str = str . printf("\\x%02X", char2nr(cmd[i]))
             endfor
-            " Py VimSaveClipBoard()
             exe "Py" . " SendToRConsole(b'" . str . "')"
-            " Py VimRestoreClipboard()
         endif
         return 1
     endif
@@ -1721,15 +1722,24 @@ function RQuit(how)
     endif
 
     if exists("b:quit_command")
-        call SendCmdToR(b:quit_command)
+        let qcmd = b:quit_command
     else
         if a:how == "save"
-            call SendCmdToR('quit(save = "yes")')
-            sleep 1
+            let qcmd = 'quit(save = "yes")'
         else
-            call SendCmdToR('quit(save = "no")')
+            let qcmd = 'quit(save = "no")'
         endif
     endif
+
+    if has("win32") || has("win64")
+        exe "Py SendQuitMsg('" . qcmd . "')"
+    else
+        call SendCmdToR(qcmd)
+        if a:how == "save"
+            sleep 1
+        endif
+    endif
+
     sleep 250m
 
     " check if the pane still exists before trying to kill it because the

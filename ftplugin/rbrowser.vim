@@ -126,7 +126,11 @@ function! RBrowserDoubleClick()
     let key = RBrowserGetName(1, line("."))
     if g:rplugin_curview == "GlobalEnv"
         exe 'Py SendToVimCom("' . "\005" . '-' . substitute(key, '\$', '-', "g") . '")'
-        call UpdateOB("GlobalEnv")
+        if g:rplugin_lastrpl == "R is busy."
+            call RWarningMsg("R is busy.")
+        else
+            call UpdateOB("GlobalEnv")
+        endif
     else
         let key = substitute(key, '\$', '-', "g") 
         let key = substitute(key, '`', '', "g") 
@@ -134,7 +138,11 @@ function! RBrowserDoubleClick()
             let key = "package:" . RBGetPkgName() . '-' . key
         endif
         exe 'Py SendToVimCom("' . "\005" . key . '")'
-        call UpdateOB("libraries")
+        if g:rplugin_lastrpl == "R is busy."
+            call RWarningMsg("R is busy.")
+        else
+            call UpdateOB("libraries")
+        endif
     endif
 endfunction
 
