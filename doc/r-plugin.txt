@@ -1868,16 +1868,7 @@ line in your |vimrc|:
    nmap <LocalLeader>sm :update<CR>:call SendCmdToR('system("make")')<CR>
 <
 
-9.15. Group windows with compiz~
-
-If you are using Compiz, it may be easier to work with the plugin if the
-various related windows (editor, terminal, and graphics window) are grouped
-because they will be raised together when one of them receives the focus.
-You may need CompizConfig Settings Manager installed to enable this feature
-(look at the "Window Management" section for "Group and Tab Windows").
-
-
-9.16. Edit your ~/.Rprofile~
+9.15. Edit your ~/.Rprofile~
 
 You may want to edit your ~/.Rprofile. Two common options are the use of GVim
 as the text editor and the use of Vim as pager. Example for Linux with these
@@ -1929,7 +1920,7 @@ An example for Windows:
    }
 <
 
-9.17. Debugging R functions~
+9.16. Debugging R functions~
 
 The Vim-R-Plugin does not have debugging facilities, but you may want to use
 the R package "debug":
@@ -1949,7 +1940,7 @@ on top" or a similar option provided by your desktop manager.
 There is also the R package "edtdbg" which aims to integrate R debugging
 facilities with Vim.
 
-9.18. Turn the R-plugin into a global plugin~
+9.17. Turn the R-plugin into a global plugin~
 							     *r-plugin-global*
 The Vim-R-plugin is a file type plugin. If you want its functionality
 available for all file types, then go to your ~/.vim/plugin directory and
@@ -1963,14 +1954,14 @@ On Windows, you probably will have to make a copy of the file to the
 ~/vimfiles/plugin directory.
 
 
-9.19. Disable syntax highlight of R functions~
+9.18. Disable syntax highlight of R functions~
 
 If you want to disable the syntax highlight of R functions edit the file
 ~/.vim/r-plugin/functions.vim and delete all lines, but do not delete the
 file.
 
 
-9.20. Tips for knitr users~
+9.19. Tips for knitr users~
 								       *knitr*
 If you are using knitr with option cache=TRUE, you may want from time to time
 to delete all objects in R workspace and all files in the cache directory. If
@@ -1985,7 +1976,7 @@ them in your vimrc. For example
 
 will produce a german document with a table of contents.
 
-9.21. Start Tmux and Vim at once~
+9.20. Start Tmux and Vim at once~
 
 If you always prefer to run Tmux before running Vim you may want to put in
 your ~/.bashrc:
@@ -1997,7 +1988,7 @@ Then you will be able to start Vim inside a Tmux session by typing:
    tvim filename.R
 <
 
-9.22. Integration with the Conque Shell plugin~
+9.21. Integration with the Conque Shell plugin~
 							     *r-plugin-conque*
 In addition to being integrated with the screen.vim plugin the Vim-R-plugin
 can also use the Conque Shell plugin, but the Conque Shell still has some
@@ -2079,7 +2070,7 @@ we were typing commands directly in the Console it would be beneficial to have
 the R syntax highlighted.
 
 
-9.23. Integration with vimshell~
+9.22. Integration with vimshell~
 							   *r-plugin-vimshell*
 Vimshell is still under development, but if you want to integrate it with the
 Vim-R-plugin, put in your |vimrc|:
@@ -2104,6 +2095,7 @@ argument. Example:
 
  * New commands:  :Rinsert  and  :Rformat.
  * Automatically update the Object Browser in GVim.
+ * On MS Windows, don't raise the R Console before sending CTRL-V to it.
 
 0.9.8 (2012-10-13)
 
