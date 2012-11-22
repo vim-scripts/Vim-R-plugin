@@ -2208,7 +2208,7 @@ function PrintRObject(rkeyword)
 endfunction
 
 " Call R functions for the word under cursor
-function RAction(rcmd)
+function RRealAction(rcmd)
     if &filetype == "rbrowser"
         let rkeyword = RBrowserGetName(1, line("."))
     else
@@ -2266,6 +2266,14 @@ function RAction(rcmd)
 
         let raction = rfun . "(" . rkeyword . ")"
         call SendCmdToR(raction)
+    endif
+endfunction
+
+function RAction(rcmd)
+    Py SendToVimCom("\x08Stop updating info.")
+    call RRealAction(a:rcmd)
+    if v:servername != ""
+        exe 'Py SendToVimCom("\x07' . v:servername . '")'
     endif
 endfunction
 
