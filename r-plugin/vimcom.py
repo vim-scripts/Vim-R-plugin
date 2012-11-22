@@ -69,6 +69,8 @@ def SendToVimCom(aString):
 
     if received is None:
         vim.command("let g:rplugin_lastrpl = 'NOANSWER'")
+        VimComPort = 0
+        DiscoverVimComPort()
     else:
         received = received.replace("'", "' . \"'\" . '")
         vim.command("let g:rplugin_lastrpl = '" + received + "'")
