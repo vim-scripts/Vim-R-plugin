@@ -1772,6 +1772,8 @@ function RQuit(how)
         endif
     endif
 
+    call delete($VIMRPLUGIN_TMPDIR . "/object_browser")
+    call delete($VIMRPLUGIN_TMPDIR . "/liblist")
 endfunction
 
 " knit the current buffer content
