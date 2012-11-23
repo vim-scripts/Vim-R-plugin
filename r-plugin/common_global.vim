@@ -882,8 +882,8 @@ function StartObjectBrowser()
                     \ '        return 0',
                     \ '    endif',
                     \ 'endfunction',
-                    \ 'Py SendToVimCom("\003GlobalEnv")',
-                    \ 'Py SendToVimCom("\004Libraries")',
+                    \ 'Py SendToVimCom("\003GlobalEnv [OB init]")',
+                    \ 'Py SendToVimCom("\004Libraries [OB init]")',
                     \ 'if v:servername != ""',
                     \ "    exe 'Py SendToVimCom(\"\\x07' . v:servername . '\")'",
                     \ 'endif',
@@ -914,7 +914,7 @@ function StartObjectBrowser()
         else
             let obpane = g:rplugin_edpane
         endif
-        let cmd = "tmux split-window -d -h -l " . panewidth . " -t " . obpane . ' "vim ' . g:rplugin_obsname_arg . ' -c ' . "'source " . objbrowserfile . "'" . '"'
+        let cmd = "tmux split-window -d -h -l " . panewidth . " -t " . obpane . ' "vim ' . g:rplugin_obsname_arg . " -c 'source " . objbrowserfile . "'" . '"'
 
         call delete($VIMRPLUGIN_TMPDIR . "/objbrpane")
 
@@ -1028,8 +1028,8 @@ function StartObjectBrowser()
         unlet g:tmp_screensname
         unlet g:tmp_curbufname
         exe "PyFile " . g:rplugin_home . "/r-plugin/vimcom.py"
-        Py SendToVimCom("\003GlobalEnv")
-        Py SendToVimCom("\004Libraries")
+        Py SendToVimCom("\003GlobalEnv [startobjectbrowser()]")
+        Py SendToVimCom("\004Libraries [startobjectbrowser()]")
         call UpdateOB("GlobalEnv")
     endif
     if wmsg != ""
@@ -1062,8 +1062,8 @@ function RObjBrowser()
         call StartObjectBrowser()
     endif
     if exists("*UpdateOB")
-        Py SendToVimCom("\003GlobalEnv")
-        Py SendToVimCom("\004Libraries")
+        Py SendToVimCom("\003GlobalEnv [RObjBrowser()]")
+        Py SendToVimCom("\004Libraries [RObjBrowser()]")
         call UpdateOB("both")
     endif
     let g:rplugin_running_objbr = 0
@@ -1073,7 +1073,7 @@ endfunction
 function RBrowserOpenCloseLists(status)
     " Avoid possibly freezing cross messages between Vim and R
     if exists("g:rplugin_curview") && v:servername != ""
-        Py SendToVimCom("\x08Stop updating info.")
+        Py SendToVimCom("\x08Stop updating info [RBrowserOpenCloseLists()]")
         let stt = a:status
     else
         let stt = a:status + 2
@@ -1170,7 +1170,7 @@ endfunction
 " Function to send commands
 " return 0 on failure and 1 on success
 function SendCmdToR(cmd)
-    Py SendToVimCom("\x09Set R as busy.")
+    Py SendToVimCom("\x09Set R as busy [SendCmdToR()]")
     if g:vimrplugin_ca_ck
         let cmd = "\001" . "\013" . a:cmd
     else
@@ -2272,7 +2272,7 @@ function RRealAction(rcmd)
 endfunction
 
 function RAction(rcmd)
-    Py SendToVimCom("\x08Stop updating info.")
+    Py SendToVimCom("\x08Stop updating info [RAction()]")
     call RRealAction(a:rcmd)
     if v:servername != ""
         exe 'Py SendToVimCom("\x07' . v:servername . '")'

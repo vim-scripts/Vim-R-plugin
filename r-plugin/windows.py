@@ -30,7 +30,7 @@ def FindRConsole():
 
 def SendToRConsole(aString):
     global RConsole
-    SendToVimCom("\x09Set R as busy.")
+    SendToVimCom("\x09Set R as busy [SendToRConsole()]")
     finalString = aString.decode("latin-1") + "\n"
     win32clipboard.OpenClipboard(0)
     win32clipboard.EmptyClipboard()
@@ -57,7 +57,7 @@ def SendToRConsole(aString):
 
 def RClearConsolePy():
     global RConsole
-    SendToVimCom("\x09Set R as busy.")
+    SendToVimCom("\x09Set R as busy [RClearConsolePy()]")
     if RConsole == 0:
         FindRConsole()
     if RConsole:
@@ -84,7 +84,7 @@ def RaiseRConsole():
         win32gui.SetForegroundWindow(RConsole)
 
 def SendQuitMsg(aString):
-    SendToVimCom("\x09Set R as busy.")
+    SendToVimCom("\x09Set R as busy [SendQuitMsg()]")
     finalString = aString.decode("latin-1") + "\n"
     win32clipboard.OpenClipboard(0)
     win32clipboard.EmptyClipboard()
