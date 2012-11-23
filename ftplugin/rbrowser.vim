@@ -64,7 +64,7 @@ function! UpdateOB(what)
         let wht = a:what
     endif
     if g:rplugin_curview != wht
-        return
+        return "curview != what"
     endif
 
     let g:rplugin_switchedbuf = 0
@@ -73,7 +73,7 @@ function! UpdateOB(what)
         silent buffers
         redir END
         if s:bufl !~ "Object_Browser"
-            return
+            return "Object_Browser not listed"
         endif
         if exists("g:rplugin_curbuf") && g:rplugin_curbuf != "Object_Browser"
             let savesb = &switchbuf
@@ -107,6 +107,7 @@ function! UpdateOB(what)
         exe "sil noautocmd sb " . g:rplugin_curbuf
         exe "set switchbuf=" . savesb
     endif
+    return "End of UpdateOB()"
 endfunction
 
 function! RBrowserDoubleClick()
@@ -314,8 +315,6 @@ function! MakeRBrowserMenu()
 endfunction
 
 function! ObBrBufUnload()
-    call delete($VIMRPLUGIN_TMPDIR . "/object_browser")
-    call delete($VIMRPLUGIN_TMPDIR . "/liblist")
     if exists("g:rplugin_editor_sname")
         call system("tmux select-pane -t " . g:rplugin_edpane)
     endif
@@ -347,20 +346,20 @@ function! OBGetDeleteCmd(lnum)
 endfunction
 
 function! OBSendDeleteCmd(cmd)
-    Py SendToVimCom("\x08Stop updating info.")
+    Py SendToVimCom("\x08Stop updating info. [OBSendDeleteCmd]")
     if exists("*RBrSendToR")
         call RBrSendToR(a:cmd)
     else
         call SendCmdToR(a:cmd)
     endif
     if g:rplugin_curview == "GlobalEnv"
-        Py SendToVimCom("\003GlobalEnv")
+        Py SendToVimCom("\003GlobalEnv [OBSendDeleteCmd]")
     else
-        Py SendToVimCom("\004Libraries")
+        Py SendToVimCom("\004Libraries [OBSendDeleteCmd]")
     endif
     call UpdateOB("both")
     if v:servername != ""
-        exe 'Py SendToVimCom("\x07' . v:servername . '")'
+        exe 'Py SendToVimCom("\x07' . v:servername . ' [OBSendDeleteCmd]")'
     endif
 endfunction
 
@@ -406,10 +405,6 @@ if has("gui_running")
     call RControlMenu()
     call RBrowserMenu()
 endif
-
-call writefile([], $VIMRPLUGIN_TMPDIR . "/object_browser")
-call writefile([], $VIMRPLUGIN_TMPDIR . "/liblist")
-
 
 if $TMUX_PANE == ""
     au BufUnload <buffer> Py SendToVimCom("\x08Stop updating info.")
