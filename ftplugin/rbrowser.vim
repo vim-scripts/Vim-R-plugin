@@ -410,9 +410,13 @@ if $TMUX_PANE == ""
     au BufUnload <buffer> Py SendToVimCom("\x08Stop updating info.")
 else
     au BufUnload <buffer> call ObBrBufUnload()
-    " Don't load problematic plugins
-    let loaded_nerd_tree = 1
-    let loaded_showmarks = 1
+    " Fix problems caused by some plugins
+    if exists("g:loaded_surround")
+        nunmap ds
+    endif
+    if exists("g:loaded_showmarks ")
+        autocmd! ShowMarks
+    endif
 endif
 
 nmap <buffer><silent> d :call OBDelete()<CR>
