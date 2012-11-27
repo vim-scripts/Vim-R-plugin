@@ -1423,6 +1423,8 @@ function SendFunctionToR(e, m)
     endif
 
     let b:needsnewomnilist = 1
+    let startline = line(".")
+    let save_cursor = getpos(".")
     let line = SanitizeRLine(getline("."))
     let i = line(".")
     while i > 0 && line !~ "function"
@@ -1430,6 +1432,7 @@ function SendFunctionToR(e, m)
         let line = SanitizeRLine(getline(i))
     endwhile
     if i == 0
+        call RWarningMsg("Begin of function not found.")
         return
     endif
     let functionline = i
@@ -1438,6 +1441,7 @@ function SendFunctionToR(e, m)
         let line = SanitizeRLine(getline(i))
     endwhile
     if i == 0
+        call RWarningMsg("The function assign operator  <-  was not found.")
         return
     endif
     let firstline = i
@@ -1449,6 +1453,7 @@ function SendFunctionToR(e, m)
         let line = SanitizeRLine(getline(i))
     endwhile
     if i == tt
+        call RWarningMsg("The function opening brace was not found.")
         return
     endif
     let nb = CountBraces(line)
@@ -1458,9 +1463,18 @@ function SendFunctionToR(e, m)
         let nb += CountBraces(line)
     endwhile
     if nb != 0
+        call RWarningMsg("The function closing brace was not found.")
         return
     endif
     let lastline = i
+
+    if startline > lastline
+        call setpos(".", [0, firstline - 1, 1])
+        call SendFunctionToR(a:e, a:m)
+        call setpos(".", save_cursor)
+        return
+    endif
+
     let lines = getline(firstline, lastline)
     let ok = RSourceLines(lines, a:e)
     if  ok == 0
