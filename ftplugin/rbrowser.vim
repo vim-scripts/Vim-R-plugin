@@ -101,7 +101,9 @@ function! UpdateOB(what)
         exe "silent read " . $VIMRPLUGIN_TMPDIR . "/liblist"
     endif
     call cursor(curline, curcol)
-    setlocal nomodifiable
+    if bufname("%") =~ "Object_Browser" || b:rplugin_extern_ob
+        setlocal nomodifiable
+    endif
     redraw
     if g:rplugin_switchedbuf
         exe "sil noautocmd sb " . g:rplugin_curbuf
