@@ -2928,6 +2928,9 @@ function SetRPath()
     else
         let b:rplugin_R = "R"
     endif
+    if !executable(b:rplugin_R)
+        call RWarningMsg("R executable not found: '" . b:rplugin_R . "'")
+    endif
     if !exists("g:vimrplugin_r_args")
         let b:rplugin_r_args = " "
     else
