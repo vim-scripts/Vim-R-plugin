@@ -871,7 +871,7 @@ function StartObjectBrowser()
                     \ 'normal! ggdG',
                     \ 'setlocal nomodified',
                     \ 'call cursor(curline, curcol)',
-                    \ 'exe "PyFile " . g:rplugin_home . "/r-plugin/vimcom.py"',
+                    \ 'exe "PyFile " . substitute(g:rplugin_home, " ", '. "'\\ '" . ', "g") . "/r-plugin/vimcom.py"',
                     \ 'function! RBrSendToR(cmd)',
                     \ '    let scmd = "tmux set-buffer '. "'" . '" . a:cmd . "\<C-M>' . "'" . ' && tmux' . tmxs . 'paste-buffer -t ' . g:rplugin_rpane . '"',
                     \ '    let rlog = system(scmd)',
