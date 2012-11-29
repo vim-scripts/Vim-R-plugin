@@ -1027,7 +1027,7 @@ function StartObjectBrowser()
         unlet g:tmp_objbrtitle
         unlet g:tmp_screensname
         unlet g:tmp_curbufname
-        exe "PyFile " . g:rplugin_home . "/r-plugin/vimcom.py"
+        exe "PyFile " . substitute(g:rplugin_home, " ", '\ ', "g") . "/r-plugin/vimcom.py"
         Py SendToVimCom("\003GlobalEnv [startobjectbrowser()]")
         Py SendToVimCom("\004Libraries [startobjectbrowser()]")
         call UpdateOB("GlobalEnv")
@@ -3077,7 +3077,7 @@ else
     command! -nargs=+ PyFile :
 endif
 
-exe "PyFile " . g:rplugin_home . "/r-plugin/vimcom.py"
+exe "PyFile " . substitute(g:rplugin_home, " ", '\ ', "g") . "/r-plugin/vimcom.py"
 
 " ^K (\013) cleans from cursor to the right and ^U (\025) cleans from cursor
 " to the left. However, ^U causes a beep if there is nothing to clean. The
