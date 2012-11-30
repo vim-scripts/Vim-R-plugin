@@ -871,7 +871,7 @@ function StartObjectBrowser()
                     \ 'normal! ggdG',
                     \ 'setlocal nomodified',
                     \ 'call cursor(curline, curcol)',
-                    \ 'exe "PyFile " . substitute(g:rplugin_home, " ", '. "'\\ '" . ', "g") . "/r-plugin/vimcom.py"',
+                    \ 'exe "PyFile " . substitute(g:rplugin_home, " ", '. "'\\\\ '" . ', "g") . "/r-plugin/vimcom.py"',
                     \ 'function! RBrSendToR(cmd)',
                     \ '    let scmd = "tmux set-buffer '. "'" . '" . a:cmd . "\<C-M>' . "'" . ' && tmux' . tmxs . 'paste-buffer -t ' . g:rplugin_rpane . '"',
                     \ '    let rlog = system(scmd)',
@@ -1027,7 +1027,7 @@ function StartObjectBrowser()
         unlet g:tmp_objbrtitle
         unlet g:tmp_screensname
         unlet g:tmp_curbufname
-        exe "PyFile " . substitute(g:rplugin_home, " ", '\ ', "g") . "/r-plugin/vimcom.py"
+        exe "PyFile " . substitute(g:rplugin_home, " ", '\\ ', "g") . "/r-plugin/vimcom.py"
         Py SendToVimCom("\003GlobalEnv [startobjectbrowser()]")
         Py SendToVimCom("\004Libraries [startobjectbrowser()]")
         call UpdateOB("GlobalEnv")
@@ -3077,7 +3077,7 @@ else
     command! -nargs=+ PyFile :
 endif
 
-exe "PyFile " . substitute(g:rplugin_home, " ", '\ ', "g") . "/r-plugin/vimcom.py"
+exe "PyFile " . substitute(g:rplugin_home, " ", '\\ ', "g") . "/r-plugin/vimcom.py"
 
 " ^K (\013) cleans from cursor to the right and ^U (\025) cleans from cursor
 " to the left. However, ^U causes a beep if there is nothing to clean. The
@@ -3288,7 +3288,7 @@ if has("win32") || has("win64")
         finish
     endif
     let rplugin_pywin32 = 1
-    exe "PyFile " . substitute(g:rplugin_home, " ", '\ ', "g") . '\r-plugin\windows.py' 
+    exe "PyFile " . substitute(g:rplugin_home, " ", '\\ ', "g") . '\r-plugin\windows.py' 
     if rplugin_pywin32 == 0
         let g:rplugin_failed = 1
         finish
