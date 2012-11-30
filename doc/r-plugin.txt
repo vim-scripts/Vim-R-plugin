@@ -42,6 +42,9 @@ Cryptic error message are bugs... Please report them at:
 
     https://github.com/jcfaria/Vim-R-plugin/issues
 
+We do not plan to take the initiative of writing code for new features, but
+patches and git pull requests are welcome.
+
 
 ==============================================================================
 							   *r-plugin-features*
@@ -129,7 +132,7 @@ following dependencies:
    Vim >= 7.3 with Python support.
    Tmux >= 1.5:     http://tmux.sourceforge.net
    Screen plugin:   http://www.vim.org/scripts/script.php?script_id=2711
-   vimcom = 0.9-3: http://www.lepem.ufc.br/jaa/vimcom.html
+   vimcom = 0.9-5:  http://www.lepem.ufc.br/jaa/vimcom.html
 
    Suggests:~
    ncurses-term:  http://invisible-island.net/ncurses
@@ -143,13 +146,17 @@ following dependencies:
    the scope of this documentation.
    
    The vimcom package creates a server on R to allow the communication with
-   Vim. The package is not used to send commands from Vim to R, but it is
-   necessary to open R documentation in Vim's buffer, run the Object Browser,
-   run either Sweave() or knit() on the document being edited. It also has
-   some functions called by Vim such as vim.plot(), vim.print(), and
+   Vim. The package is not used to send commands from Vim to R Console, but it
+   is necessary to open R documentation in Vim's buffer, run the Object
+   Browser, run either Sweave() or knit() on the document being edited. It
+   also has some functions called by Vim such as vim.plot(), vim.print(), and
    vim.bol(). This last one is required to build the data base used in
-   omnicompletion.
-   
+   omnicompletion. Before installing vimcom from source, you have to install
+   the X server development headers. On Debian/Ubuntu systems you can install
+   them with the following command in a terminal emulator:
+>
+   sudo apt-get install libx11-dev libxt-dev
+<
    The colorout package colorizes the R output and the setwidth package
    adjusts the value of options("width") whenever the terminal is resized.
    They can be installed from within R.
@@ -232,7 +239,7 @@ to install external dependencies:
       find the file that matches exactly the version of Python that you
       installed.
 
-    * vimcom = 0.9-3: http://www.lepem.ufc.br/jaa/vimcom.html
+    * vimcom = 0.9-5: http://www.lepem.ufc.br/jaa/vimcom.html
       The vimcom package creates a server on R to allow the communication with
       Vim. You certainly will want to put the following lines at the end of
       your Rprofile (usually at ~/Documents/.Rprofile):
@@ -453,6 +460,14 @@ Help (R)                                            :Rhelp
 Please see |r-plugin-key-bindings| to learn how to customize the key bindings
 without editing the plugin directly. 
 
+The plugin commands that send code to R Console are the most commonly used. If
+the code to be sent to R has a single line it is sent directly to R Console,
+but if it has more than one line (a selection of lines, a block of lines
+between two marks, a paragraph etc) the lines are written to a file and the
+plugin sends to R the command to source the file. For example, when sending a
+selection of lines, you should do either <LocalLeader>se or <LocalLeader>sa
+instead of <LocalLeader>ss to see what lines are being sourced.
+
 After the command <LocalLeader>ao, Vim will save the current buffer if it has
 any pending changes, run "R CMD BATCH --no-restore --no-save" on the current
 file and show the resulting .Rout file in a new tab. Please see
@@ -616,6 +631,11 @@ the first line of the Object Browser it will toggle the view between the
 objects in .GlobalEnv and the currently loaded libraries. The Object Browser
 requires the |+clientserver| feature to be automatically updated and the
 |+conceal| feature to correctly align list items.
+
+Note: On Linux you may find binaries without the |clientserver| feature if you
+install packages such as vim-nox on Debian/Ubuntu or vim-enhanced on
+Fedora/Red Hat. If you want to use Vim in a terminal emulator in Fedora/Red
+Hat, you may want to create a symbolic link to "gvim" named "vim".
 
 In the .GlobalEnv view, if an object has the attribute "label", it will also
 be displayed. Please, see the R help for package vimcom for some options to
@@ -863,13 +883,27 @@ indent the code below:
     class(x) <- c(if(ordered) "ordered", "factor")
 <
 
-5.5. Commands are sent twice on Mac OS X~
+5.5. Wrong message that "R is busy"~
+
+When code is sent from Vim to R Console, the vimcom library sets the value of
+the internal variable "r_is_busy" to 1. The value is set back to 0 when any
+code is successfully evaluated. If you send invalid code to R, there will be
+no successful evaluation of code and, thus, the value of "r_is_busy" will
+remain set to 1. Then, if you try to update the object browser, see the R
+documentation for any function, or do other tasks that require the hidden
+evaluation of code by R, the vimcom library will refuse to do the tasks to
+avoid any risk of corrupting R's memory. It will tell Vim that "R is busy" and
+Vim will display this message. Everything should work as expected again after
+any valid code being executed in R Console.
+
+
+5.6. Commands are sent twice on Mac OS X~
 
 If you use the screen plugin with GNU Screen, individual lines may be sent
 duplicated to R on Mac OS X.
 
 
-5.6. "VimCom port not found" on OpenBSD~
+5.7. "VimCom port not found" on OpenBSD~
 
 When the loopback interface has both IPv4 and IPv6 addresses vimcom loads ok
 but apparently does not listen on the IPv4 address (127.0.0.1), only on the
@@ -1004,7 +1038,7 @@ If vimrplugin_external_ob = 1 and R is running in an external terminal
 emulator and the communication with R is being established through Tmux, the
 Object Browser will be placed besides the R Console in the external terminal
 emulator. In this case, the command <LocalLeader>rh will not work on the
-Object Browser.
+Object Browser (you will see the message "Cmd not available").
 
 
 6.4. Vim as pager for R help~
@@ -1601,7 +1635,6 @@ directory after the installation:
    r-plugin/r.snippets
    r-plugin/tex_indent.vim
    r-plugin/vimcom.py
-   r-plugin/vimActivate.js
    r-plugin/windows.py
    syntax/rbrowser.vim
    syntax/rout.vim
@@ -2091,7 +2124,7 @@ argument. Example:
 							       *r-plugin-news*
 10. News~
 
-0.9.9 (2012-11-17)
+0.9.9 (2012-11-30)
 
  * New commands:  :Rinsert  and  :Rformat.
  * Automatically update the Object Browser in GVim.
