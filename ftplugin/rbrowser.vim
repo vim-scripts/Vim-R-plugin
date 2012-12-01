@@ -95,10 +95,10 @@ function! UpdateOB(what)
     sil normal! ggdG
     if wht == "GlobalEnv"
         call setline(1, ".GlobalEnv | Libraries")
-        exe "silent read " . $VIMRPLUGIN_TMPDIR . "/object_browser"
+        exe "silent read " . g:rplugin_esc_tmpdir . "/object_browser"
     else
         call setline(1, "Libraries | .GlobalEnv")
-        exe "silent read " . $VIMRPLUGIN_TMPDIR . "/liblist"
+        exe "silent read " . g:rplugin_esc_tmpdir . "/liblist"
     endif
     call cursor(curline, curcol)
     if bufname("%") =~ "Object_Browser" || b:rplugin_extern_ob
@@ -323,7 +323,7 @@ function! ObBrBufUnload()
 endfunction
 
 function! SourceObjBrLines()
-    exe "source " . $VIMRPLUGIN_TMPDIR . "/objbrowserInit"
+    exe "source " . g:rplugin_esc_tmpdir . "/objbrowserInit"
 endfunction
 
 function! OBGetDeleteCmd(lnum)

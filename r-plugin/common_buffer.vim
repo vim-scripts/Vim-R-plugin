@@ -111,6 +111,8 @@ else
 endif
 let s:uniquename = substitute(s:uniquename, '\W', '', 'g')
 let $VIMINSTANCEID = $VIMRPLUGIN_TMPDIR . "/" . s:uniquename . "-port"
+let $VIMINSTANCEID = substitute($VIMINSTANCEID, ' ', '', 'g')
+
 if has("clientserver")
     let g:rplugin_obsname_arg = "--servername " . toupper(substitute(substitute(expand("%:r"), '\W', '', 'g'), "_", "", "g"))
 else

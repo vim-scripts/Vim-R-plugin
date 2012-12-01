@@ -553,6 +553,8 @@ function StartR(whatr)
         call SetRPath()
     endif
 
+    let vimenv = 'VIMRPLUGIN_TMPDIR="' . $VIMRPLUGIN_TMPDIR . '" VIMINSTANCEID=' . $VIMINSTANCEID . " "
+
     " Change to buffer's directory before starting R
     lcd %:p:h
 
@@ -599,6 +601,11 @@ function StartR(whatr)
         let rcmd = b:rplugin_R . " " . b:rplugin_r_args
     endif
 
+    if $VIMRPLUGIN_TMPDIR =~ ' '
+        call RWarningMsg('Empty spaces are not allowed in temporary directory path: "' . $VIMRPLUGIN_TMPDIR . '"')
+        return
+    endif
+
     if g:vimrplugin_screenplugin
         if g:vimrplugin_only_in_tmux && g:vimrplugin_tmux && $TMUX_PANE == ""
             call RWarningMsg("Not inside Tmux.")
@@ -607,10 +614,10 @@ function StartR(whatr)
 
         if $TERM =~ "screen"
             if g:vimrplugin_tmux
-                call system("tmux set-environment VIMRPLUGIN_TMPDIR " . $VIMRPLUGIN_TMPDIR)
-                call system("tmux set-environment VIMINSTANCEID " . $VIMINSTANCEID)
+                call system("tmux set-environment -g VIMRPLUGIN_TMPDIR " . g:rplugin_esc_tmpdir)
+                call system("tmux set-environment -g VIMINSTANCEID " . $VIMINSTANCEID)
             else
-                let rcmd = "VIMRPLUGIN_TMPDIR=" . $VIMRPLUGIN_TMPDIR . " " . rcmd
+                let rcmd = vimenv . rcmd
             endif
         endif
         if g:vimrplugin_tmux == 0 && g:vimrplugin_noscreenrc == 0 && exists("g:ScreenShellScreenInitArgs")
@@ -734,11 +741,10 @@ function StartR(whatr)
             endif
             call system("tmux has-session -t " . b:screensname)
             if v:shell_error
-                let rcmd = "VIMRPLUGIN_TMPDIR=" . $VIMRPLUGIN_TMPDIR . " VIMINSTANCEID=" . $VIMINSTANCEID . " " . rcmd
                 if g:rplugin_termcmd =~ "gnome-terminal" || g:rplugin_termcmd =~ "xfce4-terminal" || g:rplugin_termcmd =~ "terminal" || g:rplugin_termcmd =~ "iterm"
-                    let opencmd = printf("%s 'tmux -2 %s new-session -s %s \"%s\"' &", g:rplugin_termcmd, tmxcnf, b:screensname, rcmd)
+                    let opencmd = printf("%s %s 'tmux -2 %s new-session -s %s \"%s\"' &", vimenv, g:rplugin_termcmd, tmxcnf, b:screensname, rcmd)
                 else
-                    let opencmd = printf("%s tmux -2 %s new-session -s %s \"%s\" &", g:rplugin_termcmd, tmxcnf, b:screensname, rcmd)
+                    let opencmd = printf("%s %s tmux -2 %s new-session -s %s \"%s\" &", vimenv, g:rplugin_termcmd, tmxcnf, b:screensname, rcmd)
                 endif
             else
                 if g:rplugin_termcmd =~ "gnome-terminal" || g:rplugin_termcmd =~ "xfce4-terminal" || g:rplugin_termcmd =~ "terminal" || g:rplugin_termcmd =~ "iterm"
@@ -761,9 +767,9 @@ function StartR(whatr)
             let scrrc = RWriteScreenRC()
             " Some terminals want quotes (see screen.vim)
             if g:rplugin_termcmd =~ "gnome-terminal" || g:rplugin_termcmd =~ "xfce4-terminal" || g:rplugin_termcmd =~ "terminal" || g:rplugin_termcmd =~ "iterm"
-                let opencmd = printf("%s 'screen %s -d -RR -S %s %s' &", g:rplugin_termcmd, scrrc, b:screensname, rcmd)
+                let opencmd = printf("%s %s 'screen %s -d -RR -S %s %s' &", vimenv, g:rplugin_termcmd, scrrc, b:screensname, rcmd)
             else
-                let opencmd = printf("%s screen %s -d -RR -S %s %s &", g:rplugin_termcmd, scrrc, b:screensname, rcmd)
+                let opencmd = printf("%s %s screen %s -d -RR -S %s %s &", vimenv, g:rplugin_termcmd, scrrc, b:screensname, rcmd)
             endif
         endif
 
@@ -888,7 +894,7 @@ function StartObjectBrowser()
                     \ "    exe 'Py SendToVimCom(\"\\x07' . v:servername . '\")'",
                     \ 'endif',
                     \ 'call setline(1, ".GlobalEnv | Libraries")',
-                    \ 'exe "silent read ' . $VIMRPLUGIN_TMPDIR . '/object_browser"',
+                    \ 'exe "silent read ' . substitute($VIMRPLUGIN_TMPDIR, ' ', '\\\\ ', 'g') . '/object_browser"',
                     \ 'redraw'], objbrowserfile)
 
         if g:vimrplugin_objbr_place =~ "left"
@@ -914,7 +920,7 @@ function StartObjectBrowser()
         else
             let obpane = g:rplugin_edpane
         endif
-        let cmd = "tmux split-window -d -h -l " . panewidth . " -t " . obpane . ' "vim ' . g:rplugin_obsname_arg . " -c 'source " . objbrowserfile . "'" . '"'
+        let cmd = "tmux split-window -d -h -l " . panewidth . " -t " . obpane . ' "vim ' . g:rplugin_obsname_arg . " -c 'source " . substitute(objbrowserfile, ' ', '\\ ', 'g') . "'" . '"'
 
         call delete($VIMRPLUGIN_TMPDIR . "/objbrpane")
 
@@ -2154,7 +2160,7 @@ function ShowRDoc(rkeyword, package, getclass)
     endif
 
     normal! ggdG
-    exe "read " . g:rplugin_docfile
+    exe "read " . substitute(g:rplugin_docfile, ' ', '\\ ', 'g')
     set filetype=rdoc
     normal! ggdd
     setlocal nomodified
@@ -2990,8 +2996,9 @@ endif
 if isdirectory("/tmp")
     let $VIMRPLUGIN_TMPDIR = "/tmp/r-plugin-" . g:rplugin_userlogin
 else
-    let $VIMRPLUGIN_TMPDIR = g:rplugin_uservimfiles . "/r-plugin"
+    let $VIMRPLUGIN_TMPDIR = g:rplugin_uservimfiles . "/r-plugin/tmp"
 endif
+let g:rplugin_esc_tmpdir = substitute($VIMRPLUGIN_TMPDIR, ' ', '\\ ', 'g')
 
 if !isdirectory($VIMRPLUGIN_TMPDIR)
     call mkdir($VIMRPLUGIN_TMPDIR, "p", 0700)
