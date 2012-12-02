@@ -21,8 +21,14 @@ def DiscoverVimComPort():
 
     while repl.find(correct_repl) < 0 and VimComPort < 10050:
         VimComPort = VimComPort + 1
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sock.settimeout(0.1)
+	for res in socket.getaddrinfo(HOST, VimComPort, socket.AF_UNSPEC, socket.SOCK_DGRAM):
+	    af, socktype, proto, canonname, sa = res
+	try:
+	    sock = socket.socket(af, socktype, proto)
+            sock.settimeout(0.1)
+	except socket.error:
+	    sock = None
+	    continue
         try:
             sock.connect((HOST, VimComPort))
             sock.send("\002What port?")
