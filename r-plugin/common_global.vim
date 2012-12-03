@@ -505,43 +505,47 @@ function GoDown()
 endfunction
 
 function RWriteScreenRC()
-    if g:vimrplugin_noscreenrc
-        return " "
-    endif
-
     let scrcnf = $VIMRPLUGIN_TMPDIR . "/" . b:screensname . ".screenrc"
 
-    if g:vimrplugin_screenplugin
+    if g:vimrplugin_noscreenrc
         let cnflines = [
-                    \ 'msgwait 0',
-                    \ 'vbell off',
-                    \ 'startup_message off',
-                    \ 'bind a resize +1',
-                    \ 'bind z resize -1',
-                    \ "termcapinfo xterm* 'ti@:te@'"]
-        if $DISPLAY != "" || $TERM =~ "xterm"
-            let cnflines = cnflines + [
-                        \ "terminfo rxvt-unicode 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'",
-                        \ 'term screen-256color']
-        endif
+                    \ 'setenv VIMRPLUGIN_TMPDIR "' . $VIMRPLUGIN_TMPDIR . '"',
+                    \ 'setenv VIMINSTANCEID ' . $VIMINSTANCEID ,
+                    \ 'source ~/.screenrc']
     else
-        if g:vimrplugin_nosingler == 1
-            let scrtitle = 'hardstatus string "' . expand("%:t") . '"'
+        if g:vimrplugin_screenplugin
+            let cnflines = [
+                        \ 'msgwait 0',
+                        \ 'vbell off',
+                        \ 'setenv VIMRPLUGIN_TMPDIR "' . $VIMRPLUGIN_TMPDIR . '"',
+                        \ 'setenv VIMINSTANCEID ' . $VIMINSTANCEID ,
+                        \ 'startup_message off',
+                        \ 'bind a resize +1',
+                        \ 'bind z resize -1',
+                        \ "termcapinfo xterm* 'ti@:te@'"]
+            if $DISPLAY != "" || $TERM =~ "xterm"
+                let cnflines = cnflines + [
+                            \ "terminfo rxvt-unicode 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'",
+                            \ 'term screen-256color']
+            endif
         else
-            let scrtitle = "hardstatus string R"
+            if g:vimrplugin_nosingler == 1
+                let scrtitle = 'hardstatus string "' . expand("%:t") . '"'
+            else
+                let scrtitle = "hardstatus string R"
+            endif
+
+            let cnflines = ["msgwait 1",
+                        \ "hardstatus lastline",
+                        \ scrtitle,
+                        \ "caption splitonly",
+                        \ 'caption string "Vim-R-plugin"',
+                        \ "termcapinfo xterm* 'ti@:te@'",
+                        \ 'vbell off']
         endif
-
-        let cnflines = ["msgwait 1",
-                    \ "hardstatus lastline",
-                    \ scrtitle,
-                    \ "caption splitonly",
-                    \ 'caption string "Vim-R-plugin"',
-                    \ "termcapinfo xterm* 'ti@:te@'",
-                    \ 'vbell off']
     endif
-
     call writefile(cnflines, scrcnf)
-    return " -c " . scrcnf
+    return ' -c "' . scrcnf . '"'
 endfunction
 
 " Start R
@@ -552,8 +556,6 @@ function StartR(whatr)
     if !exists("b:rplugin_R")
         call SetRPath()
     endif
-
-    let vimenv = 'VIMRPLUGIN_TMPDIR="' . $VIMRPLUGIN_TMPDIR . '" VIMINSTANCEID=' . $VIMINSTANCEID . " "
 
     " Change to buffer's directory before starting R
     lcd %:p:h
@@ -601,9 +603,28 @@ function StartR(whatr)
         let rcmd = b:rplugin_R . " " . b:rplugin_r_args
     endif
 
-    if $VIMRPLUGIN_TMPDIR =~ ' '
-        call RWarningMsg('Empty spaces are not allowed in temporary directory path: "' . $VIMRPLUGIN_TMPDIR . '"')
-        return
+    " Create a custom tmux.conf
+    if g:vimrplugin_tmux
+        if g:vimrplugin_notmuxconf
+            let cnflines = [
+                        \ 'set-environment -g VIMRPLUGIN_TMPDIR ' . g:rplugin_esc_tmpdir,
+                        \ 'set-environment -g VIMINSTANCEID ' . $VIMINSTANCEID,
+                        \ 'source-file ~/.tmux.conf' ]
+        else
+            let cnflines = [
+                        \ 'set-option -g prefix C-a',
+                        \ 'unbind-key C-b',
+                        \ 'bind-key C-a send-prefix',
+                        \ 'set-window-option -g mode-keys vi',
+                        \ 'set -g status off',
+                        \ "set -g terminal-overrides 'xterm*:smcup@:rmcup@'",
+                        \ 'set-environment -g VIMRPLUGIN_TMPDIR "' . $VIMRPLUGIN_TMPDIR . '"',
+                        \ 'set-environment -g VIMINSTANCEID "' . $VIMINSTANCEID . '"']
+            if g:vimrplugin_external_ob
+                let cnflines = extend(cnflines, ['set -g mode-mouse on', 'set -g mouse-select-pane on', 'set -g mouse-resize-pane on'])
+            endif
+        endif
+        call writefile(cnflines, s:tmxcnf)
     endif
 
     if g:vimrplugin_screenplugin
@@ -617,7 +638,7 @@ function StartR(whatr)
                 call system("tmux set-environment -g VIMRPLUGIN_TMPDIR " . g:rplugin_esc_tmpdir)
                 call system("tmux set-environment -g VIMINSTANCEID " . $VIMINSTANCEID)
             else
-                let rcmd = vimenv . rcmd
+                let rcmd = 'VIMRPLUGIN_TMPDIR="' . $VIMRPLUGIN_TMPDIR . '" VIMINSTANCEID=' . $VIMINSTANCEID . " " . rcmd
             endif
         endif
         if g:vimrplugin_tmux == 0 && g:vimrplugin_noscreenrc == 0 && exists("g:ScreenShellScreenInitArgs")
@@ -707,6 +728,13 @@ function StartR(whatr)
             set noautochdir
         endif
     else
+        " External terminal emulator
+        if $DISPLAY == ""
+            call RWarningMsg("The X Window system is required to run R in an external terminal.")
+            lcd -
+            return
+        endif
+
         if g:vimrplugin_tmux
             call system('export VIMRPLUGIN_TMPDIR=' . $VIMRPLUGIN_TMPDIR)
             call system('export VIMINSTANCEID=' . $VIMINSTANCEID)
@@ -716,24 +744,7 @@ function StartR(whatr)
                 let $TMUX = ""
                 call system('tmux set-option -ga update-environment " TMUX_PANE VIMRPLUGIN_TMPDIR VIMINSTANCEID"')
             endif
-
-            if g:vimrplugin_notmuxconf
-                let tmxcnf = " "
-            else
-                let tmxcnf = $VIMRPLUGIN_TMPDIR . "/tmux.conf"
-                let cnflines = [
-                            \ 'set-option -g prefix C-a',
-                            \ 'unbind-key C-b',
-                            \ 'bind-key C-a send-prefix',
-                            \ 'set-window-option -g mode-keys vi',
-                            \ 'set -g status off',
-                            \ "set -g terminal-overrides 'xterm*:smcup@:rmcup@'"]
-                if g:vimrplugin_external_ob
-                    let cnflines = extend(cnflines, ['set -g mode-mouse on', 'set -g mouse-select-pane on', 'set -g mouse-resize-pane on'])
-                endif
-                call writefile(cnflines, tmxcnf)
-                let tmxcnf = "-f " . tmxcnf
-            endif
+            let tmuxcnf = '-f "' . s:tmxcnf . '"'
             if $DISPLAY == ""
                 call RWarningMsg("The X Window system is required to run R in an external terminal.")
                 lcd -
@@ -742,23 +753,18 @@ function StartR(whatr)
             call system("tmux has-session -t " . b:screensname)
             if v:shell_error
                 if g:rplugin_termcmd =~ "gnome-terminal" || g:rplugin_termcmd =~ "xfce4-terminal" || g:rplugin_termcmd =~ "terminal" || g:rplugin_termcmd =~ "iterm"
-                    let opencmd = printf("%s %s 'tmux -2 %s new-session -s %s \"%s\"' &", vimenv, g:rplugin_termcmd, tmxcnf, b:screensname, rcmd)
+                    let opencmd = printf("%s 'tmux -2 %s new-session -s %s \"%s\"' &", g:rplugin_termcmd, tmuxcnf, b:screensname, rcmd)
                 else
-                    let opencmd = printf("%s %s tmux -2 %s new-session -s %s \"%s\" &", vimenv, g:rplugin_termcmd, tmxcnf, b:screensname, rcmd)
+                    let opencmd = printf("%s tmux -2 %s new-session -s %s \"%s\" &", g:rplugin_termcmd, tmuxcnf, b:screensname, rcmd)
                 endif
             else
                 if g:rplugin_termcmd =~ "gnome-terminal" || g:rplugin_termcmd =~ "xfce4-terminal" || g:rplugin_termcmd =~ "terminal" || g:rplugin_termcmd =~ "iterm"
-                    let opencmd = printf("%s 'tmux -2 %s attach-session -d -t %s' &", g:rplugin_termcmd, tmxcnf, b:screensname)
+                    let opencmd = printf("%s 'tmux -2 %s attach-session -d -t %s' &", g:rplugin_termcmd, tmuxcnf, b:screensname)
                 else
-                    let opencmd = printf("%s tmux -2 %s attach-session -d -t %s &", g:rplugin_termcmd, tmxcnf, b:screensname)
+                    let opencmd = printf("%s tmux -2 %s attach-session -d -t %s &", g:rplugin_termcmd, tmuxcnf, b:screensname)
                 endif
             endif
         else
-            if $DISPLAY == ""
-                call RWarningMsg("The X Window system is required to run R in an external terminal.")
-                lcd -
-                return
-            endif
             if !executable("screen")
                 call RWarningMsgInp("The value of vimrplugin_tmux = 0 but the GNU Screen application was not found.")
                 lcd -
@@ -767,9 +773,9 @@ function StartR(whatr)
             let scrrc = RWriteScreenRC()
             " Some terminals want quotes (see screen.vim)
             if g:rplugin_termcmd =~ "gnome-terminal" || g:rplugin_termcmd =~ "xfce4-terminal" || g:rplugin_termcmd =~ "terminal" || g:rplugin_termcmd =~ "iterm"
-                let opencmd = printf("%s %s 'screen %s -d -RR -S %s %s' &", vimenv, g:rplugin_termcmd, scrrc, b:screensname, rcmd)
+                let opencmd = printf("%s 'screen %s -d -RR -S %s %s' &", g:rplugin_termcmd, scrrc, b:screensname, rcmd)
             else
-                let opencmd = printf("%s %s screen %s -d -RR -S %s %s &", vimenv, g:rplugin_termcmd, scrrc, b:screensname, rcmd)
+                let opencmd = printf("%s screen %s -d -RR -S %s %s &", g:rplugin_termcmd, scrrc, b:screensname, rcmd)
             endif
         endif
 
@@ -2935,7 +2941,7 @@ function SetRPath()
         let b:rplugin_R = "R"
     endif
     if !executable(b:rplugin_R)
-        call RWarningMsg("R executable not found: '" . b:rplugin_R . "'")
+        call RWarningMsgInp("R executable not found: '" . b:rplugin_R . "'")
     endif
     if !exists("g:vimrplugin_r_args")
         let b:rplugin_r_args = " "
@@ -3208,24 +3214,13 @@ if g:vimrplugin_tmux
 
     " To get 256 colors you have to set the $TERM environment variable to
     " xterm-256color. See   :h r-plugin-tips 
+    let s:tmxcnf = $VIMRPLUGIN_TMPDIR . "/tmux.conf"
     if g:vimrplugin_notmuxconf == 0
         if $DISPLAY != "" || $TERM =~ "xterm"
             let g:ScreenShellTmuxInitArgs .= "-2"
         endif
-        let tmxcnf = $VIMRPLUGIN_TMPDIR . "/tmux.conf"
-        let cnflines = [
-                    \ 'set-option -g prefix C-a',
-                    \ 'unbind-key C-b',
-                    \ 'bind-key C-a send-prefix',
-                    \ 'set-window-option -g mode-keys vi',
-                    \ 'set -g status off',
-                    \ "set -g terminal-overrides 'xterm*:smcup@:rmcup@'",
-                    \ 'set -g mode-mouse on',
-                    \ 'set -g mouse-select-pane on',
-                    \ 'set -g mouse-resize-pane on']
-        call writefile(cnflines, tmxcnf)
-        let g:ScreenShellTmuxInitArgs .= " -f " . tmxcnf
     endif
+    let g:ScreenShellTmuxInitArgs .= ' -f "' . s:tmxcnf . '"'
 endif
 
 " Check whether GNU Screen is OK

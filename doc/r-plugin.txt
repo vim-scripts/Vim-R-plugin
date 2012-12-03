@@ -155,7 +155,11 @@ following dependencies:
    the X server development headers. On Debian/Ubuntu systems you can install
    them with the following command in a terminal emulator:
 >
-   sudo apt-get install libx11-dev libxt-dev
+   sudo apt-get install libx11-dev
+<
+   On Fedora/Red Hat, the command is:
+>
+   sudo yum install libX11-devel
 <
    The colorout package colorizes the R output and the setwidth package
    adjusts the value of options("width") whenever the terminal is resized.
@@ -1226,6 +1230,11 @@ If you want to use your own ~/.screenrc, put in your vimrc:
 >
    let vimrplugin_noscreenrc = 1
 <
+If you opted for using your own configuration file, the plugin will write a
+minimum configuration which will set the value of two environment variables
+required for the communication with R and source your own configuration file
+(either ~/.tmux.conf or ~/.screenrc).
+
 
 6.15. Integration with screen.vim plugin (Linux/Unix only)~
 						     *vimrplugin_screenplugin*
@@ -2124,11 +2133,13 @@ argument. Example:
 							       *r-plugin-news*
 10. News~
 
-0.9.9 (2012-11-30)
+0.9.9 (2012-12-03)
 
  * New commands:  :Rinsert  and  :Rformat.
  * Automatically update the Object Browser in GVim.
  * On MS Windows, don't raise the R Console before sending CTRL-V to it.
+ * Search for vimcom in both IPv4 and IPv6 ports (thanks to Zé Loff for
+   writing the patch).
 
 0.9.8 (2012-10-13)
 
