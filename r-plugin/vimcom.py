@@ -5,10 +5,12 @@ import os
 import re
 VimComPort = 0
 PortWarn = False
+VimComFamily = None
 
 def DiscoverVimComPort():
     global PortWarn
     global VimComPort
+    global VimComFamily
     HOST = "localhost"
     VimComPort = 9998
     repl = "NOTHING"
@@ -21,21 +23,21 @@ def DiscoverVimComPort():
 
     while repl.find(correct_repl) < 0 and VimComPort < 10050:
         VimComPort = VimComPort + 1
-	for res in socket.getaddrinfo(HOST, VimComPort, socket.AF_UNSPEC, socket.SOCK_DGRAM):
-	    af, socktype, proto, canonname, sa = res
-	try:
-	    sock = socket.socket(af, socktype, proto)
-            sock.settimeout(0.1)
-	except socket.error:
-	    sock = None
-	    continue
-        try:
-            sock.connect((HOST, VimComPort))
-            sock.send("\002What port?")
-            repl = sock.recv(1024)
-        except:
-            pass
-        sock.close()
+        for res in socket.getaddrinfo(HOST, VimComPort, socket.AF_UNSPEC, socket.SOCK_DGRAM):
+            af, socktype, proto, canonname, sa = res
+            try:
+                sock = socket.socket(af, socktype, proto)
+                sock.settimeout(0.1)
+                sock.connect(sa)
+                sock.send("\002What port?")
+                repl = sock.recv(1024)
+                sock.close()
+                if repl.find(correct_repl):
+                    VimComFamily = af
+                    break
+            except:
+                sock = None
+                continue
 
     if VimComPort >= 10050:
         VimComPort = 0
@@ -55,13 +57,14 @@ def DiscoverVimComPort():
 def SendToVimCom(aString):
     HOST = "localhost"
     global VimComPort
+    global VimComFamily
     if VimComPort == 0:
         VimComPort = DiscoverVimComPort()
         if VimComPort == 0:
             return
     received = None
 
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock = socket.socket(VimComFamily, socket.SOCK_DGRAM)
     sock.settimeout(3.0)
 
     try:
