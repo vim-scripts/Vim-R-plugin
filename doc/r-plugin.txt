@@ -132,7 +132,7 @@ following dependencies:
    Vim >= 7.3 with Python support.
    Tmux >= 1.5:     http://tmux.sourceforge.net
    Screen plugin:   http://www.vim.org/scripts/script.php?script_id=2711
-   vimcom = 0.9-5:  http://www.lepem.ufc.br/jaa/vimcom.html
+   vimcom = 0.9-5:  An R package.
 
    Suggests:~
    ncurses-term:  http://invisible-island.net/ncurses
@@ -160,6 +160,10 @@ following dependencies:
    On Fedora/Red Hat, the command is:
 >
    sudo yum install libX11-devel
+<
+   Finally, do in R:
+>
+   install.packages("vimcom")
 <
    The colorout package colorizes the R output and the setwidth package
    adjusts the value of options("width") whenever the terminal is resized.
@@ -243,10 +247,11 @@ to install external dependencies:
       find the file that matches exactly the version of Python that you
       installed.
 
-    * vimcom = 0.9-5: http://www.lepem.ufc.br/jaa/vimcom.html
-      The vimcom package creates a server on R to allow the communication with
-      Vim. You certainly will want to put the following lines at the end of
-      your Rprofile (usually at ~/Documents/.Rprofile):
+    * vimcom = 0.9-5: An R package, available on CRAN and installable with the
+      install.packages() command. The vimcom package creates a server on R to
+      allow the communication with Vim. You certainly will want to put the
+      following lines at the end of your Rprofile (usually at
+      ~/Documents/.Rprofile):
 >
       if(interactive()){
 	  library(vimcom)
