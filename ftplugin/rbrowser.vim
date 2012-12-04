@@ -58,24 +58,32 @@ let g:rplugin_curview = "GlobalEnv"
 
 
 function! UpdateOB(what)
-    if g:rplugin_curview != a:what
-        return
-    endif
-    if g:rplugin_ob_busy
-        return
-    endif
-    redir => s:bufl
-    silent buffers
-    redir END
-    if exists("g:rplugin_curbuf") && g:rplugin_curbuf != "Object_Browser" && g:rplugin_editor_port == 0 && s:bufl =~ "Object_Browser"
-        let savesb = &switchbuf
-        set switchbuf=useopen,usetab
-        sil noautocmd sb Object_Browser
-        let g:rplugin_switchedbuf = 1
+    if a:what == "both"
+        let wht = g:rplugin_curview
     else
-        let g:rplugin_switchedbuf = 0
+        let wht = a:what
     endif
-    set modifiable
+    if g:rplugin_curview != wht
+        return "curview != what"
+    endif
+
+    let g:rplugin_switchedbuf = 0
+    if $TMUX_PANE == ""
+        redir => s:bufl
+        silent buffers
+        redir END
+        if s:bufl !~ "Object_Browser"
+            return "Object_Browser not listed"
+        endif
+        if exists("g:rplugin_curbuf") && g:rplugin_curbuf != "Object_Browser"
+            let savesb = &switchbuf
+            set switchbuf=useopen,usetab
+            sil noautocmd sb Object_Browser
+            let g:rplugin_switchedbuf = 1
+        endif
+    endif
+
+    setlocal modifiable
     let curline = line(".")
     let curcol = col(".")
     if !exists("curline")
@@ -85,20 +93,23 @@ function! UpdateOB(what)
         let curcol = 1
     endif
     sil normal! ggdG
-    if a:what == "GlobalEnv"
+    if wht == "GlobalEnv"
         call setline(1, ".GlobalEnv | Libraries")
-        exe "silent read " . $VIMRPLUGIN_TMPDIR . "/object_browser"
+        exe "silent read " . g:rplugin_esc_tmpdir . "/object_browser"
     else
         call setline(1, "Libraries | .GlobalEnv")
-        exe "silent read " . $VIMRPLUGIN_TMPDIR . "/liblist"
+        exe "silent read " . g:rplugin_esc_tmpdir . "/liblist"
     endif
     call cursor(curline, curcol)
-    set nomodifiable
+    if bufname("%") =~ "Object_Browser" || b:rplugin_extern_ob
+        setlocal nomodifiable
+    endif
     redraw
     if g:rplugin_switchedbuf
         exe "sil noautocmd sb " . g:rplugin_curbuf
         exe "set switchbuf=" . savesb
     endif
+    return "End of UpdateOB()"
 endfunction
 
 function! RBrowserDoubleClick()
@@ -117,16 +128,24 @@ function! RBrowserDoubleClick()
     " Toggle state of list or data.frame: open X closed
     let key = RBrowserGetName(1, line("."))
     if g:rplugin_curview == "GlobalEnv"
-        exe 'Py SendToR("' . "\005" . '-' . substitute(key, '\$', '-', "g") . '")'
-        call UpdateOB("GlobalEnv")
+        exe 'Py SendToVimCom("' . "\005" . '-' . substitute(key, '\$', '-', "g") . '")'
+        if g:rplugin_lastrpl == "R is busy."
+            call RWarningMsg("R is busy.")
+        else
+            call UpdateOB("GlobalEnv")
+        endif
     else
         let key = substitute(key, '\$', '-', "g") 
         let key = substitute(key, '`', '', "g") 
         if key !~ "^package:"
             let key = "package:" . RBGetPkgName() . '-' . key
         endif
-        exe 'Py SendToR("' . "\005" . key . '")'
-        call UpdateOB("libraries")
+        exe 'Py SendToVimCom("' . "\005" . key . '")'
+        if g:rplugin_lastrpl == "R is busy."
+            call RWarningMsg("R is busy.")
+        else
+            call UpdateOB("libraries")
+        endif
     endif
 endfunction
 
@@ -298,16 +317,13 @@ function! MakeRBrowserMenu()
 endfunction
 
 function! ObBrBufUnload()
-    Py StopServer()
-    call delete($VIMRPLUGIN_TMPDIR . "/object_browser")
-    call delete($VIMRPLUGIN_TMPDIR . "/liblist")
-    if g:rplugin_editor_port
+    if exists("g:rplugin_editor_sname")
         call system("tmux select-pane -t " . g:rplugin_edpane)
     endif
 endfunction
 
 function! SourceObjBrLines()
-    exe "source " . $VIMRPLUGIN_TMPDIR . "/objbrowserInit"
+    exe "source " . g:rplugin_esc_tmpdir . "/objbrowserInit"
 endfunction
 
 function! OBGetDeleteCmd(lnum)
@@ -332,16 +348,25 @@ function! OBGetDeleteCmd(lnum)
 endfunction
 
 function! OBSendDeleteCmd(cmd)
-    let g:rplugin_ob_busy = 1
-    call RBrSendToR(a:cmd)
-    sleep 250m
-    let g:rplugin_ob_busy = 0
-    call UpdateOB(g:rplugin_curview)
-    sleep 10m
+    Py SendToVimCom("\x08Stop updating info. [OBSendDeleteCmd]")
+    if exists("*RBrSendToR")
+        call RBrSendToR(a:cmd)
+    else
+        call SendCmdToR(a:cmd)
+    endif
+    if g:rplugin_curview == "GlobalEnv"
+        Py SendToVimCom("\003GlobalEnv [OBSendDeleteCmd]")
+    else
+        Py SendToVimCom("\004Libraries [OBSendDeleteCmd]")
+    endif
+    call UpdateOB("both")
+    if v:servername != ""
+        exe 'Py SendToVimCom("\x07' . v:servername . ' [OBSendDeleteCmd]")'
+    endif
 endfunction
 
 function! OBDelete()
-    if g:rplugin_ob_busy || line(".") < 3 || g:rplugin_myport == 0
+    if line(".") < 3
         return
     endif
     let cmd = OBGetDeleteCmd(line("."))
@@ -349,9 +374,6 @@ function! OBDelete()
 endfunction
 
 function! OBMultiDelete()
-    if g:rplugin_ob_busy || g:rplugin_myport == 0
-        return
-    endif
     let fline = line("'<")
     let eline = line("'>")
     if fline < 3
@@ -386,26 +408,21 @@ if has("gui_running")
     call RBrowserMenu()
 endif
 
-call writefile([], $VIMRPLUGIN_TMPDIR . "/object_browser")
-call writefile([], $VIMRPLUGIN_TMPDIR . "/liblist")
-
-au BufUnload <buffer> call ObBrBufUnload()
-
-function! RKeepRunning()
-    if g:rplugin_myport == 0
-        Py StopServer()
-        sleep 250m
-        Py RunServer()
-        echon
+if $TMUX_PANE == ""
+    au BufUnload <buffer> Py SendToVimCom("\x08Stop updating info.")
+else
+    au BufUnload <buffer> call ObBrBufUnload()
+    " Fix problems caused by some plugins
+    if exists("g:loaded_surround")
+        nunmap ds
     endif
-endfunction
-
-if $TMUX_PANE != ""
-    set updatetime=3200
-    autocmd CursorHold <buffer> call RKeepRunning()
-    nmap <buffer><silent> d :call OBDelete()<CR>
-    vmap <buffer><silent> d <Esc>:call OBMultiDelete()<CR>
+    if exists("g:loaded_showmarks ")
+        autocmd! ShowMarks
+    endif
 endif
+
+nmap <buffer><silent> d :call OBDelete()<CR>
+vmap <buffer><silent> d <Esc>:call OBMultiDelete()<CR>
 
 let s:envstring = tolower($LC_MESSAGES . $LC_ALL . $LANG)
 if s:envstring =~ "utf-8" || s:envstring =~ "utf8"

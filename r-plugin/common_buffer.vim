@@ -33,6 +33,9 @@ endif
 " not created yet or is outdated.
 let b:needsnewomnilist = 0
 
+" This isn't the Object Browser running externally
+let b:rplugin_extern_ob = 0
+
 " Set the name of the Object Browser caption if not set yet
 let s:tnr = tabpagenr()
 if !exists("b:objbrtitle")
@@ -96,7 +99,7 @@ if g:vimrplugin_by_vim_instance == 1
   unlet s:sname
 endif
 
-if g:rplugin_firstbuffer == ""
+if exists("g:rplugin_firstbuffer") && g:rplugin_firstbuffer == ""
     " The file global_r_plugin.vim was copied to ~/.vim/plugin
     let g:rplugin_firstbuffer = expand("%:p")
 endif
@@ -108,6 +111,13 @@ else
 endif
 let s:uniquename = substitute(s:uniquename, '\W', '', 'g')
 let $VIMINSTANCEID = $VIMRPLUGIN_TMPDIR . "/" . s:uniquename . "-port"
+let $VIMINSTANCEID = substitute($VIMINSTANCEID, ' ', '', 'g')
+
+if has("clientserver")
+    let g:rplugin_obsname_arg = "--servername " . toupper(substitute(substitute(expand("%:r"), '\W', '', 'g'), "_", "", "g"))
+else
+    let g:rplugin_obsname_arg = " "
+endif
 unlet s:uniquename
 
 let g:rplugin_lastft = &filetype

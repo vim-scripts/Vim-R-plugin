@@ -9,7 +9,12 @@ fun! rcomplete#CompleteR(findstart, base)
       return texbegin
   endif
   if a:findstart
-    return match(getline('.')[: (col('.') - 2)], '[[:alnum:].\\]\+$')
+    let line = getline('.')
+    let start = col('.') - 1
+    while start > 0 && (line[start - 1] =~ '\w' || line[start - 1] =~ '\.' || line[start - 1] =~ '\$')
+      let start -= 1
+    endwhile
+    return start
   else
     if b:needsnewomnilist == 1
       call BuildROmniList("GlobalEnv", "")
@@ -41,16 +46,6 @@ fun! rcomplete#CompleteR(findstart, base)
 	call add(res, tmp2)
       endif
     endfor
-
-    " When we use R to get the completions based on the running evironment we
-    " miss information stored on the omnils file: class of object and its
-    " package.
-    "    if len(g:rplugin_liblist) == 0 && len(res) == 0
-    "        exe 'Py SendToR("utils:::.win32consoleCompletion(' . "'" . a:base . "', " . strlen(a:base) . ')$comps")'
-    "        if strlen(g:rplugin_lastrpl) > 0
-    "            let res = split(g:rplugin_lastrpl)
-    "        endif
-    "    endif
 
     return res
   endif
