@@ -620,7 +620,7 @@ function StartR(whatr)
                         \ "set -g terminal-overrides 'xterm*:smcup@:rmcup@'",
                         \ 'set-environment -g VIMRPLUGIN_TMPDIR "' . $VIMRPLUGIN_TMPDIR . '"',
                         \ 'set-environment -g VIMINSTANCEID "' . $VIMINSTANCEID . '"']
-            if g:vimrplugin_external_ob
+            if g:vimrplugin_external_ob || !has("gui_running")
                 let cnflines = extend(cnflines, ['set -g mode-mouse on', 'set -g mouse-select-pane on', 'set -g mouse-resize-pane on'])
             endif
         endif
@@ -2703,7 +2703,6 @@ function MakeRMenu()
     amenu R.Help\ (plugin).Main\ features :help r-plugin-features<CR>
     amenu R.Help\ (plugin).Installation :help r-plugin-installation<CR>
     amenu R.Help\ (plugin).Use :help r-plugin-use<CR>
-    amenu R.Help\ (plugin).How\ the\ plugin\ works :help r-plugin-functioning<CR>
     amenu R.Help\ (plugin).Known\ bugs\ and\ workarounds :help r-plugin-known-bugs<CR>
 
     amenu R.Help\ (plugin).Options.Assignment\ operator\ and\ Rnoweb\ code :help vimrplugin_assign<CR>
