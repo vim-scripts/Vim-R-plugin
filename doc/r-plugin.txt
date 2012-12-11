@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 0.9.9
+Version: 0.9.9.1
 For Vim version 7.3
 
  1. Overview                                    |r-plugin-overview|
@@ -851,7 +851,9 @@ anything.
 The R's source() function prints an extra new line between commands if the
 option echo = TRUE, and error messages and warning are printed only after the
 entire code is sourced, which makes it more difficult to find errors in the
-code sent to R.
+code sent to R. Details:
+
+   https://stat.ethz.ch/pipermail/r-devel/2012-December/065352.html
 
 
 5.2. The clipboard's content is lost (Windows only)~
@@ -903,20 +905,13 @@ documentation for any function, or do other tasks that require the hidden
 evaluation of code by R, the vimcom library will refuse to do the tasks to
 avoid any risk of corrupting R's memory. It will tell Vim that "R is busy" and
 Vim will display this message. Everything should work as expected again after
-any valid code being executed in R Console.
+any valid code is executed in R Console.
 
 
 5.6. Commands are sent twice on Mac OS X~
 
 If you use the screen plugin with GNU Screen, individual lines may be sent
 duplicated to R on Mac OS X.
-
-
-5.7. "VimCom port not found" on OpenBSD~
-
-When the loopback interface has both IPv4 and IPv6 addresses vimcom loads ok
-but apparently does not listen on the IPv4 address (127.0.0.1), only on the
-IPv6 one (fe80::1).
 
 
 ==============================================================================
@@ -2046,10 +2041,10 @@ frequently when there are non ascii characters in the output. The two most
 important Vim limitations are:
 
   - We cannot scroll the windows of a buffer that is not being edited and,
-    thus, we have to go to the R buffer to scroll it. This is a problem if we
-    are running an R command that slowly generates a lot of output because the
-    shell buffer does not scroll when there is new output but it is not the
-    currently active buffer.
+    thus, we have to go to the R Console buffer to scroll it. This is a
+    problem if we are running an R command that slowly generates a lot of
+    output because the shell buffer does not scroll when there is new output
+    but it is not the currently active buffer.
 
   - Vim does not have a timer which would make the Conque Shell more
     efficient. Vim uses the same variable, 'updatetime', to do both save swap
@@ -2137,6 +2132,10 @@ argument. Example:
 ==============================================================================
 							       *r-plugin-news*
 10. News~
+
+0.9.9.1 (2012-12-11)
+
+ * Enable mouse on Tmux again.
 
 0.9.9 (2012-12-03)
 
