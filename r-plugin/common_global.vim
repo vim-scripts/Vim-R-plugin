@@ -620,7 +620,7 @@ function StartR(whatr)
                         \ "set -g terminal-overrides 'xterm*:smcup@:rmcup@'",
                         \ 'set-environment -g VIMRPLUGIN_TMPDIR "' . $VIMRPLUGIN_TMPDIR . '"',
                         \ 'set-environment -g VIMINSTANCEID "' . $VIMINSTANCEID . '"']
-            if g:vimrplugin_external_ob
+            if g:vimrplugin_external_ob || !has("gui_running")
                 let cnflines = extend(cnflines, ['set -g mode-mouse on', 'set -g mouse-select-pane on', 'set -g mouse-resize-pane on'])
             endif
         endif
@@ -2703,7 +2703,6 @@ function MakeRMenu()
     amenu R.Help\ (plugin).Main\ features :help r-plugin-features<CR>
     amenu R.Help\ (plugin).Installation :help r-plugin-installation<CR>
     amenu R.Help\ (plugin).Use :help r-plugin-use<CR>
-    amenu R.Help\ (plugin).How\ the\ plugin\ works :help r-plugin-functioning<CR>
     amenu R.Help\ (plugin).Known\ bugs\ and\ workarounds :help r-plugin-known-bugs<CR>
 
     amenu R.Help\ (plugin).Options.Assignment\ operator\ and\ Rnoweb\ code :help vimrplugin_assign<CR>
@@ -3394,7 +3393,7 @@ if has("win32") || has("win64") || g:vimrplugin_applescript || $DISPLAY == "" ||
     " No external terminal emulator will be called, so any value is good
     let g:vimrplugin_term = "xterm"
 else
-    let s:terminals = ['gnome-terminal', 'konsole', 'xfce4-terminal', 'terminal', 'Eterm', 'rxvt', 'aterm', 'roxterm', 'terminator', 'xterm']
+    let s:terminals = ['gnome-terminal', 'konsole', 'xfce4-terminal', 'terminal', 'Eterm', 'rxvt', 'aterm', 'roxterm', 'terminator', 'lxterminal', 'xterm']
     if has('mac')
         let s:terminals = ['iTerm', 'Terminal', 'Terminal.app'] + s:terminals
     endif
@@ -3424,8 +3423,8 @@ endif
 
 let g:rplugin_termcmd = g:vimrplugin_term . " -e"
 
-if g:vimrplugin_term == "gnome-terminal" || g:vimrplugin_term == "xfce4-terminal" || g:vimrplugin_term == "terminal"
-    " Cannot set icon: http://bugzilla.gnome.org/show_bug.cgi?id=126081
+if g:vimrplugin_term == "gnome-terminal" || g:vimrplugin_term == "xfce4-terminal" || g:vimrplugin_term == "terminal" || g:vimrplugin_term == "lxterminal"
+    " Cannot set gnome-terminal icon: http://bugzilla.gnome.org/show_bug.cgi?id=126081
     let g:rplugin_termcmd = g:vimrplugin_term . " --working-directory='" . expand("%:p:h") . "' --title R -e"
 endif
 
