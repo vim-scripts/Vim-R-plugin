@@ -84,6 +84,7 @@ def RaiseRConsole():
         win32gui.SetForegroundWindow(RConsole)
 
 def SendQuitMsg(aString):
+    global RConsole
     SendToVimCom("\x09Set R as busy [SendQuitMsg()]")
     finalString = aString.decode("latin-1") + "\n"
     win32clipboard.OpenClipboard(0)
@@ -100,6 +101,7 @@ def SendQuitMsg(aString):
         win32api.keybd_event(ord('V'), 0, win32con.KEYEVENTF_EXTENDEDKEY | win32con.KEYEVENTF_KEYUP, 0)
         win32api.keybd_event(win32con.VK_CONTROL, 0, win32con.KEYEVENTF_KEYUP, 0)
         time.sleep(0.05)
+	RConsole = 0
 
 
 
