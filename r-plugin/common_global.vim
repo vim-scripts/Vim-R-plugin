@@ -3020,7 +3020,7 @@ endif
 " Variables whose default value is fixed
 call RSetDefaultValue("g:vimrplugin_map_r",             0)
 call RSetDefaultValue("g:vimrplugin_allnames",          0)
-call RSetDefaultValue("g:vimrplugin_rmhidden",          1)
+call RSetDefaultValue("g:vimrplugin_rmhidden",          0)
 call RSetDefaultValue("g:vimrplugin_assign",            1)
 call RSetDefaultValue("g:vimrplugin_assign_map",    "'_'")
 call RSetDefaultValue("g:vimrplugin_rnowebchunk",       1)

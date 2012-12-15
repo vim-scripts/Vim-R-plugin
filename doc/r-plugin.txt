@@ -209,7 +209,8 @@ show how the plugin will work on Linux in different conditions:
 
 
 Note: On Mac OS X the plugin will use AppleScript in both Vim and GVim unless
-vimrplugin_applescript = 0.
+vimrplugin_applescript = 0. Some user have reported more luck with iTerm than
+with the default Mac OS X terminal emulator.
 
 
 3.2.2. Windows~
@@ -2132,6 +2133,10 @@ argument. Example:
 ==============================================================================
 							       *r-plugin-news*
 10. News~
+
+0.9.9.2 (2012-12-11)
+
+ * Change the default value of vimrplugin_rmhidden to 0.
 
 0.9.9.1 (2012-12-11)
 
