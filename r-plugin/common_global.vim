@@ -104,6 +104,31 @@ function ReplaceUnderS()
     endif
 endfunction
 
+function! ReadEvalReply()
+    let reply = "No reply"
+    let haswaitwarn = 0
+    let ii = 0
+    while ii < 20
+        sleep 100m
+        if filereadable($VIMRPLUGIN_TMPDIR . "/eval_reply")
+            let tmp = readfile($VIMRPLUGIN_TMPDIR . "/eval_reply")
+            if len(tmp) > 0
+                let reply = tmp[0]
+                break
+            endif
+        endif
+        let ii += 1
+        if ii == 2
+            call RWarningMsg("Waiting for reply")
+            let haswaitwarn = 1
+        endif
+    endwhile
+    if haswaitwarn
+        echon "\r                 "
+    endif
+    return reply
+endfunction
+
 function! CompleteChunkOptions()
     let cline = getline(".")
     let cpos = getpos(".")
@@ -186,70 +211,73 @@ function RCompleteArgs()
             let classfor = substitute(classfor, '"', '\\"', "g")
             let rkeyword = '^' . rkeyword0 . "\x06"
             call cursor(cpos[1], cpos[2])
+            call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
             if classfor == ""
                 exe 'Py SendToVimCom("vimcom:::vim.args(' . "'" . rkeyword0 . "', '" . argkey . "')" . '")'
             else
                 exe 'Py SendToVimCom("vimcom:::vim.args(' . "'" . rkeyword0 . "', '" . argkey . "', classfor = " . classfor . ")" . '")'
             endif
-            if g:rplugin_vimcomport > 0 && g:rplugin_lastrpl != "NOT_EXISTS" && g:rplugin_lastrpl != "NO_ARGS" && g:rplugin_lastrpl != "R is busy." && g:rplugin_lastrpl != "NOANSWER" && g:rplugin_lastrpl != "INVALID" && g:rplugin_lastrpl != ""
-                let args = []
-                if g:rplugin_lastrpl[0] == "\x04" && len(split(g:rplugin_lastrpl, "\x04")) == 1
-                    return ''
-                endif
-                let tmp0 = split(g:rplugin_lastrpl, "\x04")
-                let tmp = split(tmp0[0], "\x09")
-                if(len(tmp) > 0)
-                    for id in range(len(tmp))
-                        let tmp2 = split(tmp[id], "\x07")
-                        if tmp2[0] == '...'
-                            let tmp3 = tmp2[0]
-                        else
-                            let tmp3 = tmp2[0] . " = "
-                        endif
-                        if len(tmp2) > 1
-                            call add(args,  {'word': tmp3, 'menu': tmp2[1]})
-                        else
-                            call add(args,  {'word': tmp3, 'menu': ' '})
-                        endif
-                    endfor
-                    if len(args) > 0 && len(tmp0) > 1
-                        call add(args, {'word': ' ', 'menu': tmp0[1]})
-                    endif
-                    call complete(idx2, args)
-                endif
-                return ''
-            endif
-
-            for omniL in flines
-                if omniL =~ rkeyword && omniL =~ "\x06function\x06function\x06" 
-                    let tmp1 = split(omniL, "\x06")
-                    if len(tmp1) < 5
+            if g:rplugin_vimcomport > 0
+                let g:rplugin_lastrpl = ReadEvalReply()
+                if g:rplugin_lastrpl != "NOT_EXISTS" && g:rplugin_lastrpl != "NO_ARGS" && g:rplugin_lastrpl != "R is busy." && g:rplugin_lastrpl != "NOANSWER" && g:rplugin_lastrpl != "INVALID" && g:rplugin_lastrpl != "" && g:rplugin_lastrpl != "No reply"
+                    let args = []
+                    if g:rplugin_lastrpl[0] == "\x04" && len(split(g:rplugin_lastrpl, "\x04")) == 1
                         return ''
                     endif
-                    let info = tmp1[4]
-                    let argsL = split(info, "\x09")
-                    let args = []
-                    for id in range(len(argsL))
-                        let newkey = '^' . argkey
-                        let tmp2 = split(argsL[id], "\x07")
-                        if (argkey == '' || tmp2[0] =~ newkey) && tmp2[0] !~ "No arguments"
-                            if tmp2[0] != '...'
-                                let tmp2[0] = tmp2[0] . " = "
-                            endif
-                            if len(tmp2) == 2
-                                let tmp3 = {'word': tmp2[0], 'menu': tmp2[1]}
+                    let tmp0 = split(g:rplugin_lastrpl, "\x04")
+                    let tmp = split(tmp0[0], "\x09")
+                    if(len(tmp) > 0)
+                        for id in range(len(tmp))
+                            let tmp2 = split(tmp[id], "\x07")
+                            if tmp2[0] == '...'
+                                let tmp3 = tmp2[0]
                             else
-                                let tmp3 = {'word': tmp2[0], 'menu': ''}
+                                let tmp3 = tmp2[0] . " = "
                             endif
-                            call add(args, tmp3)
+                            if len(tmp2) > 1
+                                call add(args,  {'word': tmp3, 'menu': tmp2[1]})
+                            else
+                                call add(args,  {'word': tmp3, 'menu': ' '})
+                            endif
+                        endfor
+                        if len(args) > 0 && len(tmp0) > 1
+                            call add(args, {'word': ' ', 'menu': tmp0[1]})
                         endif
-                    endfor
-                    call complete(idx2, args)
+                        call complete(idx2, args)
+                    endif
                     return ''
                 endif
-            endfor
 
-            break
+                for omniL in flines
+                    if omniL =~ rkeyword && omniL =~ "\x06function\x06function\x06" 
+                        let tmp1 = split(omniL, "\x06")
+                        if len(tmp1) < 5
+                            return ''
+                        endif
+                        let info = tmp1[4]
+                        let argsL = split(info, "\x09")
+                        let args = []
+                        for id in range(len(argsL))
+                            let newkey = '^' . argkey
+                            let tmp2 = split(argsL[id], "\x07")
+                            if (argkey == '' || tmp2[0] =~ newkey) && tmp2[0] !~ "No arguments"
+                                if tmp2[0] != '...'
+                                    let tmp2[0] = tmp2[0] . " = "
+                                endif
+                                if len(tmp2) == 2
+                                    let tmp3 = {'word': tmp2[0], 'menu': tmp2[1]}
+                                else
+                                    let tmp3 = {'word': tmp2[0], 'menu': ''}
+                                endif
+                                call add(args, tmp3)
+                            endif
+                        endfor
+                        call complete(idx2, args)
+                        return ''
+                    endif
+                endfor
+                break
+            endif
         endif
         let idx -= 1
         if idx <= 0
@@ -1153,8 +1181,10 @@ function RFormatCode() range
     elseif wco > 180
         let wco = 180
     endif
+    call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
     exe "Py SendToVimCom('formatR::tidy.source(\"" . $VIMRPLUGIN_TMPDIR . "/unformatted_code" . "\", file = \"" . $VIMRPLUGIN_TMPDIR . "/formatted_code\", width.cutoff = " . wco . ")')"
-    if g:rplugin_lastrpl == "R is busy." || g:rplugin_lastrpl == "UNKNOWN" || g:rplugin_lastrpl =~ "^Error" || g:rplugin_lastrpl == "INVALID" || g:rplugin_lastrpl == "ERROR" || g:rplugin_lastrpl == "EMPTY"
+    let g:rplugin_lastrpl = ReadEvalReply()
+    if g:rplugin_lastrpl == "R is busy." || g:rplugin_lastrpl == "UNKNOWN" || g:rplugin_lastrpl =~ "^Error" || g:rplugin_lastrpl == "INVALID" || g:rplugin_lastrpl == "ERROR" || g:rplugin_lastrpl == "EMPTY" || g:rplugin_lastrpl == "No reply"
         call RWarningMsg(g:rplugin_lastrpl)
         return
     endif
@@ -1171,11 +1201,14 @@ function RInsert(cmd)
             return
         endif
     endif
-    exe "Py SendToVimCom('paste(capture.output(" . a:cmd . "), collapse = \"\\\\n\")')"
-    if g:rplugin_lastrpl == "R is busy." || g:rplugin_lastrpl == "UNKNOWN" || g:rplugin_lastrpl =~ "^Error" || g:rplugin_lastrpl == "INVALID" || g:rplugin_lastrpl == "ERROR" || g:rplugin_lastrpl == "EMPTY" || g:rplugin_lastrpl == "RTYPE"
+    call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
+    call delete($VIMRPLUGIN_TMPDIR . "/Rinsert")
+    exe "Py SendToVimCom('capture.output(" . a:cmd . ', file = "' . $VIMRPLUGIN_TMPDIR . "/Rinsert" . '")' . "')"
+    let g:rplugin_lastrpl = ReadEvalReply()
+    if g:rplugin_lastrpl == "R is busy." || g:rplugin_lastrpl == "UNKNOWN" || g:rplugin_lastrpl =~ "^Error" || g:rplugin_lastrpl == "INVALID" || g:rplugin_lastrpl == "ERROR" || g:rplugin_lastrpl == "EMPTY" || g:rplugin_lastrpl == "No reply"
         call RWarningMsg(g:rplugin_lastrpl)
     else
-        call append(".", split(g:rplugin_lastrpl, "\n"))
+        silent exe "read " . g:rplugin_esc_tmpdir . "/Rinsert"
     endif
 endfunction
 
@@ -1830,14 +1863,16 @@ function BuildROmniList(env, packlist)
 
     call delete($VIMRPLUGIN_TMPDIR . "/vimbol_finished")
     if a:env =~ "GlobalEnv"
+        call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
         exe "Py SendToVimCom('" . omnilistcmd . "')"
         if g:rplugin_vimcomport == 0
             sleep 500m
             let b:needsnewomnilist = 1
             return
         endif
-        if g:rplugin_lastrpl == "R is busy."
-            call RWarningMsg("R is busy.")
+        let g:rplugin_lastrpl = ReadEvalReply()
+        if g:rplugin_lastrpl == "R is busy." || g:rplugin_lastrpl == "No reply"
+            call RWarningMsg(g:rplugin_lastrpl)
             let b:needsnewomnilist = 1
             sleep 800m
             return
@@ -2086,6 +2121,7 @@ function ShowRDoc(rkeyword, package, getclass)
     call SetRTextWidth()
 
     let g:rplugin_lastrpl = "R did not reply."
+    call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
     if classfor == "" && a:package == ""
         exe 'Py SendToVimCom("vim.help(' . "'" . a:rkeyword . "', " . g:rplugin_htw . 'L)")'
     elseif a:package != ""
@@ -2095,6 +2131,7 @@ function ShowRDoc(rkeyword, package, getclass)
         let classfor = substitute(classfor, '"', '\\"', "g")
         exe 'Py SendToVimCom("vim.help(' . "'" . a:rkeyword . "', " . g:rplugin_htw . "L, " . classfor . ")". '")'
     endif
+    let g:rplugin_lastrpl = ReadEvalReply()
     if g:rplugin_lastrpl != "VIMHELP"
         if g:rplugin_lastrpl =~ "^MULTILIB"
             echo "The topic '" . a:rkeyword . "' was found in more than one library:"
@@ -2104,7 +2141,9 @@ function ShowRDoc(rkeyword, package, getclass)
             endfor
             let chn = input("Please, select one of them: ")
             if chn > 0 && chn < len(libs)
+                call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
                 exe 'Py SendToVimCom("vim.help(' . "'" . a:rkeyword . "', " . g:rplugin_htw . "L, package='" . libs[chn] . "')" . '")'
+                let g:rplugin_lastrpl = ReadEvalReply()
             endif
         else
             call RWarningMsg(g:rplugin_lastrpl)
@@ -2298,9 +2337,11 @@ function RRealAction(rcmd)
 endfunction
 
 function RAction(rcmd)
-    Py SendToVimCom("\x08Stop updating info [RAction()]")
+    if !g:vimrplugin_external_ob
+        Py SendToVimCom("\x08Stop updating info [RAction()]")
+    endif
     call RRealAction(a:rcmd)
-    if v:servername != ""
+    if !g:vimrplugin_external_ob && v:servername != ""
         exe 'Py SendToVimCom("\x07' . v:servername . '")'
     endif
 endfunction
@@ -3165,6 +3206,9 @@ if g:vimrplugin_external_ob == 1
     let g:vimrplugin_objbr_place = substitute(g:vimrplugin_objbr_place, "script", "console", "")
 endif
 
+if g:vimrplugin_tmux && g:vimrplugin_objbr_place =~ "console"
+    let g:vimrplugin_external_ob = 1
+endif
 
 if has("win32") || has("win64")
     call RSetDefaultValue("g:vimrplugin_conquesleep", 200)
