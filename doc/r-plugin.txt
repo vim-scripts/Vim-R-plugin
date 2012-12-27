@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 0.9.9.1
+Version: 0.9.9.2
 For Vim version 7.3
 
  1. Overview                                    |r-plugin-overview|
@@ -132,7 +132,7 @@ following dependencies:
    Vim >= 7.3 with Python support.
    Tmux >= 1.5:     http://tmux.sourceforge.net
    Screen plugin:   http://www.vim.org/scripts/script.php?script_id=2711
-   vimcom = 0.9-5:  An R package.
+   vimcom = 0.9-6:  An R package.
 
    Suggests:~
    ncurses-term:  http://invisible-island.net/ncurses
@@ -248,7 +248,7 @@ to install external dependencies:
       find the file that matches exactly the version of Python that you
       installed.
 
-    * vimcom = 0.9-5: An R package, available on CRAN and installable with the
+    * vimcom = 0.9-6: An R package, available on CRAN and installable with the
       install.packages() command. The vimcom package creates a server on R to
       allow the communication with Vim. You certainly will want to put the
       following lines at the end of your Rprofile (usually at
@@ -808,6 +808,12 @@ A sample detachable session could be:
 
 See |vimrplugin_only_in_tmux| if you always prefer starting Tmux before
 starting Vim, but sometimes forget to start Tmux.
+
+Note: The screen.vim plugin relies on the TERM environment variable starting
+with the string "screen" to decide whether to start a new Tmux session or to
+split the current one.  If you set the environment variable in your tmux.conf
+to something different, the screen.vim plugin will not know that it is already
+inside Tmux. See |screen-bootstrap| for details.
 
 
 4.9. GNU Screen usage~
@@ -2134,7 +2140,7 @@ argument. Example:
 							       *r-plugin-news*
 10. News~
 
-0.9.9.2 (2012-12-11)
+0.9.9.2 (2012-12-25)
 
  * Change the default value of vimrplugin_rmhidden to 0.
 
