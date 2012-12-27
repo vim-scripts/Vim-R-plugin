@@ -119,12 +119,15 @@ function! ReadEvalReply()
         endif
         let ii += 1
         if ii == 2
-            call RWarningMsg("Waiting for reply")
+            echohl WarningMsg
+            echon "\rWaiting for reply"
+            echohl Normal
             let haswaitwarn = 1
         endif
     endwhile
     if haswaitwarn
         echon "\r                 "
+        redraw
     endif
     return reply
 endfunction
@@ -1215,7 +1218,6 @@ endfunction
 " Function to send commands
 " return 0 on failure and 1 on success
 function SendCmdToR(cmd)
-    Py SendToVimCom("\x09Set R as busy [SendCmdToR()]")
     if g:vimrplugin_ca_ck
         let cmd = "\001" . "\013" . a:cmd
     else

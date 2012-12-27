@@ -901,18 +901,18 @@ indent the code below:
     class(x) <- c(if(ordered) "ordered", "factor")
 <
 
-5.5. Wrong message that "R is busy"~
+5.5. Wrong message that "R is busy" (Windows only)~
 
-When code is sent from Vim to R Console, the vimcom library sets the value of
-the internal variable "r_is_busy" to 1. The value is set back to 0 when any
-code is successfully evaluated. If you send invalid code to R, there will be
-no successful evaluation of code and, thus, the value of "r_is_busy" will
-remain set to 1. Then, if you try to update the object browser, see the R
-documentation for any function, or do other tasks that require the hidden
-evaluation of code by R, the vimcom library will refuse to do the tasks to
-avoid any risk of corrupting R's memory. It will tell Vim that "R is busy" and
-Vim will display this message. Everything should work as expected again after
-any valid code is executed in R Console.
+On Windows, when code is sent from Vim to R Console, the vimcom library sets
+the value of the internal variable "r_is_busy" to 1. The value is set back to
+0 when any code is successfully evaluated. If you send invalid code to R,
+there will be no successful evaluation of code and, thus, the value of
+"r_is_busy" will remain set to 1. Then, if you try to update the object
+browser, see the R documentation for any function, or do other tasks that
+require the hidden evaluation of code by R, the vimcom library will refuse to
+do the tasks to avoid any risk of corrupting R's memory. It will tell Vim that
+"R is busy" and Vim will display this message. Everything should work as
+expected again after any valid code is executed in R Console.
 
 
 5.6. Commands are sent twice on Mac OS X~
@@ -2140,7 +2140,7 @@ argument. Example:
 							       *r-plugin-news*
 10. News~
 
-0.9.9.2 (2012-12-25)
+0.9.9.2 (2012-12-27)
 
  * Change the default value of vimrplugin_rmhidden to 0.
 
