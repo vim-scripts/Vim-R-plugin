@@ -1019,7 +1019,7 @@ Mode" on either PowerShell or Command Prompt and to send a "Right click" to
 it.
 
 
-6.2. Assignment operator and Rnoweb completion of code block~
+6.3. Assignment operator and Rnoweb completion of code block~
 							   *vimrplugin_assign*
 						       *vimrplugin_assign_map*
 						      *vimrplugin_rnowebchunk*
@@ -1042,7 +1042,7 @@ put in your |vimrc|:
    let vimrplugin_rnowebchunk = 0
 <
 
-6.3. Object Browser options~
+6.4. Object Browser options~
 						      *vimrplugin_objbr_place*
 							  *vimrplugin_objbr_w*
 						      *vimrplugin_external_ob*
@@ -1069,11 +1069,11 @@ emulator. In this case, the command <LocalLeader>rh will not work on the
 Object Browser (you will see the message "Cmd not available").
 
 
-6.4. Vim as pager for R help~
+6.5. Vim as pager for R help~
 							 *vimrplugin_vimpager*
 							 *vimrplugin_editor_w*
 							   *vimrplugin_help_w*
-6.4.1. Quick setup~
+6.5.1. Quick setup~
 
 If you do not want to see R documentation in a Vim's buffer, put in your
 |vimrc|:
@@ -1086,7 +1086,7 @@ the R console, put in your .Rprofile:
    options(pager = "vim -c 'set ft=rdoc' -")
 <
 
-6.4.2. Details and other options:~
+6.5.2. Details and other options:~
 
 The plugin key bindings will remain active in the documentation buffer, and,
 thus, you will be able to send commands to R as you do while editing an R
@@ -1116,10 +1116,10 @@ values to some variables in your |vimrc|, as in the example:
    let vimrplugin_editor_h = 60
 <
 
-6.5. Number of R processes (Linux/Unix only)~
+6.6. Number of R processes (Linux/Unix only)~
 							*vimrplugin_nosingler*
 						  *vimrplugin_by_vim_instance*
-6.5.1 Using (G)Vim without the screen.vim plugin~
+6.6.1 Using (G)Vim without the screen.vim plugin~
 
 By default, all buffers of all (G)Vim instances send code to the same R process.
 If you prefer that each Vim buffer uses its own R process, put the following
@@ -1142,14 +1142,14 @@ with the --servername argument. If you want to use more than nine GVim
 instances you will have to use the --servername argument because screen will
 not differentiate between names like "GVIM1" and "GVIM10".
 
-6.5.2 Using the screen.vim plugin~
+6.6.2 Using the screen.vim plugin~
 
 Both options are ignored when using Vim in a terminal emulator and using the
 screen.vim plugin. The plugin behaves as if the |vimrplugin_by_instance| was
 enabled.
 
 
-6.6. Use 32 bit version of R (Windows and Mac OS X only)~
+6.7. Use 32 bit version of R (Windows and Mac OS X only)~
 							     *vimrplugin_i386*
 If you are using a 64 bit Windows or a 64 bit Mac OS X, but prefer to run the
 32 bit version of R, put in your |vimrc|:
@@ -1157,7 +1157,7 @@ If you are using a 64 bit Windows or a 64 bit Mac OS X, but prefer to run the
    let vimrplugin_i386 = 1
 <
 
-6.7. R path~
+6.8. R path~
 							   *vimrplugin_r_path*
 Vim will run the first R executable in the path. You can set an alternative R
 path in your |vimrc| as in the examples:
@@ -1168,7 +1168,7 @@ path in your |vimrc| as in the examples:
 On Windows, Vim will try to find the R install path in the Windows Registry.
 
 
-6.8. Arguments to R~
+6.9. Arguments to R~
 							   *vimrplugin_r_args*
 Set this option in your |vimrc| if you want to pass command line arguments to
 R at the startup. Example:
@@ -1180,7 +1180,7 @@ default value is "--sdi", but you may change it to "--mdi" if you do not like
 the SDI style of the graphical user interface.
 
 
-6.9. Time necessary to build list of objects for omni completion~
+6.10. Time necessary to build list of objects for omni completion~
 							*vimrplugin_buildwait*
 If your system needs more than 60 seconds to build the list of objects for
 omni completion after you do the command |:RUpdateObjList|, then you should
@@ -1189,7 +1189,7 @@ set the value of |vimrplugin_buildwait| to a higher value. Example:
    let vimrplugin_buildwait = 240
 >
 
-6.10. More colorful syntax highlight of .Rout files~
+6.11. More colorful syntax highlight of .Rout files~
 						   *vimrplugin_routmorecolors*
 By default, the R commands in .Rout files are highlighted with the color of
 comments, and only the output of commands has some of its elements highlighted
@@ -1201,7 +1201,7 @@ scripts, put the following in your |vimrc|:
    let vimrplugin_routmorecolors = 1
 <
 
-6.11. How to automatically open the .Rout file~
+6.12. How to automatically open the .Rout file~
 							*vimrplugin_routnotab*
 After the command <LocalLeader>ao, Vim will save the current buffer if it has
 any pending changes, run "R CMD BATCH --no-restore --no-save" on the current
@@ -1211,7 +1211,7 @@ file is open in a new split window, put in your |vimrc|:
    let vimrplugin_routnotab = 1
 <
 
-6.12. Indent commented lines~
+6.13. Indent commented lines~
 						 *vimrplugin_indent_commented*
 You can type <LocalLeader>xx to comment out a line or selected lines. If the
 line already starts with a comment string, it will be removed. After adding
@@ -1231,7 +1231,7 @@ table below (see |r-plugin-indenting|):
 		 0                        0                ###
 <
 
-6.13. Sleep time (Windows only)~
+6.14. Sleep time (Windows only)~
 							*vimrplugin_sleeptime*
 The plugin gives to R a small amount of time to process the paste command. The
 default value is 0.2 second, but you should experiment different values. The
@@ -1240,7 +1240,7 @@ example show how to adjust the value of sleeptime in your |vimrc|:
    let vimrplugin_sleeptime = 0.1
 <
 
-6.14. Tmux and Screen configuration (Linux/Unix only)~
+6.15. Tmux and Screen configuration (Linux/Unix only)~
 						       *vimrplugin_noscreenrc*
 						       *vimrplugin_notmuxconf*
 GVim (or Vim running R in an external terminal emulator) runs Tmux with a
@@ -1260,7 +1260,7 @@ required for the communication with R and source your own configuration file
 (either ~/.tmux.conf or ~/.screenrc).
 
 
-6.15. Integration with screen.vim plugin (Linux/Unix only)~
+6.16. Integration with screen.vim plugin (Linux/Unix only)~
 						     *vimrplugin_screenplugin*
 						     *vimrplugin_screenvsplit*
 							     *vimrplugin_tmux*
@@ -1304,7 +1304,7 @@ with the Vim-R-plugin you will need to add the following to your |vimrc|:
    let vimrplugin_screenplugin = 0
 <
 
-6.16. Integration with AppleScript (OS X only)~
+6.17. Integration with AppleScript (OS X only)~
 							*vimrplugin_applescript*
 In Mac OS X, the plugin will try to send commands to R gui using AppleScript.
 If you prefer to run R and Vim in the same terminal emulator split in two
@@ -1319,7 +1319,7 @@ If you prefer to have R running in an external terminal emulator, put in your
    let vimrplugin_screenplugin = 0
 <
 
-6.17. Special R functions~
+6.18. Special R functions~
 						      *vimrplugin_listmethods*
 						      *vimrplugin_specialplot*
 The R function args() lists the arguments of a function, but not the arguments
@@ -1335,7 +1335,7 @@ after <LocalLeader>rg if you put the following line in your |vimrc|:
    let vimrplugin_specialplot = 1
 <
 
-6.18. maxdeparse~
+6.19. maxdeparse~
 						       *vimrplugin_maxdeparse*
 You can set the argument maxdeparse to be passed to R's source() function.
 Example:
@@ -1343,7 +1343,7 @@ Example:
    let vimrplugin_maxdeparse = 300
 <
 
-6.19. LaTeX command~
+6.20. LaTeX command~
 							 *vimrplugin_latexcmd*
 						       *vimrplugin_sweaveargs*
 On Windows, the plugin calls tools::texi2pdf() to build the pdf from the
@@ -1357,7 +1357,7 @@ If you want to pass arguments do the Sweave() function, set the value of the
 vimrplugin_sweaveargs variable.
 
 
-6.20. Never unmake the R menu and tool bar buttons~
+6.21. Never unmake the R menu and tool bar buttons~
 						*vimrplugin_never_unmake_menu*
 Use this option if you want that the menu item R and the R related tool bar
 buttons are not deleted when you change from one buffer to another, for
@@ -1369,7 +1369,7 @@ When this options is enabled all menu items are created regardless of the file
 type.
 
 
-6.21. Map 'r'~
+6.22. Map 'r'~
 							    *vimrplugin_map_r*
 If the variable |vimrplugin_map_r| exists, the plugin will map the letter 'r'
 to send lines to R when there are visually selected lines, for compatibility
@@ -1387,7 +1387,7 @@ Emacs:
    set tabstop=8
 <
 
-6.22. Add ^A^K to the beginning of commands~
+6.23. Add ^A^K to the beginning of commands~
 							    *vimrplugin_ca_ck*
 When one types <C-a> in the R Console the cursor goes to the beginning of the
 line and one types <C-k> the characters to the right of the cursor are
@@ -1399,7 +1399,7 @@ either Tmux or GNU Screen in some systems. The Vim-R-plugin will add
    let vimrplugin_ca_ck = 1
 <
 
-6.23. Open PDF after processing rnoweb file~
+6.24. Open PDF after processing rnoweb file~
 							  *vimrplugin_openpdf*
 						  *vimrplugin_openpdf_quietly*
 							 *vimrplugin_openhtml*
@@ -1446,7 +1446,7 @@ you prefer the non strict rst code, put the following in your |vimrc|:
    let vimrplugin_strict_rst = 0
 <
 
-6.24. Allow R commands in insert mode~
+6.25. Allow R commands in insert mode~
 						 *Vimrplugin_insert_mode_cmds*
 Vim-R commands are designed to work in insert mode as well as normal mode.
 However, depending on your <LocalLeader>, this can make it very difficult to
@@ -1460,7 +1460,7 @@ use it, add the following in your |vimrc|:
 <
 The default value is 1, for consistency with earlier versions.
 
-6.25. Show/remove hidden objects~
+6.26. Show/remove hidden objects~
 							 *vimrplugin_allnames*
 							 *vimrplugin_rmhidden*
 Hidden objects are not included in the list of objects for omni completion. If
