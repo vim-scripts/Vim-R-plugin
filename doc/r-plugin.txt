@@ -927,6 +927,7 @@ duplicated to R on Mac OS X.
 
 |vimrplugin_term|              External terminal to be used
 |vimrplugin_term_cmd|          Complete command to open an external terminal
+|vimrplugin_Rterm|             On Windows, use Rterm.exe
 |vimrplugin_assign|            Convert '_' into ' <- '
 |vimrplugin_assign_map|        Choose what to convert into ' <- '
 |vimrplugin_rnowebchunk|       Convert '<' into '<<>>=\n@' in Rnoweb files
@@ -1000,6 +1001,22 @@ your |vimrc| the variable vimrplugin_term_cmd, as in the examples below:
 <
 Please, look at the manual of your terminal emulator to know how to call it.
 The last argument must be the one which precedes the command to be executed.
+
+
+6.2. Use Rterm.exe on Windows~
+							  *r-plugin-Rterm.exe*
+If you rather prefer to use Rterm.exe than Rgui.exe, you have to set the
+"Quick Edit Mode" on either the Windows 7 PowerShell or the Windows XP Command
+Prompt and put in your |vimrc|:
+>
+   let vimrplugin_Rterm = 1
+<
+Technical details: The plugin copies the code to be sent to R to the Windows
+clipboard and, then, sends the key strokes "Ctrl+V" to R Console window.
+However, neither the Windows 7 PowerShell nor the Windows XP Command Prompt
+has a keyboard shortcut to "paste". The solution is to set the "Quick Edit
+Mode" on either PowerShell or Command Prompt and to send a "Right click" to
+it.
 
 
 6.2. Assignment operator and Rnoweb completion of code block~
@@ -2140,9 +2157,12 @@ argument. Example:
 							       *r-plugin-news*
 10. News~
 
-0.9.9.2 (2012-12-27)
+0.9.9.2 (2012-12-28)
 
+ * Update vimcom version requirement to 0.9-6 (fix incompatibility with tcltk
+   package on Unix).
  * Change the default value of vimrplugin_rmhidden to 0.
+ * New options for Windows: vimrplugin_Rterm and vimrplugin_R_window_title.
 
 0.9.9.1 (2012-12-11)
 

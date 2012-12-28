@@ -4,6 +4,7 @@ import string
 import time
 import vim
 RConsole = 0
+Rterm = False
 
 try:
     import win32api
@@ -18,18 +19,52 @@ except ImportError:
     vim.command("call RWarningMsgInp('Please install PyWin32. The Python version being used is: " + myPyVersion + " (" + myArch[0] + ")')")
     vim.command("let rplugin_pywin32 = 0")
 
+def RightClick():
+    global RConsole
+    myHandle = win32gui.GetForegroundWindow()
+    RaiseRConsole()
+    time.sleep(0.05)
+    #lParam = (y << 16) | x
+    lParam = (100 << 16) | 100
+    win32gui.SendMessage(RConsole, win32con.WM_RBUTTONDOWN, 0, lParam)
+    win32gui.SendMessage(RConsole, win32con.WM_RBUTTONUP, 0, lParam)
+    time.sleep(0.05)
+    try:
+        win32gui.SetForegroundWindow(myHandle)
+    except:
+        vim.command("call RWarningMsg('Could not put itself on foreground.')")
+
+def CntrlV():
+    win32api.keybd_event(0x11, 0, 0, 0)
+    try:
+        win32api.PostMessage(RConsole, 0x100, 0x56, 0x002F0001)
+    except:
+        vim.command("call RWarningMsg('R Console window not found [1].')")
+        RConsole = 0
+        pass
+    if RConsole:
+        time.sleep(0.05)
+        try:
+            win32api.PostMessage(RConsole, 0x101, 0x56, 0xC02F0001)
+        except:
+            vim.command("call RWarningMsg('R Console window not found [2].')")
+            pass
+    win32api.keybd_event(0x11, 0, 2, 0)
+
 def FindRConsole():
     global RConsole
-    RConsole = win32gui.FindWindow(None, "R Console")
+    Rtitle = vim.eval("g:vimrplugin_R_window_title")
+    RConsole = win32gui.FindWindow(None, Rtitle)
     if RConsole == 0:
-        RConsole = win32gui.FindWindow(None, "R Console (64-bit)")
+        RConsole = win32gui.FindWindow(None, Rtitle + " (64-bit)")
         if RConsole == 0:
-            RConsole = win32gui.FindWindow(None, "R Console (32-bit)")
+            RConsole = win32gui.FindWindow(None, Rtitle + " (32-bit)")
             if RConsole == 0:
                 vim.command("call RWarningMsg('Could not find R Console.')")
 
 def SendToRConsole(aString):
     global RConsole
+    global Rterm
     SendToVimCom("\x09Set R as busy [SendToRConsole()]")
     finalString = aString.decode("latin-1") + "\n"
     win32clipboard.OpenClipboard(0)
@@ -39,25 +74,16 @@ def SendToRConsole(aString):
     if RConsole == 0:
         FindRConsole()
     if RConsole:
-        win32api.keybd_event(0x11, 0, 0, 0)
-        try:
-            win32api.PostMessage(RConsole, 0x100, 0x56, 0x002F0001)
-        except:
-            vim.command("call RWarningMsg('R Console window not found [1].')")
-            RConsole = 0
-            pass
-        if RConsole:
-            time.sleep(0.05)
-            try:
-                win32api.PostMessage(RConsole, 0x101, 0x56, 0xC02F0001)
-            except:
-                vim.command("call RWarningMsg('R Console window not found [2].')")
-                pass
-        win32api.keybd_event(0x11, 0, 2, 0)
+        if Rterm:
+            RightClick()
+        else:
+            CntrlV()
 
 def RClearConsolePy():
     global RConsole
-    SendToVimCom("\x09Set R as busy [RClearConsolePy()]")
+    global Rterm
+    if Rterm:
+        return
     if RConsole == 0:
         FindRConsole()
     if RConsole:
@@ -82,9 +108,11 @@ def RaiseRConsole():
     FindRConsole()
     if RConsole:
         win32gui.SetForegroundWindow(RConsole)
+        time.sleep(0.1)
 
 def SendQuitMsg(aString):
     global RConsole
+    global Rterm
     SendToVimCom("\x09Set R as busy [SendQuitMsg()]")
     finalString = aString.decode("latin-1") + "\n"
     win32clipboard.OpenClipboard(0)
@@ -93,7 +121,7 @@ def SendQuitMsg(aString):
     win32clipboard.CloseClipboard()
     sleepTime = float(vim.eval("g:vimrplugin_sleeptime"))
     RaiseRConsole()
-    if RConsole:
+    if RConsole and not Rterm:
         time.sleep(sleepTime)
         win32api.keybd_event(win32con.VK_CONTROL, 0, 0, 0)
         win32api.keybd_event(ord('V'), 0, win32con.KEYEVENTF_EXTENDEDKEY | 0, 0)
@@ -101,7 +129,10 @@ def SendQuitMsg(aString):
         win32api.keybd_event(ord('V'), 0, win32con.KEYEVENTF_EXTENDEDKEY | win32con.KEYEVENTF_KEYUP, 0)
         win32api.keybd_event(win32con.VK_CONTROL, 0, win32con.KEYEVENTF_KEYUP, 0)
         time.sleep(0.05)
-	RConsole = 0
+        RConsole = 0
+    if RConsole and Rterm:
+        RightClick()
+        RConsole = 0
 
 
 
@@ -130,6 +161,11 @@ def GetRPath():
             vim.command("let s:rinstallpath =  'Not found'")
 
 def StartRPy():
+    global Rterm
+    if vim.eval("g:vimrplugin_Rterm") == "1":
+        Rterm = True
+    else:
+        Rterm = False
     rpath = vim.eval("g:rplugin_Rgui")
     rargs = ['"' + rpath + '"']
     r_args = vim.eval("b:rplugin_r_args")

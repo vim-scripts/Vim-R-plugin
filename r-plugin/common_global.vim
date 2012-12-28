@@ -3072,6 +3072,7 @@ call RSetDefaultValue("g:vimrplugin_openpdf",           0)
 call RSetDefaultValue("g:vimrplugin_openpdf_quietly",   0)
 call RSetDefaultValue("g:vimrplugin_openhtml",          0)
 call RSetDefaultValue("g:vimrplugin_i386",              0)
+call RSetDefaultValue("g:vimrplugin_Rterm",             0)
 call RSetDefaultValue("g:vimrplugin_screenvsplit",      0)
 call RSetDefaultValue("g:vimrplugin_conquevsplit",      0)
 call RSetDefaultValue("g:vimrplugin_conqueplugin",      0)
@@ -3383,6 +3384,16 @@ if has("win32") || has("win64")
     endif
     if !exists("g:vimrplugin_sleeptime")
         let g:vimrplugin_sleeptime = 0.02
+    endif
+    if g:vimrplugin_Rterm
+        let g:rplugin_Rgui = substitute(g:rplugin_Rgui, "Rgui", "Rterm", "")
+    endif
+    if !exists("g:vimrplugin_R_window_title")
+        if g:vimrplugin_Rterm
+            let g:vimrplugin_R_window_title = "Rterm"
+        else
+            let g:vimrplugin_R_window_title = "R Console"
+        endif
     endif
 endif
 
