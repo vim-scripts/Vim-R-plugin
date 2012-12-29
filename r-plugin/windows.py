@@ -35,6 +35,7 @@ def RightClick():
         vim.command("call RWarningMsg('Could not put itself on foreground.')")
 
 def CntrlV():
+    global RConsole
     win32api.keybd_event(0x11, 0, 0, 0)
     try:
         win32api.PostMessage(RConsole, 0x100, 0x56, 0x002F0001)
