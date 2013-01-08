@@ -297,6 +297,17 @@ function RCompleteArgs()
     return ''
 endfunction
 
+function RSimpleCommentLine()
+    call setline(line("."), "#" . getline("."))
+endfunction
+
+function RSimpleUncommentLine()
+    call setline(line("."), substitute(getline("."), "^#", "", ""))
+endfunction
+
+noremap <buffer><silent> <LocalLeader>xc :call RSimpleCommentLine()<CR>
+noremap <buffer><silent> <LocalLeader>xu :call RSimpleUncommentLine()<CR>
+
 function RCommentLine(lnum, ind, cmt)
     let line = getline(a:lnum)
     call cursor(a:lnum, 0)
