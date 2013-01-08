@@ -135,8 +135,6 @@ def SendQuitMsg(aString):
         RightClick()
         RConsole = 0
 
-
-
 def GetRPath():
     keyName = "SOFTWARE\\R-core\\R"
     kHandle = None
