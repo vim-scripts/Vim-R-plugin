@@ -297,16 +297,72 @@ function RCompleteArgs()
     return ''
 endfunction
 
-function RSimpleCommentLine()
-    call setline(line("."), "#" . getline("."))
+function IsRCode(lnum)
+    let save_cursor = getpos(".")
+    call cursor(a:lnum, 0)
+    let isRcode = 1
+    if &filetype == "rnoweb" && RnwIsInRCode() == 0
+        let isRcode = 0
+    endif
+    if &filetype == "rrst" && RrstIsInRCode() == 0
+        let isRcode = 0
+    endif
+    if &filetype == "rmd" && RmdIsInRCode() == 0
+        let isRcode = 0
+    endif
+    if &filetype == "rhelp"
+        let lastsection = search('^\\[a-z]*{', "bncW")
+        let secname = getline(lastsection)
+        if secname =~ '^\\usage{' || secname =~ '^\\examples{' || secname =~ '^\\dontshow{' || secname =~ '^\\dontrun{' || secname =~ '^\\donttest{' || secname =~ '^\\testonly{'
+            let isRcode = 1
+        else
+            let isRcode = 0
+        endif
+    endif
+    call setpos(".", save_cursor)
+    let g:risrcode = isRcode
+    return isRcode
 endfunction
 
-function RSimpleUncommentLine()
-    call setline(line("."), substitute(getline("."), "^#", "", ""))
+function RGetFL(mode)
+    if a:mode == "normal"
+        let fline = line(".")
+        let lline = line(".")
+    else
+        let fline = line("'<")
+        let lline = line("'>")
+    endif
+    if fline > lline
+        let tmp = lline
+        let lline = fline
+        let fline = tmp
+    endif
+    return [fline, lline]
 endfunction
 
-noremap <buffer><silent> <LocalLeader>xc :call RSimpleCommentLine()<CR>
-noremap <buffer><silent> <LocalLeader>xu :call RSimpleUncommentLine()<CR>
+function RSimpleCommentLine(mode)
+    let [fline, lline] = RGetFL(a:mode)
+    if IsRCode(fline)
+        let cstr = "#"
+    else
+        let cstr = "%"
+    endif
+    for ii in range(fline, lline)
+        call setline(ii, cstr . getline(ii))
+    endfor
+endfunction
+
+function RSimpleUncommentLine(mode)
+    let [fline, lline] = RGetFL(a:mode)
+    if IsRCode(fline)
+        let cstr = "#"
+    else
+        let cstr = "%"
+    endif
+    for ii in range(fline, lline)
+        call setline(ii, substitute(getline(ii), "^" . cstr, "", ""))
+    endfor
+endfunction
 
 function RCommentLine(lnum, ind, cmt)
     let line = getline(a:lnum)
@@ -333,35 +389,10 @@ endfunction
 
 function RComment(mode)
     let cpos = getpos(".")
-    if a:mode == "selection"
-        let fline = line("'<")
-        let lline = line("'>")
-    else
-        let fline = line(".")
-        let lline = fline
-    endif
+    let [fline, lline] = RGetFL(a:mode)
 
     " What comment string to use?
-    call cursor(fline, 0)
-    let isRcode = 1
-    if &filetype == "rnoweb" && RnwIsInRCode() == 0
-        let isRcode = 0
-    endif
-    if &filetype == "rrst" && RrstIsInRCode() == 0
-        let isRcode = 0
-    endif
-    if &filetype == "rmd" && RmdIsInRCode() == 0
-        let isRcode = 0
-    endif
-    if &filetype == "rhelp"
-        let lastsection = search('^\\[a-z]*{', "bncW")
-        let secname = getline(lastsection)
-        if secname =~ '^\\usage{' || secname =~ '^\\examples{' || secname =~ '^\\dontshow{' || secname =~ '^\\dontrun{' || secname =~ '^\\donttest{' || secname =~ '^\\testonly{'
-            let isRcode = 1
-        else
-            let isRcode = 0
-        endif
-    endif
+    let isRcode = IsRCode(fline)
     if isRcode == 0
         let cmt = '%'
     else
@@ -2717,8 +2748,12 @@ function MakeRMenu()
         vmenu <silent> R.Edit.Indent\ (selected\ lines)<Tab>= =
         nmenu <silent> R.Edit.Indent\ (whole\ buffer)<Tab>gg=G gg=G
         menu R.Edit.-Sep72- <nul>
-        call RCreateMenuItem("ni", 'Edit.Comment/Uncomment\ (line/sel)', '<Plug>RCommentLine', 'xx', ':call RComment("normal")')
-        call RCreateMenuItem("v", 'Edit.Comment/Uncomment\ (line/sel)', '<Plug>RCommentLine', 'xx', ':call RComment("selection")')
+        call RCreateMenuItem("ni", 'Edit.Comment\ (line/sel)', '<Plug>RToggleComment', 'xc', ':call RComment("normal")')
+        call RCreateMenuItem("v", 'Edit.Comment\ (line/sel)', '<Plug>RToggleComment', 'xc', ':call RComment("selection")')
+        call RCreateMenuItem("ni", 'Edit.Uncomment\ (line/sel)', '<Plug>RToggleComment', 'xu', ':call RComment("normal")')
+        call RCreateMenuItem("v", 'Edit.Uncomment\ (line/sel)', '<Plug>RToggleComment', 'xu', ':call RComment("selection")')
+        call RCreateMenuItem("ni", 'Edit.Toggle\ comment\ (line/sel)', '<Plug>RToggleComment', 'xx', ':call RComment("normal")')
+        call RCreateMenuItem("v", 'Edit.Toggle\ comment\ (line/sel)', '<Plug>RToggleComment', 'xx', ':call RComment("selection")')
         call RCreateMenuItem("ni", 'Edit.Add/Align\ right\ comment\ (line,\ sel)', '<Plug>RRightComment', ';', ':call MovePosRCodeComment("normal")')
         call RCreateMenuItem("v", 'Edit.Add/Align\ right\ comment\ (line,\ sel)', '<Plug>RRightComment', ';', ':call MovePosRCodeComment("selection")')
         if &filetype == "rnoweb" || g:vimrplugin_never_unmake_menu
@@ -2907,8 +2942,12 @@ endfunction
 function RCreateEditMaps()
     " Edit
     "-------------------------------------
-    call RCreateMaps("ni", '<Plug>RCommentLine',   'xx', ':call RComment("normal")')
-    call RCreateMaps("v", '<Plug>RCommentLine',   'xx', ':call RComment("selection")')
+    call RCreateMaps("ni", '<Plug>RToggleComment',   'xx', ':call RComment("normal")')
+    call RCreateMaps("v", '<Plug>RToggleComment',   'xx', ':call RComment("selection")')
+    call RCreateMaps("ni", '<Plug>RSimpleComment',   'xc', ':call RSimpleCommentLine("normal")')
+    call RCreateMaps("v", '<Plug>RSimpleComment',   'xc', ':call RSimpleCommentLine("selection")')
+    call RCreateMaps("ni", '<Plug>RSimpleUnComment',   'xu', ':call RSimpleUncommentLine("normal")')
+    call RCreateMaps("v", '<Plug>RSimpleUnComment',   'xu', ':call RSimpleUncommentLine("selection")')
     call RCreateMaps("ni", '<Plug>RRightComment',   ';', ':call MovePosRCodeComment("normal")')
     call RCreateMaps("v", '<Plug>RRightComment',    ';', ':call MovePosRCodeComment("selection")')
     " Replace 'underline' with '<-'

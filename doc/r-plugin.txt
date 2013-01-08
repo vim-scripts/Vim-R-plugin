@@ -683,6 +683,10 @@ libraries, the library currently under the cursor line is detached.
 
 4.6. Commenting and uncommenting lines~
 
+You can add the comment character to the beginning of a line by typing
+<LocalLeader>xc and remove it with <LocalLeader>xu. For more sophisticated
+ways of commenting and uncommenting, see below.
+
 You can toggle the state of a line as either commented or uncommented by
 typing <LocalLeader>xx.
 
@@ -1509,7 +1513,9 @@ RD, "cursor down"; RED, both "echo" and "down"):
    RClearConsole
 
    Edit R code~
-   RCommentLine
+   RSimpleComment
+   RSimpleUnComment
+   RToggleComment
    RRightComment
    RCompleteArgs
    RIndent
@@ -2162,7 +2168,8 @@ argument. Example:
  * Update vimcom version requirement to 0.9-6 (fix incompatibility with tcltk
    package on Unix).
  * Change the default value of vimrplugin_rmhidden to 0.
- * New options for Windows: vimrplugin_Rterm and vimrplugin_R_window_title.
+ * New option for Windows: vimrplugin_Rterm.
+ * New simpler un/comment commands: <LocalLeader>xc and <LocalLeader>xu.
 
 0.9.9.1 (2012-12-11)
 
