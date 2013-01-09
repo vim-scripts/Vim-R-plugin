@@ -2748,12 +2748,12 @@ function MakeRMenu()
         vmenu <silent> R.Edit.Indent\ (selected\ lines)<Tab>= =
         nmenu <silent> R.Edit.Indent\ (whole\ buffer)<Tab>gg=G gg=G
         menu R.Edit.-Sep72- <nul>
+        call RCreateMenuItem("ni", 'Edit.Toggle\ comment\ (line/sel)', '<Plug>RToggleComment', 'xx', ':call RComment("normal")')
+        call RCreateMenuItem("v", 'Edit.Toggle\ comment\ (line/sel)', '<Plug>RToggleComment', 'xx', ':call RComment("selection")')
         call RCreateMenuItem("ni", 'Edit.Comment\ (line/sel)', '<Plug>RToggleComment', 'xc', ':call RComment("normal")')
         call RCreateMenuItem("v", 'Edit.Comment\ (line/sel)', '<Plug>RToggleComment', 'xc', ':call RComment("selection")')
         call RCreateMenuItem("ni", 'Edit.Uncomment\ (line/sel)', '<Plug>RToggleComment', 'xu', ':call RComment("normal")')
         call RCreateMenuItem("v", 'Edit.Uncomment\ (line/sel)', '<Plug>RToggleComment', 'xu', ':call RComment("selection")')
-        call RCreateMenuItem("ni", 'Edit.Toggle\ comment\ (line/sel)', '<Plug>RToggleComment', 'xx', ':call RComment("normal")')
-        call RCreateMenuItem("v", 'Edit.Toggle\ comment\ (line/sel)', '<Plug>RToggleComment', 'xx', ':call RComment("selection")')
         call RCreateMenuItem("ni", 'Edit.Add/Align\ right\ comment\ (line,\ sel)', '<Plug>RRightComment', ';', ':call MovePosRCodeComment("normal")')
         call RCreateMenuItem("v", 'Edit.Add/Align\ right\ comment\ (line,\ sel)', '<Plug>RRightComment', ';', ':call MovePosRCodeComment("selection")')
         if &filetype == "rnoweb" || g:vimrplugin_never_unmake_menu

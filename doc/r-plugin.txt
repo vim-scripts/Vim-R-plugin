@@ -445,7 +445,9 @@ Edit
   . Indent (selected lines)                              =
   . Indent (whole buffer)                             gg=G
   --------------------------------------------------------
-  . Comment/Uncomment (line, sel)                      \xx
+  . Toggle comment (line, sel)                         \xx
+  . Comment (line, sel)                                \xc
+  . Uncomment (line, sel)                              \xu
   . Add/Align right comment (line, sel)                 \;
   --------------------------------------------------------
   . Go (next R chunk)                                   gn
