@@ -2105,6 +2105,8 @@ function RGetClassFor(rkeyword)
             let classfor = substitute(classfor, ' .*', '', "")
         endif
     endif
+    let classfor = substitute(classfor, '\[.*\]', '', 'g')
+    let classfor = substitute(classfor, '\[.*', '', 'g')
     if classfor =~ "^'" && classfor =~ "'$"
         let classfor = substitute(classfor, "^'", '"', "")
         let classfor = substitute(classfor, "'$", '"', "")
