@@ -578,7 +578,7 @@ function GoDown()
 endfunction
 
 function RWriteScreenRC()
-    let scrcnf = $VIMRPLUGIN_TMPDIR . "/" . b:screensname . ".screenrc"
+    let scrcnf = $VIMRPLUGIN_TMPDIR . "/" . g:rplugin_screensname . ".screenrc"
 
     if g:vimrplugin_noscreenrc
         let cnflines = [
@@ -602,11 +602,7 @@ function RWriteScreenRC()
                             \ 'term screen-256color']
             endif
         else
-            if g:vimrplugin_nosingler == 1
-                let scrtitle = 'hardstatus string "' . expand("%:t") . '"'
-            else
-                let scrtitle = "hardstatus string R"
-            endif
+            let scrtitle = 'hardstatus string "' . expand("%:t") . '"'
 
             let cnflines = ["msgwait 1",
                         \ "hardstatus lastline",
@@ -681,7 +677,7 @@ function StartR(whatr)
         if g:vimrplugin_notmuxconf
             let cnflines = [
                         \ 'set-environment -g VIMRPLUGIN_TMPDIR ' . g:rplugin_esc_tmpdir,
-                        \ 'set-environment -g VIMINSTANCEID ' . $VIMINSTANCEID,
+                        \ 'set-environment VIMINSTANCEID ' . $VIMINSTANCEID,
                         \ 'source-file ~/.tmux.conf' ]
         else
             let cnflines = [
@@ -692,7 +688,7 @@ function StartR(whatr)
                         \ 'set -g status off',
                         \ "set -g terminal-overrides 'xterm*:smcup@:rmcup@'",
                         \ 'set-environment -g VIMRPLUGIN_TMPDIR "' . $VIMRPLUGIN_TMPDIR . '"',
-                        \ 'set-environment -g VIMINSTANCEID "' . $VIMINSTANCEID . '"']
+                        \ 'set-environment VIMINSTANCEID "' . $VIMINSTANCEID . '"']
             if g:vimrplugin_external_ob || !has("gui_running")
                 let cnflines = extend(cnflines, ['set -g mode-mouse on', 'set -g mouse-select-pane on', 'set -g mouse-resize-pane on'])
             endif
@@ -709,7 +705,7 @@ function StartR(whatr)
         if $TERM =~ "screen"
             if g:vimrplugin_tmux
                 call system("tmux set-environment -g VIMRPLUGIN_TMPDIR " . g:rplugin_esc_tmpdir)
-                call system("tmux set-environment -g VIMINSTANCEID " . $VIMINSTANCEID)
+                call system("tmux set-environment VIMINSTANCEID " . $VIMINSTANCEID)
             else
                 let rcmd = 'VIMRPLUGIN_TMPDIR="' . $VIMRPLUGIN_TMPDIR . '" VIMINSTANCEID=' . $VIMINSTANCEID . " " . rcmd
             endif
@@ -744,7 +740,7 @@ function StartR(whatr)
             endif
         endif
 
-        if g:vimrplugin_by_vim_instance == 1 && exists("g:ConqueTerm_BufName") && bufloaded(substitute(g:ConqueTerm_BufName, "\\", "", "g"))
+        if exists("g:ConqueTerm_BufName") && bufloaded(substitute(g:ConqueTerm_BufName, "\\", "", "g"))
             call RWarningMsg("This Vim instance already has a Conque Shell.")
             lcd -
             return
@@ -782,11 +778,9 @@ function StartR(whatr)
         let b:conque_bufname = g:tmp_conque_bufname
         let b:objbrtitle = g:tmp_objbrtitle
 
-        if g:vimrplugin_by_vim_instance == 1
-            let g:rplugin_conqueshell = b:conqueshell
-            let g:rplugin_conque_bufname = b:conque_bufname
-            let g:rplugin_objbrtitle = b:objbrtitle
-        endif
+        let g:rplugin_conqueshell = b:conqueshell
+        let g:rplugin_conque_bufname = b:conque_bufname
+        let g:rplugin_objbrtitle = b:objbrtitle
 
         unlet g:tmp_conqueshell
         unlet g:tmp_conque_bufname
@@ -809,6 +803,7 @@ function StartR(whatr)
         endif
 
         if g:vimrplugin_tmux
+            let rcmd = "VIMINSTANCEID=" . $VIMINSTANCEID . " " . rcmd
             call system('export VIMRPLUGIN_TMPDIR=' . $VIMRPLUGIN_TMPDIR)
             call system('export VIMINSTANCEID=' . $VIMINSTANCEID)
             " Start the terminal emulator even if inside a Tmux session
@@ -823,18 +818,18 @@ function StartR(whatr)
                 lcd -
                 return
             endif
-            call system("tmux has-session -t " . b:screensname)
+            call system("tmux has-session -t " . g:rplugin_screensname)
             if v:shell_error
                 if g:rplugin_termcmd =~ "gnome-terminal" || g:rplugin_termcmd =~ "xfce4-terminal" || g:rplugin_termcmd =~ "terminal" || g:rplugin_termcmd =~ "iterm"
-                    let opencmd = printf("%s 'tmux -2 %s new-session -s %s \"%s\"' &", g:rplugin_termcmd, tmuxcnf, b:screensname, rcmd)
+                    let opencmd = printf("%s 'tmux -2 %s new-session -s %s \"%s\"' &", g:rplugin_termcmd, tmuxcnf, g:rplugin_screensname, rcmd)
                 else
-                    let opencmd = printf("%s tmux -2 %s new-session -s %s \"%s\" &", g:rplugin_termcmd, tmuxcnf, b:screensname, rcmd)
+                    let opencmd = printf("%s tmux -2 %s new-session -s %s \"%s\" &", g:rplugin_termcmd, tmuxcnf, g:rplugin_screensname, rcmd)
                 endif
             else
                 if g:rplugin_termcmd =~ "gnome-terminal" || g:rplugin_termcmd =~ "xfce4-terminal" || g:rplugin_termcmd =~ "terminal" || g:rplugin_termcmd =~ "iterm"
-                    let opencmd = printf("%s 'tmux -2 %s attach-session -d -t %s' &", g:rplugin_termcmd, tmuxcnf, b:screensname)
+                    let opencmd = printf("%s 'tmux -2 %s attach-session -d -t %s' &", g:rplugin_termcmd, tmuxcnf, g:rplugin_screensname)
                 else
-                    let opencmd = printf("%s tmux -2 %s attach-session -d -t %s &", g:rplugin_termcmd, tmuxcnf, b:screensname)
+                    let opencmd = printf("%s tmux -2 %s attach-session -d -t %s &", g:rplugin_termcmd, tmuxcnf, g:rplugin_screensname)
                 endif
             endif
         else
@@ -846,9 +841,9 @@ function StartR(whatr)
             let scrrc = RWriteScreenRC()
             " Some terminals want quotes (see screen.vim)
             if g:rplugin_termcmd =~ "gnome-terminal" || g:rplugin_termcmd =~ "xfce4-terminal" || g:rplugin_termcmd =~ "terminal" || g:rplugin_termcmd =~ "iterm"
-                let opencmd = printf("%s 'screen %s -d -RR -S %s %s' &", g:rplugin_termcmd, scrrc, b:screensname, rcmd)
+                let opencmd = printf("%s 'screen %s -d -RR -S %s %s' &", g:rplugin_termcmd, scrrc, g:rplugin_screensname, rcmd)
             else
-                let opencmd = printf("%s screen %s -d -RR -S %s %s &", g:rplugin_termcmd, scrrc, b:screensname, rcmd)
+                let opencmd = printf("%s screen %s -d -RR -S %s %s &", g:rplugin_termcmd, scrrc, g:rplugin_screensname, rcmd)
             endif
         endif
 
@@ -942,7 +937,7 @@ function StartObjectBrowser()
                     \ 'let g:rplugin_edpane = "' . g:rplugin_edpane . '"',
                     \ 'let g:rplugin_rpane = "' . g:rplugin_rpane . '"',
                     \ 'let b:objbrtitle = "' . b:objbrtitle . '"',
-                    \ 'let b:screensname = "' . b:screensname . '"',
+                    \ 'let g:rplugin_screensname = "' . g:rplugin_screensname . '"',
                     \ 'let b:rscript_buffer = "' . bufname("%") . '"',
                     \ 'set filetype=rbrowser',
                     \ 'let $VIMINSTANCEID="' . $VIMINSTANCEID . '"',
@@ -1074,7 +1069,7 @@ function StartObjectBrowser()
     else
         " Copy the values of some local variables that will be inherited
         let g:tmp_objbrtitle = b:objbrtitle
-        let g:tmp_screensname = b:screensname
+        let g:tmp_screensname = g:rplugin_screensname
         let g:tmp_curbufname = bufname("%")
 
         if g:vimrplugin_conqueplugin == 1
@@ -1106,7 +1101,7 @@ function StartObjectBrowser()
             unlet g:tmp_conqueshell
             unlet g:tmp_conque_bufname
         endif
-        let b:screensname = g:tmp_screensname
+        let g:rplugin_screensname = g:tmp_screensname
         let b:objbrtitle = g:tmp_objbrtitle
         let b:rscript_buffer = g:tmp_curbufname
         unlet g:tmp_objbrtitle
@@ -1294,17 +1289,12 @@ function SendCmdToR(cmd)
         return 1
     elseif g:vimrplugin_conqueplugin
         if !exists("b:conque_bufname")
-            if g:vimrplugin_by_vim_instance
-                if exists("g:rplugin_conqueshell")
-                    let b:conqueshell = g:rplugin_conqueshell
-                    let b:conque_bufname = g:rplugin_conque_bufname
-                    let b:objbrtitle = g:rplugin_objbrtitle
-                else
-                    call RWarningMsg("This buffer does not have a Conque Shell yet.")
-                    return 0
-                endif
+            if exists("g:rplugin_conqueshell")
+                let b:conqueshell = g:rplugin_conqueshell
+                let b:conque_bufname = g:rplugin_conque_bufname
+                let b:objbrtitle = g:rplugin_objbrtitle
             else
-                call RWarningMsg("Did you already start R?")
+                call RWarningMsg("This buffer does not have a Conque Shell yet.")
                 return 0
             endif
         endif
@@ -1364,9 +1354,9 @@ function SendCmdToR(cmd)
     " Send the command to R running in an external terminal emulator
     let str = substitute(cmd, "'", "'\\\\''", "g")
     if g:vimrplugin_tmux
-        let scmd = "tmux set-buffer '" . str . "\<C-M>' && tmux paste-buffer -t " . b:screensname . '.0'
+        let scmd = "tmux set-buffer '" . str . "\<C-M>' && tmux paste-buffer -t " . g:rplugin_screensname . '.0'
     else
-        let scmd = 'screen -S ' . b:screensname . " -X stuff '" . str . "\<C-M>'"
+        let scmd = 'screen -S ' . g:rplugin_screensname . " -X stuff '" . str . "\<C-M>'"
     endif
     let rlog = system(scmd)
     if v:shell_error
@@ -2196,7 +2186,7 @@ function ShowRDoc(rkeyword, package, getclass)
     endif
 
     " Local variables that must be inherited by the rdoc buffer
-    let g:tmp_screensname = b:screensname
+    let g:tmp_screensname = g:rplugin_screensname
     let g:tmp_objbrtitle = b:objbrtitle
     if g:vimrplugin_conqueplugin == 1
         let g:tmp_conqueshell = b:conqueshell
@@ -2239,7 +2229,7 @@ function ShowRDoc(rkeyword, package, getclass)
 
     " Inheritance of local variables from the script buffer
     let b:objbrtitle = g:tmp_objbrtitle
-    let b:screensname = g:tmp_screensname
+    let g:rplugin_screensname = g:tmp_screensname
     unlet g:tmp_objbrtitle
     if g:vimrplugin_conqueplugin == 1
         let b:conqueshell = g:tmp_conqueshell
@@ -2799,7 +2789,6 @@ function MakeRMenu()
     amenu R.Help\ (plugin).Options.Vim\ as\ pager\ for\ R\ help :help vimrplugin_vimpager<CR>
     if !has("gui_win32")
         amenu R.Help\ (plugin).Options.Terminal\ emulator :help vimrplugin_term<CR>
-        amenu R.Help\ (plugin).Options.Number\ of\ R\ processes :help vimrplugin_nosingler<CR>
         amenu R.Help\ (plugin).Options.Screen\ configuration :help vimrplugin_noscreenrc<CR>
         amenu R.Help\ (plugin).Options.Screen\ plugin :help vimrplugin_screenplugin<CR>
     endif
@@ -3132,7 +3121,6 @@ call RSetDefaultValue("g:vimrplugin_tmux",              1)
 call RSetDefaultValue("g:vimrplugin_vimshell",          0)
 call RSetDefaultValue("g:vimrplugin_listmethods",       0)
 call RSetDefaultValue("g:vimrplugin_specialplot",       0)
-call RSetDefaultValue("g:vimrplugin_nosingler",         0)
 call RSetDefaultValue("g:vimrplugin_noscreenrc",        0)
 call RSetDefaultValue("g:vimrplugin_notmuxconf",        0)
 call RSetDefaultValue("g:vimrplugin_only_in_tmux",      0)
@@ -3143,7 +3131,6 @@ call RSetDefaultValue("g:vimrplugin_objbr_w",          40)
 call RSetDefaultValue("g:vimrplugin_external_ob",       0)
 call RSetDefaultValue("g:vimrplugin_buildwait",        60)
 call RSetDefaultValue("g:vimrplugin_indent_commented",  1)
-call RSetDefaultValue("g:vimrplugin_by_vim_instance",   0)
 call RSetDefaultValue("g:vimrplugin_never_unmake_menu", 0)
 call RSetDefaultValue("g:vimrplugin_vimpager",       "'tab'")
 call RSetDefaultValue("g:vimrplugin_latexcmd", "'pdflatex'")
@@ -3580,6 +3567,18 @@ let g:rplugin_lastrpl = ""
 let g:rplugin_ob_busy = 0
 let g:rplugin_hasRSFbutton = 0
 let g:rplugin_errlist = []
+let g:rplugin_screensname = substitute("vimrplugin-" . g:rplugin_userlogin . localtime() . g:rplugin_firstbuffer, '\W', '', 'g')
+
+if $VIMINSTANCEID == ""
+    let $VIMINSTANCEID = substitute(g:rplugin_firstbuffer . localtime(), '\W', '', 'g')
+endif
+
+if has("clientserver")
+    let g:rplugin_obsname_arg = "--servername " . toupper(substitute(substitute(expand("%:r"), '\W', '', 'g'), "_", "", "g"))
+else
+    let g:rplugin_obsname_arg = " "
+endif
+
 
 call SetRPath()
 
