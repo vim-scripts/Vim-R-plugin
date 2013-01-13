@@ -2074,7 +2074,7 @@ function RGetClassFor(rkeyword)
         let begin += 1
         let line = strpart(line, begin)
         let line = substitute(line, '^\s*', '', "")
-        if line =~ '^\k*\s*(' || line =~ '^\k*\s*=\s*\k*\s*('
+        if (line =~ '^\k*\s*(' || line =~ '^\k*\s*=\s*\k*\s*(') && line !~ '[.*('
             let idx = 0
             while line[idx] != '('
                 let idx += 1
@@ -2099,14 +2099,37 @@ function RGetClassFor(rkeyword)
                 endif
             endwhile
             let classfor = strpart(line, 0, idx)
+        elseif line =~ '^\(\k\|\$\)*\s*[' || line =~ '^\(k\|\$\)*\s*=\s*\(\k\|\$\)*\s*[.*('
+            let idx = 0
+            while line[idx] != '['
+                let idx += 1
+            endwhile
+            let idx += 1
+            let nparen = 1
+            let len = strlen(line)
+            let lnum = line(".")
+            while nparen != 0
+                if line[idx] == '['
+                    let nparen += 1
+                else
+                    if line[idx] == ']'
+                        let nparen -= 1
+                    endif
+                endif
+                let idx += 1
+                if idx == len
+                    let lnum += 1
+                    let line = line . substitute(getline(lnum), '#.*', '', "")
+                    let len = strlen(line)
+                endif
+            endwhile
+            let classfor = strpart(line, 0, idx)
         else
             let classfor = substitute(line, ').*', '', "")
             let classfor = substitute(classfor, ',.*', '', "")
             let classfor = substitute(classfor, ' .*', '', "")
         endif
     endif
-    let classfor = substitute(classfor, '\[.*\]', '', 'g')
-    let classfor = substitute(classfor, '\[.*', '', 'g')
     if classfor =~ "^'" && classfor =~ "'$"
         let classfor = substitute(classfor, "^'", '"', "")
         let classfor = substitute(classfor, "'$", '"', "")
