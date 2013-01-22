@@ -3103,6 +3103,9 @@ endif
 if has("win32") || has("win64")
     let g:rplugin_home = substitute(g:rplugin_home, "\\", "/", "g")
     let g:rplugin_uservimfiles = substitute(g:rplugin_uservimfiles, "\\", "/", "g")
+    if $USERNAME != ""
+	let g:rplugin_userlogin = substitute($USERNAME, " ", "", "g")
+    endif
 endif
 
 if isdirectory("/tmp")
