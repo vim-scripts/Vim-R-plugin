@@ -148,10 +148,10 @@ function! CompleteChunkOptions()
     else
         let newbase = '^' . substitute(base, "\\$$", "", "")
     endif
-    let ktopt = ["aniopts=;'controls.loop'", "autodep=;FALSE", "background=;'#F7F7F7'",
+    let ktopt = ["animation.fun=;hook_ffmpeg_html", "aniopts=;'controls.loop'", "autodep=;FALSE", "background=;'#F7F7F7'",
                 \ "cache.path=;'cache/'", "cache=;FALSE", "child=; ", "comment=;'##'",
                 \ "dependson=;''", "dev.args=; ", "dev=; ", "dpi=;72", "echo=;TRUE",
-                \ "engine=; ", "error=;TRUE", "eval=;TRUE", "external=;TRUE",
+                \ "engine=;'R'", "error=;TRUE", "eval=;TRUE", "external=;TRUE",
                 \ "fig.align=;'left|right|center'", "fig.cap=;''", "fig.env=;'figure'",
                 \ "fig.ext=; ", "fig.height=;7", "fig.keep=;'high|none|all|first|last'",
                 \ "fig.lp=;'fig:'", "fig.path=; ", "fig.pos=;''", "fig.scap=;''",
@@ -160,7 +160,7 @@ function! CompleteChunkOptions()
                 \ "out.extra=; ", "out.height=;'7in'", "out.width=;'7in'",
                 \ "prompt=;FALSE", "ref.label=; ", "resize.height=; ",
                 \ "resize.width=; ", "results=;'markup|asis|hide'", "sanitize=;FALSE",
-                \ "size=;'normalsize'", "split=;FALSE", "tidy=;TRUE", "warning=;TRUE"]
+                \ "size=;'normalsize'", "split=;FALSE", "tidy=;TRUE", "tidy.opts=; ", "warning=;TRUE"]
     for kopt in ktopt
       if kopt =~ newbase
         let tmp1 = split(kopt, ";")
@@ -3104,7 +3104,7 @@ if has("win32") || has("win64")
     let g:rplugin_home = substitute(g:rplugin_home, "\\", "/", "g")
     let g:rplugin_uservimfiles = substitute(g:rplugin_uservimfiles, "\\", "/", "g")
     if $USERNAME != ""
-	let g:rplugin_userlogin = substitute($USERNAME, " ", "", "g")
+        let g:rplugin_userlogin = substitute($USERNAME, " ", "", "g")
     endif
 endif
 
