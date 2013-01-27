@@ -3010,9 +3010,11 @@ function RCreateSendMaps()
     call RCreateMaps('ni0', '<Plug>RDSendLine', 'd', ':call SendLineToR("down")')
     call RCreateMaps('i', '<Plug>RSendLAndOpenNewOne', 'q', ':call SendLineToR("newline")')
     nmap <LocalLeader>r<Left> :call RSendPartOfLine("left", 0)<CR>
-    imap <LocalLeader>r<Left> <Esc>l:call RSendPartOfLine("left", 0)<CR>i
     nmap <LocalLeader>r<Right> :call RSendPartOfLine("right", 0)<CR>
-    imap <LocalLeader>r<Right> <Esc>l:call RSendPartOfLine("right", 0)<CR>i
+    if g:vimrplugin_insert_mode_cmds
+        imap <LocalLeader>r<Left> <Esc>l:call RSendPartOfLine("left", 0)<CR>i
+        imap <LocalLeader>r<Right> <Esc>l:call RSendPartOfLine("right", 0)<CR>i
+    endif
 
     " For compatibility with Johannes Ranke's plugin
     if g:vimrplugin_map_r == 1
