@@ -3012,8 +3012,8 @@ function RCreateSendMaps()
     nmap <LocalLeader>r<Left> :call RSendPartOfLine("left", 0)<CR>
     nmap <LocalLeader>r<Right> :call RSendPartOfLine("right", 0)<CR>
     if g:vimrplugin_insert_mode_cmds
-        imap <LocalLeader>r<Left> <Esc>l:call RSendPartOfLine("left", 0)<CR>i
-        imap <LocalLeader>r<Right> <Esc>l:call RSendPartOfLine("right", 0)<CR>i
+        imap <buffer><silent> <LocalLeader>r<Left> <Esc>l:call RSendPartOfLine("left", 0)<CR>i
+        imap <buffer><silent> <LocalLeader>r<Right> <Esc>l:call RSendPartOfLine("right", 0)<CR>i
     endif
 
     " For compatibility with Johannes Ranke's plugin
