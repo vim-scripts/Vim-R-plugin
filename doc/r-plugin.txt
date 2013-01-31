@@ -132,7 +132,7 @@ following dependencies:
    Vim >= 7.3 with Python support.
    Tmux >= 1.5:     http://tmux.sourceforge.net
    Screen plugin:   http://www.vim.org/scripts/script.php?script_id=2711
-   vimcom = 0.9-6:  An R package.
+   vimcom = 0.9-7:  An R package.
 
    Suggests:~
    ncurses-term:  http://invisible-island.net/ncurses
@@ -248,7 +248,7 @@ to install external dependencies:
       find the file that matches exactly the version of Python that you
       installed.
 
-    * vimcom = 0.9-6: An R package, available on CRAN and installable with the
+    * vimcom = 0.9-7: An R package, available on CRAN and installable with the
       install.packages() command. The vimcom package creates a server on R to
       allow the communication with Vim. You certainly will want to put the
       following lines at the end of your Rprofile (usually at
@@ -1426,11 +1426,13 @@ write R packages or Sweave files.  For example, if <LocalLeader> is set to the
 '\' character, typing '\dQuote' in a .Rd file tries to send the command!
 
 The option vimrplugin_insert_mode_cmds disables commands in insert mode.  To
-use it, add the following in your |vimrc|:
+use it, add the following to your |vimrc|:
 >
    let g:vimrplugin_insert_mode_cmds = 0       
 <
 The default value is 1, for consistency with earlier versions.
+
+See also: |r-plugin-localleader|.
 
 6.25. Show/remove hidden objects~
 							 *vimrplugin_allnames*
@@ -2127,7 +2129,7 @@ argument. Example:
 							       *r-plugin-news*
 10. News~
 
-0.9.9.2 (2013-01-12)
+0.9.9.2 (2013-01-31)
 
  * Update vimcom version requirement to 0.9-6 (fix incompatibility with tcltk
    package on Unix).
