@@ -104,6 +104,34 @@ function ReplaceUnderS()
     endif
 endfunction
 
+function! ReadEvalReply()
+    let reply = "No reply"
+    let haswaitwarn = 0
+    let ii = 0
+    while ii < 20
+        sleep 100m
+        if filereadable($VIMRPLUGIN_TMPDIR . "/eval_reply")
+            let tmp = readfile($VIMRPLUGIN_TMPDIR . "/eval_reply")
+            if len(tmp) > 0
+                let reply = tmp[0]
+                break
+            endif
+        endif
+        let ii += 1
+        if ii == 2
+            echohl WarningMsg
+            echon "\rWaiting for reply"
+            echohl Normal
+            let haswaitwarn = 1
+        endif
+    endwhile
+    if haswaitwarn
+        echon "\r                 "
+        redraw
+    endif
+    return reply
+endfunction
+
 function! CompleteChunkOptions()
     let cline = getline(".")
     let cpos = getpos(".")
@@ -120,10 +148,10 @@ function! CompleteChunkOptions()
     else
         let newbase = '^' . substitute(base, "\\$$", "", "")
     endif
-    let ktopt = ["aniopts=;'controls.loop'", "autodep=;FALSE", "background=;'#F7F7F7'",
+    let ktopt = ["animation.fun=;hook_ffmpeg_html", "aniopts=;'controls.loop'", "autodep=;FALSE", "background=;'#F7F7F7'",
                 \ "cache.path=;'cache/'", "cache=;FALSE", "child=; ", "comment=;'##'",
                 \ "dependson=;''", "dev.args=; ", "dev=; ", "dpi=;72", "echo=;TRUE",
-                \ "engine=; ", "error=;TRUE", "eval=;TRUE", "external=;TRUE",
+                \ "engine=;'R'", "error=;TRUE", "eval=;TRUE", "external=;TRUE",
                 \ "fig.align=;'left|right|center'", "fig.cap=;''", "fig.env=;'figure'",
                 \ "fig.ext=; ", "fig.height=;7", "fig.keep=;'high|none|all|first|last'",
                 \ "fig.lp=;'fig:'", "fig.path=; ", "fig.pos=;''", "fig.scap=;''",
@@ -132,7 +160,7 @@ function! CompleteChunkOptions()
                 \ "out.extra=; ", "out.height=;'7in'", "out.width=;'7in'",
                 \ "prompt=;FALSE", "ref.label=; ", "resize.height=; ",
                 \ "resize.width=; ", "results=;'markup|asis|hide'", "sanitize=;FALSE",
-                \ "size=;'normalsize'", "split=;FALSE", "tidy=;TRUE", "warning=;TRUE"]
+                \ "size=;'normalsize'", "split=;FALSE", "tidy=;TRUE", "tidy.opts=; ", "warning=;TRUE"]
     for kopt in ktopt
       if kopt =~ newbase
         let tmp1 = split(kopt, ";")
@@ -186,70 +214,73 @@ function RCompleteArgs()
             let classfor = substitute(classfor, '"', '\\"', "g")
             let rkeyword = '^' . rkeyword0 . "\x06"
             call cursor(cpos[1], cpos[2])
+            call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
             if classfor == ""
                 exe 'Py SendToVimCom("vimcom:::vim.args(' . "'" . rkeyword0 . "', '" . argkey . "')" . '")'
             else
                 exe 'Py SendToVimCom("vimcom:::vim.args(' . "'" . rkeyword0 . "', '" . argkey . "', classfor = " . classfor . ")" . '")'
             endif
-            if g:rplugin_vimcomport > 0 && g:rplugin_lastrpl != "NOT_EXISTS" && g:rplugin_lastrpl != "NO_ARGS" && g:rplugin_lastrpl != "R is busy." && g:rplugin_lastrpl != "NOANSWER" && g:rplugin_lastrpl != "INVALID" && g:rplugin_lastrpl != ""
-                let args = []
-                if g:rplugin_lastrpl[0] == "\x04" && len(split(g:rplugin_lastrpl, "\x04")) == 1
-                    return ''
-                endif
-                let tmp0 = split(g:rplugin_lastrpl, "\x04")
-                let tmp = split(tmp0[0], "\x09")
-                if(len(tmp) > 0)
-                    for id in range(len(tmp))
-                        let tmp2 = split(tmp[id], "\x07")
-                        if tmp2[0] == '...'
-                            let tmp3 = tmp2[0]
-                        else
-                            let tmp3 = tmp2[0] . " = "
-                        endif
-                        if len(tmp2) > 1
-                            call add(args,  {'word': tmp3, 'menu': tmp2[1]})
-                        else
-                            call add(args,  {'word': tmp3, 'menu': ' '})
-                        endif
-                    endfor
-                    if len(args) > 0 && len(tmp0) > 1
-                        call add(args, {'word': ' ', 'menu': tmp0[1]})
-                    endif
-                    call complete(idx2, args)
-                endif
-                return ''
-            endif
-
-            for omniL in flines
-                if omniL =~ rkeyword && omniL =~ "\x06function\x06function\x06" 
-                    let tmp1 = split(omniL, "\x06")
-                    if len(tmp1) < 5
+            if g:rplugin_vimcomport > 0
+                let g:rplugin_lastrpl = ReadEvalReply()
+                if g:rplugin_lastrpl != "NOT_EXISTS" && g:rplugin_lastrpl != "NO_ARGS" && g:rplugin_lastrpl != "R is busy." && g:rplugin_lastrpl != "NOANSWER" && g:rplugin_lastrpl != "INVALID" && g:rplugin_lastrpl != "" && g:rplugin_lastrpl != "No reply"
+                    let args = []
+                    if g:rplugin_lastrpl[0] == "\x04" && len(split(g:rplugin_lastrpl, "\x04")) == 1
                         return ''
                     endif
-                    let info = tmp1[4]
-                    let argsL = split(info, "\x09")
-                    let args = []
-                    for id in range(len(argsL))
-                        let newkey = '^' . argkey
-                        let tmp2 = split(argsL[id], "\x07")
-                        if (argkey == '' || tmp2[0] =~ newkey) && tmp2[0] !~ "No arguments"
-                            if tmp2[0] != '...'
-                                let tmp2[0] = tmp2[0] . " = "
-                            endif
-                            if len(tmp2) == 2
-                                let tmp3 = {'word': tmp2[0], 'menu': tmp2[1]}
+                    let tmp0 = split(g:rplugin_lastrpl, "\x04")
+                    let tmp = split(tmp0[0], "\x09")
+                    if(len(tmp) > 0)
+                        for id in range(len(tmp))
+                            let tmp2 = split(tmp[id], "\x07")
+                            if tmp2[0] == '...'
+                                let tmp3 = tmp2[0]
                             else
-                                let tmp3 = {'word': tmp2[0], 'menu': ''}
+                                let tmp3 = tmp2[0] . " = "
                             endif
-                            call add(args, tmp3)
+                            if len(tmp2) > 1
+                                call add(args,  {'word': tmp3, 'menu': tmp2[1]})
+                            else
+                                call add(args,  {'word': tmp3, 'menu': ' '})
+                            endif
+                        endfor
+                        if len(args) > 0 && len(tmp0) > 1
+                            call add(args, {'word': ' ', 'menu': tmp0[1]})
                         endif
-                    endfor
-                    call complete(idx2, args)
+                        call complete(idx2, args)
+                    endif
                     return ''
                 endif
-            endfor
 
-            break
+                for omniL in flines
+                    if omniL =~ rkeyword && omniL =~ "\x06function\x06function\x06" 
+                        let tmp1 = split(omniL, "\x06")
+                        if len(tmp1) < 5
+                            return ''
+                        endif
+                        let info = tmp1[4]
+                        let argsL = split(info, "\x09")
+                        let args = []
+                        for id in range(len(argsL))
+                            let newkey = '^' . argkey
+                            let tmp2 = split(argsL[id], "\x07")
+                            if (argkey == '' || tmp2[0] =~ newkey) && tmp2[0] !~ "No arguments"
+                                if tmp2[0] != '...'
+                                    let tmp2[0] = tmp2[0] . " = "
+                                endif
+                                if len(tmp2) == 2
+                                    let tmp3 = {'word': tmp2[0], 'menu': tmp2[1]}
+                                else
+                                    let tmp3 = {'word': tmp2[0], 'menu': ''}
+                                endif
+                                call add(args, tmp3)
+                            endif
+                        endfor
+                        call complete(idx2, args)
+                        return ''
+                    endif
+                endfor
+                break
+            endif
         endif
         let idx -= 1
         if idx <= 0
@@ -264,6 +295,73 @@ function RCompleteArgs()
     endwhile
     call cursor(cpos[1], cpos[2])
     return ''
+endfunction
+
+function IsRCode(lnum)
+    let save_cursor = getpos(".")
+    call cursor(a:lnum, 0)
+    let isRcode = 1
+    if &filetype == "rnoweb" && RnwIsInRCode() == 0
+        let isRcode = 0
+    endif
+    if &filetype == "rrst" && RrstIsInRCode() == 0
+        let isRcode = 0
+    endif
+    if &filetype == "rmd" && RmdIsInRCode() == 0
+        let isRcode = 0
+    endif
+    if &filetype == "rhelp"
+        let lastsection = search('^\\[a-z]*{', "bncW")
+        let secname = getline(lastsection)
+        if secname =~ '^\\usage{' || secname =~ '^\\examples{' || secname =~ '^\\dontshow{' || secname =~ '^\\dontrun{' || secname =~ '^\\donttest{' || secname =~ '^\\testonly{'
+            let isRcode = 1
+        else
+            let isRcode = 0
+        endif
+    endif
+    call setpos(".", save_cursor)
+    let g:risrcode = isRcode
+    return isRcode
+endfunction
+
+function RGetFL(mode)
+    if a:mode == "normal"
+        let fline = line(".")
+        let lline = line(".")
+    else
+        let fline = line("'<")
+        let lline = line("'>")
+    endif
+    if fline > lline
+        let tmp = lline
+        let lline = fline
+        let fline = tmp
+    endif
+    return [fline, lline]
+endfunction
+
+function RSimpleCommentLine(mode)
+    let [fline, lline] = RGetFL(a:mode)
+    if IsRCode(fline)
+        let cstr = "#"
+    else
+        let cstr = "%"
+    endif
+    for ii in range(fline, lline)
+        call setline(ii, cstr . getline(ii))
+    endfor
+endfunction
+
+function RSimpleUncommentLine(mode)
+    let [fline, lline] = RGetFL(a:mode)
+    if IsRCode(fline)
+        let cstr = "#"
+    else
+        let cstr = "%"
+    endif
+    for ii in range(fline, lline)
+        call setline(ii, substitute(getline(ii), "^" . cstr, "", ""))
+    endfor
 endfunction
 
 function RCommentLine(lnum, ind, cmt)
@@ -291,35 +389,10 @@ endfunction
 
 function RComment(mode)
     let cpos = getpos(".")
-    if a:mode == "selection"
-        let fline = line("'<")
-        let lline = line("'>")
-    else
-        let fline = line(".")
-        let lline = fline
-    endif
+    let [fline, lline] = RGetFL(a:mode)
 
     " What comment string to use?
-    call cursor(fline, 0)
-    let isRcode = 1
-    if &filetype == "rnoweb" && RnwIsInRCode() == 0
-        let isRcode = 0
-    endif
-    if &filetype == "rrst" && RrstIsInRCode() == 0
-        let isRcode = 0
-    endif
-    if &filetype == "rmd" && RmdIsInRCode() == 0
-        let isRcode = 0
-    endif
-    if &filetype == "rhelp"
-        let lastsection = search('^\\[a-z]*{', "bncW")
-        let secname = getline(lastsection)
-        if secname =~ '^\\usage{' || secname =~ '^\\examples{' || secname =~ '^\\dontshow{' || secname =~ '^\\dontrun{' || secname =~ '^\\donttest{' || secname =~ '^\\testonly{'
-            let isRcode = 1
-        else
-            let isRcode = 0
-        endif
-    endif
+    let isRcode = IsRCode(fline)
     if isRcode == 0
         let cmt = '%'
     else
@@ -505,7 +578,7 @@ function GoDown()
 endfunction
 
 function RWriteScreenRC()
-    let scrcnf = $VIMRPLUGIN_TMPDIR . "/" . b:screensname . ".screenrc"
+    let scrcnf = $VIMRPLUGIN_TMPDIR . "/" . g:rplugin_screensname . ".screenrc"
 
     if g:vimrplugin_noscreenrc
         let cnflines = [
@@ -529,11 +602,7 @@ function RWriteScreenRC()
                             \ 'term screen-256color']
             endif
         else
-            if g:vimrplugin_nosingler == 1
-                let scrtitle = 'hardstatus string "' . expand("%:t") . '"'
-            else
-                let scrtitle = "hardstatus string R"
-            endif
+            let scrtitle = 'hardstatus string "' . expand("%:t") . '"'
 
             let cnflines = ["msgwait 1",
                         \ "hardstatus lastline",
@@ -608,7 +677,7 @@ function StartR(whatr)
         if g:vimrplugin_notmuxconf
             let cnflines = [
                         \ 'set-environment -g VIMRPLUGIN_TMPDIR ' . g:rplugin_esc_tmpdir,
-                        \ 'set-environment -g VIMINSTANCEID ' . $VIMINSTANCEID,
+                        \ 'set-environment VIMINSTANCEID ' . $VIMINSTANCEID,
                         \ 'source-file ~/.tmux.conf' ]
         else
             let cnflines = [
@@ -619,7 +688,7 @@ function StartR(whatr)
                         \ 'set -g status off',
                         \ "set -g terminal-overrides 'xterm*:smcup@:rmcup@'",
                         \ 'set-environment -g VIMRPLUGIN_TMPDIR "' . $VIMRPLUGIN_TMPDIR . '"',
-                        \ 'set-environment -g VIMINSTANCEID "' . $VIMINSTANCEID . '"']
+                        \ 'set-environment VIMINSTANCEID "' . $VIMINSTANCEID . '"']
             if g:vimrplugin_external_ob || !has("gui_running")
                 let cnflines = extend(cnflines, ['set -g mode-mouse on', 'set -g mouse-select-pane on', 'set -g mouse-resize-pane on'])
             endif
@@ -636,7 +705,7 @@ function StartR(whatr)
         if $TERM =~ "screen"
             if g:vimrplugin_tmux
                 call system("tmux set-environment -g VIMRPLUGIN_TMPDIR " . g:rplugin_esc_tmpdir)
-                call system("tmux set-environment -g VIMINSTANCEID " . $VIMINSTANCEID)
+                call system("tmux set-environment VIMINSTANCEID " . $VIMINSTANCEID)
             else
                 let rcmd = 'VIMRPLUGIN_TMPDIR="' . $VIMRPLUGIN_TMPDIR . '" VIMINSTANCEID=' . $VIMINSTANCEID . " " . rcmd
             endif
@@ -671,7 +740,7 @@ function StartR(whatr)
             endif
         endif
 
-        if g:vimrplugin_by_vim_instance == 1 && exists("g:ConqueTerm_BufName") && bufloaded(substitute(g:ConqueTerm_BufName, "\\", "", "g"))
+        if exists("g:ConqueTerm_BufName") && bufloaded(substitute(g:ConqueTerm_BufName, "\\", "", "g"))
             call RWarningMsg("This Vim instance already has a Conque Shell.")
             lcd -
             return
@@ -709,11 +778,9 @@ function StartR(whatr)
         let b:conque_bufname = g:tmp_conque_bufname
         let b:objbrtitle = g:tmp_objbrtitle
 
-        if g:vimrplugin_by_vim_instance == 1
-            let g:rplugin_conqueshell = b:conqueshell
-            let g:rplugin_conque_bufname = b:conque_bufname
-            let g:rplugin_objbrtitle = b:objbrtitle
-        endif
+        let g:rplugin_conqueshell = b:conqueshell
+        let g:rplugin_conque_bufname = b:conque_bufname
+        let g:rplugin_objbrtitle = b:objbrtitle
 
         unlet g:tmp_conqueshell
         unlet g:tmp_conque_bufname
@@ -736,6 +803,7 @@ function StartR(whatr)
         endif
 
         if g:vimrplugin_tmux
+            let rcmd = "VIMINSTANCEID=" . $VIMINSTANCEID . " " . rcmd
             call system('export VIMRPLUGIN_TMPDIR=' . $VIMRPLUGIN_TMPDIR)
             call system('export VIMINSTANCEID=' . $VIMINSTANCEID)
             " Start the terminal emulator even if inside a Tmux session
@@ -750,18 +818,18 @@ function StartR(whatr)
                 lcd -
                 return
             endif
-            call system("tmux has-session -t " . b:screensname)
+            call system("tmux has-session -t " . g:rplugin_screensname)
             if v:shell_error
                 if g:rplugin_termcmd =~ "gnome-terminal" || g:rplugin_termcmd =~ "xfce4-terminal" || g:rplugin_termcmd =~ "terminal" || g:rplugin_termcmd =~ "iterm"
-                    let opencmd = printf("%s 'tmux -2 %s new-session -s %s \"%s\"' &", g:rplugin_termcmd, tmuxcnf, b:screensname, rcmd)
+                    let opencmd = printf("%s 'tmux -2 %s new-session -s %s \"%s\"' &", g:rplugin_termcmd, tmuxcnf, g:rplugin_screensname, rcmd)
                 else
-                    let opencmd = printf("%s tmux -2 %s new-session -s %s \"%s\" &", g:rplugin_termcmd, tmuxcnf, b:screensname, rcmd)
+                    let opencmd = printf("%s tmux -2 %s new-session -s %s \"%s\" &", g:rplugin_termcmd, tmuxcnf, g:rplugin_screensname, rcmd)
                 endif
             else
                 if g:rplugin_termcmd =~ "gnome-terminal" || g:rplugin_termcmd =~ "xfce4-terminal" || g:rplugin_termcmd =~ "terminal" || g:rplugin_termcmd =~ "iterm"
-                    let opencmd = printf("%s 'tmux -2 %s attach-session -d -t %s' &", g:rplugin_termcmd, tmuxcnf, b:screensname)
+                    let opencmd = printf("%s 'tmux -2 %s attach-session -d -t %s' &", g:rplugin_termcmd, tmuxcnf, g:rplugin_screensname)
                 else
-                    let opencmd = printf("%s tmux -2 %s attach-session -d -t %s &", g:rplugin_termcmd, tmuxcnf, b:screensname)
+                    let opencmd = printf("%s tmux -2 %s attach-session -d -t %s &", g:rplugin_termcmd, tmuxcnf, g:rplugin_screensname)
                 endif
             endif
         else
@@ -773,9 +841,9 @@ function StartR(whatr)
             let scrrc = RWriteScreenRC()
             " Some terminals want quotes (see screen.vim)
             if g:rplugin_termcmd =~ "gnome-terminal" || g:rplugin_termcmd =~ "xfce4-terminal" || g:rplugin_termcmd =~ "terminal" || g:rplugin_termcmd =~ "iterm"
-                let opencmd = printf("%s 'screen %s -d -RR -S %s %s' &", g:rplugin_termcmd, scrrc, b:screensname, rcmd)
+                let opencmd = printf("%s 'screen %s -d -RR -S %s %s' &", g:rplugin_termcmd, scrrc, g:rplugin_screensname, rcmd)
             else
-                let opencmd = printf("%s screen %s -d -RR -S %s %s &", g:rplugin_termcmd, scrrc, b:screensname, rcmd)
+                let opencmd = printf("%s screen %s -d -RR -S %s %s &", g:rplugin_termcmd, scrrc, g:rplugin_screensname, rcmd)
             endif
         endif
 
@@ -869,7 +937,7 @@ function StartObjectBrowser()
                     \ 'let g:rplugin_edpane = "' . g:rplugin_edpane . '"',
                     \ 'let g:rplugin_rpane = "' . g:rplugin_rpane . '"',
                     \ 'let b:objbrtitle = "' . b:objbrtitle . '"',
-                    \ 'let b:screensname = "' . b:screensname . '"',
+                    \ 'let g:rplugin_screensname = "' . g:rplugin_screensname . '"',
                     \ 'let b:rscript_buffer = "' . bufname("%") . '"',
                     \ 'set filetype=rbrowser',
                     \ 'let $VIMINSTANCEID="' . $VIMINSTANCEID . '"',
@@ -1001,7 +1069,7 @@ function StartObjectBrowser()
     else
         " Copy the values of some local variables that will be inherited
         let g:tmp_objbrtitle = b:objbrtitle
-        let g:tmp_screensname = b:screensname
+        let g:tmp_screensname = g:rplugin_screensname
         let g:tmp_curbufname = bufname("%")
 
         if g:vimrplugin_conqueplugin == 1
@@ -1033,7 +1101,7 @@ function StartObjectBrowser()
             unlet g:tmp_conqueshell
             unlet g:tmp_conque_bufname
         endif
-        let b:screensname = g:tmp_screensname
+        let g:rplugin_screensname = g:tmp_screensname
         let b:objbrtitle = g:tmp_objbrtitle
         let b:rscript_buffer = g:tmp_curbufname
         unlet g:tmp_objbrtitle
@@ -1153,8 +1221,10 @@ function RFormatCode() range
     elseif wco > 180
         let wco = 180
     endif
+    call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
     exe "Py SendToVimCom('formatR::tidy.source(\"" . $VIMRPLUGIN_TMPDIR . "/unformatted_code" . "\", file = \"" . $VIMRPLUGIN_TMPDIR . "/formatted_code\", width.cutoff = " . wco . ")')"
-    if g:rplugin_lastrpl == "R is busy." || g:rplugin_lastrpl == "UNKNOWN" || g:rplugin_lastrpl =~ "^Error" || g:rplugin_lastrpl == "INVALID" || g:rplugin_lastrpl == "ERROR" || g:rplugin_lastrpl == "EMPTY"
+    let g:rplugin_lastrpl = ReadEvalReply()
+    if g:rplugin_lastrpl == "R is busy." || g:rplugin_lastrpl == "UNKNOWN" || g:rplugin_lastrpl =~ "^Error" || g:rplugin_lastrpl == "INVALID" || g:rplugin_lastrpl == "ERROR" || g:rplugin_lastrpl == "EMPTY" || g:rplugin_lastrpl == "No reply"
         call RWarningMsg(g:rplugin_lastrpl)
         return
     endif
@@ -1171,18 +1241,20 @@ function RInsert(cmd)
             return
         endif
     endif
-    exe "Py SendToVimCom('paste(capture.output(" . a:cmd . "), collapse = \"\\\\n\")')"
-    if g:rplugin_lastrpl == "R is busy." || g:rplugin_lastrpl == "UNKNOWN" || g:rplugin_lastrpl =~ "^Error" || g:rplugin_lastrpl == "INVALID" || g:rplugin_lastrpl == "ERROR" || g:rplugin_lastrpl == "EMPTY" || g:rplugin_lastrpl == "RTYPE"
+    call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
+    call delete($VIMRPLUGIN_TMPDIR . "/Rinsert")
+    exe "Py SendToVimCom('capture.output(" . a:cmd . ', file = "' . $VIMRPLUGIN_TMPDIR . "/Rinsert" . '")' . "')"
+    let g:rplugin_lastrpl = ReadEvalReply()
+    if g:rplugin_lastrpl == "R is busy." || g:rplugin_lastrpl == "UNKNOWN" || g:rplugin_lastrpl =~ "^Error" || g:rplugin_lastrpl == "INVALID" || g:rplugin_lastrpl == "ERROR" || g:rplugin_lastrpl == "EMPTY" || g:rplugin_lastrpl == "No reply"
         call RWarningMsg(g:rplugin_lastrpl)
     else
-        call append(".", split(g:rplugin_lastrpl, "\n"))
+        silent exe "read " . g:rplugin_esc_tmpdir . "/Rinsert"
     endif
 endfunction
 
 " Function to send commands
 " return 0 on failure and 1 on success
 function SendCmdToR(cmd)
-    Py SendToVimCom("\x09Set R as busy [SendCmdToR()]")
     if g:vimrplugin_ca_ck
         let cmd = "\001" . "\013" . a:cmd
     else
@@ -1217,17 +1289,12 @@ function SendCmdToR(cmd)
         return 1
     elseif g:vimrplugin_conqueplugin
         if !exists("b:conque_bufname")
-            if g:vimrplugin_by_vim_instance
-                if exists("g:rplugin_conqueshell")
-                    let b:conqueshell = g:rplugin_conqueshell
-                    let b:conque_bufname = g:rplugin_conque_bufname
-                    let b:objbrtitle = g:rplugin_objbrtitle
-                else
-                    call RWarningMsg("This buffer does not have a Conque Shell yet.")
-                    return 0
-                endif
+            if exists("g:rplugin_conqueshell")
+                let b:conqueshell = g:rplugin_conqueshell
+                let b:conque_bufname = g:rplugin_conque_bufname
+                let b:objbrtitle = g:rplugin_objbrtitle
             else
-                call RWarningMsg("Did you already start R?")
+                call RWarningMsg("This buffer does not have a Conque Shell yet.")
                 return 0
             endif
         endif
@@ -1287,9 +1354,9 @@ function SendCmdToR(cmd)
     " Send the command to R running in an external terminal emulator
     let str = substitute(cmd, "'", "'\\\\''", "g")
     if g:vimrplugin_tmux
-        let scmd = "tmux set-buffer '" . str . "\<C-M>' && tmux paste-buffer -t " . b:screensname . '.0'
+        let scmd = "tmux set-buffer '" . str . "\<C-M>' && tmux paste-buffer -t " . g:rplugin_screensname . '.0'
     else
-        let scmd = 'screen -S ' . b:screensname . " -X stuff '" . str . "\<C-M>'"
+        let scmd = 'screen -S ' . g:rplugin_screensname . " -X stuff '" . str . "\<C-M>'"
     endif
     let rlog = system(scmd)
     if v:shell_error
@@ -1830,14 +1897,16 @@ function BuildROmniList(env, packlist)
 
     call delete($VIMRPLUGIN_TMPDIR . "/vimbol_finished")
     if a:env =~ "GlobalEnv"
+        call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
         exe "Py SendToVimCom('" . omnilistcmd . "')"
         if g:rplugin_vimcomport == 0
             sleep 500m
             let b:needsnewomnilist = 1
             return
         endif
-        if g:rplugin_lastrpl == "R is busy."
-            call RWarningMsg("R is busy.")
+        let g:rplugin_lastrpl = ReadEvalReply()
+        if g:rplugin_lastrpl == "R is busy." || g:rplugin_lastrpl == "No reply"
+            call RWarningMsg(g:rplugin_lastrpl)
             let b:needsnewomnilist = 1
             sleep 800m
             return
@@ -2005,7 +2074,7 @@ function RGetClassFor(rkeyword)
         let begin += 1
         let line = strpart(line, begin)
         let line = substitute(line, '^\s*', '', "")
-        if line =~ '^\k*\s*(' || line =~ '^\k*\s*=\s*\k*\s*('
+        if (line =~ '^\k*\s*(' || line =~ '^\k*\s*=\s*\k*\s*(') && line !~ '[.*('
             let idx = 0
             while line[idx] != '('
                 let idx += 1
@@ -2019,6 +2088,31 @@ function RGetClassFor(rkeyword)
                     let nparen += 1
                 else
                     if line[idx] == ')'
+                        let nparen -= 1
+                    endif
+                endif
+                let idx += 1
+                if idx == len
+                    let lnum += 1
+                    let line = line . substitute(getline(lnum), '#.*', '', "")
+                    let len = strlen(line)
+                endif
+            endwhile
+            let classfor = strpart(line, 0, idx)
+        elseif line =~ '^\(\k\|\$\)*\s*[' || line =~ '^\(k\|\$\)*\s*=\s*\(\k\|\$\)*\s*[.*('
+            let idx = 0
+            while line[idx] != '['
+                let idx += 1
+            endwhile
+            let idx += 1
+            let nparen = 1
+            let len = strlen(line)
+            let lnum = line(".")
+            while nparen != 0
+                if line[idx] == '['
+                    let nparen += 1
+                else
+                    if line[idx] == ']'
                         let nparen -= 1
                     endif
                 endif
@@ -2086,6 +2180,7 @@ function ShowRDoc(rkeyword, package, getclass)
     call SetRTextWidth()
 
     let g:rplugin_lastrpl = "R did not reply."
+    call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
     if classfor == "" && a:package == ""
         exe 'Py SendToVimCom("vim.help(' . "'" . a:rkeyword . "', " . g:rplugin_htw . 'L)")'
     elseif a:package != ""
@@ -2095,6 +2190,7 @@ function ShowRDoc(rkeyword, package, getclass)
         let classfor = substitute(classfor, '"', '\\"', "g")
         exe 'Py SendToVimCom("vim.help(' . "'" . a:rkeyword . "', " . g:rplugin_htw . "L, " . classfor . ")". '")'
     endif
+    let g:rplugin_lastrpl = ReadEvalReply()
     if g:rplugin_lastrpl != "VIMHELP"
         if g:rplugin_lastrpl =~ "^MULTILIB"
             echo "The topic '" . a:rkeyword . "' was found in more than one library:"
@@ -2104,7 +2200,9 @@ function ShowRDoc(rkeyword, package, getclass)
             endfor
             let chn = input("Please, select one of them: ")
             if chn > 0 && chn < len(libs)
+                call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
                 exe 'Py SendToVimCom("vim.help(' . "'" . a:rkeyword . "', " . g:rplugin_htw . "L, package='" . libs[chn] . "')" . '")'
+                let g:rplugin_lastrpl = ReadEvalReply()
             endif
         else
             call RWarningMsg(g:rplugin_lastrpl)
@@ -2113,7 +2211,7 @@ function ShowRDoc(rkeyword, package, getclass)
     endif
 
     " Local variables that must be inherited by the rdoc buffer
-    let g:tmp_screensname = b:screensname
+    let g:tmp_screensname = g:rplugin_screensname
     let g:tmp_objbrtitle = b:objbrtitle
     if g:vimrplugin_conqueplugin == 1
         let g:tmp_conqueshell = b:conqueshell
@@ -2156,7 +2254,7 @@ function ShowRDoc(rkeyword, package, getclass)
 
     " Inheritance of local variables from the script buffer
     let b:objbrtitle = g:tmp_objbrtitle
-    let b:screensname = g:tmp_screensname
+    let g:rplugin_screensname = g:tmp_screensname
     unlet g:tmp_objbrtitle
     if g:vimrplugin_conqueplugin == 1
         let b:conqueshell = g:tmp_conqueshell
@@ -2298,9 +2396,11 @@ function RRealAction(rcmd)
 endfunction
 
 function RAction(rcmd)
-    Py SendToVimCom("\x08Stop updating info [RAction()]")
+    if !g:vimrplugin_external_ob
+        Py SendToVimCom("\x08Stop updating info [RAction()]")
+    endif
     call RRealAction(a:rcmd)
-    if v:servername != ""
+    if !g:vimrplugin_external_ob && v:servername != ""
         exe 'Py SendToVimCom("\x07' . v:servername . '")'
     endif
 endfunction
@@ -2663,8 +2763,12 @@ function MakeRMenu()
         vmenu <silent> R.Edit.Indent\ (selected\ lines)<Tab>= =
         nmenu <silent> R.Edit.Indent\ (whole\ buffer)<Tab>gg=G gg=G
         menu R.Edit.-Sep72- <nul>
-        call RCreateMenuItem("ni", 'Edit.Comment/Uncomment\ (line/sel)', '<Plug>RCommentLine', 'xx', ':call RComment("normal")')
-        call RCreateMenuItem("v", 'Edit.Comment/Uncomment\ (line/sel)', '<Plug>RCommentLine', 'xx', ':call RComment("selection")')
+        call RCreateMenuItem("ni", 'Edit.Toggle\ comment\ (line/sel)', '<Plug>RToggleComment', 'xx', ':call RComment("normal")')
+        call RCreateMenuItem("v", 'Edit.Toggle\ comment\ (line/sel)', '<Plug>RToggleComment', 'xx', ':call RComment("selection")')
+        call RCreateMenuItem("ni", 'Edit.Comment\ (line/sel)', '<Plug>RToggleComment', 'xc', ':call RComment("normal")')
+        call RCreateMenuItem("v", 'Edit.Comment\ (line/sel)', '<Plug>RToggleComment', 'xc', ':call RComment("selection")')
+        call RCreateMenuItem("ni", 'Edit.Uncomment\ (line/sel)', '<Plug>RToggleComment', 'xu', ':call RComment("normal")')
+        call RCreateMenuItem("v", 'Edit.Uncomment\ (line/sel)', '<Plug>RToggleComment', 'xu', ':call RComment("selection")')
         call RCreateMenuItem("ni", 'Edit.Add/Align\ right\ comment\ (line,\ sel)', '<Plug>RRightComment', ';', ':call MovePosRCodeComment("normal")')
         call RCreateMenuItem("v", 'Edit.Add/Align\ right\ comment\ (line,\ sel)', '<Plug>RRightComment', ';', ':call MovePosRCodeComment("selection")')
         if &filetype == "rnoweb" || g:vimrplugin_never_unmake_menu
@@ -2710,7 +2814,6 @@ function MakeRMenu()
     amenu R.Help\ (plugin).Options.Vim\ as\ pager\ for\ R\ help :help vimrplugin_vimpager<CR>
     if !has("gui_win32")
         amenu R.Help\ (plugin).Options.Terminal\ emulator :help vimrplugin_term<CR>
-        amenu R.Help\ (plugin).Options.Number\ of\ R\ processes :help vimrplugin_nosingler<CR>
         amenu R.Help\ (plugin).Options.Screen\ configuration :help vimrplugin_noscreenrc<CR>
         amenu R.Help\ (plugin).Options.Screen\ plugin :help vimrplugin_screenplugin<CR>
     endif
@@ -2853,8 +2956,12 @@ endfunction
 function RCreateEditMaps()
     " Edit
     "-------------------------------------
-    call RCreateMaps("ni", '<Plug>RCommentLine',   'xx', ':call RComment("normal")')
-    call RCreateMaps("v", '<Plug>RCommentLine',   'xx', ':call RComment("selection")')
+    call RCreateMaps("ni", '<Plug>RToggleComment',   'xx', ':call RComment("normal")')
+    call RCreateMaps("v", '<Plug>RToggleComment',   'xx', ':call RComment("selection")')
+    call RCreateMaps("ni", '<Plug>RSimpleComment',   'xc', ':call RSimpleCommentLine("normal")')
+    call RCreateMaps("v", '<Plug>RSimpleComment',   'xc', ':call RSimpleCommentLine("selection")')
+    call RCreateMaps("ni", '<Plug>RSimpleUnComment',   'xu', ':call RSimpleUncommentLine("normal")')
+    call RCreateMaps("v", '<Plug>RSimpleUnComment',   'xu', ':call RSimpleUncommentLine("selection")')
     call RCreateMaps("ni", '<Plug>RRightComment',   ';', ':call MovePosRCodeComment("normal")')
     call RCreateMaps("v", '<Plug>RRightComment',    ';', ':call MovePosRCodeComment("selection")')
     " Replace 'underline' with '<-'
@@ -2903,9 +3010,11 @@ function RCreateSendMaps()
     call RCreateMaps('ni0', '<Plug>RDSendLine', 'd', ':call SendLineToR("down")')
     call RCreateMaps('i', '<Plug>RSendLAndOpenNewOne', 'q', ':call SendLineToR("newline")')
     nmap <LocalLeader>r<Left> :call RSendPartOfLine("left", 0)<CR>
-    imap <LocalLeader>r<Left> <Esc>l:call RSendPartOfLine("left", 0)<CR>i
     nmap <LocalLeader>r<Right> :call RSendPartOfLine("right", 0)<CR>
-    imap <LocalLeader>r<Right> <Esc>l:call RSendPartOfLine("right", 0)<CR>i
+    if g:vimrplugin_insert_mode_cmds
+        imap <buffer><silent> <LocalLeader>r<Left> <Esc>l:call RSendPartOfLine("left", 0)<CR>i
+        imap <buffer><silent> <LocalLeader>r<Right> <Esc>l:call RSendPartOfLine("right", 0)<CR>i
+    endif
 
     " For compatibility with Johannes Ranke's plugin
     if g:vimrplugin_map_r == 1
@@ -2996,6 +3105,9 @@ endif
 if has("win32") || has("win64")
     let g:rplugin_home = substitute(g:rplugin_home, "\\", "/", "g")
     let g:rplugin_uservimfiles = substitute(g:rplugin_uservimfiles, "\\", "/", "g")
+    if $USERNAME != ""
+        let g:rplugin_userlogin = substitute($USERNAME, " ", "", "g")
+    endif
 endif
 
 if isdirectory("/tmp")
@@ -3020,7 +3132,7 @@ endif
 " Variables whose default value is fixed
 call RSetDefaultValue("g:vimrplugin_map_r",             0)
 call RSetDefaultValue("g:vimrplugin_allnames",          0)
-call RSetDefaultValue("g:vimrplugin_rmhidden",          1)
+call RSetDefaultValue("g:vimrplugin_rmhidden",          0)
 call RSetDefaultValue("g:vimrplugin_assign",            1)
 call RSetDefaultValue("g:vimrplugin_assign_map",    "'_'")
 call RSetDefaultValue("g:vimrplugin_rnowebchunk",       1)
@@ -3029,6 +3141,7 @@ call RSetDefaultValue("g:vimrplugin_openpdf",           0)
 call RSetDefaultValue("g:vimrplugin_openpdf_quietly",   0)
 call RSetDefaultValue("g:vimrplugin_openhtml",          0)
 call RSetDefaultValue("g:vimrplugin_i386",              0)
+call RSetDefaultValue("g:vimrplugin_Rterm",             0)
 call RSetDefaultValue("g:vimrplugin_screenvsplit",      0)
 call RSetDefaultValue("g:vimrplugin_conquevsplit",      0)
 call RSetDefaultValue("g:vimrplugin_conqueplugin",      0)
@@ -3038,7 +3151,6 @@ call RSetDefaultValue("g:vimrplugin_tmux",              1)
 call RSetDefaultValue("g:vimrplugin_vimshell",          0)
 call RSetDefaultValue("g:vimrplugin_listmethods",       0)
 call RSetDefaultValue("g:vimrplugin_specialplot",       0)
-call RSetDefaultValue("g:vimrplugin_nosingler",         0)
 call RSetDefaultValue("g:vimrplugin_noscreenrc",        0)
 call RSetDefaultValue("g:vimrplugin_notmuxconf",        0)
 call RSetDefaultValue("g:vimrplugin_only_in_tmux",      0)
@@ -3049,7 +3161,6 @@ call RSetDefaultValue("g:vimrplugin_objbr_w",          40)
 call RSetDefaultValue("g:vimrplugin_external_ob",       0)
 call RSetDefaultValue("g:vimrplugin_buildwait",        60)
 call RSetDefaultValue("g:vimrplugin_indent_commented",  1)
-call RSetDefaultValue("g:vimrplugin_by_vim_instance",   0)
 call RSetDefaultValue("g:vimrplugin_never_unmake_menu", 0)
 call RSetDefaultValue("g:vimrplugin_vimpager",       "'tab'")
 call RSetDefaultValue("g:vimrplugin_latexcmd", "'pdflatex'")
@@ -3165,6 +3276,9 @@ if g:vimrplugin_external_ob == 1
     let g:vimrplugin_objbr_place = substitute(g:vimrplugin_objbr_place, "script", "console", "")
 endif
 
+if g:vimrplugin_tmux && g:vimrplugin_objbr_place =~ "console"
+    let g:vimrplugin_external_ob = 1
+endif
 
 if has("win32") || has("win64")
     call RSetDefaultValue("g:vimrplugin_conquesleep", 200)
@@ -3338,6 +3452,16 @@ if has("win32") || has("win64")
     if !exists("g:vimrplugin_sleeptime")
         let g:vimrplugin_sleeptime = 0.02
     endif
+    if g:vimrplugin_Rterm
+        let g:rplugin_Rgui = substitute(g:rplugin_Rgui, "Rgui", "Rterm", "")
+    endif
+    if !exists("g:vimrplugin_R_window_title")
+        if g:vimrplugin_Rterm
+            let g:vimrplugin_R_window_title = "Rterm"
+        else
+            let g:vimrplugin_R_window_title = "R Console"
+        endif
+    endif
 endif
 
 " Are we in a Debian package? Is the plugin running for the first time?
@@ -3473,6 +3597,18 @@ let g:rplugin_lastrpl = ""
 let g:rplugin_ob_busy = 0
 let g:rplugin_hasRSFbutton = 0
 let g:rplugin_errlist = []
+let g:rplugin_screensname = substitute("vimrplugin-" . g:rplugin_userlogin . localtime() . g:rplugin_firstbuffer, '\W', '', 'g')
+
+if $VIMINSTANCEID == ""
+    let $VIMINSTANCEID = substitute(g:rplugin_firstbuffer . localtime(), '\W', '', 'g')
+endif
+
+if has("clientserver")
+    let g:rplugin_obsname_arg = "--servername " . toupper(substitute(substitute(expand("%:r"), '\W', '', 'g'), "_", "", "g"))
+else
+    let g:rplugin_obsname_arg = " "
+endif
+
 
 call SetRPath()
 

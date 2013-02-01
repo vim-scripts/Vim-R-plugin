@@ -131,8 +131,6 @@ function! RBrowserDoubleClick()
         exe 'Py SendToVimCom("' . "\005" . '-' . substitute(key, '\$', '-', "g") . '")'
         if g:rplugin_lastrpl == "R is busy."
             call RWarningMsg("R is busy.")
-        else
-            call UpdateOB("GlobalEnv")
         endif
     else
         let key = substitute(key, '\$', '-', "g") 
@@ -143,8 +141,6 @@ function! RBrowserDoubleClick()
         exe 'Py SendToVimCom("' . "\005" . key . '")'
         if g:rplugin_lastrpl == "R is busy."
             call RWarningMsg("R is busy.")
-        else
-            call UpdateOB("libraries")
         endif
     endif
 endfunction

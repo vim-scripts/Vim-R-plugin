@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 0.9.9.1
+Version: 0.9.9.2
 For Vim version 7.3
 
  1. Overview                                    |r-plugin-overview|
@@ -132,7 +132,7 @@ following dependencies:
    Vim >= 7.3 with Python support.
    Tmux >= 1.5:     http://tmux.sourceforge.net
    Screen plugin:   http://www.vim.org/scripts/script.php?script_id=2711
-   vimcom = 0.9-5:  An R package.
+   vimcom = 0.9-7:  An R package.
 
    Suggests:~
    ncurses-term:  http://invisible-island.net/ncurses
@@ -209,7 +209,8 @@ show how the plugin will work on Linux in different conditions:
 
 
 Note: On Mac OS X the plugin will use AppleScript in both Vim and GVim unless
-vimrplugin_applescript = 0.
+vimrplugin_applescript = 0. Some user have reported more luck with iTerm than
+with the default Mac OS X terminal emulator.
 
 
 3.2.2. Windows~
@@ -247,7 +248,7 @@ to install external dependencies:
       find the file that matches exactly the version of Python that you
       installed.
 
-    * vimcom = 0.9-5: An R package, available on CRAN and installable with the
+    * vimcom = 0.9-7: An R package, available on CRAN and installable with the
       install.packages() command. The vimcom package creates a server on R to
       allow the communication with Vim. You certainly will want to put the
       following lines at the end of your Rprofile (usually at
@@ -444,7 +445,9 @@ Edit
   . Indent (selected lines)                              =
   . Indent (whole buffer)                             gg=G
   --------------------------------------------------------
-  . Comment/Uncomment (line, sel)                      \xx
+  . Toggle comment (line, sel)                         \xx
+  . Comment (line, sel)                                \xc
+  . Uncomment (line, sel)                              \xu
   . Add/Align right comment (line, sel)                 \;
   --------------------------------------------------------
   . Go (next R chunk)                                   gn
@@ -682,6 +685,10 @@ libraries, the library currently under the cursor line is detached.
 
 4.6. Commenting and uncommenting lines~
 
+You can add the comment character to the beginning of a line by typing
+<LocalLeader>xc and remove it with <LocalLeader>xu. For more sophisticated
+ways of commenting and uncommenting, see below.
+
 You can toggle the state of a line as either commented or uncommented by
 typing <LocalLeader>xx.
 
@@ -808,6 +815,12 @@ A sample detachable session could be:
 See |vimrplugin_only_in_tmux| if you always prefer starting Tmux before
 starting Vim, but sometimes forget to start Tmux.
 
+Note: The screen.vim plugin relies on the TERM environment variable starting
+with the string "screen" to decide whether to start a new Tmux session or to
+split the current one.  If you set the environment variable in your tmux.conf
+to something different, the screen.vim plugin will not know that it is already
+inside Tmux. See |screen-bootstrap| for details.
+
 
 4.9. GNU Screen usage~
 							     *r-plugin-screen*
@@ -894,18 +907,18 @@ indent the code below:
     class(x) <- c(if(ordered) "ordered", "factor")
 <
 
-5.5. Wrong message that "R is busy"~
+5.5. Wrong message that "R is busy" (Windows only)~
 
-When code is sent from Vim to R Console, the vimcom library sets the value of
-the internal variable "r_is_busy" to 1. The value is set back to 0 when any
-code is successfully evaluated. If you send invalid code to R, there will be
-no successful evaluation of code and, thus, the value of "r_is_busy" will
-remain set to 1. Then, if you try to update the object browser, see the R
-documentation for any function, or do other tasks that require the hidden
-evaluation of code by R, the vimcom library will refuse to do the tasks to
-avoid any risk of corrupting R's memory. It will tell Vim that "R is busy" and
-Vim will display this message. Everything should work as expected again after
-any valid code is executed in R Console.
+On Windows, when code is sent from Vim to R Console, the vimcom library sets
+the value of the internal variable "r_is_busy" to 1. The value is set back to
+0 when any code is successfully evaluated. If you send invalid code to R,
+there will be no successful evaluation of code and, thus, the value of
+"r_is_busy" will remain set to 1. Then, if you try to update the object
+browser, see the R documentation for any function, or do other tasks that
+require the hidden evaluation of code by R, the vimcom library will refuse to
+do the tasks to avoid any risk of corrupting R's memory. It will tell Vim that
+"R is busy" and Vim will display this message. Everything should work as
+expected again after any valid code is executed in R Console.
 
 
 5.6. Commands are sent twice on Mac OS X~
@@ -920,6 +933,7 @@ duplicated to R on Mac OS X.
 
 |vimrplugin_term|              External terminal to be used
 |vimrplugin_term_cmd|          Complete command to open an external terminal
+|vimrplugin_Rterm|             On Windows, use Rterm.exe
 |vimrplugin_assign|            Convert '_' into ' <- '
 |vimrplugin_assign_map|        Choose what to convert into ' <- '
 |vimrplugin_rnowebchunk|       Convert '<' into '<<>>=\n@' in Rnoweb files
@@ -929,8 +943,6 @@ duplicated to R on Mac OS X.
 |vimrplugin_vimpager|          Use Vim to see R documentation
 |vimrplugin_editor_w|          Minimum width of R script buffer
 |vimrplugin_help_w|            Desired width of R documentation buffer
-|vimrplugin_nosingler|         A single R process for all Vim instances
-|vimrplugin_by_vim_instance|   Each Vim instance runs its own R
 |vimrplugin_i386|              Use 32 bit version of R
 |vimrplugin_r_path|            Directory where R is
 |vimrplugin_r_args|            Arguments to pass to R
@@ -995,7 +1007,24 @@ Please, look at the manual of your terminal emulator to know how to call it.
 The last argument must be the one which precedes the command to be executed.
 
 
-6.2. Assignment operator and Rnoweb completion of code block~
+6.2. Use Rterm.exe on Windows~
+							  *r-plugin-Rterm.exe*
+If you rather prefer to use Rterm.exe than Rgui.exe, you have to set both the
+"Quick Edit Mode" and the "Insert mode" on either the Windows 7 PowerShell or
+the Windows XP Command Prompt (click on the title bar and choose
+"properties"). Then, you should put in your |vimrc|:
+>
+   let vimrplugin_Rterm = 1
+<
+Technical details: The plugin copies the code to be sent to R to the Windows
+clipboard and, then, sends the key strokes "Ctrl+V" to R Console window.
+However, neither the Windows 7 PowerShell nor the Windows XP Command Prompt
+has a keyboard shortcut to "paste". The solution is to set the "Quick Edit
+Mode" on either PowerShell or Command Prompt and to send a "Right click" to
+it.
+
+
+6.3. Assignment operator and Rnoweb completion of code block~
 							   *vimrplugin_assign*
 						       *vimrplugin_assign_map*
 						      *vimrplugin_rnowebchunk*
@@ -1018,7 +1047,7 @@ put in your |vimrc|:
    let vimrplugin_rnowebchunk = 0
 <
 
-6.3. Object Browser options~
+6.4. Object Browser options~
 						      *vimrplugin_objbr_place*
 							  *vimrplugin_objbr_w*
 						      *vimrplugin_external_ob*
@@ -1045,11 +1074,11 @@ emulator. In this case, the command <LocalLeader>rh will not work on the
 Object Browser (you will see the message "Cmd not available").
 
 
-6.4. Vim as pager for R help~
+6.5. Vim as pager for R help~
 							 *vimrplugin_vimpager*
 							 *vimrplugin_editor_w*
 							   *vimrplugin_help_w*
-6.4.1. Quick setup~
+6.5.1. Quick setup~
 
 If you do not want to see R documentation in a Vim's buffer, put in your
 |vimrc|:
@@ -1062,7 +1091,7 @@ the R console, put in your .Rprofile:
    options(pager = "vim -c 'set ft=rdoc' -")
 <
 
-6.4.2. Details and other options:~
+6.5.2. Details and other options:~
 
 The plugin key bindings will remain active in the documentation buffer, and,
 thus, you will be able to send commands to R as you do while editing an R
@@ -1091,39 +1120,6 @@ values to some variables in your |vimrc|, as in the example:
    let vimrplugin_editor_w = 80
    let vimrplugin_editor_h = 60
 <
-
-6.5. Number of R processes (Linux/Unix only)~
-							*vimrplugin_nosingler*
-						  *vimrplugin_by_vim_instance*
-6.5.1 Using (G)Vim without the screen.vim plugin~
-
-By default, all buffers of all (G)Vim instances send code to the same R process.
-If you prefer that each Vim buffer uses its own R process, put the following
-option in your |vimrc|:
->
-   let vimrplugin_nosingler = 1
-<
-If you prefer that each Vim instance calls its own R process and all the
-instance's buffers send code to this R process while other Vim instances send
-code to other R processes then put the following in your |vimrc|:
->
-   let vimrplugin_by_vim_instance = 1
->
-The |vimrplugin_by_vim_instance| option requires that Vim is acting as a
-command server because the variable |v:servername| is used to make the name of
-the Tmux session which will run R. By default, GVim runs as server, but Vim
-does not. Hence, if you are using Vim you have either to start Vim with the
-argument --servername or use the screen.vim plugin which tries to restart Vim
-with the --servername argument. If you want to use more than nine GVim
-instances you will have to use the --servername argument because screen will
-not differentiate between names like "GVIM1" and "GVIM10".
-
-6.5.2 Using the screen.vim plugin~
-
-Both options are ignored when using Vim in a terminal emulator and using the
-screen.vim plugin. The plugin behaves as if the |vimrplugin_by_instance| was
-enabled.
-
 
 6.6. Use 32 bit version of R (Windows and Mac OS X only)~
 							     *vimrplugin_i386*
@@ -1430,11 +1426,13 @@ write R packages or Sweave files.  For example, if <LocalLeader> is set to the
 '\' character, typing '\dQuote' in a .Rd file tries to send the command!
 
 The option vimrplugin_insert_mode_cmds disables commands in insert mode.  To
-use it, add the following in your |vimrc|:
+use it, add the following to your |vimrc|:
 >
    let g:vimrplugin_insert_mode_cmds = 0       
 <
 The default value is 1, for consistency with earlier versions.
+
+See also: |r-plugin-localleader|.
 
 6.25. Show/remove hidden objects~
 							 *vimrplugin_allnames*
@@ -1485,7 +1483,9 @@ RD, "cursor down"; RED, both "echo" and "down"):
    RClearConsole
 
    Edit R code~
-   RCommentLine
+   RSimpleComment
+   RSimpleUnComment
+   RToggleComment
    RRightComment
    RCompleteArgs
    RIndent
@@ -2098,10 +2098,6 @@ Then, you will be able to scroll the R Console buffer at any time by pressing th
 <F5> key in Normal mode. Of course, you should replace <F5> with your
 preferred key.
 
-With the Conque Shell, the option |vimrplugin_nosingler| is ignored, and, by
-default, the object browser window will be created at the right of the R
-Console window.
-
 The same highlighting scheme used for .Rout files is applied to the R Console
 when using the Conque Shell plugin to run R inside a Vim's buffer. For one
 hand, we do not need to highlight R commands in the Console if they were sent
@@ -2132,6 +2128,15 @@ argument. Example:
 ==============================================================================
 							       *r-plugin-news*
 10. News~
+
+0.9.9.2 (2013-02-01)
+
+ * Update vimcom version requirement to 0.9-7 (fix incompatibility with tcltk
+   package on Unix).
+ * Change the default value of vimrplugin_rmhidden to 0.
+ * New option for Windows: vimrplugin_Rterm.
+ * New simpler un/comment commands: <LocalLeader>xc and <LocalLeader>xu.
+ * Remove options vimrplugin_nosingler and vimrplugin_by_vim_instance.
 
 0.9.9.1 (2012-12-11)
 

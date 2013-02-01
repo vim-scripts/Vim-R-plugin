@@ -49,7 +49,7 @@ endif
 
 
 " Initialize some local variables if Conque shell was already started
-if (g:vimrplugin_by_vim_instance || g:vimrplugin_nosingler == 0) && exists("g:rplugin_objbrtitle")
+if exists("g:rplugin_objbrtitle")
   if g:vimrplugin_conqueplugin
     let b:conqueshell = g:rplugin_conqueshell
     let b:conque_bufname = g:rplugin_conque_bufname
@@ -76,49 +76,10 @@ unlet b:bname
 " Special screenrc file
 let b:scrfile = " "
 
-if g:vimrplugin_nosingler == 1
-  " Make a random name for the screen session
-  let b:screensname = "vimrplugin-" . g:rplugin_userlogin . "-" . localtime()
-else
-  " Make a unique name for the screen session
-  let b:screensname = "vimrplugin-" . g:rplugin_userlogin
-endif
-
-" Make a unique name for the screen process for each Vim instance:
-if g:vimrplugin_by_vim_instance == 1
-  let s:sname = substitute(v:servername, " ", "-", "g")
-  if s:sname == "" && g:vimrplugin_conqueplugin == 0
-    call RWarningMsg("The option vimrplugin_by_vim_instance requires a servername. Please read the documentation.")
-    let g:vimrplugin_by_vim_instance = 0
-    sleep 2
-  else
-    " For screen GVIM and GVIM1 are the same string.
-    let s:sname = substitute(s:sname, "GVIM$", "GVIM0", "g")
-    let b:screensname = "vimrplugin-" . g:rplugin_userlogin . "-" . s:sname
-  endif
-  unlet s:sname
-endif
-
 if exists("g:rplugin_firstbuffer") && g:rplugin_firstbuffer == ""
     " The file global_r_plugin.vim was copied to ~/.vim/plugin
     let g:rplugin_firstbuffer = expand("%:p")
 endif
-
-if g:vimrplugin_screenplugin
-    let s:uniquename = b:screensname . g:rplugin_firstbuffer
-else
-    let s:uniquename = b:screensname
-endif
-let s:uniquename = substitute(s:uniquename, '\W', '', 'g')
-let $VIMINSTANCEID = $VIMRPLUGIN_TMPDIR . "/" . s:uniquename . "-port"
-let $VIMINSTANCEID = substitute($VIMINSTANCEID, ' ', '', 'g')
-
-if has("clientserver")
-    let g:rplugin_obsname_arg = "--servername " . toupper(substitute(substitute(expand("%:r"), '\W', '', 'g'), "_", "", "g"))
-else
-    let g:rplugin_obsname_arg = " "
-endif
-unlet s:uniquename
 
 let g:rplugin_lastft = &filetype
 
