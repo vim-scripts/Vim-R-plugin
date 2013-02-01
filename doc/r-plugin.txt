@@ -2129,9 +2129,9 @@ argument. Example:
 							       *r-plugin-news*
 10. News~
 
-0.9.9.2 (2013-01-31)
+0.9.9.2 (2013-02-01)
 
- * Update vimcom version requirement to 0.9-6 (fix incompatibility with tcltk
+ * Update vimcom version requirement to 0.9-7 (fix incompatibility with tcltk
    package on Unix).
  * Change the default value of vimrplugin_rmhidden to 0.
  * New option for Windows: vimrplugin_Rterm.
