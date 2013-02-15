@@ -2,14 +2,14 @@
 " Language:	Rrst
 " Author:	Jakson Alves de Aquino <jalvesaq@gmail.com>
 " URL:		http://www.vim.org/scripts/script.php?script_id=2628
-" Last Change:	Thu Oct 11, 2012  10:52PM
+" Last Change:	Fri Feb 15, 2013  08:06PM
 
 
 " Only load this indent file when no other was loaded.
-if exists("b:did_rrst_indent")
+if exists("b:did_indent")
   finish
 endif
-let b:did_rrst_indent = 1
+let b:did_indent = 1
 
 
 

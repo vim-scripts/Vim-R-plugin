@@ -2,14 +2,14 @@
 " Language:	R Documentation (Help), *.Rd
 " Author:	Jakson Alves de Aquino <jalvesaq@gmail.com>
 " URL:		http://www.vim.org/scripts/script.php?script_id=2628
-" Last Change:	Sun Feb 06, 2011  04:22PM
+" Last Change:	Fri Feb 15, 2013  08:06PM
 
 
 " Only load this indent file when no other was loaded.
-if exists("b:did_rhelp_indent")
+if exists("b:did_indent")
     finish
 endif
-let b:did_rhelp_indent = 1
+let b:did_indent = 1
 
 setlocal indentkeys=0{,0},:,!^F,o,O,e
 setlocal indentexpr=GetRHelpIndent()
