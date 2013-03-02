@@ -40,6 +40,8 @@ runtime r-plugin/common_global.vim
 " defined after the global ones:
 runtime r-plugin/common_buffer.vim
 
+setlocal iskeyword=@,48-57,_,.
+
 " Prepare R documentation output to be displayed by Vim
 function! FixRdoc()
     let lnr = line("$")

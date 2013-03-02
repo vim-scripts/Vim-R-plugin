@@ -34,6 +34,7 @@ set cpo&vim
 runtime ftplugin/tex_latexSuite.vim
 runtime ftplugin/tex_LatexBox.vim
 let b:main_tex_file = expand("%:p")
+setlocal iskeyword=@,48-57,_,.
 
 " Enable syntax highlight of LaTeX errors in R Console (if using Conque
 " Shell)

@@ -40,6 +40,8 @@ runtime r-plugin/common_buffer.vim
 setlocal noswapfile
 setlocal buftype=nofile
 setlocal nowrap
+setlocal iskeyword=@,48-57,_,.
+
 if g:vimrplugin_tmux && g:vimrplugin_screenplugin
     let showmarks_enable = 0
 endif

@@ -49,6 +49,8 @@ endif
 " need be defined after the global ones:
 runtime r-plugin/common_buffer.vim
 
+setlocal iskeyword=@,48-57,_,.
+
 " Run R CMD BATCH on current file and load the resulting .Rout in a split
 " window
 function! ShowRout()

@@ -43,6 +43,8 @@ endif
 " defined after the global ones:
 runtime r-plugin/common_buffer.vim
 
+setlocal iskeyword=@,48-57,_,.
+
 "==========================================================================
 " Key bindings and menu items
 
