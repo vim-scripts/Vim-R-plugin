@@ -182,7 +182,11 @@ function! RSweave()
     update
     let b:needsnewomnilist = 1
     call RSetWD()
-    call SendCmdToR('Sweave("' . expand("%:t") . '")')
+    if exists("g:vimrplugin_sweaveargs")
+        call SendCmdToR('Sweave("' . expand("%:t") . '", ' . g:vimrplugin_sweaveargs . ')')
+    else
+        call SendCmdToR('Sweave("' . expand("%:t") . '")')
+    endif
 endfunction
 
 function! ROpenPDF()
