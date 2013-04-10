@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 0.9.9.2
+Version: 0.9.9.3
 For Vim version 7.3
 
  1. Overview                                    |r-plugin-overview|
@@ -132,7 +132,7 @@ following dependencies:
    Vim >= 7.3 with Python support.
    Tmux >= 1.5:     http://tmux.sourceforge.net
    Screen plugin:   http://www.vim.org/scripts/script.php?script_id=2711
-   vimcom = 0.9-7:  An R package.
+   vimcom = 0.9-8:  An R package.
 
    Suggests:~
    ncurses-term:  http://invisible-island.net/ncurses
@@ -248,7 +248,7 @@ to install external dependencies:
       find the file that matches exactly the version of Python that you
       installed.
 
-    * vimcom = 0.9-7: An R package, available on CRAN and installable with the
+    * vimcom = 0.9-8: An R package, available on CRAN and installable with the
       install.packages() command. The vimcom package creates a server on R to
       allow the communication with Vim. You certainly will want to put the
       following lines at the end of your Rprofile.
@@ -973,6 +973,7 @@ duplicated to R on Mac OS X.
 |vimrplugin_insert_mode_cmds|  Allow R commands in insert mode.
 |vimrplugin_allnames|          Show names which begin with a dot
 |vimrplugin_rmhidden|          Remove hidden objects from R workspace.
+|vimrplugin_source|            Source additional scripts.
 
 
 6.1. Terminal emulator (Linux/Unix only)~
@@ -1450,6 +1451,16 @@ you prefer to remove only visible objects, put in your |vimrc|:
    let g:vimrplugin_rmhidden = 0
 <
 
+6.26. Source additional scripts~
+							   *vimrplugin_source*
+This variable should contain a comma separated list of Vim scripts to be
+sourced by the Vim-R-plugin. These scripts may provide additional
+functionality and/or change the behavior of the Vim-R-plugin. If you have such
+scripts, put in your |vimrc|:
+>
+   let vimrplugin_source = "~/path/to/MyScript.vim,/path/to/AnotherScript.vim"
+<
+
 ==============================================================================
 						       *r-plugin-key-bindings*
 7. Custom key bindings~
@@ -1592,6 +1603,8 @@ you can create a shortcut to it by following the example:
 >
    map <silent> <LocalLeader>s :call SendCmdToR("search()")
 <
+See also: |vimrplugin_source|.
+
 
 ==============================================================================
 							      *r-plugin-files*
@@ -1709,8 +1722,9 @@ The snipMate plugin does not come with snippets for R, but you can copy the
 files r.snippets and rmd.snippets that ship with the Vim-R-plugin (look at the
 r-plugin directory) to the snippets directory. The files have only a few
 snippets, but they will help you to get started. If you usually edit rnoweb
-files, you may also want to create an rnoweb.snippet by concatenating both
-tex.snippets and r.snippets.
+files, you may also want to create an rnoweb.snippets by concatenating both
+tex.snippets and r.snippets. If you edit R documentation, you may want to
+create an rhelp.snippets
 
 
 9.5. Easier key bindings for most used commands~
@@ -2151,11 +2165,12 @@ information: |latex-box-FAQ|.
 							       *r-plugin-news*
 10. News~
 
-0.9.9.3 (2013-03-02)
+0.9.9.3 (2013-04-09)
 
  * Minor bug fixes.
+ * New option: vimrplugin_source.
 
-0.9.9.2 (2013-03-07)
+0.9.9.2 (2013-02-01)
 
  * Update vimcom version requirement to 0.9-7 (fix incompatibility with tcltk
    package on Unix).
