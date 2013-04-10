@@ -166,6 +166,7 @@ def StartRPy():
     else:
         Rterm = False
     rpath = vim.eval("g:rplugin_Rgui")
+    rpath = rpath.replace("\\", "\\\\")
     rargs = ['"' + rpath + '"']
     r_args = vim.eval("b:rplugin_r_args")
     if r_args != " ":
