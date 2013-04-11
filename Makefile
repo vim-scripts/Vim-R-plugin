@@ -29,7 +29,7 @@
 
 
 PLUGINHOME=`pwd`
-PLUGINVERSION=0.9.9.2
+PLUGINVERSION=0.9.9.3
 DEBIANTIME=`date -R`
 PLUGINRELEASEDATE=`date +"%Y-%m-%d"`
 VIM2HTML=/usr/local/share/vim/vim73/doc/vim2html.pl 

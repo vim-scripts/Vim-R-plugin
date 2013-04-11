@@ -43,7 +43,9 @@ Cryptic error message are bugs... Please report them at:
     https://github.com/jcfaria/Vim-R-plugin/issues
 
 We do not plan to take the initiative of writing code for new features, but
-patches and git pull requests are welcome.
+patches and git pull requests are welcome. If you want a feature that only few
+people might be interested in, you can write a script to be sourced by the
+Vim-R-plugin (see |vimrplugin_source|).
 
 
 ==============================================================================
@@ -2165,7 +2167,7 @@ information: |latex-box-FAQ|.
 							       *r-plugin-news*
 10. News~
 
-0.9.9.3 (2013-04-09)
+0.9.9.3 (2013-04-11)
 
  * Minor bug fixes.
  * New option: vimrplugin_source.
