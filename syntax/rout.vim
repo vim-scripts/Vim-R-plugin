@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:    R output Files
 " Maintainer:  Jakson Aquino <jalvesaq@gmail.com>
-" Last Change: Fri Jul 06, 2012  12:33PM
+" Last Change: Tue Feb 26, 2013  01:13PM
 "
 
 " Version Clears: {{{1
@@ -16,6 +16,8 @@ endif
 if !exists("syn_rout_latex")
     let g:syn_rout_latex = 0
 endif
+
+setlocal iskeyword=@,48-57,_,.
 
 syn case match
 

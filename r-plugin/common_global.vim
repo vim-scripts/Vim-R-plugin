@@ -3058,6 +3058,19 @@ function SetRPath()
     endif
 endfunction
 
+function RSourceOtherScripts()
+    if exists("g:vimrplugin_source")
+        let flist = split(g:vimrplugin_source, ",")
+        for fl in flist
+            if fl =~ " "
+                call RWarningMsgInp("Invalid file name (empty spaces are not allowed): '" . fl . "'")
+            else
+                exe "source " . escape(fl, ' \')
+            endif
+        endfor
+    endif
+endfunction
+
 command RUpdateObjList :call RBuildSyntaxFile()
 command -nargs=+ RAddLibToList :call RBuildSyntaxFile(<q-args>)
 command -nargs=1 -complete=customlist,RLisObjs Rinsert :call RInsert(<q-args>)

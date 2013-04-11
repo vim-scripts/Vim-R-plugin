@@ -43,6 +43,8 @@ endif
 " defined after the global ones:
 runtime r-plugin/common_buffer.vim
 
+setlocal iskeyword=@,48-57,_,.
+
 "==========================================================================
 " Key bindings and menu items
 
@@ -56,6 +58,8 @@ call RCreateMaps("nvi", '<Plug>RSetwd',        'rd', ':call RSetWD()')
 if has("gui_running")
     call MakeRMenu()
 endif
+
+call RSourceOtherScripts()
 
 let &cpo = s:cpo_save
 unlet s:cpo_save

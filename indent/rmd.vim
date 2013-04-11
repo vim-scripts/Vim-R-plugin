@@ -2,18 +2,15 @@
 " Language:	Rmd
 " Author:	Jakson Alves de Aquino <jalvesaq@gmail.com>
 " URL:		http://www.vim.org/scripts/script.php?script_id=2628
-" Last Change:	Thu Oct 11, 2012  10:54PM
+" Last Change:	Fri Feb 15, 2013  09:46PM
 
 
 " Only load this indent file when no other was loaded.
-if exists("b:did_rmd_indent")
+if exists("b:did_indent")
   finish
 endif
-let b:did_rmd_indent = 1
-
-
-
 runtime indent/r.vim
+let b:did_indent = 1
 
 setlocal indentkeys=0{,0},:,!^F,o,O,e
 setlocal indentexpr=GetRmdIndent()

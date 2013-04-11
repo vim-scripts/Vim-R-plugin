@@ -314,7 +314,7 @@ difffunctionfunctionbasex	...
 diff.Datefunctionfunctionbasex	...
 diff.defaultfunctionfunctionbasex	...
 diff.POSIXtfunctionfunctionbasex	...
-difftimefunctionfunctionbasetime1	time2	tz	unitsc("secs", "mins", "hours", "days", "weeks", "auto")
+difftimefunctionfunctionbasetime1	time2	tz	unitsc("auto", "secs", "mins", "hours", "days", "weeks")
 /.difftimefunctionfunctionbasee1	e2
 [.difftimefunctionfunctionbasex	...	dropTRUE
 *.difftimefunctionfunctionbasee1	e2
@@ -594,7 +594,7 @@ levels.defaultfunctionfunctionbasex
 levels<-.factorfunctionfunctionbasex	value
 lfactorialfunctionfunctionbasex
 lgammafunctionfunctionbaseNO_ARGS
-libraryfunctionfunctionbasepackage	help	pos1 + rev(mvbutils:::search.task.trees())[1]	lib.locNULL	character.onlyFALSE	logical.returnFALSE	warn.conflictsTRUE	quietlyFALSE	keep.sourcegetOption("keep.source.pkgs")	verbosegetOption("verbose")
+libraryfunctionfunctionbasepackage	help	pos2	lib.locNULL	character.onlyFALSE	logical.returnFALSE	warn.conflictsTRUE	quietlyFALSE	keep.sourcegetOption("keep.source.pkgs")	verbosegetOption("verbose")
 library.dynamfunctionfunctionbasechname	package	lib.loc	verbosegetOption("verbose")	file.ext.Platform$dynlib.ext	...
 library.dynam.unloadfunctionfunctionbasechname	libpath	verbosegetOption("verbose")	file.ext.Platform$dynlib.ext
 licencefunctionfunctionbaseNO_ARGS
@@ -607,7 +607,7 @@ list.filesfunctionfunctionbasepath"."	patternNULL	all.filesFALSE	full.nam
 loadfunctionfunctionbasefile	envirparent.frame()
 loadedNamespacesfunctionfunctionbaseNO_ARGS
 loadingNamespaceInfofunctionfunctionbaseNO_ARGS
-loadNamespacefunctionfunctionbasepackage	lib.locNULL	keep.sourcegetOption("keep.source.pkgs")	partial{	partial    pn <- get("partial.namespaces", "mvb.session.info")	partial    (length(pn) > 0) && ((pn == "EVERY PACKAGE") || (package %in% 	partial        pn))	partial}
+loadNamespacefunctionfunctionbasepackage	lib.locNULL	keep.sourcegetOption("keep.source.pkgs")	partialFALSE
 localfunctionfunctionbaseexpr	envirnew.env()
 lockBindingfunctionfunctionbasesym	env
 lockEnvironmentfunctionfunctionbaseenv	bindingsFALSE
@@ -804,10 +804,10 @@ qrfunctionfunctionbasex	tol1e-07	LAPACKFALSE	...
 qr.coeffunctionfunctionbaseqr	y
 qr.defaultfunctionfunctionbasex	tol1e-07	LAPACKFALSE	...
 qr.fittedfunctionfunctionbaseqr	y	kqr$rank
-qr.Qfunctionfunctionbaseqr	completeFALSE	Dvecrep.int(if (cmplx) 1 + (0+0i) else 1, if (complete) dqr[1] else min(dqr))
+qr.Qfunctionfunctionbaseqr	completeFALSE	Dvec
 qr.qtyfunctionfunctionbaseqr	y
 qr.qyfunctionfunctionbaseqr	y
-qr.Rfunctionfunctionbaseqr	completeFALSE
+qr.Rfunctionfunctionbaseqr	completeFALSE	...
 qr.residfunctionfunctionbaseqr	y
 qr.solvefunctionfunctionbasea	b	tol1e-07
 qr.Xfunctionfunctionbaseqr	completeFALSE	ncolif (complete) nrow(R) else min(dim(R))

@@ -6,6 +6,8 @@ if exists("b:current_syntax")
   finish
 endif
 
+setlocal iskeyword=@,48-57,_,.
+
 if !exists("rdoc_minlines")
   let rdoc_minlines = 200
 endif
@@ -30,7 +32,7 @@ syn region rdocExample matchgroup=rdocExTitle start="^Examples:$" matchgroup=rdo
 " When using vim as R pager to see the output of help.search():
 syn region rdocPackage start="^[A-Za-z]\S*::" end="[\s\r]" contains=rdocPackName,rdocFuncName transparent
 syn match rdocPackName "^[A-Za-z][A-Za-z0-9\.]*" contained
-syn match rdocFuncName "::[A-Za-z0-9\.\-]*" contained
+syn match rdocFuncName "::[A-Za-z0-9\.\-_]*" contained
 
 " Define the default highlighting.
 hi def link rdocTitle	    Title

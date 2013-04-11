@@ -81,7 +81,7 @@ installed.packagesfunctionfunctionutilslib.locNULL	priorityNULL	noCacheFA
 install.packagesfunctionfunctionutilspkgs	lib	reposgetOption("repos")	contriburlcontrib.url(repos, type)	method	availableNULL	destdirNULL	dependenciesNA	typegetOption("pkgType")	configure.argsgetOption("configure.args")	configure.varsgetOption("configure.vars")	cleanFALSE	NcpusgetOption("Ncpus", 1L)	libs_onlyFALSE	INSTALL_opts	...
 is.relistablefunctionfunctionutilsx
 limitedLabelsfunctionfunctionutilsvalue	maxwidthgetOption("width") - 5L
-loadhistoryfunctionfunctionutilsfileif (nzchar(histfile <- Sys.getenv("R_HISTFILE"))) histfile else ".Rhistory"
+loadhistoryfunctionfunctionutilsfile".Rhistory"
 localeToCharsetfunctionfunctionutilslocaleSys.getlocale("LC_CTYPE")
 lsf.strfunctionfunctionutilspos-1	envir	...
 ls.strfunctionfunctionutilspos-1	name	envir	all.namesFALSE	pattern	mode"any"
@@ -146,7 +146,7 @@ RweaveLatexOptionsfunctionfunctionutilsoptions
 RweaveLatexSetupfunctionfunctionutilsfile	syntax	outputNULL	quietFALSE	debugFALSE	stylepath	...
 RweaveLatexWritedocfunctionfunctionutilsobject	chunk
 RweaveTryStopfunctionfunctionutilserr	options
-savehistoryfunctionfunctionutilsfileif (nzchar(histfile <- Sys.getenv("R_HISTFILE"))) histfile else ".Rhistory"
+savehistoryfunctionfunctionutilsfile".Rhistory"
 select.listfunctionfunctionutilschoices	preselectNULL	multipleFALSE	titleNULL	graphicsgetOption("menu.graphics")
 sessionInfofunctionfunctionutilspackageNULL
 setBreakpointfunctionfunctionutilssrcfile	line	nameonlyTRUE	envirparent.frame()	lastenv	verboseTRUE	tracer	printFALSE	clearFALSE	...

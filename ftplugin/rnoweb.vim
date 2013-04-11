@@ -33,7 +33,7 @@ set cpo&vim
 " Enables Vim-Latex-Suite, LaTeX-Box if installed
 runtime ftplugin/tex_latexSuite.vim
 runtime ftplugin/tex_LatexBox.vim
-let b:main_tex_file = expand("%:p")
+setlocal iskeyword=@,48-57,_,.
 
 " Enable syntax highlight of LaTeX errors in R Console (if using Conque
 " Shell)
@@ -181,7 +181,11 @@ function! RSweave()
     update
     let b:needsnewomnilist = 1
     call RSetWD()
-    call SendCmdToR('Sweave("' . expand("%:t") . '")')
+    if exists("g:vimrplugin_sweaveargs")
+        call SendCmdToR('Sweave("' . expand("%:t") . '", ' . g:vimrplugin_sweaveargs . ')')
+    else
+        call SendCmdToR('Sweave("' . expand("%:t") . '")')
+    endif
 endfunction
 
 function! ROpenPDF()
@@ -265,6 +269,8 @@ nmap <buffer><silent> gN :call RnwPreviousChunk()<CR>
 if has("gui_running")
     call MakeRMenu()
 endif
+
+call RSourceOtherScripts()
 
 let &cpo = s:cpo_save
 unlet s:cpo_save

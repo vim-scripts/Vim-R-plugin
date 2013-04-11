@@ -106,7 +106,7 @@ endfunction
 function! RMakeHTMLrmd(t)
     call RSetWD()
     update
-    let rcmd = 'require(knitr); knit2html("' . expand("%:t") . '", options = "")'
+    let rcmd = 'require(knitr); knit2html("' . expand("%:t") . '")'
     if a:t == "odt"
         if g:rplugin_has_soffice == 0
             if has("win32") || has("win64")
@@ -212,6 +212,8 @@ endif
 
 let g:rplugin_has_pandoc = 0
 let g:rplugin_has_soffice = 0
+
+call RSourceOtherScripts()
 
 let &cpo = s:cpo_save
 unlet s:cpo_save

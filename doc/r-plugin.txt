@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 0.9.9.2
+Version: 0.9.9.3
 For Vim version 7.3
 
  1. Overview                                    |r-plugin-overview|
@@ -43,7 +43,9 @@ Cryptic error message are bugs... Please report them at:
     https://github.com/jcfaria/Vim-R-plugin/issues
 
 We do not plan to take the initiative of writing code for new features, but
-patches and git pull requests are welcome.
+patches and git pull requests are welcome. If you want a feature that only few
+people might be interested in, you can write a script to be sourced by the
+Vim-R-plugin (see |vimrplugin_source|).
 
 
 ==============================================================================
@@ -132,7 +134,7 @@ following dependencies:
    Vim >= 7.3 with Python support.
    Tmux >= 1.5:     http://tmux.sourceforge.net
    Screen plugin:   http://www.vim.org/scripts/script.php?script_id=2711
-   vimcom = 0.9-7:  An R package.
+   vimcom = 0.9-8:  An R package.
 
    Suggests:~
    ncurses-term:  http://invisible-island.net/ncurses
@@ -248,16 +250,18 @@ to install external dependencies:
       find the file that matches exactly the version of Python that you
       installed.
 
-    * vimcom = 0.9-7: An R package, available on CRAN and installable with the
+    * vimcom = 0.9-8: An R package, available on CRAN and installable with the
       install.packages() command. The vimcom package creates a server on R to
       allow the communication with Vim. You certainly will want to put the
-      following lines at the end of your Rprofile (usually at
-      ~/Documents/.Rprofile):
+      following lines at the end of your Rprofile.
 >
       if(interactive()){
 	  library(vimcom)
       }
 <
+      You can do Sys.getenv("HOME") in the R Console to know where the file
+      should be, but usually it is at ~/Documents/.Rprofile.
+
 Create your |vimfiles| directory if you do not have it yet. Its path will be
 similar to one of the following:
 >
@@ -331,7 +335,7 @@ You may be interested in installing additional general plugins to get
 functionality not provided by this file type plugin. ShowMarks and snipMate
 are particularly interesting. Please read |r-plugin-tips| for details. If you
 edit Rnoweb files, you may want to try LaTeX-Box for omnicompletion of LaTeX
-code.
+code (see |r-plugin-latex-box| for details).
 
 
 ==============================================================================
@@ -862,7 +866,7 @@ anything.
 5.1. R's source() issues~
 
 The R's source() function prints an extra new line between commands if the
-option echo = TRUE, and error messages and warning are printed only after the
+option echo = TRUE, and error and warning messages are printed only after the
 entire code is sourced, which makes it more difficult to find errors in the
 code sent to R. Details:
 
@@ -918,7 +922,7 @@ browser, see the R documentation for any function, or do other tasks that
 require the hidden evaluation of code by R, the vimcom library will refuse to
 do the tasks to avoid any risk of corrupting R's memory. It will tell Vim that
 "R is busy" and Vim will display this message. Everything should work as
-expected again after any valid code is executed in R Console.
+expected again after any valid code is executed in the R Console.
 
 
 5.6. Commands are sent twice on Mac OS X~
@@ -971,6 +975,7 @@ duplicated to R on Mac OS X.
 |vimrplugin_insert_mode_cmds|  Allow R commands in insert mode.
 |vimrplugin_allnames|          Show names which begin with a dot
 |vimrplugin_rmhidden|          Remove hidden objects from R workspace.
+|vimrplugin_source|            Source additional scripts.
 
 
 6.1. Terminal emulator (Linux/Unix only)~
@@ -1008,7 +1013,7 @@ The last argument must be the one which precedes the command to be executed.
 
 
 6.2. Use Rterm.exe on Windows~
-							  *r-plugin-Rterm.exe*
+							      *vimrplugin_Rterm*
 If you rather prefer to use Rterm.exe than Rgui.exe, you have to set both the
 "Quick Edit Mode" and the "Insert mode" on either the Windows 7 PowerShell or
 the Windows XP Command Prompt (click on the title bar and choose
@@ -1419,7 +1424,7 @@ you prefer the non strict rst code, put the following in your |vimrc|:
 <
 
 6.24. Allow R commands in insert mode~
-						 *Vimrplugin_insert_mode_cmds*
+						 *vimrplugin_insert_mode_cmds*
 Vim-R commands are designed to work in insert mode as well as normal mode.
 However, depending on your <LocalLeader>, this can make it very difficult to
 write R packages or Sweave files.  For example, if <LocalLeader> is set to the
@@ -1446,6 +1451,16 @@ Hidden objects are removed from R workspace when you do <LocalLeader>rm. If
 you prefer to remove only visible objects, put in your |vimrc|:
 >
    let g:vimrplugin_rmhidden = 0
+<
+
+6.26. Source additional scripts~
+							   *vimrplugin_source*
+This variable should contain a comma separated list of Vim scripts to be
+sourced by the Vim-R-plugin. These scripts may provide additional
+functionality and/or change the behavior of the Vim-R-plugin. If you have such
+scripts, put in your |vimrc|:
+>
+   let vimrplugin_source = "~/path/to/MyScript.vim,/path/to/AnotherScript.vim"
 <
 
 ==============================================================================
@@ -1590,6 +1605,8 @@ you can create a shortcut to it by following the example:
 >
    map <silent> <LocalLeader>s :call SendCmdToR("search()")
 <
+See also: |vimrplugin_source|.
+
 
 ==============================================================================
 							      *r-plugin-files*
@@ -1707,8 +1724,9 @@ The snipMate plugin does not come with snippets for R, but you can copy the
 files r.snippets and rmd.snippets that ship with the Vim-R-plugin (look at the
 r-plugin directory) to the snippets directory. The files have only a few
 snippets, but they will help you to get started. If you usually edit rnoweb
-files, you may also want to create an rnoweb.snippet by concatenating both
-tex.snippets and r.snippets.
+files, you may also want to create an rnoweb.snippets by concatenating both
+tex.snippets and r.snippets. If you edit R documentation, you may want to
+create an rhelp.snippets
 
 
 9.5. Easier key bindings for most used commands~
@@ -2125,9 +2143,34 @@ argument. Example:
    vim --servername OBJBR file.R
 <
 
+9.23. Integration with LaTeX-Box~
+							  *r-plugin-latex-box*
+LaTeX-Box does not automatically recognize Rnoweb files as a valid LaTeX file.
+You have to tell LaTeX-BoX that the .tex file compiled by either knitr() or
+Sweave() is the main LaTeX file. You can do this in two ways. Suppose that
+your Rnoweb file is called report.Rnw... You can:
+
+    (1) Create an empty file called "report.tex.latexmain".
+
+    or
+
+    (2) Put in the first 5 lines of report.Rnw:
+
+        % For LaTeX-Box: root = report.tex
+
+Of course you must run either knitr() or Sweave() before trying LaTeX-Box
+omnicompletion. Please, read LaTeX-Box documentation for up-to-date
+information: |latex-box-FAQ|.
+
+
 ==============================================================================
 							       *r-plugin-news*
 10. News~
+
+0.9.9.3 (2013-04-11)
+
+ * Minor bug fixes.
+ * New option: vimrplugin_source.
 
 0.9.9.2 (2013-02-01)
 

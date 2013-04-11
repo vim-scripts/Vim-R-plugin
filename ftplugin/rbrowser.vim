@@ -40,6 +40,8 @@ runtime r-plugin/common_buffer.vim
 setlocal noswapfile
 setlocal buftype=nofile
 setlocal nowrap
+setlocal iskeyword=@,48-57,_,.
+
 if g:vimrplugin_tmux && g:vimrplugin_screenplugin
     let showmarks_enable = 0
 endif
@@ -427,6 +429,8 @@ else
     let s:isutf8 = 0
 endif
 unlet s:envstring
+
+call RSourceOtherScripts()
 
 let &cpo = s:cpo_save
 unlet s:cpo_save

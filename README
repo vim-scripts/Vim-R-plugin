@@ -1,6 +1,6 @@
 This is a mirror of http://www.vim.org/scripts/script.php?script_id=2628
 
-This plugin improves Vim's support for editing R code and makes it possible to integrate Vim with R. The functionality is similar to what you can find in Tinn-R and ESS mode of Emacs. This filetype plugin uses Tmux and the Screen plugin (Linux, OS X, or other Unix, vimscript #2711) or Python (Microsoft Windows) or Apple Script (Mac OS X) to communicate with R. 
+This plugin improves Vim's support for editing R code and makes it possible to integrate Vim with R. The functionality is similar to what you can find in Tinn-R and ESS mode of Emacs. This filetype plugin uses Tmux and the Screen plugin (Linux, OS X, or other Unix, vimscript #2711) or Python (Microsoft Windows) or Apple Script (Mac OS X) to communicate with R. The communication with R also depends on the R package vimcom.
 
 Screenshots and Debian package: http://www.lepem.ufc.br/jaa/vim-r-plugin.html
 Development code and bug report: https://github.com/jcfaria/Vim-R-plugin

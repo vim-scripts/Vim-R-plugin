@@ -1,6 +1,6 @@
 " markdown Text with R statements
 " Language: markdown with R code chunks
-" Last Change: Sat Oct 13, 2012  07:29AM
+" Last Change: Tue Feb 26, 2013  01:48PM
 "
 " CONFIGURATION:
 "   To highlight chunk headers as R code, put in your vimrc:
@@ -31,6 +31,9 @@ syntax include @R syntax/r.vim
 if exists("b:current_syntax")
     unlet b:current_syntax
 endif
+
+setlocal iskeyword=@,48-57,_,.
+
 if exists("g:rmd_syn_hl_chunk")
     " highlight R code inside chunk header
     syntax match rmdChunkDelim "^```{r" contained

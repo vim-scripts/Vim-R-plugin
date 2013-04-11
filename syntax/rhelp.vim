@@ -2,7 +2,7 @@
 " Language:    R Help File
 " Maintainer: Jakson Aquino <jalvesaq@gmail.com>
 " Former Maintainer: Johannes Ranke <jranke@uni-bremen.de>
-" Last Change: Wed Nov 02, 2011  03:47PM
+" Last Change: Tue Feb 26, 2013  01:13PM
 " Remarks:     - Includes R syntax highlighting in the appropriate
 "                sections if an r.vim file is in the same directory or in the
 "                default debian location.
@@ -20,6 +20,8 @@ if version < 600
 elseif exists("b:current_syntax")
   finish
 endif 
+
+setlocal iskeyword=@,48-57,_,.
 
 syn case match
 
