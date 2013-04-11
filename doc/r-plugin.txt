@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 0.9.9.3
+Version: 0.9.9.4
 For Vim version 7.3
 
  1. Overview                                    |r-plugin-overview|
@@ -1462,6 +1462,10 @@ scripts, put in your |vimrc|:
 >
    let vimrplugin_source = "~/path/to/MyScript.vim,/path/to/AnotherScript.vim"
 <
+Currently, there is only one script known to extend the Vim-R-plugin features:
+
+   - https://github.com/mllg/vim-devtools-plugin
+
 
 ==============================================================================
 						       *r-plugin-key-bindings*
@@ -2166,6 +2170,10 @@ information: |latex-box-FAQ|.
 ==============================================================================
 							       *r-plugin-news*
 10. News~
+
+0.9.9.4 (2013-04-11)
+
+ * Nothing worth of mention yet.
 
 0.9.9.3 (2013-04-11)
 
