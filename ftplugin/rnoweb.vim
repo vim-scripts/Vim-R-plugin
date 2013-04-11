@@ -270,6 +270,8 @@ if has("gui_running")
     call MakeRMenu()
 endif
 
+call RSourceOtherScripts()
+
 let &cpo = s:cpo_save
 unlet s:cpo_save
 

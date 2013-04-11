@@ -74,6 +74,8 @@ if has("gui_running")
     call MakeRMenu()
 endif
 
+call RSourceOtherScripts()
+
 setlocal bufhidden=wipe
 setlocal noswapfile
 set buftype=nofile

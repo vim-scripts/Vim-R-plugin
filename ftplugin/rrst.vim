@@ -215,5 +215,7 @@ endif
 
 let g:rplugin_has_rst2pdf = 0
 
+call RSourceOtherScripts()
+
 let &cpo = s:cpo_save
 unlet s:cpo_save

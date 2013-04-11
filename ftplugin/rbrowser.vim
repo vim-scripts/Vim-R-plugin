@@ -430,6 +430,8 @@ else
 endif
 unlet s:envstring
 
+call RSourceOtherScripts()
+
 let &cpo = s:cpo_save
 unlet s:cpo_save
 
