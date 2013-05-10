@@ -406,6 +406,8 @@ if has("gui_running")
     call RBrowserMenu()
 endif
 
+au BufEnter <buffer> stopinsert
+
 if $TMUX_PANE == ""
     au BufUnload <buffer> Py SendToVimCom("\x08Stop updating info.")
 else
