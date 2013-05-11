@@ -3,7 +3,7 @@
 " Maintainer:	      Jakson Aquino <jalvesaq@gmail.com>
 " Former Maintainers: Vaidotas Zemlys <zemlys@gmail.com>
 " 		      Tom Payne <tom@tompayne.org>
-" Last Change:	      Wed Jul 11, 2012  01:28PM
+" Last Change:	      Sat May 11, 2013  02:23PM
 " Filenames:	      *.R *.r *.Rhistory *.Rt
 " 
 " NOTE: The highlighting of R functions is defined in the
@@ -33,7 +33,7 @@ syn case match
 syn match rComment contains=@Spell "#.*"
 
 " Roxygen
-syn match rOKeyword contained "@\(param\|return\|name\|rdname\|examples\|include\)"
+syn match rOKeyword contained "@\(param\|return\|name\|rdname\|examples\|include\|docType\)"
 syn match rOKeyword contained "@\(S3method\|TODO\|aliases\|alias\|assignee\|author\|callGraphDepth\|callGraph\)"
 syn match rOKeyword contained "@\(callGraphPrimitives\|concept\|exportClass\|exportMethod\|exportPattern\|export\|formals\)"
 syn match rOKeyword contained "@\(format\|importClassesFrom\|importFrom\|importMethodsFrom\|import\|keywords\)"
@@ -74,7 +74,7 @@ syn keyword rConditional if else
 syn keyword rRepeat      for in repeat while
 
 " Constant (not really)
-syn keyword rConstant T F LETTERS letters month.ab month.name pi
+syn keyword rConstant T F LETTERS letters month.abb month.name pi
 syn keyword rConstant R.version.string
 
 syn keyword rNumber   NA_integer_ NA_real_ NA_complex_ NA_character_ 
