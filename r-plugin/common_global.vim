@@ -1171,7 +1171,7 @@ function RBrowserOpenCloseLists(status)
 
     if g:rplugin_lastrpl == "R is busy."
         call RWarningMsg("R is busy.")
-    elseif exists("g:rplugin_curview")
+    elseif exists("g:rplugin_curview") && v:servername == ""
         call UpdateOB("both")
     endif
 
