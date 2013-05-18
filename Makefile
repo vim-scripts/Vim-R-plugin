@@ -29,7 +29,7 @@
 
 
 PLUGINHOME=`pwd`
-PLUGINVERSION=0.9.9.3
+PLUGINVERSION=0.9.9.4
 DEBIANTIME=`date -R`
 PLUGINRELEASEDATE=`date +"%Y-%m-%d"`
 VIM2HTML=/usr/local/share/vim/vim73/doc/vim2html.pl 
@@ -225,6 +225,10 @@ htmldoc:
 	(cd doc ;\
 	    $(VIM2HTML) tags r-plugin.txt ;\
 	    sed -i -e 's/<code class.*gmail.com.*code>//' r-plugin.html ;\
+	    sed -i -e 's/|<a href=/<a href=/g' r-plugin.html ;\
+	    sed -i -e 's/<\/a>|/<\/a>/g' r-plugin.html ;\
+	    sed -i -e 's/|<code /<code /g' r-plugin.html ;\
+	    sed -i -e 's/<\/code>|/<\/code>/g' r-plugin.html ;\
 	    mv r-plugin.html vim-stylesheet.css /tmp )
 
 all: zip deb htmldoc
