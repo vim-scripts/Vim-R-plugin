@@ -3,7 +3,7 @@
 " Maintainer:	      Jakson Aquino <jalvesaq@gmail.com>
 " Former Maintainers: Vaidotas Zemlys <zemlys@gmail.com>
 " 		      Tom Payne <tom@tompayne.org>
-" Last Change:	      Sat May 11, 2013  02:23PM
+" Last Change:	      Sun May 19, 2013  05:59PM
 " Filenames:	      *.R *.r *.Rhistory *.Rt
 " 
 " NOTE: The highlighting of R functions is defined in the
@@ -111,7 +111,7 @@ syn match rComplex "\<\d\+[Ee][-+]\=\d\+i"
 
 syn match rOperator    "&"
 syn match rOperator    '-'
-syn match rOperator    '*'
+syn match rOperator    '\*'
 syn match rOperator    '+'
 syn match rOperator    '='
 if &filetype != "rmd" && &filetype != "rrst"
@@ -120,7 +120,7 @@ else
   syn match rOperator    "[|!<>^~`/:]"
 endif
 syn match rOperator    "%\{2}\|%\S*%"
-syn match rOpError  '*\{3}'
+syn match rOpError  '\*\{3}'
 syn match rOpError  '//'
 syn match rOpError  '&&&'
 syn match rOpError  '|||'
