@@ -214,6 +214,8 @@ function RCompleteArgs()
             let classfor = substitute(classfor, '"', '\\"', "g")
             let rkeyword = '^' . rkeyword0 . "\x06"
             call cursor(cpos[1], cpos[2])
+
+            " If R is running, use it
             call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
             if classfor == ""
                 exe 'Py SendToVimCom("vimcom:::vim.args(' . "'" . rkeyword0 . "', '" . argkey . "')" . '")'
@@ -250,37 +252,38 @@ function RCompleteArgs()
                     endif
                     return ''
                 endif
+            endif
 
-                for omniL in flines
-                    if omniL =~ rkeyword && omniL =~ "\x06function\x06function\x06" 
-                        let tmp1 = split(omniL, "\x06")
-                        if len(tmp1) < 5
-                            return ''
-                        endif
-                        let info = tmp1[4]
-                        let argsL = split(info, "\x09")
-                        let args = []
-                        for id in range(len(argsL))
-                            let newkey = '^' . argkey
-                            let tmp2 = split(argsL[id], "\x07")
-                            if (argkey == '' || tmp2[0] =~ newkey) && tmp2[0] !~ "No arguments"
-                                if tmp2[0] != '...'
-                                    let tmp2[0] = tmp2[0] . " = "
-                                endif
-                                if len(tmp2) == 2
-                                    let tmp3 = {'word': tmp2[0], 'menu': tmp2[1]}
-                                else
-                                    let tmp3 = {'word': tmp2[0], 'menu': ''}
-                                endif
-                                call add(args, tmp3)
-                            endif
-                        endfor
-                        call complete(idx2, args)
+            " If R isn't running, use the prebuilt list of objects
+            for omniL in flines
+                if omniL =~ rkeyword && omniL =~ "\x06function\x06function\x06" 
+                    let tmp1 = split(omniL, "\x06")
+                    if len(tmp1) < 5
                         return ''
                     endif
-                endfor
-                break
-            endif
+                    let info = tmp1[4]
+                    let argsL = split(info, "\x09")
+                    let args = []
+                    for id in range(len(argsL))
+                        let newkey = '^' . argkey
+                        let tmp2 = split(argsL[id], "\x07")
+                        if (argkey == '' || tmp2[0] =~ newkey) && tmp2[0] !~ "No arguments"
+                            if tmp2[0] != '...'
+                                let tmp2[0] = tmp2[0] . " = "
+                            endif
+                            if len(tmp2) == 2
+                                let tmp3 = {'word': tmp2[0], 'menu': tmp2[1]}
+                            else
+                                let tmp3 = {'word': tmp2[0], 'menu': ''}
+                            endif
+                            call add(args, tmp3)
+                        endif
+                    endfor
+                    call complete(idx2, args)
+                    return ''
+                endif
+            endfor
+            break
         endif
         let idx -= 1
         if idx <= 0
