@@ -1185,6 +1185,9 @@ function RBrowserOpenCloseLists(status)
     if exists("g:rplugin_curview") && v:servername != ""
         exe 'Py SendToVimCom("\007' . v:servername . '")'
     endif
+    if has("gui_running")
+        call UpdateOB("both")
+    endif
 endfunction
 
 " Scroll conque term buffer (called by CursorHold event)
