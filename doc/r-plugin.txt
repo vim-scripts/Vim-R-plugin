@@ -618,11 +618,11 @@ pathogen).
 4.4. Omni completion~
 
 Vim can automatically complete the names of R objects when CTRL-X CTRL-O is
-pressed in insert mode (see |omni-completion| for details and 'completeopt' to
-know how to customize the |omni-completion|). Omni completion shows in a pop
-up menu the name of the object, its class and its environment (most
-frequently, its package name). If the object is a function, its arguments are
-shown in a separate window.
+pressed in insert mode (see |omni-completion| for details). Omni completion
+shows in a pop up menu the name of the object, its class and its environment
+(most frequently, its package name). If the object is a function, its
+arguments are shown in a separate window (see 'completeopt' if you want to
+disable the preview window).
 
 If a data.frame is found, while building the list of objects, the columns in
 the data.frame are added to the list. When you try to use omni completion to
@@ -1326,9 +1326,10 @@ Example:
 On Windows, the plugin calls tools::texi2pdf() to build the pdf from the
 generated .tex file. On Linux/Unix, by default, Vim calls pdflatex to produce
 a pdf document from the .tex file produced by the R Sweave command. You can
-use the option vimrplugin_latexcmd to change this behavior. Example:
+use the option vimrplugin_latexcmd to change this behavior. Examples:
 >
    let vimrplugin_latexcmd = "latex"
+   let vimrplugin_latexcmd = "latexmk -pdf"
 <
 If you want to pass arguments do the Sweave() function, set the value of the
 vimrplugin_sweaveargs variable.
@@ -2181,7 +2182,7 @@ information: |latex-box-FAQ|.
 							       *r-plugin-news*
 10. News~
 
-0.9.9.4 (2013-04-18)
+0.9.9.4 (2013-07-08)
 
  * Minor bug fixes.
 
