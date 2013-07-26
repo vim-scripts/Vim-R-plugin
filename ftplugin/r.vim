@@ -62,7 +62,7 @@ function! ShowRout()
 
     " if not silent, the user will have to type <Enter>
     silent update
-    if has("win32") | has("win64")
+    if has("win32") || has("win64")
         let rcmd = 'Rcmd.exe BATCH --no-restore --no-save "' . expand("%") . '" "' . routfile . '"'
     else
         let rcmd = b:rplugin_R . " CMD BATCH --no-restore --no-save '" . expand("%") . "' '" . routfile . "'"
