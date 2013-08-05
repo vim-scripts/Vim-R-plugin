@@ -622,6 +622,7 @@ endfunction
 
 " Start R
 function StartR(whatr)
+    let g:rplugin_last_whatr = a:whatr
     call writefile([], $VIMRPLUGIN_TMPDIR . "/object_browser")
     call writefile([], $VIMRPLUGIN_TMPDIR . "/liblist")
 
@@ -713,6 +714,7 @@ function StartR(whatr)
                 let rcmd = 'VIMRPLUGIN_TMPDIR="' . $VIMRPLUGIN_TMPDIR . '" VIMINSTANCEID=' . $VIMINSTANCEID . " " . rcmd
             endif
         endif
+        let g:rplugin_rcmd = rcmd
         if g:vimrplugin_tmux == 0 && g:vimrplugin_noscreenrc == 0 && exists("g:ScreenShellScreenInitArgs")
             let g:ScreenShellScreenInitArgs = RWriteScreenRC()
         endif
@@ -1815,6 +1817,13 @@ endfunction
 
 " Quit R
 function RQuit(how)
+    if a:how == "restart"
+        if !(exists("g:rplugin_last_whatr") || exists("g:rplugin_rcmd"))
+            call RWarningMsg("Cannot restart R.")
+            return
+        endif
+    endif
+
     if bufloaded(b:objbrtitle)
         exe "bunload! " . b:objbrtitle
         sleep 150m
@@ -1850,6 +1859,19 @@ function RQuit(how)
             unlet g:rplugin_obpane
         endif
         sleep 250m
+    endif
+
+    if a:how == "restart"
+        if exists("g:rplugin_objbrtitle")
+            unlet g:rplugin_objbrtitle
+        endif
+        sleep 100m
+        if exists("g:rplugin_rcmd")
+            call SendCmdToR(g:rplugin_rcmd)
+        else
+            call StartR(g:rplugin_last_whatr)
+        endif
+        return
     endif
 
     if g:vimrplugin_screenplugin
