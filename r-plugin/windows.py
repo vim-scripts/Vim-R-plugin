@@ -141,23 +141,27 @@ def GetRPath():
     try:
         kHandle = win32api.RegOpenKeyEx(win32con.HKEY_LOCAL_MACHINE, keyName, 0, win32con.KEY_READ)
         rVersion, reserved, kclass, lastwrite = win32api.RegEnumKeyEx(kHandle)[-1]
+        win32api.RegCloseKey(kHandle)
+        kHandle = None
         keyName = keyName + "\\" + rVersion
         kHandle = win32api.RegOpenKeyEx(win32con.HKEY_LOCAL_MACHINE, keyName, 0, win32con.KEY_READ)
     except:
         try:
             kHandle = win32api.RegOpenKeyEx(win32con.HKEY_CURRENT_USER, keyName, 0, win32con.KEY_READ)
             rVersion, reserved, kclass, lastwrite = win32api.RegEnumKeyEx(kHandle)[-1]
+            win32api.RegCloseKey(kHandle)
+            kHandle = None
             keyName = keyName + "\\" + rVersion
             kHandle = win32api.RegOpenKeyEx(win32con.HKEY_CURRENT_USER, keyName, 0, win32con.KEY_READ)
         except:
-            vim.command("let s:rinstallpath =  'Not found'")
+            vim.command("let s:rinstallpath =  'Key not found'")
     if kHandle:
         (kname, rpath, vtype) = win32api.RegEnumValue(kHandle, 0)
         win32api.RegCloseKey(kHandle)
         if kname == 'InstallPath':
             vim.command("let s:rinstallpath = '" + rpath + "'")
         else:
-            vim.command("let s:rinstallpath =  'Not found'")
+            vim.command("let s:rinstallpath =  'Path not found'")
 
 def StartRPy():
     global Rterm

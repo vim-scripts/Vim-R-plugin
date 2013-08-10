@@ -3456,7 +3456,12 @@ if has("win32") || has("win64")
         else
             Py GetRPath()
             if exists("s:rinstallpath")
-                if s:rinstallpath == "Not found"
+                if s:rinstallpath == "Key not found"
+                    call RWarningMsgInp("Could not find R key in Windows Registry. Please, either install R or set the value of 'vimrplugin_r_path'.")
+                    let g:rplugin_failed = 1
+                    finish
+                endif
+                if s:rinstallpath == "Path not found"
                     call RWarningMsgInp("Could not find R path in Windows Registry. Please, either install R or set the value of 'vimrplugin_r_path'.")
                     let g:rplugin_failed = 1
                     finish
