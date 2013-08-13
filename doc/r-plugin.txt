@@ -6,7 +6,7 @@ Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
 Version: 0.9.9.4
-For Vim version 7.3
+For Vim version 7.4
 
  1. Overview                                    |r-plugin-overview|
  2. Main features                               |r-plugin-features|
@@ -74,7 +74,7 @@ Vim-R-plugin (see |vimrplugin_source|).
       - Automatic calculation of the best layout of the R documentation buffer
 	(split the window either horizontally or vertically according to the
 	available room).
-      - Automatic formating of the text to fit the panel width.
+      - Automatic formatting of the text to fit the panel width.
       - Send code and commands to R (useful to run examples).
       - Jump to another R documentation.
       - Syntax highlighting of R documentation.
@@ -211,7 +211,7 @@ show how the plugin will work on Linux in different conditions:
 
 
 Note: On Mac OS X the plugin will use AppleScript in both Vim and GVim unless
-vimrplugin_applescript = 0. Some user have reported more luck with iTerm than
+vimrplugin_applescript = 0. Some users have reported more luck with iTerm than
 with the default Mac OS X terminal emulator.
 
 
@@ -738,7 +738,7 @@ resize the panes by clicking on the border line and dragging it, and to scroll
 the R Console with the mouse wheel. When you use the mouse wheel, Tmux enters
 in its copy/scroll back mode (see below).
 
-The configuration script also sets <C-a> as the Tmux scape character (the
+The configuration script also sets <C-a> as the Tmux escape character (the
 default is <C-b>), that is, you have to type <C-a> before typing a Tmux
 command. Below are the most useful key bindings to use Tmux with the tmux.conf
 created by the Vim-R-plugin (see |vimrplugin_notmuxconf| if you prefer to use
@@ -771,7 +771,7 @@ configuration and learn more commands. To read the Tmux manual, type in the
 terminal emulator:
 >
   man tmux
->
+<
 Note: <C-a> was configured as the Tmux scape character, and it will not be
 passed to applications running under Tmux. To send <C-a> to either R or Vim
 you have to type <C-a>a.
@@ -1140,8 +1140,8 @@ Vim will run the first R executable in the path. You can set an alternative R
 path in your |vimrc| as in the examples:
 >
    let vimrplugin_r_path = "/path/to/my/preferred/R/version/bin"
-   let vimrplugin_r_path = "C:\\Program Files\\R\\R-2.15.1\\bin\\i386"
->
+   let vimrplugin_r_path = "C:\\Program Files\\R\\R-3.0.1\\bin\\i386"
+<
 On Windows, Vim will try to find the R install path in the Windows Registry.
 
 
@@ -2182,7 +2182,7 @@ information: |latex-box-FAQ|.
 							       *r-plugin-news*
 10. News~
 
-0.9.9.4 (2013-07-08)
+0.9.9.4 (2013-08-13)
 
  * Minor bug fixes.
 
