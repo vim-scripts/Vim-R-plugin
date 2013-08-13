@@ -23,6 +23,7 @@ if exists("b:did_ftplugin")
     finish
 endif
 
+let g:rplugin_upobcnt = 0
 
 " Don't load another plugin for this buffer
 let b:did_ftplugin = 1
@@ -60,12 +61,14 @@ let g:rplugin_curview = "GlobalEnv"
 
 
 function! UpdateOB(what)
+    let g:rplugin_upobcnt += 1
     if a:what == "both"
         let wht = g:rplugin_curview
     else
         let wht = a:what
     endif
     if g:rplugin_curview != wht
+        let g:rplugin_upobcnt -= 1
         return "curview != what"
     endif
 
@@ -75,6 +78,7 @@ function! UpdateOB(what)
         silent buffers
         redir END
         if s:bufl !~ "Object_Browser"
+            let g:rplugin_upobcnt -= 1
             return "Object_Browser not listed"
         endif
         if exists("g:rplugin_curbuf") && g:rplugin_curbuf != "Object_Browser"
@@ -104,13 +108,16 @@ function! UpdateOB(what)
     endif
     call cursor(curline, curcol)
     if bufname("%") =~ "Object_Browser" || b:rplugin_extern_ob
-        setlocal nomodifiable
+        if g:rplugin_upobcnt < 2
+            setlocal nomodifiable
+        endif
     endif
     redraw
     if g:rplugin_switchedbuf
         exe "sil noautocmd sb " . g:rplugin_curbuf
         exe "set switchbuf=" . savesb
     endif
+    let g:rplugin_upobcnt -= 1
     return "End of UpdateOB()"
 endfunction
 
@@ -144,6 +151,9 @@ function! RBrowserDoubleClick()
         if g:rplugin_lastrpl == "R is busy."
             call RWarningMsg("R is busy.")
         endif
+    endif
+    if has("win32") || has("win64")
+	    call UpdateOB("both")
     endif
 endfunction
 
