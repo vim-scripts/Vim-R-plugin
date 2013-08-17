@@ -24,7 +24,7 @@ syn region rdocStringS  start="‘" end="’"
 syn region rdocStringD  start='"' skip='\\"' end='"'
 syn match rdocURL `\v<(((https?|ftp|gopher)://|(mailto|file|news):)[^'	<>"]+|(www|web|w3)[a-z0-9_-]*\.[a-z0-9._-]+\.[^'  <>"]+)[a-zA-Z0-9/]`
 syn keyword rdocNote		note Note NOTE note: Note: NOTE: Notes Notes:
-syn match rdocArg  "^\s*\([a-z]\|[A-Z]\|[0-9]\|\.\)*: "
+syn match rdocArg  "^\s*\([a-z]\|[A-Z]\|[0-9]\|\.\|_\)*: "
 
 syn include @rdocR syntax/r.vim
 syn region rdocExample matchgroup=rdocExTitle start="^Examples:$" matchgroup=rdocExEnd end='^###$' contains=@rdocR keepend
