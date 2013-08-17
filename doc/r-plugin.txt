@@ -131,7 +131,7 @@ In addition to having R installed in your system, this plugin has the
 following dependencies:
 
    Depends:~
-   Vim >= 7.3 with Python support.
+   Vim >= 7.4 with Python support.
    Tmux >= 1.5:     http://tmux.sourceforge.net
    Screen plugin:   http://www.vim.org/scripts/script.php?script_id=2711
    vimcom = 0.9-9:  An R package.
@@ -140,6 +140,8 @@ following dependencies:
    ncurses-term:  http://invisible-island.net/ncurses
    colorout:      http://www.lepem.ufc.br/jaa/colorout.html
    setwidth:      An R package.
+   latexmk:       Automate the compilation of LaTeX documents.
+                  See examples in |vimrplugin_latexcmd|.
 
    Note: Tmux and ncurses-term are already packaged for most GNU/Linux
    distributions and other Unix variants. The library ncurses-term is
@@ -220,7 +222,7 @@ with the default Mac OS X terminal emulator.
 In addition to having R installed in your system, this plugin requires users
 to install external dependencies:
 
-    * Vim's version must be >= 7.3
+    * Vim's version must be >= 7.4
 
     * Python: http://www.python.org/download/
 
@@ -230,7 +232,7 @@ to install external dependencies:
 
       Note: Be careful to download the correct Python version because Vim
 	    needs a specific version of Python DLL. For example, the official
-	    Vim 7.3 for Windows needs either Python 2.7 or 3.1. If Python was
+	    Vim 7.4 for Windows needs either Python 2.7 or 3.1. If Python was
 	    not installed or was not found, the Vim-R-plugin will output
 	    information about what Python version Vim was compiled against. Do
 	    the following if you want to discover this information manually:
@@ -1328,8 +1330,12 @@ generated .tex file. On Linux/Unix, by default, Vim calls pdflatex to produce
 a pdf document from the .tex file produced by the R Sweave command. You can
 use the option vimrplugin_latexcmd to change this behavior. Examples:
 >
-   let vimrplugin_latexcmd = "latex"
    let vimrplugin_latexcmd = "latexmk -pdf"
+   let vimrplugin_latexcmd = "latex"
+<
+You may also want to put the following in your .Rprofile:
+>
+   options(vimcom.texerrs = TRUE)
 <
 If you want to pass arguments do the Sweave() function, set the value of the
 vimrplugin_sweaveargs variable.
