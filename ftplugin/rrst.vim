@@ -132,7 +132,7 @@ function! RMakePDFrrst()
     if g:rplugin_vimcomport == 0
         exe "Py DiscoverVimComPort()"
         if g:rplugin_vimcomport == 0
-            return
+            call RWarningMsg("The vimcom package is required to make and open the PDF.")
         endif
     endif
     update
