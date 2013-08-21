@@ -125,7 +125,7 @@ function! RMakeHTMLrmd(t)
     if g:vimrplugin_openhtml && a:t == "html"
         let rcmd = rcmd . '; browseURL("' . expand("%:r:t") . '.html")'
     endif
-    call SendCmdToR(rcmd)
+    call g:SendCmdToR(rcmd)
 endfunction
 
 function! RMakePDFrmd(t)
@@ -161,7 +161,7 @@ function! RMakePDFrmd(t)
     endif
     let pdfcmd = pdfcmd . ")"
     let b:needsnewomnilist = 1
-    call SendCmdToR(pdfcmd)
+    call g:SendCmdToR(pdfcmd)
 endfunction  
 
 " Send Rmd chunk to R

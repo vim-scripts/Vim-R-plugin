@@ -43,10 +43,6 @@ setlocal buftype=nofile
 setlocal nowrap
 setlocal iskeyword=@,48-57,_,.
 
-if g:vimrplugin_tmux && g:vimrplugin_screenplugin
-    let showmarks_enable = 0
-endif
-
 if !exists("g:rplugin_hasmenu")
     let g:rplugin_hasmenu = 0
 endif
@@ -98,7 +94,9 @@ function! UpdateOB(what)
     if !exists("curcol")
         let curcol = 1
     endif
+    let save_unnamed_reg = @@
     sil normal! ggdG
+    let @@ = save_unnamed_reg 
     if wht == "GlobalEnv"
         call setline(1, ".GlobalEnv | Libraries")
         exe "silent read " . g:rplugin_esc_tmpdir . "/object_browser"
@@ -360,7 +358,7 @@ function! OBSendDeleteCmd(cmd)
     if exists("*RBrSendToR")
         call RBrSendToR(a:cmd)
     else
-        call SendCmdToR(a:cmd)
+        call g:SendCmdToR(a:cmd)
     endif
     if g:rplugin_curview == "GlobalEnv"
         Py SendToVimCom("\003GlobalEnv [OBSendDeleteCmd]")

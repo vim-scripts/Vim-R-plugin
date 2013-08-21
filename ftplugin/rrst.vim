@@ -125,7 +125,7 @@ function! RMakeHTMLrrst(t)
         let rcmd = rcmd . '; browseURL("' . expand("%:r:t") . '.html")'
     endif
     let b:needsnewomnilist = 1
-    call SendCmdToR(rcmd)
+    call g:SendCmdToR(rcmd)
 endfunction
 
 function! RMakePDFrrst()
@@ -163,7 +163,7 @@ function! RMakePDFrrst()
     endif
     let pdfcmd = pdfcmd . ")"
     let b:needsnewomnilist = 1
-    let ok = SendCmdToR(pdfcmd)
+    let ok = g:SendCmdToR(pdfcmd)
     if ok == 0
         return
     endif

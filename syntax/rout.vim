@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:    R output Files
 " Maintainer:  Jakson Aquino <jalvesaq@gmail.com>
-" Last Change: Tue Feb 26, 2013  01:13PM
+" Last Change: Tue Aug 20, 2013  12:52PM
 "
 
 " Version Clears: {{{1
@@ -12,10 +12,6 @@ if version < 600
 elseif exists("b:current_syntax")
   finish
 endif 
-
-if !exists("syn_rout_latex")
-    let g:syn_rout_latex = 0
-endif
 
 setlocal iskeyword=@,48-57,_,.
 
@@ -118,15 +114,6 @@ endif
 if v:lang =~ "^tr"
     syn match routError	"^Hata.*"
     syn match routWarn	"^Uyarı.*"
-endif
-
-" LaTeX errors
-if syn_rout_latex == 1
-    syn match routWarn "^No file .*"
-    syn match routWarn "^Underfull .*"
-    syn match routWarn "^Overfull .*"
-    syn match routWarn "^LaTeX Warning: .*"
-    syn match routError "^! LaTeX Error: .*"
 endif
 
 " Define the default highlighting.

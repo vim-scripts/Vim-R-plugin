@@ -90,7 +90,7 @@ function! RSpin()
     update
     let b:needsnewomnilist = 1
     call RSetWD()
-    call SendCmdToR('require(knitr); spin("' . expand("%:t") . '")')
+    call g:SendCmdToR('require(knitr); spin("' . expand("%:t") . '")')
 endfunction
 
 "==========================================================================
