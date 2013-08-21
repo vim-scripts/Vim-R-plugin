@@ -597,15 +597,21 @@ function StartR_TmuxSplit(rcmd)
     call system("tmux set-environment -g VIMRPLUGIN_TMPDIR " . g:rplugin_esc_tmpdir)
     call system("tmux set-environment VIMINSTANCEID " . $VIMINSTANCEID)
     let vimpane = TmuxActivePane()
+    let tcmd = "tmux split-window "
     if g:vimrplugin_vsplit
         if g:vimrplugin_rconsole_width == -1
-            let rlog = system("tmux split-window -h -v '" . a:rcmd . "'")
+            let tcmd .= "-h"
         else
-            let rlog = system("tmux split-window -h -l " . g:vimrplugin_rconsole_width . " -v '" . a:rcmd . "'")
+            let tcmd .= "-h -l " . g:vimrplugin_rconsole_width
         endif
     else
-        let rlog = system("tmux split-window -l " . g:vimrplugin_rconsole_height . " -v '" . a:rcmd . "'")
+        let tcmd .= "-l " . g:vimrplugin_rconsole_height
     endif
+    if !g:vimrplugin_restart
+        " Let Tmux automatically kill the panel when R quits.
+        let tcmd .= " '" . a:rcmd . "'"
+    endif
+    let rlog = system(tcmd)
     if v:shell_error
         call RWarningMsg(rlog)
         return
@@ -617,6 +623,10 @@ function StartR_TmuxSplit(rcmd)
         return
     endif
     let g:SendCmdToR = function('SendCmdToR_TmuxSplit')
+    if g:vimrplugin_restart
+        call g:SendCmdToR(a:rcmd)
+    endif
+    let g:rplugin_last_rcmd = a:rcmd
 endfunction
 
 
@@ -689,7 +699,6 @@ endfunction
 
 " Start R
 function StartR(whatr)
-    let g:rplugin_last_whatr = a:whatr
     call writefile([], $VIMRPLUGIN_TMPDIR . "/object_browser")
     call writefile([], $VIMRPLUGIN_TMPDIR . "/liblist")
 
@@ -739,6 +748,25 @@ function StartR(whatr)
         call RWarningMsg("Not inside Tmux.")
         lcd -
         return
+    endif
+
+    if string(g:SendCmdToR) != "function('SendCmdToR_fake')"
+        if g:rplugin_tmuxwasfirst
+            if g:vimrplugin_restart
+                call g:SendCmdToR('quit(save = "no")')
+                call g:SendCmdToR("\014")
+                call CloseExternalOB() " TODO: Update OB instead of closing it.
+                call g:SendCmdToR(g:rplugin_last_rcmd)
+                return
+            else
+                call RWarningMsg("As far as I know, R is already running. Did you quit it from within Vim (" . g:maplocalleader . "rq if not remapped)?")
+                return
+            endif
+        else
+            if g:vimrplugin_restart
+                call RQuit("no")
+            endif
+        endif
     endif
 
     if b:rplugin_r_args == " "
@@ -1638,15 +1666,21 @@ function RSetWD()
     call g:SendCmdToR(wdcmd)
 endfunction
 
+function CloseExternalOB()
+    " check if the pane still exists before trying to kill it because the
+    " user may have already closed the Object Browser manually.
+    if exists("g:rplugin_obpane")
+        let plst = system("tmux list-panes | cat")
+        if plst =~ g:rplugin_obpane
+            call system("tmux kill-pane -t " . g:rplugin_obpane)
+            unlet g:rplugin_obpane
+        endif
+        sleep 250m
+    endif
+endfunction
+
 " Quit R
 function RQuit(how)
-    if a:how == "restart"
-        if !(exists("g:rplugin_last_whatr") || exists("g:rplugin_rcmd"))
-            call RWarningMsg("Cannot restart R.")
-            return
-        endif
-    endif
-
     if bufloaded(b:objbrtitle)
         exe "bunload! " . b:objbrtitle
         sleep 150m
@@ -1666,36 +1700,19 @@ function RQuit(how)
         exe "Py SendQuitMsg('" . qcmd . "')"
     else
         call g:SendCmdToR(qcmd)
-        if a:how == "save"
-            sleep 1
+        if g:rplugin_tmuxwasfirst
+            if a:how == "save"
+                sleep 200m
+            endif
+            if g:vimrplugin_restart
+                call g:SendCmdToR("exit")
+            endif
         endif
     endif
 
     sleep 250m
 
-    " check if the pane still exists before trying to kill it because the
-    " user may have already closed the Object Browser manually.
-    if exists("g:rplugin_obpane")
-        let plst = system("tmux list-panes | cat")
-        if plst =~ g:rplugin_obpane
-            call system("tmux kill-pane -t " . g:rplugin_obpane)
-            unlet g:rplugin_obpane
-        endif
-        sleep 250m
-    endif
-
-    if a:how == "restart"
-        if exists("g:rplugin_objbrtitle")
-            unlet g:rplugin_objbrtitle
-        endif
-        sleep 100m
-        if exists("g:rplugin_rcmd")
-            call g:SendCmdToR(g:rplugin_rcmd)
-        else
-            call StartR(g:rplugin_last_whatr)
-        endif
-        return
-    endif
+    call CloseExternalOB()
 
     if exists("g:rplugin_objbrtitle")
         unlet g:rplugin_objbrtitle
@@ -2994,6 +3011,7 @@ call RSetDefaultValue("g:vimrplugin_openpdf_quietly",   0)
 call RSetDefaultValue("g:vimrplugin_openhtml",          0)
 call RSetDefaultValue("g:vimrplugin_i386",              0)
 call RSetDefaultValue("g:vimrplugin_Rterm",             0)
+call RSetDefaultValue("g:vimrplugin_restart",           0)
 call RSetDefaultValue("g:vimrplugin_vsplit",            0)
 call RSetDefaultValue("g:vimrplugin_rconsole_width",   -1)
 call RSetDefaultValue("g:vimrplugin_rconsole_height",  15)

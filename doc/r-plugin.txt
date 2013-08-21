@@ -934,6 +934,7 @@ expected again after any valid code is executed in the R Console.
 |vimrplugin_allnames|          Show names which begin with a dot
 |vimrplugin_rmhidden|          Remove hidden objects from R workspace.
 |vimrplugin_source|            Source additional scripts.
+|vimrplugin_restart|           Restart R if it is already running.
 
 
 6.1. Terminal emulator (Linux/Unix only)~
@@ -1411,6 +1412,22 @@ Currently, there is only one script known to extend the Vim-R-plugin features:
 
    - https://github.com/mllg/vim-devtools-plugin
 
+
+6.28. Restart R if it is already running (Linux/Unix only)~
+							  *vimrplugin_restart*
+When R is already running and you type one of the commands to start R before
+you have done <LocalLeader>rq, the Vim-R-plugin does one of the following:
+(a) If R is in an external terminal emulator, the terminal is closed, a new
+one is opened with the same R session running in it. (b) If both Vim and R are
+running in different Tmux regions of the same terminal emulator, the plugin
+warns that R is already running.
+
+If instead of the default behavior, you prefer to quit and restart R when you
+do <LocalLeader>rf, <LocalLeader>rv or <LocalLeader>rc, then, put in your
+|vimrc|:
+>
+   let vimrplugin_restart = 1
+<
 
 ==============================================================================
 						       *r-plugin-key-bindings*
@@ -2073,13 +2090,14 @@ Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-0.9.9.4 (2013-08-18)
+0.9.9.4 (2013-08-21)
 
  * Minor bug fixes.
  * The support to GNU Screen, VimShell and Conque Shell was dropped. The
    screen plugin no longer is used.
  * New options: vimrplugin_vsplit, vimrplugin_rconsole_height and
    vimrplugin_rconsole_width.
+ * New option: vimrplugin_restart.
 
 0.9.9.3 (2013-04-11)
 
