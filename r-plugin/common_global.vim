@@ -1133,6 +1133,7 @@ function SendCmdToR_TmuxSplit(cmd)
         let rlog = substitute(rlog, "\n", " ", "g")
         let rlog = substitute(rlog, "\r", " ", "g")
         call RWarningMsg(rlog)
+        let g:SendCmdToR = function('SendCmdToR_fake')
         return 0
     endif
     return 1
@@ -1192,6 +1193,7 @@ function SendCmdToR_Term(cmd)
         let rlog = substitute(rlog, '\n', ' ', 'g')
         let rlog = substitute(rlog, '\r', ' ', 'g')
         call RWarningMsg(rlog)
+        let g:SendCmdToR = function('SendCmdToR_fake')
         return 0
     endif
     return 1
