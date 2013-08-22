@@ -2096,6 +2096,7 @@ Vim-R-plugin. Please look at |vimrplugin_source| for details.
  * Minor bug fixes.
  * The support to GNU Screen, VimShell and Conque Shell was dropped. The
    screen plugin no longer is used.
+ * The delete command was removed from the Object Browser.
  * New options: vimrplugin_vsplit, vimrplugin_rconsole_height and
    vimrplugin_rconsole_width.
  * New option: vimrplugin_restart.

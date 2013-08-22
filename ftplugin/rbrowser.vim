@@ -332,72 +332,6 @@ function! SourceObjBrLines()
     exe "source " . g:rplugin_esc_tmpdir . "/objbrowserInit"
 endfunction
 
-function! OBGetDeleteCmd(lnum)
-    let obj = RBrowserGetName(1, a:lnum)
-    if g:rplugin_curview == "GlobalEnv"
-        if obj =~ '\$'
-            let cmd = obj . ' <- NULL'
-        elseif obj =~ '-\[\[[0-9]*\]\]'
-            let obj = substitute(obj, '-\(\[\[[0-9]*\]\]\)', '\1', '')
-            let cmd = obj . ' <- NULL'
-        else
-            let cmd = 'rm(' . obj . ')'
-        endif
-    else
-        if obj =~ "^package:"
-            let cmd = 'detach("' . obj . '", unload = TRUE, character.only = TRUE)'
-        else
-            return ""
-        endif
-    endif
-    return cmd
-endfunction
-
-function! OBSendDeleteCmd(cmd)
-    if v:servername != ""
-        Py SendToVimCom("\x08Stop updating info. [OBSendDeleteCmd]")
-    endif
-    call g:SendCmdToR(a:cmd)
-    if g:rplugin_curview == "GlobalEnv"
-        Py SendToVimCom("\003GlobalEnv [OBSendDeleteCmd]")
-    else
-        Py SendToVimCom("\004Libraries [OBSendDeleteCmd]")
-    endif
-    call UpdateOB("both")
-    if v:servername != ""
-        exe 'Py SendToVimCom("\x07' . v:servername . '")'
-    endif
-endfunction
-
-function! OBDelete()
-    if line(".") < 3
-        return
-    endif
-    let cmd = OBGetDeleteCmd(line("."))
-    call OBSendDeleteCmd(cmd)
-endfunction
-
-function! OBMultiDelete()
-    let fline = line("'<")
-    let eline = line("'>")
-    if fline < 3
-        return
-    endif
-    let nl= 0
-    let cmd = ""
-    for ii in range(fline, eline)
-        let nl+= 1
-        if nl > 1
-            let cmd = cmd . "; "
-        endif
-        let cmd = cmd . OBGetDeleteCmd(ii)
-        if g:rplugin_curview == "GlobalEnv"
-            let cmd = substitute(cmd, "); rm(", ", ", "")
-        endif
-    endfor
-    call OBSendDeleteCmd(cmd)
-endfunction
-
 nmap <buffer><silent> <CR> :call RBrowserDoubleClick()<CR>
 nmap <buffer><silent> <2-LeftMouse> :call RBrowserDoubleClick()<CR>
 nmap <buffer><silent> <RightMouse> :call RBrowserRightClick()<CR>
@@ -426,9 +360,6 @@ else
         autocmd! ShowMarks
     endif
 endif
-
-nmap <buffer><silent> d :call OBDelete()<CR>
-vmap <buffer><silent> d <Esc>:call OBMultiDelete()<CR>
 
 let s:envstring = tolower($LC_MESSAGES . $LC_ALL . $LANG)
 if s:envstring =~ "utf-8" || s:envstring =~ "utf8"
