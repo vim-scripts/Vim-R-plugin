@@ -728,7 +728,12 @@ Tmux commands.
 If you always prefer to run Tmux before running Vim you may want to put in
 your ~/.bashrc:
 >
-   function tvim(){ tmux new-session "vim --servername VIM $@" ; }
+   if [ "x$DISPLAY" == "x" ]
+   then
+       function tvim(){ tmux new-session "vim $@" ; }
+   else
+       function tvim(){ tmux -2 new-session "TERM=screen-256color vim $@" ; }
+   fi
 <
 Then you will be able to start Vim inside a Tmux session by typing:
 >
@@ -1023,19 +1028,19 @@ browser's default width by setting the value of |vimrplugin_objbr_w| in your
    let vimrplugin_objbr_w = 30
 <
 The Object Browser will always be created by splitting the Vim script window
-if you are running GVim. However, if running Vim in a terminal emulator, the
-Object Browser will be created in a independent Vim instance in a Tmux panel
-beside the R Console. Valid values for the Object Browser placement are
-"script" or "console" and "right" or "left" separated by a comma. Examples:
+if you are running either GVim or Vim not inside a Tmux session. However, if
+running Vim in a terminal emulator inside a Tmux session, the Object Browser
+will be created in a independent Vim instance in a Tmux panel beside the R
+Console. Valid values for the Object Browser placement are "script" or
+"console" and "right" or "left" separated by a comma. Examples:
 >
    let vimrplugin_objbr_place = "script,right"
    let vimrplugin_objbr_place = "console,left"
 <
 If vimrplugin_external_ob = 1 and R is running in an external terminal
-emulator and the communication with R is being established through Tmux, the
-Object Browser will be placed besides the R Console in the external terminal
-emulator. In this case, the command <LocalLeader>rh will not work on the
-Object Browser (you will see the message "Cmd not available").
+emulator, the Object Browser will be placed besides the R Console in the
+external terminal emulator. In this case, the command <LocalLeader>rh will not
+work on the Object Browser (you will see the message "Cmd not available").
 
 
 6.5. Vim as pager for R help~
@@ -2033,14 +2038,14 @@ Here are some suggestions of configuration of Bash, Tmux and R. To understand
 what you are doing, and change the configuration to your taste, please read
 this document from the beginning.
 
-   ~/.bashr:~
+   ~/.bashrc:~
 >
    if [ "x$DISPLAY" == "x" ]
    then
        function tvim(){ tmux new-session "vim $@" ; }
    else
        alias vim='vim --servername VIM'
-       function tvim(){ tmux -2 new-session "TERM=screen-256color vim --servername VIM $@" ; }
+       function tvim(){ tmux -2 new-session "TERM=screen-256color vim $@" ; }
    fi
 <
    ~/.tmux.conf:~
