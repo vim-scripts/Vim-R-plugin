@@ -872,16 +872,8 @@ function StartObjBrowser_Tmux()
                     \ 'setlocal nomodified',
                     \ 'call cursor(curline, curcol)',
                     \ 'exe "PyFile " . substitute(g:rplugin_home, " ", '. "'\\\\ '" . ', "g") . "/r-plugin/vimcom.py"',
-                    \ 'function! RBrSendToR(cmd)',
-                    \ '    let scmd = "tmux set-buffer '. "'" . '" . a:cmd . "\<C-M>' . "'" . ' && tmux' . tmxs . 'paste-buffer -t ' . g:rplugin_rpane . '"',
-                    \ '    let rlog = system(scmd)',
-                    \ '    if v:shell_error',
-                    \ '        let rlog = substitute(rlog, "\n", " ", "g")',
-                    \ '        let rlog = substitute(rlog, "\r", " ", "g")',
-                    \ '        call RWarningMsg(rlog)',
-                    \ '        return 0',
-                    \ '    endif',
-                    \ 'endfunction',
+                    \ 'let g:rplugin_rconsole_pane = "' . g:rplugin_rconsole_pane . '"',
+                    \ 'let g:SendCmdToR = function("SendCmdToR_TmuxSplit")',
                     \ 'Py SendToVimCom("\003GlobalEnv [OB init]")',
                     \ 'Py SendToVimCom("\004Libraries [OB init]")',
                     \ 'if v:servername != ""',
@@ -1087,6 +1079,9 @@ function RBrowserOpenCloseLists(status)
     endif
     if has("gui_running")
         call UpdateOB("both")
+    endif
+    if v:servername != ""
+        exe 'Py SendToVimCom("\x07' . v:servername . '")'
     endif
 endfunction
 
@@ -2246,13 +2241,13 @@ function RRealAction(rcmd)
 endfunction
 
 function RAction(rcmd)
-    if !g:vimrplugin_external_ob
-        Py SendToVimCom("\x08Stop updating info [RAction()]")
-    endif
+    "if v:servername != ""
+    "    Py SendToVimCom("\x08Stop updating info [RAction()]")
+    "endif
     call RRealAction(a:rcmd)
-    if !g:vimrplugin_external_ob && v:servername != ""
-        exe 'Py SendToVimCom("\x07' . v:servername . '")'
-    endif
+    "if v:servername != ""
+    "    exe 'Py SendToVimCom("\x07' . v:servername . '")'
+    "endif
 endfunction
 
 if exists('g:maplocalleader')

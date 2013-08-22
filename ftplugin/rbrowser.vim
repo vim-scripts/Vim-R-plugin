@@ -354,12 +354,10 @@ function! OBGetDeleteCmd(lnum)
 endfunction
 
 function! OBSendDeleteCmd(cmd)
-    Py SendToVimCom("\x08Stop updating info. [OBSendDeleteCmd]")
-    if exists("*RBrSendToR")
-        call RBrSendToR(a:cmd)
-    else
-        call g:SendCmdToR(a:cmd)
+    if v:servername != ""
+        Py SendToVimCom("\x08Stop updating info. [OBSendDeleteCmd]")
     endif
+    call g:SendCmdToR(a:cmd)
     if g:rplugin_curview == "GlobalEnv"
         Py SendToVimCom("\003GlobalEnv [OBSendDeleteCmd]")
     else
@@ -367,7 +365,7 @@ function! OBSendDeleteCmd(cmd)
     endif
     call UpdateOB("both")
     if v:servername != ""
-        exe 'Py SendToVimCom("\x07' . v:servername . ' [OBSendDeleteCmd]")'
+        exe 'Py SendToVimCom("\x07' . v:servername . '")'
     endif
 endfunction
 
@@ -417,7 +415,7 @@ endif
 au BufEnter <buffer> stopinsert
 
 if $TMUX_PANE == ""
-    au BufUnload <buffer> Py SendToVimCom("\x08Stop updating info.")
+    au BufUnload <buffer> Py SendToVimCom("\x08Stop updating info [OB BufUnload].")
 else
     au BufUnload <buffer> call ObBrBufUnload()
     " Fix problems caused by some plugins
