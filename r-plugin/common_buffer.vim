@@ -69,9 +69,6 @@ else
 endif
 unlet b:bname
 
-" Special screenrc file
-let b:scrfile = " "
-
 if exists("g:rplugin_firstbuffer") && g:rplugin_firstbuffer == ""
     " The file global_r_plugin.vim was copied to ~/.vim/plugin
     let g:rplugin_firstbuffer = expand("%:p")
