@@ -669,10 +669,6 @@ any) used to classify the objects:
 One limitation is that objects made available by the command data() may not
 have their classes recognized in the GlobalEnv view.
 
-The Normal mode command  d  deletes the object on the cursor line or the
-element of a list or data.frame. If the Object Browser is showing the
-libraries, the library currently under the cursor line is detached.
-
 
 4.6. Commenting and uncommenting lines~
 
