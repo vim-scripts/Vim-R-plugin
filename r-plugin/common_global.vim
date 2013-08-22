@@ -671,18 +671,18 @@ function StartR_ExternalTerm(rcmd)
         call RWarningMsg("The X Window system is required to run R in an external terminal.")
         return
     endif
-    call system("tmux has-session -t " . g:rplugin_screensname)
+    call system("tmux has-session -t " . g:rplugin_tmuxsname)
     if v:shell_error
         if g:rplugin_termcmd =~ "gnome-terminal" || g:rplugin_termcmd =~ "xfce4-terminal" || g:rplugin_termcmd =~ "terminal" || g:rplugin_termcmd =~ "iterm"
-            let opencmd = printf("%s 'tmux -2 %s new-session -s %s \"%s\"' &", g:rplugin_termcmd, tmuxcnf, g:rplugin_screensname, rcmd)
+            let opencmd = printf("%s 'tmux -2 %s new-session -s %s \"%s\"' &", g:rplugin_termcmd, tmuxcnf, g:rplugin_tmuxsname, rcmd)
         else
-            let opencmd = printf("%s tmux -2 %s new-session -s %s \"%s\" &", g:rplugin_termcmd, tmuxcnf, g:rplugin_screensname, rcmd)
+            let opencmd = printf("%s tmux -2 %s new-session -s %s \"%s\" &", g:rplugin_termcmd, tmuxcnf, g:rplugin_tmuxsname, rcmd)
         endif
     else
         if g:rplugin_termcmd =~ "gnome-terminal" || g:rplugin_termcmd =~ "xfce4-terminal" || g:rplugin_termcmd =~ "terminal" || g:rplugin_termcmd =~ "iterm"
-            let opencmd = printf("%s 'tmux -2 %s attach-session -d -t %s' &", g:rplugin_termcmd, tmuxcnf, g:rplugin_screensname)
+            let opencmd = printf("%s 'tmux -2 %s attach-session -d -t %s' &", g:rplugin_termcmd, tmuxcnf, g:rplugin_tmuxsname)
         else
-            let opencmd = printf("%s tmux -2 %s attach-session -d -t %s &", g:rplugin_termcmd, tmuxcnf, g:rplugin_screensname)
+            let opencmd = printf("%s tmux -2 %s attach-session -d -t %s &", g:rplugin_termcmd, tmuxcnf, g:rplugin_tmuxsname)
         endif
     endif
 
@@ -855,7 +855,7 @@ function StartObjBrowser_Tmux()
                     \ 'let g:rplugin_rpane = "' . g:rplugin_rpane . '"',
                     \ 'let b:objbrtitle = "' . b:objbrtitle . '"',
                     \ 'let showmarks_enable = 0',
-                    \ 'let g:rplugin_screensname = "' . g:rplugin_screensname . '"',
+                    \ 'let g:rplugin_tmuxsname = "' . g:rplugin_tmuxsname . '"',
                     \ 'let b:rscript_buffer = "' . bufname("%") . '"',
                     \ 'set filetype=rbrowser',
                     \ 'let $VIMINSTANCEID="' . $VIMINSTANCEID . '"',
@@ -979,7 +979,7 @@ function StartObjBrowser_Vim()
     else
         " Copy the values of some local variables that will be inherited
         let g:tmp_objbrtitle = b:objbrtitle
-        let g:tmp_screensname = g:rplugin_screensname
+        let g:tmp_tmuxsname = g:rplugin_tmuxsname
         let g:tmp_curbufname = bufname("%")
 
         let l:sr = &splitright
@@ -994,11 +994,11 @@ function StartObjBrowser_Vim()
         sil set filetype=rbrowser
 
         " Inheritance of some local variables
-        let g:rplugin_screensname = g:tmp_screensname
+        let g:rplugin_tmuxsname = g:tmp_tmuxsname
         let b:objbrtitle = g:tmp_objbrtitle
         let b:rscript_buffer = g:tmp_curbufname
         unlet g:tmp_objbrtitle
-        unlet g:tmp_screensname
+        unlet g:tmp_tmuxsname
         unlet g:tmp_curbufname
         exe "PyFile " . substitute(g:rplugin_home, " ", '\\ ', "g") . "/r-plugin/vimcom.py"
         Py SendToVimCom("\003GlobalEnv [startobjectbrowser()]")
@@ -1210,7 +1210,7 @@ function SendCmdToR_Term(cmd)
 
     " Send the command to R running in an external terminal emulator
     let str = substitute(cmd, "'", "'\\\\''", "g")
-    let scmd = "tmux set-buffer '" . str . "\<C-M>' && tmux paste-buffer -t " . g:rplugin_screensname . '.0'
+    let scmd = "tmux set-buffer '" . str . "\<C-M>' && tmux paste-buffer -t " . g:rplugin_tmuxsname . '.0'
     let rlog = system(scmd)
     if v:shell_error
         let rlog = substitute(rlog, '\n', ' ', 'g')
@@ -2064,7 +2064,7 @@ function ShowRDoc(rkeyword, package, getclass)
     endif
 
     " Local variables that must be inherited by the rdoc buffer
-    let g:tmp_screensname = g:rplugin_screensname
+    let g:tmp_tmuxsname = g:rplugin_tmuxsname
     let g:tmp_objbrtitle = b:objbrtitle
 
     let rdoccaption = substitute(s:rdoctitle, '\', '', "g")
@@ -2103,7 +2103,7 @@ function ShowRDoc(rkeyword, package, getclass)
 
     " Inheritance of local variables from the script buffer
     let b:objbrtitle = g:tmp_objbrtitle
-    let g:rplugin_screensname = g:tmp_screensname
+    let g:rplugin_tmuxsname = g:tmp_tmuxsname
     unlet g:tmp_objbrtitle
 
     let save_unnamed_reg = @@
@@ -3379,7 +3379,7 @@ let g:rplugin_lastrpl = ""
 let g:rplugin_ob_busy = 0
 let g:rplugin_hasRSFbutton = 0
 let g:rplugin_errlist = []
-let g:rplugin_screensname = substitute("vimrplugin-" . g:rplugin_userlogin . localtime() . g:rplugin_firstbuffer, '\W', '', 'g')
+let g:rplugin_tmuxsname = substitute("vimrplugin-" . g:rplugin_userlogin . localtime() . g:rplugin_firstbuffer, '\W', '', 'g')
 
 let $VIMINSTANCEID = substitute(g:rplugin_firstbuffer . localtime(), '\W', '', 'g')
 
@@ -3395,13 +3395,13 @@ call SetRPath()
 
 " Compatibility with old versions (August 2013):
 if exists("g:vimrplugin_tmux")
-    call RWarningMsg("The option vimrplugin_tmux is deprecated.")
+    call RWarningMsg("The option vimrplugin_tmux is deprecated and will be ignored.")
 endif
 if exists("g:vimrplugin_noscreenrc")
-    call RWarningMsg("The option vimrplugin_noscreenrc is deprecated.")
+    call RWarningMsg("The option vimrplugin_noscreenrc is deprecated and will be ignored.")
 endif
 if exists("g:vimrplugin_screenplugin")
-    call RWarningMsg("The option vimrplugin_screenplugin is deprecated.")
+    call RWarningMsg("The option vimrplugin_screenplugin is deprecated and will be ignored.")
 endif
 if exists("g:vimrplugin_screenvsplit")
     call RWarningMsg("The option vimrplugin_screenvsplit is deprecated. Please use vimrplugin_vsplit instead.")
