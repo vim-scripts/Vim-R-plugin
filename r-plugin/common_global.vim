@@ -596,7 +596,7 @@ endfunction
 function StartR_TmuxSplit(rcmd)
     call system("tmux set-environment -g VIMRPLUGIN_TMPDIR " . g:rplugin_esc_tmpdir)
     call system("tmux set-environment VIMINSTANCEID " . $VIMINSTANCEID)
-    let vimpane = TmuxActivePane()
+    let g:rplugin_vim_pane = TmuxActivePane()
     let tcmd = "tmux split-window "
     if g:vimrplugin_vsplit
         if g:vimrplugin_rconsole_width == -1
@@ -617,13 +617,14 @@ function StartR_TmuxSplit(rcmd)
         return
     endif
     let g:rplugin_rconsole_pane = TmuxActivePane()
-    let rlog = system("tmux select-pane -t " . vimpane)
+    let rlog = system("tmux select-pane -t " . g:rplugin_vim_pane)
     if v:shell_error
         call RWarningMsg(rlog)
         return
     endif
     let g:SendCmdToR = function('SendCmdToR_TmuxSplit')
     if g:vimrplugin_restart
+        sleep 200m
         call g:SendCmdToR(a:rcmd)
     endif
     let g:rplugin_last_rcmd = a:rcmd
@@ -754,9 +755,16 @@ function StartR(whatr)
         if g:rplugin_tmuxwasfirst
             if g:vimrplugin_restart
                 call g:SendCmdToR('quit(save = "no")')
-                call g:SendCmdToR("\014")
-                call CloseExternalOB() " TODO: Update OB instead of closing it.
+                sleep 100m
                 call g:SendCmdToR(g:rplugin_last_rcmd)
+                if IsExternalOBRunning()
+                    call delete($VIMRPLUGIN_TMPDIR . "/vimcom_running")
+                    call WaitVimComStart()
+                    exe 'Py SendToVimCom("\007' . g:rplugin_obsname . '")'
+                    Py SendToVimCom("\004Libraries [Restarting R]")
+                    Py SendToVimCom("\003GlobalEnv [Restarting R]")
+                    call remote_expr(g:rplugin_obsname, 'UpdateOB("both")')
+                endif
                 return
             else
                 call RWarningMsg("As far as I know, R is already running. Did you quit it from within Vim (" . g:maplocalleader . "rq if not remapped)?")
@@ -764,7 +772,7 @@ function StartR(whatr)
             endif
         else
             if g:vimrplugin_restart
-                call RQuit("no")
+                call RQuit("restartR")
             endif
         endif
     endif
@@ -778,7 +786,19 @@ function StartR(whatr)
     if g:rplugin_tmuxwasfirst
         call StartR_TmuxSplit(rcmd)
     else
+        if g:vimrplugin_restart && bufloaded(b:objbrtitle)
+            call delete($VIMRPLUGIN_TMPDIR . "/vimcom_running")
+        endif
         call StartR_ExternalTerm(rcmd)
+        if g:vimrplugin_restart && bufloaded(b:objbrtitle)
+            call WaitVimComStart()
+            exe 'Py SendToVimCom("\007' . v:servername . '")'
+            Py SendToVimCom("\004Libraries [Restarting R]")
+            Py SendToVimCom("\003GlobalEnv [Restarting R]")
+            if exists("*UpdateOB")
+                call UpdateOB("both")
+            endif
+        endif
     endif
 
     " Go back to original directory:
@@ -786,186 +806,170 @@ function StartR(whatr)
     echon
 endfunction
 
+function WaitVimComStart()
+    sleep 300m
+    let ii = 0
+    while !filereadable($VIMRPLUGIN_TMPDIR . "/vimcom_running") && ii < 20
+        let ii = ii + 1
+        sleep 200m
+    endwhile
+    if filereadable($VIMRPLUGIN_TMPDIR . "/vimcom_running") && g:rplugin_tmuxwasfirst
+        sleep 100m
+        call g:SendCmdToR("\014")
+    endif
+endfunction
+
+function IsExternalOBRunning()
+    if exists("g:rplugin_ob_pane")
+        let plst = system("tmux list-panes | cat")
+        if plst =~ g:rplugin_ob_pane
+            return 1
+        endif
+        unlet g:rplugin_ob_pane
+    endif
+    return 0
+endfunction
+
 function StartObjBrowser_Tmux()
-        if b:rplugin_extern_ob
-            " This is the Object Browser
-            let g:rplugin_running_objbr = 0
-            return
-        endif
+    if b:rplugin_extern_ob
+        " This is the Object Browser
+        echoerr "StartObjBrowser_Tmux() called."
+        return
+    endif
 
-        " Don't start the Object Browser if it already exists
-        if exists("g:rplugin_obpane")
-            let plst = system("tmux list-panes | cat")
-            if plst =~ g:rplugin_obpane
-                return
-            endif
-            unlet g:rplugin_obpane
-        endif
-        sleep 250m
+    " Don't start the Object Browser if it already exists
+    if IsExternalOBRunning()
+        return
+    endif
 
-        let objbrowserfile = $VIMRPLUGIN_TMPDIR . "/objbrowserInit"
-        let tmxs = " "
+    "sleep 250m
 
-        if !exists("g:rplugin_edpane")
-            if g:rplugin_tmuxwasfirst == 0
-                let g:rplugin_edpane = "none"
-            else
-                let g:rplugin_edpane = $TMUX_PANE
-            endif
-            if strlen(g:rplugin_edpane) == 0
-                if g:vimrplugin_external_ob
-                    let g:rplugin_edpane = "none"
-                    let g:vimrplugin_objbr_place = substitute(g:vimrplugin_objbr_place, "script", "console", "g")
-                else
-                    echoer "Could not find the environment variable TMUX_PANE."
-                    return
-                endif
-            endif
-        endif
+    let objbrowserfile = $VIMRPLUGIN_TMPDIR . "/objbrowserInit"
+    let tmxs = " "
 
-        Py SendToVimCom("\001Tmux pane")
-        let ii = 0
-        while !filereadable($VIMRPLUGIN_TMPDIR . "/rpane") && ii < 20
-            let ii = ii + 1
-            sleep 50m
-        endwhile
-        if !filereadable($VIMRPLUGIN_TMPDIR . "/rpane")
-            echoer "The number of the R Tmux pane is unknown."
-            return
-        endif
-        let xx = readfile($VIMRPLUGIN_TMPDIR . "/rpane")
-        let g:rplugin_rpane = xx[0]
-        if g:rplugin_rpane !~ "%[0-9]"
-            echoer 'The number of the R Tmux pane is invalid: "' . g:rplugin_rpane . '"'
-            unlet g:rplugin_rpane
-            return
-        endif
+    if v:servername == ""
+        let myservername = '""'
+    else
+        let myservername = '"' . v:servername . '"'
+    endif
 
+    call writefile([
+                \ 'let g:rplugin_editor_sname = ' . myservername,
+                \ 'let g:rplugin_vim_pane = "' . g:rplugin_vim_pane . '"',
+                \ 'let g:rplugin_rconsole_pane = "' . g:rplugin_rconsole_pane . '"',
+                \ 'let b:objbrtitle = "' . b:objbrtitle . '"',
+                \ 'let showmarks_enable = 0',
+                \ 'let g:rplugin_tmuxsname = "' . g:rplugin_tmuxsname . '"',
+                \ 'let b:rscript_buffer = "' . bufname("%") . '"',
+                \ 'set filetype=rbrowser',
+                \ 'let $VIMINSTANCEID="' . $VIMINSTANCEID . '"',
+                \ 'let b:rplugin_extern_ob = 1',
+                \ 'setlocal modifiable',
+                \ 'set shortmess=atI',
+                \ 'set rulerformat=%3(%l%)',
+                \ 'set noruler',
+                \ 'let curline = line(".")',
+                \ 'let curcol = col(".")',
+                \ 'let save_unnamed_reg = @@',
+                \ 'normal! ggdG',
+                \ 'let @@ = save_unnamed_reg',
+                \ 'setlocal nomodified',
+                \ 'call cursor(curline, curcol)',
+                \ 'exe "PyFile " . substitute(g:rplugin_home, " ", '. "'\\\\ '" . ', "g") . "/r-plugin/vimcom.py"',
+                \ 'let g:SendCmdToR = function("SendCmdToR_TmuxSplit")',
+                \ 'Py SendToVimCom("\003GlobalEnv [OB init]")',
+                \ 'Py SendToVimCom("\004Libraries [OB init]")',
+                \ 'if v:servername != ""',
+                \ "    exe 'Py SendToVimCom(\"\\x07' . v:servername . '\")'",
+                \ 'endif',
+                \ 'call setline(1, ".GlobalEnv | Libraries")',
+                \ 'exe "silent read ' . substitute($VIMRPLUGIN_TMPDIR, ' ', '\\\\ ', 'g') . '/object_browser"',
+                \ 'redraw'], objbrowserfile)
 
-        if v:servername == ""
-            let myservername = '""'
-        else
-            let myservername = '"' . v:servername . '"'
-        endif
-
-        call writefile([
-                    \ 'call writefile([$TMUX_PANE], $VIMRPLUGIN_TMPDIR . "/objbrpane")',
-                    \ 'let g:rplugin_editor_sname = ' . myservername,
-                    \ 'let g:rplugin_edpane = "' . g:rplugin_edpane . '"',
-                    \ 'let g:rplugin_rpane = "' . g:rplugin_rpane . '"',
-                    \ 'let b:objbrtitle = "' . b:objbrtitle . '"',
-                    \ 'let showmarks_enable = 0',
-                    \ 'let g:rplugin_tmuxsname = "' . g:rplugin_tmuxsname . '"',
-                    \ 'let b:rscript_buffer = "' . bufname("%") . '"',
-                    \ 'set filetype=rbrowser',
-                    \ 'let $VIMINSTANCEID="' . $VIMINSTANCEID . '"',
-                    \ 'let b:rplugin_extern_ob = 1',
-                    \ 'setlocal modifiable',
-                    \ 'set shortmess=atI',
-                    \ 'set rulerformat=%3(%l%)',
-                    \ 'set noruler',
-                    \ 'let curline = line(".")',
-                    \ 'let curcol = col(".")',
-                    \ 'let save_unnamed_reg = @@',
-                    \ 'normal! ggdG',
-                    \ 'let @@ = save_unnamed_reg',
-                    \ 'setlocal nomodified',
-                    \ 'call cursor(curline, curcol)',
-                    \ 'exe "PyFile " . substitute(g:rplugin_home, " ", '. "'\\\\ '" . ', "g") . "/r-plugin/vimcom.py"',
-                    \ 'let g:rplugin_rconsole_pane = "' . g:rplugin_rconsole_pane . '"',
-                    \ 'let g:SendCmdToR = function("SendCmdToR_TmuxSplit")',
-                    \ 'Py SendToVimCom("\003GlobalEnv [OB init]")',
-                    \ 'Py SendToVimCom("\004Libraries [OB init]")',
-                    \ 'if v:servername != ""',
-                    \ "    exe 'Py SendToVimCom(\"\\x07' . v:servername . '\")'",
-                    \ 'endif',
-                    \ 'call setline(1, ".GlobalEnv | Libraries")',
-                    \ 'exe "silent read ' . substitute($VIMRPLUGIN_TMPDIR, ' ', '\\\\ ', 'g') . '/object_browser"',
-                    \ 'redraw'], objbrowserfile)
-
-        if g:vimrplugin_objbr_place =~ "left"
-            let panw = system("tmux list-panes | cat")
-            if g:vimrplugin_objbr_place =~ "console"
-                " Get the R Console width:
-                let panw = substitute(panw, '.*\n1: \[\([0-9]*\)x.*', '\1', "")
-            else
-                " Get the Vim with
-                let panw = substitute(panw, '.*0: \[\([0-9]*\)x.*', '\1', "")
-            endif
-            let panewidth = panw - g:vimrplugin_objbr_w
-            " Just to be safe: If the above code doesn't work as expected
-            " and we get a spurious value:
-            if panewidth < 40 || panewidth > 180
-                let panewidth = 80
-            endif
-        else
-            let panewidth = g:vimrplugin_objbr_w
-        endif
+    if g:vimrplugin_objbr_place =~ "left"
+        let panw = system("tmux list-panes | cat")
         if g:vimrplugin_objbr_place =~ "console"
-            let obpane = g:rplugin_rpane
+            " Get the R Console width:
+            let panw = substitute(panw, '.*\n1: \[\([0-9]*\)x.*', '\1', "")
         else
-            let obpane = g:rplugin_edpane
+            " Get the Vim with
+            let panw = substitute(panw, '.*0: \[\([0-9]*\)x.*', '\1', "")
         endif
-        let cmd = "tmux split-window -d -h -l " . panewidth . " -t " . obpane . ' "vim ' . g:rplugin_obsname_arg . " -c 'source " . substitute(objbrowserfile, ' ', '\\ ', 'g') . "'" . '"'
+        let panewidth = panw - g:vimrplugin_objbr_w
+        " Just to be safe: If the above code doesn't work as expected
+        " and we get a spurious value:
+        if panewidth < 40 || panewidth > 180
+            let panewidth = 80
+        endif
+    else
+        let panewidth = g:vimrplugin_objbr_w
+    endif
+    if g:vimrplugin_objbr_place =~ "console"
+        let obpane = g:rplugin_rconsole_pane
+    else
+        let obpane = g:rplugin_vim_pane
+    endif
 
-        call delete($VIMRPLUGIN_TMPDIR . "/objbrpane")
+    if has("clientserver")
+        let obsname = "--servername " . g:rplugin_obsname
+    else
+        let obsname = " "
+    endif
 
-        let rlog = system(cmd)
-        if v:shell_error
-            let rlog = substitute(rlog, '\n', ' ', 'g')
-            let rlog = substitute(rlog, '\r', ' ', 'g')
-            call RWarningMsg(rlog)
-            let g:rplugin_running_objbr = 0
-            return 0
-        endif
+    let cmd = "tmux split-window -h -l " . panewidth . " -t " . obpane . ' "vim ' . obsname . " -c 'source " . substitute(objbrowserfile, ' ', '\\ ', 'g') . "'" . '"'
+    let rlog = system(cmd)
+    if v:shell_error
+        let rlog = substitute(rlog, '\n', ' ', 'g')
+        let rlog = substitute(rlog, '\r', ' ', 'g')
+        call RWarningMsg(rlog)
+        let g:rplugin_running_objbr = 0
+        return 0
+    endif
 
-        let ii = 0
-        while !filereadable($VIMRPLUGIN_TMPDIR . "/objbrpane") && ii < 20
-            let ii = ii + 1
-            sleep 50m
-        endwhile
-        if !filereadable($VIMRPLUGIN_TMPDIR . "/objbrpane")
-            echoer "The Tmux pane number of the Object Browser is unknown."
-            return
-        endif
-        let xx = readfile($VIMRPLUGIN_TMPDIR . "/objbrpane")
-        let g:rplugin_obpane = xx[0]
-        if g:rplugin_obpane !~ "%[0-9]"
-            echoer 'The number of the Object Browser Tmux pane is invalid: "' . g:rplugin_obpane . '"'
-            unlet g:rplugin_obpane
-            return
-        endif
+    let g:rplugin_ob_pane = TmuxActivePane()
+    let rlog = system("tmux select-pane -t " . g:rplugin_vim_pane)
+    if v:shell_error
+        call RWarningMsg(rlog)
+        return 0
+    endif
 
-        if g:vimrplugin_objbr_place =~ "left"
-            if g:vimrplugin_objbr_place =~ "console"
-                call system("tmux swap-pane -d -s " . g:rplugin_rpane . " -t " . g:rplugin_obpane)
-            else
-                call system("tmux swap-pane -d -s " . g:rplugin_edpane . " -t " . g:rplugin_obpane)
-            endif
+    if g:vimrplugin_objbr_place =~ "left"
+        if g:vimrplugin_objbr_place =~ "console"
+            call system("tmux swap-pane -d -s " . g:rplugin_rconsole_pane . " -t " . g:rplugin_ob_pane)
+        else
+            call system("tmux swap-pane -d -s " . g:rplugin_vim_pane . " -t " . g:rplugin_ob_pane)
         endif
+    endif
+    if g:rplugin_ob_warn_shown == 0
         if !has("clientserver")
             call RWarningMsg("The +clientserver feature is required to automatically update the Object Browser.")
+            sleep 200m
         else
             if $DISPLAY == ""
                 call RWarningMsg("The X Window system is required to automatically update the Object Browser.")
+                sleep 200m
             endif
         endif
-        return
+        let g:rplugin_ob_warn_shown = 1
     endif
+    return
 endfunction
 
 function StartObjBrowser_Vim()
     let wmsg = ""
     if v:servername == ""
-        if !has("clientserver")
-            let wmsg = "The +clientserver feature is required to automatically update the Object Browser."
-        else
-            if $DISPLAY == "" && !(has("win32") || has("win64"))
-                let wmsg = "The X Window system is required to automatically update the Object Browser."
+        if g:rplugin_ob_warn_shown == 0
+            if !has("clientserver")
+                let wmsg = "The +clientserver feature is required to automatically update the Object Browser."
             else
-                let wmsg ="The Object Browser will not be automatically updated because Vim's client/server was not started."
+                if $DISPLAY == "" && !(has("win32") || has("win64"))
+                    let wmsg = "The X Window system is required to automatically update the Object Browser."
+                else
+                    let wmsg ="The Object Browser will not be automatically updated because Vim's client/server was not started."
+                endif
             endif
         endif
+        let g:rplugin_ob_warn_shown = 1
     else
         exe 'Py SendToVimCom("\007' . v:servername . '")'
     endif
@@ -1007,6 +1011,7 @@ function StartObjBrowser_Vim()
     endif
     if wmsg != ""
         call RWarningMsg(wmsg)
+        sleep 200m
     endif
 endfunction
 
@@ -1662,23 +1667,20 @@ function RSetWD()
 endfunction
 
 function CloseExternalOB()
-    " check if the pane still exists before trying to kill it because the
-    " user may have already closed the Object Browser manually.
-    if exists("g:rplugin_obpane")
-        let plst = system("tmux list-panes | cat")
-        if plst =~ g:rplugin_obpane
-            call system("tmux kill-pane -t " . g:rplugin_obpane)
-            unlet g:rplugin_obpane
-        endif
+    if IsExternalOBRunning()
+        call system("tmux kill-pane -t " . g:rplugin_ob_pane)
+        unlet g:rplugin_ob_pane
         sleep 250m
     endif
 endfunction
 
 " Quit R
 function RQuit(how)
-    if bufloaded(b:objbrtitle)
-        exe "bunload! " . b:objbrtitle
-        sleep 150m
+    if a:how != "restartR"
+        if bufloaded(b:objbrtitle)
+            exe "bunload! " . b:objbrtitle
+            sleep 30m
+        endif
     endif
 
     if exists("b:quit_command")
@@ -1705,20 +1707,22 @@ function RQuit(how)
         endif
     endif
 
-    sleep 250m
+    sleep 50m
 
     call CloseExternalOB()
 
-    if exists("g:rplugin_objbrtitle")
-        unlet g:rplugin_objbrtitle
+    if a:how != "restartR"
+        if exists("g:rplugin_objbrtitle")
+            unlet g:rplugin_objbrtitle
+        endif
     endif
 
     if exists("g:rplugin_rconsole_pane")
         unlet g:rplugin_rconsole_pane
     endif
 
-    call delete($VIMRPLUGIN_TMPDIR . "/object_browser")
-    call delete($VIMRPLUGIN_TMPDIR . "/liblist")
+    call writefile([], $VIMRPLUGIN_TMPDIR . "/object_browser")
+    call writefile([], $VIMRPLUGIN_TMPDIR . "/liblist")
     let g:SendCmdToR = function('SendCmdToR_fake')
 endfunction
 
@@ -2197,10 +2201,10 @@ function RRealAction(rcmd)
                         let pkg = ""
                     endif
                     if b:rplugin_extern_ob
-                        if g:rplugin_edpane == "none"
+                        if g:rplugin_vim_pane == "none"
                             call RWarningMsg("Cmd not available.")
                         else
-                            let slog = system("tmux set-buffer '" . "\<Esc>" . ':call ShowRDoc("' . rkeyword . '", "' . pkg . '", 0)' . "\<C-M>' && tmux paste-buffer -t " . g:rplugin_edpane . " && tmux select-pane -t " . g:rplugin_edpane)
+                            let slog = system("tmux set-buffer '" . "\<Esc>" . ':call ShowRDoc("' . rkeyword . '", "' . pkg . '", 0)' . "\<C-M>' && tmux paste-buffer -t " . g:rplugin_vim_pane . " && tmux select-pane -t " . g:rplugin_vim_pane)
                             if v:shell_error
                                 call RWarningMsg(slog)
                             endif
@@ -3374,6 +3378,7 @@ let g:rplugin_firstbuffer = expand("%:p")
 let g:rplugin_running_objbr = 0
 let g:rplugin_has_new_lib = 0
 let g:rplugin_has_new_obj = 0
+let g:rplugin_ob_warn_shown = 0
 let g:rplugin_vimcomport = 0
 let g:rplugin_lastrpl = ""
 let g:rplugin_ob_busy = 0
@@ -3383,11 +3388,7 @@ let g:rplugin_tmuxsname = substitute("vimrplugin-" . g:rplugin_userlogin . local
 
 let $VIMINSTANCEID = substitute(g:rplugin_firstbuffer . localtime(), '\W', '', 'g')
 
-if has("clientserver")
-    let g:rplugin_obsname_arg = "--servername " . toupper(substitute(substitute(expand("%:r"), '\W', '', 'g'), "_", "", "g"))
-else
-    let g:rplugin_obsname_arg = " "
-endif
+let g:rplugin_obsname = toupper(substitute(substitute(expand("%:r"), '\W', '', 'g'), "_", "", "g"))
 
 
 call SetRPath()
