@@ -891,6 +891,13 @@ do the tasks to avoid any risk of corrupting R's memory. It will tell Vim that
 expected again after any valid code is executed in the R Console.
 
 
+5.6. Problems with Fish Shell~
+
+Some of the plugin features does not work correctly if Vim is running inside
+Fish Shell, for example, in the Object Browser, lists and libraries do not
+open and close when the <Enter> key is pressed over them.
+
+
 ==============================================================================
 							    *r-plugin-options*
 6. Options~
