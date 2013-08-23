@@ -57,16 +57,15 @@ let g:rplugin_curview = "GlobalEnv"
 
 
 function! UpdateOB(what)
-    let g:rplugin_upobcnt += 1
     if a:what == "both"
         let wht = g:rplugin_curview
     else
         let wht = a:what
     endif
     if g:rplugin_curview != wht
-        let g:rplugin_upobcnt -= 1
         return "curview != what"
     endif
+    let g:rplugin_upobcnt += 1
 
     let g:rplugin_switchedbuf = 0
     if $TMUX_PANE == ""

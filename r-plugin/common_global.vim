@@ -756,14 +756,17 @@ function StartR(whatr)
             if g:vimrplugin_restart
                 call g:SendCmdToR('quit(save = "no")')
                 sleep 100m
+                call delete($VIMRPLUGIN_TMPDIR . "/vimcom_running")
                 call g:SendCmdToR(g:rplugin_last_rcmd)
                 if IsExternalOBRunning()
-                    call delete($VIMRPLUGIN_TMPDIR . "/vimcom_running")
+                    call remote_expr(g:rplugin_obsname, 'ResetVimComPort()')
                     call WaitVimComStart()
                     exe 'Py SendToVimCom("\007' . g:rplugin_obsname . '")'
-                    Py SendToVimCom("\004Libraries [Restarting R]")
-                    Py SendToVimCom("\003GlobalEnv [Restarting R]")
-                    call remote_expr(g:rplugin_obsname, 'UpdateOB("both")')
+                    Py SendToVimCom("\003.GlobalEnv [Restarting R]")
+                    Py SendToVimCom("\004Libraries [Restarting()]")
+                    " vimcom automatically update the libraries view, but not
+                    " the GlobalEnv one because vimcom_count_objects() returns 0.
+                    call remote_expr(g:rplugin_obsname, 'UpdateOB("GlobalEnv")')
                 endif
                 return
             else
@@ -773,6 +776,7 @@ function StartR(whatr)
         else
             if g:vimrplugin_restart
                 call RQuit("restartR")
+                call ResetVimComPort()
             endif
         endif
     endif
@@ -793,10 +797,10 @@ function StartR(whatr)
         if g:vimrplugin_restart && bufloaded(b:objbrtitle)
             call WaitVimComStart()
             exe 'Py SendToVimCom("\007' . v:servername . '")'
-            Py SendToVimCom("\004Libraries [Restarting R]")
-            Py SendToVimCom("\003GlobalEnv [Restarting R]")
+            Py SendToVimCom("\003.GlobalEnv [Restarting R]")
+            Py SendToVimCom("\004Libraries [Restarting()]")
             if exists("*UpdateOB")
-                call UpdateOB("both")
+                call UpdateOB("GlobalEnv")
             endif
         endif
     endif
@@ -828,6 +832,10 @@ function IsExternalOBRunning()
         unlet g:rplugin_ob_pane
     endif
     return 0
+endfunction
+
+function ResetVimComPort()
+    Py VimComPort = 0
 endfunction
 
 function StartObjBrowser_Tmux()
