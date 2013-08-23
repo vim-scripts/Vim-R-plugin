@@ -883,7 +883,10 @@ function StartObjBrowser_Tmux()
                 \ "    exe 'Py SendToVimCom(\"\\x07' . v:servername . '\")'",
                 \ 'endif',
                 \ 'call setline(1, ".GlobalEnv | Libraries")',
-                \ 'exe "silent read ' . substitute($VIMRPLUGIN_TMPDIR, ' ', '\\\\ ', 'g') . '/object_browser"',
+                \ 'if filereadable("' . $VIMRPLUGIN_TMPDIR . '/object_browser")',
+                \ '    exe "silent read ' . substitute($VIMRPLUGIN_TMPDIR, ' ', '\\\\ ', 'g') . '/object_browser"',
+                \ 'endif',
+                \ 'setlocal nomodifiable',
                 \ 'redraw'], objbrowserfile)
 
     if g:vimrplugin_objbr_place =~ "left"
