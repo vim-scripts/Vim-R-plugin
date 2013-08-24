@@ -698,6 +698,18 @@ function StartR_ExternalTerm(rcmd)
     let g:SendCmdToR = function('SendCmdToR_Term')
 endfunction
 
+function IsSendCmdToRFake()
+    if string(g:SendCmdToR) != "function('SendCmdToR_fake')"
+	if exists("g:maplocalleader")
+	    call RWarningMsg("As far as I know, R is already running. Did you quit it from within Vim (" . g:maplocalleader . "rq if not remapped)?")
+	else
+	    call RWarningMsg("As far as I know, R is already running. Did you quit it from within Vim (\\rq if not remapped)?")
+	endif
+	return 1
+    endif
+    return 0
+endfunction
+
 " Start R
 function StartR(whatr)
     call writefile([], $VIMRPLUGIN_TMPDIR . "/object_browser")
@@ -718,6 +730,10 @@ function StartR(whatr)
             let b:rplugin_r_args = input('Enter parameters for R: ')
             call inputrestore()
         endif
+    endif
+
+    if IsSendCmdToRFake() && (g:vimrplugin_applescript || has("win32") || has("win64"))
+	return
     endif
 
     if g:vimrplugin_applescript
@@ -769,9 +785,8 @@ function StartR(whatr)
                     call remote_expr(g:rplugin_obsname, 'UpdateOB("GlobalEnv")')
                 endif
                 return
-            else
-                call RWarningMsg("As far as I know, R is already running. Did you quit it from within Vim (" . g:maplocalleader . "rq if not remapped)?")
-                return
+            elseif IsSendCmdToRFake()
+		return
             endif
         else
             if g:vimrplugin_restart
@@ -3123,7 +3138,7 @@ if g:vimrplugin_objbr_place =~ "console"
 endif
 
 " Check whether Tmux is OK
-if !has("win32") && !has("win64") && !has("mac") && !has("gui_macvim") || !has("gui_mac") || !has("mac") || !has("macunix") && !has("gui_win32") && !has("gui_win64")
+if !has("win32") && !has("win64") && !has("mac") && !has("gui_macvim") && !has("gui_mac") && !has("mac") && !has("macunix") && !has("gui_win32") && !has("gui_win64")
     if !executable('tmux')
         call RWarningMsgInp("Please, install the 'Tmux' application to enable the Vim-R-plugin.")
         let g:rplugin_failed = 1

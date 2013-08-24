@@ -150,10 +150,7 @@ function! RBrowserDoubleClick()
             call RWarningMsg("R is busy.")
         endif
     endif
-    "if has("win32") || has("win64")
-    "    call UpdateOB("both")
-    "endif
-    if v:servername == ""
+    if v:servername == "" || has("win32") || has("win64")
         sleep 50m " R needs some time to write the file.
         call UpdateOB("both")
     endif
