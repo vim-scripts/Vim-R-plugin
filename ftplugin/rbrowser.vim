@@ -65,7 +65,10 @@ function! UpdateOB(what)
     if g:rplugin_curview != wht
         return "curview != what"
     endif
-    let g:rplugin_upobcnt += 1
+    if g:rplugin_upobcnt
+        return "OB Called twice"
+    endif
+    let g:rplugin_upobcnt = 1
 
     let g:rplugin_switchedbuf = 0
     if $TMUX_PANE == ""
@@ -73,7 +76,7 @@ function! UpdateOB(what)
         silent buffers
         redir END
         if s:bufl !~ "Object_Browser"
-            let g:rplugin_upobcnt -= 1
+            let g:rplugin_upobcnt = 0
             return "Object_Browser not listed"
         endif
         if exists("g:rplugin_curbuf") && g:rplugin_curbuf != "Object_Browser"
@@ -105,16 +108,14 @@ function! UpdateOB(what)
     endif
     call cursor(curline, curcol)
     if bufname("%") =~ "Object_Browser" || b:rplugin_extern_ob
-        if g:rplugin_upobcnt < 2
-            setlocal nomodifiable
-        endif
+        setlocal nomodifiable
     endif
     redraw
     if g:rplugin_switchedbuf
         exe "sil noautocmd sb " . g:rplugin_curbuf
         exe "set switchbuf=" . savesb
     endif
-    let g:rplugin_upobcnt -= 1
+    let g:rplugin_upobcnt = 0
     return "End of UpdateOB()"
 endfunction
 
@@ -149,8 +150,12 @@ function! RBrowserDoubleClick()
             call RWarningMsg("R is busy.")
         endif
     endif
-    if has("win32") || has("win64")
-	    call UpdateOB("both")
+    "if has("win32") || has("win64")
+    "    call UpdateOB("both")
+    "endif
+    if v:servername == ""
+        sleep 50m " R needs some time to write the file.
+        call UpdateOB("both")
     endif
 endfunction
 
@@ -323,7 +328,7 @@ endfunction
 
 function! ObBrBufUnload()
     if exists("g:rplugin_editor_sname")
-        call system("tmux select-pane -t " . g:rplugin_edpane)
+        call system("tmux select-pane -t " . g:rplugin_vim_pane)
     endif
 endfunction
 

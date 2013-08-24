@@ -829,7 +829,6 @@ function IsExternalOBRunning()
         if plst =~ g:rplugin_ob_pane
             return 1
         endif
-        unlet g:rplugin_ob_pane
     endif
     return 0
 endfunction
@@ -872,17 +871,9 @@ function StartObjBrowser_Tmux()
                 \ 'set filetype=rbrowser',
                 \ 'let $VIMINSTANCEID="' . $VIMINSTANCEID . '"',
                 \ 'let b:rplugin_extern_ob = 1',
-                \ 'setlocal modifiable',
                 \ 'set shortmess=atI',
                 \ 'set rulerformat=%3(%l%)',
                 \ 'set noruler',
-                \ 'let curline = line(".")',
-                \ 'let curcol = col(".")',
-                \ 'let save_unnamed_reg = @@',
-                \ 'normal! ggdG',
-                \ 'let @@ = save_unnamed_reg',
-                \ 'setlocal nomodified',
-                \ 'call cursor(curline, curcol)',
                 \ 'exe "PyFile " . substitute(g:rplugin_home, " ", '. "'\\\\ '" . ', "g") . "/r-plugin/vimcom.py"',
                 \ 'let g:SendCmdToR = function("SendCmdToR_TmuxSplit")',
                 \ 'Py SendToVimCom("\003GlobalEnv [OB init]")',
@@ -890,26 +881,21 @@ function StartObjBrowser_Tmux()
                 \ 'if v:servername != ""',
                 \ "    exe 'Py SendToVimCom(\"\\x07' . v:servername . '\")'",
                 \ 'endif',
-                \ 'call setline(1, ".GlobalEnv | Libraries")',
-                \ 'if filereadable("' . $VIMRPLUGIN_TMPDIR . '/object_browser")',
-                \ '    exe "silent read ' . substitute($VIMRPLUGIN_TMPDIR, ' ', '\\\\ ', 'g') . '/object_browser"',
-                \ 'endif',
-                \ 'setlocal nomodifiable',
-                \ 'redraw'], objbrowserfile)
+                \ 'call UpdateOB("GlobalEnv")'], objbrowserfile)
 
     if g:vimrplugin_objbr_place =~ "left"
         let panw = system("tmux list-panes | cat")
         if g:vimrplugin_objbr_place =~ "console"
             " Get the R Console width:
-            let panw = substitute(panw, '.*\n1: \[\([0-9]*\)x.*', '\1', "")
+            let panw = substitute(panw, '.*[0-9]: \[\([0-9]*\)x[0-9]*.\{-}' . g:rplugin_rconsole_pane . '\>.*', '\1', "")
         else
-            " Get the Vim with
-            let panw = substitute(panw, '.*0: \[\([0-9]*\)x.*', '\1', "")
+            " Get the Vim width
+            let panw = substitute(panw, '.*[0-9]: \[\([0-9]*\)x[0-9]*.\{-}' . g:rplugin_vim_pane . '\>.*', '\1', "")
         endif
         let panewidth = panw - g:vimrplugin_objbr_w
         " Just to be safe: If the above code doesn't work as expected
         " and we get a spurious value:
-        if panewidth < 40 || panewidth > 180
+        if panewidth < 30 || panewidth > 180
             let panewidth = 80
         endif
     else
@@ -1082,22 +1068,20 @@ function RBrowserOpenCloseLists(status)
 
     if g:rplugin_lastrpl == "R is busy."
         call RWarningMsg("R is busy.")
-    elseif exists("g:rplugin_curview") && v:servername == ""
-        call UpdateOB("both")
     endif
 
     if switchedbuf
         exe "sil noautocmd sb " . g:rplugin_curbuf
         exe "set switchbuf=" . savesb
     endif
-    if exists("g:rplugin_curview") && v:servername != ""
-        exe 'Py SendToVimCom("\007' . v:servername . '")'
-    endif
-    if has("gui_running")
+    if exists("g:rplugin_curview")
         call UpdateOB("both")
-    endif
-    if v:servername != ""
-        exe 'Py SendToVimCom("\x07' . v:servername . '")'
+        if v:servername != ""
+            exe 'Py SendToVimCom("\007' . v:servername . '")'
+        endif
+    elseif IsExternalOBRunning()
+        call remote_expr(g:rplugin_obsname, 'UpdateOB("GlobalEnv")')
+        exe 'Py SendToVimCom("\007' . g:rplugin_obsname . '")'
     endif
 endfunction
 
