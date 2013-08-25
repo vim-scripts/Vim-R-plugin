@@ -54,14 +54,19 @@ def CntrlV():
 
 def FindRConsole():
     global RConsole
-    Rtitle = vim.eval("g:vimrplugin_R_window_title")
+    Rttl = vim.eval("g:vimrplugin_R_window_title")
+    Rtitle = Rttl
     RConsole = win32gui.FindWindow(None, Rtitle)
     if RConsole == 0:
-        RConsole = win32gui.FindWindow(None, Rtitle + " (64-bit)")
+	Rtitle = Rttl + " (64-bit)"
+        RConsole = win32gui.FindWindow(None, Rtitle)
         if RConsole == 0:
-            RConsole = win32gui.FindWindow(None, Rtitle + " (32-bit)")
+	    Rtitle = Rttl + " (32-bit)"
+            RConsole = win32gui.FindWindow(None, Rtitle)
             if RConsole == 0:
                 vim.command("call RWarningMsg('Could not find R Console.')")
+    if RConsole:
+	vim.command("let g:rplugin_R_window_ttl = '" + Rtitle + "'")
 
 def SendToRConsole(aString):
     global RConsole

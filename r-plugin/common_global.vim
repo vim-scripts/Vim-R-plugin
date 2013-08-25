@@ -698,6 +698,41 @@ function StartR_ExternalTerm(rcmd)
     let g:SendCmdToR = function('SendCmdToR_Term')
 endfunction
 
+function StartR_Windows()
+    if string(g:SendCmdToR) != "function('SendCmdToR_fake')"
+        Py FindRConsole()
+        Py vim.command("let g:rplugin_rconsole_hndl = " + str(RConsole))
+        if g:rplugin_rconsole_hndl != 0
+            call RWarningMsg("There is already a window called '" . g:rplugin_R_window_ttl . "'.")
+            unlet g:rplugin_R_window_ttl
+            return
+        endif
+    endif
+    Py StartRPy()
+    lcd -
+    let g:SendCmdToR = function('SendCmdToR_Windows')
+endfunction
+
+function StartR_OSX(rcmd)
+    if IsSendCmdToRFake()
+        return
+    endif
+    if g:rplugin_r64app && g:vimrplugin_i386 == 0
+        let rcmd = "/Applications/R64.app"
+    else
+        let rcmd = "/Applications/R.app"
+    endif
+    if b:rplugin_r_args != " "
+        let rcmd = rcmd . " " . b:rplugin_r_args
+    endif
+    let rlog = system("open " . rcmd)
+    if v:shell_error
+        call RWarningMsg(rlog)
+    endif
+    lcd -
+    let g:SendCmdToR = function('SendCmdToR_OSX')
+endfunction
+
 function IsSendCmdToRFake()
     if string(g:SendCmdToR) != "function('SendCmdToR_fake')"
 	if exists("g:maplocalleader")
@@ -732,32 +767,13 @@ function StartR(whatr)
         endif
     endif
 
-    if IsSendCmdToRFake() && (g:vimrplugin_applescript || has("win32") || has("win64"))
-	return
-    endif
-
     if g:vimrplugin_applescript
-        if g:rplugin_r64app && g:vimrplugin_i386 == 0
-            let rcmd = "/Applications/R64.app"
-        else
-            let rcmd = "/Applications/R.app"
-        endif
-        if b:rplugin_r_args != " "
-            let rcmd = rcmd . " " . b:rplugin_r_args
-        endif
-        let rlog = system("open " . rcmd)
-        if v:shell_error
-            call RWarningMsg(rlog)
-        endif
-        lcd -
-        let g:SendCmdToR = function('SendCmdToR_OSX')
+        call StartR_OSX()
         return
     endif
 
     if has("win32") || has("win64")
-        Py StartRPy()
-        lcd -
-        let g:SendCmdToR = function('SendCmdToR_Windows')
+        call StartR_Windows()
         return
     endif
 
@@ -767,6 +783,7 @@ function StartR(whatr)
         return
     endif
 
+    " R was already started. Should restart it or warn?
     if string(g:SendCmdToR) != "function('SendCmdToR_fake')"
         if g:rplugin_tmuxwasfirst
             if g:vimrplugin_restart
