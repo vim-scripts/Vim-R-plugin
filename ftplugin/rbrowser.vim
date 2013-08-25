@@ -66,7 +66,8 @@ function! UpdateOB(what)
         return "curview != what"
     endif
     if g:rplugin_upobcnt
-        return "OB Called twice"
+        call RWarningMsg("OB called twice")
+        return "OB called twice"
     endif
     let g:rplugin_upobcnt = 1
 
@@ -133,14 +134,13 @@ function! RBrowserDoubleClick()
     endif
 
     " Toggle state of list or data.frame: open X closed
-    let key = RBrowserGetName(1, line("."))
+    let key = RBrowserGetName(0)
     if g:rplugin_curview == "GlobalEnv"
-        exe 'Py SendToVimCom("' . "\005" . '-' . substitute(key, '\$', '-', "g") . '")'
+        exe 'Py SendToVimCom("' . "\005" . key . '")'
         if g:rplugin_lastrpl == "R is busy."
             call RWarningMsg("R is busy.")
         endif
     else
-        let key = substitute(key, '\$', '-', "g") 
         let key = substitute(key, '`', '', "g") 
         if key !~ "^package:"
             let key = "package:" . RBGetPkgName() . '-' . key
@@ -161,7 +161,7 @@ function! RBrowserRightClick()
         return
     endif
 
-    let key = RBrowserGetName(1, line("."))
+    let key = RBrowserGetName(1)
     if key == ""
         return
     endif
@@ -217,7 +217,10 @@ function! RBrowserFindParent(word, curline, curpos)
         let line = substitute(getline(curline), "	.*", "", "")
         let curpos = stridx(line, '[#')
         if curpos == -1
-            let curpos = a:curpos
+            let curpos = stridx(line, '<#')
+            if curpos == -1
+                let curpos = a:curpos
+            endif
         endif
     endwhile
 
@@ -231,7 +234,11 @@ function! RBrowserFindParent(word, curline, curpos)
         endif
     endif
     if curline > 1
-        let word = substitute(line, '.*[#', "", "") . '$' . a:word
+        if line =~ '<#'
+            let word = substitute(line, '.*<#', "", "") . '@' . a:word
+        else
+            let word = substitute(line, '.*\[#', "", "") . '$' . a:word
+        endif
         if curpos != spacelimit
             let word = RBrowserFindParent(word, line("."), curpos)
         endif
@@ -244,43 +251,28 @@ function! RBrowserFindParent(word, curline, curpos)
     return ""
 endfunction
 
-function! RBrowserGetName(complete, lnum)
-    let curpos = col(".")
-
-    let line = getline(a:lnum)
+function! RBrowserGetName(cleantail)
+    let line = getline(".")
     if line =~ "^$"
-        return
+        return ""
     endif
 
-    " Is the object a top level one (curpos == 2)?
-    if g:rplugin_curview == "libraries"
-        let delim = ['##', '{#', '[#', '(#', '"#', "'#", '%#', '<#', '=#']
-    else
-        let delim = ['{#', '[#', '(#', '"#', "'#", '%#', '<#', '=#']
-    endif
-    let word = substitute(line, '^\W*#\{-1,}\(.*\)\t.*', '\1', "")
+    let curpos = stridx(line, "#")
+    let word = substitute(line, '.\{-}\(.#\)\(.\{-}\)\t', '\2\1', '')
+    let word = substitute(word, '\[#$', '$', '')
+    let word = substitute(word, '<#$', '@', '')
+    let word = substitute(word, '.#$', '', '')
 
     if word =~ ' ' || word =~ '^[0-9]'
         let word = '`' . word . '`'
     endif
 
-    if a:complete == 0
-        return word
-    endif
-
-    for i in delim
-        let curpos = stridx(line, i)
-        if curpos != -1
-            break
-        endif
-    endfor
-    if curpos == -1
-        return ""
-    endif
-
-
-    if curpos == 3
+    if curpos == 4
         " top level object
+        let word = substitute(word, '\$\[\[', '[[', "g")
+        if a:cleantail
+            let word = substitute(word, '[\$@]$', '', '')
+        endif
         if g:rplugin_curview == "libraries"
             return "package:" . word
         else
@@ -289,20 +281,28 @@ function! RBrowserGetName(complete, lnum)
     else
         if g:rplugin_curview == "libraries"
             if s:isutf8
-                if curpos == 10
+                if curpos == 11
+                    if a:cleantail
+                        let word = substitute(word, '[\$@]$', '', '')
+                    endif
+                    let word = substitute(word, '\$\[\[', '[[', "g")
                     return word
                 endif
-            elseif curpos == 6
+            elseif curpos == 7
+                if a:cleantail
+                    let word = substitute(word, '[\$@]$', '', '')
+                endif
+                let word = substitute(word, '\$\[\[', '[[', "g")
                 return word
             endif
         endif
-        if curpos > 3
+        if curpos > 4
             " Find the parent data.frame or list
-            let word = RBrowserFindParent(word, line("."), curpos)
-            " Unnamed objects of lists
-            if word =~ '\$\[\[[0-9]*\]\]'
-                let word = substitute(word, '\$\[\[\([0-9]*\)\]\]', '-[[\1]]', "g")
+            let word = RBrowserFindParent(word, line("."), curpos - 1)
+            if a:cleantail
+                let word = substitute(word, '[\$@]$', '', '')
             endif
+            let word = substitute(word, '\$\[\[', '[[', "g")
             return word
         else
             " Wrong object name delimiter: should never happen.

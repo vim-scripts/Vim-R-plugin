@@ -2212,7 +2212,7 @@ endfunction
 " Call R functions for the word under cursor
 function RRealAction(rcmd)
     if &filetype == "rbrowser"
-        let rkeyword = RBrowserGetName(1, line("."))
+        let rkeyword = RBrowserGetName(1)
     else
         let rkeyword = RGetKeyWord()
     endif

@@ -284,6 +284,7 @@ you may prefer to install the Debian package available at:
 Did you see the message "VimCom port not found"? This means that R is not
 running, the vimcom package is not installed, or R was not started by Vim.
 
+
 3.4. General instructions II (optional steps)~
 
 3.4.1 Update list of objects~
@@ -1224,16 +1225,15 @@ In this case, you can choose the initial number of columns of R Console:
 6.16. Integration with AppleScript (OS X only)~
 							*vimrplugin_applescript*
 In Mac OS X, the plugin will try to send commands to R gui using AppleScript.
-If you prefer to run R and Vim in the same terminal emulator split in two
-regions (Vim and R), put in your |vimrc|:
+If you prefer either to run R and Vim in the same terminal emulator split in
+two regions (Vim and R) or to run R in an external terminal emulator, put in
+your |vimrc|:
 >
    let vimrplugin_applescript = 0
 <
-If you prefer to have R running in an external terminal emulator, put in your
-|vimrc|:
->
-   let vimrplugin_applescript = 0
-<
+If Vim is running inside Tmux, the terminal will be split in two regions.
+Otherwise, R will start in an external terminal emulator.
+
 
 6.17. Special R functions~
 						      *vimrplugin_listmethods*
@@ -1314,7 +1314,7 @@ When one types <C-a> in the R Console the cursor goes to the beginning of the
 line and one types <C-k> the characters to the right of the cursor are
 deleted. This is useful to avoid characters left on the R Console being mixed
 with commands sent by Vim. However, sending <C-a> may be problematic if using
-either Tmux. The Vim-R-plugin will add <C-a><C-k> to every command if you put
+Tmux. The Vim-R-plugin will add <C-a><C-k> to every command if you put
 in your |vimrc|:
 >
    let vimrplugin_ca_ck = 1
@@ -1392,6 +1392,7 @@ use it, add the following to your |vimrc|:
 The default value is 1, for consistency with earlier versions.
 
 See also: |r-plugin-localleader|.
+
 
 6.26. Show/remove hidden objects~
 							 *vimrplugin_allnames*
@@ -1974,6 +1975,7 @@ on top" or a similar option provided by your desktop manager.
 There is also the R package "edtdbg" which aims to integrate R debugging
 facilities with Vim.
 
+
 9.17. Turn the R-plugin into a global plugin~
 							     *r-plugin-global*
 The Vim-R-plugin is a file type plugin. If you want its functionality
@@ -2098,7 +2100,7 @@ Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-0.9.9.4 (2013-08-21)
+0.9.9.4 (2013-08-24)
 
  * Minor bug fixes.
  * The support to GNU Screen, VimShell and Conque Shell was dropped. The
@@ -2107,6 +2109,7 @@ Vim-R-plugin. Please look at |vimrplugin_source| for details.
  * New options: vimrplugin_vsplit, vimrplugin_rconsole_height and
    vimrplugin_rconsole_width.
  * New option: vimrplugin_restart.
+ * Show elements of S4 objects in the Object Browser.
 
 0.9.9.3 (2013-04-11)
 
