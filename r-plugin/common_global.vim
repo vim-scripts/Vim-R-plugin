@@ -747,8 +747,8 @@ endfunction
 
 " Start R
 function StartR(whatr)
-    call writefile([], $VIMRPLUGIN_TMPDIR . "/object_browser")
-    call writefile([], $VIMRPLUGIN_TMPDIR . "/liblist")
+    call writefile([], $VIMRPLUGIN_TMPDIR . g:rplugin_globenv_f)
+    call writefile([], $VIMRPLUGIN_TMPDIR . g:rplugin_liblist_f)
 
     if !exists("b:rplugin_R")
         call SetRPath()
@@ -908,12 +908,20 @@ function StartObjBrowser_Tmux()
                 \ 'set noruler',
                 \ 'exe "PyFile " . substitute(g:rplugin_home, " ", '. "'\\\\ '" . ', "g") . "/r-plugin/vimcom.py"',
                 \ 'let g:SendCmdToR = function("SendCmdToR_TmuxSplit")',
-                \ 'Py SendToVimCom("\003GlobalEnv [OB init]")',
-                \ 'Py SendToVimCom("\004Libraries [OB init]")',
-                \ 'if v:servername != ""',
+                \ 'if v:servername == ""',
+                \ '    let g:rplugin_globenv_f = "' . g:rplugin_globenv_f . '"',
+                \ '    let g:rplugin_liblist_f = "' . g:rplugin_liblist_f . '"',
+                \ 'else',
+                \ '    let g:rplugin_globenv_f = "/globenv_" . v:servername',
+                \ '    let g:rplugin_liblist_f = "/liblist_" . v:servername',
                 \ "    exe 'Py SendToVimCom(\"\\x07' . v:servername . '\")'",
                 \ 'endif',
-                \ 'call UpdateOB("GlobalEnv")'], objbrowserfile)
+                \ 'Py SendToVimCom("\003GlobalEnv [OB init]")',
+                \ 'Py SendToVimCom("\004Libraries [OB init]")',
+                \ 'if v:servername == ""',
+                \ '    sleep 100m',
+                \ '    call UpdateOB("GlobalEnv")',
+                \ 'endif'], objbrowserfile)
 
     if g:vimrplugin_objbr_place =~ "left"
         let panw = system("tmux list-panes | cat")
@@ -1016,10 +1024,10 @@ function StartObjBrowser_Vim()
         let g:tmp_curbufname = bufname("%")
 
         let l:sr = &splitright
-        if g:vimrplugin_objbr_place =~ "right"
-            set splitright
-        else
+        if g:vimrplugin_objbr_place =~ "left"
             set nosplitright
+        else
+            set splitright
         endif
         sil exe "vsplit " . b:objbrtitle
         let &splitright = l:sr
@@ -1742,8 +1750,8 @@ function RQuit(how)
         unlet g:rplugin_rconsole_pane
     endif
 
-    call writefile([], $VIMRPLUGIN_TMPDIR . "/object_browser")
-    call writefile([], $VIMRPLUGIN_TMPDIR . "/liblist")
+    call writefile([], $VIMRPLUGIN_TMPDIR . g:rplugin_globenv_f)
+    call writefile([], $VIMRPLUGIN_TMPDIR . g:rplugin_liblist_f)
     let g:SendCmdToR = function('SendCmdToR_fake')
 endfunction
 
@@ -3002,9 +3010,6 @@ if !isdirectory($VIMRPLUGIN_TMPDIR)
     call mkdir($VIMRPLUGIN_TMPDIR, "p", 0700)
 endif
 
-let g:rplugin_docfile = $VIMRPLUGIN_TMPDIR . "/Rdoc"
-let g:rplugin_globalenvfname = $VIMRPLUGIN_TMPDIR . "/GlobalEnvList"
-
 " Old name of vimrplugin_assign option
 if exists("g:vimrplugin_underscore")
     let g:vimrplugin_assign = g:vimrplugin_underscore
@@ -3307,10 +3312,6 @@ endif
 let s:all_marks = "abcdefghijklmnopqrstuvwxyz"
 
 
-" Create an empty file to avoid errors if the user do Ctrl-X Ctrl-O before
-" starting R:
-call writefile([], g:rplugin_globalenvfname)
-
 " Choose a terminal (code adapted from screen.vim)
 if has("win32") || has("win64") || g:vimrplugin_applescript || $DISPLAY == "" || g:rplugin_tmuxwasfirst
     " No external terminal emulator will be called, so any value is good
@@ -3403,6 +3404,27 @@ let $VIMINSTANCEID = substitute(g:rplugin_firstbuffer . localtime(), '\W', '', '
 
 let g:rplugin_obsname = toupper(substitute(substitute(expand("%:r"), '\W', '', 'g'), "_", "", "g"))
 
+let g:rplugin_docfile = $VIMRPLUGIN_TMPDIR . "/Rdoc"
+
+if g:rplugin_tmuxwasfirst
+    if $DISPLAY == ""
+        let g:rplugin_globenv_f = "/globenv_"
+        let g:rplugin_liblist_f = "/liblist_"
+        let g:rplugin_globalenvfname = $VIMRPLUGIN_TMPDIR . "/GlobalEnvList"
+    else
+        let g:rplugin_globenv_f = "/globenv_" . g:rplugin_obsname
+        let g:rplugin_liblist_f = "/liblist_" . g:rplugin_obsname
+        let g:rplugin_globalenvfname = $VIMRPLUGIN_TMPDIR . "/GlobalEnvList_" . g:rplugin_obsname
+    endif
+else
+    let g:rplugin_globenv_f = "/globenv_" . v:servername
+    let g:rplugin_liblist_f = "/liblist_" . v:servername
+    let g:rplugin_globalenvfname = $VIMRPLUGIN_TMPDIR . "/GlobalEnvList_" . v:servername
+endif
+
+" Create an empty file to avoid errors if the user do Ctrl-X Ctrl-O before
+" starting R:
+call writefile([], g:rplugin_globalenvfname)
 
 call SetRPath()
 

@@ -66,7 +66,7 @@ function! UpdateOB(what)
         return "curview != what"
     endif
     if g:rplugin_upobcnt
-        call RWarningMsg("OB called twice")
+        echoerr "OB called twice"
         return "OB called twice"
     endif
     let g:rplugin_upobcnt = 1
@@ -102,10 +102,10 @@ function! UpdateOB(what)
     let @@ = save_unnamed_reg 
     if wht == "GlobalEnv"
         call setline(1, ".GlobalEnv | Libraries")
-        exe "silent read " . g:rplugin_esc_tmpdir . "/object_browser"
+        exe "silent read " . g:rplugin_esc_tmpdir . g:rplugin_globenv_f
     else
         call setline(1, "Libraries | .GlobalEnv")
-        exe "silent read " . g:rplugin_esc_tmpdir . "/liblist"
+        exe "silent read " . g:rplugin_esc_tmpdir . g:rplugin_liblist_f
     endif
     call cursor(curline, curcol)
     if bufname("%") =~ "Object_Browser" || b:rplugin_extern_ob
