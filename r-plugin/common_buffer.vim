@@ -48,11 +48,6 @@ if !exists("b:objbrtitle")
 endif
 
 
-" Initialize some local variables if Conque shell was already started
-if exists("g:rplugin_objbrtitle")
-    let b:objbrtitle = g:rplugin_objbrtitle
-endif
-
 " Make the file name of files to be sourced
 let b:bname = expand("%:t")
 let b:bname = substitute(b:bname, " ", "",  "g")

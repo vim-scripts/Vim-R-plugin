@@ -1738,12 +1738,6 @@ function RQuit(how)
 
     call CloseExternalOB()
 
-    if a:how != "restartR"
-        if exists("g:rplugin_objbrtitle")
-            unlet g:rplugin_objbrtitle
-        endif
-    endif
-
     if exists("g:rplugin_rconsole_pane")
         unlet g:rplugin_rconsole_pane
     endif
@@ -3016,14 +3010,6 @@ if exists("g:vimrplugin_underscore")
     let g:vimrplugin_assign = g:vimrplugin_underscore
 endif
 
-" Use the value set for ScreenShell if present
-if exists("g:ScreenShellWidth") && !exists("g:vimrplugin_rconsole_width") && g:ScreenShellWidth != "-1"
-    let g:vimrplugin_rconsole_width = g:ScreenShellWidth
-endif
-if exists("g:ScreenShellHeight") && !exists("g:vimrplugin_rconsole_height") && g:ScreenShellHeight != "15"
-    let g:vimrplugin_rconsole_height = g:ScreenShellWidth
-endif
-
 " Variables whose default value is fixed
 call RSetDefaultValue("g:vimrplugin_map_r",             0)
 call RSetDefaultValue("g:vimrplugin_allnames",          0)
@@ -3078,8 +3064,8 @@ unlet obpllen
 
 
 
-" python has priority over python3, unless ConqueTerm_PyVersion == 3
-if has("python3") && exists("g:ConqueTerm_PyVersion") && g:ConqueTerm_PyVersion == 3
+" python has priority over python3
+if has("python3")
     command! -nargs=+ Py :py3 <args>
     command! -nargs=+ PyFile :py3file <args>
 elseif has("python")
