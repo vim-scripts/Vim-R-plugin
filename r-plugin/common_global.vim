@@ -713,7 +713,7 @@ function StartR_Windows()
     let g:SendCmdToR = function('SendCmdToR_Windows')
 endfunction
 
-function StartR_OSX(rcmd)
+function StartR_OSX()
     if IsSendCmdToRFake()
         return
     endif
