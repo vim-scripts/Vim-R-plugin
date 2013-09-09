@@ -3424,7 +3424,9 @@ endif
 
 " Create an empty file to avoid errors if the user do Ctrl-X Ctrl-O before
 " starting R:
-call writefile([], g:rplugin_globalenvfname)
+if &filetype != "rbrowser"
+    call writefile([], g:rplugin_globalenvfname)
+endif
 
 call SetRPath()
 
