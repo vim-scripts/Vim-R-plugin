@@ -3146,7 +3146,7 @@ if g:vimrplugin_objbr_place =~ "console"
 endif
 
 " Check whether Tmux is OK
-if !has("win32") && !has("win64") && !has("mac") && !has("gui_macvim") && !has("gui_mac") && !has("mac") && !has("macunix") && !has("gui_win32") && !has("gui_win64")
+if !has("win32") && !has("win64") && !has("gui_win32") && !has("gui_win64") && g:vimrplugin_applescript == 0
     if !executable('tmux')
         call RWarningMsgInp("Please, install the 'Tmux' application to enable the Vim-R-plugin.")
         let g:rplugin_failed = 1
