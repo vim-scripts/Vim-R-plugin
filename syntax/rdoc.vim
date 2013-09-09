@@ -1,5 +1,5 @@
 " Vim syntax file
-" Language:	Test version of R documentation
+" Language:	R documentation
 " Maintainer:	Jakson A. Aquino <jalvesaq@gmail.com>
 
 if exists("b:current_syntax")
