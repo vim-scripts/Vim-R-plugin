@@ -42,7 +42,7 @@ else
     syntax match rmdChunkDelim "^[ \t]*```{r.*}$" contained
 endif
 syntax match rmdChunkDelim "^[ \t]*```$" contained
-syntax region rmdChunk start="^[ \t]*``` *{r.*}$" end="^```$" contains=@R,rmdChunkDelim keepend transparent fold
+syntax region rmdChunk start="^[ \t]*``` *{r.*}$" end="^[ \t]*```$" contains=@R,rmdChunkDelim keepend transparent fold
 
 " also match and syntax highlight in-line R code
 syntax match rmdEndInline "`" contained
