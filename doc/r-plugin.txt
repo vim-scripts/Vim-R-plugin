@@ -1457,12 +1457,12 @@ insert mode, and visual mode.
 
 To customize a key binding you should put in your |vimrc| something like:
 >
-   nmap <F2> <Plug>RStart
-   imap <F2> <Plug>RStart
-   vmap <F2> <Plug>RStart
+   nmap <LocalLeader>sr <Plug>RStart
+   imap <LocalLeader>sr <Plug>RStart
+   vmap <LocalLeader>sr <Plug>RStart
 <
 The above example shows how to change key binding used to start R from
-<LocalLeader>rf to <F2>.
+<LocalLeader>rf to <LocalLeader>sr.
 
 Only the custom key bindings for Normal mode are shown in Vim's menu, but you
 can type |:map| to see the complete list of current mappings, and below is the
@@ -1729,7 +1729,9 @@ You may also want to remap <C-x><C-o>:
 9.6. Remap the <LocalLeader>~
 							*r-plugin-localleader*
 People writing Rnoweb documents may find it better to use a comma or other key
-as the <LocalLeader> instead of the default backslash (see |maplocalleader|):
+as the <LocalLeader> instead of the default backslash (see |maplocalleader|).
+For example, to change the <LocalLeader> to a comma, put at the beginning of
+your |vimrc| (before any mapping command):
 >
    let maplocalleader = ","
 <
@@ -2095,20 +2097,20 @@ this document from the beginning.
    }
 <
 
-9.22. Integragion with GNU Screen, screen plugin, Conque Shell or VimShell~
+9.22. Integration with GNU Screen, screen plugin, Conque Shell or VimShell~
 
 The plugin used to be able to use GNU Screen (through screen plugin), Conque
-Shell or VimShell. This integration was removed on August 20, 2013. People
-wanting this integration back into the plugin may want to use the old
-Vim-R-plugin code as a starting point to create scripts to be sourced by the
-Vim-R-plugin. Please look at |vimrplugin_source| for details.
+Shell or VimShell to send commands to R. This integration was removed on
+August 20, 2013. People wanting this integration back into the plugin may want
+to use the old Vim-R-plugin code as a starting point to create scripts to be
+sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 
 
 ==============================================================================
 							       *r-plugin-news*
 10. News~
 
-0.9.9.4 (2013-08-27)
+0.9.9.4 (2013-09-10)
 
  * Minor bug fixes.
  * The support to GNU Screen, VimShell and Conque Shell was dropped. The
