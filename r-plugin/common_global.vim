@@ -2212,7 +2212,7 @@ function PrintRObject(rkeyword)
 endfunction
 
 " Call R functions for the word under cursor
-function RRealAction(rcmd)
+function RAction(rcmd)
     if &filetype == "rbrowser"
         let rkeyword = RBrowserGetName(1)
     else
@@ -2271,16 +2271,6 @@ function RRealAction(rcmd)
         let raction = rfun . "(" . rkeyword . ")"
         call g:SendCmdToR(raction)
     endif
-endfunction
-
-function RAction(rcmd)
-    "if v:servername != ""
-    "    Py SendToVimCom("\x08Stop updating info [RAction()]")
-    "endif
-    call RRealAction(a:rcmd)
-    "if v:servername != ""
-    "    exe 'Py SendToVimCom("\x07' . v:servername . '")'
-    "endif
 endfunction
 
 if exists('g:maplocalleader')
