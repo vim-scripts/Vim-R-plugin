@@ -2141,9 +2141,10 @@ function ShowRDoc(rkeyword, package, getclass)
 
     let save_unnamed_reg = @@
     sil normal! ggdG
-    exe "read " . substitute(g:rplugin_docfile, ' ', '\\ ', 'g')
+    let fcntt = readfile(g:rplugin_docfile)
+    call setline(1, fcntt)
     set filetype=rdoc
-    normal! ggdd
+    normal! gg
     let @@ = save_unnamed_reg
     setlocal nomodified
     setlocal nomodifiable
