@@ -633,7 +633,7 @@ endfunction
 
 function StartR_ExternalTerm(rcmd)
     if $DISPLAY == ""
-        call RWarningMsg("The X Window system is required to run R in an external terminal.")
+        call RWarningMsg("Start 'tmux' before Vim. The X Window system is required to run R in an external terminal.")
         return
     endif
 
@@ -668,10 +668,7 @@ function StartR_ExternalTerm(rcmd)
         call system('tmux set-option -ga update-environment " TMUX_PANE VIMRPLUGIN_TMPDIR VIMINSTANCEID"')
     endif
     let tmuxcnf = '-f "' . s:tmxcnf . '"'
-    if $DISPLAY == ""
-        call RWarningMsg("The X Window system is required to run R in an external terminal.")
-        return
-    endif
+
     call system("tmux has-session -t " . g:rplugin_tmuxsname)
     if v:shell_error
         if g:rplugin_termcmd =~ "gnome-terminal" || g:rplugin_termcmd =~ "xfce4-terminal" || g:rplugin_termcmd =~ "terminal" || g:rplugin_termcmd =~ "iterm"
