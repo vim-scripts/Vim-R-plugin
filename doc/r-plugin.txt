@@ -127,57 +127,51 @@ In addition to having R and Vim installed in your system, this plugin has the
 following dependencies:
 
    Depends:~
-   Tmux >= 1.5:     http://tmux.sourceforge.net
-   vimcom = 0.9-9:  An R package.
+
+   vimcom.plus = 0.9-9: http://www.lepem.ufc.br/jaa/vimcom.plus.html
+		  The vimcom.plus (or vimcom) package creates a server on R to
+		  allow the communication with Vim. The package is not used to
+		  send commands from Vim to R Console, but it is necessary to
+		  open R documentation in Vim's buffer, run the Object
+		  Browser, run either `Sweave()` or `knit()` on the document
+		  being edited. It also has some functions called by Vim such
+		  as `vim.plot()`, `vim.print()`, and `vim.bol()`. This last
+		  one is required to build the data base used in
+		  omnicompletion.
+
+   Tmux >= 1.5:   http://tmux.sourceforge.net
+                  Tmux is necessary to send commands from Vim to R Console.
 
    Suggests:~
-   ncurses-term:  http://invisible-island.net/ncurses
+
    colorout:      http://www.lepem.ufc.br/jaa/colorout.html
-   setwidth:      An R package.
+                  Colorizes the R output.
+
+   setwidth:      An R package that can be installed with the command
+                  `install.packages("setwidth")`.
+		  The library setwidth adjusts the value of `options("width")`
+		  whenever the terminal is resized.
+
+   ncurses-term:  http://invisible-island.net/ncurses
+                  Might be useful if you want support for 256 colors at the
+		  terminal emulator.
+
    latexmk:       Automate the compilation of LaTeX documents.
                   See examples in |vimrplugin_latexcmd|.
 
    Note: Tmux and ncurses-term are already packaged for most GNU/Linux
-   distributions and other Unix variants. The library ncurses-term is
-   necessary only for 256 color support in the terminal emulator.
-   Unfortunately their installation instructions vary widely and are beyond
-   the scope of this documentation.
-
-   The vimcom package creates a server on R to allow the communication with
-   Vim. The package is not used to send commands from Vim to R Console, but it
-   is necessary to open R documentation in Vim's buffer, run the Object
-   Browser, run either `Sweave()` or `knit()` on the document being edited. It
-   also has some functions called by Vim such as `vim.plot()`, `vim.print()`, and
-   `vim.bol()`. This last one is required to build the data base used in
-   omnicompletion. Before installing vimcom from source, you have to install
-   the X server development headers. On Debian/Ubuntu systems you can install
-   them with the following command in a terminal emulator:
->
-   sudo apt-get install libx11-dev
-<
-   On Fedora/Red Hat, the command is:
->
-   sudo yum install libX11-devel
-<
-   Finally, do in R:
->
-   install.packages("vimcom")
-<
-   The colorout package colorizes the R output and the setwidth package
-   adjusts the value of `options("width")` whenever the terminal is resized.
-   They can be installed from within R.
-
-   The setwidth package can be installed as usual:
->
-   install.packages("setwidth")
-<
+   distributions and other Unix variants. Unfortunately their installation
+   instructions vary widely and are beyond the scope of this documentation.
+   
    You certainly will want to put something like the following at the end of
    your ~/.Rprofile:
 >
    if(interactive()){
        library(colorout)
        library(setwidth)
-       library(vimcom)
+       library(vimcom.plus)
+       # If you can't install the vimcom.plus package, do:
+       # library(vimcom)
    }
 <
 If you start either GVim or Vim in a terminal emulator the plugin will start R
@@ -230,9 +224,11 @@ to install external dependencies:
       installed.
 
     * vimcom = 0.9-9: An R package, available on CRAN and installable with the
-      `install.packages()` command. The vimcom package creates a server on R to
-      allow the communication with Vim. You certainly will want to put the
-      following lines at the end of your Rprofile.
+      command: `install.packages("vimcom")`
+      See also: http://www.lepem.ufc.br/jaa/vimcom.plus.html
+      The vimcom package creates a server on R to allow the communication with
+      Vim. You certainly will want to put the following lines at the end of
+      your Rprofile.
 >
       if(interactive()){
 	  library(vimcom)
@@ -282,7 +278,8 @@ you may prefer to install the Debian package available at:
    http://www.lepem.ufc.br/jaa/vim-r-plugin.html
 
 Did you see the message "VimCom port not found"? This means that R is not
-running, the vimcom package is not installed, or R was not started by Vim.
+running, the vimcom.plus (or vimcom) package is not installed, or R was not
+started by Vim.
 
 
 3.4. General instructions II (optional steps)~
@@ -642,14 +639,14 @@ in your ~/.bashrc:
    fi
 <
 In the .GlobalEnv view, if an object has the attribute "label", it will also
-be displayed. Please, see the R help for package vimcom for some options to
-control the Object Browser behavior. In the Object Browser window, while in
-Normal mode, you can either press <Enter> or double click (GVim only) over a
-data.frame or list to show/hide its elements (not if viewing the content of
-loaded libraries). If you are running R in an environment where the string
-UTF-8 is part of either LC_MESSAGES or LC_ALL variables, unicode line drawing
-characters will be used to draw lines in the Object Browser. This is the case
-of most Linux distributions.
+be displayed. Please, see the R help for package vimcom.plus (or vimcom) for
+some options to control the Object Browser behavior. In the Object Browser
+window, while in Normal mode, you can either press <Enter> or double click
+(GVim only) over a data.frame or list to show/hide its elements (not if
+viewing the content of loaded libraries). If you are running R in an
+environment where the string UTF-8 is part of either LC_MESSAGES or LC_ALL
+variables, unicode line drawing characters will be used to draw lines in the
+Object Browser. This is the case of most Linux distributions.
 
 In the Libraries view, you can either double click or press <Enter> over a
 library to see its objects. In the Object Browser, the libraries have the
@@ -1924,7 +1921,9 @@ two options and some others:
        library(setwidth)
        options(vimcom.verbose = 1, vimcom.allnames = TRUE)
        if(Sys.getenv("VIMRPLUGIN_TMPDIR") != "")
-	   library(vimcom)
+	   library(vimcom.plus)
+           # If you can't install the vimcom.plus package, do:
+           # library(vimcom)
        if(Sys.getenv("TERM") != "linux" && Sys.getenv("TERM") != "")
 	   setOutputColors256(verbose = FALSE)
        if(nchar(Sys.getenv("DISPLAY")) > 1){
@@ -2093,7 +2092,9 @@ this document from the beginning.
            setOutputColors256(verbose = FALSE)
        library(setwidth)
        if(Sys.getenv("VIMRPLUGIN_TMPDIR") != "")
-           library(vimcom)
+           library(vimcom.plus)
+           # If you can't install the vimcom.plus package, do:
+           # library(vimcom)
    }
 <
 
@@ -2110,7 +2111,7 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-0.9.9.4 (2013-09-10)
+0.9.9.4 (2013-09-14)
 
  * Minor bug fixes.
  * The support to GNU Screen, VimShell and Conque Shell was dropped. The
