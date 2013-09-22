@@ -875,6 +875,8 @@ function StartObjBrowser_Tmux()
 
     " Don't start the Object Browser if it already exists
     if IsExternalOBRunning()
+        Py SendToVimCom("\003GlobalEnv [OB init]")
+        Py SendToVimCom("\004Libraries [OB init]")
         return
     endif
 
