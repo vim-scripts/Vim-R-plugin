@@ -232,6 +232,8 @@ to install external dependencies:
 >
       if(interactive()){
 	  library(vimcom)
+	  # If you can install vimcom.plus, do:
+	  # library(vimcom.plus)
       }
 <
       You can do `Sys.getenv("HOME")` in the R Console to know where the file
@@ -885,16 +887,17 @@ indent the code below:
 
 5.5. Wrong message that "R is busy" (Windows only)~
 
-On Windows, when code is sent from Vim to R Console, the vimcom library sets
-the value of the internal variable `r_is_busy` to 1. The value is set back to
-0 when any code is successfully evaluated. If you send invalid code to R,
-there will be no successful evaluation of code and, thus, the value of
-`r_is_busy` will remain set to 1. Then, if you try to update the object
-browser, see the R documentation for any function, or do other tasks that
-require the hidden evaluation of code by R, the vimcom library will refuse to
-do the tasks to avoid any risk of corrupting R's memory. It will tell Vim that
-"R is busy" and Vim will display this message. Everything should work as
-expected again after any valid code is executed in the R Console.
+On Windows, when code is sent from Vim to R Console, the vimcom (or
+vimcom.plus) library sets the value of the internal variable `r_is_busy` to 1.
+The value is set back to 0 when any code is successfully evaluated. If you
+send invalid code to R, there will be no successful evaluation of code and,
+thus, the value of `r_is_busy` will remain set to 1. Then, if you try to
+update the object browser, see the R documentation for any function, or do
+other tasks that require the hidden evaluation of code by R, the vimcom
+library will refuse to do the tasks to avoid any risk of corrupting R's
+memory. It will tell Vim that "R is busy" and Vim will display this message.
+Everything should work as expected again after any valid code is executed in
+the R Console.
 
 
 5.6. Problems with Fish Shell~
@@ -2111,9 +2114,10 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-0.9.9.4 (2013-09-14)
+0.9.9.4 (2013-09-24)
 
  * Minor bug fixes.
+ * The package now depends on vimcom.plus.
  * The support to GNU Screen, VimShell and Conque Shell was dropped. The
    screen plugin no longer is used.
  * The delete command was removed from the Object Browser.
