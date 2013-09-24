@@ -1,5 +1,5 @@
 " Vim syntax file
-" Language:	Test version of R documentation
+" Language:	R documentation
 " Maintainer:	Jakson A. Aquino <jalvesaq@gmail.com>
 
 if exists("b:current_syntax")
@@ -17,28 +17,36 @@ endif
 exec "syn sync minlines=" . rdoc_minlines . " maxlines=" . rdoc_maxlines
 
 
-syn match  rdocTitle	      "^[A-Z].*:"
+syn match  rdocTitle	      "^[A-Z].*:$"
 syn match  rdocTitle "^\S.*R Documentation$"
-syn region rdocStringS  start="â€˜" end="â€™"
-syn region rdocStringS  start="‘" end="’"
+syn match rdocFunction "\([A-Z]\|[a-z]\|\.\|_\)\([A-Z]\|[a-z]\|[0-9]\|\.\|_\)*" contained
+syn region rdocStringS  start="â€˜" end="â€™" contains=rdocFunction transparent keepend
+syn region rdocStringS  start="‘" end="’" contains=rdocFunction transparent keepend
 syn region rdocStringD  start='"' skip='\\"' end='"'
 syn match rdocURL `\v<(((https?|ftp|gopher)://|(mailto|file|news):)[^'	<>"]+|(www|web|w3)[a-z0-9_-]*\.[a-z0-9._-]+\.[^'  <>"]+)[a-zA-Z0-9/]`
 syn keyword rdocNote		note Note NOTE note: Note: NOTE: Notes Notes:
-syn match rdocArg  "^\s*\([a-z]\|[A-Z]\|[0-9]\|\.\)*: "
-
-syn include @rdocR syntax/r.vim
-syn region rdocExample matchgroup=rdocExTitle start="^Examples:$" matchgroup=rdocExEnd end='^###$' contains=@rdocR keepend
 
 " When using vim as R pager to see the output of help.search():
 syn region rdocPackage start="^[A-Za-z]\S*::" end="[\s\r]" contains=rdocPackName,rdocFuncName transparent
 syn match rdocPackName "^[A-Za-z][A-Za-z0-9\.]*" contained
 syn match rdocFuncName "::[A-Za-z0-9\.\-_]*" contained
 
+syn match rdocArgItems "\n\n.\{-}:" contains=rdocArg contained transparent
+
+syn region rdocArgReg matchgroup=rdocArgTitle start="^Arguments:" end="^[A-Z].*:$" contains=rdocArgItems,rdocArgTitle,rdocPackage,rdocFuncName,rdocStringS keepend transparent
+syn match rdocArg "\([A-Z]\|[a-z]\|[0-9]\|\.\|_\)*" contained
+
+
+syn include @rdocR syntax/r.vim
+syn region rdocExample matchgroup=rdocExTitle start="^Examples:$" matchgroup=rdocExEnd end='^###$' contains=@rdocR keepend
+
 " Define the default highlighting.
+"hi def link rdocArgReg Statement
 hi def link rdocTitle	    Title
+hi def link rdocArgTitle    Title
 hi def link rdocExTitle   Title
 hi def link rdocExEnd   Comment
-hi def link rdocStringS     Function
+hi def link rdocFunction    Function
 hi def link rdocStringD     String
 hi def link rdocURL    HtmlLink
 hi def link rdocArg         Special

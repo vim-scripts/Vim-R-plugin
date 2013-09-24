@@ -54,14 +54,19 @@ def CntrlV():
 
 def FindRConsole():
     global RConsole
-    Rtitle = vim.eval("g:vimrplugin_R_window_title")
+    Rttl = vim.eval("g:vimrplugin_R_window_title")
+    Rtitle = Rttl
     RConsole = win32gui.FindWindow(None, Rtitle)
     if RConsole == 0:
-        RConsole = win32gui.FindWindow(None, Rtitle + " (64-bit)")
+	Rtitle = Rttl + " (64-bit)"
+        RConsole = win32gui.FindWindow(None, Rtitle)
         if RConsole == 0:
-            RConsole = win32gui.FindWindow(None, Rtitle + " (32-bit)")
+	    Rtitle = Rttl + " (32-bit)"
+            RConsole = win32gui.FindWindow(None, Rtitle)
             if RConsole == 0:
                 vim.command("call RWarningMsg('Could not find R Console.')")
+    if RConsole:
+	vim.command("let g:rplugin_R_window_ttl = '" + Rtitle + "'")
 
 def SendToRConsole(aString):
     global RConsole
@@ -141,23 +146,27 @@ def GetRPath():
     try:
         kHandle = win32api.RegOpenKeyEx(win32con.HKEY_LOCAL_MACHINE, keyName, 0, win32con.KEY_READ)
         rVersion, reserved, kclass, lastwrite = win32api.RegEnumKeyEx(kHandle)[-1]
+        win32api.RegCloseKey(kHandle)
+        kHandle = None
         keyName = keyName + "\\" + rVersion
         kHandle = win32api.RegOpenKeyEx(win32con.HKEY_LOCAL_MACHINE, keyName, 0, win32con.KEY_READ)
     except:
         try:
             kHandle = win32api.RegOpenKeyEx(win32con.HKEY_CURRENT_USER, keyName, 0, win32con.KEY_READ)
             rVersion, reserved, kclass, lastwrite = win32api.RegEnumKeyEx(kHandle)[-1]
+            win32api.RegCloseKey(kHandle)
+            kHandle = None
             keyName = keyName + "\\" + rVersion
             kHandle = win32api.RegOpenKeyEx(win32con.HKEY_CURRENT_USER, keyName, 0, win32con.KEY_READ)
         except:
-            vim.command("let s:rinstallpath =  'Not found'")
+            vim.command("let s:rinstallpath =  'Key not found'")
     if kHandle:
         (kname, rpath, vtype) = win32api.RegEnumValue(kHandle, 0)
         win32api.RegCloseKey(kHandle)
         if kname == 'InstallPath':
             vim.command("let s:rinstallpath = '" + rpath + "'")
         else:
-            vim.command("let s:rinstallpath =  'Not found'")
+            vim.command("let s:rinstallpath =  'Path not found'")
 
 def StartRPy():
     global Rterm

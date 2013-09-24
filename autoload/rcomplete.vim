@@ -51,5 +51,3 @@ fun! rcomplete#CompleteR(findstart, base)
   endif
 endfun
 
-set completefunc=CompleteR
-

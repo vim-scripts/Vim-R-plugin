@@ -1,6 +1,6 @@
 " markdown Text with R statements
 " Language: markdown with R code chunks
-" Last Change: Tue Feb 26, 2013  01:48PM
+" Last Change: Thu Sep 05, 2013  06:35PM
 "
 " CONFIGURATION:
 "   To highlight chunk headers as R code, put in your vimrc:
@@ -36,13 +36,13 @@ setlocal iskeyword=@,48-57,_,.
 
 if exists("g:rmd_syn_hl_chunk")
     " highlight R code inside chunk header
-    syntax match rmdChunkDelim "^```{r" contained
+    syntax match rmdChunkDelim "^[ \t]*```{r" contained
     syntax match rmdChunkDelim "}$" contained
 else
-    syntax match rmdChunkDelim "^```{r.*}$" contained
+    syntax match rmdChunkDelim "^[ \t]*```{r.*}$" contained
 endif
-syntax match rmdChunkDelim "^```$" contained
-syntax region rmdChunk start="^``` *{r.*}$" end="^```$" contains=@R,rmdChunkDelim keepend transparent fold
+syntax match rmdChunkDelim "^[ \t]*```$" contained
+syntax region rmdChunk start="^[ \t]*``` *{r.*}$" end="^[ \t]*```$" contains=@R,rmdChunkDelim keepend transparent fold
 
 " also match and syntax highlight in-line R code
 syntax match rmdEndInline "`" contained

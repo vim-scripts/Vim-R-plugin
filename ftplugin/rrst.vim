@@ -125,20 +125,22 @@ function! RMakeHTMLrrst(t)
         let rcmd = rcmd . '; browseURL("' . expand("%:r:t") . '.html")'
     endif
     let b:needsnewomnilist = 1
-    call SendCmdToR(rcmd)
+    call g:SendCmdToR(rcmd)
 endfunction
 
 function! RMakePDFrrst()
     if g:rplugin_vimcomport == 0
         exe "Py DiscoverVimComPort()"
         if g:rplugin_vimcomport == 0
-            return
+            call RWarningMsg("The vimcom package is required to make and open the PDF.")
         endif
     endif
     update
     call RSetWD()
     if g:rplugin_has_rst2pdf == 0
-        if executable("rst2pdf")
+        if exists("g:vimrplugin_rst2pdfpath") && executable(g:vimrplugin_rst2pdfpath)
+            let g:rplugin_has_rst2pdf = 1
+        elseif executable("rst2pdf")
             let g:rplugin_has_rst2pdf = 1
         else
             call RWarningMsg("Is 'rst2pdf' application installed? Cannot convert into PDF: 'rst2pdf' executable not found.")
@@ -154,14 +156,14 @@ function! RMakePDFrrst()
         let pdfcmd = pdfcmd . ", " . g:vimrplugin_knitargs
     endif
     if exists("g:vimrplugin_rst2pdfpath")
-        pdfcmd = pdfcmd . ", rst2pdfpath='" . g:vimrplugin_rst2pdf_path . "'"
+        let pdfcmd = pdfcmd . ", rst2pdfpath='" . g:vimrplugin_rst2pdfpath . "'"
     endif
     if exists("g:vimrplugin_rst2pdfargs")
         let pdfcmd = pdfcmd . ", " . g:vimrplugin_rst2pdfargs
     endif
     let pdfcmd = pdfcmd . ")"
     let b:needsnewomnilist = 1
-    let ok = SendCmdToR(pdfcmd)
+    let ok = g:SendCmdToR(pdfcmd)
     if ok == 0
         return
     endif

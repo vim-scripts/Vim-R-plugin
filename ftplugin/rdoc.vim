@@ -47,6 +47,9 @@ function! FixRdoc()
     let lnr = line("$")
     for i in range(1, lnr)
         call setline(i, substitute(getline(i), "_\010", "", "g"))
+        " A space after 'Arguments:' is necessary for correct syntax highlight
+        " of the first argument
+        call setline(i, substitute(getline(i), "^Arguments:", "Arguments: ", ""))
     endfor
     let has_ex = search("^Examples:$")
     if has_ex

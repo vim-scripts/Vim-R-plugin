@@ -23,6 +23,7 @@ if exists("b:did_ftplugin")
     finish
 endif
 
+let g:rplugin_upobcnt = 0
 
 " Don't load another plugin for this buffer
 let b:did_ftplugin = 1
@@ -41,10 +42,6 @@ setlocal noswapfile
 setlocal buftype=nofile
 setlocal nowrap
 setlocal iskeyword=@,48-57,_,.
-
-if g:vimrplugin_tmux && g:vimrplugin_screenplugin
-    let showmarks_enable = 0
-endif
 
 if !exists("g:rplugin_hasmenu")
     let g:rplugin_hasmenu = 0
@@ -68,6 +65,11 @@ function! UpdateOB(what)
     if g:rplugin_curview != wht
         return "curview != what"
     endif
+    if g:rplugin_upobcnt
+        echoerr "OB called twice"
+        return "OB called twice"
+    endif
+    let g:rplugin_upobcnt = 1
 
     let g:rplugin_switchedbuf = 0
     if $TMUX_PANE == ""
@@ -75,6 +77,7 @@ function! UpdateOB(what)
         silent buffers
         redir END
         if s:bufl !~ "Object_Browser"
+            let g:rplugin_upobcnt = 0
             return "Object_Browser not listed"
         endif
         if exists("g:rplugin_curbuf") && g:rplugin_curbuf != "Object_Browser"
@@ -94,14 +97,15 @@ function! UpdateOB(what)
     if !exists("curcol")
         let curcol = 1
     endif
+    let save_unnamed_reg = @@
     sil normal! ggdG
+    let @@ = save_unnamed_reg 
     if wht == "GlobalEnv"
-        call setline(1, ".GlobalEnv | Libraries")
-        exe "silent read " . g:rplugin_esc_tmpdir . "/object_browser"
+        let fcntt = readfile($VIMRPLUGIN_TMPDIR . g:rplugin_globenv_f)
     else
-        call setline(1, "Libraries | .GlobalEnv")
-        exe "silent read " . g:rplugin_esc_tmpdir . "/liblist"
+        let fcntt = readfile($VIMRPLUGIN_TMPDIR . g:rplugin_liblist_f)
     endif
+    call setline(1, fcntt)
     call cursor(curline, curcol)
     if bufname("%") =~ "Object_Browser" || b:rplugin_extern_ob
         setlocal nomodifiable
@@ -111,6 +115,7 @@ function! UpdateOB(what)
         exe "sil noautocmd sb " . g:rplugin_curbuf
         exe "set switchbuf=" . savesb
     endif
+    let g:rplugin_upobcnt = 0
     return "End of UpdateOB()"
 endfunction
 
@@ -128,14 +133,13 @@ function! RBrowserDoubleClick()
     endif
 
     " Toggle state of list or data.frame: open X closed
-    let key = RBrowserGetName(1, line("."))
+    let key = RBrowserGetName(0)
     if g:rplugin_curview == "GlobalEnv"
-        exe 'Py SendToVimCom("' . "\005" . '-' . substitute(key, '\$', '-', "g") . '")'
+        exe 'Py SendToVimCom("' . "\005" . key . '")'
         if g:rplugin_lastrpl == "R is busy."
             call RWarningMsg("R is busy.")
         endif
     else
-        let key = substitute(key, '\$', '-', "g") 
         let key = substitute(key, '`', '', "g") 
         if key !~ "^package:"
             let key = "package:" . RBGetPkgName() . '-' . key
@@ -145,6 +149,10 @@ function! RBrowserDoubleClick()
             call RWarningMsg("R is busy.")
         endif
     endif
+    if v:servername == "" || has("win32") || has("win64")
+        sleep 50m " R needs some time to write the file.
+        call UpdateOB("both")
+    endif
 endfunction
 
 function! RBrowserRightClick()
@@ -152,7 +160,7 @@ function! RBrowserRightClick()
         return
     endif
 
-    let key = RBrowserGetName(1, line("."))
+    let key = RBrowserGetName(1)
     if key == ""
         return
     endif
@@ -208,7 +216,10 @@ function! RBrowserFindParent(word, curline, curpos)
         let line = substitute(getline(curline), "	.*", "", "")
         let curpos = stridx(line, '[#')
         if curpos == -1
-            let curpos = a:curpos
+            let curpos = stridx(line, '<#')
+            if curpos == -1
+                let curpos = a:curpos
+            endif
         endif
     endwhile
 
@@ -222,7 +233,11 @@ function! RBrowserFindParent(word, curline, curpos)
         endif
     endif
     if curline > 1
-        let word = substitute(line, '.*[#', "", "") . '$' . a:word
+        if line =~ '<#'
+            let word = substitute(line, '.*<#', "", "") . '@' . a:word
+        else
+            let word = substitute(line, '.*\[#', "", "") . '$' . a:word
+        endif
         if curpos != spacelimit
             let word = RBrowserFindParent(word, line("."), curpos)
         endif
@@ -235,65 +250,58 @@ function! RBrowserFindParent(word, curline, curpos)
     return ""
 endfunction
 
-function! RBrowserGetName(complete, lnum)
-    let curpos = col(".")
-
-    let line = getline(a:lnum)
+function! RBrowserGetName(cleantail)
+    let line = getline(".")
     if line =~ "^$"
-        return
+        return ""
     endif
 
-    " Is the object a top level one (curpos == 2)?
-    if g:rplugin_curview == "libraries"
-        let delim = ['##', '{#', '[#', '(#', '"#', "'#", '%#', '<#', '=#']
-    else
-        let delim = ['{#', '[#', '(#', '"#', "'#", '%#', '<#', '=#']
-    endif
-    let word = substitute(line, '^\W*#\{-1,}\(.*\)\t.*', '\1', "")
+    let curpos = stridx(line, "#")
+    let word = substitute(line, '.\{-}\(.#\)\(.\{-}\)\t', '\2\1', '')
+    let word = substitute(word, '\[#$', '$', '')
+    let word = substitute(word, '<#$', '@', '')
+    let word = substitute(word, '.#$', '', '')
 
     if word =~ ' ' || word =~ '^[0-9]'
         let word = '`' . word . '`'
     endif
 
-    if a:complete == 0
-        return word
-    endif
-
-    for i in delim
-        let curpos = stridx(line, i)
-        if curpos != -1
-            break
-        endif
-    endfor
-    if curpos == -1
-        return ""
-    endif
-
-
-    if curpos == 3
+    if (g:rplugin_curview == "GlobalEnv" && curpos == 4) || (g:rplugin_curview == "libraries" && curpos == 3)
         " top level object
+        let word = substitute(word, '\$\[\[', '[[', "g")
+        if a:cleantail
+            let word = substitute(word, '[\$@]$', '', '')
+        endif
         if g:rplugin_curview == "libraries"
-            return "package:" . word
+            return "package:" . substitute(word, "#", "", "")
         else
             return word
         endif
     else
         if g:rplugin_curview == "libraries"
             if s:isutf8
-                if curpos == 10
+                if curpos == 11
+                    if a:cleantail
+                        let word = substitute(word, '[\$@]$', '', '')
+                    endif
+                    let word = substitute(word, '\$\[\[', '[[', "g")
                     return word
                 endif
-            elseif curpos == 6
+            elseif curpos == 7
+                if a:cleantail
+                    let word = substitute(word, '[\$@]$', '', '')
+                endif
+                let word = substitute(word, '\$\[\[', '[[', "g")
                 return word
             endif
         endif
-        if curpos > 3
+        if curpos > 4
             " Find the parent data.frame or list
-            let word = RBrowserFindParent(word, line("."), curpos)
-            " Unnamed objects of lists
-            if word =~ '\$\[\[[0-9]*\]\]'
-                let word = substitute(word, '\$\[\[\([0-9]*\)\]\]', '-[[\1]]', "g")
+            let word = RBrowserFindParent(word, line("."), curpos - 1)
+            if a:cleantail
+                let word = substitute(word, '[\$@]$', '', '')
             endif
+            let word = substitute(word, '\$\[\[', '[[', "g")
             return word
         else
             " Wrong object name delimiter: should never happen.
@@ -316,80 +324,12 @@ endfunction
 
 function! ObBrBufUnload()
     if exists("g:rplugin_editor_sname")
-        call system("tmux select-pane -t " . g:rplugin_edpane)
+        call system("tmux select-pane -t " . g:rplugin_vim_pane)
     endif
 endfunction
 
 function! SourceObjBrLines()
     exe "source " . g:rplugin_esc_tmpdir . "/objbrowserInit"
-endfunction
-
-function! OBGetDeleteCmd(lnum)
-    let obj = RBrowserGetName(1, a:lnum)
-    if g:rplugin_curview == "GlobalEnv"
-        if obj =~ '\$'
-            let cmd = obj . ' <- NULL'
-        elseif obj =~ '-\[\[[0-9]*\]\]'
-            let obj = substitute(obj, '-\(\[\[[0-9]*\]\]\)', '\1', '')
-            let cmd = obj . ' <- NULL'
-        else
-            let cmd = 'rm(' . obj . ')'
-        endif
-    else
-        if obj =~ "^package:"
-            let cmd = 'detach("' . obj . '", unload = TRUE, character.only = TRUE)'
-        else
-            return ""
-        endif
-    endif
-    return cmd
-endfunction
-
-function! OBSendDeleteCmd(cmd)
-    Py SendToVimCom("\x08Stop updating info. [OBSendDeleteCmd]")
-    if exists("*RBrSendToR")
-        call RBrSendToR(a:cmd)
-    else
-        call SendCmdToR(a:cmd)
-    endif
-    if g:rplugin_curview == "GlobalEnv"
-        Py SendToVimCom("\003GlobalEnv [OBSendDeleteCmd]")
-    else
-        Py SendToVimCom("\004Libraries [OBSendDeleteCmd]")
-    endif
-    call UpdateOB("both")
-    if v:servername != ""
-        exe 'Py SendToVimCom("\x07' . v:servername . ' [OBSendDeleteCmd]")'
-    endif
-endfunction
-
-function! OBDelete()
-    if line(".") < 3
-        return
-    endif
-    let cmd = OBGetDeleteCmd(line("."))
-    call OBSendDeleteCmd(cmd)
-endfunction
-
-function! OBMultiDelete()
-    let fline = line("'<")
-    let eline = line("'>")
-    if fline < 3
-        return
-    endif
-    let nl= 0
-    let cmd = ""
-    for ii in range(fline, eline)
-        let nl+= 1
-        if nl > 1
-            let cmd = cmd . "; "
-        endif
-        let cmd = cmd . OBGetDeleteCmd(ii)
-        if g:rplugin_curview == "GlobalEnv"
-            let cmd = substitute(cmd, "); rm(", ", ", "")
-        endif
-    endfor
-    call OBSendDeleteCmd(cmd)
 endfunction
 
 nmap <buffer><silent> <CR> :call RBrowserDoubleClick()<CR>
@@ -406,8 +346,10 @@ if has("gui_running")
     call RBrowserMenu()
 endif
 
+au BufEnter <buffer> stopinsert
+
 if $TMUX_PANE == ""
-    au BufUnload <buffer> Py SendToVimCom("\x08Stop updating info.")
+    au BufUnload <buffer> Py SendToVimCom("\x08Stop updating info [OB BufUnload].")
 else
     au BufUnload <buffer> call ObBrBufUnload()
     " Fix problems caused by some plugins
@@ -419,9 +361,6 @@ else
     endif
 endif
 
-nmap <buffer><silent> d :call OBDelete()<CR>
-vmap <buffer><silent> d <Esc>:call OBMultiDelete()<CR>
-
 let s:envstring = tolower($LC_MESSAGES . $LC_ALL . $LANG)
 if s:envstring =~ "utf-8" || s:envstring =~ "utf8"
     let s:isutf8 = 1
@@ -429,6 +368,8 @@ else
     let s:isutf8 = 0
 endif
 unlet s:envstring
+
+call setline(1, ".GlobalEnv | Libraries")
 
 call RSourceOtherScripts()
 

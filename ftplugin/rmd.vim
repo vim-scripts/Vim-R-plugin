@@ -54,9 +54,9 @@ runtime r-plugin/common_buffer.vim
 
 function! RmdIsInRCode()
     let curline = line(".")
-    let chunkline = search("^```[ ]*{r", "bncW")
+    let chunkline = search("^[ \t]*```[ ]*{r", "bncW")
     call cursor(chunkline)
-    let docline = search("^```$", "ncW")
+    let docline = search("^[ \t]*```$", "ncW")
     call cursor(curline)
     if 0 < chunkline && chunkline < curline && curline < docline
         return 1
@@ -71,12 +71,12 @@ function! RmdPreviousChunk() range
     for var in range(1, chunk)
         let curline = line(".")
         if RmdIsInRCode()
-            let i = search("^```[ ]*{r", "bnW")
+            let i = search("^[ \t]*```[ ]*{r", "bnW")
             if i != 0
                 call cursor(i-1, 1)
             endif
         endif
-        let i = search("^```[ ]*{r", "bnW")
+        let i = search("^[ \t]*```[ ]*{r", "bnW")
         if i == 0
             call cursor(curline, 1)
             call RWarningMsg("There is no previous R code chunk to go.")
@@ -92,7 +92,7 @@ function! RmdNextChunk() range
     let rg = range(a:firstline, a:lastline)
     let chunk = len(rg)
     for var in range(1, chunk)
-        let i = search("^```[ ]*{r", "nW")
+        let i = search("^[ \t]*```[ ]*{r", "nW")
         if i == 0
             call RWarningMsg("There is no next R code chunk to go.")
             return
@@ -125,14 +125,14 @@ function! RMakeHTMLrmd(t)
     if g:vimrplugin_openhtml && a:t == "html"
         let rcmd = rcmd . '; browseURL("' . expand("%:r:t") . '.html")'
     endif
-    call SendCmdToR(rcmd)
+    call g:SendCmdToR(rcmd)
 endfunction
 
 function! RMakePDFrmd(t)
     if g:rplugin_vimcomport == 0
         exe "Py DiscoverVimComPort()"
         if g:rplugin_vimcomport == 0
-            return
+            call RWarningMsg("The vimcom package is required to make and open the PDF.")
         endif
     endif
     if g:rplugin_has_pandoc == 0
@@ -161,7 +161,7 @@ function! RMakePDFrmd(t)
     endif
     let pdfcmd = pdfcmd . ")"
     let b:needsnewomnilist = 1
-    call SendCmdToR(pdfcmd)
+    call g:SendCmdToR(pdfcmd)
 endfunction  
 
 " Send Rmd chunk to R
@@ -170,8 +170,8 @@ function! SendRmdChunkToR(e, m)
         call RWarningMsg("Not inside an R code chunk.")
         return
     endif
-    let chunkline = search("^```[ ]*{r", "bncW") + 1
-    let docline = search("^```", "ncW") - 1
+    let chunkline = search("^[ \t]*```[ ]*{r", "bncW") + 1
+    let docline = search("^[ \t]*```", "ncW") - 1
     let lines = getline(chunkline, docline)
     let b:needsnewomnilist = 1
     let ok = RSourceLines(lines, a:e)

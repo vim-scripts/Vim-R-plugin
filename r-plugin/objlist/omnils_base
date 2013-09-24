@@ -24,6 +24,7 @@
 [[<-functionfunctionbaseNO_ARGS
 {functionfunctionbaseNO_ARGS
 @functionfunctionbaseNO_ARGS
+@<-functionfunctionbaseNO_ARGS
 $functionfunctionbaseNO_ARGS
 $<-functionfunctionbaseNO_ARGS
 *functionfunctionbaseNO_ARGS
@@ -50,7 +51,7 @@ all.equal.formulafunctionfunctionbasetarget	current	...
 all.equal.languagefunctionfunctionbasetarget	current	...
 all.equal.listfunctionfunctionbasetarget	current	check.attributesTRUE	...
 all.equal.numericfunctionfunctionbasetarget	current	tolerance.Machine$double.eps^0.5	scaleNULL	check.attributesTRUE	...
-all.equal.POSIXctfunctionfunctionbasetarget	current	...	scale1
+all.equal.POSIXctfunctionfunctionbasetarget	current	...	tolerance0.001	scale1
 all.equal.rawfunctionfunctionbasetarget	current	check.attributesTRUE	...
 all.namesfunctionfunctionbaseexpr	functionsTRUE	max.names-1L	uniqueFALSE
 all.varsfunctionfunctionbaseexpr	functionsFALSE	max.names-1L	uniqueTRUE
@@ -176,7 +177,6 @@ as.POSIXlt.numericfunctionfunctionbasex	tz""	origin	...
 as.POSIXlt.POSIXctfunctionfunctionbasex	tz""	...
 as.qrfunctionfunctionbasex
 as.rawfunctionfunctionbaseNO_ARGS
-as.realfunctionfunctionbaseNO_ARGS
 asS3functionfunctionbaseobject	flagTRUE	completeTRUE
 asS4functionfunctionbaseobject	flagTRUE	completeTRUE
 assignfunctionfunctionbasex	value	pos-1	enviras.environment(pos)	inheritsFALSE	immediateTRUE
@@ -190,8 +190,8 @@ as.vector.factorfunctionfunctionbasex	mode"any"
 atanfunctionfunctionbaseNO_ARGS
 atan2functionfunctionbasey	x
 atanhfunctionfunctionbaseNO_ARGS
-attachfunctionfunctionbasewhat	pos2	namedeparse(substitute(what))	warn.conflictsTRUE
-attachNamespacefunctionfunctionbasens	pos2	dataPathNULL	dependsNULL
+attachfunctionfunctionbasewhat	namedeparse(substitute(what))	warn.conflictsTRUE
+attachNamespacefunctionfunctionbasens	dependsNULL
 attrfunctionfunctionbaseNO_ARGS
 attr<-functionfunctionbaseNO_ARGS
 attr.all.equalfunctionfunctionbasetarget	current	check.attributesTRUE	check.namesTRUE	...
@@ -210,6 +210,12 @@ betafunctionfunctionbasea	b
 bindingIsActivefunctionfunctionbasesym	env
 bindingIsLockedfunctionfunctionbasesym	env
 bindtextdomainfunctionfunctionbasedomain	dirnameNULL
+bitwAndfunctionfunctionbasea	b
+bitwNotfunctionfunctionbasea
+bitwOrfunctionfunctionbasea	b
+bitwShiftLfunctionfunctionbasea	n
+bitwShiftRfunctionfunctionbasea	n
+bitwXorfunctionfunctionbasea	b
 bodyfunctionfunctionbasefunsys.function(sys.parent())
 body<-functionfunctionbasefun	envirenvironment(fun)	value
 bquotefunctionfunctionbaseexpr	whereparent.frame()
@@ -229,7 +235,6 @@ callCCfunctionfunctionbasefun
 capabilitiesfunctionfunctionbasewhatNULL
 casefoldfunctionfunctionbasex	upperFALSE
 catfunctionfunctionbase...	file""	sep" "	fillFALSE	labelsNULL	appendFALSE
-categoryfunctionfunctionbase...
 cbindfunctionfunctionbase...	deparse.level1
 cbind.data.framefunctionfunctionbase...	deparse.level1
 c.Datefunctionfunctionbase...	recursiveFALSE
@@ -240,12 +245,13 @@ charmatchfunctionfunctionbasex	table
 charToRawfunctionfunctionbasex
 chartrfunctionfunctionbaseold	new	x
 check_tzonesfunctionfunctionbase...
-cholfunctionfunctionbasex	pivotFALSE	LINPACK	...
+cholfunctionfunctionbasex	pivotFALSE	LINPACKFALSE	tol-1	...
 chol2invfunctionfunctionbasex	sizeNCOL(x)	LINPACKFALSE
-chol.defaultfunctionfunctionbasex	pivotFALSE	LINPACK	...
+chol.defaultfunctionfunctionbasex	pivotFALSE	LINPACKFALSE	tol-1	...
 choosefunctionfunctionbasen	k
 classfunctionfunctionbaseNO_ARGS
 class<-functionfunctionbaseNO_ARGS
+clearPushBackfunctionfunctionbaseconnection
 closefunctionfunctionbasecon	...
 closeAllConnectionsfunctionfunctionbaseNO_ARGS
 close.connectionfunctionfunctionbasecon	type"rw"	...
@@ -280,9 +286,9 @@ cummaxfunctionfunctionbaseNO_ARGS
 cumminfunctionfunctionbaseNO_ARGS
 cumprodfunctionfunctionbaseNO_ARGS
 cumsumfunctionfunctionbaseNO_ARGS
-cutfunctionfunctionbasex	breaks	labelsNULL	include.lowestFALSE	rightTRUE	dig.lab3	ordered_resultFALSE	...
+cutfunctionfunctionbasex	breaks	labelsNULL	include.lowestFALSE	rightTRUE	ordered_resultFALSE	...
 cut.Datefunctionfunctionbasex	breaks	labelsNULL	start.on.mondayTRUE	rightFALSE	...
-cut.defaultfunctionfunctionbasex	breaks	labelsNULL	include.lowestFALSE	rightTRUE	dig.lab3	ordered_resultFALSE	...
+cut.defaultfunctionfunctionbasex	breaks	labelsNULL	include.lowestFALSE	rightTRUE	ordered_resultFALSE	...
 cut.POSIXtfunctionfunctionbasex	breaks	labelsNULL	start.on.mondayTRUE	rightFALSE	...
 data.classfunctionfunctionbasex
 [<-.data.framefunctionfunctionbasex	i	j	value
@@ -304,7 +310,7 @@ default.stringsAsFactorsfunctionfunctionbaseNO_ARGS
 delayedAssignfunctionfunctionbasex	value	eval.envparent.frame(1)	assign.envparent.frame(1)
 deparsefunctionfunctionbaseexpr	backtickmode(expr) %in% c("call", "expression", "(", "function")	controlc("keepInteger", "showAttributes", "keepNA")	nlines-1L
 detfunctionfunctionbasex	...
-detachfunctionfunctionbasename	pos2	unloadFALSE	character.onlyFALSE	forceFALSE
+detachfunctionfunctionbasename	unloadFALSE	character.onlyFALSE	forceFALSE
 determinantfunctionfunctionbasex	logarithmTRUE	...
 determinant.matrixfunctionfunctionbasex	logarithmTRUE	...
 dgetfunctionfunctionbasefile
@@ -326,7 +332,7 @@ dimnamesfunctionfunctionbaseNO_ARGS
 dimnames<-functionfunctionbaseNO_ARGS
 dimnames<-.data.framefunctionfunctionbasex	value
 dimnames.data.framefunctionfunctionbasex
-dirfunctionfunctionbasepath"."	patternNULL	all.filesFALSE	full.namesFALSE	recursiveFALSE	ignore.caseFALSE	include.dirsFALSE
+dirfunctionfunctionbasepath"."	patternNULL	all.filesFALSE	full.namesFALSE	recursiveFALSE	ignore.caseFALSE	include.dirsFALSE	no..FALSE
 dir.createfunctionfunctionbasepath	showWarningsTRUE	recursiveFALSE	mode"0777"
 dirnamefunctionfunctionbasepath
 $.DLLInfofunctionfunctionbasex	name
@@ -339,10 +345,10 @@ droplevelsfunctionfunctionbasex	...
 droplevels.data.framefunctionfunctionbasex	exceptNULL	...
 droplevels.factorfunctionfunctionbasex	...
 dumpfunctionfunctionbaselist	file"dumpdata.R"	appendFALSE	control"all"	envirparent.frame()	evaluateTRUE
-duplicatedfunctionfunctionbasex	incomparablesFALSE	fromLastFALSE	...
+duplicatedfunctionfunctionbasex	incomparablesFALSE	fromLastFALSE	nmaxNA	...
 duplicated.arrayfunctionfunctionbasex	incomparablesFALSE	fromLastFALSE	...
 duplicated.data.framefunctionfunctionbasex	incomparablesFALSE	fromLastFALSE	...
-duplicated.defaultfunctionfunctionbasex	incomparablesFALSE	fromLastFALSE	...
+duplicated.defaultfunctionfunctionbasex	incomparablesFALSE	fromLastFALSE	nmaxNA	...
 duplicated.matrixfunctionfunctionbasex	incomparablesFALSE	fromLastFALSE	...
 duplicated.numeric_versionfunctionfunctionbasex	incomparablesFALSE	...
 duplicated.POSIXltfunctionfunctionbasex	incomparablesFALSE	...
@@ -371,7 +377,7 @@ expand.gridfunctionfunctionbase...	KEEP.OUT.ATTRSTRUE	stringsAsFactorsTRUE
 expm1functionfunctionbaseNO_ARGS
 expressionfunctionfunctionbaseNO_ARGS
 FlogicallogicalbaseNot a function
-factorfunctionfunctionbasexcharacter()	levels	labels	excludeNA	orderedis.ordered(x)
+factorfunctionfunctionbasexcharacter()	levels	labels	excludeNA	orderedis.ordered(x)	nmaxNA
 [<-.factorfunctionfunctionbasex	...	value
 [.factorfunctionfunctionbasex	...	dropFALSE
 [[<-.factorfunctionfunctionbasex	...	value
@@ -422,23 +428,20 @@ format.octmodefunctionfunctionbasex	widthNULL	...
 format.packageInfofunctionfunctionbasex	...
 format.POSIXctfunctionfunctionbasex	format""	tz""	usetzFALSE	...
 format.POSIXltfunctionfunctionbasex	format""	usetzFALSE	...
-format.pvalfunctionfunctionbasepv	digitsmax(1, getOption("digits") - 2)	eps.Machine$double.eps	na.form"NA"	...
+format.pvalfunctionfunctionbasepv	digitsmax(1L, getOption("digits") - 2L)	eps.Machine$double.eps	na.form"NA"	...
 format.summaryDefaultfunctionfunctionbasex	...
 forwardsolvefunctionfunctionbasel	x	kncol(l)	upper.triFALSE	transposeFALSE
 functionfunctionfunctionbaseNO_ARGS
 gammafunctionfunctionbaseNO_ARGS
-gammaCodyfunctionfunctionbasex
 gcfunctionfunctionbaseverbosegetOption("verbose")	resetFALSE
 gcinfofunctionfunctionbaseverbose
 gc.timefunctionfunctionbaseNO_ARGS
 gctorturefunctionfunctionbaseonTRUE
 gctorture2functionfunctionbasestep	wait	inhibit_releaseFALSE
-getfunctionfunctionbasex	pos-1	enviras.environment(pos)	mode"any"	inheritsTRUE
+getfunctionfunctionbasex	pos-1L	enviras.environment(pos)	mode"any"	inheritsTRUE
 getAllConnectionsfunctionfunctionbaseNO_ARGS
 getCallingDLLfunctionfunctionbasefsys.function(-1)	doStopFALSE
 getCallingDLLefunctionfunctionbasee
-getCConverterDescriptionsfunctionfunctionbaseNO_ARGS
-getCConverterStatusfunctionfunctionbaseNO_ARGS
 getConnectionfunctionfunctionbasewhat
 getDLLRegisteredRoutinesfunctionfunctionbasedll	addNamesTRUE
 getDLLRegisteredRoutines.characterfunctionfunctionbasedll	addNamesTRUE
@@ -456,7 +459,6 @@ getNamespaceNamefunctionfunctionbasens
 getNamespaceUsersfunctionfunctionbasens
 getNamespaceVersionfunctionfunctionbasens
 getNativeSymbolInfofunctionfunctionbasename	PACKAGE	unlistTRUE	withRegistrationInfoFALSE
-getNumCConvertersfunctionfunctionbaseNO_ARGS
 getOptionfunctionfunctionbasex	defaultNULL
 getRversionfunctionfunctionbaseNO_ARGS
 getSrcLinesfunctionfunctionbasesrcfile	first	last
@@ -481,7 +483,7 @@ Ifunctionfunctionbasex
 iconvfunctionfunctionbasex	from""	to""	subNA	markTRUE	toRawFALSE
 iconvlistfunctionfunctionbaseNO_ARGS
 icuSetCollatefunctionfunctionbase...
-identicalfunctionfunctionbasex	y	num.eqTRUE	single.NATRUE	attrib.as.setTRUE	ignore.bytecodeTRUE
+identicalfunctionfunctionbasex	y	num.eqTRUE	single.NATRUE	attrib.as.setTRUE	ignore.bytecodeTRUE	ignore.environmentFALSE
 identityfunctionfunctionbasex
 ifflow-controlflow-controlbaseNot a function
 ifelsefunctionfunctionbasetest	yes	no
@@ -550,10 +552,9 @@ is.primitivefunctionfunctionbasex
 is.qrfunctionfunctionbasex
 is.RfunctionfunctionbaseNO_ARGS
 is.rawfunctionfunctionbaseNO_ARGS
-is.realfunctionfunctionbaseNO_ARGS
 is.recursivefunctionfunctionbaseNO_ARGS
 isRestartfunctionfunctionbasex
-isS4functionfunctionbaseobject
+isS4functionfunctionbaseNO_ARGS
 isSeekablefunctionfunctionbasecon
 is.singlefunctionfunctionbaseNO_ARGS
 is.symbolfunctionfunctionbaseNO_ARGS
@@ -594,7 +595,7 @@ levels.defaultfunctionfunctionbasex
 levels<-.factorfunctionfunctionbasex	value
 lfactorialfunctionfunctionbasex
 lgammafunctionfunctionbaseNO_ARGS
-libraryfunctionfunctionbasepackage	help	pos2	lib.locNULL	character.onlyFALSE	logical.returnFALSE	warn.conflictsTRUE	quietlyFALSE	keep.sourcegetOption("keep.source.pkgs")	verbosegetOption("verbose")
+libraryfunctionfunctionbasepackage	help	poslocal({	pos    poz <- try(1 + rev(mvbutils:::search.task.trees())[1])	pos    if (inherits(poz, "try-error")) 	pos        poz <- 2	pos    poz	pos})	lib.locNULL	character.onlyFALSE	logical.returnFALSE	warn.conflictsTRUE	quietlyFALSE	verbosegetOption("verbose")
 library.dynamfunctionfunctionbasechname	package	lib.loc	verbosegetOption("verbose")	file.ext.Platform$dynlib.ext	...
 library.dynam.unloadfunctionfunctionbasechname	libpath	verbosegetOption("verbose")	file.ext.Platform$dynlib.ext
 licencefunctionfunctionbaseNO_ARGS
@@ -602,12 +603,12 @@ licensefunctionfunctionbaseNO_ARGS
 listfunctionfunctionbaseNO_ARGS
 list2envfunctionfunctionbasex	envirNULL	parentparent.frame()	hash(length(x) > 100)	sizemax(29L, length(x))
 list.dirsfunctionfunctionbasepath"."	full.namesTRUE	recursiveTRUE
-list.filesfunctionfunctionbasepath"."	patternNULL	all.filesFALSE	full.namesFALSE	recursiveFALSE	ignore.caseFALSE	include.dirsFALSE
+list.filesfunctionfunctionbasepath"."	patternNULL	all.filesFALSE	full.namesFALSE	recursiveFALSE	ignore.caseFALSE	include.dirsFALSE	no..FALSE
 [.listoffunctionfunctionbasex	i	...
-loadfunctionfunctionbasefile	envirparent.frame()
+loadfunctionfunctionbasefile	envirparent.frame()	verboseFALSE
 loadedNamespacesfunctionfunctionbaseNO_ARGS
 loadingNamespaceInfofunctionfunctionbaseNO_ARGS
-loadNamespacefunctionfunctionbasepackage	lib.locNULL	keep.sourcegetOption("keep.source.pkgs")	partialFALSE
+loadNamespacefunctionfunctionbasepackage	lib.locNULL	keep.sourcegetOption("keep.source.pkgs")	partiallocal({	partial    ok <- try({	partial        pn <- as.environment("mvb.session.info")$partial.namespaces	partial        (length(pn) > 0) && ((pn == "EVERY PACKAGE") || (package %in% 	partial            pn))	partial    })	partial    !inherits(ok, "try-error") && ok	partial})	versionCheckNULL	override.envFALSE
 localfunctionfunctionbaseexpr	envirnew.env()
 lockBindingfunctionfunctionbasesym	env
 lockEnvironmentfunctionfunctionbaseenv	bindingsFALSE
@@ -618,11 +619,10 @@ log2functionfunctionbaseNO_ARGS
 logbfunctionfunctionbasex	baseexp(1)
 logicalfunctionfunctionbaseNO_ARGS
 lower.trifunctionfunctionbasex	diagFALSE
-lsfunctionfunctionbasename	pos-1	enviras.environment(pos)	all.namesFALSE	pattern
+lsfunctionfunctionbasename	pos-1L	enviras.environment(pos)	all.namesFALSE	pattern
 makeActiveBindingfunctionfunctionbasesym	fun	env
 make.namesfunctionfunctionbasenames	uniqueFALSE	allow_TRUE
 make.uniquefunctionfunctionbasenames	sep"."
-manglePackageNamefunctionfunctionbasepkgName	pkgVersion
 Mapfunctionfunctionbasef	...
 mapplyfunctionfunctionbaseFUN	...	MoreArgsNULL	SIMPLIFYTRUE	USE.NAMESTRUE
 margin.tablefunctionfunctionbasex	marginNULL
@@ -640,7 +640,6 @@ matrixfunctionfunctionbasedataNA	nrow1	ncol1	byrowFALSE	dimnamesNULL
 maxfunctionfunctionbaseNO_ARGS
 max.colfunctionfunctionbasem	ties.methodc("random", "first", "last")
 meanfunctionfunctionbasex	trim0	na.rmFALSE	...
-mean.data.framefunctionfunctionbasex	...
 mean.Datefunctionfunctionbasex	...
 mean.defaultfunctionfunctionbasex	trim0	na.rmFALSE	...
 mean.difftimefunctionfunctionbasex	...
@@ -654,7 +653,7 @@ mergefunctionfunctionbasex	y	...
 merge.data.framefunctionfunctionbasex	y	byintersect(names(x), names(y))	by.x	by.y	allFALSE	all.x	all.y	sortTRUE	suffixesc(".x", ".y")	incomparablesNULL	...
 merge.defaultfunctionfunctionbasex	y	...
 messagefunctionfunctionbase...	domainNULL	appendLFTRUE
-mgetfunctionfunctionbasex	envir	mode"any"	ifnotfoundlist(function(x) stop(paste0("value for '", x, "' not found"), 	ifnotfound    call. = FALSE))	inheritsFALSE
+mgetfunctionfunctionbasex	enviras.environment(-1L)	mode"any"	ifnotfound	inheritsFALSE
 minfunctionfunctionbaseNO_ARGS
 missingfunctionfunctionbaseNO_ARGS
 ModfunctionfunctionbaseNO_ARGS
@@ -698,7 +697,7 @@ numericfunctionfunctionbaseNO_ARGS
 numeric_versionfunctionfunctionbasex	strictTRUE
 nzcharfunctionfunctionbaseNO_ARGS
 %o%functionfunctionbaseX	Y
-objectsfunctionfunctionbasename	pos-1	enviras.environment(pos)	all.namesFALSE	pattern
+objectsfunctionfunctionbasename	pos-1L	enviras.environment(pos)	all.namesFALSE	pattern
 |.octmodefunctionfunctionbasea	b
 !.octmodefunctionfunctionbasea
 [.octmodefunctionfunctionbasex	i
@@ -732,7 +731,7 @@ pairlistfunctionfunctionbase...
 parent.envfunctionfunctionbaseenv
 parent.env<-functionfunctionbaseenv	value
 parent.framefunctionfunctionbasen1
-parsefunctionfunctionbasefile""	nNULL	textNULL	prompt"?"	srcfileNULL	encoding"unknown"
+parsefunctionfunctionbasefile""	nNULL	textNULL	prompt"?"	keep.sourcegetOption("keep.source")	srcfileNULL	encoding"unknown"
 parseNamespaceFilefunctionfunctionbasepackage	package.lib	mustExistTRUE
 pastefunctionfunctionbase...	sep" "	collapseNULL
 paste0functionfunctionbase...	collapseNULL
@@ -789,13 +788,14 @@ print.simple.listfunctionfunctionbasex	...
 print.srcfilefunctionfunctionbasex	...
 print.srcreffunctionfunctionbasex	useSourceTRUE	...
 print.summaryDefaultfunctionfunctionbasex	...
-print.summary.tablefunctionfunctionbasex	digitsmax(1, getOption("digits") - 3)	...
+print.summary.tablefunctionfunctionbasex	digitsmax(1L, getOption("digits") - 3L)	...
 print.tablefunctionfunctionbasex	digitsgetOption("digits")	quoteFALSE	na.print""	zero.print"0"	justify"none"	...
 print.warningsfunctionfunctionbasex	...
 prmatrixfunctionfunctionbasex	rowlabdn[[1]]	collabdn[[2]]	quoteTRUE	rightFALSE	na.printNULL	...
 proc.timefunctionfunctionbaseNO_ARGS
 prodfunctionfunctionbaseNO_ARGS
 prop.tablefunctionfunctionbasex	marginNULL
+provideDimnamesfunctionfunctionbasex	sep""	baselist(LETTERS)
 psigammafunctionfunctionbasex
 pushBackfunctionfunctionbasedata	connection	newLineTRUE
 pushBackLengthfunctionfunctionbaseconnection
@@ -837,7 +837,6 @@ readlinefunctionfunctionbaseprompt""
 readLinesfunctionfunctionbaseconstdin()	n-1L	okTRUE	warnTRUE	encoding"unknown"
 readRDSfunctionfunctionbasefile	refhookNULL
 readRenvironfunctionfunctionbasepath
-realfunctionfunctionbaseNO_ARGS
 Recallfunctionfunctionbase...
 Reducefunctionfunctionbasef	x	init	rightFALSE	accumulateFALSE
 regexecfunctionfunctionbasepattern	text	ignore.caseFALSE	fixedFALSE	useBytesFALSE
@@ -848,7 +847,6 @@ registerS3methodsfunctionfunctionbaseinfo	package	env
 regmatchesfunctionfunctionbasex	m	invertFALSE
 regmatches<-functionfunctionbasex	m	invertFALSE	value
 removefunctionfunctionbase...	listcharacter()	pos-1	enviras.environment(pos)	inheritsFALSE
-removeCConverterfunctionfunctionbaseid
 removeTaskCallbackfunctionfunctionbaseid
 repfunctionfunctionbaseNO_ARGS
 rep.Datefunctionfunctionbasex	...
@@ -856,11 +854,12 @@ repeatflow-controlflow-controlbaseNot a function
 rep.factorfunctionfunctionbasex	...
 rep.intfunctionfunctionbasex	times
 replacefunctionfunctionbasex	list	values
+rep_lenfunctionfunctionbasex	length.out
 replicatefunctionfunctionbasen	expr	simplify"array"
 rep.numeric_versionfunctionfunctionbasex	...
 rep.POSIXctfunctionfunctionbasex	...
 rep.POSIXltfunctionfunctionbasex	...
-requirefunctionfunctionbasepackage	lib.locNULL	quietlyFALSE	warn.conflictsTRUE	keep.sourcegetOption("keep.source.pkgs")	character.onlyFALSE
+requirefunctionfunctionbasepackage	lib.locNULL	quietlyFALSE	warn.conflictsTRUE	character.onlyFALSE
 requireNamespacefunctionfunctionbasepackage	...	quietlyFALSE
 restartDescriptionfunctionfunctionbaser
 restartFormalsfunctionfunctionbaser
@@ -930,7 +929,6 @@ seq_lenfunctionfunctionbaseNO_ARGS
 seq.POSIXtfunctionfunctionbasefrom	to	by	length.outNULL	along.withNULL	...
 sequencefunctionfunctionbasenvec
 serializefunctionfunctionbaseobject	connection	asciiFALSE	xdrTRUE	versionNULL	refhookNULL
-setCConverterStatusfunctionfunctionbaseid	status
 setdifffunctionfunctionbasex	y
 setequalfunctionfunctionbasex	y
 setHookfunctionfunctionbasehookName	value	actionc("append", "prepend", "replace")
@@ -958,8 +956,8 @@ sink.numberfunctionfunctionbasetypec("output", "message")
 slice.indexfunctionfunctionbasex	MARGIN
 socketConnectionfunctionfunctionbasehost"localhost"	port	serverFALSE	blockingFALSE	open"a+"	encodinggetOption("encoding")	timeoutgetOption("timeout")
 socketSelectfunctionfunctionbasesocklist	writeFALSE	timeoutNULL
-solvefunctionfunctionbasea	b	tolifelse(LINPACK, 1e-07, .Machine$double.eps)	LINPACKFALSE	...
-solve.defaultfunctionfunctionbasea	b	tolifelse(LINPACK, 1e-07, .Machine$double.eps)	LINPACKFALSE	...
+solvefunctionfunctionbasea	b	tol.Machine$double.eps	LINPACKFALSE	...
+solve.defaultfunctionfunctionbasea	b	tol.Machine$double.eps	LINPACKFALSE	...
 solve.qrfunctionfunctionbasea	b	...
 sortfunctionfunctionbasex	decreasingFALSE	na.lastNA	...
 sort.defaultfunctionfunctionbasex	decreasingFALSE	na.lastNA	...
@@ -967,13 +965,13 @@ sort.intfunctionfunctionbasex	partialNULL	na.lastNA	decreasingFALSE	metho
 sort.listfunctionfunctionbasex	partialNULL	na.lastTRUE	decreasingFALSE	methodc("shell", "quick", "radix")
 sort.POSIXltfunctionfunctionbasex	decreasingFALSE	na.lastNA	...
 sourcefunctionfunctionbasefile	localFALSE	echo	print.eval	verbosegetOption("verbose")	prompt.echogetOption("prompt")	max.deparse.length150	chdirFALSE	encodinggetOption("encoding")	continue.echogetOption("continue")	skip.echo0	keep.sourcegetOption("keep.source")
-splitfunctionfunctionbasex	f	dropFALSE	...
+splitfunctionfunctionbasex	f	dropFALSE	sep"."	...
 split<-functionfunctionbasex	f	dropFALSE	...	value
 split<-.data.framefunctionfunctionbasex	f	dropFALSE	...	value
 split.data.framefunctionfunctionbasex	f	dropFALSE	...
 split.Datefunctionfunctionbasex	f	dropFALSE	...
 split<-.defaultfunctionfunctionbasex	f	dropFALSE	...	value
-split.defaultfunctionfunctionbasex	f	dropFALSE	...
+split.defaultfunctionfunctionbasex	f	dropFALSE	sep"."	...
 split.POSIXctfunctionfunctionbasex	f	dropFALSE	...
 sprintffunctionfunctionbasefmt	...
 sqrtfunctionfunctionbaseNO_ARGS
@@ -1008,23 +1006,24 @@ substr<-functionfunctionbasex	start	stop	value
 substringfunctionfunctionbasetext	first
 substring<-functionfunctionbasetext	first	value
 sumfunctionfunctionbaseNO_ARGS
-summaryfunctionfunctionbaseobject	...	digitsmax(3, getOption("digits") - 3)
+summaryfunctionfunctionbaseobject	...	digitsmax(3L, getOption("digits") - 3L)
 summary.connectionfunctionfunctionbaseobject	...
-summary.data.framefunctionfunctionbaseobject	maxsum7	digitsmax(3, getOption("digits") - 3)	...
+summary.data.framefunctionfunctionbaseobject	digitsmax(3L, getOption("digits") - 3L)	...
 Summary.data.framefunctionfunctionbase...	na.rm
-summary.Datefunctionfunctionbaseobject	digits12	...
+summary.Datefunctionfunctionbaseobject	...
 Summary.Datefunctionfunctionbase...	na.rm
-summary.defaultfunctionfunctionbaseobject	...	digitsmax(3, getOption("digits") - 3)
+summary.defaultfunctionfunctionbaseobject	...	digitsmax(3L, getOption("digits") - 3L)
 Summary.difftimefunctionfunctionbase...	na.rm
 summary.factorfunctionfunctionbaseobject	maxsum100	...
 Summary.factorfunctionfunctionbase...	na.rm
 summary.matrixfunctionfunctionbaseobject	...
 Summary.numeric_versionfunctionfunctionbase...	na.rm
 Summary.orderedfunctionfunctionbase...	na.rm
-summary.POSIXctfunctionfunctionbaseobject	digits15	...
+summary.POSIXctfunctionfunctionbaseobject	...
 Summary.POSIXctfunctionfunctionbase...	na.rm
 summary.POSIXltfunctionfunctionbaseobject	digits15	...
 Summary.POSIXltfunctionfunctionbase...	na.rm
+summary.proc_timefunctionfunctionbaseobject	...
 summary.srcfilefunctionfunctionbaseobject	...
 summary.srcreffunctionfunctionbaseobject	useSourceFALSE	...
 summary.tablefunctionfunctionbaseobject	...
@@ -1109,10 +1108,10 @@ typeoffunctionfunctionbasex
 unclassfunctionfunctionbaseNO_ARGS
 undebugfunctionfunctionbasefun
 unionfunctionfunctionbasex	y
-uniquefunctionfunctionbasex	incomparablesFALSE	fromLastFALSE	...
+uniquefunctionfunctionbasex	incomparablesFALSE	fromLastFALSE	nmaxNA	...
 unique.arrayfunctionfunctionbasex	incomparablesFALSE	MARGIN1	fromLastFALSE	...
 unique.data.framefunctionfunctionbasex	incomparablesFALSE	fromLastFALSE	...
-unique.defaultfunctionfunctionbasex	incomparablesFALSE	fromLastFALSE	...
+unique.defaultfunctionfunctionbasex	incomparablesFALSE	fromLastFALSE	nmaxNA	...
 unique.matrixfunctionfunctionbasex	incomparablesFALSE	MARGIN1	fromLastFALSE	...
 unique.numeric_versionfunctionfunctionbasex	incomparablesFALSE	...
 unique.POSIXltfunctionfunctionbasex	incomparablesFALSE	...

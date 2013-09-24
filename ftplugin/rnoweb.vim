@@ -35,10 +35,6 @@ runtime ftplugin/tex_latexSuite.vim
 runtime ftplugin/tex_LatexBox.vim
 setlocal iskeyword=@,48-57,_,.
 
-" Enable syntax highlight of LaTeX errors in R Console (if using Conque
-" Shell)
-let syn_rout_latex = 1
-
 " Source scripts common to R, Rnoweb, Rhelp and Rdoc:
 runtime r-plugin/common_global.vim
 if exists("g:rplugin_failed")
@@ -114,7 +110,7 @@ function! RMakePDF(bibtex, knit)
     if g:rplugin_vimcomport == 0
         exe "Py DiscoverVimComPort()"
         if g:rplugin_vimcomport == 0
-            return
+            call RWarningMsg("The vimcom package is required to make and open the PDF.")
         endif
     endif
     update
@@ -151,7 +147,7 @@ function! RMakePDF(bibtex, knit)
 
     let pdfcmd = pdfcmd . ")"
     let b:needsnewomnilist = 1
-    let ok = SendCmdToR(pdfcmd)
+    let ok = g:SendCmdToR(pdfcmd)
     if ok == 0
         return
     endif
@@ -182,9 +178,9 @@ function! RSweave()
     let b:needsnewomnilist = 1
     call RSetWD()
     if exists("g:vimrplugin_sweaveargs")
-        call SendCmdToR('Sweave("' . expand("%:t") . '", ' . g:vimrplugin_sweaveargs . ')')
+        call g:SendCmdToR('Sweave("' . expand("%:t") . '", ' . g:vimrplugin_sweaveargs . ')')
     else
-        call SendCmdToR('Sweave("' . expand("%:t") . '")')
+        call g:SendCmdToR('Sweave("' . expand("%:t") . '")')
     endif
 endfunction
 
@@ -221,9 +217,9 @@ function! ROpenPDF()
 
     if g:rplugin_pdfviewer == "none"
         if g:vimrplugin_openpdf_quietly
-            call SendCmdToR('vim.openpdf("' . expand("%:p:r") . ".pdf" . '", TRUE)')
+            call g:SendCmdToR('vim.openpdf("' . expand("%:p:r") . ".pdf" . '", TRUE)')
         else
-            call SendCmdToR('vim.openpdf("' . expand("%:p:r") . ".pdf" . '")')
+            call g:SendCmdToR('vim.openpdf("' . expand("%:p:r") . ".pdf" . '")')
         endif
     else
         let openlog = system(g:rplugin_pdfviewer . " '" . expand("%:p:r") . ".pdf" . "'")

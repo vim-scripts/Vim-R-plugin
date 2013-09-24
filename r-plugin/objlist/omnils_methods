@@ -1,4 +1,3 @@
-@<-functionfunctionmethodsobject	name	value
 addNextMethodfunctionfunctionmethodsmethod	f"<unknown>"	mlist	optionalFALSE	envir
 allGenericsfunctionfunctionmethods...
 allNamesfunctionfunctionmethodsx
@@ -17,6 +16,7 @@ callGenericfunctionfunctionmethods...
 callNextMethodfunctionfunctionmethods...
 canCoercefunctionfunctionmethodsobject	Class
 cbind2functionfunctionmethodsx	y	...
+checkAtAssignmentfunctionfunctionmethodscl	name	valueClass
 checkSlotAssignmentfunctionfunctionmethodsobj	name	value
 classesToAMfunctionfunctionmethodsclasses	includeSubclassesFALSE	abbreviate2
 classLabelfunctionfunctionmethodsClass
@@ -170,11 +170,10 @@ S3Partfunctionfunctionmethodsobject	strictS3FALSE	S3Class
 S3Part<-functionfunctionmethodsobject	strictS3FALSE	needClass.S3Class(object)	value
 sealClassfunctionfunctionmethodsClass	wheretopenv(parent.frame())
 seemsS4Objectfunctionfunctionmethodsobject
-selectMethodfunctionfunctionmethodsf	signature	optionalFALSE	useInheritedTRUE	mlistif (!is.null(fdef)) getMethodsForDispatch(fdef)	fdefgetGeneric(f, !optional)	verboseFALSE	doCacheFALSE	returnAllFALSE
+selectMethodfunctionfunctionmethodsf	signature	optionalFALSE	useInheritedTRUE	mlistif (!is.null(fdef)) getMethodsForDispatch(fdef)	fdefgetGeneric(f, !optional)	verboseFALSE	doCacheFALSE
 selectSuperClassesfunctionfunctionmethodsClass	dropVirtualFALSE	namesOnlyTRUE	directOnlyTRUE	simpleOnly	wheretopenv(parent.frame())
-sessionDatafunctionfunctionmethodsNO_ARGS
 setAsfunctionfunctionmethodsfrom	to	def	replaceNULL	wheretopenv(parent.frame())
-setClassfunctionfunctionmethodsClass	representationlist()	prototypeNULL	containscharacter()	validityNULL	accesslist()	wheretopenv(parent.frame())	version.newExternalptr()	sealedFALSE	packagegetPackageName(where)	S3methodsFALSE
+setClassfunctionfunctionmethodsClass	representationlist()	prototypeNULL	containscharacter()	validityNULL	accesslist()	wheretopenv(parent.frame())	version.newExternalptr()	sealedFALSE	packagegetPackageName(where)	S3methodsFALSE	slots
 setClassUnionfunctionfunctionmethodsname	memberscharacter()	wheretopenv(parent.frame())
 setDataPartfunctionfunctionmethodsobject	value	checkTRUE
 setGenericfunctionfunctionmethodsname	defNULL	grouplist()	valueClasscharacter()	wheretopenv(parent.frame())	packageNULL	signatureNULL	useAsDefaultNULL	genericFunctionNULL	simpleInheritanceOnlyNULL
@@ -209,10 +208,9 @@ Summaryfunctionfunctionmethodsx	...	na.rmFALSE
 superClassDepthfunctionfunctionmethodsClassDef	soFarClassDef@className	simpleOnlyTRUE
 testInheritedMethodsfunctionfunctionmethodsf	signatures	testTRUE	virtualFALSE	groupMethodsTRUE	where
 testVirtualfunctionfunctionmethodsproperties	extends	prototype	where
-traceOfffunctionfunctionmethodswhat
+traceOfffunctionfunctionmethodswhatL
 traceOnfunctionfunctionmethodswhat	tracer	exitNULL
 tryNewfunctionfunctionmethodsClass	where
-trySilentfunctionfunctionmethodsexpr
 unRematchDefinitionfunctionfunctionmethodsdefinition
 validObjectfunctionfunctionmethodsobject	testFALSE	completeFALSE
 validSlotNamesfunctionfunctionmethodsnames

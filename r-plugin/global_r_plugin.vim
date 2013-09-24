@@ -1,8 +1,4 @@
 
-if !exists("g:ScreenVersion")
-    runtime plugin/screen.vim
-endif
-
 runtime ftplugin/r.vim
 
 function SetExeCmd()

@@ -25,7 +25,7 @@
 
 " Set completion with CTRL-X CTRL-O to autoloaded function.
 if exists('&ofu')
-  setlocal ofu=rcomplete#CompleteR
+    setlocal ofu=rcomplete#CompleteR
 endif
 
 " Automatically rebuild the file listing .GlobalEnv objects for omni
@@ -39,42 +39,30 @@ let b:rplugin_extern_ob = 0
 " Set the name of the Object Browser caption if not set yet
 let s:tnr = tabpagenr()
 if !exists("b:objbrtitle")
-  if s:tnr == 1
-    let b:objbrtitle = "Object_Browser"
-  else
-    let b:objbrtitle = "Object_Browser" . s:tnr
-  endif
-  unlet s:tnr
+    if s:tnr == 1
+        let b:objbrtitle = "Object_Browser"
+    else
+        let b:objbrtitle = "Object_Browser" . s:tnr
+    endif
+    unlet s:tnr
 endif
 
-
-" Initialize some local variables if Conque shell was already started
-if exists("g:rplugin_objbrtitle")
-  if g:vimrplugin_conqueplugin
-    let b:conqueshell = g:rplugin_conqueshell
-    let b:conque_bufname = g:rplugin_conque_bufname
-  endif
-  let b:objbrtitle = g:rplugin_objbrtitle
-endif
 
 " Make the file name of files to be sourced
 let b:bname = expand("%:t")
 let b:bname = substitute(b:bname, " ", "",  "g")
 if exists("*getpid") " getpid() was introduced in Vim 7.1.142
-  let b:rsource = $VIMRPLUGIN_TMPDIR . "/Rsource-" . getpid() . "-" . b:bname
+    let b:rsource = $VIMRPLUGIN_TMPDIR . "/Rsource-" . getpid() . "-" . b:bname
 else
-  let b:randnbr = system("echo $RANDOM")
-  let b:randnbr = substitute(b:randnbr, "\n", "", "")
-  if strlen(b:randnbr) == 0
-    let b:randnbr = "NoRandom"
-  endif
-  let b:rsource = $VIMRPLUGIN_TMPDIR . "/Rsource-" . b:randnbr . "-" . b:bname
-  unlet b:randnbr
+    let b:randnbr = system("echo $RANDOM")
+    let b:randnbr = substitute(b:randnbr, "\n", "", "")
+    if strlen(b:randnbr) == 0
+        let b:randnbr = "NoRandom"
+    endif
+    let b:rsource = $VIMRPLUGIN_TMPDIR . "/Rsource-" . b:randnbr . "-" . b:bname
+    unlet b:randnbr
 endif
 unlet b:bname
-
-" Special screenrc file
-let b:scrfile = " "
 
 if exists("g:rplugin_firstbuffer") && g:rplugin_firstbuffer == ""
     " The file global_r_plugin.vim was copied to ~/.vim/plugin
@@ -82,4 +70,8 @@ if exists("g:rplugin_firstbuffer") && g:rplugin_firstbuffer == ""
 endif
 
 let g:rplugin_lastft = &filetype
+
+if !exists("g:SendCmdToR")
+    let g:SendCmdToR = function('SendCmdToR_fake')
+endif
 

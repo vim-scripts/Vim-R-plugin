@@ -62,7 +62,7 @@ function! ShowRout()
 
     " if not silent, the user will have to type <Enter>
     silent update
-    if has("win32") | has("win64")
+    if has("win32") || has("win64")
         let rcmd = 'Rcmd.exe BATCH --no-restore --no-save "' . expand("%") . '" "' . routfile . '"'
     else
         let rcmd = b:rplugin_R . " CMD BATCH --no-restore --no-save '" . expand("%") . "' '" . routfile . "'"
@@ -90,7 +90,7 @@ function! RSpin()
     update
     let b:needsnewomnilist = 1
     call RSetWD()
-    call SendCmdToR('require(knitr); spin("' . expand("%:t") . '")')
+    call g:SendCmdToR('require(knitr); spin("' . expand("%:t") . '")')
 endfunction
 
 "==========================================================================
