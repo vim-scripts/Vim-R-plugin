@@ -789,14 +789,14 @@ function StartR(whatr)
                 call delete($VIMRPLUGIN_TMPDIR . "/vimcom_running")
                 call g:SendCmdToR(g:rplugin_last_rcmd)
                 if IsExternalOBRunning()
-                    call remote_expr(g:rplugin_obsname, 'ResetVimComPort()')
+                    call VimExprToOB('ResetVimComPort()')
                     call WaitVimComStart()
                     exe 'Py SendToVimCom("\007' . g:rplugin_obsname . '")'
                     Py SendToVimCom("\003.GlobalEnv [Restarting R]")
                     Py SendToVimCom("\004Libraries [Restarting()]")
                     " vimcom automatically update the libraries view, but not
                     " the GlobalEnv one because vimcom_count_objects() returns 0.
-                    call remote_expr(g:rplugin_obsname, 'UpdateOB("GlobalEnv")')
+                    call VimExprToOB('UpdateOB("GlobalEnv")')
                 endif
                 return
             elseif IsSendCmdToRFake()
@@ -1086,7 +1086,34 @@ function RObjBrowser()
     return
 endfunction
 
+function VimExprToOB(msg)
+    if serverlist() =~ "\\<" . g:rplugin_obsname . "\n"
+        return remote_expr(g:rplugin_obsname, a:msg)
+    endif
+    return "Vim server not found"
+endfunction
+
 function RBrowserOpenCloseLists(status)
+    if a:status == 1 
+        if exists("g:rplugin_curview")
+            let curview = g:rplugin_curview
+        else
+            if IsExternalOBRunning()
+                let curview = VimExprToOB('g:rplugin_curview')
+            else
+                let curview = "GlobalEnv"
+            endif
+        endif
+        if curview == "libraries"
+            echohl WarningMsg
+            echon "GlobalEnv command only."
+            sleep 1
+            echohl Normal
+            normal! :<Esc>
+            return
+        endif
+    endif
+
     " Avoid possibly freezing cross messages between Vim and R
     if exists("g:rplugin_curview") && v:servername != ""
         Py SendToVimCom("\x08Stop updating info [RBrowserOpenCloseLists()]")
@@ -1119,7 +1146,7 @@ function RBrowserOpenCloseLists(status)
             exe 'Py SendToVimCom("\007' . v:servername . '")'
         endif
     elseif IsExternalOBRunning()
-        call remote_expr(g:rplugin_obsname, 'UpdateOB("GlobalEnv")')
+        call VimExprToOB('UpdateOB("GlobalEnv")')
         exe 'Py SendToVimCom("\007' . g:rplugin_obsname . '")'
     endif
 endfunction
