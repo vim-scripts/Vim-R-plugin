@@ -29,7 +29,7 @@
 
 
 PLUGINHOME=`pwd`
-PLUGINVERSION=0.9.9.4
+PLUGINVERSION=0.9.9.5
 DEBIANTIME=`date -R`
 PLUGINRELEASEDATE=`date +"%Y-%m-%d"`
 VIM2HTML=/usr/local/share/vim/vim73/doc/vim2html.pl 
@@ -54,7 +54,7 @@ zip:
 	    r-plugin/objlist/omnils_datasets r-plugin/objlist/omnils_graphics \
 	    r-plugin/objlist/omnils_grDevices r-plugin/objlist/omnils_methods \
 	    r-plugin/objlist/omnils_stats r-plugin/objlist/omnils_utils \
-	    r-plugin/objlist/omnils_vimcom r-plugin/objlist/README \
+	    r-plugin/objlist/omnils_vimcom.plus r-plugin/objlist/README \
 	    r-plugin/tex_indent.vim r-plugin/r.snippets \
 	    r-plugin/common_buffer.vim r-plugin/common_global.vim \
 	    bitmaps/ricon.xbm bitmaps/ricon.png \

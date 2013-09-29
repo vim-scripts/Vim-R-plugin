@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 0.9.9.4
+Version: 0.9.9.5
 For Vim version 7.4
 
  1. Overview                                    |r-plugin-overview|
@@ -2118,6 +2118,10 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 ==============================================================================
 							       *r-plugin-news*
 10. News~
+
+0.9.9.5 (2013-09-28)
+
+ * Minor bug fixes.
 
 0.9.9.4 (2013-09-24)
 
