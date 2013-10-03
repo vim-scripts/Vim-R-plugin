@@ -217,12 +217,24 @@ function RCompleteArgs()
             let rkeyword = '^' . rkeyword0 . "\x06"
             call cursor(cpos[1], cpos[2])
 
+            "TODO: Delete this temporary code when vimcom 1.0-0 is released:
+            if g:rplugin_vimcom_pkg != "vimcom.plus"
+                Py SendToVimCom("find.package('vimcom.plus', quiet = TRUE)")
+                let g:rplugin_lastrpl = ReadEvalReply()
+                if g:rplugin_vimcomport > 0
+                    let g:rplugin_lastrpl = ReadEvalReply()
+                    if g:rplugin_lastrpl =~ "vimcom.plus"
+                        let g:rplugin_vimcom_pkg = "vimcom.plus"
+                    endif
+                endif
+            endif
+
             " If R is running, use it
             call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
             if classfor == ""
-                exe 'Py SendToVimCom("vimcom:::vim.args(' . "'" . rkeyword0 . "', '" . argkey . "')" . '")'
+                exe 'Py SendToVimCom("' . g:rplugin_vimcom_pkg . ':::vim.args(' . "'" . rkeyword0 . "', '" . argkey . "')" . '")'
             else
-                exe 'Py SendToVimCom("vimcom:::vim.args(' . "'" . rkeyword0 . "', '" . argkey . "', classfor = " . classfor . ")" . '")'
+                exe 'Py SendToVimCom("' . g:rplugin_vimcom_pkg . ':::vim.args(' . "'" . rkeyword0 . "', '" . argkey . "', classfor = " . classfor . ")" . '")'
             endif
             if g:rplugin_vimcomport > 0
                 let g:rplugin_lastrpl = ReadEvalReply()
@@ -3411,6 +3423,7 @@ let g:rplugin_has_new_lib = 0
 let g:rplugin_has_new_obj = 0
 let g:rplugin_ob_warn_shown = 0
 let g:rplugin_vimcomport = 0
+let g:rplugin_vimcom_pkg = "vimcom"
 let g:rplugin_lastrpl = ""
 let g:rplugin_ob_busy = 0
 let g:rplugin_hasRSFbutton = 0
