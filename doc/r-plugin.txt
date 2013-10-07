@@ -340,8 +340,8 @@ commands to R.
 
 This plugin has many key bindings, which correspond with menu entries and, in
 some cases, toolbar buttons. In the list below, the backslash represents the
-<LocalLeader>. Not all menu items and key bindings are
-enabled in all filetypes supported by the plugin (r, rnoweb, rhelp):
+<LocalLeader>. Not all menu items and key bindings are enabled in all
+filetypes supported by the plugin (r, rnoweb, rhelp):
 
 Start/Close
   . Start R (default)                                  \rf
@@ -464,9 +464,11 @@ The plugin commands that send code to R Console are the most commonly used. If
 the code to be sent to R has a single line it is sent directly to R Console,
 but if it has more than one line (a selection of lines, a block of lines
 between two marks, a paragraph etc) the lines are written to a file and the
-plugin sends to R the command to source the file. For example, when sending a
-selection of lines, you should do either <LocalLeader>se or <LocalLeader>sa
-instead of <LocalLeader>ss to see what lines are being sourced.
+plugin sends to R the command to source the file. You should type quickly
+<LocalLeader>d to send to R Console the line currently under the cursor. If
+you want to see what lines are being sourced when sending a selection of
+lines, you should do either <LocalLeader>se or <LocalLeader>sa instead of
+<LocalLeader>ss.
 
 After the command <LocalLeader>ao, Vim will save the current buffer if it has
 any pending changes, run "R CMD BATCH --no-restore --no-save" on the current
@@ -624,13 +626,12 @@ them.
 4.5. The Object Browser~
 
 You have to do <LocalLeader>ro to either start or updated the Object Browser.
-The updating is automatic only if the Object Browser is running in a separate
-Tmux panel. The Object Browser has two views: .GlobalEnv and Libraries. If you
-either press <Enter> or double click (GVim or Vim with 'mouse' set to "a") on
-the first line of the Object Browser it will toggle the view between the
-objects in .GlobalEnv and the currently loaded libraries. The Object Browser
-requires the |+clientserver| feature to be automatically updated and the
-|+conceal| feature to correctly align list items.
+The Object Browser has two views: .GlobalEnv and Libraries. If you either
+press <Enter> or double click (GVim or Vim with 'mouse' set to "a") on the
+first line of the Object Browser it will toggle the view between the objects
+in .GlobalEnv and the currently loaded libraries. The Object Browser requires
+the |+clientserver| feature to be automatically updated and the |+conceal|
+feature to correctly align list items.
 
 Note: On Linux you may find binaries without the |clientserver| feature if you
 install packages such as vim-nox on Debian/Ubuntu or vim-enhanced on
@@ -1072,10 +1073,10 @@ If you do not want to see R documentation in a Vim's buffer, put in your
    let vimrplugin_vimpager = "no"
 <
 If you want to use Vim to see R documentation even when looking for help in
-the R console, put in your .Rprofile:
->
-   options(pager = "vim -c 'set ft=rdoc' -")
-<
+the R console, you have to create a shell script in your path that will call
+Vim in the right way. You can, for example, create a file named
+`~/bin/vimrpager` to do that (see |r-plugin-quick-setup|).
+
 
 6.5.2. Details and other options:~
 
@@ -1920,9 +1921,7 @@ line in your |vimrc|:
 
 9.15. Edit your ~/.Rprofile~
 
-You may want to edit your ~/.Rprofile. Two common options are the use of GVim
-as the text editor and the use of Vim as pager. Example for Linux with these
-two options and some others:
+You may want to edit your ~/.Rprofile. Example for Linux:
 >
    if(interactive()){
        library(colorout)
@@ -1938,15 +1937,13 @@ two options and some others:
 	   grDevices::X11.options(width = 4.5, height = 4, ypos = 0,
 				  xpos = 1000, pointsize = 10)
 	   options(editor = 'gvim -f -c "set ft=r"')
-	   options(pager = "gvim -c 'set ft=rdoc' -")
        } else {
 	   options(editor = 'vim -c "set ft=r"')
-	   options(pager = "vim -c 'set ft=rdoc' -")
        }
    }
 <
 The test for the environment variable DISPLAY is useful if you eventually use
-the plugin over ssh or on the Linux console.
+the plugin in the Linux console.
 
 The `X11.options()` is used to choose the position and dimensions of the X11
 graphical device. You can also install the application wmctrl and create
@@ -2090,7 +2087,7 @@ this document from the beginning.
                vimcom.verbose = 1,
                vimcom.allnames = FALSE,
                vimcom.texerrs = TRUE,
-               pager = "vim -c 'set ft=rdoc' -")
+               pager = "vimrpager")
        if(nchar(Sys.getenv("DISPLAY")) > 1)
            options(editor = 'gvim -f -c "set ft=r"')
        else
@@ -2104,6 +2101,17 @@ this document from the beginning.
            # If you can't install the vimcom.plus package, do:
            # library(vimcom)
    }
+<
+   ~/bin/vimrpager~
+>
+   #!/bin/sh
+
+   cat | vim -c 'set ft=rdoc' -
+<
+NOTE: You have to change the `~/bin/vimrpager` permissions to make it
+executable:
+>
+   chmod +x ~/bin/vimrpager
 <
 
 9.22. Integration with GNU Screen, screen plugin, Conque Shell or VimShell~
@@ -2119,7 +2127,7 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-0.9.9.5 (2013-09-28)
+0.9.9.5 (2013-10-07)
 
  * Minor bug fixes.
 
