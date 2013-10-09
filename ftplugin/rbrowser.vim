@@ -257,7 +257,7 @@ function! RBrowserGetName(cleantail)
     endif
 
     let curpos = stridx(line, "#")
-    let word = substitute(line, '.\{-}\(.#\)\(.\{-}\)\t', '\2\1', '')
+    let word = substitute(line, '.\{-}\(.#\)\(.\{-}\)\t.*', '\2\1', '')
     let word = substitute(word, '\[#$', '$', '')
     let word = substitute(word, '<#$', '@', '')
     let word = substitute(word, '.#$', '', '')
