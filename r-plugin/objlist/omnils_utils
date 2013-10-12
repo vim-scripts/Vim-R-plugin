@@ -53,7 +53,7 @@ download.packagesfunctionfunctionutilspkgs	destdir	availableNULL	reposgetO
 dump.framesfunctionfunctionutilsdumpto"last.dump"	to.fileFALSE
 editfunctionfunctionutilsname	...
 emacsfunctionfunctionutilsnameNULL	file""
-examplefunctionfunctionutilstopic	packageNULL	lib.locNULL	character.onlyFALSE	give.linesFALSE	localFALSE	echoTRUE	verbosegetOption("verbose")	setRNGFALSE	askgetOption("example.ask")	prompt.prefixabbreviate(topic, 6)
+examplefunctionfunctionutilstopic	packageNULL	lib.locNULL	character.onlyFALSE	give.linesFALSE	localFALSE	echoTRUE	verbosegetOption("verbose")	setRNGFALSE	askgetOption("example.ask")	prompt.prefixabbreviate(topic, 6)	run.dontrunFALSE
 file.editfunctionfunctionutils...	title	editorgetOption("editor")	fileEncoding""
 file_testfunctionfunctionutilsop	x	y
 findfunctionfunctionutilswhat	mode"any"	numericFALSE	simple.wordsTRUE
@@ -100,7 +100,7 @@ memory.sizefunctionfunctionutilsmaxFALSE
 menufunctionfunctionutilschoices	graphicsFALSE	titleNULL
 methodsfunctionfunctionutilsgeneric.function	class
 mirror2htmlfunctionfunctionutilsmirrorsNULL	file"mirrors.html"	head"mirrors-head.html"	foot"mirrors-foot.html"
-modifyListfunctionfunctionutilsx	val
+modifyListfunctionfunctionutilsx	val	keep.nullFALSE
 new.packagesfunctionfunctionutilslib.locNULL	reposgetOption("repos")	contriburlcontrib.url(repos, type)	instPkgsinstalled.packages(lib.loc = lib.loc)	method	availableNULL	askFALSE	...	typegetOption("pkgType")
 newsfunctionfunctionutilsquery	package"R"	lib.locNULL	formatNULL	readerNULL	dbNULL
 nslfunctionfunctionutilshostname

@@ -668,10 +668,10 @@ mostattributes<-functionfunctionbaseobj	value
 namesfunctionfunctionbaseNO_ARGS
 names<-functionfunctionbaseNO_ARGS
 namespaceExportfunctionfunctionbasens	vars
-namespaceImportfunctionfunctionbaseself	...
-namespaceImportClassesfunctionfunctionbaseself	ns	vars
-namespaceImportFromfunctionfunctionbaseself	ns	vars	generics	packages
-namespaceImportMethodsfunctionfunctionbaseself	ns	vars
+namespaceImportfunctionfunctionbaseself	...	fromNULL
+namespaceImportClassesfunctionfunctionbaseself	ns	vars	fromNULL
+namespaceImportFromfunctionfunctionbaseself	ns	vars	generics	packages	fromNULL
+namespaceImportMethodsfunctionfunctionbaseself	ns	vars	fromNULL
 names<-.POSIXltfunctionfunctionbasex	value
 names.POSIXltfunctionfunctionbasex
 nargsfunctionfunctionbaseNO_ARGS
@@ -1154,6 +1154,7 @@ version$version.stringcharactercharacterbaseNot a function
 version$nicknamecharactercharacterbaseNot a function
 warningfunctionfunctionbase...	call.TRUE	immediate.FALSE	domainNULL
 warningsfunctionfunctionbase...
+[.warningsfunctionfunctionbasex	...
 weekdaysfunctionfunctionbasex	abbreviate
 weekdays.Datefunctionfunctionbasex	abbreviateFALSE
 weekdays.POSIXtfunctionfunctionbasex	abbreviateFALSE

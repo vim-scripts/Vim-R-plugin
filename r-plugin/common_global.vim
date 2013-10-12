@@ -217,12 +217,24 @@ function RCompleteArgs()
             let rkeyword = '^' . rkeyword0 . "\x06"
             call cursor(cpos[1], cpos[2])
 
+            "TODO: Delete this temporary code when vimcom 1.0-0 is released:
+            if g:rplugin_vimcom_pkg != "vimcom.plus"
+                Py SendToVimCom("find.package('vimcom.plus', quiet = TRUE)")
+                let g:rplugin_lastrpl = ReadEvalReply()
+                if g:rplugin_vimcomport > 0
+                    let g:rplugin_lastrpl = ReadEvalReply()
+                    if g:rplugin_lastrpl =~ "vimcom.plus"
+                        let g:rplugin_vimcom_pkg = "vimcom.plus"
+                    endif
+                endif
+            endif
+
             " If R is running, use it
             call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
             if classfor == ""
-                exe 'Py SendToVimCom("vimcom:::vim.args(' . "'" . rkeyword0 . "', '" . argkey . "')" . '")'
+                exe 'Py SendToVimCom("' . g:rplugin_vimcom_pkg . ':::vim.args(' . "'" . rkeyword0 . "', '" . argkey . "')" . '")'
             else
-                exe 'Py SendToVimCom("vimcom:::vim.args(' . "'" . rkeyword0 . "', '" . argkey . "', classfor = " . classfor . ")" . '")'
+                exe 'Py SendToVimCom("' . g:rplugin_vimcom_pkg . ':::vim.args(' . "'" . rkeyword0 . "', '" . argkey . "', classfor = " . classfor . ")" . '")'
             endif
             if g:rplugin_vimcomport > 0
                 let g:rplugin_lastrpl = ReadEvalReply()
@@ -789,14 +801,14 @@ function StartR(whatr)
                 call delete($VIMRPLUGIN_TMPDIR . "/vimcom_running")
                 call g:SendCmdToR(g:rplugin_last_rcmd)
                 if IsExternalOBRunning()
-                    call remote_expr(g:rplugin_obsname, 'ResetVimComPort()')
+                    call VimExprToOB('ResetVimComPort()')
                     call WaitVimComStart()
                     exe 'Py SendToVimCom("\007' . g:rplugin_obsname . '")'
                     Py SendToVimCom("\003.GlobalEnv [Restarting R]")
                     Py SendToVimCom("\004Libraries [Restarting()]")
                     " vimcom automatically update the libraries view, but not
                     " the GlobalEnv one because vimcom_count_objects() returns 0.
-                    call remote_expr(g:rplugin_obsname, 'UpdateOB("GlobalEnv")')
+                    call VimExprToOB('UpdateOB("GlobalEnv")')
                 endif
                 return
             elseif IsSendCmdToRFake()
@@ -1086,7 +1098,34 @@ function RObjBrowser()
     return
 endfunction
 
+function VimExprToOB(msg)
+    if serverlist() =~ "\\<" . g:rplugin_obsname . "\n"
+        return remote_expr(g:rplugin_obsname, a:msg)
+    endif
+    return "Vim server not found"
+endfunction
+
 function RBrowserOpenCloseLists(status)
+    if a:status == 1 
+        if exists("g:rplugin_curview")
+            let curview = g:rplugin_curview
+        else
+            if IsExternalOBRunning()
+                let curview = VimExprToOB('g:rplugin_curview')
+            else
+                let curview = "GlobalEnv"
+            endif
+        endif
+        if curview == "libraries"
+            echohl WarningMsg
+            echon "GlobalEnv command only."
+            sleep 1
+            echohl Normal
+            normal! :<Esc>
+            return
+        endif
+    endif
+
     " Avoid possibly freezing cross messages between Vim and R
     if exists("g:rplugin_curview") && v:servername != ""
         Py SendToVimCom("\x08Stop updating info [RBrowserOpenCloseLists()]")
@@ -1119,7 +1158,7 @@ function RBrowserOpenCloseLists(status)
             exe 'Py SendToVimCom("\007' . v:servername . '")'
         endif
     elseif IsExternalOBRunning()
-        call remote_expr(g:rplugin_obsname, 'UpdateOB("GlobalEnv")')
+        call VimExprToOB('UpdateOB("GlobalEnv")')
         exe 'Py SendToVimCom("\007' . g:rplugin_obsname . '")'
     endif
 endfunction
@@ -3384,6 +3423,7 @@ let g:rplugin_has_new_lib = 0
 let g:rplugin_has_new_obj = 0
 let g:rplugin_ob_warn_shown = 0
 let g:rplugin_vimcomport = 0
+let g:rplugin_vimcom_pkg = "vimcom"
 let g:rplugin_lastrpl = ""
 let g:rplugin_ob_busy = 0
 let g:rplugin_hasRSFbutton = 0
