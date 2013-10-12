@@ -633,8 +633,8 @@ in .GlobalEnv and the currently loaded libraries. The Object Browser requires
 the |+clientserver| feature to be automatically updated and the |+conceal|
 feature to correctly align list items.
 
-Note: On Linux you may find binaries without the |clientserver| feature if you
-install packages such as vim-nox on Debian/Ubuntu or vim-enhanced on
+Note: On Linux you may find Vim binaries without the |clientserver| feature if
+you install packages such as vim-nox on Debian/Ubuntu or vim-enhanced on
 Fedora/Red Hat. If you want to use Vim in a terminal emulator in Fedora/Red
 Hat, you may want to create a symbolic link to "gvim" named "vim". You still
 have to explicitly start the server with the argument |--servername|.  To
@@ -2127,7 +2127,7 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-0.9.9.5 (2013-10-07)
+0.9.9.5 (2013-10-12)
 
  * Minor bug fixes.
 
