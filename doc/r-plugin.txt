@@ -1126,6 +1126,11 @@ path in your |vimrc| as in the examples:
 <
 On Windows, Vim will try to find the R install path in the Windows Registry.
 
+You can set a different R version for specific R scripts in your |vimrc|.
+Example:
+>
+   autocmd BufReadPre ~/old* let vimrplugin_r_path='~/app/R-2.8.1/bin'
+<
 
 6.8. Arguments to R~
 							   *vimrplugin_r_args*
