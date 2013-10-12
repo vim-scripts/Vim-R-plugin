@@ -2945,10 +2945,9 @@ endfunction
 
 function SetRPath()
     if exists("g:vimrplugin_r_path")
-        if isdirectory(g:vimrplugin_r_path)
-            let b:rplugin_R = g:vimrplugin_r_path . "/R"
-        else
-            let b:rplugin_R = g:vimrplugin_r_path
+        let b:rplugin_R = expand(g:vimrplugin_r_path)
+        if isdirectory(b:rplugin_R)
+            let b:rplugin_R = b:rplugin_R . "/R"
         endif
     else
         let b:rplugin_R = "R"
