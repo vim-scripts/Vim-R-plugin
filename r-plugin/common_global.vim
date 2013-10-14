@@ -732,7 +732,9 @@ function StartR_OSX()
         let rcmd = "/Applications/R.app"
     endif
     if b:rplugin_r_args != " "
-        let rcmd = rcmd . " " . b:rplugin_r_args
+        " https://github.com/jcfaria/Vim-R-plugin/issues/63
+        " https://stat.ethz.ch/pipermail/r-sig-mac/2013-February/009978.html
+        call RWarningMsg("We cannot pass arguments to R.app (" . b:rplugin_r_args . ").")
     endif
     let rlog = system("open " . rcmd)
     if v:shell_error
@@ -1106,7 +1108,7 @@ function VimExprToOB(msg)
 endfunction
 
 function RBrowserOpenCloseLists(status)
-    if a:status == 1 
+    if a:status == 1
         if exists("g:rplugin_curview")
             let curview = g:rplugin_curview
         else
