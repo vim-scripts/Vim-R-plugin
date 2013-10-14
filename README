@@ -1,7 +1,5 @@
-This is the development code of Vim-R-plugin. You should use it if you want
-to contribute to its development (testing unreleased versions, fixing bugs,
-writing code etc). You may want to adjust Vim's 'runtimepath' in your
-~/.vimrc as in the example below:
+This is the development code of Vim-R-plugin. You may want to adjust Vim's
+'runtimepath' in your ~/.vimrc as in the example below:
 
 set runtimepath=~/Vim-R-plugin,~/.vim,$VIMRUNTIME,~/.vim/after
 
