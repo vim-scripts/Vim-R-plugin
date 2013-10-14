@@ -30,7 +30,8 @@ endif
 syn case match
 
 " Comment
-syn match rComment contains=@Spell "#.*"
+syn match rCommentTodo contained "\(BUG\|FIXME\|NOTE\|TODO\):"
+syn match rComment contains=@Spell,rCommentTodo "#.*"
 
 " Roxygen
 syn match rOKeyword contained "@\(param\|return\|name\|rdname\|examples\|include\|docType\)"
@@ -187,6 +188,7 @@ hi def link rArrow       Statement
 hi def link rBoolean     Boolean
 hi def link rBraceError  Error
 hi def link rComment     Comment
+hi def link rCommentTodo Todo
 hi def link rOComment    Comment
 hi def link rComplex     Number
 hi def link rConditional Conditional
