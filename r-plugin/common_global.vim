@@ -734,7 +734,7 @@ function StartR_OSX()
     if b:rplugin_r_args != " "
         " https://github.com/jcfaria/Vim-R-plugin/issues/63
         " https://stat.ethz.ch/pipermail/r-sig-mac/2013-February/009978.html
-        call RWarningMsg("We cannot pass arguments to R.app (" . b:rplugin_r_args . ").")
+        call RWarningMsg('R.app does not support command line arguments. To pass "' . b:rplugin_r_args . '" to R, you must run it in a console. Set "vimrplugin_applescript = 0" (you may need to install XQuartz)')
     endif
     let rlog = system("open " . rcmd)
     if v:shell_error
