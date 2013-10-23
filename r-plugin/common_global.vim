@@ -151,17 +151,17 @@ function! CompleteChunkOptions()
         let newbase = '^' . substitute(base, "\\$$", "", "")
     endif
     let ktopt = ["animation.fun=;hook_ffmpeg_html", "aniopts=;'controls.loop'", "autodep=;FALSE", "background=;'#F7F7F7'",
-                \ "cache.path=;'cache/'", "cache=;FALSE", "child=; ", "comment=;'##'",
+                \ "cache.path=;'cache/'", "cache.vars=; ", "cache=;FALSE", "child=; ", "comment=;'##'",
                 \ "dependson=;''", "dev.args=; ", "dev=; ", "dpi=;72", "echo=;TRUE",
                 \ "engine=;'R'", "error=;TRUE", "eval=;TRUE", "external=;TRUE",
                 \ "fig.align=;'left|right|center'", "fig.cap=;''", "fig.env=;'figure'",
                 \ "fig.ext=; ", "fig.height=;7", "fig.keep=;'high|none|all|first|last'",
-                \ "fig.lp=;'fig:'", "fig.path=; ", "fig.pos=;''", "fig.scap=;''",
-                \ "fig.show=;'asis|hold|animate'", "fig.width=;7", "highlight=;TRUE",
+                \ "fig.lp=;'fig:'", "fig.path=; ", "fig.pos=;''", "fig.scap=;''", "fig.subcap=; ",
+                \ "fig.show=;'asis|hold|animate|hide'", "fig.width=;7", "highlight=;TRUE",
                 \ "include=;TRUE", "interval=;1", "message=;TRUE", "opts.label=;''",
                 \ "out.extra=; ", "out.height=;'7in'", "out.width=;'7in'",
-                \ "prompt=;FALSE", "ref.label=; ", "resize.height=; ",
-                \ "resize.width=; ", "results=;'markup|asis|hide'", "sanitize=;FALSE",
+                \ "prompt=;FALSE", "purl=;TRUE", "ref.label=; ", "resize.height=; ",
+                \ "resize.width=; ", "results=;'markup|asis|hold|hide'", "sanitize=;FALSE",
                 \ "size=;'normalsize'", "split=;FALSE", "tidy=;TRUE", "tidy.opts=; ", "warning=;TRUE"]
     for kopt in ktopt
       if kopt =~ newbase
