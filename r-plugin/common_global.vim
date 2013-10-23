@@ -1352,10 +1352,11 @@ endfunction
 " Send file to R
 function SendFileToR(e)
     let b:needsnewomnilist = 1
-    let lines = getline("1", line("$"))
-    let ok = RSourceLines(lines, a:e)
-    if  ok == 0
-        return
+    update
+    if a:e == "echo"
+        call g:SendCmdToR('base::source("' . expand("%:p") . '", echo=TRUE)')
+    else
+        call g:SendCmdToR('base::source("' . expand("%:p") . '")')
     endif
 endfunction
 
