@@ -470,9 +470,10 @@ you want to see what lines are being sourced when sending a selection of
 lines, you should do either <LocalLeader>se or <LocalLeader>sa instead of
 <LocalLeader>ss.
 
-After the command <LocalLeader>ao, Vim will save the current buffer if it has
-any pending changes, run "R CMD BATCH --no-restore --no-save" on the current
-file and show the resulting .Rout file in a new tab. Please see
+After the commands that send, sweave or knit the current buffer, Vim will save
+the current buffer if it has any pending changes before performing the tasks.
+After <LocalLeader>ao, Vim will run "R CMD BATCH --no-restore --no-save" on
+the current file and show the resulting .Rout file in a new tab. Please see
 |vimrplugin_routnotab| if you prefer that the file is open in a new split
 window. Note: The command <LocalLeader>ao, silently writes the current buffer
 to its file if it was modified and deletes the .Rout file if it exists.
@@ -492,9 +493,9 @@ argument to the function to try to figure out whether the function is a
 generic one and whether it is more appropriate to show a specific method. The
 same procedure is followed with <LocalLeader>rp, that is, while printing an
 object. For example, if you run the code below and, then, press
-<LocalLeader>rh and <LocalLeader>rp over the two occurrences of summary, the
-plugin will show different documentations and print different objects in each
-case:
+<LocalLeader>rh and <LocalLeader>rp over the two occurrences of `summary`, the
+plugin will show different help documents and print different function methods
+in each case:
 >
    y <- rnorm(100)
    x <- rnorm(100)
@@ -2193,7 +2194,7 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 
  * Minor bug fixes.
 
-0.9.9.5 (2013-10-12)
+0.9.9.5 (2013-10-24)
 
  * Minor bug fixes.
 
