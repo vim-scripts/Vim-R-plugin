@@ -961,6 +961,7 @@ And in Normal mode Vim do:
 >
    :let rplugin_rconsole_pane = "X"
    :let rplugin_tmuxsname = "Y"
+   :let g:needsnewomnilist = 1
 <
 Finally, do one of the commands below in Normal mode Vim, according to how R
 is running:

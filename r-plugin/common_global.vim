@@ -196,7 +196,7 @@ function RCompleteArgs()
         let argkey = strpart(line, idx1, idx2 - idx1 + 1)
         let idx2 = cpos[2] - strlen(argkey)
     endif
-    if b:needsnewomnilist == 1
+    if g:needsnewomnilist == 1
       call BuildROmniList("GlobalEnv", "")
     endif
     let flines = g:rplugin_globalenvlines + g:rplugin_liblist
@@ -1351,7 +1351,7 @@ endfunction
 
 " Send file to R
 function SendFileToR(e)
-    let b:needsnewomnilist = 1
+    let g:needsnewomnilist = 1
     update
     if a:e == "echo"
         call g:SendCmdToR('base::source("' . expand("%:p") . '", echo=TRUE)')
@@ -1381,7 +1381,7 @@ function SendMBlockToR(e, m)
         return
     endif
 
-    let b:needsnewomnilist = 1
+    let g:needsnewomnilist = 1
     let curline = line(".")
     let lineA = 1
     let lineB = line("$")
@@ -1436,7 +1436,7 @@ function SendFunctionToR(e, m)
         return
     endif
 
-    let b:needsnewomnilist = 1
+    let g:needsnewomnilist = 1
     let startline = line(".")
     let save_cursor = getpos(".")
     let line = SanitizeRLine(getline("."))
@@ -1519,7 +1519,7 @@ function SendSelectionToR(e, m)
         return
     endif
 
-    let b:needsnewomnilist = 1
+    let g:needsnewomnilist = 1
 
     if line("'<") == line("'>")
         let i = col("'<") - 1
@@ -1595,7 +1595,7 @@ function SendParagraphToR(e, m)
         return
     endif
 
-    let b:needsnewomnilist = 1
+    let g:needsnewomnilist = 1
     let i = line(".")
     let c = col(".")
     let max = line("$")
@@ -1686,7 +1686,7 @@ function SendLineToR(godown)
         endif
     endif
 
-    let b:needsnewomnilist = 1
+    let g:needsnewomnilist = 1
     let ok = g:SendCmdToR(line)
     if ok
         if a:godown =~ "down"
@@ -1799,7 +1799,7 @@ endfunction
 " knit the current buffer content
 function! RKnit()
     update
-    let b:needsnewomnilist = 1
+    let g:needsnewomnilist = 1
     call RSetWD()
     call g:SendCmdToR('require(knitr); knit("' . expand("%:t") . '")')
 endfunction
@@ -1809,7 +1809,7 @@ endfunction
 function BuildROmniList(env, packlist)
     if a:env =~ "GlobalEnv"
         let rtf = g:rplugin_globalenvfname
-        let b:needsnewomnilist = 0
+        let g:needsnewomnilist = 0
     else
         let rtf = g:rplugin_omnidname
     endif
@@ -1828,13 +1828,13 @@ function BuildROmniList(env, packlist)
         exe "Py SendToVimCom('" . omnilistcmd . "')"
         if g:rplugin_vimcomport == 0
             sleep 500m
-            let b:needsnewomnilist = 1
+            let g:needsnewomnilist = 1
             return
         endif
         let g:rplugin_lastrpl = ReadEvalReply()
         if g:rplugin_lastrpl == "R is busy." || g:rplugin_lastrpl == "No reply"
             call RWarningMsg(g:rplugin_lastrpl)
-            let b:needsnewomnilist = 1
+            let g:needsnewomnilist = 1
             sleep 800m
             return
         endif
@@ -3461,6 +3461,11 @@ if &filetype != "rbrowser"
 endif
 
 call SetRPath()
+
+" Automatically rebuild the file listing .GlobalEnv objects for omni
+" completion if the user press <C-X><C-O> and we know that the file either was
+" not created yet or is outdated.
+let g:needsnewomnilist = 0
 
 
 " Compatibility with old versions (August 2013):

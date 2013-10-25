@@ -160,7 +160,7 @@ function! RMakePDFrmd(t)
         let pdfcmd = pdfcmd . ", pandoc_args = '" . g:vimrplugin_pandoc_args . "'"
     endif
     let pdfcmd = pdfcmd . ")"
-    let b:needsnewomnilist = 1
+    let g:needsnewomnilist = 1
     call g:SendCmdToR(pdfcmd)
 endfunction  
 
@@ -173,7 +173,7 @@ function! SendRmdChunkToR(e, m)
     let chunkline = search("^[ \t]*```[ ]*{r", "bncW") + 1
     let docline = search("^[ \t]*```", "ncW") - 1
     let lines = getline(chunkline, docline)
-    let b:needsnewomnilist = 1
+    let g:needsnewomnilist = 1
     let ok = RSourceLines(lines, a:e)
     if ok == 0
         return
