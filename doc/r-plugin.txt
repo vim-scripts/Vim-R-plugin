@@ -2123,12 +2123,29 @@ this document from the beginning.
 
    ~/.bashrc:~
 >
-   if [ "x$DISPLAY" == "x" ]
+   # Get 256 colors and automatic update of Object Browser:
+   if [ "x$DISPLAY" != "x" ]
    then
-       function tvim(){ tmux new-session "vim $@" ; }
-   else
+       if [ "screen" = "$TERM" ]
+       then
+           export TERM=screen-256color
+       else
+           export TERM=xterm-256color
+       fi
        alias vim='vim --servername VIM'
-       function tvim(){ tmux -2 new-session "TERM=screen-256color vim $@" ; }
+       if [ "x$TERM" == "xxterm" ] || [ "x$TERM" == "xxterm-256color" ]
+       then
+           function tvim(){ tmux -2 new-session "TERM=screen-256color vim --servername VIM $@" ; }
+       else
+           function tvim(){ tmux new-session "vim --servername VIM $@" ; }
+       fi
+   else
+       if [ "x$TERM" == "xxterm" ] || [ "x$TERM" == "xxterm-256color" ]
+       then
+           function tvim(){ tmux -2 new-session "TERM=screen-256color vim $@" ; }
+       else
+           function tvim(){ tmux new-session "vim $@" ; }
+       fi
    fi
 <
    ~/.tmux.conf:~
@@ -2160,10 +2177,11 @@ this document from the beginning.
        if(Sys.getenv("TERM") != "linux" && Sys.getenv("TERM") != "")
            setOutputColors256(verbose = FALSE)
        library(setwidth)
-       if(Sys.getenv("VIMRPLUGIN_TMPDIR") != "")
+       if(Sys.getenv("VIMRPLUGIN_TMPDIR") != ""){
            library(vimcom.plus)
            # If you can't install the vimcom.plus package, do:
            # library(vimcom)
+       }
    }
 <
    ~/bin/vimrpager~
