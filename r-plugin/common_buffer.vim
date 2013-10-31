@@ -28,11 +28,6 @@ if exists('&ofu')
     setlocal ofu=rcomplete#CompleteR
 endif
 
-" Automatically rebuild the file listing .GlobalEnv objects for omni
-" completion if the user press <C-X><C-O> and we know that the file either was
-" not created yet or is outdated.
-let b:needsnewomnilist = 0
-
 " This isn't the Object Browser running externally
 let b:rplugin_extern_ob = 0
 

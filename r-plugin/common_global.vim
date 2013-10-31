@@ -151,17 +151,17 @@ function! CompleteChunkOptions()
         let newbase = '^' . substitute(base, "\\$$", "", "")
     endif
     let ktopt = ["animation.fun=;hook_ffmpeg_html", "aniopts=;'controls.loop'", "autodep=;FALSE", "background=;'#F7F7F7'",
-                \ "cache.path=;'cache/'", "cache=;FALSE", "child=; ", "comment=;'##'",
+                \ "cache.path=;'cache/'", "cache.vars=; ", "cache=;FALSE", "child=; ", "comment=;'##'",
                 \ "dependson=;''", "dev.args=; ", "dev=; ", "dpi=;72", "echo=;TRUE",
                 \ "engine=;'R'", "error=;TRUE", "eval=;TRUE", "external=;TRUE",
                 \ "fig.align=;'left|right|center'", "fig.cap=;''", "fig.env=;'figure'",
                 \ "fig.ext=; ", "fig.height=;7", "fig.keep=;'high|none|all|first|last'",
-                \ "fig.lp=;'fig:'", "fig.path=; ", "fig.pos=;''", "fig.scap=;''",
-                \ "fig.show=;'asis|hold|animate'", "fig.width=;7", "highlight=;TRUE",
+                \ "fig.lp=;'fig:'", "fig.path=; ", "fig.pos=;''", "fig.scap=;''", "fig.subcap=; ",
+                \ "fig.show=;'asis|hold|animate|hide'", "fig.width=;7", "highlight=;TRUE",
                 \ "include=;TRUE", "interval=;1", "message=;TRUE", "opts.label=;''",
                 \ "out.extra=; ", "out.height=;'7in'", "out.width=;'7in'",
-                \ "prompt=;FALSE", "ref.label=; ", "resize.height=; ",
-                \ "resize.width=; ", "results=;'markup|asis|hide'", "sanitize=;FALSE",
+                \ "prompt=;FALSE", "purl=;TRUE", "ref.label=; ", "resize.height=; ",
+                \ "resize.width=; ", "results=;'markup|asis|hold|hide'", "sanitize=;FALSE",
                 \ "size=;'normalsize'", "split=;FALSE", "tidy=;TRUE", "tidy.opts=; ", "warning=;TRUE"]
     for kopt in ktopt
       if kopt =~ newbase
@@ -196,7 +196,7 @@ function RCompleteArgs()
         let argkey = strpart(line, idx1, idx2 - idx1 + 1)
         let idx2 = cpos[2] - strlen(argkey)
     endif
-    if b:needsnewomnilist == 1
+    if g:needsnewomnilist == 1
       call BuildROmniList("GlobalEnv", "")
     endif
     let flines = g:rplugin_globalenvlines + g:rplugin_liblist
@@ -732,7 +732,9 @@ function StartR_OSX()
         let rcmd = "/Applications/R.app"
     endif
     if b:rplugin_r_args != " "
-        let rcmd = rcmd . " " . b:rplugin_r_args
+        " https://github.com/jcfaria/Vim-R-plugin/issues/63
+        " https://stat.ethz.ch/pipermail/r-sig-mac/2013-February/009978.html
+        call RWarningMsg('R.app does not support command line arguments. To pass "' . b:rplugin_r_args . '" to R, you must run it in a console. Set "vimrplugin_applescript = 0" (you may need to install XQuartz)')
     endif
     let rlog = system("open " . rcmd)
     if v:shell_error
@@ -1106,7 +1108,7 @@ function VimExprToOB(msg)
 endfunction
 
 function RBrowserOpenCloseLists(status)
-    if a:status == 1 
+    if a:status == 1
         if exists("g:rplugin_curview")
             let curview = g:rplugin_curview
         else
@@ -1349,11 +1351,12 @@ endfunction
 
 " Send file to R
 function SendFileToR(e)
-    let b:needsnewomnilist = 1
-    let lines = getline("1", line("$"))
-    let ok = RSourceLines(lines, a:e)
-    if  ok == 0
-        return
+    let g:needsnewomnilist = 1
+    update
+    if a:e == "echo"
+        call g:SendCmdToR('base::source("' . expand("%:p") . '", echo=TRUE)')
+    else
+        call g:SendCmdToR('base::source("' . expand("%:p") . '")')
     endif
 endfunction
 
@@ -1378,7 +1381,7 @@ function SendMBlockToR(e, m)
         return
     endif
 
-    let b:needsnewomnilist = 1
+    let g:needsnewomnilist = 1
     let curline = line(".")
     let lineA = 1
     let lineB = line("$")
@@ -1433,7 +1436,7 @@ function SendFunctionToR(e, m)
         return
     endif
 
-    let b:needsnewomnilist = 1
+    let g:needsnewomnilist = 1
     let startline = line(".")
     let save_cursor = getpos(".")
     let line = SanitizeRLine(getline("."))
@@ -1516,7 +1519,7 @@ function SendSelectionToR(e, m)
         return
     endif
 
-    let b:needsnewomnilist = 1
+    let g:needsnewomnilist = 1
 
     if line("'<") == line("'>")
         let i = col("'<") - 1
@@ -1592,7 +1595,7 @@ function SendParagraphToR(e, m)
         return
     endif
 
-    let b:needsnewomnilist = 1
+    let g:needsnewomnilist = 1
     let i = line(".")
     let c = col(".")
     let max = line("$")
@@ -1683,7 +1686,7 @@ function SendLineToR(godown)
         endif
     endif
 
-    let b:needsnewomnilist = 1
+    let g:needsnewomnilist = 1
     let ok = g:SendCmdToR(line)
     if ok
         if a:godown =~ "down"
@@ -1796,7 +1799,7 @@ endfunction
 " knit the current buffer content
 function! RKnit()
     update
-    let b:needsnewomnilist = 1
+    let g:needsnewomnilist = 1
     call RSetWD()
     call g:SendCmdToR('require(knitr); knit("' . expand("%:t") . '")')
 endfunction
@@ -1806,7 +1809,7 @@ endfunction
 function BuildROmniList(env, packlist)
     if a:env =~ "GlobalEnv"
         let rtf = g:rplugin_globalenvfname
-        let b:needsnewomnilist = 0
+        let g:needsnewomnilist = 0
     else
         let rtf = g:rplugin_omnidname
     endif
@@ -1825,13 +1828,13 @@ function BuildROmniList(env, packlist)
         exe "Py SendToVimCom('" . omnilistcmd . "')"
         if g:rplugin_vimcomport == 0
             sleep 500m
-            let b:needsnewomnilist = 1
+            let g:needsnewomnilist = 1
             return
         endif
         let g:rplugin_lastrpl = ReadEvalReply()
         if g:rplugin_lastrpl == "R is busy." || g:rplugin_lastrpl == "No reply"
             call RWarningMsg(g:rplugin_lastrpl)
-            let b:needsnewomnilist = 1
+            let g:needsnewomnilist = 1
             sleep 800m
             return
         endif
@@ -2945,10 +2948,9 @@ endfunction
 
 function SetRPath()
     if exists("g:vimrplugin_r_path")
-        if isdirectory(g:vimrplugin_r_path)
-            let b:rplugin_R = g:vimrplugin_r_path . "/R"
-        else
-            let b:rplugin_R = g:vimrplugin_r_path
+        let b:rplugin_R = expand(g:vimrplugin_r_path)
+        if isdirectory(b:rplugin_R)
+            let b:rplugin_R = b:rplugin_R . "/R"
         endif
     else
         let b:rplugin_R = "R"
@@ -3459,6 +3461,11 @@ if &filetype != "rbrowser"
 endif
 
 call SetRPath()
+
+" Automatically rebuild the file listing .GlobalEnv objects for omni
+" completion if the user press <C-X><C-O> and we know that the file either was
+" not created yet or is outdated.
+let g:needsnewomnilist = 0
 
 
 " Compatibility with old versions (August 2013):
