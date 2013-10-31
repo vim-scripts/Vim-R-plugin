@@ -22,14 +22,14 @@
 #   file functions.vim.vanilla must exist. Run the Vim    #
 #   command :RUpdateObjList with R vanilla running (that  #
 #   is, R with only the default libraries loaded) and,    #
-#   then, the file functions.vim be renamed to            #
+#   then, rename the file functions.vim to                #
 #   functions.vim.vanilla.                                #
 ###########################################################
 
 
 
 PLUGINHOME=`pwd`
-PLUGINVERSION=0.9.9.5
+PLUGINVERSION=0.9.9.6
 DEBIANTIME=`date -R`
 PLUGINRELEASEDATE=`date +"%Y-%m-%d"`
 VIM2HTML=/usr/local/share/vim/vim74/doc/vim2html.pl 

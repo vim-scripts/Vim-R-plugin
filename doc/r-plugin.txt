@@ -2209,11 +2209,11 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-0.9.9.6 (2013-10-12)
+0.9.9.6 (2013-10-31)
 
  * Minor bug fixes.
 
-0.9.9.5 (2013-10-24)
+0.9.9.5 (2013-10-12)
 
  * Minor bug fixes.
 
