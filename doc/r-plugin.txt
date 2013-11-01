@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 0.9.9.6
+Version: 0.9.9.7
 For Vim version 7.4
 
  1. Overview                                    |r-plugin-overview|
@@ -128,7 +128,7 @@ following dependencies:
 
    Depends:~
 
-   vimcom.plus = 0.9-9: http://www.lepem.ufc.br/jaa/vimcom.plus.html
+   vimcom.plus = 0.9-91: http://www.lepem.ufc.br/jaa/vimcom.plus.html
 		  The vimcom.plus (or vimcom) package creates a server on R to
 		  allow the communication with Vim. The package is not used to
 		  send commands from Vim to R Console, but it is necessary to
@@ -213,7 +213,7 @@ to install external dependencies:
       versions.
 
 
-    * vimcom = 0.9-9: An R package, available on CRAN and installable with the
+    * vimcom = 0.9-91: An R package, available on CRAN and installable with the
       command: `install.packages("vimcom")`
       See also: http://www.lepem.ufc.br/jaa/vimcom.plus.html
       The vimcom package creates a server on R to allow the communication with
@@ -2216,6 +2216,10 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 ==============================================================================
 							       *r-plugin-news*
 10. News~
+
+0.9.9.7 (2013-11-01)
+
+ * Minor bug fixes.
 
 0.9.9.6 (2013-10-31)
 
