@@ -34,7 +34,7 @@ def DiscoverVimComPort():
                 sock.close()
                 if repl.find(correct_repl):
                     VimComFamily = af
-                    if repl.find("vimcom.plus"):
+                    if repl.find(" vimcom.plus ") > -1:
                         vim.command("let g:rplugin_vimcom_pkg = 'vimcom.plus'")
                     break
             except:
