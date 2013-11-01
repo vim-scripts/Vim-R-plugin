@@ -1383,10 +1383,14 @@ endfunction
 function SendFileToR(e)
     let g:needsnewomnilist = 1
     update
+    let fpath = expand("%:p")
+    if has("win32") || has("win64")
+        let fpath = substitute(fpath, "\\", "/", "g")
+    endif
     if a:e == "echo"
-        call g:SendCmdToR('base::source("' . expand("%:p") . '", echo=TRUE)')
+        call g:SendCmdToR('base::source("' . fpath . '", echo=TRUE)')
     else
-        call g:SendCmdToR('base::source("' . expand("%:p") . '")')
+        call g:SendCmdToR('base::source("' . fpath . '")')
     endif
 endfunction
 
