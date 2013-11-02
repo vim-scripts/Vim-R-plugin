@@ -898,8 +898,9 @@ function StartObjBrowser_Tmux()
 
     " Don't start the Object Browser if it already exists
     if IsExternalOBRunning()
-        Py SendToVimCom("\003GlobalEnv [OB init]")
         Py SendToVimCom("\004Libraries [OB init]")
+        sleep 50m
+        Py SendToVimCom("\003GlobalEnv [OB init]")
         return
     endif
 
@@ -938,8 +939,9 @@ function StartObjBrowser_Tmux()
                 \ '    let g:rplugin_liblist_f = "/liblist_" . v:servername',
                 \ "    exe 'Py SendToVimCom(\"\\x07' . v:servername . '\")'",
                 \ 'endif',
-                \ 'Py SendToVimCom("\003GlobalEnv [OB init]")',
                 \ 'Py SendToVimCom("\004Libraries [OB init]")',
+                \ 'sleep 50m',
+                \ 'Py SendToVimCom("\003GlobalEnv [OB init]")',
                 \ 'if v:servername == ""',
                 \ '    sleep 100m',
                 \ '    call UpdateOB("GlobalEnv")',
