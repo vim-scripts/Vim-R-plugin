@@ -233,6 +233,9 @@ function! RBrowserFindParent(word, curline, curpos)
         endif
     endif
     if curline > 1
+        if line =~ " "
+            let line = substitute(line, '\(.\)#\(.*\)$', '\1#`\2`', "")
+        endif
         if line =~ '<#'
             let word = substitute(line, '.*<#', "", "") . '@' . a:word
         else
