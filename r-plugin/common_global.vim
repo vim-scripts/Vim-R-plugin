@@ -2318,7 +2318,7 @@ function RAction(rcmd)
             if g:vimrplugin_vimpager == "no"
                 call g:SendCmdToR("help(" . rkeyword . ")")
             else
-                if bufname("%") =~ "Object_Browser"
+                if bufname("%") =~ "Object_Browser" || b:rplugin_extern_ob
                     if g:rplugin_curview == "libraries"
                         let pkg = RBGetPkgName()
                     else
