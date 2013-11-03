@@ -213,17 +213,22 @@ to install external dependencies:
       versions.
 
 
-    * vimcom = 0.9-91: An R package, available on CRAN and installable with the
-      command: `install.packages("vimcom")`
-      See also: http://www.lepem.ufc.br/jaa/vimcom.plus.html
-      The vimcom package creates a server on R to allow the communication with
-      Vim. You certainly will want to put the following lines at the end of
-      your Rprofile.
+    * vimcom.plus = 0.9-91: http://www.lepem.ufc.br/jaa/vimcom.plus.html
+      The vimcom.plus (or vimcom) package creates a server on R to allow the
+      communication with Vim. The package is not used to send commands from
+      Vim to R Console, but it is necessary to open R documentation in Vim's
+      buffer, run the Object Browser, run either `Sweave()` or `knit()` on the
+      document being edited. It also has some functions called by Vim such as
+      `vim.plot()`, `vim.print()`, and `vim.bol()`. This last one is required
+      to build the data base used in omnicompletion.
+      The vimcom.plus package creates a server on R to allow the communication
+      with Vim. You certainly will want to put the following lines at the end
+      of your Rprofile.
 >
       if(interactive()){
-	  library(vimcom)
-	  # If you can install vimcom.plus, do:
-	  # library(vimcom.plus)
+	  library(vimcom.plus)
+	  # If you cannot install vimcom.plus, do:
+	  # library(vimcom)
       }
 <
       You can do `Sys.getenv("HOME")` in the R Console to know where the file
@@ -1333,10 +1338,6 @@ use the option vimrplugin_latexcmd to change this behavior. Examples:
    let vimrplugin_latexcmd = "latexmk -pdf"
    let vimrplugin_latexcmd = "latex"
 <
-You may also want to put the following in your .Rprofile:
->
-   options(vimcom.texerrs = TRUE)
-<
 If you want to pass arguments do the `Sweave()` function, set the value of the
 vimrplugin_sweaveargs variable.
 
@@ -2151,8 +2152,6 @@ this document from the beginning.
        options(setwidth.verbose = 1,
                colorout.verbose = 1,
                vimcom.verbose = 1,
-               vimcom.allnames = FALSE,
-               vimcom.texerrs = TRUE,
                pager = "vimrpager")
        if(nchar(Sys.getenv("DISPLAY")) > 1)
            options(editor = 'gvim -f -c "set ft=r"')
@@ -2217,7 +2216,7 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-0.9.9.7 (2013-11-01)
+0.9.9.7 (2013-11-02)
 
  * Minor bug fixes.
 
