@@ -134,6 +134,20 @@ function! ReadEvalReply()
     return reply
 endfunction
 
+function RCheckVimCom(msg)
+    if exists("g:rplugin_vimcom_checked")
+        return 1
+    endif
+    if g:rplugin_vimcomport == 0
+        Py DiscoverVimComPort()
+    endif
+    if g:rplugin_vimcomport && g:rplugin_vimcom_pkg == "vimcom"
+	call RWarningMsg("The R package vimcom.plus is required to " . a:msg)
+        return 1
+    endif
+    return 0
+endfunction
+
 function! CompleteChunkOptions()
     let cline = getline(".")
     let cpos = getpos(".")
@@ -202,6 +216,13 @@ function RCompleteArgs()
     let flines = g:rplugin_globalenvlines + g:rplugin_liblist
     let np = 1
     let nl = 0
+
+    if has("win32") || has("win64") && g:rplugin_vimcom_pkg == "vimcom"
+        if RCheckVimCom("complete function arguments.")
+            return
+        endif
+    endif
+
     while np != 0 && nl < 10
         if line[idx] == '('
             let np -= 1
@@ -216,18 +237,6 @@ function RCompleteArgs()
             let classfor = substitute(classfor, '"', '\\"', "g")
             let rkeyword = '^' . rkeyword0 . "\x06"
             call cursor(cpos[1], cpos[2])
-
-            "TODO: Delete this temporary code when vimcom 1.0-0 is released:
-            if g:rplugin_vimcom_pkg != "vimcom.plus"
-                Py SendToVimCom("find.package('vimcom.plus', quiet = TRUE)")
-                let g:rplugin_lastrpl = ReadEvalReply()
-                if g:rplugin_vimcomport > 0
-                    let g:rplugin_lastrpl = ReadEvalReply()
-                    if g:rplugin_lastrpl =~ "vimcom.plus"
-                        let g:rplugin_vimcom_pkg = "vimcom.plus"
-                    endif
-                endif
-            endif
 
             " If R is running, use it
             call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
@@ -889,8 +898,9 @@ function StartObjBrowser_Tmux()
 
     " Don't start the Object Browser if it already exists
     if IsExternalOBRunning()
-        Py SendToVimCom("\003GlobalEnv [OB init]")
         Py SendToVimCom("\004Libraries [OB init]")
+        sleep 50m
+        Py SendToVimCom("\003GlobalEnv [OB init]")
         return
     endif
 
@@ -929,8 +939,9 @@ function StartObjBrowser_Tmux()
                 \ '    let g:rplugin_liblist_f = "/liblist_" . v:servername',
                 \ "    exe 'Py SendToVimCom(\"\\x07' . v:servername . '\")'",
                 \ 'endif',
-                \ 'Py SendToVimCom("\003GlobalEnv [OB init]")',
                 \ 'Py SendToVimCom("\004Libraries [OB init]")',
+                \ 'sleep 50m',
+                \ 'Py SendToVimCom("\003GlobalEnv [OB init]")',
                 \ 'if v:servername == ""',
                 \ '    sleep 100m',
                 \ '    call UpdateOB("GlobalEnv")',
@@ -1077,6 +1088,13 @@ function RObjBrowser()
         call RWarningMsg("The Object Browser can be opened only if R is running.")
         return
     endif
+
+    if has("win32") || has("win64") && g:rplugin_vimcom_pkg == "vimcom"
+        if RCheckVimCom("run the Object Browser on Windows.")
+            return
+        endif
+    endif
+
     if g:rplugin_running_objbr == 1
         " Called twice due to BufEnter event
         return
@@ -1172,6 +1190,13 @@ function RFormatCode() range
             return
         endif
     endif
+
+    if has("win32") || has("win64") && g:rplugin_vimcom_pkg == "vimcom"
+        if RCheckVimCom("run :Rformat.")
+            return
+        endif
+    endif
+
     let lns = getline(a:firstline, a:lastline)
     call writefile(lns, $VIMRPLUGIN_TMPDIR . "/unformatted_code")
     let wco = &textwidth
@@ -1202,6 +1227,13 @@ function RInsert(cmd)
             return
         endif
     endif
+
+    if has("win32") || has("win64") && g:rplugin_vimcom_pkg == "vimcom"
+        if RCheckVimCom("run :Rinsert.")
+            return
+        endif
+    endif
+
     call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
     call delete($VIMRPLUGIN_TMPDIR . "/Rinsert")
     exe "Py SendToVimCom('capture.output(" . a:cmd . ', file = "' . $VIMRPLUGIN_TMPDIR . "/Rinsert" . '")' . "')"
@@ -1353,10 +1385,14 @@ endfunction
 function SendFileToR(e)
     let g:needsnewomnilist = 1
     update
+    let fpath = expand("%:p")
+    if has("win32") || has("win64")
+        let fpath = substitute(fpath, "\\", "/", "g")
+    endif
     if a:e == "echo"
-        call g:SendCmdToR('base::source("' . expand("%:p") . '", echo=TRUE)')
+        call g:SendCmdToR('base::source("' . fpath . '", echo=TRUE)')
     else
-        call g:SendCmdToR('base::source("' . expand("%:p") . '")')
+        call g:SendCmdToR('base::source("' . fpath . '")')
     endif
 endfunction
 
@@ -1807,6 +1843,19 @@ endfunction
 " Tell R to create a list of objects file listing all currently available
 " objects in its environment. The file is necessary for omni completion.
 function BuildROmniList(env, packlist)
+
+    if has("win32") || has("win64") && g:rplugin_vimcom_pkg == "vimcom"
+	if !exists("g:rplugin_vimcom_omni_warn")
+	    let g:rplugin_vimcom_omni_warn = 1
+            if RCheckVimCom("complete the names of objects from R's workspace.")
+                sleep 2
+                return
+            endif
+        else
+            return
+	endif
+    endif
+
     if a:env =~ "GlobalEnv"
         let rtf = g:rplugin_globalenvfname
         let g:needsnewomnilist = 0
@@ -2072,6 +2121,12 @@ function ShowRDoc(rkeyword, package, getclass)
         return
     endif
 
+    if (has("win32") || has("win64")) && g:rplugin_vimcom_pkg == "vimcom"
+        if RCheckVimCom("see R help on Vim buffer.")
+            return
+        endif
+    endif
+
     if filewritable(g:rplugin_docfile)
         call delete(g:rplugin_docfile)
     endif
@@ -2256,7 +2311,7 @@ endfunction
 " Call R functions for the word under cursor
 function RAction(rcmd)
     if &filetype == "rbrowser"
-        let rkeyword = RBrowserGetName(1)
+        let rkeyword = RBrowserGetName(1, 0)
     else
         let rkeyword = RGetKeyWord()
     endif
@@ -2265,7 +2320,7 @@ function RAction(rcmd)
             if g:vimrplugin_vimpager == "no"
                 call g:SendCmdToR("help(" . rkeyword . ")")
             else
-                if bufname("%") =~ "Object_Browser"
+                if bufname("%") =~ "Object_Browser" || b:rplugin_extern_ob
                     if g:rplugin_curview == "libraries"
                         let pkg = RBGetPkgName()
                     else
@@ -3371,7 +3426,7 @@ else
 endif
 
 if !exists("g:vimrplugin_term") && !exists("g:vimrplugin_term_cmd")
-    call RWarningMsgInp("Please, set the variable 'g:vimrplugin_term_cmd' in your .vimrc.\nRead the plugin documentation for details.")
+    call RWarningMsgInp("Please, set the variable 'g:vimrplugin_term_cmd' in your .vimrc. Read the plugin documentation for details.")
     let g:rplugin_failed = 1
     finish
 endif

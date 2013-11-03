@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 0.9.9.6
+Version: 0.9.9.7
 For Vim version 7.4
 
  1. Overview                                    |r-plugin-overview|
@@ -128,7 +128,7 @@ following dependencies:
 
    Depends:~
 
-   vimcom.plus = 0.9-9: http://www.lepem.ufc.br/jaa/vimcom.plus.html
+   vimcom.plus = 0.9-91: http://www.lepem.ufc.br/jaa/vimcom.plus.html
 		  The vimcom.plus (or vimcom) package creates a server on R to
 		  allow the communication with Vim. The package is not used to
 		  send commands from Vim to R Console, but it is necessary to
@@ -200,45 +200,35 @@ to install external dependencies:
 
     * Vim's version must be >= 7.4
 
-    * Python: http://www.python.org/download/
+    * Python 2.7.5 (32 bit): http://www.python.org/download/
+      Do not choose the X86-64 version because it will not work. 
 
-      Note: The official Vim is 32 bit and, thus, Python must be 32 bit too.
-      However, Vim and R run as independent processes, that is, you may have
-      32 bit Vim sending commands to 64 bit R.
+    * pywin32: http://sourceforge.net/projects/pywin32/files/pywin32/Build%20218/pywin32-218.win32-py2.7.exe/download
+			     
+      Note: The above versions of Python and pywin32 are known to work with
+      the official GVim 7.4 binary. The default download may not match the
+      Python version Vim was linked against: you have to "View all files" on
+      the download page to find the file that matches exactly the above
+      versions. Please, read |r-plugin-python| if want to use different
+      versions.
 
-      Note: Be careful to download the correct Python version because Vim
-	    needs a specific version of Python DLL. For example, the official
-	    Vim 7.4 for Windows needs either Python 2.7 or 3.1. If Python was
-	    not installed or was not found, the Vim-R-plugin will output
-	    information about what Python version Vim was compiled against. Do
-	    the following if you want to discover this information manually:
 
-	    1. Type  :version  in Vim (normal mode).
-
-	    2. Look for a string like -DDYNAMIC_PYTHON_DLL="python27.dll".
-
-	    3. Install the Python version which corresponds to the version
-	       which Vim was linked against. In the example of step 2
-	       (python27.dll) the required Python version is 2.7.x.
-
-    * pywin32: http://sourceforge.net/projects/pywin32/
-
-      Note: The default download may not match the Python version Vim was
-      linked against. You have to "View all files" on the download page to
-      find the file that matches exactly the version of Python that you
-      installed.
-
-    * vimcom = 0.9-9: An R package, available on CRAN and installable with the
-      command: `install.packages("vimcom")`
-      See also: http://www.lepem.ufc.br/jaa/vimcom.plus.html
-      The vimcom package creates a server on R to allow the communication with
-      Vim. You certainly will want to put the following lines at the end of
-      your Rprofile.
+    * vimcom.plus = 0.9-91: http://www.lepem.ufc.br/jaa/vimcom.plus.html
+      The vimcom.plus (or vimcom) package creates a server on R to allow the
+      communication with Vim. The package is not used to send commands from
+      Vim to R Console, but it is necessary to open R documentation in Vim's
+      buffer, run the Object Browser, run either `Sweave()` or `knit()` on the
+      document being edited. It also has some functions called by Vim such as
+      `vim.plot()`, `vim.print()`, and `vim.bol()`. This last one is required
+      to build the data base used in omnicompletion.
+      The vimcom.plus package creates a server on R to allow the communication
+      with Vim. You certainly will want to put the following lines at the end
+      of your Rprofile.
 >
       if(interactive()){
-	  library(vimcom)
-	  # If you can install vimcom.plus, do:
-	  # library(vimcom.plus)
+	  library(vimcom.plus)
+	  # If you cannot install vimcom.plus, do:
+	  # library(vimcom)
       }
 <
       You can do `Sys.getenv("HOME")` in the R Console to know where the file
@@ -1348,10 +1338,6 @@ use the option vimrplugin_latexcmd to change this behavior. Examples:
    let vimrplugin_latexcmd = "latexmk -pdf"
    let vimrplugin_latexcmd = "latex"
 <
-You may also want to put the following in your .Rprofile:
->
-   options(vimcom.texerrs = TRUE)
-<
 If you want to pass arguments do the `Sweave()` function, set the value of the
 vimrplugin_sweaveargs variable.
 
@@ -2166,8 +2152,6 @@ this document from the beginning.
        options(setwidth.verbose = 1,
                colorout.verbose = 1,
                vimcom.verbose = 1,
-               vimcom.allnames = FALSE,
-               vimcom.texerrs = TRUE,
                pager = "vimrpager")
        if(nchar(Sys.getenv("DISPLAY")) > 1)
            options(editor = 'gvim -f -c "set ft=r"')
@@ -2196,7 +2180,30 @@ executable:
    chmod +x ~/bin/vimrpager
 <
 
-9.22. Integration with GNU Screen, screen plugin, Conque Shell or VimShell~
+9.22. Python versions~
+							     *r-plugin-python*
+Are you using Windows and need to use a specific version of either Python or
+pywin32? The official Vim is 32 bit and, thus, Python must be 32 bit too.
+However, Vim and R run as independent processes, that is, you may have 32 bit
+Vim sending commands to 64 bit R. Be careful to download the correct Python
+version because Vim needs a specific version of Python DLL. For example, the
+official Vim 7.4 for Windows needs either Python 2.7 or 3.1. If Python was not
+installed or was not found, the Vim-R-plugin will output information about
+what Python version Vim was compiled against. Do the following if you want to
+discover this information manually:
+
+   1. Type  :version  in Vim (normal mode).
+
+   2. Look for a string like -DDYNAMIC_PYTHON_DLL="python27.dll".
+
+   3. Install the Python version which corresponds to the version which Vim
+   was linked against. In the example of step 2 (python27.dll) the required
+   Python version is 2.7.x.
+
+    * pywin32: http://sourceforge.net/projects/pywin32/
+
+
+9.23. Integration with GNU Screen, screen plugin, Conque Shell or VimShell~
 
 The plugin used to be able to use GNU Screen (through screen plugin), Conque
 Shell or VimShell to send commands to R. This integration was removed on
@@ -2208,6 +2215,10 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 ==============================================================================
 							       *r-plugin-news*
 10. News~
+
+0.9.9.7 (2013-11-02)
+
+ * Minor bug fixes.
 
 0.9.9.6 (2013-10-31)
 

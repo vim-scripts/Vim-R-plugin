@@ -133,7 +133,7 @@ function! RBrowserDoubleClick()
     endif
 
     " Toggle state of list or data.frame: open X closed
-    let key = RBrowserGetName(0)
+    let key = RBrowserGetName(0, 1)
     if g:rplugin_curview == "GlobalEnv"
         exe 'Py SendToVimCom("' . "\005" . key . '")'
         if g:rplugin_lastrpl == "R is busy."
@@ -160,7 +160,7 @@ function! RBrowserRightClick()
         return
     endif
 
-    let key = RBrowserGetName(1)
+    let key = RBrowserGetName(1, 0)
     if key == ""
         return
     endif
@@ -233,6 +233,11 @@ function! RBrowserFindParent(word, curline, curpos)
         endif
     endif
     if curline > 1
+        let line = substitute(line, '^.\{-}\(.\)#', '\1#', "")
+        let line = substitute(line, '^ *', '', "")
+        if line =~ " " || line =~ '^.#[0-9]'
+            let line = substitute(line, '\(.\)#\(.*\)$', '\1#`\2`', "")
+        endif
         if line =~ '<#'
             let word = substitute(line, '.*<#', "", "") . '@' . a:word
         else
@@ -250,7 +255,19 @@ function! RBrowserFindParent(word, curline, curpos)
     return ""
 endfunction
 
-function! RBrowserGetName(cleantail)
+function! RBrowserCleanTailTick(word, cleantail, cleantick)
+    let nword = a:word
+    if a:cleantick
+        let nword = substitute(nword, "`", "", "g")
+    endif
+    if a:cleantail
+        let nword = substitute(nword, '[\$@]$', '', '')
+        let nword = substitute(nword, '[\$@]`$', '`', '')
+    endif
+    return nword
+endfunction
+
+function! RBrowserGetName(cleantail, cleantick)
     let line = getline(".")
     if line =~ "^$"
         return ""
@@ -269,9 +286,7 @@ function! RBrowserGetName(cleantail)
     if (g:rplugin_curview == "GlobalEnv" && curpos == 4) || (g:rplugin_curview == "libraries" && curpos == 3)
         " top level object
         let word = substitute(word, '\$\[\[', '[[', "g")
-        if a:cleantail
-            let word = substitute(word, '[\$@]$', '', '')
-        endif
+        let word = RBrowserCleanTailTick(word, a:cleantail, a:cleantick)
         if g:rplugin_curview == "libraries"
             return "package:" . substitute(word, "#", "", "")
         else
@@ -281,16 +296,12 @@ function! RBrowserGetName(cleantail)
         if g:rplugin_curview == "libraries"
             if s:isutf8
                 if curpos == 11
-                    if a:cleantail
-                        let word = substitute(word, '[\$@]$', '', '')
-                    endif
+                    let word = RBrowserCleanTailTick(word, a:cleantail, a:cleantick)
                     let word = substitute(word, '\$\[\[', '[[', "g")
                     return word
                 endif
             elseif curpos == 7
-                if a:cleantail
-                    let word = substitute(word, '[\$@]$', '', '')
-                endif
+                let word = RBrowserCleanTailTick(word, a:cleantail, a:cleantick)
                 let word = substitute(word, '\$\[\[', '[[', "g")
                 return word
             endif
@@ -298,9 +309,7 @@ function! RBrowserGetName(cleantail)
         if curpos > 4
             " Find the parent data.frame or list
             let word = RBrowserFindParent(word, line("."), curpos - 1)
-            if a:cleantail
-                let word = substitute(word, '[\$@]$', '', '')
-            endif
+            let word = RBrowserCleanTailTick(word, a:cleantail, a:cleantick)
             let word = substitute(word, '\$\[\[', '[[', "g")
             return word
         else
