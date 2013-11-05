@@ -616,6 +616,7 @@ endfunction
 
 function StartR_TmuxSplit(rcmd)
     call system("tmux set-environment -g VIMRPLUGIN_TMPDIR " . g:rplugin_esc_tmpdir)
+    call system("tmux set-environment -g VIMRPLUGIN_HOME " . g:rplugin_home)
     call system("tmux set-environment VIMINSTANCEID " . $VIMINSTANCEID)
     let g:rplugin_vim_pane = TmuxActivePane()
     let tcmd = "tmux split-window "
@@ -662,6 +663,7 @@ function StartR_ExternalTerm(rcmd)
     if g:vimrplugin_notmuxconf
         let cnflines = [
                     \ 'set-environment -g VIMRPLUGIN_TMPDIR ' . g:rplugin_esc_tmpdir,
+                    \ 'set-environment -g VIMRPLUGIN_HOME ' . g:rplugin_home,
                     \ 'set-environment VIMINSTANCEID ' . $VIMINSTANCEID,
                     \ 'source-file ~/.tmux.conf' ]
     else
@@ -673,6 +675,7 @@ function StartR_ExternalTerm(rcmd)
                     \ 'set -g status off',
                     \ "set -g terminal-overrides 'xterm*:smcup@:rmcup@'",
                     \ 'set-environment -g VIMRPLUGIN_TMPDIR "' . $VIMRPLUGIN_TMPDIR . '"',
+                    \ 'set-environment -g VIMRPLUGIN_HOME "' . g:rplugin_home . '"',
                     \ 'set-environment VIMINSTANCEID "' . $VIMINSTANCEID . '"']
         if g:vimrplugin_external_ob || !has("gui_running")
             let cnflines = extend(cnflines, ['set -g mode-mouse on', 'set -g mouse-select-pane on', 'set -g mouse-resize-pane on'])
@@ -681,6 +684,7 @@ function StartR_ExternalTerm(rcmd)
     call writefile(cnflines, s:tmxcnf)
     let rcmd = "VIMINSTANCEID=" . $VIMINSTANCEID . " " . a:rcmd
     call system('export VIMRPLUGIN_TMPDIR=' . $VIMRPLUGIN_TMPDIR)
+    call system('export VIMRPLUGIN_TMPDIR=' . g:rplugin_home)
     call system('export VIMINSTANCEID=' . $VIMINSTANCEID)
     " Start the terminal emulator even if inside a Tmux session
     if $TMUX != ""
@@ -2221,7 +2225,7 @@ function ShowRDoc(rkeyword, package, getclass)
             endif
         else
             echohl WarningMsg
-            echomsg "Invalid vimrplugin_vimpager value: '" . g:vimrplugin_vimpager . "'"
+            echomsg 'Invalid vimrplugin_vimpager value: "' . g:vimrplugin_vimpager . '". Valid values are: "tab", "vertical", "horizontal", "tabnew" and "no".'
             echohl Normal
             return
         endif
@@ -3085,6 +3089,8 @@ if has("win32") || has("win64")
     endif
 endif
 
+let $VIMRPLUGIN_HOME = g:rplugin_home
+
 if isdirectory("/tmp")
     let $VIMRPLUGIN_TMPDIR = "/tmp/r-plugin-" . g:rplugin_userlogin
 else
@@ -3145,7 +3151,7 @@ if obpllen > 1
 endif
 for idx in range(0, obpllen)
     if objbrplace[idx] != "console" && objbrplace[idx] != "script" && objbrplace[idx] != "left" && objbrplace[idx] != "right"
-        call RWarningMsgInp("Invalid option for vimrplugin_objbr_place: " . objbrplace[idx])
+        call RWarningMsgInp('Invalid option for vimrplugin_objbr_place: "' . objbrplace[idx] . '". Valid options are: console or script and right or left."')
         let g:rplugin_failed = 1
         finish
     endif
