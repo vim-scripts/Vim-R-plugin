@@ -222,6 +222,7 @@ deb:
 	    fakeroot dpkg-deb -b vim-r-plugin-tmp vim-r-plugin_$(PLUGINVERSION)-1_all.deb )
 
 htmldoc:
+	vim -c ':helptags ~/src/Vim-R-plugin' -c ':quit'
 	(cd doc ;\
 	    $(VIM2HTML) tags r-plugin.txt ;\
 	    sed -i -e 's/<code class.*gmail.com.*code>//' r-plugin.html ;\
