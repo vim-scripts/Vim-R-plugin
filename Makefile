@@ -22,11 +22,19 @@
 
 
 PLUGINHOME=`pwd`
-PLUGINVERSION=0.9.9.7
+PLUGINVERSION=0.9.9.8
 DEBIANTIME=`date -R`
 PLUGINRELEASEDATE=`date +"%Y-%m-%d"`
 VIM2HTML=/usr/local/share/vim/vim74/doc/vim2html.pl 
 
+
+vimball:
+	# Update the version date in doc/r-plugin.txt header and in the news
+	sed -i -e "s/^Version: [0-9].[0-9].[0-9].[0-9]/Version: $(PLUGINVERSION)/" doc/r-plugin.txt
+	sed -i -e "s/vim-r-plugin_[0-9].[0-9].[0-9].[0-9].vmb/vim-r-plugin_$(PLUGINVERSION).vmb/" doc/r-plugin.txt
+	sed -i -e "s/^$(PLUGINVERSION) (201[0-9]-[0-9][0-9]-[0-9][0-9])$$/$(PLUGINVERSION) ($(PLUGINRELEASEDATE))/" doc/r-plugin.txt
+	vim -c "%MkVimball vim-r-plugin_$(PLUGINVERSION) ." -c "q" list_for_vimball
+	mv vim-r-plugin_$(PLUGINVERSION).vmb /tmp
 zip:
 	# Clean previously created files
 	(cd /tmp ;\
@@ -126,13 +134,11 @@ deb:
 	<http://www.gnu.org/copyleft/gpl.txt> for the terms of the latest version\n\
 	of the GNU General Public License.\n\
 	" > /tmp/vim-r-plugin-tmp/usr/share/doc/vim-r-plugin/copyright
-	unzip /tmp/vim-r-plugin-$(PLUGINVERSION).zip -d /tmp/vim-r-plugin-tmp/usr/share/vim/addons
-	# Delete the files unnecessary in a Debian system
+	# Unpack the plugin
+	vim -c 'let g:vimball_home="/tmp/vim-r-plugin-tmp/usr/share/vim/addons"' -c "so %" -c "q" /tmp/vim-r-plugin_$(PLUGINVERSION).vmb
+	# Delete file unnecessary in a Debian system
 	(cd /tmp/vim-r-plugin-tmp/usr/share/vim/addons ;\
 	    rm r-plugin/windows.py )
-	# Add a comment to r-plugin.txt
-	(cd /tmp/vim-r-plugin-tmp/usr/share/vim/addons ;\
-	    sed -e 's/3.2.1. Unix (Linux, OS X, etc.)./3.2.1. Unix (Linux, OS X, etc.)~\n\nNote: If the plugin was installed from the Debian package, then the\ninstallation is finished and you should now read sections 3.3 and 3.4./' -i doc/r-plugin.txt )
 	# Create the DEBIAN directory
 	( cd /tmp/vim-r-plugin-tmp ;\
 	    mkdir DEBIAN ;\

@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 0.9.9.7
+Version: 0.9.9.8
 For Vim version 7.4
 
  1. Overview                                    |r-plugin-overview|
@@ -90,14 +90,16 @@ For screenshots see: http://www.lepem.ufc.br/jaa/vim-r-plugin.html
 						       *r-plugin-installation*
 3. Installation~
 
-The installation instructions are split in four sections: (1) general
-instructions for all operating systems; (2) instructions that are specific for
-either Unix/Linux/OSX or Windows; (3) troubleshooting; and (4) optional steps.
+The installation instructions are split in four sections:
 
-3.1. General instructions I~
+   1. Instructions specific for Unix/Linux/OSX
+   2. Instructions specific for Windows
+   3. Troubleshooting
+   4. Optional steps
 
-Note: Most of the plugin commands require that you type the <LocalLeader>
-which is '\' by default.
+3.1. Instructions for Unix (Linux, OS X, etc.)~
+
+If you are using Windows, jump to section 3.2.
 
 You need to activate plugins and indentation according to 'filetype'. You
 should have at least the following options in your |vimrc|:
@@ -110,21 +112,17 @@ should have at least the following options in your |vimrc|:
 Make a backup of your ~/.vim directory because existing files will be
 replaced. Please, look at |r-plugin-files| to see the list of files.
 
-3.2. Operating system specific instructions~
-
-3.2.1. Unix (Linux, OS X, etc.)~
-
-Uncompress the archive:
+Start a terminal emulator, go to the directory where you have downloaded the
+plugin and type:
 >
-   unzip vim-r-plugin-*.zip -d ~/.vim
+   vim vim-r-plugin_0.9.9.8.vmb
 <
-Start Vim and build the tags file for this document (and others that eventually
-are in the same directory):
+Then, in Vim, type:
 >
-  :helptags ~/.vim/doc
+   :so %
 <
-In addition to having R and Vim installed in your system, this plugin has the
-following dependencies:
+The plugin is installed, but in addition to having R and Vim installed in your
+system, this plugin has the following dependencies:
 
    Depends:~
 
@@ -193,10 +191,22 @@ vimrplugin_applescript = 0. Some users have reported more luck with iTerm than
 with the default Mac OS X terminal emulator.
 
 
-3.2.2. Windows~
+3.2. Instructions for Windows ~
 
-In addition to having R installed in your system, this plugin requires users
-to install external dependencies:
+Open the directory where you have downloaded the file
+`vim-r-plugin_0.9.9.8.vmb`, right click on it and choose "Edit with Vim".
+>
+Then, in Vim, type:
+>
+   :so %
+<
+Press <Enter> and the plugin will be installed (because the plugin has many
+files, you have to press the space bar a few times to finish the
+installation). You can, then, can quit Vim. However in addition to having R
+and Vim installed in your system, this plugin requires users to install
+external dependencies:
+
+    * R's version must be >= 3.0.0.
 
     * Vim's version must be >= 7.4
 
@@ -212,41 +222,18 @@ to install external dependencies:
       versions. Please, read |r-plugin-python| if want to use different
       versions.
 
-
     * vimcom.plus = 0.9-92: http://www.lepem.ufc.br/jaa/vimcom.plus.html
-      The vimcom.plus (or vimcom) package creates a server on R to allow the
-      communication with Vim. The package is not used to send commands from
-      Vim to R Console, but it is necessary to open R documentation in Vim's
-      buffer, run the Object Browser, run either `Sweave()` or `knit()` on the
-      document being edited. It also has some functions called by Vim such as
-      `vim.plot()`, `vim.print()`, and `vim.bol()`. This last one is required
-      to build the data base used in omnicompletion.
       The vimcom.plus package creates a server on R to allow the communication
-      with Vim. You certainly will want to put the following lines at the end
-      of your Rprofile.
+      with Vim and it must be loaded to Vim-R-plugin to work properly. Instead
+      of loading it manually with the command `library(vimcom.plus)` each time
+      that R is started, you should start it at your Rprofile. You can do
+      `Sys.getenv("HOME")` in the R Console to know where the file should be
+      created, but usually it is at ~/Documents/.Rprofile. Put the following
+      lines at the end of your Rprofile.
 >
-      if(interactive()){
-	  library(vimcom.plus)
-	  # If you cannot install vimcom.plus, do:
-	  # library(vimcom)
-      }
-<
-      You can do `Sys.getenv("HOME")` in the R Console to know where the file
-      should be, but usually it is at ~/Documents/.Rprofile.
-
-Create your |vimfiles| directory if you do not have it yet. Its path will be
-similar to one of the following:
->
-  C:\Documents and Settings\yourlogin\vimfiles
-  C:\Users\yourlogin\vimfiles
-<
-Uncompress the archive. Right click on the plugin's zip file and choose
-"Extract all". Then choose ~/vimfiles as the destination directory.
-
-Start Vim and build the tags file for this document (and others that eventually
-are in the same directory):
->
-  :helptags ~\vimfiles\doc
+         library(vimcom.plus)
+         # If you cannot install vimcom.plus, do:
+         # library(vimcom)
 <
 Start editing an R file with GVim and try to send some lines to R Console. You
 may have to adjust the value of |vimrplugin_sleeptime|.
@@ -262,10 +249,6 @@ key bindings will not be active while editing either unnamed files or files
 with name extensions other than the mentioned above. If the plugin is active,
 pressing <LocalLeader>rf should start R.
 
-Look at the ~/.vim (Linux, Unix, OS X) or ~/vimfiles (Windows) directory. Is
-there a subdirectory named "r-plugin"? If not, then you unpacked the plugin in
-the wrong place.
-
 Did you see warning messages but they disappeared before you have had time to
 read them? Type the command |:messages| in Normal mode to see them again.
 
@@ -279,7 +262,7 @@ running, the vimcom.plus (or vimcom) package is not installed, or R was not
 started by Vim.
 
 
-3.4. General instructions II (optional steps)~
+3.4. Optional steps~
 
 3.4.1 Customize the plugin~
 
@@ -300,6 +283,7 @@ code (see |r-plugin-latex-box| for details).
 
 Please read |r-plugin-toolbar| if you want to add R buttons to GVim's tool
 bar.
+
 
 ==============================================================================
 								*r-plugin-use*
@@ -2204,7 +2188,7 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-0.9.9.8 (2013-11-05)
+0.9.9.8 (2013-11-06)
 
  * The list of objects for omnicompletion and the list of functions for syntax
    highlight now are built dynamically. Deprecated commands and options:
@@ -2212,6 +2196,9 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
    vimrplugin_permanent_libs.
 
  * New option: vimrplugin_show_args.
+
+ * Remove toolbar icons (they still may be added back manually by interested
+   users).
 
 0.9.9.7 (2013-11-06)
 
