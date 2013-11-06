@@ -2802,47 +2802,51 @@ function MakeRMenu()
     "----------------------------------------------------------------------------
     " ToolBar
     "----------------------------------------------------------------------------
-    " Buttons
-    amenu <silent> ToolBar.RStart :call StartR("R")<CR>
-    amenu <silent> ToolBar.RClose :call RQuit('no')<CR>
-    "---------------------------
-    if &filetype == "r" || g:vimrplugin_never_unmake_menu
-        nmenu <silent> ToolBar.RSendFile :call SendFileToR("echo")<CR>
-        imenu <silent> ToolBar.RSendFile <Esc>:call SendFileToR("echo")<CR>
-        let g:rplugin_hasRSFbutton = 1
-    endif
-    nmenu <silent> ToolBar.RSendBlock :call SendMBlockToR("echo", "down")<CR>
-    imenu <silent> ToolBar.RSendBlock <Esc>:call SendMBlockToR("echo", "down")<CR>
-    nmenu <silent> ToolBar.RSendFunction :call SendFunctionToR("echo", "down")<CR>
-    imenu <silent> ToolBar.RSendFunction <Esc>:call SendFunctionToR("echo", "down")<CR>
-    vmenu <silent> ToolBar.RSendSelection <ESC>:call SendSelectionToR("echo", "down")<CR>
-    nmenu <silent> ToolBar.RSendParagraph :call SendParagraphToR("echo", "down")<CR>
-    imenu <silent> ToolBar.RSendParagraph <Esc>:call SendParagraphToR("echo", "down")<CR>
-    nmenu <silent> ToolBar.RSendLine :call SendLineToR("down")<CR>
-    imenu <silent> ToolBar.RSendLine <Esc>:call SendLineToR("down")<CR>
-    "---------------------------
-    nmenu <silent> ToolBar.RListSpace :call g:SendCmdToR("ls()")<CR>
-    imenu <silent> ToolBar.RListSpace <Esc>:call g:SendCmdToR("ls()")<CR>
-    nmenu <silent> ToolBar.RClear :call RClearConsole()<CR>
-    imenu <silent> ToolBar.RClear <Esc>:call RClearConsole()<CR>
-    nmenu <silent> ToolBar.RClearAll :call RClearAll()<CR>
-    imenu <silent> ToolBar.RClearAll <Esc>:call RClearAll()<CR>
+    if g:rplugin_has_icons
+        " Buttons
+        amenu <silent> ToolBar.RStart :call StartR("R")<CR>
+        amenu <silent> ToolBar.RClose :call RQuit('no')<CR>
+        "---------------------------
+        if &filetype == "r" || g:vimrplugin_never_unmake_menu
+            nmenu <silent> ToolBar.RSendFile :call SendFileToR("echo")<CR>
+            imenu <silent> ToolBar.RSendFile <Esc>:call SendFileToR("echo")<CR>
+            let g:rplugin_hasRSFbutton = 1
+        endif
+        nmenu <silent> ToolBar.RSendBlock :call SendMBlockToR("echo", "down")<CR>
+        imenu <silent> ToolBar.RSendBlock <Esc>:call SendMBlockToR("echo", "down")<CR>
+        nmenu <silent> ToolBar.RSendFunction :call SendFunctionToR("echo", "down")<CR>
+        imenu <silent> ToolBar.RSendFunction <Esc>:call SendFunctionToR("echo", "down")<CR>
+        vmenu <silent> ToolBar.RSendSelection <ESC>:call SendSelectionToR("echo", "down")<CR>
+        nmenu <silent> ToolBar.RSendParagraph :call SendParagraphToR("echo", "down")<CR>
+        imenu <silent> ToolBar.RSendParagraph <Esc>:call SendParagraphToR("echo", "down")<CR>
+        nmenu <silent> ToolBar.RSendLine :call SendLineToR("down")<CR>
+        imenu <silent> ToolBar.RSendLine <Esc>:call SendLineToR("down")<CR>
+        "---------------------------
+        nmenu <silent> ToolBar.RListSpace :call g:SendCmdToR("ls()")<CR>
+        imenu <silent> ToolBar.RListSpace <Esc>:call g:SendCmdToR("ls()")<CR>
+        nmenu <silent> ToolBar.RClear :call RClearConsole()<CR>
+        imenu <silent> ToolBar.RClear <Esc>:call RClearConsole()<CR>
+        nmenu <silent> ToolBar.RClearAll :call RClearAll()<CR>
+        imenu <silent> ToolBar.RClearAll <Esc>:call RClearAll()<CR>
 
-    " Hints
-    tmenu ToolBar.RStart Start R (default)
-    tmenu ToolBar.RClose Close R (no save)
-    if &filetype == "r" || g:vimrplugin_never_unmake_menu
-        tmenu ToolBar.RSendFile Send file (echo)
+        " Hints
+        tmenu ToolBar.RStart Start R (default)
+        tmenu ToolBar.RClose Close R (no save)
+        if &filetype == "r" || g:vimrplugin_never_unmake_menu
+            tmenu ToolBar.RSendFile Send file (echo)
+        endif
+        tmenu ToolBar.RSendBlock Send block (cur, echo and down)
+        tmenu ToolBar.RSendFunction Send function (cur, echo and down)
+        tmenu ToolBar.RSendSelection Send selection (cur, echo and down)
+        tmenu ToolBar.RSendParagraph Send paragraph (cur, echo and down)
+        tmenu ToolBar.RSendLine Send line (cur and down)
+        tmenu ToolBar.RListSpace List objects
+        tmenu ToolBar.RClear Clear the console screen
+        tmenu ToolBar.RClearAll Remove objects from workspace and clear the console screen
+        let g:rplugin_hasbuttons = 1
+    else
+        let g:rplugin_hasbuttons = 0
     endif
-    tmenu ToolBar.RSendBlock Send block (cur, echo and down)
-    tmenu ToolBar.RSendFunction Send function (cur, echo and down)
-    tmenu ToolBar.RSendSelection Send selection (cur, echo and down)
-    tmenu ToolBar.RSendParagraph Send paragraph (cur, echo and down)
-    tmenu ToolBar.RSendLine Send line (cur and down)
-    tmenu ToolBar.RListSpace List objects
-    tmenu ToolBar.RClear Clear the console screen
-    tmenu ToolBar.RClearAll Remove objects from workspace and clear the console screen
-    let g:rplugin_hasbuttons = 1
 endfunction
 
 function UnMakeRMenu()
@@ -3516,6 +3520,17 @@ let g:rplugin_libls = split(g:vimrplugin_permanent_libs, ",")
 let g:rplugin_liblist = []
 let s:list_of_objs = []
 
+" Check whether tool bar icons exist
+let g:rplugin_has_icons = 0
+if has("win32") || has("win64")
+    if filereadable(g:rplugin_uservimfiles . "/bitmaps/RStart.bmp")
+        let g:rplugin_has_icons = 1
+    endif
+else
+    if filereadable(g:rplugin_uservimfiles . "/bitmaps/RStart.png")
+        let g:rplugin_has_icons = 1
+    endif
+endif
 
 " Compatibility with old versions (August 2013):
 if exists("g:vimrplugin_tmux")

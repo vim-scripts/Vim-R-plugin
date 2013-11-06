@@ -45,19 +45,7 @@ zip:
 	    r-plugin/global_r_plugin.vim r-plugin/windows.py \
 	    r-plugin/objlist/README \
 	    r-plugin/tex_indent.vim r-plugin/r.snippets \
-	    r-plugin/common_buffer.vim r-plugin/common_global.vim \
-	    bitmaps/ricon.xbm bitmaps/ricon.png \
-	    bitmaps/RStart.png bitmaps/RStart.bmp \
-	    bitmaps/RClose.png bitmaps/RClose.bmp \
-	    bitmaps/RSendFile.png bitmaps/RSendFile.bmp \
-	    bitmaps/RSendBlock.png bitmaps/RSendBlock.bmp \
-	    bitmaps/RSendFunction.png bitmaps/RSendFunction.bmp \
-	    bitmaps/RSendParagraph.png bitmaps/RSendParagraph.bmp \
-	    bitmaps/RSendSelection.png bitmaps/RSendSelection.bmp \
-	    bitmaps/RSendLine.png bitmaps/RSendLine.bmp \
-	    bitmaps/RListSpace.png bitmaps/RListSpace.bmp \
-	    bitmaps/RClear.png bitmaps/RClear.bmp \
-	    bitmaps/RClearAll.png bitmaps/RClearAll.bmp
+	    r-plugin/common_buffer.vim r-plugin/common_global.vim
 	# Unpack the tar.gz and create the zip file
 	(cd /tmp ;\
 	    tar -xvzf vimrplugintmpfile.tar.gz -C vim-r-plugin-tmp/usr/share/vim/addons > /dev/null ;\
@@ -88,19 +76,6 @@ deb:
 	disabledby: \"let disable_r_ftplugin = 1\"\n\
 	files:\n\
 	  - autoload/rcomplete.vim\n\
-	  - bitmaps/RClose.png\n\
-	  - bitmaps/RClear.png\n\
-	  - bitmaps/RClearAll.png\n\
-	  - bitmaps/RListSpace.png\n\
-	  - bitmaps/RSendBlock.png\n\
-	  - bitmaps/RSendFile.png\n\
-	  - bitmaps/RSendFunction.png\n\
-	  - bitmaps/RSendLine.png\n\
-	  - bitmaps/RSendParagraph.png\n\
-	  - bitmaps/RSendSelection.png\n\
-	  - bitmaps/RStart.png\n\
-	  - bitmaps/ricon.png\n\
-	  - bitmaps/ricon.xbm\n\
 	  - doc/r-plugin.txt\n\
 	  - ftdetect/r.vim\n\
 	  - ftplugin/r.vim\n\
@@ -154,7 +129,7 @@ deb:
 	unzip /tmp/vim-r-plugin-$(PLUGINVERSION).zip -d /tmp/vim-r-plugin-tmp/usr/share/vim/addons
 	# Delete the files unnecessary in a Debian system
 	(cd /tmp/vim-r-plugin-tmp/usr/share/vim/addons ;\
-	    rm bitmaps/*.bmp r-plugin/windows.py )
+	    rm r-plugin/windows.py )
 	# Add a comment to r-plugin.txt
 	(cd /tmp/vim-r-plugin-tmp/usr/share/vim/addons ;\
 	    sed -e 's/3.2.1. Unix (Linux, OS X, etc.)./3.2.1. Unix (Linux, OS X, etc.)~\n\nNote: If the plugin was installed from the Debian package, then the\ninstallation is finished and you should now read sections 3.3 and 3.4./' -i doc/r-plugin.txt )
