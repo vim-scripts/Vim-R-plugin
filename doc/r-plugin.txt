@@ -951,7 +951,7 @@ is running:
 |vimrplugin_rconsole_height|   The number of lines of R Console (Tmux split)
 |vimrplugin_vsplit|            Make Tmux split the window vertically
 |vimrplugin_rconsole_width|    The number of columns of R Console (Tmux split)
-|vimrplugin_applescript|       Use osascript in Mac OS X.
+|vimrplugin_applescript|       Use osascript in Mac OS X
 |vimrplugin_listmethods|       Do `vim.list.args()` instead of `args()`
 |vimrplugin_specialplot|       Do `vim.plot()` instead of `plot()`
 |vimrplugin_maxdeparse|        Argument to R `args()` function
@@ -959,16 +959,17 @@ is running:
 |vimrplugin_sweaveargs|        Arguments do `Sweave()`
 |vimrplugin_never_unmake_menu| Do not unmake the menu when switching buffers
 |vimrplugin_map_r|             Use 'r' to send lines and selected text
-|vimrplugin_ca_ck|             Add ^A^K to the beginning of commands.
-|vimrplugin_openpdf|           Open PDF after processing rnoweb file.
-|vimrplugin_openpdf_quietly|   Open PDF quietly.
-|vimrplugin_openhtml|          Open PDF quietly.
-|vimrplugin_strict_rst|        Code style for generated rst files.
-|vimrplugin_insert_mode_cmds|  Allow R commands in insert mode.
+|vimrplugin_ca_ck|             Add ^A^K to the beginning of commands
+|vimrplugin_openpdf|           Open PDF after processing rnoweb file
+|vimrplugin_openpdf_quietly|   Open PDF quietly
+|vimrplugin_openhtml|          Open PDF quietly
+|vimrplugin_strict_rst|        Code style for generated rst files
+|vimrplugin_insert_mode_cmds|  Allow R commands in insert mode
 |vimrplugin_allnames|          Show names which begin with a dot
-|vimrplugin_rmhidden|          Remove hidden objects from R workspace.
-|vimrplugin_source|            Source additional scripts.
-|vimrplugin_restart|           Restart R if it is already running.
+|vimrplugin_rmhidden|          Remove hidden objects from R workspace
+|vimrplugin_source|            Source additional scripts
+|vimrplugin_restart|           Restart R if it is already running
+|vimrplugin_show_args|         Show extra information during omnicompletion
 
 
 6.1. Terminal emulator (Linux/Unix only)~
@@ -1467,6 +1468,18 @@ do <LocalLeader>rf, <LocalLeader>rv or <LocalLeader>rc, then, put in your
 >
    let vimrplugin_restart = 1
 <
+
+6.29. Show extra information during omnicompletion~
+							*vimrplugin_show_args*
+If you want that Vim shows a preview window with the function arguments as you
+do omnicompletion, put in your |vimrc|:
+>
+   let vimrplugin_show_args = 1
+<
+The preview window is not shown by default because it is more convenient to
+run <Ctrl-X><Ctrl-A> to complete the function arguments. The preview window
+will be shown only if "preview" is included in your 'completeopt'.
+
 
 ==============================================================================
 						       *r-plugin-key-bindings*
@@ -2188,6 +2201,8 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
    highlight now are built dynamically. Deprecated commands and options:
    :RUpdateObjList, :RAddLibToList, vimrplugin_buildwait. New option:
    vimrplugin_permanent_libs.
+
+ * New option: vimrplugin_show_args.
 
 0.9.9.7 (2013-11-06)
 

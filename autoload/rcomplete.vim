@@ -39,10 +39,14 @@ fun! rcomplete#CompleteR(findstart, base)
             continue
         endif
         let tmp1 = split(line, "\x06", 1)
-        let info = tmp1[4]
-        let info = substitute(info, "\t", ", ", "g")
-        let info = substitute(info, "\x07", " = ", "g")
-	let tmp2 = {'word': tmp1[0], 'menu': tmp1[1] . ' ' . tmp1[3], 'info': info}
+        if g:vimrplugin_show_args
+            let info = tmp1[4]
+            let info = substitute(info, "\t", ", ", "g")
+            let info = substitute(info, "\x07", " = ", "g")
+            let tmp2 = {'word': tmp1[0], 'menu': tmp1[1] . ' ' . tmp1[3], 'info': info}
+        else
+            let tmp2 = {'word': tmp1[0], 'menu': tmp1[1] . ' ' . tmp1[3]}
+        endif
 	call add(res, tmp2)
       endif
     endfor
