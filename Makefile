@@ -35,33 +35,6 @@ vimball:
 	sed -i -e "s/^$(PLUGINVERSION) (201[0-9]-[0-9][0-9]-[0-9][0-9])$$/$(PLUGINVERSION) ($(PLUGINRELEASEDATE))/" doc/r-plugin.txt
 	vim -c "%MkVimball vim-r-plugin_$(PLUGINVERSION) ." -c "q" list_for_vimball
 	mv vim-r-plugin_$(PLUGINVERSION).vmb /tmp
-zip:
-	# Clean previously created files
-	(cd /tmp ;\
-	    rm -rf vim-r-plugin-tmp/usr/share/vim/addons ;\
-	    mkdir -p vim-r-plugin-tmp/usr/share/vim/addons )
-	rm -f /tmp/vim-r-plugin-$(PLUGINVERSION).zip
-	# Update the version date in doc/r-plugin.txt header and in the news
-	sed -i -e "s/^Version: [0-9].[0-9].[0-9].[0-9]/Version: $(PLUGINVERSION)/" doc/r-plugin.txt
-	sed -i -e "s/^$(PLUGINVERSION) (201[0-9]-[0-9][0-9]-[0-9][0-9])$$/$(PLUGINVERSION) ($(PLUGINRELEASEDATE))/" doc/r-plugin.txt
-	# Create a tar.gz file
-	tar -cvzf /tmp/vimrplugintmpfile.tar.gz ftdetect/r.vim indent/r.vim indent/rmd.vim \
-	    indent/rrst.vim indent/rnoweb.vim indent/rhelp.vim autoload/rcomplete.vim ftplugin/r*.vim \
-	    syntax/rout.vim syntax/r.vim syntax/rhelp.vim syntax/rmd.vim \
-	    syntax/rrst.vim syntax/rdoc.vim syntax/rbrowser.vim \
-	    doc/r-plugin.txt r-plugin/vimcom.py \
-	    r-plugin/global_r_plugin.vim r-plugin/windows.py \
-	    r-plugin/objlist/README \
-	    r-plugin/tex_indent.vim r-plugin/r.snippets \
-	    r-plugin/common_buffer.vim r-plugin/common_global.vim
-	# Unpack the tar.gz and create the zip file
-	(cd /tmp ;\
-	    tar -xvzf vimrplugintmpfile.tar.gz -C vim-r-plugin-tmp/usr/share/vim/addons > /dev/null ;\
-	    rm vimrplugintmpfile.tar.gz )
-	(cd /tmp/vim-r-plugin-tmp/usr/share/vim/addons ;\
-	    chmod +w r-plugin/tex_indent.vim ;\
-	    rm -f /tmp/vim-r-plugin-$(PLUGINVERSION).zip ;\
-	    zip -r /tmp/vim-r-plugin-$(PLUGINVERSION).zip . )
 
 deb:
 	# Clean previously created files
