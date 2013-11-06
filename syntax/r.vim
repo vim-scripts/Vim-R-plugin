@@ -3,7 +3,7 @@
 " Maintainer:	      Jakson Aquino <jalvesaq@gmail.com>
 " Former Maintainers: Vaidotas Zemlys <zemlys@gmail.com>
 " 		      Tom Payne <tom@tompayne.org>
-" Last Change:	      Sun May 19, 2013  05:59PM
+" Last Change:	      Wed Nov 06, 2013  10:00AM
 " Filenames:	      *.R *.r *.Rhistory *.Rt
 " 
 " NOTE: The highlighting of R functions is defined in the
@@ -152,7 +152,11 @@ syn match rParenError "[\]}]" contained
 
 " Source list of R functions. The list is produced by the Vim-R-plugin
 " http://www.vim.org/scripts/script.php?script_id=2628
-runtime r-plugin/functions.vim
+if exists("g:rplugin_libls") && exists("*RAddToLibList")
+  for lib in g:rplugin_libls
+    call RAddToLibList(lib, 0)
+  endfor
+endif
 
 syn match rDollar display contained "\$"
 syn match rDollar display contained "@"

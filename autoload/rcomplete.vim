@@ -17,7 +17,7 @@ fun! rcomplete#CompleteR(findstart, base)
     return start
   else
     if g:needsnewomnilist == 1
-      call BuildROmniList("GlobalEnv", "")
+      call BuildROmniList()
     endif
     let res = []
     if strlen(a:base) == 0

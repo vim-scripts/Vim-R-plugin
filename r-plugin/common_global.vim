@@ -211,7 +211,7 @@ function RCompleteArgs()
         let idx2 = cpos[2] - strlen(argkey)
     endif
     if g:needsnewomnilist == 1
-      call BuildROmniList("GlobalEnv", "")
+      call BuildROmniList()
     endif
     let flines = g:rplugin_globalenvlines + g:rplugin_liblist
     let np = 1
@@ -617,6 +617,9 @@ endfunction
 function StartR_TmuxSplit(rcmd)
     call system("tmux set-environment -g VIMRPLUGIN_TMPDIR " . g:rplugin_esc_tmpdir)
     call system("tmux set-environment -g VIMRPLUGIN_HOME " . g:rplugin_home)
+    if v:servername != ""
+        call system("tmux set-environment VIMEDITOR_SVRNM " . v:servername)
+    endif
     call system("tmux set-environment VIMINSTANCEID " . $VIMINSTANCEID)
     let g:rplugin_vim_pane = TmuxActivePane()
     let tcmd = "tmux split-window "
@@ -660,32 +663,37 @@ function StartR_ExternalTerm(rcmd)
     endif
 
     " Create a custom tmux.conf
+    let cnflines = [
+                \ 'set-environment -g VIMRPLUGIN_TMPDIR ' . g:rplugin_esc_tmpdir,
+                \ 'set-environment -g VIMRPLUGIN_HOME ' . g:rplugin_home,
+                \ 'set-environment VIMINSTANCEID ' . $VIMINSTANCEID ]
+    if v:servername != ""
+        let cnflines = cnflines + [ 'set-environment VIMEDITOR_SVRNM ' . v:servername,
+    endif
     if g:vimrplugin_notmuxconf
-        let cnflines = [
-                    \ 'set-environment -g VIMRPLUGIN_TMPDIR ' . g:rplugin_esc_tmpdir,
-                    \ 'set-environment -g VIMRPLUGIN_HOME ' . g:rplugin_home,
-                    \ 'set-environment VIMINSTANCEID ' . $VIMINSTANCEID,
-                    \ 'source-file ~/.tmux.conf' ]
+        let cnflines = cnflines + [ 'source-file ~/.tmux.conf' ]
     else
-        let cnflines = [
+        let cnflines = cnflines + [
                     \ 'set-option -g prefix C-a',
                     \ 'unbind-key C-b',
                     \ 'bind-key C-a send-prefix',
                     \ 'set-window-option -g mode-keys vi',
                     \ 'set -g status off',
                     \ "set -g terminal-overrides 'xterm*:smcup@:rmcup@'",
-                    \ 'set-environment -g VIMRPLUGIN_TMPDIR "' . $VIMRPLUGIN_TMPDIR . '"',
-                    \ 'set-environment -g VIMRPLUGIN_HOME "' . g:rplugin_home . '"',
-                    \ 'set-environment VIMINSTANCEID "' . $VIMINSTANCEID . '"']
+        ]
         if g:vimrplugin_external_ob || !has("gui_running")
-            let cnflines = extend(cnflines, ['set -g mode-mouse on', 'set -g mouse-select-pane on', 'set -g mouse-resize-pane on'])
+            call extend(cnflines, ['set -g mode-mouse on', 'set -g mouse-select-pane on', 'set -g mouse-resize-pane on'])
         endif
     endif
+    call extend(cnflines, ['set-environment VIMINSTANCEID "' . $VIMINSTANCEID . '"'])
     call writefile(cnflines, s:tmxcnf)
     let rcmd = "VIMINSTANCEID=" . $VIMINSTANCEID . " " . a:rcmd
     call system('export VIMRPLUGIN_TMPDIR=' . $VIMRPLUGIN_TMPDIR)
-    call system('export VIMRPLUGIN_TMPDIR=' . g:rplugin_home)
+    call system('export VIMRPLUGIN_HOME=' . g:rplugin_home)
     call system('export VIMINSTANCEID=' . $VIMINSTANCEID)
+    if v:servername != ""
+        call system('export VIMEDITOR_SVRNM=' . v:servername)
+    endif
     " Start the terminal emulator even if inside a Tmux session
     if $TMUX != ""
         let tmuxenv = $TMUX
@@ -773,6 +781,9 @@ endfunction
 function StartR(whatr)
     call writefile([], $VIMRPLUGIN_TMPDIR . g:rplugin_globenv_f)
     call writefile([], $VIMRPLUGIN_TMPDIR . g:rplugin_liblist_f)
+    if filereadable($VIMRPLUGIN_TMPDIR . "/libnames_" . $VIMINSTANCEID)
+        call delete($VIMRPLUGIN_TMPDIR . "/libnames_" . $VIMINSTANCEID)
+    endif
 
     if !exists("b:rplugin_R")
         call SetRPath()
@@ -1846,7 +1857,7 @@ endfunction
 
 " Tell R to create a list of objects file listing all currently available
 " objects in its environment. The file is necessary for omni completion.
-function BuildROmniList(env, packlist)
+function BuildROmniList()
 
     if has("win32") || has("win64") && g:rplugin_vimcom_pkg == "vimcom"
 	if !exists("g:rplugin_vimcom_omni_warn")
@@ -1860,23 +1871,15 @@ function BuildROmniList(env, packlist)
 	endif
     endif
 
-    if a:env =~ "GlobalEnv"
-        let rtf = g:rplugin_globalenvfname
-        let g:needsnewomnilist = 0
-    else
-        let rtf = g:rplugin_omnidname
-    endif
+    let rtf = g:rplugin_globalenvfname
+    let g:needsnewomnilist = 0
     let omnilistcmd = 'vim.bol("' . rtf . '"'
-    if a:packlist != ""
-        let omnilistcmd = omnilistcmd . ", packlist=" . a:packlist
-    endif
     if g:vimrplugin_allnames == 1
         let omnilistcmd = omnilistcmd . ', allnames = TRUE'
     endif
     let omnilistcmd = omnilistcmd . ')'
 
     call delete($VIMRPLUGIN_TMPDIR . "/vimbol_finished")
-    if a:env =~ "GlobalEnv"
         call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
         exe "Py SendToVimCom('" . omnilistcmd . "')"
         if g:rplugin_vimcomport == 0
@@ -1892,91 +1895,88 @@ function BuildROmniList(env, packlist)
             return
         endif
         sleep 20m
-    else
-        echohl WarningMsg
-        echo "Please, wait..."
-        echohl Normal
-        call g:SendCmdToR(omnilistcmd)
-        sleep 2
-    endif
     let ii = 0
-    while !filereadable($VIMRPLUGIN_TMPDIR . "/vimbol_finished") && ii < g:vimrplugin_buildwait
+    while !filereadable($VIMRPLUGIN_TMPDIR . "/vimbol_finished") && ii < 5
         let ii += 1
         sleep
     endwhile
     echon "\r               "
-    if ii == g:vimrplugin_buildwait
+    if ii == 5
         call RWarningMsg("No longer waiting...")
         return
     endif
 
-    if a:env == "GlobalEnv"
-        let g:rplugin_globalenvlines = readfile(g:rplugin_globalenvfname)
-    endif
+    let g:rplugin_globalenvlines = readfile(g:rplugin_globalenvfname)
     echon
 endfunction
 
-function RFillLibList()
-    let g:rplugin_liblist = []
-    if isdirectory(g:rplugin_uservimfiles . "/r-plugin/objlist")
-        let dirls = split(glob(g:rplugin_uservimfiles . "/r-plugin/objlist/omnils_*"), "\n")
-        for omf in dirls
-            let g:rplugin_liblist = g:rplugin_liblist + readfile(omf)
-        endfor
-    endif
+function RRemoveFromLibls(nlib)
+    let idx = 0
+    for lib in g:rplugin_libls
+        if lib == a:nlib
+            call remove(g:rplugin_libls, idx)
+            break
+        endif
+        let idx += 1
+    endfor
 endfunction
 
-function RBuildSyntaxFile(...)
-    if g:rplugin_vimcomport == 0
-        exe "Py DiscoverVimComPort()"
-        if g:rplugin_vimcomport == 0
+function RAddToLibList(nlib, verbose)
+    if isdirectory(g:rplugin_uservimfiles . "/r-plugin/objlist")
+        let omf = split(glob(g:rplugin_uservimfiles . "/r-plugin/objlist/omnils_" . a:nlib . "_*"), "\n")
+        if len(omf) == 1
+            let nlist = readfile(omf[0])
+
+            " List of objects for omni completion
+            let g:rplugin_liblist = g:rplugin_liblist + nlist
+
+            " List of objects for :Rhelp completion
+            for xx in nlist
+                let xxx = split(xx, "\x06")
+                if xxx[0] !~ '\$'
+                    call add(s:list_of_objs, xxx[0])
+                endif
+            endfor
+
+            let fnf = split(glob(g:rplugin_uservimfiles . "/r-plugin/objlist/fun_" . a:nlib . "_*"), "\n")
+            if len(fnf) == 1
+                " List of functions for syntax highlith
+                silent exe "source " . fnf[0]
+            elseif a:verbose && len(fnf) == 0
+                call RWarningMsg('Fun_ file for "' . a:nlib . '" not found.')
+                return
+            elseif a:verbose && len(fnf) > 1
+                call RWarningMsg('There is more than one fun_ file for "' . a:nlib . '".')
+                return
+            endif
+        elseif a:verbose && len(omf) == 0
+            call RWarningMsg('Omnils file for "' . a:nlib . '" not found.')
+            call RRemoveFromLibls(a:nlib)
+            return
+        elseif a:verbose && len(omf) > 1
+            call RWarningMsg('There is more than one omnils file for "' . a:nlib . '".')
+            call RRemoveFromLibls(a:nlib)
             return
         endif
     endif
-    if a:0 == 0
-        let packls = ""
-    else
-        let packls = 'c("' . join(split(a:1), '", "') . '")'
-    endif
-    call BuildROmniList("libraries", packls)
-    sleep 100m
-    call RFillLibList()
-    call BuildRHelpList()
-    let res = []
-    let nf = 0
-    let funlist = ""
-    for line in g:rplugin_liblist
-        let obj = split(line, "\x06", 1)
-        if obj[2] == "function" && obj[0] !~ '%'
-            if obj[0] !~ '[[:punct:]]' || (obj[0] =~ '\.[a-zA-Z]' && obj[0] !~ '[[:punct:]][[:punct:]]')
-                let nf += 1
-                let funlist = funlist . " " . obj[0]
-                if nf == 7
-                    let line = "syn keyword rFunction " . funlist
-                    call add(res, line)
-                    let nf = 0
-                    let funlist = ""
+endfunction
+
+function RFillLibList()
+    if filereadable($VIMRPLUGIN_TMPDIR . "/libnames_" . $VIMINSTANCEID)
+        let newls = readfile($VIMRPLUGIN_TMPDIR . "/libnames_" . $VIMINSTANCEID)
+        for nlib in newls
+            let isold = 0
+            for olib in g:rplugin_libls
+                if nlib == olib
+                    let isold = 1
+                    break
                 endif
+            endfor
+            if isold == 0
+                let g:rplugin_libls = g:rplugin_libls + [ nlib ]
+                call RAddToLibList(nlib, 1)
             endif
-        endif
-    endfor
-    if nf > 0
-        let line = "syn keyword rFunction " . funlist
-        call add(res, line)
-    endif
-    call writefile(res, g:rplugin_uservimfiles . "/r-plugin/functions.vim")
-    if &filetype == "rbrowser"
-        let savesb = &switchbuf
-        set switchbuf=useopen,usetab
-        exe "sb " . b:rscript_buffer
-        unlet b:current_syntax
-        exe "runtime syntax/r.vim"
-        exe "sb " . b:objbrtitle
-        exe "set switchbuf=" . savesb
-        call UpdateOB("libraries")
-    else
-        unlet b:current_syntax
-        exe "set filetype=" . &filetype
+        endfor
     endif
 endfunction
 
@@ -2249,18 +2249,6 @@ function ShowRDoc(rkeyword, package, getclass)
     setlocal nomodified
     setlocal nomodifiable
     redraw
-endfunction
-
-function BuildRHelpList()
-    if !exists("s:list_of_objs")
-        let s:list_of_objs = []
-    endif
-    for xx in g:rplugin_liblist
-        let xxx = split(xx, "\x06")
-        if xxx[0] !~ '\$'
-            call add(s:list_of_objs, xxx[0])
-        endif
-    endfor
 endfunction
 
 function RLisObjs(arglead, cmdline, curpos)
@@ -2763,12 +2751,6 @@ function MakeRMenu()
     call RBrowserMenu()
 
     "----------------------------------------------------------------------------
-    " Syntax
-    "----------------------------------------------------------------------------
-    nmenu <silent> R.Syntax.Build\ omniList\ (loaded)<Tab>:RUpdateObjList :call RBuildSyntaxFile()<CR>
-    imenu <silent> R.Syntax.Build\ omniList\ (loaded)<Tab>:RUpdateObjList <Esc>:call RBuildSyntaxFile()<CR>a
-
-    "----------------------------------------------------------------------------
     " Help
     "----------------------------------------------------------------------------
     menu R.-Sep8- <nul>
@@ -2793,7 +2775,6 @@ function MakeRMenu()
     endif
     amenu R.Help\ (plugin).Options.R\ path :help vimrplugin_r_path<CR>
     amenu R.Help\ (plugin).Options.Arguments\ to\ R :help vimrplugin_r_args<CR>
-    amenu R.Help\ (plugin).Options.Time\ building\ omniList :help vimrplugin_buildwait<CR>
     amenu R.Help\ (plugin).Options.Syntax\ highlighting\ of\ \.Rout\ files :help vimrplugin_routmorecolors<CR>
     amenu R.Help\ (plugin).Options.Automatically\ open\ the\ \.Rout\ file :help vimrplugin_routnotab<CR>
     amenu R.Help\ (plugin).Options.Special\ R\ functions :help vimrplugin_listmethods<CR>
@@ -3037,13 +3018,15 @@ function RSourceOtherScripts()
     endif
 endfunction
 
-command RUpdateObjList :call RBuildSyntaxFile()
-command -nargs=+ RAddLibToList :call RBuildSyntaxFile(<q-args>)
 command -nargs=1 -complete=customlist,RLisObjs Rinsert :call RInsert(<q-args>)
 command -range=% Rformat <line1>,<line2>:call RFormatCode()
 command RBuildTags :call g:SendCmdToR('rtags(ofile = "TAGS")')
 command -nargs=? -complete=customlist,RLisObjs Rhelp :call RAskHelp(<q-args>)
 command -nargs=? -complete=dir RSourceDir :call RSourceDirectory(<q-args>)
+
+" TODO: Delete these two commands (Nov 2013):
+command RUpdateObjList :call RWarningMsg("This command is deprecated. Now the list of objects is automatically updated by the R package vimcom.plus.")
+command -nargs=? RAddLibToList :call RWarningMsg("This command is deprecated. Now the list of objects is automatically updated by the R package vimcom.plus.")
 
 "==========================================================================
 " Global variables
@@ -3090,6 +3073,9 @@ if has("win32") || has("win64")
 endif
 
 let $VIMRPLUGIN_HOME = g:rplugin_home
+if v:servername != ""
+    let $VIMEDITOR_SVRNM = v:servername
+endif
 
 if isdirectory("/tmp")
     let $VIMRPLUGIN_TMPDIR = "/tmp/r-plugin-" . g:rplugin_userlogin
@@ -3133,13 +3119,13 @@ call RSetDefaultValue("g:vimrplugin_editor_w",         66)
 call RSetDefaultValue("g:vimrplugin_help_w",           46)
 call RSetDefaultValue("g:vimrplugin_objbr_w",          40)
 call RSetDefaultValue("g:vimrplugin_external_ob",       0)
-call RSetDefaultValue("g:vimrplugin_buildwait",        60)
 call RSetDefaultValue("g:vimrplugin_indent_commented",  1)
 call RSetDefaultValue("g:vimrplugin_never_unmake_menu", 0)
 call RSetDefaultValue("g:vimrplugin_vimpager",       "'tab'")
 call RSetDefaultValue("g:vimrplugin_latexcmd", "'pdflatex'")
 call RSetDefaultValue("g:vimrplugin_objbr_place", "'script,right'")
 call RSetDefaultValue("g:vimrplugin_insert_mode_cmds",  1)
+call RSetDefaultValue("g:vimrplugin_permanent_libs", "'base,stats,graphics,grDevices,utils,datasets,methods'")
 
 " Look for invalid options
 let objbrplace = split(g:vimrplugin_objbr_place, ",")
@@ -3389,11 +3375,6 @@ if g:vimrplugin_objbr_w < 10
     let g:vimrplugin_objbr_w = 10
 endif
 
-" Keeps the libraries object list in memory to avoid the need of reading the file
-" repeatedly:
-call RFillLibList()
-call BuildRHelpList()
-
 
 " Control the menu 'R' and the tool bar buttons
 if !exists("g:rplugin_hasmenu")
@@ -3527,6 +3508,12 @@ call SetRPath()
 " completion if the user press <C-X><C-O> and we know that the file either was
 " not created yet or is outdated.
 let g:needsnewomnilist = 0
+
+" Keeps the names object list in memory to avoid the need of reading the files
+" repeatedly:
+let g:rplugin_libls = split(g:vimrplugin_permanent_libs, ",")
+let g:rplugin_liblist = []
+let s:list_of_objs = []
 
 
 " Compatibility with old versions (August 2013):

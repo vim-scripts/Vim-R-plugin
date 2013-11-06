@@ -17,13 +17,6 @@
 #   This script builds both the zip and the deb files of  #
 #   released versions of the plugin. The files are        #
 #   created at the /tmp directory.                        #
-#                                                         #
-#   To make the distribution version of the plugin the    #
-#   file functions.vim.vanilla must exist. Run the Vim    #
-#   command :RUpdateObjList with R vanilla running (that  #
-#   is, R with only the default libraries loaded) and,    #
-#   then, rename the file functions.vim to                #
-#   functions.vim.vanilla.                                #
 ###########################################################
 
 
@@ -48,13 +41,9 @@ zip:
 	    indent/rrst.vim indent/rnoweb.vim indent/rhelp.vim autoload/rcomplete.vim ftplugin/r*.vim \
 	    syntax/rout.vim syntax/r.vim syntax/rhelp.vim syntax/rmd.vim \
 	    syntax/rrst.vim syntax/rdoc.vim syntax/rbrowser.vim \
-	    doc/r-plugin.txt r-plugin/functions.vim.vanilla r-plugin/vimcom.py \
+	    doc/r-plugin.txt r-plugin/vimcom.py \
 	    r-plugin/global_r_plugin.vim r-plugin/windows.py \
-	    r-plugin/objlist/omnils_base r-plugin/objlist/omnils_colorout \
-	    r-plugin/objlist/omnils_datasets r-plugin/objlist/omnils_graphics \
-	    r-plugin/objlist/omnils_grDevices r-plugin/objlist/omnils_methods \
-	    r-plugin/objlist/omnils_stats r-plugin/objlist/omnils_utils \
-	    r-plugin/objlist/omnils_vimcom.plus r-plugin/objlist/README \
+	    r-plugin/objlist/README \
 	    r-plugin/tex_indent.vim r-plugin/r.snippets \
 	    r-plugin/common_buffer.vim r-plugin/common_global.vim \
 	    bitmaps/ricon.xbm bitmaps/ricon.png \
@@ -75,7 +64,6 @@ zip:
 	    rm vimrplugintmpfile.tar.gz )
 	(cd /tmp/vim-r-plugin-tmp/usr/share/vim/addons ;\
 	    chmod +w r-plugin/tex_indent.vim ;\
-	    mv r-plugin/functions.vim.vanilla r-plugin/functions.vim;\
 	    rm -f /tmp/vim-r-plugin-$(PLUGINVERSION).zip ;\
 	    zip -r /tmp/vim-r-plugin-$(PLUGINVERSION).zip . )
 
@@ -222,7 +210,7 @@ deb:
 	    fakeroot dpkg-deb -b vim-r-plugin-tmp vim-r-plugin_$(PLUGINVERSION)-1_all.deb )
 
 htmldoc:
-	vim -c ':helptags ~/src/Vim-R-plugin' -c ':quit'
+	vim -c ":helptags ~/src/Vim-R-plugin/doc" -c ":quit" ;\
 	(cd doc ;\
 	    $(VIM2HTML) tags r-plugin.txt ;\
 	    sed -i -e 's/<code class.*gmail.com.*code>//' r-plugin.html ;\

@@ -128,7 +128,7 @@ following dependencies:
 
    Depends:~
 
-   vimcom.plus = 0.9-91: http://www.lepem.ufc.br/jaa/vimcom.plus.html
+   vimcom.plus = 0.9-92: http://www.lepem.ufc.br/jaa/vimcom.plus.html
 		  The vimcom.plus (or vimcom) package creates a server on R to
 		  allow the communication with Vim. The package is not used to
 		  send commands from Vim to R Console, but it is necessary to
@@ -213,7 +213,7 @@ to install external dependencies:
       versions.
 
 
-    * vimcom.plus = 0.9-91: http://www.lepem.ufc.br/jaa/vimcom.plus.html
+    * vimcom.plus = 0.9-92: http://www.lepem.ufc.br/jaa/vimcom.plus.html
       The vimcom.plus (or vimcom) package creates a server on R to allow the
       communication with Vim. The package is not used to send commands from
       Vim to R Console, but it is necessary to open R documentation in Vim's
@@ -281,19 +281,13 @@ started by Vim.
 
 3.4. General instructions II (optional steps)~
 
-3.4.1 Update list of objects~
-
-Start R and update the list of objects for omni completion and syntax
-highlight (see |:RUpdateObjList| for details).
-
-
-3.4.2 Customize the plugin~
+3.4.1 Customize the plugin~
 
 Please, read the section |r-plugin-options|. Emacs/ESS users should read the
 section Indenting setup (|r-plugin-indenting|) of this document.
 
 
-3.4.3 Hide unused buttons~
+3.4.2 Hide unused buttons~
 
 Edit GVim's toolbar and remove the buttons that you never use. The plugin adds
 some buttons to the toolbar, but you may not see them because GVim has too
@@ -303,7 +297,7 @@ on the toolbar:
    http://vim.wikia.com/wiki/Hide_toolbar_or_menus_to_see_more_text
 
 
-3.4.4 Install additional plugins~
+3.4.3 Install additional plugins~
 
 You may be interested in installing additional general plugins to get
 functionality not provided by this file type plugin. ShowMarks and snipMate
@@ -432,10 +426,6 @@ Edit
   . Go (previous R chunk)                               gN
 -----------------------------------------------------------
 
-Syntax
-  . Build omnils (loaded packages)       :RUpdateObjList
------------------------------------------------------------
-
 Object Browser
   . Show/Update                                        \ro
   . Expand (all lists)                                 \r=
@@ -502,11 +492,13 @@ CTRL-A can also be used to complete knitr chunk options if the cursor is
 inside the chunk header.
 
 If R is not running or if it is running but is busy the completion will be
-based on information saved with the command |:RUpdateObjList|. Otherwise, the
-pop up menu for completion of function arguments will include an additional
-line with the name of the library where the function is (if the function name
-can be found in more than one library) and the function method (if what is
-being shown are the arguments of a method and not of the function itself).
+based on information from the packages listed by |vimrplugin_permanent_libs|
+(provided that the libraries were loaded at least once during a session of
+Vim-R-plugin usage). Otherwise, the pop up menu for completion of function
+arguments will include an additional line with the name of the library where
+the function is (if the function name can be found in more than one library)
+and the function method (if what is being shown are the arguments of a method
+and not of the function itself).
 
 To get help on an R topic, type in Vim (Normal mode):
 >
@@ -516,7 +508,8 @@ The command may be abbreviated to  :Rh  and you can either press <Tab> to
 trigger the autocompletion of R objects names or hit CTRL-D to list the
 possible completions (see |cmdline-completion| for details on the various ways
 of getting command-line completion). The list of objects used for
-completion is the same one built by |:RUpdateObjList|.
+completion is the available for omnicompletion (see
+|vimrplugin_permanent_libs|).
 
 You can source all .R files in a directory with the Normal mode command
 :RSourceDir, which accepts an optional argument (the directory to be sourced).
@@ -551,45 +544,14 @@ mode:
 
 
 4.3. Omni completion and the highlighting of functions~
-							     *:RUpdateObjList*
-							      *:RAddLibToList*
+
 The plugin adds some features to the default syntax highlight of R code. One
-such feature is the highlight of R functions. However, only functions that
-R loads by default are highlighted. To add functions of other libraries, you
-should do the following:
+such feature is the highlight of R functions. However, functions are
+highlighted only if their libraries are loaded by R (but see
+|vimrplugin_permanent_libs|).
 
-  1. Start R from within Vim.
-  2. Use R's `library()` to load the libraries whose functions you want
-     highlighted.
-  3. Run the following command in Vim's Normal mode:
-     :RUpdateObjList
-
-The command :RUpdateObjList in addition to creating a list of function names
-to be highlighted also creates a file containing a list of objects for omni
-completion (|compl-omni|) including all objects currently in R's workspace,
-except the .GlobalEnv objects. These two lists are stored permanently in the
-~/.vim/r-plugin directory.
-
-The command  :RUpdateObjList  waits 60 seconds to R finish building the list.
-If this time is not enough to your system, please, set a different value of
-|vimrplugin_buildwait|.
-
-You should run  :RUpdateObjList  whenever you upgrade R since some functions
-are removed and new ones are added at each new R version.
-
-If have already run  :RUpdateObjList  and now want to add the objects of
-specific libraries to both the list of objects for omnicompletion and the list
-of functions for syntax highlight you can use the Vim command  :RAddLibToList.
-Example:
->
-   :RAddLibToList foreign Matrix
-<
 Note: If you have too many loaded packages Vim may be unable to load the list
-of functions for syntax highlight. If you want to remove the objects of
-specific libraries, please, delete the corresponding files from
-~/.vim/r-plugin/objlist/ directory (the directory may be at a different
-location if you are using a plugin management system like vim-addons or
-pathogen).
+of functions for syntax highlight.
 
 
 4.4. Omni completion~
@@ -981,7 +943,7 @@ is running:
 |vimrplugin_i386|              Use 32 bit version of R
 |vimrplugin_r_path|            Directory where R is
 |vimrplugin_r_args|            Arguments to pass to R
-|vimrplugin_buildwait|         Time to wait for :RUpdateObjList to finish
+|vimrplugin_permanent_libs|    Objects for omnicompletion and syntax highlight
 |vimrplugin_routmorecolors|    More syntax highlighting in R output
 |vimrplugin_routnotab|         Show output of R CMD BATCH in new window
 |vimrplugin_indent_commented|  Indent lines commented with the \xx command
@@ -1193,14 +1155,18 @@ default value is "--sdi", but you may change it to "--mdi" if you do not like
 the SDI style of the graphical user interface.
 
 
-6.9. Time necessary to build list of objects for omni completion~
-							*vimrplugin_buildwait*
-If your system needs more than 60 seconds to build the list of objects for
-omni completion after you do the command |:RUpdateObjList|, then you should
-set the value of |vimrplugin_buildwait| to a higher value. Example:
+6.9. Omnicompletion and syntax highlight of R functions~
+						   *vimrplugin_permanent_libs*
+The list of functions to be highlighted and the list of objects for
+omnicompletion are built dynamically as the libraries are loaded by R.
+However, you can set the value of vimrplugin_permanent_libs if you want that
+the functions and objects of specific packages are respectively highlighted
+and available for omnicompletion even if R is not running. By default, only
+the functions of vanilla R are always highlighted. Below is the default value
+of vimrplugin_permanent_libs:
 >
-   let vimrplugin_buildwait = 240
->
+   let vimrplugin_permanent_libs = "base,stats,graphics,grDevices,utils,datasets,methods"
+<
 
 6.10. More colorful syntax highlight of .Rout files~
 						   *vimrplugin_routmorecolors*
@@ -2216,7 +2182,14 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-0.9.9.7 (2013-11-02)
+0.9.9.8 (2013-11-05)
+
+ * The list of objects for omnicompletion and the list of functions for syntax
+   highlight now are built dynamically. Deprecated commands and options:
+   :RUpdateObjList, :RAddLibToList, vimrplugin_buildwait. New option:
+   vimrplugin_permanent_libs.
+
+0.9.9.7 (2013-11-06)
 
  * Minor bug fixes.
 
