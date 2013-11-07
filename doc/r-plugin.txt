@@ -181,15 +181,17 @@ If you start either GVim or Vim in a terminal emulator the plugin will start R
 in a external terminal emulator. If you start Vim inside of a Tmux session,
 the plugin will split the Tmux window in two and start R in the other pane.
 
-The recommended way of running the plugin on Linux is through the custom Bash
-function `tvim`. Please, read the section |r-plugin-tmux|, especially the tip
-|r-plugin-tvim|. If you don't want to read this entire document to find a few
-suggestions of configuration of ~/.bashrc, ~/.tmux.conf and ~/.Rprofile, jump
-to |r-plugin-quick-setup|.
+The recommended way of running the plugin on Linux is running Vim inside a
+Tmux session. If you do not use Tmux frequently, it is recommended that you
+create a custom Bash function. Please, read the section |r-plugin-tmux|,
+especially the tip |r-plugin-tvim|. If you don't want to read this entire
+document to find a few suggestions of configuration of ~/.bashrc, ~/.tmux.conf
+and ~/.Rprofile, jump to |r-plugin-quick-setup|.
 
-Note: On Mac OS X the plugin will use AppleScript in both Vim and GVim unless
-vimrplugin_applescript = 0. Some users have reported more luck with iTerm than
-with the default Mac OS X terminal emulator.
+Note: On Mac OS X, in both Vim and GVim, the plugin will use AppleScript to
+send commands to the R Console application unless vimrplugin_applescript = 0.
+Some users have reported more luck with iTerm than with the default Mac OS X
+terminal emulator.
 
 
 3.2. Instructions for Windows ~
@@ -667,17 +669,10 @@ other for Tmux. Then, it's useful (but not required) to know some Tmux
 commands. After you finished editing the file, you have to type `exit` to quit
 the Tmux session.
 							       *r-plugin-tvim*
-If you always prefer to run Tmux before running Vim you may want to put in
-your ~/.bashrc:
->
-   if [ "x$DISPLAY" == "x" ]
-   then
-       function tvim(){ tmux new-session "vim $@" ; }
-   else
-       function tvim(){ tmux -2 new-session "TERM=screen-256color vim $@" ; }
-   fi
-<
-Then you will be able to start a Tmux session running Vim by typing:
+If you always prefer to run Tmux before running Vim you could create a Bash
+function called `tvim` (please, see the ~/.bashrc example at
+|r-plugin-quick-setup|). Then you will be able to start a Tmux session running
+Vim by typing:
 >
    tvim filename.R
 <
@@ -2070,7 +2065,9 @@ this document from the beginning.
 
    ~/.bashrc:~
 >
-   # Get 256 colors and automatic update of Object Browser:
+   # Change the TERM environment variable (to get 256 colors) and make Vim
+   # connecting to X Server even if running in a terminal emulator (to get
+   # dynamic update of syntax highlight and Object Browser):
    if [ "x$DISPLAY" != "x" ]
    then
        if [ "screen" = "$TERM" ]
@@ -2110,18 +2107,27 @@ this document from the beginning.
    ~/.Rprofile~
 >
    if(interactive()){
+       # Get startup messages of three packages and set Vim as R pager:
        options(setwidth.verbose = 1,
                colorout.verbose = 1,
                vimcom.verbose = 1,
                pager = "vimrpager")
+       # Use either Vim or GVim as text editor for R:
        if(nchar(Sys.getenv("DISPLAY")) > 1)
            options(editor = 'gvim -f -c "set ft=r"')
        else
            options(editor = 'vim -c "set ft=r"')
+       # Load the colorout library:
        library(colorout)
-       if(Sys.getenv("TERM") != "linux" && Sys.getenv("TERM") != "")
+       if(Sys.getenv("TERM") != "linux" && Sys.getenv("TERM") != ""){
+           # Choose the colors for R output among 256 options.
+           # You should run show256Colors() and help(setOutputColors256) to
+           # know how to change the colors according to your taste:
            setOutputColors256(verbose = FALSE)
+       }
+       # Load the setwidth library:
        library(setwidth)
+       # Load the vimcom.plus library only if R was started by Vim:
        if(Sys.getenv("VIMRPLUGIN_TMPDIR") != ""){
            library(vimcom.plus)
            # If you can't install the vimcom.plus package, do:
@@ -2132,7 +2138,8 @@ this document from the beginning.
    ~/bin/vimrpager~
 >
    #!/bin/sh
-
+   # I don't know the reason, but we can't pipe the output directly to Vim. So
+   # we need this script to use 'cat' is intermediary.
    cat | vim -c 'set ft=rdoc' -
 <
 NOTE: You have to change the `~/bin/vimrpager` permissions to make it
