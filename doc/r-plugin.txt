@@ -196,22 +196,12 @@ terminal emulator.
 
 3.2. Instructions for Windows ~
 
-Open the directory where you have downloaded the file
-`vim-r-plugin_0.9.9.8.vmb`, right click on it and choose "Edit with Vim".
->
-Then, in Vim, type:
->
-   :so %
-<
-Press <Enter> and the plugin will be installed (because the plugin has many
-files, you have to press the space bar a few times to finish the
-installation). You can, then, can quit Vim. However in addition to having R
-and Vim installed in your system, this plugin requires users to install
-external dependencies:
+Before installing the plugin, you should install several external
+dependencies:
 
-    * R's version must be >= 3.0.0.
+    * R's version must be >= 3.0.0: http://www.r-project.org/
 
-    * Vim's version must be >= 7.4
+    * Vim's version must be >= 7.4: http://www.vim.org/download.php
 
     * Python 2.7.5 (32 bit): http://www.python.org/download/
       Do not choose the X86-64 version because it will not work. 
@@ -220,24 +210,50 @@ external dependencies:
 			     
       Note: The above versions of Python and pywin32 are known to work with
       the official GVim 7.4 binary. The default download may not match the
-      Python version Vim was linked against: you have to "View all files" on
-      the download page to find the file that matches exactly the above
+      Python version Vim was linked against: then you have to "View all files"
+      on the download page to find the file that matches exactly the above
       versions. Please, read |r-plugin-python| if want to use different
       versions.
 
     * vimcom.plus = 0.9-92: http://www.lepem.ufc.br/jaa/vimcom.plus.html
-      The vimcom.plus package creates a server on R to allow the communication
-      with Vim and it must be loaded to Vim-R-plugin to work properly. Instead
-      of loading it manually with the command `library(vimcom.plus)` each time
-      that R is started, you should start it at your Rprofile. You can do
-      `Sys.getenv("HOME")` in the R Console to know where the file should be
-      created, but usually it is at ~/Documents/.Rprofile. Put the following
-      lines at the end of your Rprofile.
+      
+      Note: If you cannot build vimcom.plus yourself, you will want to
+      download and install the zip file.
+
+Now, download the file `vim-r-plugin_0.9.9.8.vmb` from
+
+    http://www.vim.org/scripts/script.php?script_id=2628
+    
+and open the directory where you have downloaded it, right click on it and
+choose "Edit with Vim".
 >
-         library(vimcom.plus)
-         # If you cannot install vimcom.plus, do:
-         # library(vimcom)
+Then, in Vim, type:
+>
+   :so %
 <
+Press <Enter> and the plugin will be installed (because the plugin has many
+files, you have to press the space bar a few times to finish the
+installation). You should, then, quit Vim. 
+
+Start GVim again and edit an R script. You can right click a .R file and
+choose "Edit with Vim" or create a new one with the Normal mode command:
+>
+   :e example.R
+<
+To finish the installation, start R and click on the menu bar
+>
+   R
+   Start/Close
+   Start R (default)
+<
+and, finally, do in Vim:
+>
+   :RpluginConfig
+<
+The above command will guide you through additional configuration steps. You
+may not want to run it if you are already an experienced Vim user, but, you
+may want to see |r-plugin-Rprofile-Windows|.
+
 Start editing an R file with GVim and try to send some lines to R Console. You
 may have to adjust the value of |vimrplugin_sleeptime|.
 
@@ -1926,7 +1942,7 @@ line in your |vimrc|:
 <
 
 9.15. Edit your ~/.Rprofile~
-
+							   *r-plugin-Rprofile*
 You may want to edit your ~/.Rprofile. Example for Linux:
 >
    if(interactive()){
@@ -1965,13 +1981,12 @@ which can display R plots in a separate panel. Although we can not embed an R
 graphical device in Vim, we can at least make it always visible over the
 terminal emulator or the GVim window.
 
+						   *r-plugin-Rprofile-Windows*
 An example for Windows:
 >
    if (interactive()) {
-     local({
-       options(editor = '"C:/Program Files (x86)/Vim/vim73/gvim.exe" "-c" "set filetype=r"')
-       options(help_type = "html")
-     })
+       library(vimcom.plus)
+       options(editor = '"C:/Program Files (x86)/Vim/vim74/gvim.exe" "-c" "set filetype=r"')
    }
 <
 
@@ -2059,10 +2074,31 @@ See also: |vimrplugin_latexcmd|.
 Please, look at section |r-plugin-options| if you want information about the
 Vim-r-plugin customization.
 
-Here are some suggestions of configuration of Bash, Tmux and R. To understand
-what you are doing, and change the configuration to your taste, please read
-this document from the beginning.
+Here are some suggestions of configuration of Vim, Bash, Tmux and R. To
+understand what you are doing, and change the configuration to your taste,
+please read this document from the beginning.
 
+   ~/.vimrc~
+>
+   " Minimum required configuration:
+   set nocompatible
+   syntax on
+   filetype plugin on
+   filetype indent on
+   " Change Leader and LocalLeader keys:
+   let maplocalleader = ","
+   let mapleader = ";"
+   " Use Ctrl+Space to do omnicompletion:
+   if has("gui_running")
+       inoremap <C-Space> <C-x><C-o>
+   else
+       inoremap <Nul> <C-x><C-o>
+   endif
+   " Press the space bar to send lines and selection to R:
+   vmap <Space> <Plug>RDSendSelection
+   nmap <Space> <Plug>RDSendLine
+<
+						   *r-plugin-quick-bash-setup*
    ~/.bashrc:~
 >
    # Change the TERM environment variable (to get 256 colors) and make Vim
@@ -2092,6 +2128,8 @@ this document from the beginning.
        fi
    fi
 <
+
+						   *r-plugin-quick-tmux-setup*
    ~/.tmux.conf:~
 >
    set-option -g prefix C-a
@@ -2104,6 +2142,8 @@ this document from the beginning.
    set -g mouse-select-pane on
    set -g mouse-resize-pane on
 <
+
+						      *r-plugin-quick-R-setup*
    ~/.Rprofile~
 >
    if(interactive()){
@@ -2135,6 +2175,7 @@ this document from the beginning.
        }
    }
 <
+
    ~/bin/vimrpager~
 >
    #!/bin/sh
@@ -2196,7 +2237,7 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-0.9.9.8 (2013-11-06)
+0.9.9.8 (2013-11-07)
 
  * The list of objects for omnicompletion and the list of functions for syntax
    highlight now are built dynamically. Deprecated commands and options:

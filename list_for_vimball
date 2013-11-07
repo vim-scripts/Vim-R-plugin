@@ -28,3 +28,5 @@ r-plugin/tex_indent.vim
 r-plugin/r.snippets
 r-plugin/common_buffer.vim
 r-plugin/common_global.vim
+r-plugin/Rconfig.R
+r-plugin/vimrconfig.vim

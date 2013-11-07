@@ -76,6 +76,8 @@ deb:
 	  - r-plugin/vimcom.py\n\
 	  - r-plugin/global_r_plugin.vim\n\
 	  - r-plugin/tex_indent.vim\n\
+	  - r-plugin/Rconfig.R\n\
+	  - r-plugin/vimrconfig.vim\n\
 	  - syntax/r.vim\n\
 	  - syntax/rdoc.vim\n\
 	  - syntax/rout.vim\n\

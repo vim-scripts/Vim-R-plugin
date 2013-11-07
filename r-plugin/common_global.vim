@@ -668,7 +668,7 @@ function StartR_ExternalTerm(rcmd)
                 \ 'set-environment -g VIMRPLUGIN_HOME ' . g:rplugin_home,
                 \ 'set-environment VIMINSTANCEID ' . $VIMINSTANCEID ]
     if v:servername != ""
-        let cnflines = cnflines + [ 'set-environment VIMEDITOR_SVRNM ' . v:servername,
+        let cnflines = cnflines + [ 'set-environment VIMEDITOR_SVRNM ' . v:servername ]
     endif
     if g:vimrplugin_notmuxconf
         let cnflines = cnflines + [ 'source-file ~/.tmux.conf' ]
@@ -679,8 +679,7 @@ function StartR_ExternalTerm(rcmd)
                     \ 'bind-key C-a send-prefix',
                     \ 'set-window-option -g mode-keys vi',
                     \ 'set -g status off',
-                    \ "set -g terminal-overrides 'xterm*:smcup@:rmcup@'",
-        ]
+                    \ "set -g terminal-overrides 'xterm*:smcup@:rmcup@'" ]
         if g:vimrplugin_external_ob || !has("gui_running")
             call extend(cnflines, ['set -g mode-mouse on', 'set -g mouse-select-pane on', 'set -g mouse-resize-pane on'])
         endif
@@ -1933,7 +1932,7 @@ function RAddToLibList(nlib, verbose)
             " List of objects for :Rhelp completion
             for xx in nlist
                 let xxx = split(xx, "\x06")
-                if xxx[0] !~ '\$'
+                if len(xxx) > 0 && xxx[0] !~ '\$'
                     call add(s:list_of_objs, xxx[0])
                 endif
             endfor
@@ -3027,6 +3026,7 @@ command -range=% Rformat <line1>,<line2>:call RFormatCode()
 command RBuildTags :call g:SendCmdToR('rtags(ofile = "TAGS")')
 command -nargs=? -complete=customlist,RLisObjs Rhelp :call RAskHelp(<q-args>)
 command -nargs=? -complete=dir RSourceDir :call RSourceDirectory(<q-args>)
+command RpluginConfig :runtime r-plugin/vimrconfig.vim
 
 " TODO: Delete these two commands (Nov 2013):
 command RUpdateObjList :call RWarningMsg("This command is deprecated. Now the list of objects is automatically updated by the R package vimcom.plus.")
@@ -3519,6 +3519,12 @@ let g:needsnewomnilist = 0
 let g:rplugin_libls = split(g:vimrplugin_permanent_libs, ",")
 let g:rplugin_liblist = []
 let s:list_of_objs = []
+if exists("b:current_syntax")
+    " The syntax/r.vim was read before this script
+    for lib in g:rplugin_libls
+        call RAddToLibList(lib, 0)
+    endfor
+endif
 
 " Check whether tool bar icons exist
 if has("win32") || has("win64")
