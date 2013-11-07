@@ -180,11 +180,12 @@ system, this plugin has the following dependencies:
 If you start either GVim or Vim in a terminal emulator the plugin will start R
 in a external terminal emulator. If you start Vim inside of a Tmux session,
 the plugin will split the Tmux window in two and start R in the other pane.
-Please, read the section |r-plugin-tmux|, especially the tip |r-plugin-tvim|.
 
-If you don't want to read this entire document to find a few suggestions of
-configuration of ~/.bashrc, ~/.tmux.conf and ~/.Rprofile, jump to
-|r-plugin-quick-setup|.
+The recommended way of running the plugin on Linux is through the custom Bash
+function `tvim`. Please, read the section |r-plugin-tmux|, especially the tip
+|r-plugin-tvim|. If you don't want to read this entire document to find a few
+suggestions of configuration of ~/.bashrc, ~/.tmux.conf and ~/.Rprofile, jump
+to |r-plugin-quick-setup|.
 
 Note: On Mac OS X the plugin will use AppleScript in both Vim and GVim unless
 vimrplugin_applescript = 0. Some users have reported more luck with iTerm than
