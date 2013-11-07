@@ -3521,15 +3521,10 @@ let g:rplugin_liblist = []
 let s:list_of_objs = []
 
 " Check whether tool bar icons exist
-let g:rplugin_has_icons = 0
 if has("win32") || has("win64")
-    if filereadable(g:rplugin_uservimfiles . "/bitmaps/RStart.bmp")
-        let g:rplugin_has_icons = 1
-    endif
+    let g:rplugin_has_icons = len(globpath(&rtp, "bitmaps/RStart.bmp")) > 0
 else
-    if filereadable(g:rplugin_uservimfiles . "/bitmaps/RStart.png")
-        let g:rplugin_has_icons = 1
-    endif
+    let g:rplugin_has_icons = len(globpath(&rtp, "bitmaps/RStart.png")) > 0
 endif
 
 " Compatibility with old versions (August 2013):
