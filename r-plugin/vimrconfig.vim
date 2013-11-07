@@ -178,45 +178,45 @@ function! RConfigBash()
             echo "Vim and Tmux can display up to 256 colors in the terminal emulator,"
             echo "but we have to configure the TERM environment variable for that."
             echo "Instead of starting Tmux and then starting Vim, we can configure"
-            echo "Bash to start both at once with the 'tmux' command."
+            echo "Bash to start both at once with the 'tvim' command."
             echo "The serverclient feature must be enabled for automatic update of the"
             echo "Object Browser and syntax highlight of function names."
             echohl Question
             let what = input("Do you want that all these features are added to your .bashrc? [yes/no]: ")
             echohl Normal
             if what =~ "^[yY]"
+                let blines = blines + ['',
+                            \ '# The lines below were created by Vim-R-plugin command :RpluginConfig:',
+                            \ '# Change the TERM environment variable (to get 256 colors) and make Vim',
+                            \ '# connecting to X Server even if running in a terminal emulator (to get',
+                            \ '# dynamic update of syntax highlight and Object Browser):',
+                            \ 'if [ "x$DISPLAY" != "x" ]',
+                            \ 'then',
+                            \ '    if [ "screen" = "$TERM" ]',
+                            \ '    then',
+                            \ '        export TERM=screen-256color',
+                            \ '    else',
+                            \ '        export TERM=xterm-256color',
+                            \ '    fi',
+                            \ '    alias vim="vim --servername VIM"',
+                            \ '    if [ "x$TERM" == "xxterm" ] || [ "x$TERM" == "xxterm-256color" ]',
+                            \ '    then',
+                            \ '        function tvim(){ tmux -2 new-session "TERM=screen-256color vim --servername VIM $@" ; }',
+                            \ '    else',
+                            \ '        function tvim(){ tmux new-session "vim --servername VIM $@" ; }',
+                            \ '    fi',
+                            \ 'else',
+                            \ '    if [ "x$TERM" == "xxterm" ] || [ "x$TERM" == "xxterm-256color" ]',
+                            \ '    then',
+                            \ '        function tvim(){ tmux -2 new-session "TERM=screen-256color vim $@" ; }',
+                            \ '    else',
+                            \ '        function tvim(){ tmux new-session "vim $@" ; }',
+                            \ '    fi',
+                            \ 'fi' ]
+                call writefile(blines, $HOME . "/.bashrc")
                 silent exe "tabnew " . $HOME . "/.bashrc"
                 silent help r-plugin-quick-bash-setup
             endif
-            let blines = blines + ['',
-                        \ '# The lines below were created by Vim-R-plugin command :RpluginConfig:',
-                        \ '# Change the TERM environment variable (to get 256 colors) and make Vim',
-                        \ '# connecting to X Server even if running in a terminal emulator (to get',
-                        \ '# dynamic update of syntax highlight and Object Browser):',
-                        \ 'if [ "x$DISPLAY" != "x" ]',
-                        \ 'then',
-                        \ '    if [ "screen" = "$TERM" ]',
-                        \ '    then',
-                        \ '        export TERM=screen-256color',
-                        \ '    else',
-                        \ '        export TERM=xterm-256color',
-                        \ '    fi',
-                        \ '    alias vim="vim --servername VIM"',
-                        \ '    if [ "x$TERM" == "xxterm" ] || [ "x$TERM" == "xxterm-256color" ]',
-                        \ '    then',
-                        \ '        function tvim(){ tmux -2 new-session "TERM=screen-256color vim --servername VIM $@" ; }',
-                        \ '    else',
-                        \ '        function tvim(){ tmux new-session "vim --servername VIM $@" ; }',
-                        \ '    fi',
-                        \ 'else',
-                        \ '    if [ "x$TERM" == "xxterm" ] || [ "x$TERM" == "xxterm-256color" ]',
-                        \ '    then',
-                        \ '        function tvim(){ tmux -2 new-session "TERM=screen-256color vim $@" ; }',
-                        \ '    else',
-                        \ '        function tvim(){ tmux new-session "vim $@" ; }',
-                        \ '    fi',
-                        \ 'fi' ]
-            call writefile(blines, $HOME . "/.bashrc")
         endif
     endif
 endfunction
