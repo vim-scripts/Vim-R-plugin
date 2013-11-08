@@ -66,89 +66,120 @@ function! RConfigVimrc()
             let uvimrc = $HOME . "/.vimrc"
         endif
     endif
+
     if filereadable(uvimrc)
+        let hasvimrc = 1
         echohl WarningMsg
         echo "You already have a vimrc."
         echohl Normal
-        let vlines = readfile(uvimrc)
-        if RFindString(vlines, "maplocalleader") == 0
-            echo "It seems that you didn't map your <LocalLeader> to another key."
-        endif
-        if RFindString(vlines, "<C-x><C-o>") == 0 && RFindString(vlines, "<C-X><C-O>") == 0 && RFindString(vlines, "<c-x><c-o>") == 0
-            echo "It seems that you didn't create an easier map for omnicompletion yet."
-        endif
-        if RFindString(vlines, "RDSendLine") == 0
-            echo "It seems that you didn't create an easier map to send lines."
-        endif
-        if RFindString(vlines, "RDSendSelection") == 0
-            echo "It seems that you didn't create an easier map to send selected lines."
-        endif
         echohl Question
-        let what = input("Do you want to see your vimrc along with the plugin tips on how to\nconfigure the vimrc? [yes/no]: ")
+        let what = input("Do you want to add to the bottom of your vimrc some options that\nmost users consider convenient for the Vim-R-plugin? [yes/no]: ")
         echohl Normal
         if what =~ "^[yY]"
-            silent exe "tabnew " . uvimrc
-            silent help r-plugin-quick-setup
+            let vlines = readfile(uvimrc)
+        else
+            return
         endif
-        redraw
     else
+        let hasvimrc = 0
         echohl Question
         let what = input("It seems that you don't have a vimrc yet. Should I create it now? [yes/no]: ")
         echohl Normal
         if what =~ "^[yY]"
-            let vlines = ['" The lines below were created by Vim-R-plugin command :RpluginConfig:',
-                        \ '" Minimum required configuration:',
-                        \ 'set nocompatible',
-                        \ 'syntax on',
-                        \ 'filetype plugin on',
-                        \ 'filetype indent on' ]
-
-            echo " "
-            echo "By default, Vim's LocalLeader is the backslash (\\) which is problematic"
-            echo "if we are editing LaTeX or Rnoweb (R+LaTeX) files."
-            echohl Question
-            let what = input("Do you want to change the LocalLeader to a comma (,)? [yes/no]: ")
-            echohl Normal
-            if what =~ "^[yY]"
-                let vlines = vlines + ['" Change the <LocalLeader> key:',
-                            \ 'let maplocalleader = ","' ]
-            endif
-            echo " "
-            echo "By default, you have to press Ctrl+X Ctrl+O to complete the names of"
-            echo "functions and other objects. This is called omnicompletion."
-            echohl Question
-            let what = input("Do you want to press Ctrl+Space to do omnicompletion?  [yes/no]: ")
-            echohl Normal
-            if what =~ "^[yY]"
-                let vlines = vlines + ['" Use Ctrl+Space to do omnicompletion:',
-                            \ 'if has("gui_running")',
-                            \ '    inoremap <C-Space> <C-x><C-o>',
-                            \ 'else',
-                            \ '    inoremap <Nul> <C-x><C-o>',
-                            \ 'endif' ]
-            endif
-            echo " "
-            echo "By default, you have to press \\d to send one line of code to R"
-            echo "and \\ss to send a selection of lines."
-            echohl Question
-            let what = input("Do you prefer to press the space bar to send lines and selections\nto R Console? [yes/no]: ")
-            if what =~ "^[yY]"
-                let vlines = vlines + ['" Press the space bar to send lines (in Normal mode) and selections to R:',
-                            \ 'vmap <Space> <Plug>RDSendSelection',
-                            \ 'nmap <Space> <Plug>RDSendLine' ]
-            endif
-            call writefile(vlines, uvimrc)
-            echo " "
-            echohl Question
-            let what = input("You now have a new vimrc. Do you want to see it now? [yes/no]: ")
-            echohl Normal
-            if what =~ "^[yY]"
-                silent exe "tabnew " . uvimrc
-            endif
-            redraw
-            call RWarningMsg("The changes in your vimrc will be effective only after you quit Vim and start it again.")
+            let vlines = []
+        else
+            return
         endif
     endif
+
+    let vlines = vlines + ['', '" The lines below were created by Vim-R-plugin command :RpluginConfig:']
+
+    if RFindString(vlines, 'set\s*nocompatible') == 0 && RFindString(vlines, 'set\s*nocp') == 0
+        let vlines = vlines + ['set nocompatible']
+    endif
+    if RFindString(vlines, 'syntax\s*on') == 0
+        let vlines = vlines + ['syntax on']
+    endif
+    if RFindString(vlines, 'filet.* plugin on') == 0
+        let vlines = vlines + ['filetype plugin on']
+    endif
+    if RFindString(vlines, 'filet.* indent on') == 0
+        let vlines = vlines + ['filetype indent on']
+    endif
+
+    echo " "
+    if RFindString(vlines, "maplocalleader") == 0
+        if hasvimrc
+            echohl WarningMsg
+            echo "It seems that you didn't map your <LocalLeader> to another key."
+            echohl Normal
+        endif
+        echo "By default, Vim's LocalLeader is the backslash (\\) which is problematic"
+        echo "if we are editing LaTeX or Rnoweb (R+LaTeX) files."
+        echohl Question
+        let what = input("Do you want to change the LocalLeader to a comma (,)? [yes/no]: ")
+        echohl Normal
+        if what =~ "^[yY]"
+            let vlines = vlines + ['" Change the <LocalLeader> key:',
+                        \ 'let maplocalleader = ","']
+        endif
+    endif
+
+    echo " "
+    if RFindString(vlines, "<C-x><C-o>") == 0 && RFindString(vlines, "<C-X><C-O>") == 0 && RFindString(vlines, "<c-x><c-o>") == 0
+        if hasvimrc
+            echohl WarningMsg
+            echo "It seems that you didn't create an easier map for omnicompletion yet."
+            echohl Normal
+        endif
+        echo "By default, you have to press Ctrl+X Ctrl+O to complete the names of"
+        echo "functions and other objects. This is called omnicompletion."
+        echohl Question
+        let what = input("Do you want to press Ctrl+Space to do omnicompletion?  [yes/no]: ")
+        echohl Normal
+        if what =~ "^[yY]"
+            let vlines = vlines + ['" Use Ctrl+Space to do omnicompletion:',
+                        \ 'if has("gui_running")',
+                        \ '    inoremap <C-Space> <C-x><C-o>',
+                        \ 'else',
+                        \ '    inoremap <Nul> <C-x><C-o>',
+                        \ 'endif']
+        endif
+    endif
+
+    echo " "
+    if RFindString(vlines, "RDSendLine") == 0 || RFindString(vlines, "RDSendSelection") == 0
+        if hasvimrc
+            echohl WarningMsg
+            echo "It seems that you didn't create an easier map to"
+            echo "either send lines or send selected lines."
+            echohl Normal
+        endif
+        echo "By default, you have to press \\d to send one line of code to R"
+        echo "and \\ss to send a selection of lines."
+        echohl Question
+        let what = input("Do you prefer to press the space bar to send lines and selections\nto R Console? [yes/no]: ")
+        echohl Normal
+        if what =~ "^[yY]"
+            let vlines = vlines + ['" Press the space bar to send lines (in Normal mode) and selections to R:',
+                        \ 'vmap <Space> <Plug>RDSendSelection',
+                        \ 'nmap <Space> <Plug>RDSendLine']
+        endif
+    endif
+    call writefile(vlines, uvimrc)
+
+    echo " "
+    echohl Question
+    let what = input("You now have a new vimrc. Do you want to see it now? [yes/no]: ")
+    echohl Normal
+    if what =~ "^[yY]"
+        silent exe "tabnew " . uvimrc
+    endif
+    redraw
+    echohl WarningMsg
+    echo "The changes in your vimrc will be effective"
+    echo "only after you quit Vim and start it again."
+    echohl Normal
 endfunction
 
 " Configure .bashrc
@@ -248,7 +279,7 @@ function! RConfigTmux()
                         \ "set -g terminal-overrides 'xterm*:smcup@:rmcup@'",
                         \ "set -g mode-mouse on",
                         \ "set -g mouse-select-pane on",
-                        \ "set -g mouse-resize-pane on" ]
+                        \ "set -g mouse-resize-pane on"]
             call writefile(vlines, $HOME . "/.tmux.conf")
             echo " "
             echohl Question
