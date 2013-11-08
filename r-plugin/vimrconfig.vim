@@ -92,7 +92,12 @@ function! RConfigVimrc()
         endif
     endif
 
-    let vlines = vlines + ['', '" The lines below were created by Vim-R-plugin command :RpluginConfig:']
+    let vlines = vlines + ['']
+    if exists("*strftime")
+        let vlines = vlines + ['" Lines added by the Vim-R-plugin command :RpluginConfig (' . strftime("%Y-%b-%d %H:%M") . '):']
+    else
+        let vlines = vlines + ['" Lines added by the Vim-R-plugin command :RpluginConfig:']
+    endif
 
     if RFindString(vlines, 'set\s*nocompatible') == 0 && RFindString(vlines, 'set\s*nocp') == 0
         let vlines = vlines + ['set nocompatible']
@@ -170,10 +175,11 @@ function! RConfigVimrc()
 
     echo " "
     echohl Question
-    let what = input("You now have a new vimrc. Do you want to see it now? [yes/no]: ")
+    let what = input("Do you want to see your vimrc now? [yes/no]: ")
     echohl Normal
     if what =~ "^[yY]"
         silent exe "tabnew " . uvimrc
+        normal! G
     endif
     redraw
     echohl WarningMsg
@@ -216,9 +222,13 @@ function! RConfigBash()
             let what = input("Do you want that all these features are added to your .bashrc? [yes/no]: ")
             echohl Normal
             if what =~ "^[yY]"
-                let blines = blines + ['',
-                            \ '# The lines below were created by Vim-R-plugin command :RpluginConfig:',
-                            \ '# Change the TERM environment variable (to get 256 colors) and make Vim',
+                let blines = blines + ['']
+                if exists("*strftime")
+                    let blines = blines + ['# Lines added by the Vim-R-plugin command :RpluginConfig (' . strftime("%Y-%b-%d %H:%M") . '):']
+                else
+                    let blines = blines + ['# Lines added by the Vim-R-plugin command :RpluginConfig:']
+                endif
+                let blines = blines + ['# Change the TERM environment variable (to get 256 colors) and make Vim',
                             \ '# connecting to X Server even if running in a terminal emulator (to get',
                             \ '# dynamic update of syntax highlight and Object Browser):',
                             \ 'if [ "x$DISPLAY" != "x" ]',
@@ -245,10 +255,16 @@ function! RConfigBash()
                             \ '    fi',
                             \ 'fi' ]
                 call writefile(blines, $HOME . "/.bashrc")
-                silent exe "tabnew " . $HOME . "/.bashrc"
-                silent help r-plugin-quick-bash-setup
+                echohl Question
+                let what = input("Do you want to see your .bashrc now? [yes/no]: ")
+                echohl Normal
+                if what =~ "^[yY]"
+                    silent exe "tabnew " . $HOME . "/.bashrc"
+                    normal! G27k
+                endif
             endif
         endif
+        redraw
     endif
 endfunction
 
@@ -270,8 +286,13 @@ function! RConfigTmux()
         let what = input("You don't have a ~/.tmux.conf yet. Should I create it now? [yes/no]: ")
         echohl Normal
         if what =~ "^[yY]"
-            let vlines = ['# The lines below were created by Vim-R-plugin command :RpluginConfig:',
-                        \ "set-option -g prefix C-a",
+            let tlines = ['']
+            if exists("*strftime")
+                let tlines = tlines + ['# Lines added by the Vim-R-plugin command :RpluginConfig (' . strftime("%Y-%b-%d %H:%M") . '):']
+            else
+                let tlines = tlines + ['# Lines added by the Vim-R-plugin command :RpluginConfig:']
+            endif
+            let tlines = tlines + ["set-option -g prefix C-a",
                         \ "unbind-key C-b",
                         \ "bind-key C-a send-prefix",
                         \ "set -g status off",
@@ -280,10 +301,10 @@ function! RConfigTmux()
                         \ "set -g mode-mouse on",
                         \ "set -g mouse-select-pane on",
                         \ "set -g mouse-resize-pane on"]
-            call writefile(vlines, $HOME . "/.tmux.conf")
+            call writefile(tlines, $HOME . "/.tmux.conf")
             echo " "
             echohl Question
-            let what = input("You now have a new .tmux.conf. Do you want to see it now? [yes/no]: ")
+            let what = input("Do you want to see your .tmux.conf now? [yes/no]: ")
             echohl Normal
             if what =~ "^[yY]"
                 silent exe "tabnew " . $HOME . "/.tmux.conf"

@@ -24,7 +24,7 @@ if(length(grep("vimcom", .rpflines)) > 0){
 } else {
     .rpflines <- c(.rpflines,
                    '',
-                   '# Added by Vim-R-plugin command  :RpluginConfig :',
+                   paste0('# Lines added by the Vim-R-plugin command :RpluginConfig (', format(Sys.time(), "%Y-%b-%d %H:%M"), '):'),
                    'if(interactive()){',
                    '    library("vimcom.plus")')
     if(.Platform$OS.type == "windows"){
