@@ -78,6 +78,7 @@ function! RConfigVimrc()
         if what =~ "^[yY]"
             let vlines = readfile(uvimrc)
         else
+            redraw
             return
         endif
     else
@@ -88,6 +89,7 @@ function! RConfigVimrc()
         if what =~ "^[yY]"
             let vlines = []
         else
+            redraw
             return
         endif
     endif
@@ -315,6 +317,13 @@ function! RConfigTmux()
 endfunction
 
 function! RConfigVimR()
+    if string(g:SendCmdToR) == "function('SendCmdToR_fake')"
+        call StartR("R")
+        echohl WarningMsg
+        echo "Please wait..."
+        echohl Normal
+        sleep 2
+    endif
     if RConfigRprofile()
         return
     endif
