@@ -18,15 +18,14 @@ if(file.exists(.rpf)){
 } else {
     .rpflines <- ""
 }
-if(length(grep("vimcom", .rpflines)) > 0){
+if(length(grep("library.*vimcom", .rpflines)) > 0 || length(grep("require.*vimcom", .rpflines) > 0)){
     writeLines(c(.rpf, "vimcom_found"),
 	       con = paste0(Sys.getenv("VIMRPLUGIN_TMPDIR"), "/configR_result"))
 } else {
     .rpflines <- c(.rpflines,
                    '',
                    paste0('# Lines added by the Vim-R-plugin command :RpluginConfig (', format(Sys.time(), "%Y-%b-%d %H:%M"), '):'),
-                   'if(interactive()){',
-                   '    library("vimcom.plus")')
+                   'if(interactive()){')
     if(.Platform$OS.type == "windows"){
         .rpflines <- c(.rpflines, '    options(editor = \'"C:/Program Files (x86)/Vim/vim74/gvim.exe" "-c" "set filetype=r"\')')
     } else {
@@ -44,7 +43,7 @@ if(length(grep("vimcom", .rpflines)) > 0){
                        '    }',
                        '    library(setwidth)')
     }
-    .rpflines <- c(.rpflines, "}")
+    .rpflines <- c(.rpflines, '    library(vimcom.plus)', "}")
     writeLines(.rpflines, con = .rpf)
     writeLines(c(.rpf, "new_Rprofile"),
 	       con = paste0(Sys.getenv("VIMRPLUGIN_TMPDIR"), "/configR_result"))
