@@ -101,41 +101,15 @@ The installation instructions are split in four sections:
 
 If you are using Windows, jump to section 3.2.
 
-You need to activate plugins and indentation according to 'filetype'. You
-should have at least the following options in your |vimrc|:
->
-   set nocompatible
-   syntax enable
-   filetype plugin on
-   filetype indent on
-<
-Make a backup of your ~/.vim directory because existing files will be
-replaced. Please, look at |r-plugin-files| to see the list of files.
-
-Start a terminal emulator, go to the directory where you have downloaded the
-plugin and type:
->
-   vim vim-r-plugin_0.9.9.8.vmb
-<
-Then, in Vim, type:
->
-   :so %
-<
-The plugin is installed, but in addition to having R and Vim installed in your
-system, this plugin has the following dependencies:
+Before installing the plugin, you should install its dependencies:
 
    Depends:~
 
+   Vim >= 7.4: http://www.vim.org/download.php
+
+   R >= 3.0.0: http://www.r-project.org/
+
    vimcom.plus = 0.9-92: http://www.lepem.ufc.br/jaa/vimcom.plus.html
-		  The vimcom.plus (or vimcom) package creates a server on R to
-		  allow the communication with Vim. The package is not used to
-		  send commands from Vim to R Console, but it is necessary to
-		  open R documentation in Vim's buffer, run the Object
-		  Browser, run either `Sweave()` or `knit()` on the document
-		  being edited. It also has some functions called by Vim such
-		  as `vim.plot()`, `vim.print()`, and `vim.bol()`. This last
-		  one is required to build the data base used in
-		  omnicompletion.
 
    Tmux >= 1.5:   http://tmux.sourceforge.net
                   Tmux is necessary to send commands from Vim to R Console.
@@ -157,25 +131,50 @@ system, this plugin has the following dependencies:
    latexmk:       Automate the compilation of LaTeX documents.
                   See examples in |vimrplugin_latexcmd|.
 
-   Note: Tmux and ncurses-term are already packaged for most GNU/Linux
-   distributions and other Unix variants. Unfortunately their installation
-   instructions vary widely and are beyond the scope of this documentation.
+   Note: Vim, R, Tmux, ncurses-term and latexmk are already packaged for most
+   GNU/Linux distributions and other Unix variants. Unfortunately their
+   installation instructions vary widely and are beyond the scope of this
+   documentation.
    
-   You certainly will want to put something like the following at the end of
-   your ~/.Rprofile:
->
-   if(interactive()){
-       library(colorout)
-       library(setwidth)
-       library(vimcom.plus)
-       # If you can't install the vimcom.plus package, do:
-       # library(vimcom)
-   }
-<
    Conflicts:~
 
    Users have reported that the Vim-R-plugin might not work well with Fish
    Shell and tcsh.
+
+
+You need to activate plugins and indentation according to 'filetype'. You
+should have at least the following options in your |vimrc|:
+>
+   set nocompatible
+   syntax enable
+   filetype plugin on
+   filetype indent on
+<
+Make a backup of your ~/.vim directory because existing files will be
+replaced. Please, look at |r-plugin-files| to see the list of files.
+
+Start a terminal emulator, go to the directory where you have downloaded the
+plugin and type:
+>
+   vim vim-r-plugin_0.9.9.8.vmb
+<
+Then, in Vim, type:
+>
+   :so %
+<
+Press <Enter> and the plugin will be installed (because the plugin has many
+files, you have to press the space bar a few times to finish the
+installation). You should, then, quit Vim. 
+
+Start Vim again and edit an R script. Type <LocalLeader>rf to start R and run
+the command below to get help configuring ~/.vimrc, ~/.bashrc, ~/.tmux.conf
+and ~/.Rprofile (the <LocalLeader> is `\` by default):
+>
+   :RpluginConfig
+<
+The above command will guide you through additional configuration steps, but
+if you prefer to configure everything by yourself, please, read the section
+|r-plugin-quick-setup|.
 
 If you start either GVim or Vim in a terminal emulator the plugin will start R
 in a external terminal emulator. If you start Vim inside of a Tmux session,
@@ -183,10 +182,9 @@ the plugin will split the Tmux window in two and start R in the other pane.
 
 The recommended way of running the plugin on Linux is running Vim inside a
 Tmux session. If you do not use Tmux frequently, it is recommended that you
-create a custom Bash function. Please, read the section |r-plugin-tmux|,
-especially the tip |r-plugin-tvim|. If you don't want to read this entire
-document to find a few suggestions of configuration of ~/.bashrc, ~/.tmux.conf
-and ~/.Rprofile, jump to |r-plugin-quick-setup|.
+create a custom Bash function as explained in the section |r-plugin-tmux|,
+especially the tip |r-plugin-tvim| (the above command :RpluginConfig should do
+this for you).
 
 Note: On Mac OS X, in both Vim and GVim, the plugin will use AppleScript to
 send commands to the R Console application unless vimrplugin_applescript = 0.
@@ -251,11 +249,10 @@ and, finally, do in Vim:
    :RpluginConfig
 <
 The above command will guide you through additional configuration steps. You
-may not want to run it if you are already an experienced Vim user, but, you
-may want to see |r-plugin-Rprofile-Windows|.
+you are already an experienced Vim user, instead of running the above command
+you may preffer to read |r-plugin-Rprofile-Windows|.
 
-Start editing an R file with GVim and try to send some lines to R Console. You
-may have to adjust the value of |vimrplugin_sleeptime|.
+You may have to adjust the value of |vimrplugin_sleeptime|.
 
 
 3.3. Troubleshooting (if the plugin doesn't work)~
