@@ -1679,7 +1679,7 @@ function SendParagraphToR(e, m)
     endif
 endfunction
 
-" Send current line to R. Don't go down if called by <S-Enter>.
+" Send current line to R.
 function SendLineToR(godown)
     let line = getline(".")
     if strlen(line) == 0
@@ -2957,7 +2957,7 @@ function RCreateSendMaps()
 
     " *Line*
     "-------------------------------------
-    call RCreateMaps("ni0", '<Plug>RSendLine', 'l', ':call SendLineToR("stay")')
+    call RCreateMaps("ni", '<Plug>RSendLine', 'l', ':call SendLineToR("stay")')
     call RCreateMaps('ni0', '<Plug>RDSendLine', 'd', ':call SendLineToR("down")')
     call RCreateMaps('i', '<Plug>RSendLAndOpenNewOne', 'q', ':call SendLineToR("newline")')
     nmap <LocalLeader>r<Left> :call RSendPartOfLine("left", 0)<CR>
