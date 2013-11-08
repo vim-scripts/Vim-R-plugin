@@ -8,6 +8,19 @@ function! RFindString(lll, sss)
     return 0
 endfunction
 
+function! RGetYesOrNo(ans)
+    if a:ans =~ "^[yY]"
+        return 1
+    elseif a:ans =~ "^[nN]" || a:ans == ""
+        return 0
+    else
+        echohl WarningMsg
+        let newans = input('Please, type "y", "n" or <Enter>: ')
+        echohl Normal
+        return RGetYesOrNo(newans)
+    endif
+endfunction
+
 " Configure .Rprofile
 function! RConfigRprofile()
     call delete($VIMRPLUGIN_TMPDIR . "/configR_result")
@@ -25,14 +38,14 @@ function! RConfigRprofile()
             echohl Question
             let what = input("Do you want to see your .Rprofile now? [y/N]: ")
             echohl Normal
-            if what =~ "^[yY]"
+            if RGetYesOrNo(what)
                 silent exe "tabnew " . res[0]
             endif
         else
             echohl Question
             let what = input("Do you want to see your .Rprofile along with tips on how to\nconfigure it? [y/N]: ")
             echohl Normal
-            if what =~ "^[yY]"
+            if RGetYesOrNo(what)
                 silent exe "tabnew " . res[0]
                 silent help r-plugin-quick-R-setup
             endif
@@ -75,7 +88,7 @@ function! RConfigVimrc()
         echohl Question
         let what = input("Do you want to add to the bottom of your vimrc some options that\nmost users consider convenient for the Vim-R-plugin? [y/N]: ")
         echohl Normal
-        if what =~ "^[yY]"
+        if RGetYesOrNo(what)
             let vlines = readfile(uvimrc)
         else
             redraw
@@ -86,7 +99,7 @@ function! RConfigVimrc()
         echohl Question
         let what = input("It seems that you don't have a vimrc yet. Should I create it now? [y/N]: ")
         echohl Normal
-        if what =~ "^[yY]"
+        if RGetYesOrNo(what)
             let vlines = []
         else
             redraw
@@ -126,7 +139,7 @@ function! RConfigVimrc()
         echohl Question
         let what = input("Do you want to change the LocalLeader to a comma (,)? [y/N]: ")
         echohl Normal
-        if what =~ "^[yY]"
+        if RGetYesOrNo(what)
             let vlines = vlines + ['" Change the <LocalLeader> key:',
                         \ 'let maplocalleader = ","']
         endif
@@ -144,7 +157,7 @@ function! RConfigVimrc()
         echohl Question
         let what = input("Do you want to press Ctrl+Space to do omnicompletion?  [y/N]: ")
         echohl Normal
-        if what =~ "^[yY]"
+        if RGetYesOrNo(what)
             let vlines = vlines + ['" Use Ctrl+Space to do omnicompletion:',
                         \ 'if has("gui_running")',
                         \ '    inoremap <C-Space> <C-x><C-o>',
@@ -167,7 +180,7 @@ function! RConfigVimrc()
         echohl Question
         let what = input("Do you prefer to press the space bar to send lines and selections\nto R Console? [y/N]: ")
         echohl Normal
-        if what =~ "^[yY]"
+        if RGetYesOrNo(what)
             let vlines = vlines + ['" Press the space bar to send lines (in Normal mode) and selections to R:',
                         \ 'vmap <Space> <Plug>RDSendSelection',
                         \ 'nmap <Space> <Plug>RDSendLine']
@@ -179,7 +192,7 @@ function! RConfigVimrc()
     echohl Question
     let what = input("Do you want to see your vimrc now? [y/N]: ")
     echohl Normal
-    if what =~ "^[yY]"
+    if RGetYesOrNo(what)
         silent exe "tabnew " . uvimrc
         normal! G
     endif
@@ -209,7 +222,7 @@ function! RConfigBash()
             echohl Question
             let what = input("Do you want to see your ~/.bashrc along with the plugin\ntips on how to configure Bash? [y/N]: ")
             echohl Normal
-            if what =~ "^[yY]"
+            if RGetYesOrNo(what)
                 silent exe "tabnew " . $HOME . "/.bashrc"
                 silent help r-plugin-quick-bash-setup
             endif
@@ -223,7 +236,7 @@ function! RConfigBash()
             echohl Question
             let what = input("Do you want that all these features are added to your .bashrc? [y/N]: ")
             echohl Normal
-            if what =~ "^[yY]"
+            if RGetYesOrNo(what)
                 let blines = blines + ['']
                 if exists("*strftime")
                     let blines = blines + ['# Lines added by the Vim-R-plugin command :RpluginConfig (' . strftime("%Y-%b-%d %H:%M") . '):']
@@ -260,7 +273,7 @@ function! RConfigBash()
                 echohl Question
                 let what = input("Do you want to see your .bashrc now? [y/N]: ")
                 echohl Normal
-                if what =~ "^[yY]"
+                if RGetYesOrNo(what)
                     silent exe "tabnew " . $HOME . "/.bashrc"
                     normal! G27k
                 endif
@@ -278,7 +291,7 @@ function! RConfigTmux()
         echohl Question
         let what = input("Do you want to see it along with the plugin tips on how to\nconfigure Tmux? [y/N]: ")
         echohl Normal
-        if what =~ "^[yY]"
+        if RGetYesOrNo(what)
             silent exe "tabnew " . $HOME . "/.tmux.conf"
             silent help r-plugin-quick-tmux-setup
         endif
@@ -287,7 +300,7 @@ function! RConfigTmux()
         echohl Question
         let what = input("You don't have a ~/.tmux.conf yet. Should I create it now? [y/N]: ")
         echohl Normal
-        if what =~ "^[yY]"
+        if RGetYesOrNo(what)
             let tlines = ['']
             if exists("*strftime")
                 let tlines = tlines + ['# Lines added by the Vim-R-plugin command :RpluginConfig (' . strftime("%Y-%b-%d %H:%M") . '):']
@@ -308,7 +321,7 @@ function! RConfigTmux()
             echohl Question
             let what = input("Do you want to see your .tmux.conf now? [y/N]: ")
             echohl Normal
-            if what =~ "^[yY]"
+            if RGetYesOrNo(what)
                 silent exe "tabnew " . $HOME . "/.tmux.conf"
             endif
             redraw
@@ -318,11 +331,19 @@ endfunction
 
 function! RConfigVimR()
     if string(g:SendCmdToR) == "function('SendCmdToR_fake')"
-        call StartR("R")
+        if hasmapto("<Plug>RStart", "n")
+            let cmd = RNMapCmd("<Plug>RStart")
+        else
+            if exists("g:maplocalleader")
+                let cmd = g:maplocalleader . "rf"
+            else
+                let cmd = "\\rf"
+            endif
+        endif
         echohl WarningMsg
-        echo "Please wait..."
+        echomsg "Please type  " . cmd . "  to start R before running  :RpluginConfig"
         echohl Normal
-        sleep 2
+        return
     endif
     if RConfigRprofile()
         return
