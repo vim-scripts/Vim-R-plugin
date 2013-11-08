@@ -2796,6 +2796,7 @@ function MakeRMenu()
     amenu R.Help\ (plugin).News :help r-plugin-news<CR>
 
     amenu R.Help\ (R)<Tab>:Rhelp :call g:SendCmdToR("help.start()")<CR>
+    amenu R.Configure\ (Vim-R)<Tab>:RpluginConfig :RpluginConfig<CR>
     let g:rplugin_hasmenu = 1
 
     "----------------------------------------------------------------------------
