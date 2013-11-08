@@ -23,14 +23,14 @@ function! RConfigRprofile()
         endif
         if has("win32") || has("win64")
             echohl Question
-            let what = input("Do you want to see your .Rprofile now? [yes/no]: ")
+            let what = input("Do you want to see your .Rprofile now? [y/N]: ")
             echohl Normal
             if what =~ "^[yY]"
                 silent exe "tabnew " . res[0]
             endif
         else
             echohl Question
-            let what = input("Do you want to see your .Rprofile along with tips on how to\nconfigure it? [yes/no]: ")
+            let what = input("Do you want to see your .Rprofile along with tips on how to\nconfigure it? [y/N]: ")
             echohl Normal
             if what =~ "^[yY]"
                 silent exe "tabnew " . res[0]
@@ -73,7 +73,7 @@ function! RConfigVimrc()
         echo "You already have a vimrc."
         echohl Normal
         echohl Question
-        let what = input("Do you want to add to the bottom of your vimrc some options that\nmost users consider convenient for the Vim-R-plugin? [yes/no]: ")
+        let what = input("Do you want to add to the bottom of your vimrc some options that\nmost users consider convenient for the Vim-R-plugin? [y/N]: ")
         echohl Normal
         if what =~ "^[yY]"
             let vlines = readfile(uvimrc)
@@ -84,7 +84,7 @@ function! RConfigVimrc()
     else
         let hasvimrc = 0
         echohl Question
-        let what = input("It seems that you don't have a vimrc yet. Should I create it now? [yes/no]: ")
+        let what = input("It seems that you don't have a vimrc yet. Should I create it now? [y/N]: ")
         echohl Normal
         if what =~ "^[yY]"
             let vlines = []
@@ -124,7 +124,7 @@ function! RConfigVimrc()
         echo "By default, Vim's LocalLeader is the backslash (\\) which is problematic"
         echo "if we are editing LaTeX or Rnoweb (R+LaTeX) files."
         echohl Question
-        let what = input("Do you want to change the LocalLeader to a comma (,)? [yes/no]: ")
+        let what = input("Do you want to change the LocalLeader to a comma (,)? [y/N]: ")
         echohl Normal
         if what =~ "^[yY]"
             let vlines = vlines + ['" Change the <LocalLeader> key:',
@@ -142,7 +142,7 @@ function! RConfigVimrc()
         echo "By default, you have to press Ctrl+X Ctrl+O to complete the names of"
         echo "functions and other objects. This is called omnicompletion."
         echohl Question
-        let what = input("Do you want to press Ctrl+Space to do omnicompletion?  [yes/no]: ")
+        let what = input("Do you want to press Ctrl+Space to do omnicompletion?  [y/N]: ")
         echohl Normal
         if what =~ "^[yY]"
             let vlines = vlines + ['" Use Ctrl+Space to do omnicompletion:',
@@ -165,7 +165,7 @@ function! RConfigVimrc()
         echo "By default, you have to press \\d to send one line of code to R"
         echo "and \\ss to send a selection of lines."
         echohl Question
-        let what = input("Do you prefer to press the space bar to send lines and selections\nto R Console? [yes/no]: ")
+        let what = input("Do you prefer to press the space bar to send lines and selections\nto R Console? [y/N]: ")
         echohl Normal
         if what =~ "^[yY]"
             let vlines = vlines + ['" Press the space bar to send lines (in Normal mode) and selections to R:',
@@ -177,7 +177,7 @@ function! RConfigVimrc()
 
     echo " "
     echohl Question
-    let what = input("Do you want to see your vimrc now? [yes/no]: ")
+    let what = input("Do you want to see your vimrc now? [y/N]: ")
     echohl Normal
     if what =~ "^[yY]"
         silent exe "tabnew " . uvimrc
@@ -207,7 +207,7 @@ function! RConfigBash()
             echohl WarningMsg
             echo "Nothing was added to your ~/.bashrc because the string 'tvim' was found in it."
             echohl Question
-            let what = input("Do you want to see your ~/.bashrc along with the plugin\ntips on how to configure Bash? [yes/no]: ")
+            let what = input("Do you want to see your ~/.bashrc along with the plugin\ntips on how to configure Bash? [y/N]: ")
             echohl Normal
             if what =~ "^[yY]"
                 silent exe "tabnew " . $HOME . "/.bashrc"
@@ -221,7 +221,7 @@ function! RConfigBash()
             echo "The serverclient feature must be enabled for automatic update of the"
             echo "Object Browser and syntax highlight of function names."
             echohl Question
-            let what = input("Do you want that all these features are added to your .bashrc? [yes/no]: ")
+            let what = input("Do you want that all these features are added to your .bashrc? [y/N]: ")
             echohl Normal
             if what =~ "^[yY]"
                 let blines = blines + ['']
@@ -258,7 +258,7 @@ function! RConfigBash()
                             \ 'fi' ]
                 call writefile(blines, $HOME . "/.bashrc")
                 echohl Question
-                let what = input("Do you want to see your .bashrc now? [yes/no]: ")
+                let what = input("Do you want to see your .bashrc now? [y/N]: ")
                 echohl Normal
                 if what =~ "^[yY]"
                     silent exe "tabnew " . $HOME . "/.bashrc"
@@ -276,7 +276,7 @@ function! RConfigTmux()
         echohl WarningMsg
         echo "You already have a .tmux.conf."
         echohl Question
-        let what = input("Do you want to see it along with the plugin tips on how to\nconfigure Tmux? [yes/no]: ")
+        let what = input("Do you want to see it along with the plugin tips on how to\nconfigure Tmux? [y/N]: ")
         echohl Normal
         if what =~ "^[yY]"
             silent exe "tabnew " . $HOME . "/.tmux.conf"
@@ -285,7 +285,7 @@ function! RConfigTmux()
         redraw
     else
         echohl Question
-        let what = input("You don't have a ~/.tmux.conf yet. Should I create it now? [yes/no]: ")
+        let what = input("You don't have a ~/.tmux.conf yet. Should I create it now? [y/N]: ")
         echohl Normal
         if what =~ "^[yY]"
             let tlines = ['']
@@ -306,7 +306,7 @@ function! RConfigTmux()
             call writefile(tlines, $HOME . "/.tmux.conf")
             echo " "
             echohl Question
-            let what = input("Do you want to see your .tmux.conf now? [yes/no]: ")
+            let what = input("Do you want to see your .tmux.conf now? [y/N]: ")
             echohl Normal
             if what =~ "^[yY]"
                 silent exe "tabnew " . $HOME . "/.tmux.conf"
