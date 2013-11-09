@@ -930,6 +930,7 @@ is running:
 |vimrplugin_vimpager|          Use Vim to see R documentation
 |vimrplugin_editor_w|          Minimum width of R script buffer
 |vimrplugin_help_w|            Desired width of R documentation buffer
+|vimrplugin_htw|               Maximum text width of R documentation
 |vimrplugin_i386|              Use 32 bit version of R
 |vimrplugin_r_path|            Directory where R is
 |vimrplugin_r_args|            Arguments to pass to R
@@ -1067,6 +1068,7 @@ work on the Object Browser (you will see the message "Cmd not available").
 							 *vimrplugin_vimpager*
 							 *vimrplugin_editor_w*
 							   *vimrplugin_help_w*
+							      *vimrplugin_htw*
 6.5.1. Quick setup~
 
 If you do not want to see R documentation in a Vim's buffer, put in your
@@ -1108,6 +1110,10 @@ values to some variables in your |vimrc|, as in the example:
 >
    let vimrplugin_editor_w = 80
    let vimrplugin_editor_h = 60
+<
+To set the maximum text width of the documentation, use vimrplugin_htw as in
+>
+   let vimrplugin_htw = 80
 <
 
 6.6. Use 32 bit version of R (Windows and Mac OS X only)~
