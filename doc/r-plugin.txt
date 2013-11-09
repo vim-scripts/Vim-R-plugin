@@ -167,8 +167,8 @@ files, you have to press the space bar a few times to finish the
 installation). You should, then, quit Vim. 
 
 Start Vim again and edit an R script. Type <LocalLeader>rf to start R and run
-the command below to get help configuring ~/.vimrc, ~/.bashrc, ~/.tmux.conf
-and ~/.Rprofile (the <LocalLeader> is `\` by default):
+the command below to get help configuring ~/.Rprofile, ~/.vimrc, ~/.tmux.conf,
+and ~/.bashrc (the <LocalLeader> is `\` by default):
 >
    :RpluginConfig
 <
@@ -238,17 +238,19 @@ choose "Edit with Vim" or create a new one with the Normal mode command:
 >
    :e example.R
 <
-To finish the installation, start R and click on the menu bar
+To finish the installation, you have to start R to run a configuration script.
+Please, click on the menu bar
 >
    R
    Start/Close
    Start R (default)
 <
-and, finally, do in Vim:
+and, finally, click on the menu bar
 >
-   :RpluginConfig
+   R
+   Configure (Vim-R)
 <
-The above command will guide you through additional configuration steps. You
+The above command will guide you through additional configuration steps. If
 you are already an experienced Vim user, instead of running the above command
 you may preffer to read |r-plugin-Rprofile-Windows|.
 
