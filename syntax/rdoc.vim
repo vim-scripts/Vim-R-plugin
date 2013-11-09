@@ -3,16 +3,16 @@
 " Maintainer:	Jakson A. Aquino <jalvesaq@gmail.com>
 
 if exists("b:current_syntax")
-  finish
+    finish
 endif
 
 setlocal iskeyword=@,48-57,_,.
 
 if !exists("rdoc_minlines")
-  let rdoc_minlines = 200
+    let rdoc_minlines = 200
 endif
 if !exists("rdoc_maxlines")
-  let rdoc_maxlines = 2 * rdoc_minlines
+    let rdoc_maxlines = 2 * rdoc_minlines
 endif
 exec "syn sync minlines=" . rdoc_minlines . " maxlines=" . rdoc_maxlines
 
@@ -57,4 +57,4 @@ hi def link rdocFuncName Function
 
 let b:current_syntax = "rdoc"
 
-" vim:ts=8 sts=2 sw=2:
+" vim: ts=8 sw=4

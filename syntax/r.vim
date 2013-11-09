@@ -3,7 +3,7 @@
 " Maintainer:	      Jakson Aquino <jalvesaq@gmail.com>
 " Former Maintainers: Vaidotas Zemlys <zemlys@gmail.com>
 " 		      Tom Payne <tom@tompayne.org>
-" Last Change:	      Sat Nov 09, 2013  06:36PM
+" Last Change:	      Sat Nov 09, 2013  07:27PM
 " Filenames:	      *.R *.r *.Rhistory *.Rt
 " 
 " NOTE: The highlighting of R functions is defined in the
@@ -18,13 +18,13 @@
 " Some lines of code were borrowed from Zhuojun Chen.
 
 if exists("b:current_syntax")
-  finish
+    finish
 endif
 
 setlocal iskeyword=@,48-57,_,.
 
 if exists("g:r_syntax_folding")
-  setlocal foldmethod=syntax
+    setlocal foldmethod=syntax
 endif
 
 syn case match
@@ -43,15 +43,15 @@ syn match rOComment contains=@Spell,rOKeyword "#'.*"
 
 
 if &filetype == "rhelp"
-  " string enclosed in double quotes
-  syn region rString contains=rSpecial,@Spell start=/"/ skip=/\\\\\|\\"/ end=/"/
-  " string enclosed in single quotes
-  syn region rString contains=rSpecial,@Spell start=/'/ skip=/\\\\\|\\'/ end=/'/
+    " string enclosed in double quotes
+    syn region rString contains=rSpecial,@Spell start=/"/ skip=/\\\\\|\\"/ end=/"/
+    " string enclosed in single quotes
+    syn region rString contains=rSpecial,@Spell start=/'/ skip=/\\\\\|\\'/ end=/'/
 else
-  " string enclosed in double quotes
-  syn region rString contains=rSpecial,rStrError,@Spell start=/"/ skip=/\\\\\|\\"/ end=/"/
-  " string enclosed in single quotes
-  syn region rString contains=rSpecial,rStrError,@Spell start=/'/ skip=/\\\\\|\\'/ end=/'/
+    " string enclosed in double quotes
+    syn region rString contains=rSpecial,rStrError,@Spell start=/"/ skip=/\\\\\|\\"/ end=/"/
+    " string enclosed in single quotes
+    syn region rString contains=rSpecial,rStrError,@Spell start=/'/ skip=/\\\\\|\\'/ end=/'/
 endif
 
 syn match rStrError display contained "\\."
@@ -116,9 +116,9 @@ syn match rOperator    '\*'
 syn match rOperator    '+'
 syn match rOperator    '='
 if &filetype != "rmd" && &filetype != "rrst"
-  syn match rOperator    "[|!<>^~/:]"
+    syn match rOperator    "[|!<>^~/:]"
 else
-  syn match rOperator    "[|!<>^~`/:]"
+    syn match rOperator    "[|!<>^~`/:]"
 endif
 syn match rOperator    "%\{2}\|%\S*%"
 syn match rOpError  '\*\{3}'
@@ -136,13 +136,13 @@ syn match rDelimiter "[,;:]"
 
 " Error
 if exists("g:r_syntax_folding")
-  syn region rRegion matchgroup=Delimiter start=/(/ matchgroup=Delimiter end=/)/ transparent contains=ALLBUT,rError,rBraceError,rCurlyError fold
-  syn region rRegion matchgroup=Delimiter start=/{/ matchgroup=Delimiter end=/}/ transparent contains=ALLBUT,rError,rBraceError,rParenError fold
-  syn region rRegion matchgroup=Delimiter start=/\[/ matchgroup=Delimiter end=/]/ transparent contains=ALLBUT,rError,rCurlyError,rParenError fold
+    syn region rRegion matchgroup=Delimiter start=/(/ matchgroup=Delimiter end=/)/ transparent contains=ALLBUT,rError,rBraceError,rCurlyError fold
+    syn region rRegion matchgroup=Delimiter start=/{/ matchgroup=Delimiter end=/}/ transparent contains=ALLBUT,rError,rBraceError,rParenError fold
+    syn region rRegion matchgroup=Delimiter start=/\[/ matchgroup=Delimiter end=/]/ transparent contains=ALLBUT,rError,rCurlyError,rParenError fold
 else
-  syn region rRegion matchgroup=Delimiter start=/(/ matchgroup=Delimiter end=/)/ transparent contains=ALLBUT,rError,rBraceError,rCurlyError
-  syn region rRegion matchgroup=Delimiter start=/{/ matchgroup=Delimiter end=/}/ transparent contains=ALLBUT,rError,rBraceError,rParenError
-  syn region rRegion matchgroup=Delimiter start=/\[/ matchgroup=Delimiter end=/]/ transparent contains=ALLBUT,rError,rCurlyError,rParenError
+    syn region rRegion matchgroup=Delimiter start=/(/ matchgroup=Delimiter end=/)/ transparent contains=ALLBUT,rError,rBraceError,rCurlyError
+    syn region rRegion matchgroup=Delimiter start=/{/ matchgroup=Delimiter end=/}/ transparent contains=ALLBUT,rError,rBraceError,rParenError
+    syn region rRegion matchgroup=Delimiter start=/\[/ matchgroup=Delimiter end=/]/ transparent contains=ALLBUT,rError,rCurlyError,rParenError
 endif
 
 syn match rError      "[)\]}]"
@@ -228,13 +228,13 @@ syn keyword rType array category character complex double function integer list 
 
 " Name of object with spaces
 if &filetype != "rmd" && &filetype != "rrst"
-  syn region rNameWSpace start="`" end="`"
+    syn region rNameWSpace start="`" end="`"
 endif
 
 if &filetype == "rhelp"
-  syn match rhPreProc "^#ifdef.*" 
-  syn match rhPreProc "^#endif.*" 
-  syn match rhSection "\\dontrun\>"
+    syn match rhPreProc "^#ifdef.*" 
+    syn match rhPreProc "^#endif.*" 
+    syn match rhSection "\\dontrun\>"
 endif
 
 " Define the default highlighting.
