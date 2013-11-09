@@ -2001,18 +2001,17 @@ function SetRTextWidth()
         endif
 
         if s:vimpager == "horizontal"
-            " Use the window width (at most 80 columns)
-            let htwf = (wwidth > 80) ? 88.1 : ((wwidth - 1) / 0.9)
+            " Use the window width (at most g:vimrplugin_htw columns)
+            let htwf = (wwidth > g:vimrplugin_htw) ? 88.1 : ((wwidth - 1) / 0.9)
         elseif g:vimrplugin_vimpager == "tab" || g:vimrplugin_vimpager == "tabnew"
             let wwidth = &columns
-            let htwf = (wwidth > 80) ? 88.1 : ((wwidth - 1) / 0.9)
+            let htwf = (wwidth > g:vimrplugin_htw) ? 88.1 : ((wwidth - 1) / 0.9)
         else
-            let min_e = (g:vimrplugin_editor_w > 80) ? g:vimrplugin_editor_w : 80
+            let min_e = (g:vimrplugin_editor_w > g:vimrplugin_htw) ? g:vimrplugin_editor_w : g:vimrplugin_htw
             let min_h = (g:vimrplugin_help_w > 73) ? g:vimrplugin_help_w : 73
 
             if wwidth > (min_e + min_h)
-                " The editor window is large enough to be split as either >80+73 or
-                " the user defined minimum values
+                " The editor window is large enough to be split
                 let s:hwidth = min_h
             elseif wwidth > (min_e + g:vimrplugin_help_w)
                 " The help window must have less than min_h columns
@@ -2028,9 +2027,6 @@ function SetRTextWidth()
         if !(has("win32") || has("win64"))
             exe "language " . curlang
         endif
-    endif
-    if exists('g:vimrplugin_htw') && g:vimrplugin_htw < g:rplugin_htw
-        let g:rplugin_htw = g:vimrplugin_htw
     endif
 endfunction
 
@@ -3125,6 +3121,7 @@ call RSetDefaultValue("g:vimrplugin_only_in_tmux",      0)
 call RSetDefaultValue("g:vimrplugin_routnotab",         0)
 call RSetDefaultValue("g:vimrplugin_editor_w",         66)
 call RSetDefaultValue("g:vimrplugin_help_w",           46)
+call RSetDefaultValue("g:vimrplugin_htw",              80)
 call RSetDefaultValue("g:vimrplugin_objbr_w",          40)
 call RSetDefaultValue("g:vimrplugin_external_ob",       0)
 call RSetDefaultValue("g:vimrplugin_show_args",         0)
