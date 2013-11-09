@@ -70,3 +70,5 @@ if !exists("g:SendCmdToR")
     let g:SendCmdToR = function('SendCmdToR_fake')
 endif
 
+autocmd BufEnter <buffer> call RUpdateFunSyntax(0)
+

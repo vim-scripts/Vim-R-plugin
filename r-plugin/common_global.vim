@@ -1922,7 +1922,7 @@ endfunction
 
 function RAddToLibList(nlib, verbose)
     if isdirectory(g:rplugin_uservimfiles . "/r-plugin/objlist")
-        let omf = split(glob(g:rplugin_uservimfiles . "/r-plugin/objlist/omnils_" . a:nlib . "_*"), "\n")
+        let omf = split(globpath(&rtp, 'r-plugin/objlist/omnils_' . a:nlib . '_*'), "\n")
         if len(omf) == 1
             let nlist = readfile(omf[0])
 
@@ -1936,24 +1936,15 @@ function RAddToLibList(nlib, verbose)
                     call add(s:list_of_objs, xxx[0])
                 endif
             endfor
-
-            let fnf = split(glob(g:rplugin_uservimfiles . "/r-plugin/objlist/fun_" . a:nlib . "_*"), "\n")
-            if len(fnf) == 1
-                " List of functions for syntax highlith
-                silent exe "source " . fnf[0]
-            elseif a:verbose && len(fnf) == 0
-                call RWarningMsg('Fun_ file for "' . a:nlib . '" not found.')
-                return
-            elseif a:verbose && len(fnf) > 1
-                call RWarningMsg('There is more than one fun_ file for "' . a:nlib . '".')
-                return
-            endif
         elseif a:verbose && len(omf) == 0
             call RWarningMsg('Omnils file for "' . a:nlib . '" not found.')
             call RRemoveFromLibls(a:nlib)
             return
         elseif a:verbose && len(omf) > 1
             call RWarningMsg('There is more than one omnils file for "' . a:nlib . '".')
+            for obl in omf
+                call RWarningMsg(obl)
+            endfor
             call RRemoveFromLibls(a:nlib)
             return
         endif
@@ -1976,6 +1967,10 @@ function RFillLibList()
                 call RAddToLibList(nlib, 1)
             endif
         endfor
+    endif
+
+    if exists("*RUpdateFunSyntax")
+        call RUpdateFunSyntax(0)
     endif
 endfunction
 
@@ -3520,12 +3515,9 @@ let g:needsnewomnilist = 0
 let g:rplugin_libls = split(g:vimrplugin_permanent_libs, ",")
 let g:rplugin_liblist = []
 let s:list_of_objs = []
-if exists("b:current_syntax")
-    " The syntax/r.vim was read before this script
-    for lib in g:rplugin_libls
-        call RAddToLibList(lib, 0)
-    endfor
-endif
+for lib in g:rplugin_libls
+    call RAddToLibList(lib, 0)
+endfor
 
 " Check whether tool bar icons exist
 if has("win32") || has("win64")
