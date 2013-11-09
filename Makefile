@@ -33,8 +33,8 @@ vimball:
 	sed -i -e "s/^Version: [0-9].[0-9].[0-9].[0-9]/Version: $(PLUGINVERSION)/" doc/r-plugin.txt
 	sed -i -e "s/vim-r-plugin_[0-9].[0-9].[0-9].[0-9].vmb/vim-r-plugin_$(PLUGINVERSION).vmb/" doc/r-plugin.txt
 	sed -i -e "s/^$(PLUGINVERSION) (201[0-9]-[0-9][0-9]-[0-9][0-9])$$/$(PLUGINVERSION) ($(PLUGINRELEASEDATE))/" doc/r-plugin.txt
-	vim -c "%MkVimball vim-r-plugin_$(PLUGINVERSION) ." -c "q" list_for_vimball
-	mv vim-r-plugin_$(PLUGINVERSION).vmb /tmp
+	vim -c "%MkVimball vim-r-plugin ." -c "q" list_for_vimball
+	mv vim-r-plugin.vmb /tmp
 
 deb:
 	# Clean previously created files
