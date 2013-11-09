@@ -1989,7 +1989,7 @@ function SetRTextWidth()
         let s:vimpager = g:vimrplugin_vimpager
 
         " Consider 'numberwidth' = 5
-        if &number
+        if &number || &relativenumber
             let wwidth = winwidth(0) - 5
         else
             let wwidth = winwidth(0)
