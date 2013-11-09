@@ -2029,6 +2029,9 @@ function SetRTextWidth()
             exe "language " . curlang
         endif
     endif
+    if exists('g:vimrplugin_htw') && g:vimrplugin_htw < g:rplugin_htw
+        let g:rplugin_htw = g:vimrplugin_htw
+    endif
 endfunction
 
 function RGetClassFor(rkeyword)
