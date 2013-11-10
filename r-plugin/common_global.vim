@@ -1988,12 +1988,7 @@ function SetRTextWidth()
         " and to decide whether to obey vimrplugin_vimpager = 'vertical'
         let s:vimpager = g:vimrplugin_vimpager
 
-        " Consider 'numberwidth' = 5
-        if &number || &relativenumber
-            let wwidth = winwidth(0) - 5
-        else
-            let wwidth = winwidth(0)
-        endif
+        let wwidth = winwidth(0)
 
         " Not enough room to split vertically
         if g:vimrplugin_vimpager == "vertical" && wwidth <= (g:vimrplugin_help_w + g:vimrplugin_editor_w)
@@ -2024,6 +2019,7 @@ function SetRTextWidth()
         endif
         let htw = printf("%f", htwf)
         let g:rplugin_htw = substitute(htw, "\\..*", "", "")
+        let g:rplugin_htw = g:rplugin_htw - (&number || &relativenumber) * &numberwidth
         if !(has("win32") || has("win64"))
             exe "language " . curlang
         endif
