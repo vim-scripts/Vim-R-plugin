@@ -186,9 +186,45 @@ function! RConfigVimrc()
                         \ 'nmap <Space> <Plug>RDSendLine']
         endif
     endif
+
+    if !hasvimrc
+        echo " "
+        echo "There are some options that most Vim users like, but that are not enabled by"
+        echo "default such as highlighting the last search pattern, incremental search"
+        echo "and setting the indentation as four spaces."
+        echohl Question
+        let what = input("Do you want these options in your vimrc? [y/N]: ")
+        echohl Normal
+        if RGetYesOrNo(what)
+            let vlines = vlines + [
+                        \ '" The lines below were also added by the Vim-R-plugin because you did not have',
+                        \ '" a vimrc yet in the hope that they will help you getting started with Vim:',
+                        \ '',
+                        \ '" Highlight the last searched pattern:',
+                        \ 'set hlsearch',
+                        \ '',
+                        \ '" Show where the next patter is as you type it:',
+                        \ 'set incsearch',
+                        \ '',
+                        \ '" By default, Vim indents code by 8 spaces. Most people preffer 4 spaces:',
+                        \ 'set sw=4',
+                        \ '',
+                        \ '" There are hundreds of color schemes for Vim on the internet, but you can',
+                        \ '" start with color schemes already installed.',
+                        \ '" Click on GVim menu bar "Edit / Color scheme" to know the name of your',
+                        \ '" preffered color scheme, then, remove the double quote (which is a comment',
+                        \ '" character, like the # is for R language) and replace the value "not_defined"',
+                        \ '" below:',
+                        \ '"colorscheme not_defined']
+        endif
+    endif
+
     call writefile(vlines, uvimrc)
 
     echo " "
+    echohl WarningMsg
+    echo "The changes in your vimrc will be effective"
+    echo "only after you quit Vim and start it again."
     echohl Question
     let what = input("Do you want to see your vimrc now? [y/N]: ")
     echohl Normal
@@ -197,10 +233,6 @@ function! RConfigVimrc()
         normal! G
     endif
     redraw
-    echohl WarningMsg
-    echo "The changes in your vimrc will be effective"
-    echo "only after you quit Vim and start it again."
-    echohl Normal
 endfunction
 
 " Configure .bashrc
@@ -270,6 +302,17 @@ function! RConfigBash()
                             \ '    fi',
                             \ 'fi' ]
                 call writefile(blines, $HOME . "/.bashrc")
+                if !has("gui_running")
+                    echo " "
+                    echohl WarningMsg
+                    echo "The changes in your bashrc will be effective"
+                    echo "only after you exit from Bash and start it again"
+                    if $DISPLAY == ""
+                        echo "(logoff and login again)."
+                    else
+                        echo "(close the terminal emulator and start it again)."
+                    endif
+                endif
                 echohl Question
                 let what = input("Do you want to see your .bashrc now? [y/N]: ")
                 echohl Normal
