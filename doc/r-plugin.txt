@@ -434,6 +434,7 @@ Object Browser
 
 Help (plugin)
 Help (R)                                            :Rhelp
+Configure (Vim-R)                           :RpluginConfig
 -----------------------------------------------------------
 
 Please see |r-plugin-key-bindings| to learn how to customize the key bindings
@@ -1910,18 +1911,7 @@ code automatically, breaking only comment lines, put in your |vimrc|:
 9.13. Vim with 256 colors in a terminal emulator (Linux/Unix only)~
 
 If you want 256 colors support in Vim, install the package ncurses-term. Then
-put in your ~/.bashrc:
->
-   if [ "x" != "x$DISPLAY" ]
-   then
-       if [ "screen" = "$TERM" ]
-       then
-           export TERM=screen-256color
-       else
-           export TERM=xterm-256color
-       fi
-   fi
-<
+put in your ~/.bashrc the lines suggested at |r-plugin-quick-bash-setup|.
 Finally, put in your |vimrc|:
 >
    if &term =~ "xterm" || &term =~ "256" || $DISPLAY != ""
@@ -1945,30 +1935,13 @@ line in your |vimrc|:
 
 9.15. Edit your ~/.Rprofile~
 							   *r-plugin-Rprofile*
-You may want to edit your ~/.Rprofile. Example for Linux:
+You may want to edit your ~/.Rprofile in addition to considering the
+suggestions of |r-plugin-quick-R-setup| you may also want to put the following
+lines in your .Rprofile if you are using Linux:
 >
-   if(interactive()){
-       library(colorout)
-       library(setwidth)
-       options(vimcom.verbose = 1, vimcom.allnames = TRUE)
-       if(Sys.getenv("VIMRPLUGIN_TMPDIR") != "")
-	   library(vimcom.plus)
-           # If you can't install the vimcom.plus package, do:
-           # library(vimcom)
-       if(Sys.getenv("TERM") != "linux" && Sys.getenv("TERM") != "")
-	   setOutputColors256(verbose = FALSE)
-       if(nchar(Sys.getenv("DISPLAY")) > 1){
-	   grDevices::X11.options(width = 4.5, height = 4, ypos = 0,
-				  xpos = 1000, pointsize = 10)
-	   options(editor = 'gvim -f -c "set ft=r"')
-       } else {
-	   options(editor = 'vim -c "set ft=r"')
-       }
-   }
+   grDevices::X11.options(width = 4.5, height = 4, ypos = 0,
+                          xpos = 1000, pointsize = 10)
 <
-The test for the environment variable DISPLAY is useful if you eventually use
-the plugin in the Linux console.
-
 The `X11.options()` is used to choose the position and dimensions of the X11
 graphical device. You can also install the application wmctrl and create
 shortcuts in your desktop environment to the commands
@@ -1983,14 +1956,6 @@ which can display R plots in a separate panel. Although we can not embed an R
 graphical device in Vim, we can at least make it always visible over the
 terminal emulator or the GVim window.
 
-						   *r-plugin-Rprofile-Windows*
-An example for Windows:
->
-   if (interactive()) {
-       library(vimcom.plus)
-       options(editor = '"C:/Program Files (x86)/Vim/vim74/gvim.exe" "-c" "set filetype=r"')
-   }
-<
 
 9.16. Debugging R functions~
 
@@ -2029,13 +1994,14 @@ On Windows, you probably will have to make a copy of the file to the
 
 9.18. Disable syntax highlight of R functions~
 
-If you want to disable the syntax highlight of R functions edit the file
-~/.vim/r-plugin/functions.vim and delete all lines, but do not delete the
-file.
-
+If you want to disable the syntax highlight of R functions put in your
+|vimrc|:
+>
+   autocmd Syntax * syntax clear rFunction
+<
 
 9.19. Tips for knitr users~
-								       *knitr*
+							      *r-plugin-knitr*
 If you are using knitr with option cache=TRUE, you may want from time to time
 to delete all objects in R workspace and all files in the cache directory. If
 you want to use <LocalLeader>kr in Normal mode for this, put in your |vimrc|:
