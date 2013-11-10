@@ -70,5 +70,8 @@ if !exists("g:SendCmdToR")
     let g:SendCmdToR = function('SendCmdToR_fake')
 endif
 
+" It would be better if we could call RUpdateFunSyntax() for all buffers
+" immediately after a new library was loaded, but the command :bufdo
+" temporarily disables Syntax events.
 autocmd BufEnter <buffer> call RUpdateFunSyntax(0)
 
