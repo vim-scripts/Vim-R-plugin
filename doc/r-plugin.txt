@@ -313,17 +313,18 @@ Note: The <LocalLeader> is '\' by default.
 
 Note: It is recommended the use of different keys for <Leader> and
 <LocalLeader> to avoid clashes between filetype plugins and general plugins
-key binds. See |filetype-plugins| and |maplocalleader|.
+key binds. See |filetype-plugins|, |maplocalleader| and |r-plugin-localleader|.
 
 To use the plugin, open a .R or .Rnw or .Rd file with Vim and type
 <LocalLeader>rf. Then, you will be able to use the plugin key bindings to send
 commands to R.
 
-This plugin has many key bindings, which correspond with menu entries and, in
-some cases. In the list below, the backslash represents the <LocalLeader>. Not
-all menu items and key bindings are enabled in all filetypes supported by the
-plugin (r, rnoweb, rhelp):
+This plugin has many key bindings, which correspond with menu entries. In the
+list below, the backslash represents the <LocalLeader>. Not all menu items and
+key bindings are enabled in all filetypes supported by the plugin (r, rnoweb,
+rhelp, rrst, rmd).
 
+Menu entry                                Default shortcut~
 Start/Close
   . Start R (default)                                  \rf
   . Start R --vanilla                                  \rv
@@ -394,11 +395,12 @@ Command
   . Sweave, BibTeX and PDF (cur file) (Linux/Unix)     \sb
   --------------------------------------------------------
   . Knit (cur file)                                    \kn
-  . Spin (cur file)                                    \ks
   . Knit and PDF (cur file)                            \kp
-  . Knit and Beamer PDF (cur file) (Only Rmd)          \kl
-  . Knit and PDF (cur file, verbose) (Windows)         \kv
   . Knit, BibTeX and PDF (cur file) (Linux/Unix)       \kb
+  . Knit and Beamer PDF (cur file) (only .Rmd)         \kl
+  . Knit and HTML (cur file, verbose) (only .Rmd)      \kh
+  . Knit and PDF (cur file, verbose) (Windows)         \kv
+  . Spin (cur file) (only .R)                          \ks
   --------------------------------------------------------
   . Open PDF (cur file)                                \op
   --------------------------------------------------------
@@ -1558,19 +1560,20 @@ RD, "cursor down"; RED, both "echo" and "down"):
    RSummary
    RListSpace
 
-   Support to Rnoweb, Rmd, Rrst~
+   Support to Sweave and knitr~
    RSendChunk
    RDSendChunk
    RESendChunk
    REDSendChunk
-   RBibTeX
-   RBibTeXK
+   RBibTeX    (Sweave)
+   RBibTeXK   (Knitr)
    RSweave
    RKnit
    RMakeHTML
    RMakeODT
-   RMakePDF
-   RMakePDFK
+   RMakePDF   (Sweave)
+   RMakePDFK  (Knitr)
+   RMakePDFKb (.Rmd, beamer)
    ROpenPDF
    RSpinFile
 
