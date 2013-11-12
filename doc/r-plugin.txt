@@ -153,10 +153,14 @@ should have at least the following options in your |vimrc|:
 Make a backup of your ~/.vim directory because existing files will be
 replaced. Please, look at |r-plugin-files| to see the list of files.
 
+Download the latest version of the plugin from:
+
+    http://www.vim.org/scripts/script.php?script_id=2628
+
 Start a terminal emulator, go to the directory where you have downloaded the
 plugin and type:
 >
-   vim vim-r-plugin_0.9.9.8.vmb
+   vim Vim-R-plugin.vmb
 <
 Then, in Vim, type:
 >
@@ -218,7 +222,7 @@ dependencies:
       Note: If you cannot build vimcom.plus yourself, you will want to
       download and install the zip file.
 
-Now, download the file `vim-r-plugin_0.9.9.8.vmb` from
+Now, download the latest version of `Vim-R-plugin.vmb` from
 
     http://www.vim.org/scripts/script.php?script_id=2628
     
@@ -1630,57 +1634,38 @@ The following files are part of the plugin and should be in your ~/.vim
 directory after the installation:
 
 
-   autoload/rcomplete.vim
-   bitmaps/RClearAll.bmp
-   bitmaps/RClearAll.png
-   bitmaps/RClear.bmp
-   bitmaps/RClear.png
-   bitmaps/RClose.bmp
-   bitmaps/RClose.png
-   bitmaps/ricon.png
-   bitmaps/ricon.xbm
-   bitmaps/RListSpace.bmp
-   bitmaps/RListSpace.png
-   bitmaps/RSendBlock.bmp
-   bitmaps/RSendBlock.png
-   bitmaps/RSendFile.bmp
-   bitmaps/RSendFile.png
-   bitmaps/RSendFunction.bmp
-   bitmaps/RSendFunction.png
-   bitmaps/RSendLine.bmp
-   bitmaps/RSendLine.png
-   bitmaps/RSendParagraph.bmp
-   bitmaps/RSendParagraph.png
-   bitmaps/RSendSelection.bmp
-   bitmaps/RSendSelection.png
-   bitmaps/RStart.bmp
-   bitmaps/RStart.png
-   doc/r-plugin.txt
    ftdetect/r.vim
-   ftplugin/rhelp.vim
-   ftplugin/rnoweb.vim
-   ftplugin/r.vim
-   ftplugin/rbrowser.vim
-   ftplugin/rmd.vim
-   ftplugin/rrst.vim
    indent/r.vim
-   indent/rhelp.vim
-   indent/rnoweb.vim
    indent/rmd.vim
    indent/rrst.vim
-   r-plugin/common_buffer.vim
-   r-plugin/common_global.vim
-   r-plugin/functions.vim
-   r-plugin/objlist/
-   r-plugin/r.snippets
-   r-plugin/tex_indent.vim
-   r-plugin/vimcom.py
-   r-plugin/windows.py
-   syntax/rbrowser.vim
+   indent/rnoweb.vim
+   indent/rhelp.vim
+   autoload/rcomplete.vim
+   ftplugin/r.vim
+   ftplugin/rbrowser.vim
+   ftplugin/rdoc.vim
+   ftplugin/rhelp.vim
+   ftplugin/rmd.vim
+   ftplugin/rrst.vim
+   ftplugin/rnoweb.vim
    syntax/rout.vim
    syntax/r.vim
+   syntax/rhelp.vim
    syntax/rmd.vim
    syntax/rrst.vim
+   syntax/rdoc.vim
+   syntax/rbrowser.vim
+   doc/r-plugin.txt
+   r-plugin/vimcom.py
+   r-plugin/global_r_plugin.vim
+   r-plugin/windows.py
+   r-plugin/objlist/README
+   r-plugin/tex_indent.vim
+   r-plugin/r.snippets
+   r-plugin/common_buffer.vim
+   r-plugin/common_global.vim
+   r-plugin/Rconfig.R
+   r-plugin/vimrconfig.vim
 
 
 ==============================================================================
@@ -2205,7 +2190,7 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-0.9.9.8 (2013-11-09)
+0.9.9.8 (2013-11-10)
 
  * The list of objects for omnicompletion and the list of functions for syntax
    highlight now are built dynamically. Deprecated commands and options:

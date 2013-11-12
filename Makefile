@@ -33,8 +33,8 @@ vimball:
 	sed -i -e "s/^Version: [0-9].[0-9].[0-9].[0-9]/Version: $(PLUGINVERSION)/" doc/r-plugin.txt
 	sed -i -e "s/vim-r-plugin_[0-9].[0-9].[0-9].[0-9].vmb/vim-r-plugin_$(PLUGINVERSION).vmb/" doc/r-plugin.txt
 	sed -i -e "s/^$(PLUGINVERSION) (201[0-9]-[0-9][0-9]-[0-9][0-9])$$/$(PLUGINVERSION) ($(PLUGINRELEASEDATE))/" doc/r-plugin.txt
-	vim -c "%MkVimball vim-r-plugin ." -c "q" list_for_vimball
-	mv vim-r-plugin.vmb /tmp
+	vim -c "%MkVimball Vim-R-plugin ." -c "q" list_for_vimball
+	mv Vim-R-plugin.vmb /tmp
 
 deb:
 	# Clean previously created files
@@ -110,7 +110,7 @@ deb:
 	of the GNU General Public License.\n\
 	" > /tmp/vim-r-plugin-tmp/usr/share/doc/vim-r-plugin/copyright
 	# Unpack the plugin
-	vim -c 'let g:vimball_home="/tmp/vim-r-plugin-tmp/usr/share/vim/addons"' -c "so %" -c "q" /tmp/vim-r-plugin_$(PLUGINVERSION).vmb
+	vim -c 'set nomore' -c 'let g:vimball_home="/tmp/vim-r-plugin-tmp/usr/share/vim/addons"' -c "so %" -c "q" /tmp/Vim-R-plugin.vmb
 	# Delete file unnecessary in a Debian system
 	(cd /tmp/vim-r-plugin-tmp/usr/share/vim/addons ;\
 	    rm r-plugin/windows.py )
