@@ -146,7 +146,6 @@ function! RMakePDF(bibtex, knit)
     endif
 
     let pdfcmd = pdfcmd . ")"
-    let g:needsnewomnilist = 1
     let ok = g:SendCmdToR(pdfcmd)
     if ok == 0
         return
@@ -162,7 +161,6 @@ function! SendChunkToR(e, m)
     let chunkline = search("^<<", "bncW") + 1
     let docline = search("^@", "ncW") - 1
     let lines = getline(chunkline, docline)
-    let g:needsnewomnilist = 1
     let ok = RSourceLines(lines, a:e)
     if ok == 0
         return
@@ -175,7 +173,6 @@ endfunction
 " Sweave the current buffer content
 function! RSweave()
     update
-    let g:needsnewomnilist = 1
     call RSetWD()
     if exists("g:vimrplugin_sweaveargs")
         call g:SendCmdToR('Sweave("' . expand("%:t") . '", ' . g:vimrplugin_sweaveargs . ')')

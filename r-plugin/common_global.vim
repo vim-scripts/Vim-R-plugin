@@ -210,7 +210,7 @@ function RCompleteArgs()
         let argkey = strpart(line, idx1, idx2 - idx1 + 1)
         let idx2 = cpos[2] - strlen(argkey)
     endif
-    if g:needsnewomnilist == 1
+    if string(g:SendCmdToR) != "function('SendCmdToR_fake')"
       call BuildROmniList()
     endif
     let flines = g:rplugin_globalenvlines + g:rplugin_liblist
@@ -1397,7 +1397,6 @@ endfunction
 
 " Send file to R
 function SendFileToR(e)
-    let g:needsnewomnilist = 1
     update
     let fpath = expand("%:p")
     if has("win32") || has("win64")
@@ -1431,7 +1430,6 @@ function SendMBlockToR(e, m)
         return
     endif
 
-    let g:needsnewomnilist = 1
     let curline = line(".")
     let lineA = 1
     let lineB = line("$")
@@ -1486,7 +1484,6 @@ function SendFunctionToR(e, m)
         return
     endif
 
-    let g:needsnewomnilist = 1
     let startline = line(".")
     let save_cursor = getpos(".")
     let line = SanitizeRLine(getline("."))
@@ -1569,8 +1566,6 @@ function SendSelectionToR(e, m)
         return
     endif
 
-    let g:needsnewomnilist = 1
-
     if line("'<") == line("'>")
         let i = col("'<") - 1
         let j = col("'>") - i
@@ -1645,7 +1640,6 @@ function SendParagraphToR(e, m)
         return
     endif
 
-    let g:needsnewomnilist = 1
     let i = line(".")
     let c = col(".")
     let max = line("$")
@@ -1736,7 +1730,6 @@ function SendLineToR(godown)
         endif
     endif
 
-    let g:needsnewomnilist = 1
     let ok = g:SendCmdToR(line)
     if ok
         if a:godown =~ "down"
@@ -1849,7 +1842,6 @@ endfunction
 " knit the current buffer content
 function! RKnit()
     update
-    let g:needsnewomnilist = 1
     call RSetWD()
     call g:SendCmdToR('require(knitr); knit("' . expand("%:t") . '")')
 endfunction
@@ -1871,7 +1863,6 @@ function BuildROmniList()
     endif
 
     let rtf = g:rplugin_globalenvfname
-    let g:needsnewomnilist = 0
     let omnilistcmd = 'vim.bol("' . rtf . '"'
     if g:vimrplugin_allnames == 1
         let omnilistcmd = omnilistcmd . ', allnames = TRUE'
@@ -1883,13 +1874,11 @@ function BuildROmniList()
         exe "Py SendToVimCom('" . omnilistcmd . "')"
         if g:rplugin_vimcomport == 0
             sleep 500m
-            let g:needsnewomnilist = 1
             return
         endif
         let g:rplugin_lastrpl = ReadEvalReply()
         if g:rplugin_lastrpl == "R is busy." || g:rplugin_lastrpl == "No reply"
             call RWarningMsg(g:rplugin_lastrpl)
-            let g:needsnewomnilist = 1
             sleep 800m
             return
         endif
@@ -3539,11 +3528,6 @@ if &filetype != "rbrowser"
 endif
 
 call SetRPath()
-
-" Automatically rebuild the file listing .GlobalEnv objects for omni
-" completion if the user press <C-X><C-O> and we know that the file either was
-" not created yet or is outdated.
-let g:needsnewomnilist = 0
 
 " Keeps the names object list in memory to avoid the need of reading the files
 " repeatedly:

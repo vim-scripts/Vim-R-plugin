@@ -16,7 +16,7 @@ fun! rcomplete#CompleteR(findstart, base)
     endwhile
     return start
   else
-    if g:needsnewomnilist == 1
+    if string(g:SendCmdToR) != "function('SendCmdToR_fake')"
       call BuildROmniList()
     endif
     let res = []

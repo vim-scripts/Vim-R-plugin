@@ -88,7 +88,6 @@ endfunction
 " Convert R script into Rmd, md and, then, html.
 function! RSpin()
     update
-    let g:needsnewomnilist = 1
     call RSetWD()
     call g:SendCmdToR('require(knitr); spin("' . expand("%:t") . '")')
 endfunction

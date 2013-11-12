@@ -124,7 +124,6 @@ function! RMakeHTMLrrst(t)
     if g:vimrplugin_openhtml && a:t == "html"
         let rcmd = rcmd . '; browseURL("' . expand("%:r:t") . '.html")'
     endif
-    let g:needsnewomnilist = 1
     call g:SendCmdToR(rcmd)
 endfunction
 
@@ -162,7 +161,6 @@ function! RMakePDFrrst()
         let pdfcmd = pdfcmd . ", " . g:vimrplugin_rst2pdfargs
     endif
     let pdfcmd = pdfcmd . ")"
-    let g:needsnewomnilist = 1
     let ok = g:SendCmdToR(pdfcmd)
     if ok == 0
         return
@@ -178,7 +176,6 @@ function! SendRrstChunkToR(e, m)
     let chunkline = search("^\\.\\. {r", "bncW") + 1
     let docline = search("^\\.\\. \\.\\.", "ncW") - 1
     let lines = getline(chunkline, docline)
-    let g:needsnewomnilist = 1
     let ok = RSourceLines(lines, a:e)
     if ok == 0
         return
