@@ -1951,7 +1951,10 @@ function RAddToLibList(nlib, verbose)
     endif
 endfunction
 
+" This function is called by the R package vimcom.plus whenever a library is
+" loaded.
 function RFillLibList()
+    " Update the list of objects for omnicompletion
     if filereadable($VIMRPLUGIN_TMPDIR . "/libnames_" . $VIMINSTANCEID)
         let newls = readfile($VIMRPLUGIN_TMPDIR . "/libnames_" . $VIMINSTANCEID)
         for nlib in newls
@@ -1971,11 +1974,8 @@ function RFillLibList()
 
     if exists("*RUpdateFunSyntax")
         call RUpdateFunSyntax(0)
-        " If is included in another file type (like rnoweb or rhelp), the R
-        " syntax isn't automatically updated. So, we call "syntax on" to force
-        " the update.
         if &filetype != "r"
-            syntax on
+            silent exe "set filetype=" . &filetype
         endif
     endif
 endfunction
@@ -2999,18 +2999,32 @@ function RCreateSendMaps()
 endfunction
 
 function RBufEnter()
-    if &filetype != g:rplugin_lastft
-        call UnMakeRMenu()
-        if &filetype == "r" || &filetype == "rnoweb" || &filetype == "rrst" || &filetype == "rdoc" || &filetype == "rbrowser" || &filetype == "rhelp"
-            if &filetype == "rbrowser"
-                call MakeRBrowserMenu()
-            else
-                call MakeRMenu()
+    let g:rplugin_curbuf = bufname("%")
+    if has("gui_running")
+        if &filetype != g:rplugin_lastft
+            call UnMakeRMenu()
+            if &filetype == "r" || &filetype == "rnoweb" || &filetype == "rmd" || &filetype == "rrst" || &filetype == "rdoc" || &filetype == "rbrowser" || &filetype == "rhelp"
+                if &filetype == "rbrowser"
+                    call MakeRBrowserMenu()
+                else
+                    call MakeRMenu()
+                endif
             endif
         endif
+        if &buftype != "nofile" || (&buftype == "nofile" && &filetype != "rbrowser")
+            let g:rplugin_lastft = &filetype
+        endif
     endif
-    if &buftype != "nofile" || &filetype == "rbrowser"
-        let g:rplugin_lastft = &filetype
+
+    " It would be better if we could call RUpdateFunSyntax() for all buffers
+    " immediately after a new library was loaded, but the command :bufdo
+    " temporarily disables Syntax events.
+    if exists("b:rplugin_funls") && len(b:rplugin_funls) < len(g:rplugin_libls)
+        call RUpdateFunSyntax(0)
+        " If R code is included in another file type (like rnoweb or
+        " rhelp), the R syntax isn't automatically updated. So, we force
+        " it: 
+        silent exe "set filetype=" . &filetype
     endif
 endfunction
 
@@ -3481,15 +3495,7 @@ if exists("g:vimrplugin_term_cmd")
     let g:rplugin_termcmd = g:vimrplugin_term_cmd
 endif
 
-augroup RBufControl
-    au BufEnter * let g:rplugin_curbuf = bufname("%")
-augroup END
-
-if has("gui_running")
-    augroup RMenuControl
-        au BufEnter * call RBufEnter()
-    augroup END
-endif
+autocmd BufEnter * call RBufEnter()
 
 let g:rplugin_firstbuffer = expand("%:p")
 let g:rplugin_running_objbr = 0
