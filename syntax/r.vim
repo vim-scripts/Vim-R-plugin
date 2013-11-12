@@ -3,7 +3,7 @@
 " Maintainer:	      Jakson Aquino <jalvesaq@gmail.com>
 " Former Maintainers: Vaidotas Zemlys <zemlys@gmail.com>
 " 		      Tom Payne <tom@tompayne.org>
-" Last Change:	      Sat Nov 09, 2013  07:27PM
+" Last Change:	      Mon Nov 11, 2013  10:12PM
 " Filenames:	      *.R *.r *.Rhistory *.Rt
 " 
 " NOTE: The highlighting of R functions is defined in the
@@ -150,64 +150,6 @@ syn match rBraceError "[)}]" contained
 syn match rCurlyError "[)\]]" contained
 syn match rParenError "[\]}]" contained
 
-" Source lists of R functions. The lists are produced by the Vim-R-plugin
-" http://www.vim.org/scripts/script.php?script_id=2628
-if !exists("g:vimrplugin_permanent_libs")
-    let g:vimrplugin_permanent_libs = "base,stats,graphics,grDevices,utils,datasets,methods"
-endif
-let b:rplugin_funls = []
-
-function! RAddToFunList(lib, verbose)
-    " Only run once for each package:
-    for pkg in b:rplugin_funls
-        if pkg == a:lib
-            return
-        endif
-    endfor
-
-    " The fun_ files list functions of R packages and are created by the
-    " Vim-R-plugin:
-    let fnf = split(globpath(&rtp, 'r-plugin/objlist/fun_' . a:lib . '_*'), "\n")
-
-    if len(fnf) == 1
-        silent exe "source " . fnf[0]
-        let b:rplugin_funls += [a:lib]
-    elseif a:verbose && len(fnf) == 0
-        echohl WarningMsg
-        echomsg 'Fun_ file for "' . a:lib . '" not found.'
-        echohl Normal
-        return
-    elseif a:verbose && len(fnf) > 1
-        echohl WarningMsg
-        echomsg 'There is more than one fun_ file for "' . a:lib . '":'
-        for fff in fnf
-            echomsg fff
-        endfor
-        echohl Normal
-        return
-    endif
-endfunction
-
-function! RUpdateFunSyntax(verbose)
-    " Do nothing if called at a buffer that doesn't include R syntax:
-    if !exists("b:rplugin_funls")
-        return
-    endif
-    if exists("g:rplugin_libls")
-        for lib in g:rplugin_libls
-            call RAddToFunList(lib, a:verbose)
-        endfor
-    else
-        if exists("g:vimrplugin_permanent_libs")
-            for lib in split(g:vimrplugin_permanent_libs, ",")
-                call RAddToFunList(lib, a:verbose)
-            endfor
-        endif
-    endif
-endfunction
-
-call RUpdateFunSyntax(0)
-
 syn match rDollar display contained "\$"
 syn match rDollar display contained "@"
 
@@ -273,5 +215,78 @@ hi def link rType        Type
 hi def link rOKeyword    Title
 
 let b:current_syntax="r"
+
+" The code below is used by the Vim-R-plugin:
+" http://www.vim.org/scripts/script.php?script_id=2628
+
+" Users may define the value of g:vimrplugin_permanent_libs to determine what
+" functions should be highlighted even if R is not running. By default, the
+" functions of packages loaded by R --vanilla are highlighted.
+if !exists("g:vimrplugin_permanent_libs")
+    let g:vimrplugin_permanent_libs = "base,stats,graphics,grDevices,utils,datasets,methods"
+endif
+
+" Store the names R package whose functions were already added to syntax
+" highlight to avoid sourcing them repeatedly.
+let b:rplugin_funls = []
+
+" The function RUpdateFunSyntax() is called by the Vim-R-plugin whenever the
+" user loads a new package in R. The function should be defined only once.
+" Thus, if it's already defined, call it and finish.
+if exists("*RUpdateFunSyntax")
+    call RUpdateFunSyntax(0)
+    finish
+endif
+
+function RAddToFunList(lib, verbose)
+    " Only run once for each package:
+    for pkg in b:rplugin_funls
+        if pkg == a:lib
+            return
+        endif
+    endfor
+
+    " The fun_ files list functions of R packages and are created by the
+    " Vim-R-plugin:
+    let fnf = split(globpath(&rtp, 'r-plugin/objlist/fun_' . a:lib . '_*'), "\n")
+
+    if len(fnf) == 1
+        silent exe "source " . fnf[0]
+        let b:rplugin_funls += [a:lib]
+    elseif a:verbose && len(fnf) == 0
+        echohl WarningMsg
+        echomsg 'Fun_ file for "' . a:lib . '" not found.'
+        echohl Normal
+        return
+    elseif a:verbose && len(fnf) > 1
+        echohl WarningMsg
+        echomsg 'There is more than one fun_ file for "' . a:lib . '":'
+        for fff in fnf
+            echomsg fff
+        endfor
+        echohl Normal
+        return
+    endif
+endfunction
+
+function RUpdateFunSyntax(verbose)
+    " Do nothing if called at a buffer that doesn't include R syntax:
+    if !exists("b:rplugin_funls")
+        return
+    endif
+    if exists("g:rplugin_libls")
+        for lib in g:rplugin_libls
+            call RAddToFunList(lib, a:verbose)
+        endfor
+    else
+        if exists("g:vimrplugin_permanent_libs")
+            for lib in split(g:vimrplugin_permanent_libs, ",")
+                call RAddToFunList(lib, a:verbose)
+            endfor
+        endif
+    endif
+endfunction
+
+call RUpdateFunSyntax(0)
 
 " vim: ts=8 sw=4

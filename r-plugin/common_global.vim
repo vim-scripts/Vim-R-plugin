@@ -1971,6 +1971,12 @@ function RFillLibList()
 
     if exists("*RUpdateFunSyntax")
         call RUpdateFunSyntax(0)
+        " If is included in another file type (like rnoweb or rhelp), the R
+        " syntax isn't automatically updated. So, we call "syntax on" to force
+        " the update.
+        if &filetype != "r"
+            syntax on
+        endif
     endif
 endfunction
 
