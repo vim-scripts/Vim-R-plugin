@@ -54,7 +54,7 @@ Vim-R-plugin (see |vimrplugin_source|).
 
   * Syntax highlighting for R code, including:
       - Special characters in strings.
-      - Functions of all installed packages (must be updated manually).
+      - Functions of loaded packages.
       - Special highlighting for R output (.Rout files).
       - Spell check only strings and comments.
       - Fold code when foldmethod=syntax.
@@ -203,6 +203,11 @@ dependencies:
 
     * R's version must be >= 3.0.0: http://www.r-project.org/
 
+    * vimcom.plus = 0.9-92: http://www.lepem.ufc.br/jaa/vimcom.plus.html
+      
+      Note: If you cannot build vimcom.plus yourself, you will want to
+      download and install the zip file.
+
     * Vim's version must be >= 7.4: http://www.vim.org/download.php
 
     * Python 2.7.5 (32 bit): http://www.python.org/download/
@@ -216,11 +221,6 @@ dependencies:
       on the download page to find the file that matches exactly the above
       versions. Please, read |r-plugin-python| if want to use different
       versions.
-
-    * vimcom.plus = 0.9-92: http://www.lepem.ufc.br/jaa/vimcom.plus.html
-      
-      Note: If you cannot build vimcom.plus yourself, you will want to
-      download and install the zip file.
 
 Now, download the latest version of `Vim-R-plugin.vmb` from
 
@@ -910,7 +910,6 @@ And in Normal mode Vim do:
 >
    :let rplugin_rconsole_pane = "X"
    :let rplugin_tmuxsname = "Y"
-   :let g:needsnewomnilist = 1
 <
 Finally, do one of the commands below in Normal mode Vim, according to how R
 is running:
@@ -951,7 +950,7 @@ is running:
 |vimrplugin_applescript|       Use osascript in Mac OS X
 |vimrplugin_listmethods|       Do `vim.list.args()` instead of `args()`
 |vimrplugin_specialplot|       Do `vim.plot()` instead of `plot()`
-|vimrplugin_maxdeparse|        Argument to R `args()` function
+|vimrplugin_maxdeparse|        Argument to R `source()` function
 |vimrplugin_latexcmd|          Command to run on .tex files
 |vimrplugin_sweaveargs|        Arguments do `Sweave()`
 |vimrplugin_never_unmake_menu| Do not unmake the menu when switching buffers
@@ -1447,9 +1446,11 @@ scripts, put in your |vimrc|:
 >
    let vimrplugin_source = "~/path/to/MyScript.vim,/path/to/AnotherScript.vim"
 <
-Currently, there is only one script known to extend the Vim-R-plugin features:
+Currently, there are only two scripts known to extend the Vim-R-plugin
+features:
 
    - https://github.com/mllg/vim-devtools-plugin
+   - https://github.com/jalvesaq/screenR
 
 
 6.28. Restart R if it is already running (Linux/Unix only)~
@@ -1487,7 +1488,7 @@ will be shown only if "preview" is included in your 'completeopt'.
 When creating custom key bindings for the Vim-R-plugin, it is necessary to
 create three maps for most functions because the way the function is called is
 different in each Vim mode. Thus, key bindings must be made for Normal mode,
-insert mode, and visual mode.
+Insert mode, and Visual mode.
 
 To customize a key binding you should put in your |vimrc| something like:
 >
@@ -1949,7 +1950,7 @@ the R package "debug":
 >
    install.packages("debug")
    library(debug)
-   mtrace(function)
+   mtrace(function_name)
 <
 Once the library is installed and loaded, you should use `mtrace(function_name)`
 to enable the debugging of a function. Then, the next time that the function
@@ -1958,9 +1959,6 @@ hit <Enter> to evaluate the current line, `go(n)` to go to line `n` in the
 function and `qqq()` to quit the function (See debug's help for details). A
 useful tip is to click on the title bar of the debug window and choose "Always
 on top" or a similar option provided by your desktop manager.
-
-There is also the R package "edtdbg" which aims to integrate R debugging
-facilities with Vim.
 
 
 9.17. Turn the R-plugin into a global plugin~
@@ -2190,7 +2188,7 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-0.9.9.8 (2013-11-10)
+0.9.9.8 (2013-11-13)
 
  * The list of objects for omnicompletion and the list of functions for syntax
    highlight now are built dynamically. Deprecated commands and options:
