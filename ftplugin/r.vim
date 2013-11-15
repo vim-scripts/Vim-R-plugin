@@ -92,8 +92,15 @@ function! RSpin()
     call g:SendCmdToR('require(knitr); spin("' . expand("%:t") . '")')
 endfunction
 
+" Default IsInRCode function when the plugin is used as a global plugin
+function DefaultIsInRCode(vrb)
+    return 1
+endfunction
+
 "==========================================================================
 " Key bindings and menu items
+
+let b:IsInRCode = function("DefaultIsInRCode")
 
 call RCreateStartMaps()
 call RCreateEditMaps()

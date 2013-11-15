@@ -46,15 +46,15 @@ setlocal iskeyword=@,48-57,_,.
 " defined after the global ones:
 runtime r-plugin/common_buffer.vim
 
-function! RrstIsInRCode()
-    let curline = line(".")
+function! RrstIsInRCode(vrb)
     let chunkline = search("^\\.\\. {r", "bncW")
-    call cursor(chunkline)
     let docline = search("^\\.\\. \\.\\.", "bncW")
-    call cursor(curline)
-    if chunkline > docline
+    if chunkline > docline && chunkline != line(".")
         return 1
     else
+        if a:vrb
+            call RWarningMsg("Not inside an R code chunk.")
+        endif
         return 0
     endif
 endfunction
@@ -64,7 +64,7 @@ function! RrstPreviousChunk() range
     let chunk = len(rg)
     for var in range(1, chunk)
         let curline = line(".")
-        if RrstIsInRCode()
+        if RrstIsInRCode(0)
             let i = search("^\\.\\. {r", "bnW")
             if i != 0
                 call cursor(i-1, 1)
@@ -169,7 +169,7 @@ endfunction
 
 " Send Rrst chunk to R
 function! SendRrstChunkToR(e, m)
-    if RrstIsInRCode() == 0
+    if RrstIsInRCode(0) == 0
         call RWarningMsg("Not inside an R code chunk.")
         return
     endif
@@ -184,6 +184,11 @@ function! SendRrstChunkToR(e, m)
         call RrstNextChunk()
     endif  
 endfunction
+
+let b:IsInRCode = function("RrstIsInRCode")
+let b:PreviousRChunk = function("RrstPreviousChunk")
+let b:NextRChunk = function("RrstNextChunk")
+let b:SendChunkToR = function("SendRrstChunkToR")
 
 "==========================================================================
 " Key bindings and menu items
@@ -200,12 +205,12 @@ call RCreateMaps("nvi", '<Plug>RMakePDFK',    'kp', ':call RMakePDFrrst()')
 call RCreateMaps("nvi", '<Plug>RMakeHTML',    'kh', ':call RMakeHTMLrrst("html")')
 call RCreateMaps("nvi", '<Plug>RMakeODT',     'ko', ':call RMakeHTMLrrst("odt")')
 call RCreateMaps("nvi", '<Plug>RIndent',      'si', ':call RrstToggleIndentSty()')
-call RCreateMaps("ni",  '<Plug>RSendChunk',   'cc', ':call SendRrstChunkToR("silent", "stay")')
-call RCreateMaps("ni",  '<Plug>RESendChunk',  'ce', ':call SendRrstChunkToR("echo", "stay")')
-call RCreateMaps("ni",  '<Plug>RDSendChunk',  'cd', ':call SendRrstChunkToR("silent", "down")')
-call RCreateMaps("ni",  '<Plug>REDSendChunk', 'ca', ':call SendRrstChunkToR("echo", "down")')
-nmap <buffer><silent> gn :call RrstNextChunk()<CR>
-nmap <buffer><silent> gN :call RrstPreviousChunk()<CR>
+call RCreateMaps("ni",  '<Plug>RSendChunk',   'cc', ':call b:SendChunkToR("silent", "stay")')
+call RCreateMaps("ni",  '<Plug>RESendChunk',  'ce', ':call b:SendChunkToR("echo", "stay")')
+call RCreateMaps("ni",  '<Plug>RDSendChunk',  'cd', ':call b:SendChunkToR("silent", "down")')
+call RCreateMaps("ni",  '<Plug>REDSendChunk', 'ca', ':call b:SendChunkToR("echo", "down")')
+nmap <buffer><silent> gn :call b:NextRChunk()<CR>
+nmap <buffer><silent> gN :call b:PreviousRChunk()<CR>
 
 " Menu R
 if has("gui_running")

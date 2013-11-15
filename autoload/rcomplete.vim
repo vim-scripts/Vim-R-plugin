@@ -4,7 +4,7 @@
 "
 
 fun! rcomplete#CompleteR(findstart, base)
-  if &filetype == "rnoweb" && RnwIsInRCode() == 0 && exists("*LatexBox_Complete")
+  if &filetype == "rnoweb" && RnwIsInRCode(0) == 0 && exists("*LatexBox_Complete")
       let texbegin = LatexBox_Complete(a:findstart, a:base)
       return texbegin
   endif

@@ -72,7 +72,7 @@ function RSetDefaultValue(var, val)
 endfunction
 
 function ReplaceUnderS()
-    if (&filetype == "rnoweb" || &filetype == "tex") && RnwIsInRCode() == 0
+    if &filetype != "r" && b:IsInRCode(0) == 0
         let isString = 1
     else
         let j = col(".")
@@ -323,33 +323,6 @@ function RCompleteArgs()
     return ''
 endfunction
 
-function IsRCode(lnum)
-    let save_cursor = getpos(".")
-    call cursor(a:lnum, 0)
-    let isRcode = 1
-    if &filetype == "rnoweb" && RnwIsInRCode() == 0
-        let isRcode = 0
-    endif
-    if &filetype == "rrst" && RrstIsInRCode() == 0
-        let isRcode = 0
-    endif
-    if &filetype == "rmd" && RmdIsInRCode() == 0
-        let isRcode = 0
-    endif
-    if &filetype == "rhelp"
-        let lastsection = search('^\\[a-z]*{', "bncW")
-        let secname = getline(lastsection)
-        if secname =~ '^\\usage{' || secname =~ '^\\examples{' || secname =~ '^\\dontshow{' || secname =~ '^\\dontrun{' || secname =~ '^\\donttest{' || secname =~ '^\\testonly{'
-            let isRcode = 1
-        else
-            let isRcode = 0
-        endif
-    endif
-    call setpos(".", save_cursor)
-    let g:risrcode = isRcode
-    return isRcode
-endfunction
-
 function RGetFL(mode)
     if a:mode == "normal"
         let fline = line(".")
@@ -366,28 +339,32 @@ function RGetFL(mode)
     return [fline, lline]
 endfunction
 
-function RSimpleCommentLine(mode)
-    let [fline, lline] = RGetFL(a:mode)
-    if IsRCode(fline)
-        let cstr = "#"
-    else
-        let cstr = "%"
-    endif
-    for ii in range(fline, lline)
-        call setline(ii, cstr . getline(ii))
-    endfor
+function IsLineInRCode(vrb, line)
+    let save_cursor = getpos(".")
+    call setpos(".", [0, a:line, 1, 0])
+    let isR = b:IsInRCode(a:vrb)
+    call setpos('.', save_cursor)
+    return isR
 endfunction
 
-function RSimpleUncommentLine(mode)
+function RSimpleCommentLine(mode, what)
     let [fline, lline] = RGetFL(a:mode)
-    if IsRCode(fline)
-        let cstr = "#"
-    else
+    let cstr = "#"
+    if (&filetype == "rnoweb"|| &filetype == "rhelp") && IsLineInRCode(0, fline) == 0
         let cstr = "%"
+    elseif (&filetype == "rmd" || &filetype == "rrst") && IsLineInRCode(0, fline) == 0
+        return
     endif
-    for ii in range(fline, lline)
-        call setline(ii, substitute(getline(ii), "^" . cstr, "", ""))
-    endfor
+
+    if a:what == "c"
+        for ii in range(fline, lline)
+            call setline(ii, cstr . getline(ii))
+        endfor
+    else
+        for ii in range(fline, lline)
+            call setline(ii, substitute(getline(ii), "^" . cstr, "", ""))
+        endfor
+    endif
 endfunction
 
 function RCommentLine(lnum, ind, cmt)
@@ -418,19 +395,19 @@ function RComment(mode)
     let [fline, lline] = RGetFL(a:mode)
 
     " What comment string to use?
-    let isRcode = IsRCode(fline)
-    if isRcode == 0
-        let cmt = '%'
-    else
-        if g:r_indent_ess_comments
-            if g:vimrplugin_indent_commented
-                let cmt = '##'
-            else
-                let cmt = '###'
-            endif
+    if g:r_indent_ess_comments
+        if g:vimrplugin_indent_commented
+            let cmt = '##'
         else
-            let cmt = '#'
+            let cmt = '###'
         endif
+    else
+        let cmt = '#'
+    endif
+    if (&filetype == "rnoweb" || &filetype == "rhelp") && IsLineInRCode(0, fline) == 0
+        let cmt = "%"
+    elseif (&filetype == "rmd" || &filetype == "rrst") && IsLineInRCode(0, fline) == 0
+        return
     endif
 
     let lnum = fline
@@ -543,36 +520,6 @@ function CountBraces(line)
     return result
 endfunction
 
-function RnwPreviousChunk()
-    let curline = line(".")
-    if RnwIsInRCode()
-        let i = search("^<<.*$", "bnW")
-        if i != 0
-            call cursor(i-1, 1)
-        endif
-    endif
-
-    let i = search("^<<.*$", "bnW")
-    if i == 0
-        call cursor(curline, 1)
-        call RWarningMsg("There is no previous R code chunk to go.")
-    else
-        call cursor(i+1, 1)
-    endif
-    return
-endfunction
-
-function RnwNextChunk()
-    let linenr = search("^<<.*", "nW")
-    if linenr == 0
-        call RWarningMsg("There is no next R code chunk to go.")
-    else
-        let linenr += 1
-        call cursor(linenr, 1)
-    endif
-    return
-endfunction
-
 " Skip empty lines and lines whose first non blank char is '#'
 function GoDown()
     if &filetype == "rnoweb"
@@ -586,6 +533,12 @@ function GoDown()
         let curline = getline(".")
         if curline =~ '^```$'
             call RmdNextChunk()
+            return
+        endif
+    elseif &filetype == "rrst"
+        let curline = getline(".")
+        if curline =~ '^\.\. \.\.$'
+            call RrstNextChunk()
             return
         endif
     endif
@@ -1274,6 +1227,8 @@ function SendCmdToR_TmuxSplit(cmd)
     endif
 
     if !exists("g:rplugin_rconsole_pane")
+        " Should never happen
+        call RWarningMsg("Missing internal variable: g:rplugin_rconsole_pane")
     endif
     let str = substitute(cmd, "'", "'\\\\''", "g")
     let scmd = "tmux set-buffer '" . str . "\<C-M>' && tmux paste-buffer -t " . g:rplugin_rconsole_pane
@@ -1413,20 +1368,7 @@ endfunction
 " Adapted of the plugin marksbrowser
 " Function to get the marks which the cursor is between
 function SendMBlockToR(e, m)
-    if &filetype == "rnoweb" && RnwIsInRCode() == 0
-        call RWarningMsg("Not inside an R code chunk.")
-        return
-    endif
-    if &filetype == "rdoc" && search("^Examples:$", "bncW") == 0
-        call RWarningMsg('Not in the "Examples" section.')
-        return
-    endif
-    if &filetype == "rrst" && RrstIsInRCode() == 0
-        call RWarningMsg("Not inside an R code chunk.")
-        return
-    endif
-    if &filetype == "rmd" && RmdIsInRCode() == 0
-        call RWarningMsg("Not inside an R code chunk.")
+    if &filetype != "r" && b:IsInRCode(1) == 0
         return
     endif
 
@@ -1467,20 +1409,7 @@ endfunction
 
 " Send functions to R
 function SendFunctionToR(e, m)
-    if &filetype == "rnoweb" && RnwIsInRCode() == 0
-        call RWarningMsg("Not inside an R code chunk.")
-        return
-    endif
-    if &filetype == "rdoc" && search("^Examples:$", "bncW") == 0
-        call RWarningMsg('Not in the "Examples" section.')
-        return
-    endif
-    if &filetype == "rrst" && RrstIsInRCode() == 0
-        call RWarningMsg("Not inside an R code chunk.")
-        return
-    endif
-    if &filetype == "rmd" && RmdIsInRCode() == 0
-        call RWarningMsg("Not inside an R code chunk.")
+    if &filetype != "r" && b:IsInRCode(1) == 0
         return
     endif
 
@@ -1549,20 +1478,7 @@ endfunction
 
 " Send selection to R
 function SendSelectionToR(e, m)
-    if &filetype == "rnoweb" && RnwIsInRCode() == 0 && !(line("'<") == line("'>") && getline(".") =~ "\\Sexpr")
-        call RWarningMsg("Not inside an R code chunk.")
-        return
-    endif
-    if &filetype == "rdoc" && search("^Examples:$", "bncW") == 0
-        call RWarningMsg('Not in the "Examples" section.')
-        return
-    endif
-    if &filetype == "rrst" && RrstIsInRCode() == 0
-        call RWarningMsg("Not inside an R code chunk.")
-        return
-    endif
-    if &filetype == "rmd" && RmdIsInRCode() == 0
-        call RWarningMsg("Not inside an R code chunk.")
+    if &filetype != "r" && b:IsInRCode(1) == 0
         return
     endif
 
@@ -1623,20 +1539,7 @@ endfunction
 
 " Send paragraph to R
 function SendParagraphToR(e, m)
-    if &filetype == "rnoweb" && RnwIsInRCode() == 0
-        call RWarningMsg("Not inside an R code chunk.")
-        return
-    endif
-    if &filetype == "rdoc" && search("^Examples:$", "bncW") == 0
-        call RWarningMsg('Not in the "Examples" section.')
-        return
-    endif
-    if &filetype == "rrst" && RrstIsInRCode() == 0
-        call RWarningMsg("Not inside an R code chunk.")
-        return
-    endif
-    if &filetype == "rmd" && RmdIsInRCode() == 0
-        call RWarningMsg("Not inside an R code chunk.")
+    if &filetype != "r" && b:IsInRCode(1) == 0
         return
     endif
 
@@ -1690,8 +1593,33 @@ function SendLineToR(godown)
             endif
             return
         endif
-        if RnwIsInRCode() == 0
-            call RWarningMsg("Not inside an R code chunk.")
+        if RnwIsInRCode(1) == 0
+            return
+        endif
+    endif
+
+    if &filetype == "rmd"
+        if line =~ "^```$"
+            if a:godown =~ "down"
+                call GoDown()
+            endif
+            return
+        endif
+        let line = substitute(line, "^\\`\\`\\?", "", "")
+        if RmdIsInRCode(1) == 0
+            return
+        endif
+    endif
+
+    if &filetype == "rrst"
+        if line =~ "^\.\. \.\.$"
+            if a:godown =~ "down"
+                call GoDown()
+            endif
+            return
+        endif
+        let line = substitute(line, "^\\.\\. \\?", "", "")
+        if RrstIsInRCode(1) == 0
             return
         endif
     endif
@@ -1703,31 +1631,13 @@ function SendLineToR(godown)
             call ShowRDoc(topic, package, 1)
             return
         endif
-        if search("^Examples:$", "bncW") == 0
-            call RWarningMsg('Not in the "Examples" section.')
+        if RdocIsInRCode(1) == 0
             return
         endif
     endif
 
-    if &filetype == "rrst"
-        let line = substitute(line, "^\\.\\. \\?", "", "")
-        if RrstIsInRCode() == 0
-            call RWarningMsg("Not inside an R code chunk.")
-            return
-        endif
-    endif
-    if &filetype == "rmd"
-        if line =~ "^```$"
-            if a:godown =~ "down"
-                call GoDown()
-            endif
-            return
-        endif
-        let line = substitute(line, "^\\`\\`\\?", "", "")
-        if RmdIsInRCode() == 0
-            call RWarningMsg("Not inside an R code chunk.")
-            return
-        endif
+    if &filetype == "rhelp" && RhelpIsInRCode(1) == 0
+        return
     endif
 
     let ok = g:SendCmdToR(line)
@@ -2596,28 +2506,12 @@ function MakeRMenu()
     call RCreateMenuItem("ni", 'Send.Block\ (cur,\ down)', '<Plug>RDSendMBlock', 'bd', ':call SendMBlockToR("silent", "down")')
     call RCreateMenuItem("ni", 'Send.Block\ (cur,\ echo\ and\ down)', '<Plug>REDSendMBlock', 'ba', ':call SendMBlockToR("echo", "down")')
     "-------------------------------
-    if &filetype == "rnoweb" || g:vimrplugin_never_unmake_menu
+    if &filetype == "rnoweb" || &filetype == "rmd" || &filetype == "rrst" || g:vimrplugin_never_unmake_menu
         menu R.Send.-Sep2- <nul>
-        call RCreateMenuItem("ni", 'Send.Chunk\ (cur)', '<Plug>RSendChunk', 'cc', ':call SendChunkToR("silent", "stay")')
-        call RCreateMenuItem("ni", 'Send.Chunk\ (cur,\ echo)', '<Plug>RESendChunk', 'ce', ':call SendChunkToR("echo", "stay")')
-        call RCreateMenuItem("ni", 'Send.Chunk\ (cur,\ down)', '<Plug>RDSendChunk', 'cd', ':call SendChunkToR("silent", "down")')
-        call RCreateMenuItem("ni", 'Send.Chunk\ (cur,\ echo\ and\ down)', '<Plug>REDSendChunk', 'ca', ':call SendChunkToR("echo", "down")')
-    endif
-    "-------------------------------
-    if &filetype == "rmd" || g:vimrplugin_never_unmake_menu
-        menu R.Send.-Sep2- <nul>
-        call RCreateMenuItem("ni", 'Send.Chunk\ (cur)', '<Plug>RSendChunk', 'cc', ':call SendRmdChunkToR("silent", "stay")')
-        call RCreateMenuItem("ni", 'Send.Chunk\ (cur,\ echo)', '<Plug>RESendChunk', 'ce', ':call SendRmdChunkToR("echo", "stay")')
-        call RCreateMenuItem("ni", 'Send.Chunk\ (cur,\ down)', '<Plug>RDSendChunk', 'cd', ':call SendRmdChunkToR("silent", "down")')
-        call RCreateMenuItem("ni", 'Send.Chunk\ (cur,\ echo\ and\ down)', '<Plug>REDSendChunk', 'ca', ':call SendRmdChunkToR("echo", "down")')
-    endif
-    "-------------------------------
-    if &filetype == "rrst" || g:vimrplugin_never_unmake_menu
-        menu R.Send.-Sep2- <nul>
-        call RCreateMenuItem("ni", 'Send.Chunk\ (cur)', '<Plug>RSendChunk', 'cc', ':call SendRrstChunkToR("silent", "stay")')
-        call RCreateMenuItem("ni", 'Send.Chunk\ (cur,\ echo)', '<Plug>RESendChunk', 'ce', ':call SendRrstChunkToR("echo", "stay")')
-        call RCreateMenuItem("ni", 'Send.Chunk\ (cur,\ down)', '<Plug>RDSendChunk', 'cd', ':call SendRrstChunkToR("silent", "down")')
-        call RCreateMenuItem("ni", 'Send.Chunk\ (cur,\ echo\ and\ down)', '<Plug>REDSendChunk', 'ca', ':call SendRrstChunkToR("echo", "down")')
+        call RCreateMenuItem("ni", 'Send.Chunk\ (cur)', '<Plug>RSendChunk', 'cc', ':call b:SendChunkToR("silent", "stay")')
+        call RCreateMenuItem("ni", 'Send.Chunk\ (cur,\ echo)', '<Plug>RESendChunk', 'ce', ':call b:SendChunkToR("echo", "stay")')
+        call RCreateMenuItem("ni", 'Send.Chunk\ (cur,\ down)', '<Plug>RDSendChunk', 'cd', ':call b:SendChunkToR("silent", "down")')
+        call RCreateMenuItem("ni", 'Send.Chunk\ (cur,\ echo\ and\ down)', '<Plug>REDSendChunk', 'ca', ':call b:SendChunkToR("echo", "down")')
     endif
     "-------------------------------
     menu R.Send.-Sep3- <nul>
@@ -2732,26 +2626,16 @@ function MakeRMenu()
         menu R.Edit.-Sep72- <nul>
         call RCreateMenuItem("ni", 'Edit.Toggle\ comment\ (line/sel)', '<Plug>RToggleComment', 'xx', ':call RComment("normal")')
         call RCreateMenuItem("v", 'Edit.Toggle\ comment\ (line/sel)', '<Plug>RToggleComment', 'xx', ':call RComment("selection")')
-        call RCreateMenuItem("ni", 'Edit.Comment\ (line/sel)', '<Plug>RToggleComment', 'xc', ':call RComment("normal")')
-        call RCreateMenuItem("v", 'Edit.Comment\ (line/sel)', '<Plug>RToggleComment', 'xc', ':call RComment("selection")')
-        call RCreateMenuItem("ni", 'Edit.Uncomment\ (line/sel)', '<Plug>RToggleComment', 'xu', ':call RComment("normal")')
-        call RCreateMenuItem("v", 'Edit.Uncomment\ (line/sel)', '<Plug>RToggleComment', 'xu', ':call RComment("selection")')
+        call RCreateMenuItem("ni", 'Edit.Comment\ (line/sel)', '<Plug>RSimpleComment', 'xc', ':call RSimpleCommentLine("normal", "c")')
+        call RCreateMenuItem("v", 'Edit.Comment\ (line/sel)', '<Plug>RSimpleComment', 'xc', ':call RSimpleCommentLine("selection", "c")')
+        call RCreateMenuItem("ni", 'Edit.Uncomment\ (line/sel)', '<Plug>RSimpleUnComment', 'xu', ':call RSimpleCommentLine("normal", "u")')
+        call RCreateMenuItem("v", 'Edit.Uncomment\ (line/sel)', '<Plug>RSimpleUnComment', 'xu', ':call RSimpleCommentLine("selection", "u")')
         call RCreateMenuItem("ni", 'Edit.Add/Align\ right\ comment\ (line,\ sel)', '<Plug>RRightComment', ';', ':call MovePosRCodeComment("normal")')
         call RCreateMenuItem("v", 'Edit.Add/Align\ right\ comment\ (line,\ sel)', '<Plug>RRightComment', ';', ':call MovePosRCodeComment("selection")')
-        if &filetype == "rnoweb" || g:vimrplugin_never_unmake_menu
+        if &filetype == "rnoweb" || &filetype == "rrst" || &filetype == "rmd" || g:vimrplugin_never_unmake_menu
             menu R.Edit.-Sep73- <nul>
-            nmenu <silent> R.Edit.Go\ (next\ R\ chunk)<Tab>gn :call RnwNextChunk()<CR>
-            nmenu <silent> R.Edit.Go\ (previous\ R\ chunk)<Tab>gN :call RnwPreviousChunk()<CR>
-        endif
-        if &filetype == "rrst" || g:vimrplugin_never_unmake_menu
-            menu R.Edit.-Sep73- <nul>
-            nmenu <silent> R.Edit.Go\ (next\ R\ chunk)<Tab>gn :call RrstNextChunk()<CR>
-            nmenu <silent> R.Edit.Go\ (previous\ R\ chunk)<Tab>gN :call RrstPreviousChunk()<CR>
-        endif
-        if &filetype == "rmd" || g:vimrplugin_never_unmake_menu
-            menu R.Edit.-Sep73- <nul>
-            nmenu <silent> R.Edit.Go\ (next\ R\ chunk)<Tab>gn :call RmdNextChunk()<CR>
-            nmenu <silent> R.Edit.Go\ (previous\ R\ chunk)<Tab>gN :call RmdPreviousChunk()<CR>
+            nmenu <silent> R.Edit.Go\ (next\ R\ chunk)<Tab>gn :call b:NextRChunk()<CR>
+            nmenu <silent> R.Edit.Go\ (previous\ R\ chunk)<Tab>gN :call b:PreviousRChunk()<CR>
         endif
     endif
 
@@ -2923,10 +2807,10 @@ function RCreateEditMaps()
     "-------------------------------------
     call RCreateMaps("ni", '<Plug>RToggleComment',   'xx', ':call RComment("normal")')
     call RCreateMaps("v", '<Plug>RToggleComment',   'xx', ':call RComment("selection")')
-    call RCreateMaps("ni", '<Plug>RSimpleComment',   'xc', ':call RSimpleCommentLine("normal")')
-    call RCreateMaps("v", '<Plug>RSimpleComment',   'xc', ':call RSimpleCommentLine("selection")')
-    call RCreateMaps("ni", '<Plug>RSimpleUnComment',   'xu', ':call RSimpleUncommentLine("normal")')
-    call RCreateMaps("v", '<Plug>RSimpleUnComment',   'xu', ':call RSimpleUncommentLine("selection")')
+    call RCreateMaps("ni", '<Plug>RSimpleComment',   'xc', ':call RSimpleCommentLine("normal", "c")')
+    call RCreateMaps("v", '<Plug>RSimpleComment',   'xc', ':call RSimpleCommentLine("selection", "c")')
+    call RCreateMaps("ni", '<Plug>RSimpleUnComment',   'xu', ':call RSimpleCommentLine("normal", "u")')
+    call RCreateMaps("v", '<Plug>RSimpleUnComment',   'xu', ':call RSimpleCommentLine("selection", "u")')
     call RCreateMaps("ni", '<Plug>RRightComment',   ';', ':call MovePosRCodeComment("normal")')
     call RCreateMaps("v", '<Plug>RRightComment',    ';', ':call MovePosRCodeComment("selection")')
     " Replace 'underline' with '<-'
@@ -3000,7 +2884,7 @@ function RBufEnter()
                 endif
             endif
         endif
-        if &buftype != "nofile" || (&buftype == "nofile" && &filetype != "rbrowser")
+        if &buftype != "nofile" || (&buftype == "nofile" && &filetype == "rbrowser")
             let g:rplugin_lastft = &filetype
         endif
     endif

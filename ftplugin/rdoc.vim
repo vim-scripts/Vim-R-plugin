@@ -66,8 +66,22 @@ function! FixRdoc()
     unlet old_undolevels
 endfunction
 
+function! RdocIsInRCode(vrb)
+    let exline = search("^Examples:$", "bncW")
+    if exline > 0 && line(".") > exline
+        return 1
+    else
+        if a:vrb
+            call RWarningMsg('Not in the "Examples" section.')
+        endif
+        return 0
+    endif
+endfunction
+
 "==========================================================================
 " Key bindings and menu items
+
+let b:IsInRCode = function("RdocIsInRCode")
 
 call RCreateSendMaps()
 call RControlMaps()
