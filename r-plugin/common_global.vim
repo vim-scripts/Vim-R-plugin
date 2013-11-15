@@ -1576,6 +1576,40 @@ function SendParagraphToR(e, m)
     endif
 endfunction
 
+" Send R code from the first chunk up to current line
+function SendFHChunkToR()
+    if &filetype == "rnoweb"
+        let begchk = "^<<.*>>=\$"
+        let endchk = "^@"
+    elseif &filetype == "rmd"
+        let begchk = "^[ \t]*```[ ]*{r"
+        let endchk = "^[ \t]*```$"
+    elseif &filetype == "rrst"
+        let begchk = "^\\.\\. {r"
+        let endchk = "^\\.\\. \\.\\."
+    else
+        " Should never happen
+        call RWarningMsg('Strange filetype (SendFHChunkToR): "' . &filetype '"')
+    endif
+
+    let codelines = []
+    let here = line(".")
+    let curbuf = getline(1, "$")
+    let idx = 1
+    while idx < here
+        if curbuf[idx] =~ begchk
+            let idx += 1
+            while curbuf[idx] !~ endchk && idx < here
+                let codelines += [curbuf[idx]]
+                let idx += 1
+            endwhile
+        else
+            let idx += 1
+        endif
+    endwhile
+    call RSourceLines(codelines, "silent")
+endfunction
+
 " Send current line to R.
 function SendLineToR(godown)
     let line = getline(".")
@@ -2512,6 +2546,7 @@ function MakeRMenu()
         call RCreateMenuItem("ni", 'Send.Chunk\ (cur,\ echo)', '<Plug>RESendChunk', 'ce', ':call b:SendChunkToR("echo", "stay")')
         call RCreateMenuItem("ni", 'Send.Chunk\ (cur,\ down)', '<Plug>RDSendChunk', 'cd', ':call b:SendChunkToR("silent", "down")')
         call RCreateMenuItem("ni", 'Send.Chunk\ (cur,\ echo\ and\ down)', '<Plug>REDSendChunk', 'ca', ':call b:SendChunkToR("echo", "down")')
+        call RCreateMenuItem("ni", 'Send.Chunk\ (from\ first\ to\ here)', '<Plug>RSendChunkFH', 'ch', ':call SendFHChunkToR()')
     endif
     "-------------------------------
     menu R.Send.-Sep3- <nul>
@@ -2852,6 +2887,10 @@ function RCreateSendMaps()
     call RCreateMaps("ni", '<Plug>RESendParagraph',  'pe', ':call SendParagraphToR("echo", "stay")')
     call RCreateMaps("ni", '<Plug>RDSendParagraph',  'pd', ':call SendParagraphToR("silent", "down")')
     call RCreateMaps("ni", '<Plug>REDSendParagraph', 'pa', ':call SendParagraphToR("echo", "down")')
+
+    if &filetype == "rnoweb" || &filetype == "rmd" || &filetype == "rrst"
+        call RCreateMaps("ni", '<Plug>RSendChunkFH', 'ch', ':call SendFHChunkToR()')
+    endif
 
     " *Line*
     "-------------------------------------
