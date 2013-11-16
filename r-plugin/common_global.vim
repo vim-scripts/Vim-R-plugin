@@ -568,13 +568,14 @@ function TmuxActivePane()
 endfunction
 
 function StartR_TmuxSplit(rcmd)
+    let g:rplugin_vim_pane = TmuxActivePane()
     call system("tmux set-environment -g VIMRPLUGIN_TMPDIR " . g:rplugin_esc_tmpdir)
     call system("tmux set-environment -g VIMRPLUGIN_HOME " . g:rplugin_home)
+    call system("tmux set-environment -g VIM_PANE " . g:rplugin_vim_pane)
     if v:servername != ""
         call system("tmux set-environment VIMEDITOR_SVRNM " . v:servername)
     endif
     call system("tmux set-environment VIMINSTANCEID " . $VIMINSTANCEID)
-    let g:rplugin_vim_pane = TmuxActivePane()
     let tcmd = "tmux split-window "
     if g:vimrplugin_vsplit
         if g:vimrplugin_rconsole_width == -1
