@@ -3085,10 +3085,15 @@ call RSetDefaultValue("g:vimrplugin_show_args",         0)
 call RSetDefaultValue("g:vimrplugin_indent_commented",  1)
 call RSetDefaultValue("g:vimrplugin_never_unmake_menu", 0)
 call RSetDefaultValue("g:vimrplugin_vimpager",       "'tab'")
-call RSetDefaultValue("g:vimrplugin_latexcmd", "'pdflatex'")
 call RSetDefaultValue("g:vimrplugin_objbr_place", "'script,right'")
 call RSetDefaultValue("g:vimrplugin_insert_mode_cmds",  1)
 call RSetDefaultValue("g:vimrplugin_permanent_libs", "'base,stats,graphics,grDevices,utils,datasets,methods'")
+
+if executable("latexmk")
+    call RSetDefaultValue("g:vimrplugin_latexcmd", "'latexmk -pdf'")
+else
+    call RSetDefaultValue("g:vimrplugin_latexcmd", "'pdflatex'")
+endif
 
 " Look for invalid options
 let objbrplace = split(g:vimrplugin_objbr_place, ",")
