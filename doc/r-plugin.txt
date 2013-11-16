@@ -1299,11 +1299,11 @@ Example:
 							 *vimrplugin_latexcmd*
 						       *vimrplugin_sweaveargs*
 On Windows, the plugin calls `tools::texi2pdf()` to build the pdf from the
-generated .tex file. On Linux/Unix, by default, Vim calls pdflatex to produce
-a pdf document from the .tex file produced by the R Sweave command. You can
-use the option vimrplugin_latexcmd to change this behavior. Examples:
+generated .tex file. On Linux/Unix, by default, Vim calls `latexmk` `-pdf` to
+produce a pdf document from the .tex file produced by either `Sweave()` or
+`knit()` command. If `latexmk` is not installed, it calls `pdflatex`. You can
+use the option vimrplugin_latexcmd to change this behavior. Example:
 >
-   let vimrplugin_latexcmd = "latexmk -pdf"
    let vimrplugin_latexcmd = "latex"
 <
 If you want to pass arguments do the `Sweave()` function, set the value of the
@@ -1906,7 +1906,7 @@ code automatically, breaking only comment lines, put in your |vimrc|:
 9.13. Vim with 256 colors in a terminal emulator (Linux/Unix only)~
 
 If you want 256 colors support in Vim, install the package ncurses-term. Then
-put in your ~/.bashrc the lines suggested at |r-plugin-quick-bash-setup|.
+put in your ~/.bashrc the lines suggested at |r-plugin-bash-setup|.
 Finally, put in your |vimrc|:
 >
    if &term =~ "xterm" || &term =~ "256" || $DISPLAY != ""
@@ -1931,7 +1931,7 @@ line in your |vimrc|:
 9.15. Edit your ~/.Rprofile~
 							   *r-plugin-Rprofile*
 You may want to edit your ~/.Rprofile in addition to considering the
-suggestions of |r-plugin-quick-R-setup| you may also want to put the following
+suggestions of |r-plugin-R-setup| you may also want to put the following
 lines in your .Rprofile if you are using Linux:
 >
    grDevices::X11.options(width = 4.5, height = 4, ypos = 0,
@@ -2058,7 +2058,7 @@ please read this document from the beginning.
    vmap <Space> <Plug>RDSendSelection
    nmap <Space> <Plug>RDSendLine
 <
-						   *r-plugin-quick-bash-setup*
+							 *r-plugin-bash-setup*
    ~/.bashrc:~
 >
    # Change the TERM environment variable (to get 256 colors) and make Vim
@@ -2089,7 +2089,7 @@ please read this document from the beginning.
    fi
 <
 
-						   *r-plugin-quick-tmux-setup*
+							 *r-plugin-tmux-setup*
    ~/.tmux.conf:~
 >
    set-option -g prefix C-a
@@ -2103,7 +2103,7 @@ please read this document from the beginning.
    set -g mouse-resize-pane on
 <
 
-						      *r-plugin-quick-R-setup*
+							    *r-plugin-R-setup*
    ~/.Rprofile~
 >
    if(interactive()){
@@ -2112,6 +2112,10 @@ please read this document from the beginning.
                colorout.verbose = 1,
                vimcom.verbose = 1,
                pager = "vimrpager")
+       # Use the text based web browser w3m to navigate through R docs:
+       if(Sys.getenv("TMUX") != "")
+           options(browser="~/bin/vimrw3mbrowser",
+                   help_type = "html")
        # Use either Vim or GVim as text editor for R:
        if(nchar(Sys.getenv("DISPLAY")) > 1)
            options(editor = 'gvim -f -c "set ft=r"')
@@ -2139,14 +2143,44 @@ please read this document from the beginning.
    ~/bin/vimrpager~
 >
    #!/bin/sh
-   # I don't know the reason, but we can't pipe the output directly to Vim. So
-   # we need this script to use 'cat' is intermediary.
+   # I don't know the reason, but we can't pipe the output directly to Vim.
+   # So we need this script to use 'cat' is intermediary.
    cat | vim -c 'set ft=rdoc' -
 <
-NOTE: You have to change the `~/bin/vimrpager` permissions to make it
-executable:
+
+   ~/bin/vimrw3mbrowser~
+>
+   #!/bin/sh
+   NCOLS=$(tput cols)
+   if [ "$NCOLS" -gt "140" ]
+   then
+       if [ "x$VIM_PANE" = "x" ]
+       then
+           tmux split-window -h "w3m $1 && exit"
+       else
+           tmux split-window -h -t $VIM_PANE "w3m $1 && exit"
+       fi
+   else
+       tmux new-window "w3m $1 && exit"
+   fi
+<
+
+NOTES: 1. The `~/bin` diretory must be in your PATH.
+       2. To use the `vimrw3mbrower` script the web browser w3m must be
+          installed.
+       3. You have to change `~/bin/vimrpager` and `~/bin/vimrw3mbrowser`
+          permissions to make them executable:
 >
    chmod +x ~/bin/vimrpager
+   chmod +x ~/bin/vimrw3mbrowser
+<
+
+Finally, if you want to use vi key bindings in Bash:
+
+   ~/.inputrc~
+>
+   set editing-mode vi
+   set keymap vi
 <
 
 9.22. Python versions~
@@ -2197,7 +2231,7 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-0.9.9.8 (2013-11-14)
+0.9.9.8 (2013-11-16)
 
  * The list of objects for omnicompletion and the list of functions for syntax
    highlight now are built dynamically. Deprecated commands and options:
@@ -2211,6 +2245,8 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 
  * Remove toolbar icons (they still may be added back manually by interested
    users).
+
+ * If latexmk is installed, use it by default to compile the pdf.
 
 0.9.9.7 (2013-11-06)
 
