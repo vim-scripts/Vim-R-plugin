@@ -604,7 +604,10 @@ function StartR_TmuxSplit(rcmd)
     let g:SendCmdToR = function('SendCmdToR_TmuxSplit')
     if g:vimrplugin_restart
         sleep 200m
+        let ca_ck = g:vimrplugin_ca_ck
+        let g:vimrplugin_ca_ck = 0
         call g:SendCmdToR(a:rcmd)
+        let g:vimrplugin_ca_ck = ca_ck
     endif
     let g:rplugin_last_rcmd = a:rcmd
 endfunction
@@ -1766,7 +1769,10 @@ function RQuit(how)
                 sleep 200m
             endif
             if g:vimrplugin_restart
+                let ca_ck = g:vimrplugin_ca_ck
+                let g:vimrplugin_ca_ck = 0
                 call g:SendCmdToR("exit")
+                let g:vimrplugin_ca_ck = ca_ck
             endif
         endif
     endif
