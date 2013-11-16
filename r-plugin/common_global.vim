@@ -887,7 +887,7 @@ function StartObjBrowser_Tmux()
     endif
 
     call writefile([
-                \ 'let g:rplugin_editor_sname = ' . myservername,
+                \ 'let g:rplugin_editor_sname = "' . myservername . '"',
                 \ 'let g:rplugin_vim_pane = "' . g:rplugin_vim_pane . '"',
                 \ 'let g:rplugin_rconsole_pane = "' . g:rplugin_rconsole_pane . '"',
                 \ 'let b:objbrtitle = "' . b:objbrtitle . '"',
@@ -1731,6 +1731,7 @@ function RSetWD()
         let wdcmd = substitute(wdcmd, "\\", "/", "g")
     endif
     call g:SendCmdToR(wdcmd)
+    sleep 100m
 endfunction
 
 function CloseExternalOB()
@@ -2262,9 +2263,13 @@ function RAction(rcmd)
                         if g:rplugin_vim_pane == "none"
                             call RWarningMsg("Cmd not available.")
                         else
-                            let slog = system("tmux set-buffer '" . "\<Esc>" . ':call ShowRDoc("' . rkeyword . '", "' . pkg . '", 0)' . "\<C-M>' && tmux paste-buffer -t " . g:rplugin_vim_pane . " && tmux select-pane -t " . g:rplugin_vim_pane)
-                            if v:shell_error
-                                call RWarningMsg(slog)
+                            if g:rplugin_editor_sname == ""
+                                let slog = system("tmux set-buffer '" . "\<Esc>" . ':call ShowRDoc("' . rkeyword . '", "' . pkg . '", 0)' . "\<C-M>' && tmux paste-buffer -t " . g:rplugin_vim_pane . " && tmux select-pane -t " . g:rplugin_vim_pane)
+                                if v:shell_error
+                                    call RWarningMsg(slog)
+                                endif
+                            else
+                                silent exe 'call remote_expr("' . g:rplugin_editor_sname . '", ' . "'ShowRDoc(" . '"' . rkeyword . '", "' . pkg . '", 0)' . "')"
                             endif
                         endif
                     else
