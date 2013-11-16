@@ -93,7 +93,7 @@ function! RSpin()
 endfunction
 
 " Default IsInRCode function when the plugin is used as a global plugin
-function DefaultIsInRCode(vrb)
+function! DefaultIsInRCode(vrb)
     return 1
 endfunction
 
