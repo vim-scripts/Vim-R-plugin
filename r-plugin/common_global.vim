@@ -781,7 +781,10 @@ function StartR(whatr)
                 call g:SendCmdToR('quit(save = "no")')
                 sleep 100m
                 call delete($VIMRPLUGIN_TMPDIR . "/vimcom_running")
+                let ca_ck = g:vimrplugin_ca_ck
+                let g:vimrplugin_ca_ck = 0
                 call g:SendCmdToR(g:rplugin_last_rcmd)
+                let g:vimrplugin_ca_ck = ca_ck
                 if IsExternalOBRunning()
                     call VimExprToOB('ResetVimComPort()')
                     call WaitVimComStart()
@@ -875,8 +878,6 @@ function StartObjBrowser_Tmux()
         return
     endif
 
-    "sleep 250m
-
     let objbrowserfile = $VIMRPLUGIN_TMPDIR . "/objbrowserInit"
     let tmxs = " "
 
@@ -887,7 +888,7 @@ function StartObjBrowser_Tmux()
     endif
 
     call writefile([
-                \ 'let g:rplugin_editor_sname = "' . myservername . '"',
+                \ 'let g:rplugin_editor_sname = ' . myservername,
                 \ 'let g:rplugin_vim_pane = "' . g:rplugin_vim_pane . '"',
                 \ 'let g:rplugin_rconsole_pane = "' . g:rplugin_rconsole_pane . '"',
                 \ 'let b:objbrtitle = "' . b:objbrtitle . '"',
