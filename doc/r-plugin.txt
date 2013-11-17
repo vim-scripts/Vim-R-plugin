@@ -518,7 +518,7 @@ completion is the available for omnicompletion (see
 
 You can source all .R files in a directory with the Normal mode command
 :RSourceDir, which accepts an optional argument (the directory to be sourced).
-
+								    *:Rinsert*
 The command  :Rinsert <cmd>  inserts one or more lines with the output of the
 R command sent to R. By using this command we can avoid the need of copying
 and pasting the output R from its console to Vim. For example, to insert the
@@ -695,9 +695,12 @@ In this case, the terminal window is split in two regions: one for Vim and the
 other for Tmux. Then, it's useful (but not required) to know some Tmux
 commands. After you finished editing the file, you have to type `exit` to quit
 the Tmux session.
+
+
+4.8.1 tvim~
 							       *r-plugin-tvim*
-If you always prefer to run Tmux before running Vim you could create a Bash
-function called `tvim` (please, see the ~/.bashrc example at
+If, as recommended, you always prefer to run Tmux before running Vim you could
+create a Bash function called `tvim` (please, see the ~/.bashrc example at
 |r-plugin-quick-setup|). Then you will be able to start a Tmux session running
 Vim by typing:
 >
@@ -707,18 +710,33 @@ Using the `tvim` function, the Tmux session is finished when you quits Vim.
 That is, the only advantage of using `tvim` is that you do not have to type
 `tmux` before and `exit` after the edition of the file.
 
-The Tmux configuration file provided by the Vim-R-plugin configures Tmux to
-use vi key bindings. It also configures Tmux to react to mouse clicks. You
-should be able to switch the active pane by clicking on an inactive pane, to
-resize the panes by clicking on the border line and dragging it, and to scroll
-the R Console with the mouse wheel. When you use the mouse wheel, Tmux enters
-in its copy/scroll back mode (see below).
+If you are going to run Vim inside Tmux, than you should create your
+~/.tmux.conf if it does not exist yet. You may put the lines below in your
+~/.tmux.conf as a starting point to your own configuration file:
+>
+    set-option -g prefix C-a
+    unbind-key C-b
+    bind-key C-a send-prefix
+    set-window-option -g mode-keys vi
+    set -g terminal-overrides 'xterm*:smcup@:rmcup@'
+    set -g mode-mouse on
+    set -g mouse-select-pane on
+    set -g mouse-resize-pane on
+<
+
+4.8.2 Key bindings and mouse support~
+
+The Tmux configuration file suggested above configures Tmux to use vi key
+bindings. It also configures Tmux to react to mouse clicks. You should be able
+to switch the active pane by clicking on an inactive pane, to resize the panes
+by clicking on the border line and dragging it, and to scroll the R Console
+with the mouse wheel. When you use the mouse wheel, Tmux enters in its
+copy/scroll back mode (see below).
 
 The configuration script also sets <C-a> as the Tmux escape character (the
 default is <C-b>), that is, you have to type <C-a> before typing a Tmux
-command. Below are the most useful key bindings to use Tmux with the tmux.conf
-created by the Vim-R-plugin (see |vimrplugin_notmuxconf| if you prefer to use
-your own ~/.tmux.conf)
+command. Below are the most useful key bindings to use Tmux with the above
+tmux.conf:
 
     <C-a>arrow keys : Move the cursor to the Tmux panel above, below, at the
                       right or at the left of the current one.
@@ -748,33 +766,43 @@ terminal emulator:
 >
   man tmux
 <
-Note: <C-a> was configured as the Tmux escape character, and it will not be
-passed to applications running under Tmux. To send <C-a> to either R or Vim
+Note: Because <C-a> was configured as the Tmux escape character, it will not
+be passed to applications running under Tmux. To send <C-a> to either R or Vim
 you have to type <C-a>a.
 
-With Tmux, you can detach the Vim-R session and reattach it latter. This
-is useful if you plan to begin the use the Vim-R-plugin in a machine and
-latter move to another computer and access remotely you previous Vim-R-plugin
-session.
 
-  - Create your ~/.tmux.conf if it does not exist yet. You may put the lines
-    below in your ~/.tmux.conf as a starting point to your own configuration
-    file:
+4.8.3 Copying and pasting~
+
+You do not need to copy code from Vim to R because you can use the plugin's
+shortcuts to send the code, but you may want to copy something from R Console
+and paste it in another application. For pasting the output of R commands into
+Vim's buffer, you can use the command |:Rinsert|. If you want to copy text
+from an application running inside the Tmux to another application also
+running in Tmux, as explained in the previous subsection, you can enter in
+Tmux copy/scroll mode, select the text, copy it, switch to the other
+application pane and, then, paste.
+
+However, if you want to copy something from either Vim or R to another
+application not running inside Tmux, Tmux may prevent the X server from
+capturing the text selected by the mouse. The solution is to disable mouse
+support in Tmux. You will be able to toggle mouse support on and off by typing
+<C-a>m if you add the following line to your ~/.tmux.conf:
 >
-    set-option -g prefix C-a
-    unbind-key C-b
-    bind-key C-a send-prefix
-    set-window-option -g mode-keys vi
-    set -g terminal-overrides 'xterm*:smcup@:rmcup@'
-    set -g mode-mouse on
-    set -g mouse-select-pane on
-    set -g mouse-resize-pane on
+   bind m run-shell '( if [ "mode-mouse on" = "$(tmux show-window-option | grep mode-mouse)" ]; then toggle=off; else toggle=on; fi; tmux display-message "mouse $toggle"; tmux set-option -w mode-mouse $toggle ; for cmd in mouse-select-pane mouse-resize-pane mouse-select-window; do tmux set-option -g $cmd $toggle ; done;) > /dev/null 2>&1'
 <
+
+4.8.2 Remote access~
+
+With Tmux, you can detach the Vim-R session and reattach it latter. This is
+useful if you plan to begin the use the Vim-R-plugin in a machine and latter
+move to another computer and access remotely your previous Vim-R-plugin
+session. Below is the step-by-step procedure to run the Vim-R-plugin remotely:
+
   - Start Tmux:
       tmux
 
   - Start Vim:
-      vim theScript.R
+      vim the_script.R
 
   - Use Vim to start an R session:
       <LocalLeader>rf
@@ -1232,8 +1260,8 @@ put in your |vimrc|:
 <
 If you opted for using your own configuration file, the plugin will write a
 minimum configuration which will set the value of two environment variables
-required for the communication with R and source your own configuration file
-(~/.tmux.conf).
+required for the communication with R and then source your own configuration
+file (~/.tmux.conf).
 
 
 6.15. Integration with Tmux (Linux/Unix only)~
