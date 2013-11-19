@@ -875,6 +875,13 @@ function StartObjBrowser_Tmux()
         Py SendToVimCom("\004Libraries [OB init]")
         sleep 50m
         Py SendToVimCom("\003GlobalEnv [OB init]")
+        sleep 50m
+        if $DISPLAY == "" && exists("g:rplugin_ob_pane")
+            let slog = system("tmux set-buffer ':silent call UpdateOB(\"both\")\<C-M>:\<Esc>' && tmux paste-buffer -t " . g:rplugin_ob_pane . " && tmux select-pane -t " . g:rplugin_ob_pane)
+            if v:shell_error
+                call RWarningMsg(slog)
+            endif
+        endif
         return
     endif
 
@@ -1104,6 +1111,9 @@ function RBrowserOpenCloseLists(status)
         else
             if IsExternalOBRunning()
                 let curview = VimExprToOB('g:rplugin_curview')
+                if curview == "Vim server not found"
+                    return
+                endif
             else
                 let curview = "GlobalEnv"
             endif
@@ -2265,7 +2275,7 @@ function RAction(rcmd)
                             call RWarningMsg("Cmd not available.")
                         else
                             if g:rplugin_editor_sname == ""
-                                let slog = system("tmux set-buffer '" . "\<Esc>" . ':call ShowRDoc("' . rkeyword . '", "' . pkg . '", 0)' . "\<C-M>' && tmux paste-buffer -t " . g:rplugin_vim_pane . " && tmux select-pane -t " . g:rplugin_vim_pane)
+                                let slog = system("tmux set-buffer '" . "\<C-\>\<C-N>" . ':call ShowRDoc("' . rkeyword . '", "' . pkg . '", 0)' . "\<C-M>' && tmux paste-buffer -t " . g:rplugin_vim_pane . " && tmux select-pane -t " . g:rplugin_vim_pane)
                                 if v:shell_error
                                     call RWarningMsg(slog)
                                 endif
