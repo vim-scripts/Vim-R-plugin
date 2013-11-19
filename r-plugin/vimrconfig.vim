@@ -196,26 +196,33 @@ function! RConfigVimrc()
         let what = input("Do you want these options in your vimrc? [y/N]: ")
         echohl Normal
         if RGetYesOrNo(what)
-            let vlines = vlines + [
+            let vlines = vlines + ['',
                         \ '" The lines below were also added by the Vim-R-plugin because you did not have',
                         \ '" a vimrc yet in the hope that they will help you getting started with Vim:',
                         \ '',
                         \ '" Highlight the last searched pattern:',
                         \ 'set hlsearch',
                         \ '',
-                        \ '" Show where the next patter is as you type it:',
+                        \ '" Show where the next pattern is as you type it:',
                         \ 'set incsearch',
                         \ '',
-                        \ '" By default, Vim indents code by 8 spaces. Most people preffer 4 spaces:',
+                        \ '" By default, Vim indents code by 8 spaces. Most people prefer 4 spaces:',
                         \ 'set sw=4',
                         \ '',
                         \ '" There are hundreds of color schemes for Vim on the internet, but you can',
                         \ '" start with color schemes already installed.',
                         \ '" Click on GVim menu bar "Edit / Color scheme" to know the name of your',
-                        \ '" preffered color scheme, then, remove the double quote (which is a comment',
+                        \ '" preferred color scheme, then, remove the double quote (which is a comment',
                         \ '" character, like the # is for R language) and replace the value "not_defined"',
                         \ '" below:',
                         \ '"colorscheme not_defined']
+            if has("unix") && has("syntax") && (&term =~ "xterm" || &term =~ "256" || $DISPLAY != "")
+                let vlines = vlines + ['',
+                            \ '" Use 256 colors even if in a terminal emulator:',
+                            \ 'if &term =~ "xterm" || &term =~ "256" || $DISPLAY != ""',
+                            \ '    set t_Co=256',
+                            \ 'endif']
+            endif
         endif
     endif
 
