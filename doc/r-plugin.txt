@@ -106,6 +106,8 @@ Before installing the plugin, you should install its dependencies:
    Depends:~
 
    Vim >= 7.4: http://www.vim.org/download.php
+	       In addition to the most commonly used features, the plugin
+	       requires: |+python| or |+python3|, |+clientserver| and |+conceal|.
 
    R >= 3.0.0: http://www.r-project.org/
 
@@ -168,7 +170,7 @@ Then, in Vim, type:
 <
 Press <Enter> and the plugin will be installed (because the plugin has many
 files, you have to press the space bar a few times to finish the
-installation). You should, then, quit Vim. 
+installation). You should, then, quit Vim.
 
 Start Vim again and edit an R script. Type <LocalLeader>rf to start R and run
 the command below to get help configuring ~/.Rprofile, ~/.vimrc, ~/.tmux.conf,
@@ -600,14 +602,9 @@ you install packages such as vim-nox on Debian/Ubuntu or vim-enhanced on
 Fedora/Red Hat. If you want to use Vim in a terminal emulator in Fedora/Red
 Hat, you may want to create a symbolic link to "gvim" named "vim". You still
 have to explicitly start the server with the argument |--servername|.  To
-avoid having to type this argument every time that you start Vim, you may put
-in your ~/.bashrc:
->
-   if [ "x$DISPLAY" != "x" ]
-   then
-       alias vim='vim --servername VIM'
-   fi
-<
+avoid having to type this argument every time that you start Vim, please look
+at the example in |r-plugin-bash-setup|.
+
 In the .GlobalEnv view, if an object has the attribute "label", it will also
 be displayed. Please, see the R help for package vimcom.plus (or vimcom) for
 some options to control the Object Browser behavior. In the Object Browser
@@ -1940,11 +1937,12 @@ Finally, put in your |vimrc|:
    if &term =~ "xterm" || &term =~ "256" || $DISPLAY != ""
        set t_Co=256
    endif
-   colorscheme your_prefered_color_scheme
+   colorscheme your_preferred_color_scheme
 <
 You have to search the internet for color schemes supporting 256 colors,
 download and copy them to ~/.vim/colors. You may use the command
-|:colorscheme| to try them all before setting your preference in your |vimrc|.
+|:colorscheme| to try them one by one before setting your preference in your
+|vimrc|.
 
 
 9.14. Run your Makefile from within R~
@@ -2085,6 +2083,23 @@ please read this document from the beginning.
    " Press the space bar to send lines and selection to R:
    vmap <Space> <Plug>RDSendSelection
    nmap <Space> <Plug>RDSendLine
+   " The lines below are suggestions for Vim in general and are not
+   " specific to the improvement of the Vim-R-plugin.
+   " Highlight the last searched pattern:
+   set hlsearch
+   " Show where the next pattern is as you type it:
+   set incsearch
+   " By default, Vim indents code by 8 spaces. Most people prefer 4
+   " spaces:
+   set sw=4
+   " Search "Vim colorscheme 256" in the internet and download color
+   " schemes that supports 256 colors in the terminal emulator. Then,
+   " uncomment the code below to set you color scheme:
+   "colorscheme not_defined
+   " Use 256 colors even if in a terminal emulator:
+   if &term =~ "xterm" || &term =~ "256" || $DISPLAY != ""
+       set t_Co=256
+   endif
 <
 							 *r-plugin-bash-setup*
    ~/.bashrc:~
@@ -2259,7 +2274,7 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-0.9.9.8 (2013-11-16)
+0.9.9.8 (2013-11-19)
 
  * The list of objects for omnicompletion and the list of functions for syntax
    highlight now are built dynamically. Deprecated commands and options:
