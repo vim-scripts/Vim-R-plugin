@@ -24,17 +24,123 @@ endfunction
 " Configure .Rprofile
 function! RConfigRprofile()
     call delete($VIMRPLUGIN_TMPDIR . "/configR_result")
-    let rcmd = 'source("' . g:rplugin_uservimfiles . '/r-plugin/Rconfig.R")'
-    call g:SendCmdToR(rcmd)
+    let configR = ['if(.Platform$OS.type == "windows"){',
+                \ '    .rpf <- Sys.getenv("R_PROFILE_USER")',
+                \ '    if(.rpf == ""){',
+                \ '        if(Sys.getenv("R_USER") == "")',
+                \ '            stop("R_USER environment variable not set.")',
+                \ '        .rpf <- paste0(Sys.getenv("R_USER"), "\\.Rprofile")',
+                \ '    }',
+                \ '} else {',
+                \ '    if(Sys.getenv("HOME") == ""){',
+                \ '        stop("HOME environment variable not set.")',
+                \ '    } else {',
+                \ '        .rpf <- paste0(Sys.getenv("HOME"), "/.Rprofile")',
+                \ '    }',
+                \ '}',
+                \ 'writeLines(.rpf, con = paste0(Sys.getenv("VIMRPLUGIN_TMPDIR"), "/configR_result"))',
+                \ 'rm(.rpf)']
+    call RSourceLines(configR, "silent")
     sleep 1
+    if !filereadable($VIMRPLUGIN_TMPDIR . "/configR_result")
+        sleep 2
+    endif
     if filereadable($VIMRPLUGIN_TMPDIR . "/configR_result")
         let res = readfile($VIMRPLUGIN_TMPDIR . "/configR_result")
-        if res[1] == "vimcom_found"
+        if filereadable(res[0])
+            let rpflines = readfile(res[0])
+        else
+            let rpflines = []
+        endif
+
+        let hasvimcom = 0
+        for line in rpflines
+            if line =~ "library.*vimcom" || line =~ "require.*vimcom"
+                let hasvimcom = 1
+                break
+            endif
+        endfor
+        if hasvimcom
             call RWarningMsg('The string "vimcom" was found in your .Rprofile. No change was done.')
-        elseif res[1] == "new_Rprofile"
+        else
+            let rpflines += ['']
+            if exists("*strftime")
+                let rpflines += ['# Lines added by the Vim-R-plugin command :RpluginConfig (' . strftime("%Y-%b-%d %H:%M") . '):']
+            else
+                let rpflines += ['# Lines added by the Vim-R-plugin command :RpluginConfig:']
+            endif
+            let rpflines += ['if(interactive()){']
+            if has("win32") || has("win64")
+                let rpflines += ["    options(editor = '" . '"C:/Program Files (x86)/Vim/vim74/gvim.exe" "-c" "set filetype=r"' . "')"]
+            else
+                let rpflines += ['    if(nchar(Sys.getenv("DISPLAY")) > 1)',
+                            \ "        options(editor = '" . 'gvim -f -c "set ft=r"' . "')",
+                            \ '    else',
+                            \ "        options(editor = '" . 'vim -c "set ft=r"' . "')",
+                            \ '    library(colorout)',
+                            \ '    if(Sys.getenv("TERM") != "linux" && Sys.getenv("TERM") != ""){',
+                            \ '        # Choose the colors for R output among 256 options.',
+                            \ '        # You should run show256Colors() and help(setOutputColors256) to',
+                            \ '        # know how to change the colors according to your taste:',
+                            \ '        setOutputColors256(verbose = FALSE)',
+                            \ '    }',
+                            \ '    library(setwidth)']
+            endif
+            let rpflines += ['    library(vimcom.plus)']
+
+            echo " "
+            echo "By defalt, R uses the 'less' application to show help documents."
+            echohl Question
+            let what = input("Dou you prefer to see help documents in Vim? [y/N]: ")
+            echohl Normal
+            if RGetYesOrNo(what)
+                let rpflines += ['    # See R documentation on Vim buffer even if asking for help in R Console:']
+                if ($PATH =~ "\\~/bin" || $PATH =~ expand("~/bin")) && filewritable(expand("~/bin")) == 2 && !filereadable(expand("~/bin/vimrpager"))
+                    call writefile(['#!/bin/sh',
+                                \ 'cat | vim -c "set ft=rdoc" -'], expand("~/bin/vimrpager"))
+                    call system("chmod +x " . expand("~/bin/vimrpager"))
+                    let rpflines += ['    options(help_type = "text", pager = "~/bin/vimrpager")']
+                endif
+                let rpflines += ['    if(Sys.getenv("VIM_PANE") != "")',
+                            \ '        options(pager = vim.pager)']
+            endif
+
+            if executable("w3m") && ($PATH =~ "\\~/bin" || $PATH =~ expand("~/bin")) && filewritable(expand("~/bin")) == 2 && !filereadable(expand("~/bin/vimrw3mbrowser"))
+                echo " "
+                echo "The w3m application, a text based web browser, is installed in your system."
+                echo "When R is running inside of a Tmux session, it can be configured to"
+                echo "start its help system in w3m running in a Tmux pane."
+                echohl Question
+                let what = input("Do you want to use w3m instead of your default web browser? [y/N]: ")
+                if RGetYesOrNo(what)
+                    call writefile(['#!/bin/sh',
+                                \ 'NCOLS=$(tput cols)',
+                                \ 'if [ "$NCOLS" -gt "140" ]',
+                                \ 'then',
+                                \ '    if [ "x$VIM_PANE" = "x" ]',
+                                \ '    then',
+                                \ '        tmux split-window -h "w3m $1 && exit"',
+                                \ '    else',
+                                \ '        tmux split-window -h -t $VIM_PANE "w3m $1 && exit"',
+                                \ '    fi',
+                                \ 'else',
+                                \ '    tmux new-window "w3m $1 && exit"',
+                                \ 'fi'], expand("~/bin/vimrw3mbrowser"))
+                    call system("chmod +x " . expand("~/bin/vimrw3mbrowser"))
+                    let rpflines += ['    # Use the text based web browser w3m to navigate through R docs:',
+                                \ '    # Replace VIM_PANE with TMUX if you know what you are doing.',
+                                \ '    if(Sys.getenv("VIM_PANE") != "")',
+                                \ '        options(browser="~/bin/vimrw3mbrowser")']
+                endif
+            endif
+
+            let rpflines += ["}"]
+            call writefile(rpflines, res[0])
+            echo " "
             call RWarningMsg('Your new .Rprofile was created.')
         endif
-        if has("win32") || has("win64")
+
+        if has("win32") || has("win64") || !hasvimcom
             echohl Question
             let what = input("Do you want to see your .Rprofile now? [y/N]: ")
             echohl Normal
@@ -47,7 +153,7 @@ function! RConfigRprofile()
             echohl Normal
             if RGetYesOrNo(what)
                 silent exe "tabnew " . res[0]
-                silent help r-plugin-quick-R-setup
+                silent help r-plugin-R-setup
             endif
         endif
         redraw
@@ -107,24 +213,24 @@ function! RConfigVimrc()
         endif
     endif
 
-    let vlines = vlines + ['']
+    let vlines += ['']
     if exists("*strftime")
-        let vlines = vlines + ['" Lines added by the Vim-R-plugin command :RpluginConfig (' . strftime("%Y-%b-%d %H:%M") . '):']
+        let vlines += ['" Lines added by the Vim-R-plugin command :RpluginConfig (' . strftime("%Y-%b-%d %H:%M") . '):']
     else
-        let vlines = vlines + ['" Lines added by the Vim-R-plugin command :RpluginConfig:']
+        let vlines += ['" Lines added by the Vim-R-plugin command :RpluginConfig:']
     endif
 
     if RFindString(vlines, 'set\s*nocompatible') == 0 && RFindString(vlines, 'set\s*nocp') == 0
-        let vlines = vlines + ['set nocompatible']
+        let vlines += ['set nocompatible']
     endif
     if RFindString(vlines, 'syntax\s*on') == 0
-        let vlines = vlines + ['syntax on']
+        let vlines += ['syntax on']
     endif
     if RFindString(vlines, 'filet.* plugin on') == 0
-        let vlines = vlines + ['filetype plugin on']
+        let vlines += ['filetype plugin on']
     endif
     if RFindString(vlines, 'filet.* indent on') == 0
-        let vlines = vlines + ['filetype indent on']
+        let vlines += ['filetype indent on']
     endif
 
     echo " "
@@ -140,7 +246,7 @@ function! RConfigVimrc()
         let what = input("Do you want to change the LocalLeader to a comma (,)? [y/N]: ")
         echohl Normal
         if RGetYesOrNo(what)
-            let vlines = vlines + ['" Change the <LocalLeader> key:',
+            let vlines += ['" Change the <LocalLeader> key:',
                         \ 'let maplocalleader = ","']
         endif
     endif
@@ -158,7 +264,7 @@ function! RConfigVimrc()
         let what = input("Do you want to press Ctrl+Space to do omnicompletion?  [y/N]: ")
         echohl Normal
         if RGetYesOrNo(what)
-            let vlines = vlines + ['" Use Ctrl+Space to do omnicompletion:',
+            let vlines += ['" Use Ctrl+Space to do omnicompletion:',
                         \ 'if has("gui_running")',
                         \ '    inoremap <C-Space> <C-x><C-o>',
                         \ 'else',
@@ -181,7 +287,7 @@ function! RConfigVimrc()
         let what = input("Do you prefer to press the space bar to send lines and selections\nto R Console? [y/N]: ")
         echohl Normal
         if RGetYesOrNo(what)
-            let vlines = vlines + ['" Press the space bar to send lines (in Normal mode) and selections to R:',
+            let vlines += ['" Press the space bar to send lines (in Normal mode) and selections to R:',
                         \ 'vmap <Space> <Plug>RDSendSelection',
                         \ 'nmap <Space> <Plug>RDSendLine']
         endif
@@ -196,7 +302,7 @@ function! RConfigVimrc()
         let what = input("Do you want these options in your vimrc? [y/N]: ")
         echohl Normal
         if RGetYesOrNo(what)
-            let vlines = vlines + ['',
+            let vlines += ['',
                         \ '" The lines below were also added by the Vim-R-plugin because you did not have',
                         \ '" a vimrc yet in the hope that they will help you getting started with Vim:',
                         \ '',
@@ -217,7 +323,7 @@ function! RConfigVimrc()
                         \ '" below:',
                         \ '"colorscheme not_defined']
             if has("unix") && has("syntax") && (&term =~ "xterm" || &term =~ "256" || $DISPLAY != "")
-                let vlines = vlines + ['',
+                let vlines += ['',
                             \ '" Use 256 colors even if in a terminal emulator:',
                             \ 'if &term =~ "xterm" || &term =~ "256" || $DISPLAY != ""',
                             \ '    set t_Co=256',
@@ -263,7 +369,7 @@ function! RConfigBash()
             echohl Normal
             if RGetYesOrNo(what)
                 silent exe "tabnew " . $HOME . "/.bashrc"
-                silent help r-plugin-quick-bash-setup
+                silent help r-plugin-bash-setup
             endif
         else
             echo "Vim and Tmux can display up to 256 colors in the terminal emulator,"
@@ -276,13 +382,13 @@ function! RConfigBash()
             let what = input("Do you want that all these features are added to your .bashrc? [y/N]: ")
             echohl Normal
             if RGetYesOrNo(what)
-                let blines = blines + ['']
+                let blines += ['']
                 if exists("*strftime")
-                    let blines = blines + ['# Lines added by the Vim-R-plugin command :RpluginConfig (' . strftime("%Y-%b-%d %H:%M") . '):']
+                    let blines += ['# Lines added by the Vim-R-plugin command :RpluginConfig (' . strftime("%Y-%b-%d %H:%M") . '):']
                 else
-                    let blines = blines + ['# Lines added by the Vim-R-plugin command :RpluginConfig:']
+                    let blines += ['# Lines added by the Vim-R-plugin command :RpluginConfig:']
                 endif
-                let blines = blines + ['# Change the TERM environment variable (to get 256 colors) and make Vim',
+                let blines += ['# Change the TERM environment variable (to get 256 colors) and make Vim',
                             \ '# connecting to X Server even if running in a terminal emulator (to get',
                             \ '# dynamic update of syntax highlight and Object Browser):',
                             \ 'if [ "x$DISPLAY" != "x" ]',
@@ -343,7 +449,7 @@ function! RConfigTmux()
         echohl Normal
         if RGetYesOrNo(what)
             silent exe "tabnew " . $HOME . "/.tmux.conf"
-            silent help r-plugin-quick-tmux-setup
+            silent help r-plugin-tmux-setup
         endif
         redraw
     else
@@ -353,11 +459,11 @@ function! RConfigTmux()
         if RGetYesOrNo(what)
             let tlines = ['']
             if exists("*strftime")
-                let tlines = tlines + ['# Lines added by the Vim-R-plugin command :RpluginConfig (' . strftime("%Y-%b-%d %H:%M") . '):']
+                let tlines += ['# Lines added by the Vim-R-plugin command :RpluginConfig (' . strftime("%Y-%b-%d %H:%M") . '):']
             else
-                let tlines = tlines + ['# Lines added by the Vim-R-plugin command :RpluginConfig:']
+                let tlines += ['# Lines added by the Vim-R-plugin command :RpluginConfig:']
             endif
-            let tlines = tlines + ["set-option -g prefix C-a",
+            let tlines += ["set-option -g prefix C-a",
                         \ "unbind-key C-b",
                         \ "bind-key C-a send-prefix",
                         \ "set -g status off",

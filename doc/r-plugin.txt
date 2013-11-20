@@ -1699,7 +1699,6 @@ directory after the installation:
    r-plugin/r.snippets
    r-plugin/common_buffer.vim
    r-plugin/common_global.vim
-   r-plugin/Rconfig.R
    r-plugin/vimrconfig.vim
 
 
@@ -2190,7 +2189,7 @@ please read this document from the beginning.
 >
    #!/bin/sh
    # I don't know the reason, but we can't pipe the output directly to Vim.
-   # So we need this script to use 'cat' is intermediary.
+   # So we need this script to use 'cat' as intermediary.
    cat | vim -c 'set ft=rdoc' -
 <
 

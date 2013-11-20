@@ -31,7 +31,6 @@ VIM2HTML=/usr/local/share/vim/vim74/doc/vim2html.pl
 vimball:
 	# Update the version date in doc/r-plugin.txt header and in the news
 	sed -i -e "s/^Version: [0-9].[0-9].[0-9].[0-9]/Version: $(PLUGINVERSION)/" doc/r-plugin.txt
-	sed -i -e "s/vim-r-plugin_[0-9].[0-9].[0-9].[0-9].vmb/vim-r-plugin_$(PLUGINVERSION).vmb/" doc/r-plugin.txt
 	sed -i -e "s/^$(PLUGINVERSION) (201[0-9]-[0-9][0-9]-[0-9][0-9])$$/$(PLUGINVERSION) ($(PLUGINRELEASEDATE))/" doc/r-plugin.txt
 	vim -c "%MkVimball Vim-R-plugin ." -c "q" list_for_vimball
 	mv Vim-R-plugin.vmb /tmp
@@ -76,7 +75,6 @@ deb:
 	  - r-plugin/vimcom.py\n\
 	  - r-plugin/global_r_plugin.vim\n\
 	  - r-plugin/tex_indent.vim\n\
-	  - r-plugin/Rconfig.R\n\
 	  - r-plugin/vimrconfig.vim\n\
 	  - syntax/r.vim\n\
 	  - syntax/rdoc.vim\n\

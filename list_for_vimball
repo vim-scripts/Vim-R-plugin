@@ -13,7 +13,6 @@ indent/rhelp.vim
 indent/rmd.vim
 indent/rnoweb.vim
 indent/rrst.vim
-r-plugin/Rconfig.R
 r-plugin/common_buffer.vim
 r-plugin/common_global.vim
 r-plugin/global_r_plugin.vim
