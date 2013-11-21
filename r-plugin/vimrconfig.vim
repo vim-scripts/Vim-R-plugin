@@ -99,7 +99,7 @@ function! RConfigRprofile()
                     call writefile(['#!/bin/sh',
                                 \ 'cat | vim -c "set ft=rdoc" -'], expand("~/bin/vimrpager"))
                     call system("chmod +x " . expand("~/bin/vimrpager"))
-                    let rpflines += ['    options(help_type = "text", pager = "~/bin/vimrpager")']
+                    let rpflines += ['    options(help_type = "text", pager = "' . expand("~/bin/vimrpager") . '")']
                 endif
                 let rpflines += ['    if(Sys.getenv("VIM_PANE") != "")',
                             \ '        options(pager = vim.pager)']
@@ -130,7 +130,7 @@ function! RConfigRprofile()
                     let rpflines += ['    # Use the text based web browser w3m to navigate through R docs:',
                                 \ '    # Replace VIM_PANE with TMUX if you know what you are doing.',
                                 \ '    if(Sys.getenv("VIM_PANE") != "")',
-                                \ '        options(browser="~/bin/vimrw3mbrowser")']
+                                \ '        options(browser="' . expand("~/bin/vimrw3mbrowser") . '")']
                 endif
             endif
 
