@@ -405,21 +405,19 @@ function! RConfigBash()
                             \ 'then',
                             \ '    export HAS_256_COLORS=yes',
                             \ '    alias tmux="tmux -2"',
-                            \ '    if [ "screen" = "$TERM" ]',
+                            \ '    if [ "$TERM" = "xterm" ]',
                             \ '    then',
-                            \ '        export TERM=screen-256color',
-                            \ '    else',
                             \ '        export TERM=xterm-256color',
                             \ '    fi',
                             \ '    alias vim="vim --servername VIM"',
-                            \ '    if [ "x$TERM" == "xxterm" ] || [ "x$TERM" == "xxterm-256color" ]',
+                            \ '    if [ "$TERM" == "xterm" ] || [ "$TERM" == "xterm-256color" ]',
                             \ '    then',
                             \ '        function tvim(){ tmux -2 new-session "TERM=screen-256color vim --servername VIM $@" ; }',
                             \ '    else',
                             \ '        function tvim(){ tmux new-session "vim --servername VIM $@" ; }',
                             \ '    fi',
                             \ 'else',
-                            \ '    if [ "x$TERM" == "xxterm" ] || [ "x$TERM" == "xxterm-256color" ]',
+                            \ '    if [ "$TERM" == "xterm" ] || [ "$TERM" == "xterm-256color" ]',
                             \ '    then',
                             \ '        export HAS_256_COLORS=yes',
                             \ '        alias tmux="tmux -2"',
@@ -427,6 +425,10 @@ function! RConfigBash()
                             \ '    else',
                             \ '        function tvim(){ tmux new-session "vim $@" ; }',
                             \ '    fi',
+                            \ 'fi',
+                            \ 'if [ "$TERM" = "screen" ] && [ "$HAS_256_COLORS" = "yes" ]',
+                            \ 'then',
+                            \ '    export TERM=screen-256color',
                             \ 'fi' ]
                 call writefile(blines, $HOME . "/.bashrc")
                 if !has("gui_running")
@@ -445,7 +447,7 @@ function! RConfigBash()
                 echohl Normal
                 if RGetYesOrNo(what)
                     silent exe "tabnew " . $HOME . "/.bashrc"
-                    normal! G27k
+                    normal! G32k
                 endif
             endif
         endif
