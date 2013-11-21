@@ -233,8 +233,8 @@ function! RConfigVimrc()
         let vlines += ['filetype indent on']
     endif
 
-    echo " "
     if RFindString(vlines, "maplocalleader") == 0
+        echo " "
         if hasvimrc
             echohl WarningMsg
             echo "It seems that you didn't map your <LocalLeader> to another key."
@@ -251,8 +251,8 @@ function! RConfigVimrc()
         endif
     endif
 
-    echo " "
     if RFindString(vlines, "<C-x><C-o>") == 0 && RFindString(vlines, "<C-X><C-O>") == 0 && RFindString(vlines, "<c-x><c-o>") == 0
+        echo " "
         if hasvimrc
             echohl WarningMsg
             echo "It seems that you didn't create an easier map for omnicompletion yet."
@@ -273,8 +273,8 @@ function! RConfigVimrc()
         endif
     endif
 
-    echo " "
     if RFindString(vlines, "RDSendLine") == 0 || RFindString(vlines, "RDSendSelection") == 0
+        echo " "
         if hasvimrc
             echohl WarningMsg
             echo "It seems that you didn't create an easier map to"
@@ -290,6 +290,23 @@ function! RConfigVimrc()
             let vlines += ['" Press the space bar to send lines (in Normal mode) and selections to R:',
                         \ 'vmap <Space> <Plug>RDSendSelection',
                         \ 'nmap <Space> <Plug>RDSendLine']
+        endif
+    endif
+
+    if has("unix") && has("syntax") && RFindString(vlines, "t_Co") == 0
+        echo " "
+        echo "Vim is capable of displaying 256 colors in terminal emulators. However, it"
+        echo "doesn't always detect that the terminal has this feature and defaults to"
+        echo "using only 8 colors."
+        echohl Question
+        let what = input("Do you want to enable the use of 256 colors whenever possible? [y/N]: ")
+        echohl Normal
+        if RGetYesOrNo(what)
+            let vlines += ['',
+                        \ '" Force Vim to use 256 colors if running in a capable terminal emulator:',
+                        \ 'if &term =~ "xterm" || &term =~ "256" || $DISPLAY != "" || $HAS_256_COLORS == "yes"',
+                        \ '    set t_Co=256',
+                        \ 'endif']
         endif
     endif
 
@@ -322,13 +339,6 @@ function! RConfigVimrc()
                         \ '" character, like the # is for R language) and replace the value "not_defined"',
                         \ '" below:',
                         \ '"colorscheme not_defined']
-            if has("unix") && has("syntax") && (&term =~ "xterm" || &term =~ "256" || $DISPLAY != "")
-                let vlines += ['',
-                            \ '" Use 256 colors even if in a terminal emulator:',
-                            \ 'if &term =~ "xterm" || &term =~ "256" || $DISPLAY != ""',
-                            \ '    set t_Co=256',
-                            \ 'endif']
-            endif
         endif
     endif
 
@@ -350,7 +360,6 @@ endfunction
 
 " Configure .bashrc
 function! RConfigBash()
-    echo " "
     if filereadable($HOME . "/.bashrc")
         let blines = readfile($HOME . "/.bashrc")
         let hastvim = 0
@@ -361,6 +370,7 @@ function! RConfigBash()
             endif
         endfor
 
+        echo " "
         if hastvim
             echohl WarningMsg
             echo "Nothing was added to your ~/.bashrc because the string 'tvim' was found in it."
@@ -393,6 +403,8 @@ function! RConfigBash()
                             \ '# dynamic update of syntax highlight and Object Browser):',
                             \ 'if [ "x$DISPLAY" != "x" ]',
                             \ 'then',
+                            \ '    export HAS_256_COLORS=yes',
+                            \ '    alias tmux="tmux -2"',
                             \ '    if [ "screen" = "$TERM" ]',
                             \ '    then',
                             \ '        export TERM=screen-256color',
@@ -409,6 +421,8 @@ function! RConfigBash()
                             \ 'else',
                             \ '    if [ "x$TERM" == "xxterm" ] || [ "x$TERM" == "xxterm-256color" ]',
                             \ '    then',
+                            \ '        export HAS_256_COLORS=yes',
+                            \ '        alias tmux="tmux -2"',
                             \ '        function tvim(){ tmux -2 new-session "TERM=screen-256color vim $@" ; }',
                             \ '    else',
                             \ '        function tvim(){ tmux new-session "vim $@" ; }',
