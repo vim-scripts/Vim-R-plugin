@@ -152,9 +152,6 @@ should have at least the following options in your |vimrc|:
    filetype plugin on
    filetype indent on
 <
-Make a backup of your ~/.vim directory because existing files will be
-replaced. Please, look at |r-plugin-files| to see the list of files.
-
 Download the latest version of the plugin from:
 
     http://www.vim.org/scripts/script.php?script_id=2628
@@ -178,7 +175,7 @@ and ~/.bashrc (the <LocalLeader> is `\` by default):
 >
    :RpluginConfig
 <
-The above command will guide you through additional configuration steps, but
+The above command will guide you through the final configuration steps, but
 if you prefer to configure everything by yourself, please, read the section
 |r-plugin-quick-setup|.
 
@@ -221,7 +218,7 @@ dependencies:
       the official GVim 7.4 binary. The default download may not match the
       Python version Vim was linked against: then you have to "View all files"
       on the download page to find the file that matches exactly the above
-      versions. Please, read |r-plugin-python| if want to use different
+      versions. Please, read |r-plugin-python| if need to use different
       versions.
 
 Now, download the latest version of `Vim-R-plugin.vmb` from
@@ -256,9 +253,7 @@ and, finally, click on the menu bar
    R
    Configure (Vim-R)
 <
-The above command will guide you through additional configuration steps. If
-you are already an experienced Vim user, instead of running the above command
-you may preffer to read |r-plugin-Rprofile-Windows|.
+The above command will guide you through the final configuration steps.
 
 You may have to adjust the value of |vimrplugin_sleeptime|.
 
@@ -515,7 +510,7 @@ The command may be abbreviated to  :Rh  and you can either press <Tab> to
 trigger the autocompletion of R objects names or hit CTRL-D to list the
 possible completions (see |cmdline-completion| for details on the various ways
 of getting command-line completion). The list of objects used for
-completion is the available for omnicompletion (see
+completion is the same available for omnicompletion (see
 |vimrplugin_permanent_libs|).
 
 You can source all .R files in a directory with the Normal mode command
@@ -685,7 +680,7 @@ section refers to the case of starting R when Vim already is in a Tmux
 session, that is, if you do:
 >
    tmux
-   vim filename.R
+   vim --servername VIM filename.R
    exit
 <
 In this case, the terminal window is split in two regions: one for Vim and the
@@ -704,8 +699,10 @@ Vim by typing:
    tvim filename.R
 <
 Using the `tvim` function, the Tmux session is finished when you quits Vim.
-That is, the only advantage of using `tvim` is that you do not have to type
-`tmux` before and `exit` after the edition of the file.
+That is, the main advantage of using `tvim` is that you do not have to type
+`tmux` before and `exit` after the edition of the file. Moreover, the
+`tvim` command also pass the |--servername| argument to Vim, which is required
+update of the Object Browser and functions highlight.
 
 If you are going to run Vim inside Tmux, than you should create your
 ~/.tmux.conf if it does not exist yet. You may put the lines below in your
@@ -771,13 +768,12 @@ you have to type <C-a>a.
 4.8.3 Copying and pasting~
 
 You do not need to copy code from Vim to R because you can use the plugin's
-shortcuts to send the code, but you may want to copy something from R Console
-and paste it in another application. For pasting the output of R commands into
-Vim's buffer, you can use the command |:Rinsert|. If you want to copy text
-from an application running inside the Tmux to another application also
-running in Tmux, as explained in the previous subsection, you can enter in
-Tmux copy/scroll mode, select the text, copy it, switch to the other
-application pane and, then, paste.
+shortcuts to send the code. For pasting the output of R commands into Vim's
+buffer, you can use the command |:Rinsert|. If you want to copy text from an
+application running inside the Tmux to another application also running in
+Tmux, as explained in the previous subsection, you can enter in Tmux
+copy/scroll mode, select the text, copy it, switch to the other application
+pane and, then, paste.
 
 However, if you want to copy something from either Vim or R to another
 application not running inside Tmux, Tmux may prevent the X server from
@@ -792,8 +788,8 @@ support in Tmux. You will be able to toggle mouse support on and off by typing
 
 With Tmux, you can detach the Vim-R session and reattach it latter. This is
 useful if you plan to begin the use the Vim-R-plugin in a machine and latter
-move to another computer and access remotely your previous Vim-R-plugin
-session. Below is the step-by-step procedure to run the Vim-R-plugin remotely:
+move to another computer and access remotely your previous Vim-R session.
+Below is the step-by-step procedure to run the Vim-R remotely:
 
   - Start Tmux:
       tmux
@@ -895,35 +891,39 @@ open and close when the <Enter> key is pressed over them.
 
 5.7. R must be started by Vim~
 
-The communication between Vim and R will only work if R was started by Vim
+The communication between Vim and R will work only if R was started by Vim
 through the <LocalLeader>rf command because the plugin was designed to connect
 each Vim instance with its own R instance. If you start R before Vim, it will
-not inherit from Vim the environment variables VIMRPLUGIN_TMPDIR and
-VIMINSTANCEID. The former variable is the path used by the R package vimcom to
-save temporary files used by the Vim-R-plugin to: perform omnicompletion, show
-R documentation in a Vim buffer, and update the Object Browser. The latter is
-used by the Vim-R-plugin to know that it is not connecting to an R instance
-initiated by another Vim instance. If you use Vim to start R, but then closes
-Vim, the VIMINSTANCEID variable in R will become outdated. Additionally, the
-Vim-R-plugin sets the value of its internal variable SendCmdToR from
-SendCmdToR_fake to the appropriate value when R is successfully started. It is
-possible to set the values of all these variables manually, but, as you can
-see below, it is not practical to do so. If you have either started R before
-Vim or closed Vim and opened it again and really want full communication
-between Vim and R, you can try the following (not all procedures are necessary
-for all cases):
+not inherit from Vim the environment variables VIMRPLUGIN_TMPDIR,
+VIMRPLUGIN_HOME, VIMEDITOR_SVRNM and VIMINSTANCEID. The first one is the path
+used by the R package vimcom to save temporary files used by the Vim-R-plugin
+to: perform omnicompletion, show R documentation in a Vim buffer, and update
+the Object Browser. The latter is used by the Vim-R-plugin to know that it is
+not connecting to an R instance initiated by another Vim instance. If you use
+Vim to start R, but then closes Vim, the VIMINSTANCEID variable in R will
+become outdated. Additionally, the Vim-R-plugin sets the value of its internal
+variable SendCmdToR from SendCmdToR_fake to the appropriate value when R is
+successfully started. It is possible to set the values of all these variables
+manually, but, as you can see below, it is not practical to do so. If you have
+either started R before Vim or closed Vim and opened it again and really want
+full communication between Vim and R, you can try the following (not all
+procedures are necessary for all cases):
 
    In Normal mode Vim do:
 >
    :echo $VIMRPLUGIN_TMPDIR
    :echo $VIMINSTANCEID
+   :echo $VIMEDITOR_SVRNM
+   :echo $VIMRPLUGIN_HOME
 <
    In R do:
 >
    detach("package:vimcom.plus", unload = TRUE) # or vimcom
-   Sys.setenv(VIMRPLUGIN_TMPDIR="X") # where "X" is what Vim has echoed
+   Sys.setenv(VIMRPLUGIN_TMPDIR="T") # where "T" is what Vim has echoed
    library(vimcom.plus)              # or vimcom
-   Sys.setenv(VIMINSTANCEID="Y")     # where "Y" is what Vim has echoed
+   Sys.setenv(VIMINSTANCEID="I")     # where "I" is what Vim has echoed
+   Sys.setenv(VIMEDITOR_SVRNM"="S")  # where "S" is what Vim has echoed
+   Sys.setenv(VIMRPLUGIN_HOME"="H")  # where "H" is what Vim has echoed
 <
 If you are running R in a terminal emulator (Linux/Unix) Vim still needs to
 know the name of Tmux session and Tmux pane where R is running.
@@ -2276,7 +2276,7 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-0.9.9.8 (2013-11-19)
+0.9.9.8 (2013-11-24)
 
  * The list of objects for omnicompletion and the list of functions for syntax
    highlight now are built dynamically. Deprecated commands and options:
