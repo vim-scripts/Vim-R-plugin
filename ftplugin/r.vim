@@ -80,6 +80,7 @@ function! ShowRout()
         else
             exe "tabnew " . routfile
         endif
+        set filetype=rout
     else
         call RWarningMsg("The file '" . routfile . "' is not readable.")
     endif
