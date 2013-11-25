@@ -61,7 +61,9 @@ function! RConfigRprofile()
             endif
         endfor
         if hasvimcom
-            call RWarningMsg('The string "vimcom" was found in your .Rprofile. No change was done.')
+            echohl WarningMsg
+            echo 'The string "vimcom" was found in your .Rprofile. No change was done.'
+            echohl Normal
         else
             let rpflines += ['']
             if exists("*strftime")
@@ -88,6 +90,7 @@ function! RConfigRprofile()
             endif
             let rpflines += ['    library(vimcom.plus)']
 
+            redraw
             echo " "
             echo "By defalt, R uses the 'less' application to show help documents."
             echohl Question
@@ -106,6 +109,7 @@ function! RConfigRprofile()
             endif
 
             if executable("w3m") && ($PATH =~ "\\~/bin" || $PATH =~ expand("~/bin")) && filewritable(expand("~/bin")) == 2 && !filereadable(expand("~/bin/vimrw3mbrowser"))
+                redraw
                 echo " "
                 echo "The w3m application, a text based web browser, is installed in your system."
                 echo "When R is running inside of a Tmux session, it can be configured to"
@@ -136,8 +140,11 @@ function! RConfigRprofile()
 
             let rpflines += ["}"]
             call writefile(rpflines, res[0])
+            redraw
             echo " "
-            call RWarningMsg('Your new .Rprofile was created.')
+            echohl WarningMsg
+            echo 'Your new .Rprofile was created.'
+            echohl Normal
         endif
 
         if has("win32") || has("win64") || !hasvimcom
@@ -159,6 +166,7 @@ function! RConfigRprofile()
         redraw
     else
         redraw
+        echo " "
         call RWarningMsg("Error: configR_result not found.")
         sleep 1
         return 1
@@ -188,6 +196,7 @@ function! RConfigVimrc()
 
     if filereadable(uvimrc)
         let hasvimrc = 1
+        echo " "
         echohl WarningMsg
         echo "You already have a vimrc."
         echohl Normal
@@ -234,6 +243,7 @@ function! RConfigVimrc()
     endif
 
     if RFindString(vlines, "maplocalleader") == 0
+        redraw
         echo " "
         if hasvimrc
             echohl WarningMsg
@@ -252,6 +262,7 @@ function! RConfigVimrc()
     endif
 
     if RFindString(vlines, "<C-x><C-o>") == 0 && RFindString(vlines, "<C-X><C-O>") == 0 && RFindString(vlines, "<c-x><c-o>") == 0
+        redraw
         echo " "
         if hasvimrc
             echohl WarningMsg
@@ -274,6 +285,7 @@ function! RConfigVimrc()
     endif
 
     if RFindString(vlines, "RDSendLine") == 0 || RFindString(vlines, "RDSendSelection") == 0
+        redraw
         echo " "
         if hasvimrc
             echohl WarningMsg
@@ -294,6 +306,7 @@ function! RConfigVimrc()
     endif
 
     if has("unix") && has("syntax") && RFindString(vlines, "t_Co") == 0
+        redraw
         echo " "
         echo "Vim is capable of displaying 256 colors in terminal emulators. However, it"
         echo "doesn't always detect that the terminal has this feature and defaults to"
@@ -311,6 +324,7 @@ function! RConfigVimrc()
     endif
 
     if !hasvimrc
+        redraw
         echo " "
         echo "There are some options that most Vim users like, but that are not enabled by"
         echo "default such as highlighting the last search pattern, incremental search"
@@ -330,20 +344,23 @@ function! RConfigVimrc()
                         \ 'set incsearch',
                         \ '',
                         \ '" By default, Vim indents code by 8 spaces. Most people prefer 4 spaces:',
-                        \ 'set sw=4',
-                        \ '',
-                        \ '" There are hundreds of color schemes for Vim on the internet, but you can',
-                        \ '" start with color schemes already installed.',
-                        \ '" Click on GVim menu bar "Edit / Color scheme" to know the name of your',
-                        \ '" preferred color scheme, then, remove the double quote (which is a comment',
-                        \ '" character, like the # is for R language) and replace the value "not_defined"',
-                        \ '" below:',
-                        \ '"colorscheme not_defined']
+                        \ 'set sw=4']
         endif
     endif
 
+    if RFindString(vlines, "^\s*colo") == 0
+        let vlines += ['',
+                    \ '" There are hundreds of color schemes for Vim on the internet, but you can',
+                    \ '" start with color schemes already installed.',
+                    \ '" Click on GVim menu bar "Edit / Color scheme" to know the name of your',
+                    \ '" preferred color scheme, then, remove the double quote (which is a comment',
+                    \ '" character, like the # is for R language) and replace the value "not_defined"',
+                    \ '" below:',
+                    \ '"colorscheme not_defined']
+    endif
     call writefile(vlines, uvimrc)
 
+    redraw
     echo " "
     echohl WarningMsg
     echo "The changes in your vimrc will be effective"
@@ -370,6 +387,7 @@ function! RConfigBash()
             endif
         endfor
 
+        redraw
         echo " "
         if hastvim
             echohl WarningMsg
@@ -432,6 +450,7 @@ function! RConfigBash()
                             \ 'fi' ]
                 call writefile(blines, $HOME . "/.bashrc")
                 if !has("gui_running")
+                    redraw
                     echo " "
                     echohl WarningMsg
                     echo "The changes in your bashrc will be effective"
@@ -456,6 +475,7 @@ function! RConfigBash()
 endfunction
 
 function! RConfigTmux()
+    redraw
     echo " "
     if filereadable($HOME . "/.tmux.conf")
         echohl WarningMsg
@@ -489,6 +509,7 @@ function! RConfigTmux()
                         \ "set -g mouse-select-pane on",
                         \ "set -g mouse-resize-pane on"]
             call writefile(tlines, $HOME . "/.tmux.conf")
+            redraw
             echo " "
             echohl Question
             let what = input("Do you want to see your .tmux.conf now? [y/N]: ")
@@ -512,9 +533,7 @@ function! RConfigVimR()
                 let cmd = "\\rf"
             endif
         endif
-        echohl WarningMsg
-        echomsg "Please type  " . cmd . "  to start R before running  :RpluginConfig"
-        echohl Normal
+        call RWarningMsg("Please type  " . cmd . "  to start R before running  :RpluginConfig")
         return
     endif
     if RConfigRprofile()
