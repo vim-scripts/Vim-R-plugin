@@ -558,7 +558,7 @@ endfunction
 
 " Adapted from screen plugin:
 function TmuxActivePane()
-  let line = system('tmux list-panes | grep "(active)$"')
+  let line = system("tmux list-panes | grep \'(active)$'")
   let paneid = matchstr(line, '\v\%\d+ \(active\)')
   if !empty(paneid)
     return matchstr(paneid, '\v^\%\d+')
