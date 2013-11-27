@@ -67,7 +67,7 @@ if rmdIsPandoc == 0
     " Region
     syntax match rmdLaTeXRegDelim "\$\$" contained
     syntax match rmdLaTeXRegDelim "\$\$latex$" contained
-    syntax region rmdLaTeXRegion start="^\$\$" skip="\\\$" end="^\$\$" contains=@LaTeX,rmdLaTeXSt,rmdLaTeXRegDelim keepend 
+    syntax region rmdLaTeXRegion start="^\$\$" skip="\\\$" end="\$\$$" contains=@LaTeX,rmdLaTeXSt,rmdLaTeXRegDelim keepend 
     syntax region rmdLaTeXRegion2 start="^\\\[" end="\\\]" contains=@LaTeX,rmdLaTeXSt,rmdLaTeXRegDelim keepend
     hi def link rmdLaTeXSt Statement
     hi def link rmdLaTeXInlDelim Special
