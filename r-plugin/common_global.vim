@@ -643,7 +643,14 @@ function StartR_ExternalTerm(rcmd)
     endif
     call extend(cnflines, ['set-environment VIMINSTANCEID "' . $VIMINSTANCEID . '"'])
     call writefile(cnflines, s:tmxcnf)
-    let rcmd = "VIMINSTANCEID=" . $VIMINSTANCEID . " " . a:rcmd
+	
+	let is_bash = system('echo $BASH')
+	if v:shell_error || len(is_bash) == 0 || empty(matchstr(tolower(is_bash),'undefined variable')) == 0
+		let rcmd = a:rcmd
+	else
+		let rcmd = "VIMINSTANCEID=" . $VIMINSTANCEID . " " . a:rcmd
+	endif
+
     call system('export VIMRPLUGIN_TMPDIR=' . $VIMRPLUGIN_TMPDIR)
     call system('export VIMRPLUGIN_HOME=' . g:rplugin_home)
     call system('export VIMINSTANCEID=' . $VIMINSTANCEID)
