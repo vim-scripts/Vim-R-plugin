@@ -1,6 +1,6 @@
 " markdown Text with R statements
 " Language: markdown with R code chunks
-" Last Change: Thu Sep 05, 2013  06:35PM
+" Last Change: Sat Nov 09, 2013  07:28PM
 "
 " CONFIGURATION:
 "   To highlight chunk headers as R code, put in your vimrc:
@@ -81,3 +81,5 @@ hi def link rmdBlockQuote Comment
 hi def link rmdSlidifySpecial Special
 
 let b:current_syntax = "rmd"
+
+" vim: ts=8 sw=4

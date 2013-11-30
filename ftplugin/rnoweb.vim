@@ -48,7 +48,7 @@ runtime r-plugin/common_buffer.vim
 setlocal iskeyword=@,48-57,_,.
 
 function! RWriteChunk()
-    if getline(".") =~ "^\\s*$" && RnwIsInRCode() == 0
+    if getline(".") =~ "^\\s*$" && RnwIsInRCode(0) == 0
         call setline(line("."), "<<>>=")
         exe "normal! o@"
         exe "normal! 0kl"
@@ -57,12 +57,15 @@ function! RWriteChunk()
     endif
 endfunction
 
-function! RnwIsInRCode()
+function! RnwIsInRCode(vrb)
     let chunkline = search("^<<", "bncW")
     let docline = search("^@", "bncW")
-    if chunkline > docline
+    if chunkline > docline && chunkline != line(".")
         return 1
     else
+        if a:vrb
+            call RWarningMsg("Not inside an R code chunk.")
+        endif
         return 0
     endif
 endfunction
@@ -72,7 +75,7 @@ function! RnwPreviousChunk() range
     let chunk = len(rg)
     for var in range(1, chunk)
         let curline = line(".")
-        if RnwIsInRCode()
+        if RnwIsInRCode(0)
             let i = search("^<<.*$", "bnW")
             if i != 0
                 call cursor(i-1, 1)
@@ -146,7 +149,6 @@ function! RMakePDF(bibtex, knit)
     endif
 
     let pdfcmd = pdfcmd . ")"
-    let g:needsnewomnilist = 1
     let ok = g:SendCmdToR(pdfcmd)
     if ok == 0
         return
@@ -154,15 +156,14 @@ function! RMakePDF(bibtex, knit)
 endfunction  
 
 " Send Sweave chunk to R
-function! SendChunkToR(e, m)
-    if RnwIsInRCode() == 0
+function! RnwSendChunkToR(e, m)
+    if RnwIsInRCode(0) == 0
         call RWarningMsg("Not inside an R code chunk.")
         return
     endif
     let chunkline = search("^<<", "bncW") + 1
     let docline = search("^@", "ncW") - 1
     let lines = getline(chunkline, docline)
-    let g:needsnewomnilist = 1
     let ok = RSourceLines(lines, a:e)
     if ok == 0
         return
@@ -175,7 +176,6 @@ endfunction
 " Sweave the current buffer content
 function! RSweave()
     update
-    let g:needsnewomnilist = 1
     call RSetWD()
     if exists("g:vimrplugin_sweaveargs")
         call g:SendCmdToR('Sweave("' . expand("%:t") . '", ' . g:vimrplugin_sweaveargs . ')')
@@ -236,6 +236,13 @@ if g:vimrplugin_rnowebchunk == 1
     imap <buffer><silent> < <Esc>:call RWriteChunk()<CR>a
 endif
 
+" Pointers to functions whose purposes are the same in rnoweb, rrst, rmd,
+" rhelp and rdoc and which are called at common_global.vim
+let b:IsInRCode = function("RnwIsInRCode")
+let b:PreviousRChunk = function("RnwPreviousChunk")
+let b:NextRChunk = function("RnwNextChunk")
+let b:SendChunkToR = function("RnwSendChunkToR")
+
 "==========================================================================
 " Key bindings and menu items
 
@@ -254,10 +261,10 @@ call RCreateMaps("nvi", '<Plug>RMakePDFK',    'kp', ':call RMakePDF("nobib", 1)'
 call RCreateMaps("nvi", '<Plug>RBibTeXK',     'kb', ':call RMakePDF("bibtex", 1)')
 call RCreateMaps("nvi", '<Plug>ROpenPDF',     'op', ':call ROpenPDF()')
 call RCreateMaps("nvi", '<Plug>RIndent',      'si', ':call RnwToggleIndentSty()')
-call RCreateMaps("ni",  '<Plug>RSendChunk',   'cc', ':call SendChunkToR("silent", "stay")')
-call RCreateMaps("ni",  '<Plug>RESendChunk',  'ce', ':call SendChunkToR("echo", "stay")')
-call RCreateMaps("ni",  '<Plug>RDSendChunk',  'cd', ':call SendChunkToR("silent", "down")')
-call RCreateMaps("ni",  '<Plug>REDSendChunk', 'ca', ':call SendChunkToR("echo", "down")')
+call RCreateMaps("ni",  '<Plug>RSendChunk',   'cc', ':call b:SendChunkToR("silent", "stay")')
+call RCreateMaps("ni",  '<Plug>RESendChunk',  'ce', ':call b:SendChunkToR("echo", "stay")')
+call RCreateMaps("ni",  '<Plug>RDSendChunk',  'cd', ':call b:SendChunkToR("silent", "down")')
+call RCreateMaps("ni",  '<Plug>REDSendChunk', 'ca', ':call b:SendChunkToR("echo", "down")')
 nmap <buffer><silent> gn :call RnwNextChunk()<CR>
 nmap <buffer><silent> gN :call RnwPreviousChunk()<CR>
 

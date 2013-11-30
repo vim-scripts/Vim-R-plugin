@@ -3,16 +3,16 @@
 " Maintainer:	Jakson A. Aquino <jalvesaq@gmail.com>
 
 if exists("b:current_syntax")
-  finish
+    finish
 endif
 
 setlocal iskeyword=@,48-57,_,.
 
 if !exists("rdoc_minlines")
-  let rdoc_minlines = 200
+    let rdoc_minlines = 200
 endif
 if !exists("rdoc_maxlines")
-  let rdoc_maxlines = 2 * rdoc_minlines
+    let rdoc_maxlines = 2 * rdoc_minlines
 endif
 exec "syn sync minlines=" . rdoc_minlines . " maxlines=" . rdoc_maxlines
 
@@ -20,8 +20,8 @@ exec "syn sync minlines=" . rdoc_minlines . " maxlines=" . rdoc_maxlines
 syn match  rdocTitle	      "^[A-Z].*:$"
 syn match  rdocTitle "^\S.*R Documentation$"
 syn match rdocFunction "\([A-Z]\|[a-z]\|\.\|_\)\([A-Z]\|[a-z]\|[0-9]\|\.\|_\)*" contained
-syn region rdocStringS  start="‘" end="’" contains=rdocFunction transparent keepend
-syn region rdocStringS  start="�" end="�" contains=rdocFunction transparent keepend
+syn region rdocStringS  start="â" end="â" contains=rdocFunction transparent keepend
+syn region rdocStringS  start="" end="" contains=rdocFunction transparent keepend
 syn region rdocStringD  start='"' skip='\\"' end='"'
 syn match rdocURL `\v<(((https?|ftp|gopher)://|(mailto|file|news):)[^'	<>"]+|(www|web|w3)[a-z0-9_-]*\.[a-z0-9._-]+\.[^'  <>"]+)[a-zA-Z0-9/]`
 syn keyword rdocNote		note Note NOTE note: Note: NOTE: Notes Notes:
@@ -57,4 +57,4 @@ hi def link rdocFuncName Function
 
 let b:current_syntax = "rdoc"
 
-" vim:ts=8 sts=2 sw=2:
+" vim: ts=8 sw=4

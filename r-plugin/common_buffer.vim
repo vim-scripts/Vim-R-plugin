@@ -70,3 +70,4 @@ if !exists("g:SendCmdToR")
     let g:SendCmdToR = function('SendCmdToR_fake')
 endif
 
+

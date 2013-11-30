@@ -80,6 +80,7 @@ function! ShowRout()
         else
             exe "tabnew " . routfile
         endif
+        set filetype=rout
     else
         call RWarningMsg("The file '" . routfile . "' is not readable.")
     endif
@@ -88,13 +89,19 @@ endfunction
 " Convert R script into Rmd, md and, then, html.
 function! RSpin()
     update
-    let g:needsnewomnilist = 1
     call RSetWD()
     call g:SendCmdToR('require(knitr); spin("' . expand("%:t") . '")')
 endfunction
 
+" Default IsInRCode function when the plugin is used as a global plugin
+function! DefaultIsInRCode(vrb)
+    return 1
+endfunction
+
 "==========================================================================
 " Key bindings and menu items
+
+let b:IsInRCode = function("DefaultIsInRCode")
 
 call RCreateStartMaps()
 call RCreateEditMaps()

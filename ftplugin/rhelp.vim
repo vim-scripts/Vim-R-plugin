@@ -45,8 +45,23 @@ runtime r-plugin/common_buffer.vim
 
 setlocal iskeyword=@,48-57,_,.
 
+function! RhelpIsInRCode(vrb)
+    let lastsec = search('^\\[a-z][a-z]*{', "bncW")
+    let secname = getline(lastsec)
+    if line(".") > lastsec && (secname =~ '^\\usage{' || secname =~ '^\\examples{' || secname =~ '^\\dontshow{' || secname =~ '^\\dontrun{' || secname =~ '^\\donttest{' || secname =~ '^\\testonly{')
+        return 1
+    else
+        if a:vrb
+            call RWarningMsg("Not inside an R section.")
+        endif
+        return 0
+    endif
+endfunction
+
 "==========================================================================
 " Key bindings and menu items
+
+let b:IsInRCode = function("RhelpIsInRCode")
 
 call RCreateStartMaps()
 call RCreateEditMaps()

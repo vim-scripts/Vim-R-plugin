@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 0.9.9.7
+Version: 0.9.9.8
 For Vim version 7.4
 
  1. Overview                                    |r-plugin-overview|
@@ -54,7 +54,7 @@ Vim-R-plugin (see |vimrplugin_source|).
 
   * Syntax highlighting for R code, including:
       - Special characters in strings.
-      - Functions of all installed packages (must be updated manually).
+      - Functions of loaded packages.
       - Special highlighting for R output (.Rout files).
       - Spell check only strings and comments.
       - Fold code when foldmethod=syntax.
@@ -90,54 +90,28 @@ For screenshots see: http://www.lepem.ufc.br/jaa/vim-r-plugin.html
 						       *r-plugin-installation*
 3. Installation~
 
-The installation instructions are split in four sections: (1) general
-instructions for all operating systems; (2) instructions that are specific for
-either Unix/Linux/OSX or Windows; (3) troubleshooting; and (4) optional steps.
+The installation instructions are split in four sections:
 
-3.1. General instructions I~
+   1. Instructions specific for Unix/Linux/OSX
+   2. Instructions specific for Windows
+   3. Troubleshooting
+   4. Optional steps
 
-Note: Most of the plugin commands require that you type the <LocalLeader>
-which is '\' by default.
+3.1. Instructions for Unix (Linux, OS X, etc.)~
 
-You need to activate plugins and indentation according to 'filetype'. You
-should have at least the following options in your |vimrc|:
->
-   set nocompatible
-   syntax enable
-   filetype plugin on
-   filetype indent on
-<
-Make a backup of your ~/.vim directory because existing files will be
-replaced. Please, look at |r-plugin-files| to see the list of files.
+If you are using Windows, jump to section 3.2.
 
-3.2. Operating system specific instructions~
-
-3.2.1. Unix (Linux, OS X, etc.)~
-
-Uncompress the archive:
->
-   unzip vim-r-plugin-*.zip -d ~/.vim
-<
-Start Vim and build the tags file for this document (and others that eventually
-are in the same directory):
->
-  :helptags ~/.vim/doc
-<
-In addition to having R and Vim installed in your system, this plugin has the
-following dependencies:
+Before installing the plugin, you should install its dependencies:
 
    Depends:~
 
-   vimcom.plus = 0.9-91: http://www.lepem.ufc.br/jaa/vimcom.plus.html
-		  The vimcom.plus (or vimcom) package creates a server on R to
-		  allow the communication with Vim. The package is not used to
-		  send commands from Vim to R Console, but it is necessary to
-		  open R documentation in Vim's buffer, run the Object
-		  Browser, run either `Sweave()` or `knit()` on the document
-		  being edited. It also has some functions called by Vim such
-		  as `vim.plot()`, `vim.print()`, and `vim.bol()`. This last
-		  one is required to build the data base used in
-		  omnicompletion.
+   Vim >= 7.4: http://www.vim.org/download.php
+	       In addition to the most commonly used features, the plugin
+	       requires: |+python| or |+python3|, |+clientserver| and |+conceal|.
+
+   R >= 3.0.0: http://www.r-project.org/
+
+   vimcom.plus = 0.9-92: http://www.lepem.ufc.br/jaa/vimcom.plus.html
 
    Tmux >= 1.5:   http://tmux.sourceforge.net
                   Tmux is necessary to send commands from Vim to R Console.
@@ -159,46 +133,80 @@ following dependencies:
    latexmk:       Automate the compilation of LaTeX documents.
                   See examples in |vimrplugin_latexcmd|.
 
-   Note: Tmux and ncurses-term are already packaged for most GNU/Linux
-   distributions and other Unix variants. Unfortunately their installation
-   instructions vary widely and are beyond the scope of this documentation.
+   Note: Vim, R, Tmux, ncurses-term and latexmk are already packaged for most
+   GNU/Linux distributions and other Unix variants. Unfortunately their
+   installation instructions vary widely and are beyond the scope of this
+   documentation.
    
-   You certainly will want to put something like the following at the end of
-   your ~/.Rprofile:
+You need to activate plugins and indentation according to 'filetype'. You
+should have at least the following options in your |vimrc|:
 >
-   if(interactive()){
-       library(colorout)
-       library(setwidth)
-       library(vimcom.plus)
-       # If you can't install the vimcom.plus package, do:
-       # library(vimcom)
-   }
+   set nocompatible
+   syntax enable
+   filetype plugin on
+   filetype indent on
 <
-   Conflicts:~
+Download the latest version of the plugin from:
 
-   Users have reported that the Vim-R-plugin might not work well with Fish
-   Shell and tcsh.
+    http://www.vim.org/scripts/script.php?script_id=2628
+
+Start a terminal emulator, go to the directory where you have downloaded the
+plugin and type:
+>
+   vim Vim-R-plugin.vmb
+<
+Then, in Vim, type:
+>
+   :so %
+<
+Press <Enter> and the plugin will be installed (because the plugin has many
+files, you have to press the space bar a few times to finish the
+installation). You should, then, quit Vim. Note: if you need too install the
+plugin in a non default directory, do `:UseVimball` `[path]`.
+
+Start Vim again and edit an R script. Type <LocalLeader>rf to start R and run
+the command below to get help configuring ~/.Rprofile, ~/.vimrc, ~/.tmux.conf,
+and ~/.bashrc (the <LocalLeader> is `\` by default):
+>
+   :RpluginConfig
+<
+The above command will guide you through the final configuration steps, but
+if you prefer to configure everything by yourself, please, read the section
+|r-plugin-quick-setup|.
 
 If you start either GVim or Vim in a terminal emulator the plugin will start R
 in a external terminal emulator. If you start Vim inside of a Tmux session,
 the plugin will split the Tmux window in two and start R in the other pane.
-Please, read the section |r-plugin-tmux|, especially the tip |r-plugin-tvim|.
 
-If you don't want to read this entire document to find a few suggestions of
-configuration of ~/.bashrc, ~/.tmux.conf and ~/.Rprofile, jump to
-|r-plugin-quick-setup|.
+The recommended way of running the plugin on Linux is running Vim inside a
+Tmux session. If you do not use Tmux frequently, it is recommended that you
+create a custom Bash function as explained in the section |r-plugin-tmux|,
+especially the tip |r-plugin-tvim| (the above command :RpluginConfig should do
+this for you).
 
-Note: On Mac OS X the plugin will use AppleScript in both Vim and GVim unless
-vimrplugin_applescript = 0. Some users have reported more luck with iTerm than
-with the default Mac OS X terminal emulator.
+Note: On Mac OS X, in both Vim and GVim, the plugin will use AppleScript to
+send commands to the R Console application unless vimrplugin_applescript = 0.
+Some users have reported more luck with iTerm than with the default Mac OS X
+terminal emulator.
 
+If you want to uninstall the plugin, do
+>
+   :RmVimball Vim-R-plugin
+<
 
-3.2.2. Windows~
+3.2. Instructions for Windows ~
 
-In addition to having R installed in your system, this plugin requires users
-to install external dependencies:
+Before installing the plugin, you should install several external
+dependencies:
 
-    * Vim's version must be >= 7.4
+    * R's version must be >= 3.0.0: http://www.r-project.org/
+
+    * vimcom.plus = 0.9-92: http://www.lepem.ufc.br/jaa/vimcom.plus.html
+      
+      Note: If you cannot build vimcom.plus yourself, you will want to
+      download and install the zip file.
+
+    * Vim's version must be >= 7.4: http://www.vim.org/download.php
 
     * Python 2.7.5 (32 bit): http://www.python.org/download/
       Do not choose the X86-64 version because it will not work. 
@@ -207,64 +215,62 @@ to install external dependencies:
 			     
       Note: The above versions of Python and pywin32 are known to work with
       the official GVim 7.4 binary. The default download may not match the
-      Python version Vim was linked against: you have to "View all files" on
-      the download page to find the file that matches exactly the above
-      versions. Please, read |r-plugin-python| if want to use different
+      Python version Vim was linked against: then you have to "View all files"
+      on the download page to find the file that matches exactly the above
+      versions. Please, read |r-plugin-python| if need to use different
       versions.
 
+Now, download the latest version of `Vim-R-plugin.vmb` from
 
-    * vimcom.plus = 0.9-91: http://www.lepem.ufc.br/jaa/vimcom.plus.html
-      The vimcom.plus (or vimcom) package creates a server on R to allow the
-      communication with Vim. The package is not used to send commands from
-      Vim to R Console, but it is necessary to open R documentation in Vim's
-      buffer, run the Object Browser, run either `Sweave()` or `knit()` on the
-      document being edited. It also has some functions called by Vim such as
-      `vim.plot()`, `vim.print()`, and `vim.bol()`. This last one is required
-      to build the data base used in omnicompletion.
-      The vimcom.plus package creates a server on R to allow the communication
-      with Vim. You certainly will want to put the following lines at the end
-      of your Rprofile.
+    http://www.vim.org/scripts/script.php?script_id=2628
+    
+and open the directory where you have downloaded it, right click on it and
+choose "Edit with Vim".
 >
-      if(interactive()){
-	  library(vimcom.plus)
-	  # If you cannot install vimcom.plus, do:
-	  # library(vimcom)
-      }
-<
-      You can do `Sys.getenv("HOME")` in the R Console to know where the file
-      should be, but usually it is at ~/Documents/.Rprofile.
-
-Create your |vimfiles| directory if you do not have it yet. Its path will be
-similar to one of the following:
+Then, in Vim, type:
 >
-  C:\Documents and Settings\yourlogin\vimfiles
-  C:\Users\yourlogin\vimfiles
+   :so %
 <
-Uncompress the archive. Right click on the plugin's zip file and choose
-"Extract all". Then choose ~/vimfiles as the destination directory.
+Press <Enter> and the plugin will be installed (because the plugin has many
+files, you have to press the space bar a few times to finish the
+installation). You should, then, quit Vim. Note: if you need too install the
+plugin in a non default directory, do `:UseVimball` `[path]`.
 
-Start Vim and build the tags file for this document (and others that eventually
-are in the same directory):
+Start GVim again and edit an R script. You can right click a .R file and
+choose "Edit with Vim" or create a new one with the Normal mode command:
 >
-  :helptags ~\vimfiles\doc
+   :e example.R
 <
-Start editing an R file with GVim and try to send some lines to R Console. You
-may have to adjust the value of |vimrplugin_sleeptime|.
+To finish the installation, you have to start R to run a configuration script.
+Please, click on the menu bar
+>
+   R
+   Start/Close
+   Start R (default)
+<
+and, finally, click on the menu bar
+>
+   R
+   Configure (Vim-R)
+<
+The above command will guide you through the final configuration steps.
 
+You may have to adjust the value of |vimrplugin_sleeptime|.
+
+If you want to uninstall the plugin, do
+>
+   :RmVimball Vim-R-plugin
+<
 
 3.3. Troubleshooting (if the plugin doesn't work)~
 
 Note: The <LocalLeader> is '\' by default.
 
 The plugin is a |file-type| plugin. It will be active only if you are editing
-a .R, .Rnw, .Rd, Rmd, or Rrst file. The menu items and tool bar buttons will
-not be visible and the key bindings will not be active while editing either
-unnamed files or files with name extensions other than the mentioned above. If
-the plugin is active, pressing <LocalLeader>rf should start R.
-
-Look at the ~/.vim (Linux, Unix, OS X) or ~/vimfiles (Windows) directory. Is
-there a subdirectory named "r-plugin"? If not, then you unpacked the plugin in
-the wrong place.
+a .R, .Rnw, .Rd, Rmd, or Rrst file. The menu items will not be visible and the
+key bindings will not be active while editing either unnamed files or files
+with name extensions other than the mentioned above. If the plugin is active,
+pressing <LocalLeader>rf should start R.
 
 Did you see warning messages but they disappeared before you have had time to
 read them? Type the command |:messages| in Normal mode to see them again.
@@ -279,37 +285,27 @@ running, the vimcom.plus (or vimcom) package is not installed, or R was not
 started by Vim.
 
 
-3.4. General instructions II (optional steps)~
+3.4. Optional steps~
 
-3.4.1 Update list of objects~
-
-Start R and update the list of objects for omni completion and syntax
-highlight (see |:RUpdateObjList| for details).
-
-
-3.4.2 Customize the plugin~
+3.4.1 Customize the plugin~
 
 Please, read the section |r-plugin-options|. Emacs/ESS users should read the
 section Indenting setup (|r-plugin-indenting|) of this document.
 
 
-3.4.3 Hide unused buttons~
-
-Edit GVim's toolbar and remove the buttons that you never use. The plugin adds
-some buttons to the toolbar, but you may not see them because GVim has too
-many buttons by default. Please see the page below to know how to hide buttons
-on the toolbar:
-
-   http://vim.wikia.com/wiki/Hide_toolbar_or_menus_to_see_more_text
-
-
-3.4.4 Install additional plugins~
+3.4.2 Install additional plugins~
 
 You may be interested in installing additional general plugins to get
 functionality not provided by this file type plugin. ShowMarks and snipMate
 are particularly interesting. Please read |r-plugin-tips| for details. If you
 edit Rnoweb files, you may want to try LaTeX-Box for omnicompletion of LaTeX
 code (see |r-plugin-latex-box| for details).
+
+
+3.4.3 Add buttons to GVim~
+
+Please read |r-plugin-toolbar| if you want to add R buttons to GVim's tool
+bar.
 
 
 ==============================================================================
@@ -322,17 +318,18 @@ Note: The <LocalLeader> is '\' by default.
 
 Note: It is recommended the use of different keys for <Leader> and
 <LocalLeader> to avoid clashes between filetype plugins and general plugins
-key binds. See |filetype-plugins| and |maplocalleader|.
+key binds. See |filetype-plugins|, |maplocalleader| and |r-plugin-localleader|.
 
 To use the plugin, open a .R or .Rnw or .Rd file with Vim and type
 <LocalLeader>rf. Then, you will be able to use the plugin key bindings to send
 commands to R.
 
-This plugin has many key bindings, which correspond with menu entries and, in
-some cases, toolbar buttons. In the list below, the backslash represents the
-<LocalLeader>. Not all menu items and key bindings are enabled in all
-filetypes supported by the plugin (r, rnoweb, rhelp):
+This plugin has many key bindings, which correspond with menu entries. In the
+list below, the backslash represents the <LocalLeader>. Not all menu items and
+key bindings are enabled in all filetypes supported by the plugin (r, rnoweb,
+rhelp, rrst, rmd).
 
+Menu entry                                Default shortcut~
 Start/Close
   . Start R (default)                                  \rf
   . Start R --vanilla                                  \rv
@@ -355,6 +352,7 @@ Send
   . Chunk (cur, echo)                                  \ce
   . Chunk (cur, down)                                  \cd
   . Chunk (cur, echo and down)                         \ca
+  . Chunk (from first to here)                         \ch
   --------------------------------------------------------
   . Function (cur)                                     \ff
   . Function (cur, echo)                               \fe
@@ -403,11 +401,12 @@ Command
   . Sweave, BibTeX and PDF (cur file) (Linux/Unix)     \sb
   --------------------------------------------------------
   . Knit (cur file)                                    \kn
-  . Spin (cur file)                                    \ks
   . Knit and PDF (cur file)                            \kp
-  . Knit and Beamer PDF (cur file) (Only Rmd)          \kl
-  . Knit and PDF (cur file, verbose) (Windows)         \kv
   . Knit, BibTeX and PDF (cur file) (Linux/Unix)       \kb
+  . Knit and Beamer PDF (cur file) (only .Rmd)         \kl
+  . Knit and HTML (cur file, verbose) (only .Rmd)      \kh
+  . Knit and PDF (cur file, verbose) (Windows)         \kv
+  . Spin (cur file) (only .R)                          \ks
   --------------------------------------------------------
   . Open PDF (cur file)                                \op
   --------------------------------------------------------
@@ -432,10 +431,6 @@ Edit
   . Go (previous R chunk)                               gN
 -----------------------------------------------------------
 
-Syntax
-  . Build omnils (loaded packages)       :RUpdateObjList
------------------------------------------------------------
-
 Object Browser
   . Show/Update                                        \ro
   . Expand (all lists)                                 \r=
@@ -445,6 +440,7 @@ Object Browser
 
 Help (plugin)
 Help (R)                                            :Rhelp
+Configure (Vim-R)                           :RpluginConfig
 -----------------------------------------------------------
 
 Please see |r-plugin-key-bindings| to learn how to customize the key bindings
@@ -502,11 +498,13 @@ CTRL-A can also be used to complete knitr chunk options if the cursor is
 inside the chunk header.
 
 If R is not running or if it is running but is busy the completion will be
-based on information saved with the command |:RUpdateObjList|. Otherwise, the
-pop up menu for completion of function arguments will include an additional
-line with the name of the library where the function is (if the function name
-can be found in more than one library) and the function method (if what is
-being shown are the arguments of a method and not of the function itself).
+based on information from the packages listed by |vimrplugin_permanent_libs|
+(provided that the libraries were loaded at least once during a session of
+Vim-R-plugin usage). Otherwise, the pop up menu for completion of function
+arguments will include an additional line with the name of the library where
+the function is (if the function name can be found in more than one library)
+and the function method (if what is being shown are the arguments of a method
+and not of the function itself).
 
 To get help on an R topic, type in Vim (Normal mode):
 >
@@ -516,11 +514,12 @@ The command may be abbreviated to  :Rh  and you can either press <Tab> to
 trigger the autocompletion of R objects names or hit CTRL-D to list the
 possible completions (see |cmdline-completion| for details on the various ways
 of getting command-line completion). The list of objects used for
-completion is the same one built by |:RUpdateObjList|.
+completion is the same available for omnicompletion (see
+|vimrplugin_permanent_libs|).
 
 You can source all .R files in a directory with the Normal mode command
 :RSourceDir, which accepts an optional argument (the directory to be sourced).
-
+								    *:Rinsert*
 The command  :Rinsert <cmd>  inserts one or more lines with the output of the
 R command sent to R. By using this command we can avoid the need of copying
 and pasting the output R from its console to Vim. For example, to insert the
@@ -549,47 +548,20 @@ mode:
    [count]gn : go to the next chunk of R code
    [count]gN : go to the previous chunk of R code
 
+The commands <LocalLeader>cc, ce, cd and ca send the current chunk of R code
+to R Console. The command <LocalLeader>ch sends the R code from the first
+chunk up to the current line.
+
 
 4.3. Omni completion and the highlighting of functions~
-							     *:RUpdateObjList*
-							      *:RAddLibToList*
+
 The plugin adds some features to the default syntax highlight of R code. One
-such feature is the highlight of R functions. However, only functions that
-R loads by default are highlighted. To add functions of other libraries, you
-should do the following:
+such feature is the highlight of R functions. However, functions are
+highlighted only if their libraries are loaded by R (but see
+|vimrplugin_permanent_libs|).
 
-  1. Start R from within Vim.
-  2. Use R's `library()` to load the libraries whose functions you want
-     highlighted.
-  3. Run the following command in Vim's Normal mode:
-     :RUpdateObjList
-
-The command :RUpdateObjList in addition to creating a list of function names
-to be highlighted also creates a file containing a list of objects for omni
-completion (|compl-omni|) including all objects currently in R's workspace,
-except the .GlobalEnv objects. These two lists are stored permanently in the
-~/.vim/r-plugin directory.
-
-The command  :RUpdateObjList  waits 60 seconds to R finish building the list.
-If this time is not enough to your system, please, set a different value of
-|vimrplugin_buildwait|.
-
-You should run  :RUpdateObjList  whenever you upgrade R since some functions
-are removed and new ones are added at each new R version.
-
-If have already run  :RUpdateObjList  and now want to add the objects of
-specific libraries to both the list of objects for omnicompletion and the list
-of functions for syntax highlight you can use the Vim command  :RAddLibToList.
-Example:
->
-   :RAddLibToList foreign Matrix
-<
 Note: If you have too many loaded packages Vim may be unable to load the list
-of functions for syntax highlight. If you want to remove the objects of
-specific libraries, please, delete the corresponding files from
-~/.vim/r-plugin/objlist/ directory (the directory may be at a different
-location if you are using a plugin management system like vim-addons or
-pathogen).
+of functions for syntax highlight.
 
 
 4.4. Omni completion~
@@ -629,14 +601,9 @@ you install packages such as vim-nox on Debian/Ubuntu or vim-enhanced on
 Fedora/Red Hat. If you want to use Vim in a terminal emulator in Fedora/Red
 Hat, you may want to create a symbolic link to "gvim" named "vim". You still
 have to explicitly start the server with the argument |--servername|.  To
-avoid having to type this argument every time that you start Vim, you may put
-in your ~/.bashrc:
->
-   if [ "x$DISPLAY" != "x" ]
-   then
-       alias vim='vim --servername VIM'
-   fi
-<
+avoid having to type this argument every time that you start Vim, please look
+at the example in |r-plugin-bash-setup|.
+
 In the .GlobalEnv view, if an object has the attribute "label", it will also
 be displayed. Please, see the R help for package vimcom.plus (or vimcom) for
 some options to control the Object Browser behavior. In the Object Browser
@@ -717,44 +684,57 @@ section refers to the case of starting R when Vim already is in a Tmux
 session, that is, if you do:
 >
    tmux
-   vim filename.R
+   vim --servername VIM filename.R
    exit
 <
 In this case, the terminal window is split in two regions: one for Vim and the
 other for Tmux. Then, it's useful (but not required) to know some Tmux
 commands. After you finished editing the file, you have to type `exit` to quit
 the Tmux session.
+
+
+4.8.1 tvim~
 							       *r-plugin-tvim*
-If you always prefer to run Tmux before running Vim you may want to put in
-your ~/.bashrc:
->
-   if [ "x$DISPLAY" == "x" ]
-   then
-       function tvim(){ tmux new-session "vim $@" ; }
-   else
-       function tvim(){ tmux -2 new-session "TERM=screen-256color vim $@" ; }
-   fi
-<
-Then you will be able to start a Tmux session running Vim by typing:
+If, as recommended, you always prefer to run Tmux before running Vim you could
+create a Bash function called `tvim` (please, see the ~/.bashrc example at
+|r-plugin-quick-setup|). Then you will be able to start a Tmux session running
+Vim by typing:
 >
    tvim filename.R
 <
 Using the `tvim` function, the Tmux session is finished when you quits Vim.
-That is, the only advantage of using `tvim` is that you do not have to type
-`tmux` before and `exit` after the edition of the file.
+That is, the main advantage of using `tvim` is that you do not have to type
+`tmux` before and `exit` after the edition of the file. Moreover, the
+`tvim` command also pass the |--servername| argument to Vim, which is required
+update of the Object Browser and functions highlight.
 
-The Tmux configuration file provided by the Vim-R-plugin configures Tmux to
-use vi key bindings. It also configures Tmux to react to mouse clicks. You
-should be able to switch the active pane by clicking on an inactive pane, to
-resize the panes by clicking on the border line and dragging it, and to scroll
-the R Console with the mouse wheel. When you use the mouse wheel, Tmux enters
-in its copy/scroll back mode (see below).
+If you are going to run Vim inside Tmux, than you should create your
+~/.tmux.conf if it does not exist yet. You may put the lines below in your
+~/.tmux.conf as a starting point to your own configuration file:
+>
+    set-option -g prefix C-a
+    unbind-key C-b
+    bind-key C-a send-prefix
+    set-window-option -g mode-keys vi
+    set -g terminal-overrides 'xterm*:smcup@:rmcup@'
+    set -g mode-mouse on
+    set -g mouse-select-pane on
+    set -g mouse-resize-pane on
+<
+
+4.8.2 Key bindings and mouse support~
+
+The Tmux configuration file suggested above configures Tmux to use vi key
+bindings. It also configures Tmux to react to mouse clicks. You should be able
+to switch the active pane by clicking on an inactive pane, to resize the panes
+by clicking on the border line and dragging it, and to scroll the R Console
+with the mouse wheel. When you use the mouse wheel, Tmux enters in its
+copy/scroll back mode (see below).
 
 The configuration script also sets <C-a> as the Tmux escape character (the
 default is <C-b>), that is, you have to type <C-a> before typing a Tmux
-command. Below are the most useful key bindings to use Tmux with the tmux.conf
-created by the Vim-R-plugin (see |vimrplugin_notmuxconf| if you prefer to use
-your own ~/.tmux.conf)
+command. Below are the most useful key bindings to use Tmux with the above
+tmux.conf:
 
     <C-a>arrow keys : Move the cursor to the Tmux panel above, below, at the
                       right or at the left of the current one.
@@ -784,33 +764,42 @@ terminal emulator:
 >
   man tmux
 <
-Note: <C-a> was configured as the Tmux escape character, and it will not be
-passed to applications running under Tmux. To send <C-a> to either R or Vim
+Note: Because <C-a> was configured as the Tmux escape character, it will not
+be passed to applications running under Tmux. To send <C-a> to either R or Vim
 you have to type <C-a>a.
 
-With Tmux, you can detach the Vim-R session and reattach it latter. This
-is useful if you plan to begin the use the Vim-R-plugin in a machine and
-latter move to another computer and access remotely you previous Vim-R-plugin
-session.
 
-  - Create your ~/.tmux.conf if it does not exist yet. You may put the lines
-    below in your ~/.tmux.conf as a starting point to your own configuration
-    file:
+4.8.3 Copying and pasting~
+
+You do not need to copy code from Vim to R because you can use the plugin's
+shortcuts to send the code. For pasting the output of R commands into Vim's
+buffer, you can use the command |:Rinsert|. If you want to copy text from an
+application running inside the Tmux to another application also running in
+Tmux, as explained in the previous subsection, you can enter in Tmux
+copy/scroll mode, select the text, copy it, switch to the other application
+pane and, then, paste.
+
+However, if you want to copy something from either Vim or R to another
+application not running inside Tmux, Tmux may prevent the X server from
+capturing the text selected by the mouse. The solution is to disable mouse
+support in Tmux. You will be able to toggle mouse support on and off by typing
+<C-a>m if you add the following line to your ~/.tmux.conf:
 >
-    set-option -g prefix C-a
-    unbind-key C-b
-    bind-key C-a send-prefix
-    set-window-option -g mode-keys vi
-    set -g terminal-overrides 'xterm*:smcup@:rmcup@'
-    set -g mode-mouse on
-    set -g mouse-select-pane on
-    set -g mouse-resize-pane on
+   bind m run-shell '( if [ "mode-mouse on" = "$(tmux show-window-option | grep mode-mouse)" ]; then toggle=off; else toggle=on; fi; tmux display-message "mouse $toggle"; tmux set-option -w mode-mouse $toggle ; for cmd in mouse-select-pane mouse-resize-pane mouse-select-window; do tmux set-option -g $cmd $toggle ; done;) > /dev/null 2>&1'
 <
+
+4.8.2 Remote access~
+
+With Tmux, you can detach the Vim-R session and reattach it latter. This is
+useful if you plan to begin the use the Vim-R-plugin in a machine and latter
+move to another computer and access remotely your previous Vim-R session.
+Below is the step-by-step procedure to run the Vim-R remotely:
+
   - Start Tmux:
       tmux
 
   - Start Vim:
-      vim theScript.R
+      vim the_script.R
 
   - Use Vim to start an R session:
       <LocalLeader>rf
@@ -897,44 +886,41 @@ Everything should work as expected again after any valid code is executed in
 the R Console.
 
 
-5.6. Problems with Fish Shell~
+5.6. R must be started by Vim~
 
-Some of the plugin features does not work correctly if Vim is running inside
-Fish Shell, for example, in the Object Browser, lists and libraries do not
-open and close when the <Enter> key is pressed over them.
-
-
-5.7. R must be started by Vim~
-
-The communication between Vim and R will only work if R was started by Vim
+The communication between Vim and R will work only if R was started by Vim
 through the <LocalLeader>rf command because the plugin was designed to connect
 each Vim instance with its own R instance. If you start R before Vim, it will
-not inherit from Vim the environment variables VIMRPLUGIN_TMPDIR and
-VIMINSTANCEID. The former variable is the path used by the R package vimcom to
-save temporary files used by the Vim-R-plugin to: perform omnicompletion, show
-R documentation in a Vim buffer, and update the Object Browser. The latter is
-used by the Vim-R-plugin to know that it is not connecting to an R instance
-initiated by another Vim instance. If you use Vim to start R, but then closes
-Vim, the VIMINSTANCEID variable in R will become outdated. Additionally, the
-Vim-R-plugin sets the value of its internal variable SendCmdToR from
-SendCmdToR_fake to the appropriate value when R is successfully started. It is
-possible to set the values of all these variables manually, but, as you can
-see below, it is not practical to do so. If you have either started R before
-Vim or closed Vim and opened it again and really want full communication
-between Vim and R, you can try the following (not all procedures are necessary
-for all cases):
+not inherit from Vim the environment variables VIMRPLUGIN_TMPDIR,
+VIMRPLUGIN_HOME, VIMEDITOR_SVRNM and VIMINSTANCEID. The first one is the path
+used by the R package vimcom to save temporary files used by the Vim-R-plugin
+to: perform omnicompletion, show R documentation in a Vim buffer, and update
+the Object Browser. The latter is used by the Vim-R-plugin to know that it is
+not connecting to an R instance initiated by another Vim instance. If you use
+Vim to start R, but then closes Vim, the VIMINSTANCEID variable in R will
+become outdated. Additionally, the Vim-R-plugin sets the value of its internal
+variable SendCmdToR from SendCmdToR_fake to the appropriate value when R is
+successfully started. It is possible to set the values of all these variables
+manually, but, as you can see below, it is not practical to do so. If you have
+either started R before Vim or closed Vim and opened it again and really want
+full communication between Vim and R, you can try the following (not all
+procedures are necessary for all cases):
 
    In Normal mode Vim do:
 >
    :echo $VIMRPLUGIN_TMPDIR
    :echo $VIMINSTANCEID
+   :echo $VIMEDITOR_SVRNM
+   :echo $VIMRPLUGIN_HOME
 <
    In R do:
 >
    detach("package:vimcom.plus", unload = TRUE) # or vimcom
-   Sys.setenv(VIMRPLUGIN_TMPDIR="X") # where "X" is what Vim has echoed
+   Sys.setenv(VIMRPLUGIN_TMPDIR="T") # where "T" is what Vim has echoed
    library(vimcom.plus)              # or vimcom
-   Sys.setenv(VIMINSTANCEID="Y")     # where "Y" is what Vim has echoed
+   Sys.setenv(VIMINSTANCEID="I")     # where "I" is what Vim has echoed
+   Sys.setenv(VIMEDITOR_SVRNM"="S")  # where "S" is what Vim has echoed
+   Sys.setenv(VIMRPLUGIN_HOME"="H")  # where "H" is what Vim has echoed
 <
 If you are running R in a terminal emulator (Linux/Unix) Vim still needs to
 know the name of Tmux session and Tmux pane where R is running.
@@ -951,7 +937,6 @@ And in Normal mode Vim do:
 >
    :let rplugin_rconsole_pane = "X"
    :let rplugin_tmuxsname = "Y"
-   :let g:needsnewomnilist = 1
 <
 Finally, do one of the commands below in Normal mode Vim, according to how R
 is running:
@@ -981,7 +966,7 @@ is running:
 |vimrplugin_i386|              Use 32 bit version of R
 |vimrplugin_r_path|            Directory where R is
 |vimrplugin_r_args|            Arguments to pass to R
-|vimrplugin_buildwait|         Time to wait for :RUpdateObjList to finish
+|vimrplugin_permanent_libs|    Objects for omnicompletion and syntax highlight
 |vimrplugin_routmorecolors|    More syntax highlighting in R output
 |vimrplugin_routnotab|         Show output of R CMD BATCH in new window
 |vimrplugin_indent_commented|  Indent lines commented with the \xx command
@@ -989,24 +974,25 @@ is running:
 |vimrplugin_rconsole_height|   The number of lines of R Console (Tmux split)
 |vimrplugin_vsplit|            Make Tmux split the window vertically
 |vimrplugin_rconsole_width|    The number of columns of R Console (Tmux split)
-|vimrplugin_applescript|       Use osascript in Mac OS X.
+|vimrplugin_applescript|       Use osascript in Mac OS X
 |vimrplugin_listmethods|       Do `vim.list.args()` instead of `args()`
 |vimrplugin_specialplot|       Do `vim.plot()` instead of `plot()`
-|vimrplugin_maxdeparse|        Argument to R `args()` function
+|vimrplugin_maxdeparse|        Argument to R `source()` function
 |vimrplugin_latexcmd|          Command to run on .tex files
 |vimrplugin_sweaveargs|        Arguments do `Sweave()`
 |vimrplugin_never_unmake_menu| Do not unmake the menu when switching buffers
 |vimrplugin_map_r|             Use 'r' to send lines and selected text
-|vimrplugin_ca_ck|             Add ^A^K to the beginning of commands.
-|vimrplugin_openpdf|           Open PDF after processing rnoweb file.
-|vimrplugin_openpdf_quietly|   Open PDF quietly.
-|vimrplugin_openhtml|          Open PDF quietly.
-|vimrplugin_strict_rst|        Code style for generated rst files.
-|vimrplugin_insert_mode_cmds|  Allow R commands in insert mode.
+|vimrplugin_ca_ck|             Add ^A^K to the beginning of commands
+|vimrplugin_openpdf|           Open PDF after processing rnoweb file
+|vimrplugin_openpdf_quietly|   Open PDF quietly
+|vimrplugin_openhtml|          Open PDF quietly
+|vimrplugin_strict_rst|        Code style for generated rst files
+|vimrplugin_insert_mode_cmds|  Allow R commands in insert mode
 |vimrplugin_allnames|          Show names which begin with a dot
-|vimrplugin_rmhidden|          Remove hidden objects from R workspace.
-|vimrplugin_source|            Source additional scripts.
-|vimrplugin_restart|           Restart R if it is already running.
+|vimrplugin_rmhidden|          Remove hidden objects from R workspace
+|vimrplugin_source|            Source additional scripts
+|vimrplugin_restart|           Restart R if it is already running
+|vimrplugin_show_args|         Show extra information during omnicompletion
 
 
 6.1. Terminal emulator (Linux/Unix only)~
@@ -1193,14 +1179,18 @@ default value is "--sdi", but you may change it to "--mdi" if you do not like
 the SDI style of the graphical user interface.
 
 
-6.9. Time necessary to build list of objects for omni completion~
-							*vimrplugin_buildwait*
-If your system needs more than 60 seconds to build the list of objects for
-omni completion after you do the command |:RUpdateObjList|, then you should
-set the value of |vimrplugin_buildwait| to a higher value. Example:
+6.9. Omnicompletion and syntax highlight of R functions~
+						   *vimrplugin_permanent_libs*
+The list of functions to be highlighted and the list of objects for
+omnicompletion are built dynamically as the libraries are loaded by R.
+However, you can set the value of vimrplugin_permanent_libs if you want that
+the functions and objects of specific packages are respectively highlighted
+and available for omnicompletion even if R is not running. By default, only
+the functions of vanilla R are always highlighted. Below is the default value
+of vimrplugin_permanent_libs:
 >
-   let vimrplugin_buildwait = 240
->
+   let vimrplugin_permanent_libs = "base,stats,graphics,grDevices,utils,datasets,methods"
+<
 
 6.10. More colorful syntax highlight of .Rout files~
 						   *vimrplugin_routmorecolors*
@@ -1264,8 +1254,8 @@ put in your |vimrc|:
 <
 If you opted for using your own configuration file, the plugin will write a
 minimum configuration which will set the value of two environment variables
-required for the communication with R and source your own configuration file
-(~/.tmux.conf).
+required for the communication with R and then source your own configuration
+file (~/.tmux.conf).
 
 
 6.15. Integration with Tmux (Linux/Unix only)~
@@ -1331,27 +1321,29 @@ Example:
 							 *vimrplugin_latexcmd*
 						       *vimrplugin_sweaveargs*
 On Windows, the plugin calls `tools::texi2pdf()` to build the pdf from the
-generated .tex file. On Linux/Unix, by default, Vim calls pdflatex to produce
-a pdf document from the .tex file produced by the R Sweave command. You can
-use the option vimrplugin_latexcmd to change this behavior. Examples:
+generated .tex file. On Linux/Unix, by default, Vim calls `latexmk` `-pdf` to
+produce a pdf document from the .tex file produced by either `Sweave()` or
+`knit()` command. If `latexmk` is not installed, it calls `pdflatex`. You can
+use the option vimrplugin_latexcmd to change this behavior. Example:
 >
-   let vimrplugin_latexcmd = "latexmk -pdf"
    let vimrplugin_latexcmd = "latex"
 <
 If you want to pass arguments do the `Sweave()` function, set the value of the
 vimrplugin_sweaveargs variable.
 
 
-6.20. Never unmake the R menu and tool bar buttons~
+6.20. Never unmake the R menu~
 						*vimrplugin_never_unmake_menu*
-Use this option if you want that the menu item R and the R related tool bar
-buttons are not deleted when you change from one buffer to another, for
-example, when going from an .R file to a .txt one:
+Use this option if you want that the menu item R is not deleted when you
+change from one buffer to another, for example, when going from an .R file to
+a .txt one:
 >
    let vimrplugin_never_unmake_menu = 1
 <
-When this options is enabled all menu items are created regardless of the file
-type.
+When this option is enabled all menu items are created regardless of the file
+type. If you have added R related tool bar buttons (see |r-plugin-toolbar|)
+the buttons also are created at the plugin startup and kept while you go to
+different file type buffers.
 
 
 6.21. Map 'r'~
@@ -1481,9 +1473,14 @@ scripts, put in your |vimrc|:
 >
    let vimrplugin_source = "~/path/to/MyScript.vim,/path/to/AnotherScript.vim"
 <
-Currently, there is only one script known to extend the Vim-R-plugin features:
+Currently, there are only two scripts known to extend the Vim-R-plugin
+features:
 
-   - https://github.com/mllg/vim-devtools-plugin
+   Support to the devtools R package~
+   https://github.com/mllg/vim-devtools-plugin
+
+   Basic integration with GNU screen~
+   https://github.com/jalvesaq/screenR
 
 
 6.28. Restart R if it is already running (Linux/Unix only)~
@@ -1502,6 +1499,18 @@ do <LocalLeader>rf, <LocalLeader>rv or <LocalLeader>rc, then, put in your
    let vimrplugin_restart = 1
 <
 
+6.29. Show extra information during omnicompletion~
+							*vimrplugin_show_args*
+If you want that Vim shows a preview window with the function arguments as you
+do omnicompletion, put in your |vimrc|:
+>
+   let vimrplugin_show_args = 1
+<
+The preview window is not shown by default because it is more convenient to
+run <Ctrl-X><Ctrl-A> to complete the function arguments. The preview window
+will be shown only if "preview" is included in your 'completeopt'.
+
+
 ==============================================================================
 						       *r-plugin-key-bindings*
 7. Custom key bindings~
@@ -1509,7 +1518,7 @@ do <LocalLeader>rf, <LocalLeader>rv or <LocalLeader>rc, then, put in your
 When creating custom key bindings for the Vim-R-plugin, it is necessary to
 create three maps for most functions because the way the function is called is
 different in each Vim mode. Thus, key bindings must be made for Normal mode,
-insert mode, and visual mode.
+Insert mode, and Visual mode.
 
 To customize a key binding you should put in your |vimrc| something like:
 >
@@ -1587,19 +1596,21 @@ RD, "cursor down"; RED, both "echo" and "down"):
    RSummary
    RListSpace
 
-   Support to Rnoweb, Rmd, Rrst~
+   Support to Sweave and knitr~
    RSendChunk
    RDSendChunk
    RESendChunk
    REDSendChunk
-   RBibTeX
-   RBibTeXK
+   RSendChunkFH (from the first chunk to here)
+   RBibTeX    (Sweave)
+   RBibTeXK   (Knitr)
    RSweave
    RKnit
    RMakeHTML
    RMakeODT
-   RMakePDF
-   RMakePDFK
+   RMakePDF   (Sweave)
+   RMakePDFK  (Knitr)
+   RMakePDFKb (.Rmd, beamer)
    ROpenPDF
    RSpinFile
 
@@ -1655,57 +1666,37 @@ The following files are part of the plugin and should be in your ~/.vim
 directory after the installation:
 
 
-   autoload/rcomplete.vim
-   bitmaps/RClearAll.bmp
-   bitmaps/RClearAll.png
-   bitmaps/RClear.bmp
-   bitmaps/RClear.png
-   bitmaps/RClose.bmp
-   bitmaps/RClose.png
-   bitmaps/ricon.png
-   bitmaps/ricon.xbm
-   bitmaps/RListSpace.bmp
-   bitmaps/RListSpace.png
-   bitmaps/RSendBlock.bmp
-   bitmaps/RSendBlock.png
-   bitmaps/RSendFile.bmp
-   bitmaps/RSendFile.png
-   bitmaps/RSendFunction.bmp
-   bitmaps/RSendFunction.png
-   bitmaps/RSendLine.bmp
-   bitmaps/RSendLine.png
-   bitmaps/RSendParagraph.bmp
-   bitmaps/RSendParagraph.png
-   bitmaps/RSendSelection.bmp
-   bitmaps/RSendSelection.png
-   bitmaps/RStart.bmp
-   bitmaps/RStart.png
-   doc/r-plugin.txt
    ftdetect/r.vim
-   ftplugin/rhelp.vim
-   ftplugin/rnoweb.vim
-   ftplugin/r.vim
-   ftplugin/rbrowser.vim
-   ftplugin/rmd.vim
-   ftplugin/rrst.vim
    indent/r.vim
-   indent/rhelp.vim
-   indent/rnoweb.vim
    indent/rmd.vim
    indent/rrst.vim
-   r-plugin/common_buffer.vim
-   r-plugin/common_global.vim
-   r-plugin/functions.vim
-   r-plugin/objlist/
-   r-plugin/r.snippets
-   r-plugin/tex_indent.vim
-   r-plugin/vimcom.py
-   r-plugin/windows.py
-   syntax/rbrowser.vim
+   indent/rnoweb.vim
+   indent/rhelp.vim
+   autoload/rcomplete.vim
+   ftplugin/r.vim
+   ftplugin/rbrowser.vim
+   ftplugin/rdoc.vim
+   ftplugin/rhelp.vim
+   ftplugin/rmd.vim
+   ftplugin/rrst.vim
+   ftplugin/rnoweb.vim
    syntax/rout.vim
    syntax/r.vim
+   syntax/rhelp.vim
    syntax/rmd.vim
    syntax/rrst.vim
+   syntax/rdoc.vim
+   syntax/rbrowser.vim
+   doc/r-plugin.txt
+   r-plugin/vimcom.py
+   r-plugin/global_r_plugin.vim
+   r-plugin/windows.py
+   r-plugin/objlist/README
+   r-plugin/tex_indent.vim
+   r-plugin/r.snippets
+   r-plugin/common_buffer.vim
+   r-plugin/common_global.vim
+   r-plugin/vimrconfig.vim
 
 
 ==============================================================================
@@ -1936,28 +1927,18 @@ code automatically, breaking only comment lines, put in your |vimrc|:
 9.13. Vim with 256 colors in a terminal emulator (Linux/Unix only)~
 
 If you want 256 colors support in Vim, install the package ncurses-term. Then
-put in your ~/.bashrc:
->
-   if [ "x" != "x$DISPLAY" ]
-   then
-       if [ "screen" = "$TERM" ]
-       then
-           export TERM=screen-256color
-       else
-           export TERM=xterm-256color
-       fi
-   fi
-<
+put in your ~/.bashrc the lines suggested at |r-plugin-bash-setup|.
 Finally, put in your |vimrc|:
 >
    if &term =~ "xterm" || &term =~ "256" || $DISPLAY != ""
        set t_Co=256
    endif
-   colorscheme your_prefered_color_scheme
+   colorscheme your_preferred_color_scheme
 <
 You have to search the internet for color schemes supporting 256 colors,
 download and copy them to ~/.vim/colors. You may use the command
-|:colorscheme| to try them all before setting your preference in your |vimrc|.
+|:colorscheme| to try them one by one before setting your preference in your
+|vimrc|.
 
 
 9.14. Run your Makefile from within R~
@@ -1970,31 +1951,14 @@ line in your |vimrc|:
 <
 
 9.15. Edit your ~/.Rprofile~
-
-You may want to edit your ~/.Rprofile. Example for Linux:
+							   *r-plugin-Rprofile*
+You may want to edit your ~/.Rprofile in addition to considering the
+suggestions of |r-plugin-R-setup| you may also want to put the following
+lines in your .Rprofile if you are using Linux:
 >
-   if(interactive()){
-       library(colorout)
-       library(setwidth)
-       options(vimcom.verbose = 1, vimcom.allnames = TRUE)
-       if(Sys.getenv("VIMRPLUGIN_TMPDIR") != "")
-	   library(vimcom.plus)
-           # If you can't install the vimcom.plus package, do:
-           # library(vimcom)
-       if(Sys.getenv("TERM") != "linux" && Sys.getenv("TERM") != "")
-	   setOutputColors256(verbose = FALSE)
-       if(nchar(Sys.getenv("DISPLAY")) > 1){
-	   grDevices::X11.options(width = 4.5, height = 4, ypos = 0,
-				  xpos = 1000, pointsize = 10)
-	   options(editor = 'gvim -f -c "set ft=r"')
-       } else {
-	   options(editor = 'vim -c "set ft=r"')
-       }
-   }
+   grDevices::X11.options(width = 4.5, height = 4, ypos = 0,
+                          xpos = 1000, pointsize = 10)
 <
-The test for the environment variable DISPLAY is useful if you eventually use
-the plugin in the Linux console.
-
 The `X11.options()` is used to choose the position and dimensions of the X11
 graphical device. You can also install the application wmctrl and create
 shortcuts in your desktop environment to the commands
@@ -2009,15 +1973,6 @@ which can display R plots in a separate panel. Although we can not embed an R
 graphical device in Vim, we can at least make it always visible over the
 terminal emulator or the GVim window.
 
-An example for Windows:
->
-   if (interactive()) {
-     local({
-       options(editor = '"C:/Program Files (x86)/Vim/vim73/gvim.exe" "-c" "set filetype=r"')
-       options(help_type = "html")
-     })
-   }
-<
 
 9.16. Debugging R functions~
 
@@ -2026,7 +1981,7 @@ the R package "debug":
 >
    install.packages("debug")
    library(debug)
-   mtrace(function)
+   mtrace(function_name)
 <
 Once the library is installed and loaded, you should use `mtrace(function_name)`
 to enable the debugging of a function. Then, the next time that the function
@@ -2035,9 +1990,6 @@ hit <Enter> to evaluate the current line, `go(n)` to go to line `n` in the
 function and `qqq()` to quit the function (See debug's help for details). A
 useful tip is to click on the title bar of the debug window and choose "Always
 on top" or a similar option provided by your desktop manager.
-
-There is also the R package "edtdbg" which aims to integrate R debugging
-facilities with Vim.
 
 
 9.17. Turn the R-plugin into a global plugin~
@@ -2056,13 +2008,14 @@ On Windows, you probably will have to make a copy of the file to the
 
 9.18. Disable syntax highlight of R functions~
 
-If you want to disable the syntax highlight of R functions edit the file
-~/.vim/r-plugin/functions.vim and delete all lines, but do not delete the
-file.
-
+If you want to disable the syntax highlight of R functions put in your
+|vimrc|:
+>
+   autocmd Syntax * syntax clear rFunction
+<
 
 9.19. Tips for knitr users~
-								       *knitr*
+							      *r-plugin-knitr*
 If you are using knitr with option cache=TRUE, you may want from time to time
 to delete all objects in R workspace and all files in the cache directory. If
 you want to use <LocalLeader>kr in Normal mode for this, put in your |vimrc|:
@@ -2103,13 +2056,53 @@ See also: |vimrplugin_latexcmd|.
 Please, look at section |r-plugin-options| if you want information about the
 Vim-r-plugin customization.
 
-Here are some suggestions of configuration of Bash, Tmux and R. To understand
-what you are doing, and change the configuration to your taste, please read
-this document from the beginning.
+Here are some suggestions of configuration of Vim, Bash, Tmux and R. To
+understand what you are doing, and change the configuration to your taste,
+please read this document from the beginning.
 
+   ~/.vimrc~
+>
+   " Minimum required configuration:
+   set nocompatible
+   syntax on
+   filetype plugin on
+   filetype indent on
+   " Change Leader and LocalLeader keys:
+   let maplocalleader = ","
+   let mapleader = ";"
+   " Use Ctrl+Space to do omnicompletion:
+   if has("gui_running")
+       inoremap <C-Space> <C-x><C-o>
+   else
+       inoremap <Nul> <C-x><C-o>
+   endif
+   " Press the space bar to send lines and selection to R:
+   vmap <Space> <Plug>RDSendSelection
+   nmap <Space> <Plug>RDSendLine
+   " The lines below are suggestions for Vim in general and are not
+   " specific to the improvement of the Vim-R-plugin.
+   " Highlight the last searched pattern:
+   set hlsearch
+   " Show where the next pattern is as you type it:
+   set incsearch
+   " By default, Vim indents code by 8 spaces. Most people prefer 4
+   " spaces:
+   set sw=4
+   " Search "Vim colorscheme 256" in the internet and download color
+   " schemes that supports 256 colors in the terminal emulator. Then,
+   " uncomment the code below to set you color scheme:
+   "colorscheme not_defined
+   " Use 256 colors even if in a terminal emulator:
+   if &term =~ "xterm" || &term =~ "256" || $DISPLAY != ""
+       set t_Co=256
+   endif
+<
+							 *r-plugin-bash-setup*
    ~/.bashrc:~
 >
-   # Get 256 colors and automatic update of Object Browser:
+   # Change the TERM environment variable (to get 256 colors) and make Vim
+   # connecting to X Server even if running in a terminal emulator (to get
+   # dynamic update of syntax highlight and Object Browser):
    if [ "x$DISPLAY" != "x" ]
    then
        if [ "screen" = "$TERM" ]
@@ -2134,6 +2127,8 @@ this document from the beginning.
        fi
    fi
 <
+
+							 *r-plugin-tmux-setup*
    ~/.tmux.conf:~
 >
    set-option -g prefix C-a
@@ -2146,38 +2141,88 @@ this document from the beginning.
    set -g mouse-select-pane on
    set -g mouse-resize-pane on
 <
+
+							    *r-plugin-R-setup*
    ~/.Rprofile~
 >
    if(interactive()){
+       # Get startup messages of three packages and set Vim as R pager:
        options(setwidth.verbose = 1,
                colorout.verbose = 1,
                vimcom.verbose = 1,
                pager = "vimrpager")
+       # Use the text based web browser w3m to navigate through R docs:
+       if(Sys.getenv("TMUX") != "")
+           options(browser="~/bin/vimrw3mbrowser",
+                   help_type = "html")
+       # Use either Vim or GVim as text editor for R:
        if(nchar(Sys.getenv("DISPLAY")) > 1)
            options(editor = 'gvim -f -c "set ft=r"')
        else
            options(editor = 'vim -c "set ft=r"')
+       # Load the colorout library:
        library(colorout)
-       if(Sys.getenv("TERM") != "linux" && Sys.getenv("TERM") != "")
+       if(Sys.getenv("TERM") != "linux" && Sys.getenv("TERM") != ""){
+           # Choose the colors for R output among 256 options.
+           # You should run show256Colors() and help(setOutputColors256) to
+           # know how to change the colors according to your taste:
            setOutputColors256(verbose = FALSE)
+       }
+       # Load the setwidth library:
        library(setwidth)
+       # Load the vimcom.plus library only if R was started by Vim:
        if(Sys.getenv("VIMRPLUGIN_TMPDIR") != ""){
            library(vimcom.plus)
            # If you can't install the vimcom.plus package, do:
            # library(vimcom)
+           # See R documentation on Vim buffer even if asking for help in R Console:
+           if(Sys.getenv("VIM_PANE") != "")
+               options(help_type = "text", pager = vim.pager)
        }
    }
 <
+
    ~/bin/vimrpager~
 >
    #!/bin/sh
-
+   # I don't know the reason, but we can't pipe the output directly to Vim.
+   # So we need this script to use 'cat' as intermediary.
    cat | vim -c 'set ft=rdoc' -
 <
-NOTE: You have to change the `~/bin/vimrpager` permissions to make it
-executable:
+
+   ~/bin/vimrw3mbrowser~
+>
+   #!/bin/sh
+   NCOLS=$(tput cols)
+   if [ "$NCOLS" -gt "140" ]
+   then
+       if [ "x$VIM_PANE" = "x" ]
+       then
+           tmux split-window -h "w3m $1 && exit"
+       else
+           tmux split-window -h -t $VIM_PANE "w3m $1 && exit"
+       fi
+   else
+       tmux new-window "w3m $1 && exit"
+   fi
+<
+
+NOTES: 1. The `~/bin` diretory must be in your PATH.
+       2. To use the `vimrw3mbrower` script the web browser w3m must be
+          installed.
+       3. You have to change `~/bin/vimrpager` and `~/bin/vimrw3mbrowser`
+          permissions to make them executable:
 >
    chmod +x ~/bin/vimrpager
+   chmod +x ~/bin/vimrw3mbrowser
+<
+
+Finally, if you want to use vi key bindings in Bash:
+
+   ~/.inputrc~
+>
+   set editing-mode vi
+   set keymap vi
 <
 
 9.22. Python versions~
@@ -2203,7 +2248,19 @@ discover this information manually:
     * pywin32: http://sourceforge.net/projects/pywin32/
 
 
-9.23. Integration with GNU Screen, screen plugin, Conque Shell or VimShell~
+9.23. Add tool bar icons and hide unused buttons~
+							    *r-plugin-toolbar*
+If you want to add some R buttons to GVim tool bar download the zip file
+http://www.lepem.ufc.br/jaa/bitmaps.zip and unpack it at either ~/.vim
+(Unix/Linux/Mac OS X) or ~/vimfiles (Windows). You may not see the buttons
+because GVim has too many buttons by default. Then, you may want to edit
+GVim's toolbar and remove the buttons that you never use. Please see the page
+below to know how to hide buttons on the toolbar:
+
+   http://vim.wikia.com/wiki/Hide_toolbar_or_menus_to_see_more_text
+
+
+9.24. Integration with GNU Screen, screen plugin, Conque Shell or VimShell~
 
 The plugin used to be able to use GNU Screen (through screen plugin), Conque
 Shell or VimShell to send commands to R. This integration was removed on
@@ -2216,7 +2273,24 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-0.9.9.7 (2013-11-02)
+0.9.9.8 (2013-11-30)
+
+ * The list of objects for omnicompletion and the list of functions for syntax
+   highlight now are built dynamically. Deprecated commands and options:
+   :RUpdateObjList, :RAddLibToList, vimrplugin_buildwait. New option:
+   vimrplugin_permanent_libs.
+
+ * New options: vimrplugin_show_args.
+
+ * New command \ch: send to R Console all R code from the first chunk up to
+   this line.
+
+ * Remove toolbar icons (they still may be added back manually by interested
+   users).
+
+ * If latexmk is installed, use it by default to compile the pdf.
+
+0.9.9.7 (2013-11-06)
 
  * Minor bug fixes.
 

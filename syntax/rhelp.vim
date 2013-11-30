@@ -2,7 +2,7 @@
 " Language:    R Help File
 " Maintainer: Jakson Aquino <jalvesaq@gmail.com>
 " Former Maintainer: Johannes Ranke <jranke@uni-bremen.de>
-" Last Change: Sat Jul 06, 2013  07:45PM
+" Last Change: Sat Nov 09, 2013  07:29PM
 " Remarks:     - Includes R syntax highlighting in the appropriate
 "                sections if an r.vim file is in the same directory or in the
 "                default debian location.
@@ -16,9 +16,9 @@
 " For version 5.x: Clear all syntax items
 " For version 6.x and 7.x: Quit when a syntax file was already loaded
 if version < 600 
-  syntax clear
+    syntax clear
 elseif exists("b:current_syntax")
-  finish
+    finish
 endif 
 
 setlocal iskeyword=@,48-57,_,.
@@ -214,33 +214,34 @@ syn match rhelpParenError /[\]}]/ contained
 " For version 5.7 and earlier: only when not done already
 " For version 5.8 and later: only when an item doesn't have highlighting yet
 if version >= 508 || !exists("did_rhelp_syntax_inits")
-  if version < 508
-    let did_rhelp_syntax_inits = 1
-    command -nargs=+ HiLink hi link <args>
-  else
-    command -nargs=+ HiLink hi def link <args>
-  endif
-  HiLink rhelpVerbatim    String
-  HiLink rhelpDelimiter   Delimiter
-  HiLink rhelpIdentifier  Identifier
-  HiLink rhelpString      String
-  HiLink rhelpCodeSpecial Special
-  HiLink rhelpKeyword     Keyword
-  HiLink rhelpDots        Keyword
-  HiLink rhelpLink        Underlined
-  HiLink rhelpType        Type
-  HiLink rhelpSection     PreCondit
-  HiLink rhelpError       Error
-  HiLink rhelpBraceError  Error
-  HiLink rhelpCurlyError  Error
-  HiLink rhelpParenError  Error
-  HiLink rhelpPreProc     PreProc
-  HiLink rhelpDelimiter   Delimiter
-  HiLink rhelpComment     Comment
-  HiLink rhelpRComment    Comment
-  HiLink rhelpSpecialChar SpecialChar
-  delcommand HiLink
+    if version < 508
+        let did_rhelp_syntax_inits = 1
+        command -nargs=+ HiLink hi link <args>
+    else
+        command -nargs=+ HiLink hi def link <args>
+    endif
+    HiLink rhelpVerbatim    String
+    HiLink rhelpDelimiter   Delimiter
+    HiLink rhelpIdentifier  Identifier
+    HiLink rhelpString      String
+    HiLink rhelpCodeSpecial Special
+    HiLink rhelpKeyword     Keyword
+    HiLink rhelpDots        Keyword
+    HiLink rhelpLink        Underlined
+    HiLink rhelpType        Type
+    HiLink rhelpSection     PreCondit
+    HiLink rhelpError       Error
+    HiLink rhelpBraceError  Error
+    HiLink rhelpCurlyError  Error
+    HiLink rhelpParenError  Error
+    HiLink rhelpPreProc     PreProc
+    HiLink rhelpDelimiter   Delimiter
+    HiLink rhelpComment     Comment
+    HiLink rhelpRComment    Comment
+    HiLink rhelpSpecialChar SpecialChar
+    delcommand HiLink
 endif 
 
 let   b:current_syntax = "rhelp"
-" vim: foldmethod=marker:
+
+" vim: foldmethod=marker sw=4

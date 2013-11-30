@@ -52,15 +52,15 @@ endif
 " be defined after the global ones:
 runtime r-plugin/common_buffer.vim
 
-function! RmdIsInRCode()
-    let curline = line(".")
+function! RmdIsInRCode(vrb)
     let chunkline = search("^[ \t]*```[ ]*{r", "bncW")
-    call cursor(chunkline)
-    let docline = search("^[ \t]*```$", "ncW")
-    call cursor(curline)
-    if 0 < chunkline && chunkline < curline && curline < docline
+    let docline = search("^[ \t]*```$", "bncW")
+    if chunkline > docline && chunkline != line(".")
         return 1
     else
+        if a:vrb
+            call RWarningMsg("Not inside an R code chunk.")
+        endif
         return 0
     endif
 endfunction
@@ -70,7 +70,7 @@ function! RmdPreviousChunk() range
     let chunk = len(rg)
     for var in range(1, chunk)
         let curline = line(".")
-        if RmdIsInRCode()
+        if RmdIsInRCode(0)
             let i = search("^[ \t]*```[ ]*{r", "bnW")
             if i != 0
                 call cursor(i-1, 1)
@@ -160,20 +160,18 @@ function! RMakePDFrmd(t)
         let pdfcmd = pdfcmd . ", pandoc_args = '" . g:vimrplugin_pandoc_args . "'"
     endif
     let pdfcmd = pdfcmd . ")"
-    let g:needsnewomnilist = 1
     call g:SendCmdToR(pdfcmd)
 endfunction  
 
 " Send Rmd chunk to R
 function! SendRmdChunkToR(e, m)
-    if RmdIsInRCode() == 0
+    if RmdIsInRCode(0) == 0
         call RWarningMsg("Not inside an R code chunk.")
         return
     endif
     let chunkline = search("^[ \t]*```[ ]*{r", "bncW") + 1
     let docline = search("^[ \t]*```", "ncW") - 1
     let lines = getline(chunkline, docline)
-    let g:needsnewomnilist = 1
     let ok = RSourceLines(lines, a:e)
     if ok == 0
         return
@@ -182,6 +180,11 @@ function! SendRmdChunkToR(e, m)
         call RmdNextChunk()
     endif  
 endfunction
+
+let b:IsInRCode = function("RmdIsInRCode")
+let b:PreviousRChunk = function("RmdPreviousChunk")
+let b:NextRChunk = function("RmdNextChunk")
+let b:SendChunkToR = function("SendRmdChunkToR")
 
 "==========================================================================
 " Key bindings and menu items
@@ -195,15 +198,15 @@ call RCreateMaps("nvi", '<Plug>RSetwd',        'rd', ':call RSetWD()')
 " Only .Rmd files use these functions:
 call RCreateMaps("nvi", '<Plug>RKnit',        'kn', ':call RKnit()')
 call RCreateMaps("nvi", '<Plug>RMakePDFK',    'kp', ':call RMakePDFrmd("latex")')
-call RCreateMaps("nvi", '<Plug>RMakePDFK',    'kl', ':call RMakePDFrmd("beamer")')
+call RCreateMaps("nvi", '<Plug>RMakePDFKb',   'kl', ':call RMakePDFrmd("beamer")')
 call RCreateMaps("nvi", '<Plug>RMakeHTML',    'kh', ':call RMakeHTMLrmd("html")')
 call RCreateMaps("nvi", '<Plug>RMakeODT',     'ko', ':call RMakeHTMLrmd("odt")')
-call RCreateMaps("ni",  '<Plug>RSendChunk',   'cc', ':call SendRmdChunkToR("silent", "stay")')
-call RCreateMaps("ni",  '<Plug>RESendChunk',  'ce', ':call SendRmdChunkToR("echo", "stay")')
-call RCreateMaps("ni",  '<Plug>RDSendChunk',  'cd', ':call SendRmdChunkToR("silent", "down")')
-call RCreateMaps("ni",  '<Plug>REDSendChunk', 'ca', ':call SendRmdChunkToR("echo", "down")')
-nmap <buffer><silent> gn :call RmdNextChunk()<CR>
-nmap <buffer><silent> gN :call RmdPreviousChunk()<CR>
+call RCreateMaps("ni",  '<Plug>RSendChunk',   'cc', ':call b:SendChunkToR("silent", "stay")')
+call RCreateMaps("ni",  '<Plug>RESendChunk',  'ce', ':call b:SendChunkToR("echo", "stay")')
+call RCreateMaps("ni",  '<Plug>RDSendChunk',  'cd', ':call b:SendChunkToR("silent", "down")')
+call RCreateMaps("ni",  '<Plug>REDSendChunk', 'ca', ':call b:SendChunkToR("echo", "down")')
+nmap <buffer><silent> gn :call b:NextRChunk()<CR>
+nmap <buffer><silent> gN :call b:PreviousRChunk()<CR>
 
 " Menu R
 if has("gui_running")

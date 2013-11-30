@@ -1,7 +1,7 @@
 " reStructured Text with R statements
 " Language: reST with R code chunks
 " Maintainer: Alex Zvoleff, azvoleff@mail.sdsu.edu
-" Last Change: Tue Feb 26, 2013  01:13PM
+" Last Change: Sat Nov 09, 2013  07:28PM
 "
 " CONFIGURATION:
 "   To highlight chunk headers as R code, put in your vimrc:
@@ -43,3 +43,5 @@ hi def link rrstChunkDelim Special
 hi def link rrstInlineDelim Special
 
 let b:current_syntax = "rrst"
+
+" vim: ts=8 sw=4

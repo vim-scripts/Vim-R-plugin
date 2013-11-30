@@ -4,7 +4,7 @@
 "
 
 fun! rcomplete#CompleteR(findstart, base)
-  if &filetype == "rnoweb" && RnwIsInRCode() == 0 && exists("*LatexBox_Complete")
+  if &filetype == "rnoweb" && RnwIsInRCode(0) == 0 && exists("*LatexBox_Complete")
       let texbegin = LatexBox_Complete(a:findstart, a:base)
       return texbegin
   endif
@@ -16,8 +16,8 @@ fun! rcomplete#CompleteR(findstart, base)
     endwhile
     return start
   else
-    if g:needsnewomnilist == 1
-      call BuildROmniList("GlobalEnv", "")
+    if string(g:SendCmdToR) != "function('SendCmdToR_fake')"
+      call BuildROmniList()
     endif
     let res = []
     if strlen(a:base) == 0
@@ -39,10 +39,14 @@ fun! rcomplete#CompleteR(findstart, base)
             continue
         endif
         let tmp1 = split(line, "\x06", 1)
-        let info = tmp1[4]
-        let info = substitute(info, "\t", ", ", "g")
-        let info = substitute(info, "\x07", " = ", "g")
-	let tmp2 = {'word': tmp1[0], 'menu': tmp1[1] . ' ' . tmp1[3], 'info': info}
+        if g:vimrplugin_show_args
+            let info = tmp1[4]
+            let info = substitute(info, "\t", ", ", "g")
+            let info = substitute(info, "\x07", " = ", "g")
+            let tmp2 = {'word': tmp1[0], 'menu': tmp1[1] . ' ' . tmp1[3], 'info': info}
+        else
+            let tmp2 = {'word': tmp1[0], 'menu': tmp1[1] . ' ' . tmp1[3]}
+        endif
 	call add(res, tmp2)
       endif
     endfor
