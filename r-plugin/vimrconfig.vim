@@ -90,51 +90,53 @@ function! RConfigRprofile()
             endif
             let rpflines += ['    library(vimcom.plus)']
 
-            redraw
-            echo " "
-            echo "By defalt, R uses the 'less' application to show help documents."
-            echohl Question
-            let what = input("Dou you prefer to see help documents in Vim? [y/N]: ")
-            echohl Normal
-            if RGetYesOrNo(what)
-                let rpflines += ['    # See R documentation on Vim buffer even if asking for help in R Console:']
-                if ($PATH =~ "\\~/bin" || $PATH =~ expand("~/bin")) && filewritable(expand("~/bin")) == 2 && !filereadable(expand("~/bin/vimrpager"))
-                    call writefile(['#!/bin/sh',
-                                \ 'cat | vim -c "set ft=rdoc" -'], expand("~/bin/vimrpager"))
-                    call system("chmod +x " . expand("~/bin/vimrpager"))
-                    let rpflines += ['    options(help_type = "text", pager = "' . expand("~/bin/vimrpager") . '")']
-                endif
-                let rpflines += ['    if(Sys.getenv("VIM_PANE") != "")',
-                            \ '        options(pager = vim.pager)']
-            endif
-
-            if executable("w3m") && ($PATH =~ "\\~/bin" || $PATH =~ expand("~/bin")) && filewritable(expand("~/bin")) == 2 && !filereadable(expand("~/bin/vimrw3mbrowser"))
+            if !(has("win32") || has("win64"))
                 redraw
                 echo " "
-                echo "The w3m application, a text based web browser, is installed in your system."
-                echo "When R is running inside of a Tmux session, it can be configured to"
-                echo "start its help system in w3m running in a Tmux pane."
+                echo "By defalt, R uses the 'less' application to show help documents."
                 echohl Question
-                let what = input("Do you want to use w3m instead of your default web browser? [y/N]: ")
+                let what = input("Dou you prefer to see help documents in Vim? [y/N]: ")
+                echohl Normal
                 if RGetYesOrNo(what)
-                    call writefile(['#!/bin/sh',
-                                \ 'NCOLS=$(tput cols)',
-                                \ 'if [ "$NCOLS" -gt "140" ]',
-                                \ 'then',
-                                \ '    if [ "x$VIM_PANE" = "x" ]',
-                                \ '    then',
-                                \ '        tmux split-window -h "w3m $1 && exit"',
-                                \ '    else',
-                                \ '        tmux split-window -h -t $VIM_PANE "w3m $1 && exit"',
-                                \ '    fi',
-                                \ 'else',
-                                \ '    tmux new-window "w3m $1 && exit"',
-                                \ 'fi'], expand("~/bin/vimrw3mbrowser"))
-                    call system("chmod +x " . expand("~/bin/vimrw3mbrowser"))
-                    let rpflines += ['    # Use the text based web browser w3m to navigate through R docs:',
-                                \ '    # Replace VIM_PANE with TMUX if you know what you are doing.',
-                                \ '    if(Sys.getenv("VIM_PANE") != "")',
-                                \ '        options(browser="' . expand("~/bin/vimrw3mbrowser") . '")']
+                    let rpflines += ['    # See R documentation on Vim buffer even if asking for help in R Console:']
+                    if ($PATH =~ "\\~/bin" || $PATH =~ expand("~/bin")) && filewritable(expand("~/bin")) == 2 && !filereadable(expand("~/bin/vimrpager"))
+                        call writefile(['#!/bin/sh',
+                                    \ 'cat | vim -c "set ft=rdoc" -'], expand("~/bin/vimrpager"))
+                        call system("chmod +x " . expand("~/bin/vimrpager"))
+                        let rpflines += ['    options(help_type = "text", pager = "' . expand("~/bin/vimrpager") . '")']
+                    endif
+                    let rpflines += ['    if(Sys.getenv("VIM_PANE") != "")',
+                                \ '        options(pager = vim.pager)']
+                endif
+
+                if executable("w3m") && ($PATH =~ "\\~/bin" || $PATH =~ expand("~/bin")) && filewritable(expand("~/bin")) == 2 && !filereadable(expand("~/bin/vimrw3mbrowser"))
+                    redraw
+                    echo " "
+                    echo "The w3m application, a text based web browser, is installed in your system."
+                    echo "When R is running inside of a Tmux session, it can be configured to"
+                    echo "start its help system in w3m running in a Tmux pane."
+                    echohl Question
+                    let what = input("Do you want to use w3m instead of your default web browser? [y/N]: ")
+                    if RGetYesOrNo(what)
+                        call writefile(['#!/bin/sh',
+                                    \ 'NCOLS=$(tput cols)',
+                                    \ 'if [ "$NCOLS" -gt "140" ]',
+                                    \ 'then',
+                                    \ '    if [ "x$VIM_PANE" = "x" ]',
+                                    \ '    then',
+                                    \ '        tmux split-window -h "w3m $1 && exit"',
+                                    \ '    else',
+                                    \ '        tmux split-window -h -t $VIM_PANE "w3m $1 && exit"',
+                                    \ '    fi',
+                                    \ 'else',
+                                    \ '    tmux new-window "w3m $1 && exit"',
+                                    \ 'fi'], expand("~/bin/vimrw3mbrowser"))
+                        call system("chmod +x " . expand("~/bin/vimrw3mbrowser"))
+                        let rpflines += ['    # Use the text based web browser w3m to navigate through R docs:',
+                                    \ '    # Replace VIM_PANE with TMUX if you know what you are doing.',
+                                    \ '    if(Sys.getenv("VIM_PANE") != "")',
+                                    \ '        options(browser="' . expand("~/bin/vimrw3mbrowser") . '")']
+                    endif
                 endif
             endif
 
@@ -348,7 +350,7 @@ function! RConfigVimrc()
         endif
     endif
 
-    if RFindString(vlines, "^\s*colo") == 0
+    if RFindString(vlines, "colorscheme") == 0
         let vlines += ['',
                     \ '" There are hundreds of color schemes for Vim on the internet, but you can',
                     \ '" start with color schemes already installed.',
