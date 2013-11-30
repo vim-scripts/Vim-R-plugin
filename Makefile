@@ -173,6 +173,7 @@ htmldoc:
 	    sed -i -e 's/|<code /<code /g' r-plugin.html ;\
 	    sed -i -e 's/<\/code>|/<\/code>/g' r-plugin.html ;\
 	    sed -i -e 's/`//g' r-plugin.html ;\
+	    sed -i -e 's/<\/pre><hr><pre>/  --------------------------------------------------------\n/' r-plugin.html ;\
 	    mv r-plugin.html vim-stylesheet.css /tmp )
 
 all: zip deb htmldoc

@@ -2273,7 +2273,7 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-0.9.9.8 (2013-11-26)
+0.9.9.8 (2013-11-30)
 
  * The list of objects for omnicompletion and the list of functions for syntax
    highlight now are built dynamically. Deprecated commands and options:
