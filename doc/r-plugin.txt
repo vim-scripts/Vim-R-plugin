@@ -161,8 +161,11 @@ Then, in Vim, type:
 <
 Press <Enter> and the plugin will be installed (because the plugin has many
 files, you have to press the space bar a few times to finish the
-installation). You should, then, quit Vim. Note: if you need too install the
-plugin in a non default directory, do `:UseVimball` `[path]`.
+installation). You should, then, quit Vim.
+
+Note: If you need too install the plugin in a non default directory, do
+`:UseVimball` `[path]`. Then, create a symbolic link to `path/ftdetect/r.vim`
+into `~/.vim/ftdetect/r.vim`.
 
 Start Vim again and edit an R script. Type <LocalLeader>rf to start R and run
 the command below to get help configuring ~/.Rprofile, ~/.vimrc, ~/.tmux.conf,
@@ -233,8 +236,11 @@ Then, in Vim, type:
 <
 Press <Enter> and the plugin will be installed (because the plugin has many
 files, you have to press the space bar a few times to finish the
-installation). You should, then, quit Vim. Note: if you need too install the
-plugin in a non default directory, do `:UseVimball` `[path]`.
+installation). You should, then, quit Vim.
+
+Note: If you need too install the plugin in a non default directory, do
+`:UseVimball` `[path]`. Then, create a symbolic link to `path/ftdetect/r.vim`
+into `~/vimfiles/ftdetect/r.vim`.
 
 Start GVim again and edit an R script. You can right click a .R file and
 choose "Edit with Vim" or create a new one with the Normal mode command:
