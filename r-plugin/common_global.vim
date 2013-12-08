@@ -2965,6 +2965,21 @@ function RBufEnter()
     endif
 endfunction
 
+function RVimLeave()
+    call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
+    call delete($VIMRPLUGIN_TMPDIR . "/formatted_code")
+    call delete($VIMRPLUGIN_TMPDIR . "/GlobalEnvList_" . $VIMINSTANCEID)
+    call delete($VIMRPLUGIN_TMPDIR . "/globenv_" . $VIMINSTANCEID)
+    call delete($VIMRPLUGIN_TMPDIR . "/liblist_" . $VIMINSTANCEID)
+    call delete($VIMRPLUGIN_TMPDIR . "/libnames_" . $VIMINSTANCEID)
+    call delete($VIMRPLUGIN_TMPDIR . "/objbrowserInit")
+    call delete($VIMRPLUGIN_TMPDIR . "/Rinsert")
+    call delete($VIMRPLUGIN_TMPDIR . "/tmux.conf")
+    call delete($VIMRPLUGIN_TMPDIR . "/unformatted_code")
+    call delete($VIMRPLUGIN_TMPDIR . "/vimbol_finished")
+    call delete($VIMRPLUGIN_TMPDIR . "/vimcom_running")
+endfunction
+
 function SetRPath()
     if exists("g:vimrplugin_r_path")
         let b:rplugin_R = expand(g:vimrplugin_r_path)
@@ -3438,6 +3453,9 @@ if exists("g:vimrplugin_term_cmd")
 endif
 
 autocmd BufEnter * call RBufEnter()
+if &filetype != "rbrowser"
+    autocmd VimLeave * call RVimLeave()
+endif
 
 let g:rplugin_firstbuffer = expand("%:p")
 let g:rplugin_running_objbr = 0
