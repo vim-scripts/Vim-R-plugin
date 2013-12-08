@@ -36,9 +36,13 @@ The latest stable version of this plugin is available at:
     http://www.vim.org/scripts/script.php?script_id=2628
 
 Feedback is welcomed. Please submit bug reports to the developers. Do not like
-a feature? Tell us and we may add an option to disable it. The plugin should
-emit useful warnings if you do things it was not programmed to deal with.
-Cryptic error message are bugs... Please report them at:
+a feature? Tell us and we may add an option to disable it. If you have any
+comments or questions, please post them at:
+
+    https://groups.google.com/forum/#!forum/vim-r-plugin
+
+The plugin should emit useful warnings if you do things it was not programmed
+to deal with. Cryptic error message are bugs... Please report them at:
 
     https://github.com/jcfaria/Vim-R-plugin/issues
 
