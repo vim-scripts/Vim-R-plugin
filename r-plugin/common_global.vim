@@ -3458,7 +3458,7 @@ autocmd BufEnter * call RBufEnter()
 if &filetype != "rbrowser"
     autocmd VimLeave * call RVimLeave()
 endif
-autocmd BufLeave * call delete(b:rsource)
+autocmd BufLeave * if exists("b:rsource") | call delete(b:rsource) | endif
 
 let g:rplugin_firstbuffer = expand("%:p")
 let g:rplugin_running_objbr = 0
