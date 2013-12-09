@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 0.9.9.8
+Version: 0.9.9.9
 For Vim version 7.4
 
  1. Overview                                    |r-plugin-overview|
@@ -2284,6 +2284,12 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 ==============================================================================
 							       *r-plugin-news*
 10. News~
+
+0.9.9.9 (2013-12-09)
+
+ * Minor bug fixes.
+ 
+ * Support to R package slidify (thanks to Michael Lerch).
 
 0.9.9.8 (2013-11-30)
 
