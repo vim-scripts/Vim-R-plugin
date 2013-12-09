@@ -128,6 +128,17 @@ function! RMakeHTMLrmd(t)
     call g:SendCmdToR(rcmd)
 endfunction
 
+function! RMakeSlidesrmd()
+    call RSetWD()
+    update
+    let rcmd = 'require(slidify); slidify("' . expand("%:t") . '")'
+    if g:vimrplugin_openhtml
+        let rcmd = rcmd . '; browseURL("' . expand("%:r:t") . '.html")'
+    endif
+    call g:SendCmdToR(rcmd)
+endfunction
+
+
 function! RMakePDFrmd(t)
     if g:rplugin_vimcomport == 0
         exe "Py DiscoverVimComPort()"
@@ -200,6 +211,7 @@ call RCreateMaps("nvi", '<Plug>RKnit',        'kn', ':call RKnit()')
 call RCreateMaps("nvi", '<Plug>RMakePDFK',    'kp', ':call RMakePDFrmd("latex")')
 call RCreateMaps("nvi", '<Plug>RMakePDFKb',   'kl', ':call RMakePDFrmd("beamer")')
 call RCreateMaps("nvi", '<Plug>RMakeHTML',    'kh', ':call RMakeHTMLrmd("html")')
+call RCreateMaps("nvi", '<Plug>RMakeSlides',  'sl', ':call RMakeSlidesrmd()')
 call RCreateMaps("nvi", '<Plug>RMakeODT',     'ko', ':call RMakeHTMLrmd("odt")')
 call RCreateMaps("ni",  '<Plug>RSendChunk',   'cc', ':call b:SendChunkToR("silent", "stay")')
 call RCreateMaps("ni",  '<Plug>RESendChunk',  'ce', ':call b:SendChunkToR("echo", "stay")')
