@@ -444,8 +444,8 @@ Edit
 
 Object Browser
   . Show/Update                                        \ro
-  . Expand (all lists)                                 \r=
-  . Collapse (all lists)                               \r-
+  . Expand (all lists) (Linux/Unix)                    \r=
+  . Collapse (all lists) (Linux/Unix)                  \r-
   . Toggle (cur)                                     Enter
 -----------------------------------------------------------
 
@@ -2285,7 +2285,7 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-0.9.9.9 (2013-12-09)
+0.9.9.9 (2013-12-10)
 
  * Minor bug fixes.
  
