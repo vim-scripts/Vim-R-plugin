@@ -215,10 +215,12 @@ dependencies:
 
     * Vim's version must be >= 7.4: http://www.vim.org/download.php
 
-    * Python 2.7.5 (32 bit): http://www.python.org/download/
+    * Python 2.7.6 (32 bit):
+      http://www.python.org/ftp/python/2.7.6/python-2.7.6.msi
       Do not choose the X86-64 version because it will not work. 
 
-    * pywin32: http://sourceforge.net/projects/pywin32/files/pywin32/Build%20218/pywin32-218.win32-py2.7.exe/download
+    * pywin32:
+      http://sourceforge.net/projects/pywin32/files/pywin32/Build%20218/pywin32-218.win32-py2.7.exe/download
 			     
       Note: The above versions of Python and pywin32 are known to work with
       the official GVim 7.4 binary. The default download may not match the
@@ -444,8 +446,8 @@ Edit
 
 Object Browser
   . Show/Update                                        \ro
-  . Expand (all lists) (Linux/Unix)                    \r=
-  . Collapse (all lists) (Linux/Unix)                  \r-
+  . Expand (all lists)                                 \r=
+  . Collapse (all lists)                               \r-
   . Toggle (cur)                                     Enter
 -----------------------------------------------------------
 
