@@ -1074,6 +1074,14 @@ emulates RStudio behavior (may only works on GVim):
 >
    let vimrplugin_assign_map = "<M-->"
 <
+Note: If you are using Vim in a terminal emulator, you have to put in your
+|vimrc|:
+>
+   set <M-->=^[-
+   let vimrplugin_assign_map = "<M-->"
+<
+where `^[` is obtained by pressing CTRL-V CTRL-[ in Insert mode.
+
 Note: You can't map <C-=>, as StatET does.
 
 In Rnoweb files, a '<' is replaced with '<<>>=\n@'. To disable this feature,
@@ -2246,7 +2254,7 @@ pywin32? The official Vim is 32 bit and, thus, Python must be 32 bit too.
 However, Vim and R run as independent processes, that is, you may have 32 bit
 Vim sending commands to 64 bit R. Be careful to download the correct Python
 version because Vim needs a specific version of Python DLL. For example, the
-official Vim 7.4 for Windows needs either Python 2.7 or 3.1. If Python was not
+official Vim 7.4 for Windows needs either Python 2.7 or 3.2. If Python was not
 installed or was not found, the Vim-R-plugin will output information about
 what Python version Vim was compiled against. Do the following if you want to
 discover this information manually:
@@ -2287,7 +2295,7 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-0.9.9.9 (2013-12-10)
+0.9.9.9 (2013-12-20)
 
  * Minor bug fixes.
  
