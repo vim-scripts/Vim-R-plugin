@@ -879,9 +879,9 @@ function StartObjBrowser_Tmux()
 
     " Don't start the Object Browser if it already exists
     if IsExternalOBRunning()
-        Py SendToVimCom("\004Libraries [OB init]")
+        Py SendToVimCom("\003GlobalEnv [OB StartObjBrowser_Tmux]")
         sleep 50m
-        Py SendToVimCom("\003GlobalEnv [OB init]")
+        Py SendToVimCom("\004Libraries [OB StartObjBrowser_Tmux]")
         sleep 50m
         if $DISPLAY == "" && exists("g:rplugin_ob_pane")
             let slog = system("tmux set-buffer ':silent call UpdateOB(\"both\")\<C-M>:\<Esc>' && tmux paste-buffer -t " . g:rplugin_ob_pane . " && tmux select-pane -t " . g:rplugin_ob_pane)
@@ -919,9 +919,9 @@ function StartObjBrowser_Tmux()
                 \ 'if has("clientserver") && v:servername != ""',
                 \ "   exe 'Py SendToVimCom(" . '"\007' . "' . v:servername . '" . '")' . "'",
                 \ 'endif',
-                \ 'Py SendToVimCom("\004Libraries [OB init]")',
-                \ 'sleep 50m',
                 \ 'Py SendToVimCom("\003GlobalEnv [OB init]")',
+                \ 'sleep 50m',
+                \ 'Py SendToVimCom("\004Libraries [OB init]")',
                 \ 'if v:servername == ""',
                 \ '    sleep 100m',
                 \ '    call UpdateOB("GlobalEnv")',
@@ -1046,8 +1046,8 @@ function StartObjBrowser_Vim()
         unlet g:tmp_tmuxsname
         unlet g:tmp_curbufname
         exe "PyFile " . substitute(g:rplugin_home, " ", '\\ ', "g") . "/r-plugin/vimcom.py"
-        Py SendToVimCom("\003GlobalEnv [startobjectbrowser()]")
-        Py SendToVimCom("\004Libraries [startobjectbrowser()]")
+        Py SendToVimCom("\003GlobalEnv [StartObjBrowser_Vim]")
+        Py SendToVimCom("\004Libraries [StartObjBrowser_Vim]")
         call UpdateOB("GlobalEnv")
     endif
     if wmsg != ""
@@ -1495,7 +1495,9 @@ endfunction
 " Send selection to R
 function SendSelectionToR(e, m)
     if &filetype != "r" && b:IsInRCode(1) == 0
-        return
+        if !(&filetype == "rnoweb" && getline(".") =~ "\\Sexpr{")
+            return
+        endif
     endif
 
     if line("'<") == line("'>")
