@@ -68,7 +68,7 @@ Vim-R-plugin (see |vimrplugin_source|).
       - Start/Close R.
       - Send lines, selection, paragraphs, functions, blocks, entire file.
       - Send commands with the object under cursor as argument: help, args,
-	plot, print, str, summary, example, names.
+        plot, print, str, summary, example, names.
       - Send to R the Sweave and pdflatex commands.
   * Omni completion (auto-completion) for R objects (.GlobalEnv and installed
     packages). The list of installed packages must be updated manually.
@@ -76,8 +76,8 @@ Vim-R-plugin (see |vimrplugin_source|).
   * Auto-completion of knitr chunk options.
   * Ability to see R's documentation in a Vim's buffer:
       - Automatic calculation of the best layout of the R documentation buffer
-	(split the window either horizontally or vertically according to the
-	available room).
+        (split the window either horizontally or vertically according to the
+        available room).
       - Automatic formatting of the text to fit the panel width.
       - Send code and commands to R (useful to run examples).
       - Jump to another R documentation.
@@ -110,9 +110,8 @@ Before installing the plugin, you should install its dependencies:
    Depends:~
 
    Vim >= 7.4: http://www.vim.org/download.php
-	       In addition to the most commonly used features, the plugin
-	       requires: |+python| or |+python3|, |+clientserver| and |+conceal|.
-
+               In addition to the most commonly used features, the plugin
+               requires: |+python| or |+python3|, |+clientserver| and |+conceal|. 
    R >= 3.0.0: http://www.r-project.org/
 
    vimcom.plus = 0.9-92: http://www.lepem.ufc.br/jaa/vimcom.plus.html
@@ -127,12 +126,12 @@ Before installing the plugin, you should install its dependencies:
 
    setwidth:      An R package that can be installed with the command
                   `install.packages("setwidth")`.
-		  The library setwidth adjusts the value of `options("width")`
-		  whenever the terminal is resized.
+                  The library setwidth adjusts the value of `options("width")`
+                  whenever the terminal is resized.
 
    ncurses-term:  http://invisible-island.net/ncurses
                   Might be useful if you want support for 256 colors at the
-		  terminal emulator.
+                  terminal emulator.
 
    latexmk:       Automate the compilation of LaTeX documents.
                   See examples in |vimrplugin_latexcmd|.
@@ -649,16 +648,22 @@ have their classes recognized in the GlobalEnv view.
 
 4.6. Commenting and uncommenting lines~
 
-You can add the comment character to the beginning of a line by typing
-<LocalLeader>xc and remove it with <LocalLeader>xu. For more sophisticated
-ways of commenting and uncommenting, see below.
-
 You can toggle the state of a line as either commented or uncommented by
-typing <LocalLeader>xx.
+typing <LocalLeader>xx. The string used to comment the line will be "# ",
+"## " or "### ", depending on the values of |vimrplugin_indent_commented| and
+|r_indent_ess_comments|.
 
-You can also add comments to the right of a line with the <LocalLeader>;
-shortcut. By default, the comment starts at the 40th column, which can be
-changed by setting the value of r_indent_comment_column, as below:
+You can also add the string "# " to the beginning of a line by typing
+<LocalLeader>xc and remove it with <LocalLeader>xu. In this case, you can set
+the value of vimrplugin_rcomment_string to control what string will be added
+to the begining of the line. Example:
+>
+   let vimrplugin_rcomment_string = "# "
+<
+Finally, you can also add comments to the right of a line with the
+<LocalLeader>; shortcut. By default, the comment starts at the 40th column,
+which can be changed by setting the value of r_indent_comment_column, as
+below:
 >
    let r_indent_comment_column = 20
 <
@@ -667,7 +672,7 @@ after the last character in the line. If you are running <LocalLeader>; over a
 selection of lines, the comments will be aligned according to the longest
 line.
 
-While typing comments the leader comment string is automatically added to new
+Note: While typing comments the leader comment string is automatically added to new
 lines when you reach 'textwidth' but not when you press <Enter>. Please, read
 the Vim help about 'formatoptions' and |fo-table|. For example, you can add the
 following line to your |vimrc| if you want the comment string being added
@@ -753,14 +758,14 @@ tmux.conf:
                       right or at the left of the current one.
 
     <C-a><C-Up>     : Move the panel division upward one line, that is, resize
-		      the panels. Repeat <C-Up> to move more. <C-Down> will
-		      move the division downward one line. If you are using
-		      the vertical split, you should use <C-Left> and
-		      <C-Right> to resize the panels.
+                      the panels. Repeat <C-Up> to move more. <C-Down> will
+                      move the division downward one line. If you are using
+                      the vertical split, you should use <C-Left> and
+                      <C-Right> to resize the panels.
 
     <C-a>[          : Enter the copy/scroll back mode. You can use <PgUp>,
-		      <PgDown> and vi key bindings to move the cursor around
-		      the panel. Press q to quit copy mode.
+                      <PgDown> and vi key bindings to move the cursor around
+                      the panel. Press q to quit copy mode.
     <C-a>]          : Paste the content of Tmux paste buffer.
 
 While in the copy and scroll back mode, the following key bindings are very
@@ -877,10 +882,10 @@ indent the code below:
     # But this one will be correctly indented:
 
     levels(x) <- ## nl == nL or 1
-	if (nl == nL)
-	    as.character(labels)
-	else
-	    paste(labels, seq_along(levels), sep = "")
+        if (nl == nL)
+            as.character(labels)
+        else
+            paste(labels, seq_along(levels), sep = "")
     class(x) <- c(if(ordered) "ordered", "factor")
 <
 
@@ -1082,7 +1087,8 @@ Note: If you are using Vim in a terminal emulator, you have to put in your
 <
 where `^[` is obtained by pressing CTRL-V CTRL-[ in Insert mode.
 
-Note: You can't map <C-=>, as StatET does.
+Note: You can't map <C-=>, as StatET does because only alphabetic letters can
+be mapped in combination with the CTRL key.
 
 In Rnoweb files, a '<' is replaced with '<<>>=\n@'. To disable this feature,
 put in your |vimrc|:
@@ -1145,10 +1151,10 @@ The valid values of vimrplugin_vimpager are:
 
    "tab"       : Show the help document in a new tab. If there is already a
                  tab with an R help document, use it.
-		 This is the default.
+                 This is the default.
    "vertical"  : Split the window vertically if the editor width is large
-		 enough; otherwise, split the window horizontally and attempt
-		 to set the window height to at least 20 lines.
+                 enough; otherwise, split the window horizontally and attempt
+                 to set the window height to at least 20 lines.
    "horizontal": Split the window horizontally.
    "tabnew"    : Show the help document in a new tab.
    "no"        : Do not show R documentation in Vim.
@@ -1237,6 +1243,7 @@ file is open in a new split window, put in your |vimrc|:
 
 6.12. Indent commented lines~
 						 *vimrplugin_indent_commented*
+						       *r_indent_ess_comments*
 You can type <LocalLeader>xx to comment out a line or selected lines. If the
 line already starts with a comment string, it will be removed. After adding
 the comment string, the line will be reindented by default. To turn off the
@@ -1250,9 +1257,9 @@ table below (see |r-plugin-indenting|):
 >
    vimrplugin_indent_commented   r_indent_ess_comments   string
                  1                        0                #
-		 0                        1                #
-		 1                        1                ##
-		 0                        0                ###
+                 0                        0                #
+                 1                        1                ##
+                 0                        1                ###
 <
 
 6.13. Sleep time (Windows only)~
@@ -1884,10 +1891,10 @@ Below is an example of indentation with and without this option enabled:
    }                                             }
 <
 Notes: (1) Not all code indented by Emacs/ESS will be indented by the
-	   Vim-R-plugin in the same way, and, in some circumstances it may be
-	   necessary to make changes in the code to get it properly indented
-	   by Vim (you may have to either put or remove braces and line
-	   breaks).
+           Vim-R-plugin in the same way, and, in some circumstances it may be
+           necessary to make changes in the code to get it properly indented
+           by Vim (you may have to either put or remove braces and line
+           breaks).
        (2) Indenting is not a file type plugin option. It is a feature defined
            in indent/r.vim. That is why it is documented in this section.
 
@@ -2300,6 +2307,8 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
  * Minor bug fixes.
  
  * Support to R package slidify (thanks to Michael Lerch).
+
+ * New option: vimrplugin_rcomment_string.
 
 0.9.9.8 (2013-11-30)
 
