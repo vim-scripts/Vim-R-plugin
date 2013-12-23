@@ -349,7 +349,7 @@ endfunction
 
 function RSimpleCommentLine(mode, what)
     let [fline, lline] = RGetFL(a:mode)
-    let cstr = "#"
+    let cstr = g:vimrplugin_rcomment_string
     if (&filetype == "rnoweb"|| &filetype == "rhelp") && IsLineInRCode(0, fline) == 0
         let cstr = "%"
     elseif (&filetype == "rmd" || &filetype == "rrst") && IsLineInRCode(0, fline) == 0
@@ -3120,12 +3120,13 @@ call RSetDefaultValue("g:vimrplugin_help_w",           46)
 call RSetDefaultValue("g:vimrplugin_objbr_w",          40)
 call RSetDefaultValue("g:vimrplugin_external_ob",       0)
 call RSetDefaultValue("g:vimrplugin_show_args",         0)
-call RSetDefaultValue("g:vimrplugin_indent_commented",  1)
 call RSetDefaultValue("g:vimrplugin_never_unmake_menu", 0)
-call RSetDefaultValue("g:vimrplugin_vimpager",       "'tab'")
-call RSetDefaultValue("g:vimrplugin_objbr_place", "'script,right'")
 call RSetDefaultValue("g:vimrplugin_insert_mode_cmds",  1)
-call RSetDefaultValue("g:vimrplugin_permanent_libs", "'base,stats,graphics,grDevices,utils,datasets,methods'")
+call RSetDefaultValue("g:vimrplugin_indent_commented",  1)
+call RSetDefaultValue("g:vimrplugin_rcomment_string", "'# '")
+call RSetDefaultValue("g:vimrplugin_vimpager",        "'tab'")
+call RSetDefaultValue("g:vimrplugin_objbr_place",     "'script,right'")
+call RSetDefaultValue("g:vimrplugin_permanent_libs",  "'base,stats,graphics,grDevices,utils,datasets,methods'")
 
 if executable("latexmk")
     call RSetDefaultValue("g:vimrplugin_latexcmd", "'latexmk -pdf'")
