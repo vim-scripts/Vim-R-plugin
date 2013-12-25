@@ -672,14 +672,17 @@ after the last character in the line. If you are running <LocalLeader>; over a
 selection of lines, the comments will be aligned according to the longest
 line.
 
-Note: While typing comments the leader comment string is automatically added to new
-lines when you reach 'textwidth' but not when you press <Enter>. Please, read
-the Vim help about 'formatoptions' and |fo-table|. For example, you can add the
-following line to your |vimrc| if you want the comment string being added
-after <Enter>:
+Note: While typing comments the leader comment string is automatically added
+to new lines when you reach 'textwidth' but not when you press <Enter>.
+Please, read the Vim help about 'formatoptions' and |fo-table|. For example,
+you can add the following line to your |vimrc| if you want the comment string
+being added after <Enter>:
 >
    autocmd FileType r setlocal formatoptions-=t formatoptions+=croql
 <
+Tip: You can use Vim substitution command `:%s/#.*//` to delete all comments
+in a buffer (see |:s| and |pattern-overview|).
+
 
 4.7. Build a tags file to jump to function definitions~
 								 *:RBuildTags*
@@ -766,7 +769,10 @@ tmux.conf:
     <C-a>[          : Enter the copy/scroll back mode. You can use <PgUp>,
                       <PgDown> and vi key bindings to move the cursor around
                       the panel. Press q to quit copy mode.
+
     <C-a>]          : Paste the content of Tmux paste buffer.
+
+    <C-a>z          : Hide/show all panes execpt the current one.
 
 While in the copy and scroll back mode, the following key bindings are very
 useful:
@@ -2302,7 +2308,7 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-0.9.9.9 (2013-12-20)
+0.9.9.9 (2013-12-25)
 
  * Minor bug fixes.
  
