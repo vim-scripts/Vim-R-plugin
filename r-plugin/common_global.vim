@@ -2969,7 +2969,10 @@ function RBufEnter()
 endfunction
 
 function RVimLeave()
-    call delete(b:rsource)
+    if exists("b:rsource")
+        " b:rsource only exists if the filetype of the last buffer is .R*
+        call delete(b:rsource)
+    endif
     call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
     call delete($VIMRPLUGIN_TMPDIR . "/formatted_code")
     call delete($VIMRPLUGIN_TMPDIR . "/GlobalEnvList_" . $VIMINSTANCEID)
