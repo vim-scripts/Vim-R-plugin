@@ -101,9 +101,9 @@ function! UpdateOB(what)
     sil normal! ggdG
     let @@ = save_unnamed_reg 
     if wht == "GlobalEnv"
-        let fcntt = readfile($VIMRPLUGIN_TMPDIR . g:rplugin_globenv_f)
+        let fcntt = readfile($VIMRPLUGIN_TMPDIR . "/globenv_" . $VIMINSTANCEID)
     else
-        let fcntt = readfile($VIMRPLUGIN_TMPDIR . g:rplugin_liblist_f)
+        let fcntt = readfile($VIMRPLUGIN_TMPDIR . "/liblist_" . $VIMINSTANCEID)
     endif
     call setline(1, fcntt)
     call cursor(curline, curcol)

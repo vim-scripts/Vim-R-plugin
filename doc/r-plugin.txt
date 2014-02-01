@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 0.9.9.8
+Version: 0.9.9.9
 For Vim version 7.4
 
  1. Overview                                    |r-plugin-overview|
@@ -36,9 +36,13 @@ The latest stable version of this plugin is available at:
     http://www.vim.org/scripts/script.php?script_id=2628
 
 Feedback is welcomed. Please submit bug reports to the developers. Do not like
-a feature? Tell us and we may add an option to disable it. The plugin should
-emit useful warnings if you do things it was not programmed to deal with.
-Cryptic error message are bugs... Please report them at:
+a feature? Tell us and we may add an option to disable it. If you have any
+comments or questions, please post them at:
+
+    https://groups.google.com/forum/#!forum/vim-r-plugin
+
+The plugin should emit useful warnings if you do things it was not programmed
+to deal with. Cryptic error message are bugs... Please report them at:
 
     https://github.com/jcfaria/Vim-R-plugin/issues
 
@@ -64,16 +68,16 @@ Vim-R-plugin (see |vimrplugin_source|).
       - Start/Close R.
       - Send lines, selection, paragraphs, functions, blocks, entire file.
       - Send commands with the object under cursor as argument: help, args,
-	plot, print, str, summary, example, names.
-      - Send to R the Sweave and pdflatex commands.
-  * Omni completion (auto-completion) for R objects (.GlobalEnv and installed
-    packages). The list of installed packages must be updated manually.
+        plot, print, str, summary, example, names.
+      - Send to R the Sweave, knit and pdflatex commands.
+  * Omni completion (auto-completion) for R objects (.GlobalEnv and loaded
+    packages).
   * Auto-completion of function arguments.
   * Auto-completion of knitr chunk options.
   * Ability to see R's documentation in a Vim's buffer:
       - Automatic calculation of the best layout of the R documentation buffer
-	(split the window either horizontally or vertically according to the
-	available room).
+        (split the window either horizontally or vertically according to the
+        available room).
       - Automatic formatting of the text to fit the panel width.
       - Send code and commands to R (useful to run examples).
       - Jump to another R documentation.
@@ -101,17 +105,20 @@ The installation instructions are split in four sections:
 
 If you are using Windows, jump to section 3.2.
 
+If you are an unexperienced Vim user, start a terminal emulator and type in
+it: `vimtutor`<Enter>
+
 Before installing the plugin, you should install its dependencies:
 
    Depends:~
 
    Vim >= 7.4: http://www.vim.org/download.php
-	       In addition to the most commonly used features, the plugin
-	       requires: |+python| or |+python3|, |+clientserver| and |+conceal|.
+               In addition to the most commonly used features, the plugin
+               requires: |+python| or |+python3|, |+clientserver| and |+conceal|. 
 
    R >= 3.0.0: http://www.r-project.org/
 
-   vimcom.plus = 0.9-92: http://www.lepem.ufc.br/jaa/vimcom.plus.html
+   vimcom.plus = 0.9-93: http://www.lepem.ufc.br/jaa/vimcom.plus.html
 
    Tmux >= 1.5:   http://tmux.sourceforge.net
                   Tmux is necessary to send commands from Vim to R Console.
@@ -123,12 +130,12 @@ Before installing the plugin, you should install its dependencies:
 
    setwidth:      An R package that can be installed with the command
                   `install.packages("setwidth")`.
-		  The library setwidth adjusts the value of `options("width")`
-		  whenever the terminal is resized.
+                  The library setwidth adjusts the value of `options("width")`
+                  whenever the terminal is resized.
 
    ncurses-term:  http://invisible-island.net/ncurses
                   Might be useful if you want support for 256 colors at the
-		  terminal emulator.
+                  terminal emulator.
 
    latexmk:       Automate the compilation of LaTeX documents.
                   See examples in |vimrplugin_latexcmd|.
@@ -161,8 +168,11 @@ Then, in Vim, type:
 <
 Press <Enter> and the plugin will be installed (because the plugin has many
 files, you have to press the space bar a few times to finish the
-installation). You should, then, quit Vim. Note: if you need too install the
-plugin in a non default directory, do `:UseVimball` `[path]`.
+installation). You should, then, quit Vim.
+
+Note: If you need too install the plugin in a non default directory, do
+`:UseVimball` `[path]`. Then, create a symbolic link to `path/ftdetect/r.vim`
+into `~/.vim/ftdetect/r.vim`.
 
 Start Vim again and edit an R script. Type <LocalLeader>rf to start R and run
 the command below to get help configuring ~/.Rprofile, ~/.vimrc, ~/.tmux.conf,
@@ -185,7 +195,7 @@ especially the tip |r-plugin-tvim| (the above command :RpluginConfig should do
 this for you).
 
 Note: On Mac OS X, in both Vim and GVim, the plugin will use AppleScript to
-send commands to the R Console application unless vimrplugin_applescript = 0.
+send commands to the R Console application unless |vimrplugin_applescript| = 0.
 Some users have reported more luck with iTerm than with the default Mac OS X
 terminal emulator.
 
@@ -201,23 +211,25 @@ dependencies:
 
     * R's version must be >= 3.0.0: http://www.r-project.org/
 
-    * vimcom.plus = 0.9-92: http://www.lepem.ufc.br/jaa/vimcom.plus.html
+    * vimcom.plus = 0.9-93: http://www.lepem.ufc.br/jaa/vimcom.plus.html
       
       Note: If you cannot build vimcom.plus yourself, you will want to
       download and install the zip file.
 
     * Vim's version must be >= 7.4: http://www.vim.org/download.php
 
-    * Python 2.7.5 (32 bit): http://www.python.org/download/
+    * Python 2.7.6 (32 bit):
+      http://www.python.org/ftp/python/2.7.6/python-2.7.6.msi
       Do not choose the X86-64 version because it will not work. 
 
-    * pywin32: http://sourceforge.net/projects/pywin32/files/pywin32/Build%20218/pywin32-218.win32-py2.7.exe/download
+    * pywin32:
+      http://sourceforge.net/projects/pywin32/files/pywin32/Build%20218/pywin32-218.win32-py2.7.exe/download
 			     
       Note: The above versions of Python and pywin32 are known to work with
       the official GVim 7.4 binary. The default download may not match the
       Python version Vim was linked against: then you have to "View all files"
       on the download page to find the file that matches exactly the above
-      versions. Please, read |r-plugin-python| if need to use different
+      versions. Please, read |r-plugin-python| if you need to use different
       versions.
 
 Now, download the latest version of `Vim-R-plugin.vmb` from
@@ -233,8 +245,11 @@ Then, in Vim, type:
 <
 Press <Enter> and the plugin will be installed (because the plugin has many
 files, you have to press the space bar a few times to finish the
-installation). You should, then, quit Vim. Note: if you need too install the
-plugin in a non default directory, do `:UseVimball` `[path]`.
+installation). You should, then, quit Vim.
+
+Note: If you need too install the plugin in a non default directory, do
+`:UseVimball` `[path]`. Then, create a symbolic link to `path/ftdetect/r.vim`
+into `~/vimfiles/ftdetect/r.vim`.
 
 Start GVim again and edit an R script. You can right click a .R file and
 choose "Edit with Vim" or create a new one with the Normal mode command:
@@ -281,8 +296,8 @@ you may prefer to install the Debian package available at:
    http://www.lepem.ufc.br/jaa/vim-r-plugin.html
 
 Did you see the message "VimCom port not found"? This means that R is not
-running, the vimcom.plus (or vimcom) package is not installed, or R was not
-started by Vim.
+running, the vimcom.plus (or vimcom) package is not installed (or is installed
+but is not loaded), or R was not started by Vim.
 
 
 3.4. Optional steps~
@@ -407,6 +422,7 @@ Command
   . Knit and HTML (cur file, verbose) (only .Rmd)      \kh
   . Knit and PDF (cur file, verbose) (Windows)         \kv
   . Spin (cur file) (only .R)                          \ks
+  . Slidify (cur file) (only .Rmd)                     \sl
   --------------------------------------------------------
   . Open PDF (cur file)                                \op
   --------------------------------------------------------
@@ -530,8 +546,8 @@ Vim:
 <
 The output inserted by  :Rinsert  is limited to 5012 characters.
 
-The command  :Rformat  call the function `tidy.source()` of formatR package to
-format either the entire buffer or the selected lines. The value of the
+The command  :Rformat  calls the function `tidy.source()` of formatR package
+to format either the entire buffer or the selected lines. The value of the
 `width.cutoff` argument is set to the buffer's 'textwidth' if it is not
 outside the range 20-180. Se R help on `tidy.source` for details on how to
 control the function behavior.
@@ -579,11 +595,11 @@ complete the name of a data.frame, the columns are not shown. But when the
 data.frame name is already complete, and you have inserted the '$' symbol,
 omni completion will show the column names.
 
-Vim uses one for the objects of .GlobalEnv and a list of files for all other
-objects. The .GlobalEnv list is stored in the /tmp/r-plugin-yourlogin
-directory and, thus, is deleted after each reboot. The other files are stored
-in ~/.vim/r-plugin/objlist/ and remain available until you manually delete
-them.
+Vim uses one file to store the names of .GlobalEnv objects and a list of files
+for all other objects. The .GlobalEnv list is stored in the
+/tmp/r-plugin-yourlogin directory and is deleted when you quits Vim. The other
+files are stored in ~/.vim/r-plugin/objlist/ and remain available until you
+manually delete them.
 
 
 4.5. The Object Browser~
@@ -603,6 +619,11 @@ Hat, you may want to create a symbolic link to "gvim" named "vim". You still
 have to explicitly start the server with the argument |--servername|.  To
 avoid having to type this argument every time that you start Vim, please look
 at the example in |r-plugin-bash-setup|.
+
+Note: On Mac OS X the Object Browser will not be automatically updated if you
+are using MacVim because the R package vimcom.plus has support only for
+Windows and X11 interprocess communication systems while MacVim is a Cocoa
+application.
 
 In the .GlobalEnv view, if an object has the attribute "label", it will also
 be displayed. Please, see the R help for package vimcom.plus (or vimcom) for
@@ -636,16 +657,22 @@ have their classes recognized in the GlobalEnv view.
 
 4.6. Commenting and uncommenting lines~
 
-You can add the comment character to the beginning of a line by typing
-<LocalLeader>xc and remove it with <LocalLeader>xu. For more sophisticated
-ways of commenting and uncommenting, see below.
-
 You can toggle the state of a line as either commented or uncommented by
-typing <LocalLeader>xx.
+typing <LocalLeader>xx. The string used to comment the line will be "# ",
+"## " or "### ", depending on the values of |vimrplugin_indent_commented| and
+|r_indent_ess_comments|.
 
-You can also add comments to the right of a line with the <LocalLeader>;
-shortcut. By default, the comment starts at the 40th column, which can be
-changed by setting the value of r_indent_comment_column, as below:
+You can also add the string "# " to the beginning of a line by typing
+<LocalLeader>xc and remove it with <LocalLeader>xu. In this case, you can set
+the value of vimrplugin_rcomment_string to control what string will be added
+to the begining of the line. Example:
+>
+   let vimrplugin_rcomment_string = "# "
+<
+Finally, you can also add comments to the right of a line with the
+<LocalLeader>; shortcut. By default, the comment starts at the 40th column,
+which can be changed by setting the value of r_indent_comment_column, as
+below:
 >
    let r_indent_comment_column = 20
 <
@@ -654,14 +681,17 @@ after the last character in the line. If you are running <LocalLeader>; over a
 selection of lines, the comments will be aligned according to the longest
 line.
 
-While typing comments the leader comment string is automatically added to new
-lines when you reach 'textwidth' but not when you press <Enter>. Please, read
-the Vim help about 'formatoptions' and |fo-table|. For example, you can add the
-following line to your |vimrc| if you want the comment string being added
-after <Enter>:
+Note: While typing comments the leader comment string is automatically added
+to new lines when you reach 'textwidth' but not when you press <Enter>.
+Please, read the Vim help about 'formatoptions' and |fo-table|. For example,
+you can add the following line to your |vimrc| if you want the comment string
+being added after <Enter>:
 >
    autocmd FileType r setlocal formatoptions-=t formatoptions+=croql
 <
+Tip: You can use Vim substitution command `:%s/#.*//` to delete all comments
+in a buffer (see |:s| and |pattern-overview|).
+
 
 4.7. Build a tags file to jump to function definitions~
 								 *:RBuildTags*
@@ -740,15 +770,20 @@ tmux.conf:
                       right or at the left of the current one.
 
     <C-a><C-Up>     : Move the panel division upward one line, that is, resize
-		      the panels. Repeat <C-Up> to move more. <C-Down> will
-		      move the division downward one line. If you are using
-		      the vertical split, you should use <C-Left> and
-		      <C-Right> to resize the panels.
+                      the panels. Repeat <C-Up> to move more. <C-Down> will
+                      move the division downward one line. If you are using
+                      the vertical split, you should use <C-Left> and
+                      <C-Right> to resize the panels.
 
     <C-a>[          : Enter the copy/scroll back mode. You can use <PgUp>,
-		      <PgDown> and vi key bindings to move the cursor around
-		      the panel. Press q to quit copy mode.
+                      <PgDown> and vi key bindings to move the cursor around
+                      the panel. Press q to quit copy mode.
+
     <C-a>]          : Paste the content of Tmux paste buffer.
+
+    <C-a>z          : Hide/show all panes except the current one.
+		      Note: If you mistakenly press <C-a><C-z>, you have to
+		      type `fg` to get Tmux back to the foreground.
 
 While in the copy and scroll back mode, the following key bindings are very
 useful:
@@ -825,10 +860,10 @@ anything.
 
 5.1. R's source() issues~
 
-The R's `source()` function prints an extra new line between commands if the
-option echo = TRUE, and error and warning messages are printed only after the
-entire code is sourced, which makes it more difficult to find errors in the
-code sent to R. Details:
+The R's `source()` function of base package prints an extra new line between
+commands if the option echo = TRUE, and error and warning messages are printed
+only after the entire code is sourced, which makes it more difficult to find
+errors in the code sent to R. Details:
 
    https://stat.ethz.ch/pipermail/r-devel/2012-December/065352.html
 
@@ -864,10 +899,10 @@ indent the code below:
     # But this one will be correctly indented:
 
     levels(x) <- ## nl == nL or 1
-	if (nl == nL)
-	    as.character(labels)
-	else
-	    paste(labels, seq_along(levels), sep = "")
+        if (nl == nL)
+            as.character(labels)
+        else
+            paste(labels, seq_along(levels), sep = "")
     class(x) <- c(if(ordered) "ordered", "factor")
 <
 
@@ -1047,26 +1082,35 @@ it.
 
 
 6.3. Assignment operator and Rnoweb completion of code block~
-							   *vimrplugin_assign*
-						       *vimrplugin_assign_map*
 						      *vimrplugin_rnowebchunk*
-While editing R code, '_' is replaced with ' <- '. To disable this feature,
-put in your |vimrc|:
->
-   let vimrplugin_assign = 0
-<
-If want to bind other keys to be replaced by ' <- ', set the value of
-|vimrplugin_assign_map| in your |vimrc|, as in the example below which
-emulates RStudio behavior (may only works on GVim):
->
-   let vimrplugin_assign_map = "<M-->"
-<
-Note: You can't map <C-=>, as StatET does.
-
+						       *vimrplugin_assign_map*
+							   *vimrplugin_assign*
 In Rnoweb files, a '<' is replaced with '<<>>=\n@'. To disable this feature,
 put in your |vimrc|:
 >
    let vimrplugin_rnowebchunk = 0
+<
+While editing R code, '_' is replaced with ' <- '. If want to bind other keys
+to be replaced by ' <- ', set the value of |vimrplugin_assign_map| in your
+|vimrc|, as in the example below which emulates RStudio behavior (may only
+works on GVim):
+>
+   let vimrplugin_assign_map = "<M-->"
+<
+Note: If you are using Vim in a terminal emulator, you have to put in your
+|vimrc|:
+>
+   set <M-->=^[-
+   let vimrplugin_assign_map = "<M-->"
+<
+where `^[` is obtained by pressing CTRL-V CTRL-[ in Insert mode.
+
+Note: You can't map <C-=>, as StatET does because only alphabetic letters can
+be mapped in combination with the CTRL key.
+
+To completely disable this feature, put in your |vimrc|:
+>
+   let vimrplugin_assign = 0
 <
 
 6.4. Object Browser options~
@@ -1124,10 +1168,10 @@ The valid values of vimrplugin_vimpager are:
 
    "tab"       : Show the help document in a new tab. If there is already a
                  tab with an R help document, use it.
-		 This is the default.
+                 This is the default.
    "vertical"  : Split the window vertically if the editor width is large
-		 enough; otherwise, split the window horizontally and attempt
-		 to set the window height to at least 20 lines.
+                 enough; otherwise, split the window horizontally and attempt
+                 to set the window height to at least 20 lines.
    "horizontal": Split the window horizontally.
    "tabnew"    : Show the help document in a new tab.
    "no"        : Do not show R documentation in Vim.
@@ -1216,6 +1260,7 @@ file is open in a new split window, put in your |vimrc|:
 
 6.12. Indent commented lines~
 						 *vimrplugin_indent_commented*
+						       *r_indent_ess_comments*
 You can type <LocalLeader>xx to comment out a line or selected lines. If the
 line already starts with a comment string, it will be removed. After adding
 the comment string, the line will be reindented by default. To turn off the
@@ -1229,9 +1274,9 @@ table below (see |r-plugin-indenting|):
 >
    vimrplugin_indent_commented   r_indent_ess_comments   string
                  1                        0                #
-		 0                        1                #
-		 1                        1                ##
-		 0                        0                ###
+                 0                        0                #
+                 1                        1                ##
+                 0                        1                ###
 <
 
 6.13. Sleep time (Windows only)~
@@ -1613,6 +1658,7 @@ RD, "cursor down"; RED, both "echo" and "down"):
    RMakePDFKb (.Rmd, beamer)
    ROpenPDF
    RSpinFile
+   RMakeSlides (Slidify)
 
    Object browser~
    RUpdateObjBrowser
@@ -1862,10 +1908,10 @@ Below is an example of indentation with and without this option enabled:
    }                                             }
 <
 Notes: (1) Not all code indented by Emacs/ESS will be indented by the
-	   Vim-R-plugin in the same way, and, in some circumstances it may be
-	   necessary to make changes in the code to get it properly indented
-	   by Vim (you may have to either put or remove braces and line
-	   breaks).
+           Vim-R-plugin in the same way, and, in some circumstances it may be
+           necessary to make changes in the code to get it properly indented
+           by Vim (you may have to either put or remove braces and line
+           breaks).
        (2) Indenting is not a file type plugin option. It is a feature defined
            in indent/r.vim. That is why it is documented in this section.
 
@@ -2232,7 +2278,7 @@ pywin32? The official Vim is 32 bit and, thus, Python must be 32 bit too.
 However, Vim and R run as independent processes, that is, you may have 32 bit
 Vim sending commands to 64 bit R. Be careful to download the correct Python
 version because Vim needs a specific version of Python DLL. For example, the
-official Vim 7.4 for Windows needs either Python 2.7 or 3.1. If Python was not
+official Vim 7.4 for Windows needs either Python 2.7 or 3.2. If Python was not
 installed or was not found, the Vim-R-plugin will output information about
 what Python version Vim was compiled against. Do the following if you want to
 discover this information manually:
@@ -2272,6 +2318,16 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 ==============================================================================
 							       *r-plugin-news*
 10. News~
+
+0.9.9.9 (2014-02-01)
+
+ * Minor bug fixes.
+ 
+ * Delete temporary files on VimLeave event.
+
+ * Support to R package slidify (thanks to Michael Lerch).
+
+ * New option: vimrplugin_rcomment_string.
 
 0.9.9.8 (2013-11-30)
 

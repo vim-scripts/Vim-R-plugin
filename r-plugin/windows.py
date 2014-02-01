@@ -24,7 +24,6 @@ def RightClick():
     myHandle = win32gui.GetForegroundWindow()
     RaiseRConsole()
     time.sleep(0.05)
-    #lParam = (y << 16) | x
     lParam = (100 << 16) | 100
     win32gui.SendMessage(RConsole, win32con.WM_RBUTTONDOWN, 0, lParam)
     win32gui.SendMessage(RConsole, win32con.WM_RBUTTONUP, 0, lParam)
@@ -58,21 +57,24 @@ def FindRConsole():
     Rtitle = Rttl
     RConsole = win32gui.FindWindow(None, Rtitle)
     if RConsole == 0:
-	Rtitle = Rttl + " (64-bit)"
+        Rtitle = Rttl + " (64-bit)"
         RConsole = win32gui.FindWindow(None, Rtitle)
         if RConsole == 0:
-	    Rtitle = Rttl + " (32-bit)"
+            Rtitle = Rttl + " (32-bit)"
             RConsole = win32gui.FindWindow(None, Rtitle)
             if RConsole == 0:
                 vim.command("call RWarningMsg('Could not find R Console.')")
     if RConsole:
-	vim.command("let g:rplugin_R_window_ttl = '" + Rtitle + "'")
+        vim.command("let g:rplugin_R_window_ttl = '" + Rtitle + "'")
 
 def SendToRConsole(aString):
     global RConsole
     global Rterm
     SendToVimCom("\x09Set R as busy [SendToRConsole()]")
-    finalString = aString.decode("latin-1") + "\n"
+    if sys.hexversion < 0x03000000:
+        finalString = aString.decode("latin-1") + "\n"
+    else:
+        finalString = aString
     win32clipboard.OpenClipboard(0)
     win32clipboard.EmptyClipboard()
     win32clipboard.SetClipboardText(finalString)
@@ -120,7 +122,10 @@ def SendQuitMsg(aString):
     global RConsole
     global Rterm
     SendToVimCom("\x09Set R as busy [SendQuitMsg()]")
-    finalString = aString.decode("latin-1") + "\n"
+    if sys.hexversion < 0x03000000:
+        finalString = aString.decode("latin-1") + "\n"
+    else:
+        finalString = aString + "\n"
     win32clipboard.OpenClipboard(0)
     win32clipboard.EmptyClipboard()
     win32clipboard.SetClipboardText(finalString)

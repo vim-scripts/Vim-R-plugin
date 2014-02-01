@@ -29,8 +29,12 @@ def DiscoverVimComPort():
                 sock = socket.socket(af, socktype, proto)
                 sock.settimeout(0.1)
                 sock.connect(sa)
-                sock.send("\002What port?")
-                repl = sock.recv(1024)
+                if sys.hexversion < 0x03000000:
+                    sock.send("\002What port?")
+                    repl = sock.recv(1024)
+                else:
+                    sock.send("\002What port?".encode())
+                    repl = sock.recv(1024).decode()
                 sock.close()
                 if repl.find(correct_repl):
                     VimComFamily = af
@@ -50,8 +54,8 @@ def DiscoverVimComPort():
     else:
         vim.command("let g:rplugin_vimcomport = " + str(VimComPort))
         PortWarn = False
-        if repl.find("0.9-92") != 0:
-            vim.command("call RWarningMsg('This version of Vim-R-plugin requires vimcom.plus (or vimcom) 0.9-92.')")
+        if repl.find("0.9-93") != 0:
+            vim.command("call RWarningMsg('This version of Vim-R-plugin requires vimcom.plus (or vimcom) 0.9-93.')")
             vim.command("sleep 1")
     return(VimComPort)
 
@@ -71,8 +75,12 @@ def SendToVimCom(aString):
 
     try:
         sock.connect((HOST, VimComPort))
-        sock.send(aString)
-        received = sock.recv(5012)
+        if sys.hexversion < 0x03000000:
+            sock.send(aString)
+            received = sock.recv(5012)
+        else:
+            sock.send(aString.encode())
+            received = sock.recv(5012).decode()
     except:
         pass
     finally:
@@ -85,5 +93,4 @@ def SendToVimCom(aString):
     else:
         received = received.replace("'", "' . \"'\" . '")
         vim.command("let g:rplugin_lastrpl = '" + received + "'")
-
 

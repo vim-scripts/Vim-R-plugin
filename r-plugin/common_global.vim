@@ -349,7 +349,7 @@ endfunction
 
 function RSimpleCommentLine(mode, what)
     let [fline, lline] = RGetFL(a:mode)
-    let cstr = "#"
+    let cstr = g:vimrplugin_rcomment_string
     if (&filetype == "rnoweb"|| &filetype == "rhelp") && IsLineInRCode(0, fline) == 0
         let cstr = "%"
     elseif (&filetype == "rmd" || &filetype == "rrst") && IsLineInRCode(0, fline) == 0
@@ -742,8 +742,8 @@ endfunction
 
 " Start R
 function StartR(whatr)
-    call writefile([], $VIMRPLUGIN_TMPDIR . g:rplugin_globenv_f)
-    call writefile([], $VIMRPLUGIN_TMPDIR . g:rplugin_liblist_f)
+    call writefile([], $VIMRPLUGIN_TMPDIR . "/globenv_" . $VIMINSTANCEID)
+    call writefile([], $VIMRPLUGIN_TMPDIR . "/liblist_" . $VIMINSTANCEID)
     if filereadable($VIMRPLUGIN_TMPDIR . "/libnames_" . $VIMINSTANCEID)
         call delete($VIMRPLUGIN_TMPDIR . "/libnames_" . $VIMINSTANCEID)
     endif
@@ -879,9 +879,9 @@ function StartObjBrowser_Tmux()
 
     " Don't start the Object Browser if it already exists
     if IsExternalOBRunning()
-        Py SendToVimCom("\004Libraries [OB init]")
+        Py SendToVimCom("\003GlobalEnv [OB StartObjBrowser_Tmux]")
         sleep 50m
-        Py SendToVimCom("\003GlobalEnv [OB init]")
+        Py SendToVimCom("\004Libraries [OB StartObjBrowser_Tmux]")
         sleep 50m
         if $DISPLAY == "" && exists("g:rplugin_ob_pane")
             let slog = system("tmux set-buffer ':silent call UpdateOB(\"both\")\<C-M>:\<Esc>' && tmux paste-buffer -t " . g:rplugin_ob_pane . " && tmux select-pane -t " . g:rplugin_ob_pane)
@@ -910,24 +910,18 @@ function StartObjBrowser_Tmux()
                 \ 'let g:rplugin_tmuxsname = "' . g:rplugin_tmuxsname . '"',
                 \ 'let b:rscript_buffer = "' . bufname("%") . '"',
                 \ 'set filetype=rbrowser',
-                \ 'let $VIMINSTANCEID="' . $VIMINSTANCEID . '"',
                 \ 'let b:rplugin_extern_ob = 1',
                 \ 'set shortmess=atI',
                 \ 'set rulerformat=%3(%l%)',
                 \ 'set noruler',
                 \ 'exe "PyFile " . substitute(g:rplugin_home, " ", '. "'\\\\ '" . ', "g") . "/r-plugin/vimcom.py"',
                 \ 'let g:SendCmdToR = function("SendCmdToR_TmuxSplit")',
-                \ 'if v:servername == ""',
-                \ '    let g:rplugin_globenv_f = "' . g:rplugin_globenv_f . '"',
-                \ '    let g:rplugin_liblist_f = "' . g:rplugin_liblist_f . '"',
-                \ 'else',
-                \ '    let g:rplugin_globenv_f = "/globenv_" . v:servername',
-                \ '    let g:rplugin_liblist_f = "/liblist_" . v:servername',
-                \ "    exe 'Py SendToVimCom(\"\\x07' . v:servername . '\")'",
+                \ 'if has("clientserver") && v:servername != ""',
+                \ "   exe 'Py SendToVimCom(" . '"\007' . "' . v:servername . '" . '")' . "'",
                 \ 'endif',
-                \ 'Py SendToVimCom("\004Libraries [OB init]")',
-                \ 'sleep 50m',
                 \ 'Py SendToVimCom("\003GlobalEnv [OB init]")',
+                \ 'sleep 50m',
+                \ 'Py SendToVimCom("\004Libraries [OB init]")',
                 \ 'if v:servername == ""',
                 \ '    sleep 100m',
                 \ '    call UpdateOB("GlobalEnv")',
@@ -1052,8 +1046,8 @@ function StartObjBrowser_Vim()
         unlet g:tmp_tmuxsname
         unlet g:tmp_curbufname
         exe "PyFile " . substitute(g:rplugin_home, " ", '\\ ', "g") . "/r-plugin/vimcom.py"
-        Py SendToVimCom("\003GlobalEnv [startobjectbrowser()]")
-        Py SendToVimCom("\004Libraries [startobjectbrowser()]")
+        Py SendToVimCom("\003GlobalEnv [StartObjBrowser_Vim]")
+        Py SendToVimCom("\004Libraries [StartObjBrowser_Vim]")
         call UpdateOB("GlobalEnv")
     endif
     if wmsg != ""
@@ -1501,7 +1495,9 @@ endfunction
 " Send selection to R
 function SendSelectionToR(e, m)
     if &filetype != "r" && b:IsInRCode(1) == 0
-        return
+        if !(&filetype == "rnoweb" && getline(".") =~ "\\Sexpr{")
+            return
+        endif
     endif
 
     if line("'<") == line("'>")
@@ -1804,8 +1800,10 @@ function RQuit(how)
         unlet g:rplugin_rconsole_pane
     endif
 
-    call writefile([], $VIMRPLUGIN_TMPDIR . g:rplugin_globenv_f)
-    call writefile([], $VIMRPLUGIN_TMPDIR . g:rplugin_liblist_f)
+    call delete($VIMRPLUGIN_TMPDIR . "/globenv_" . $VIMINSTANCEID)
+    call delete($VIMRPLUGIN_TMPDIR . "/liblist_" . $VIMINSTANCEID)
+    call delete($VIMRPLUGIN_TMPDIR . "/libnames_" . $VIMINSTANCEID)
+    call delete($VIMRPLUGIN_TMPDIR . "/GlobalEnvList_" . $VIMINSTANCEID)
     let g:SendCmdToR = function('SendCmdToR_fake')
 endfunction
 
@@ -1832,8 +1830,7 @@ function BuildROmniList()
 	endif
     endif
 
-    let rtf = g:rplugin_globalenvfname
-    let omnilistcmd = 'vim.bol("' . rtf . '"'
+    let omnilistcmd = 'vim.bol("' . $VIMRPLUGIN_TMPDIR . "/GlobalEnvList_" . $VIMINSTANCEID . '"'
     if g:vimrplugin_allnames == 1
         let omnilistcmd = omnilistcmd . ', allnames = TRUE'
     endif
@@ -1864,7 +1861,7 @@ function BuildROmniList()
         return
     endif
 
-    let g:rplugin_globalenvlines = readfile(g:rplugin_globalenvfname)
+    let g:rplugin_globalenvlines = readfile($VIMRPLUGIN_TMPDIR . "/GlobalEnvList_" . $VIMINSTANCEID)
     echon
 endfunction
 
@@ -2642,6 +2639,7 @@ function MakeRMenu()
             call RCreateMenuItem("nvi", 'Command.Knit\ and\ Beamer\ PDF\ (cur\ file)', '<Plug>RMakePDFKb', 'kl', ':call RMakePDFrmd("beamer")')
             call RCreateMenuItem("nvi", 'Command.Knit\ and\ HTML\ (cur\ file)', '<Plug>RMakeHTML', 'kh', ':call RMakeHTMLrmd("html")')
             call RCreateMenuItem("nvi", 'Command.Knit\ and\ ODT\ (cur\ file)', '<Plug>RMakeODT', 'ko', ':call RMakeHTMLrmd("odt")')
+            call RCreateMenuItem("nvi", 'Command.Slidify\ (cur\ file)', '<Plug>RMakeSlides', 'sl', ':call RMakeSlidesrmd()')
         endif
         if &filetype == "rrst" || g:vimrplugin_never_unmake_menu
             call RCreateMenuItem("nvi", 'Command.Knit\ and\ PDF\ (cur\ file)', '<Plug>RMakePDFK', 'kp', ':call RMakePDFrrst()')
@@ -2970,6 +2968,26 @@ function RBufEnter()
     endif
 endfunction
 
+function RVimLeave()
+    if exists("b:rsource")
+        " b:rsource only exists if the filetype of the last buffer is .R*
+        call delete(b:rsource)
+    endif
+    call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
+    call delete($VIMRPLUGIN_TMPDIR . "/formatted_code")
+    call delete($VIMRPLUGIN_TMPDIR . "/GlobalEnvList_" . $VIMINSTANCEID)
+    call delete($VIMRPLUGIN_TMPDIR . "/globenv_" . $VIMINSTANCEID)
+    call delete($VIMRPLUGIN_TMPDIR . "/liblist_" . $VIMINSTANCEID)
+    call delete($VIMRPLUGIN_TMPDIR . "/libnames_" . $VIMINSTANCEID)
+    call delete($VIMRPLUGIN_TMPDIR . "/objbrowserInit")
+    call delete($VIMRPLUGIN_TMPDIR . "/Rdoc")
+    call delete($VIMRPLUGIN_TMPDIR . "/Rinsert")
+    call delete($VIMRPLUGIN_TMPDIR . "/tmux.conf")
+    call delete($VIMRPLUGIN_TMPDIR . "/unformatted_code")
+    call delete($VIMRPLUGIN_TMPDIR . "/vimbol_finished")
+    call delete($VIMRPLUGIN_TMPDIR . "/vimcom_running")
+endfunction
+
 function SetRPath()
     if exists("g:vimrplugin_r_path")
         let b:rplugin_R = expand(g:vimrplugin_r_path)
@@ -3105,12 +3123,13 @@ call RSetDefaultValue("g:vimrplugin_help_w",           46)
 call RSetDefaultValue("g:vimrplugin_objbr_w",          40)
 call RSetDefaultValue("g:vimrplugin_external_ob",       0)
 call RSetDefaultValue("g:vimrplugin_show_args",         0)
-call RSetDefaultValue("g:vimrplugin_indent_commented",  1)
 call RSetDefaultValue("g:vimrplugin_never_unmake_menu", 0)
-call RSetDefaultValue("g:vimrplugin_vimpager",       "'tab'")
-call RSetDefaultValue("g:vimrplugin_objbr_place", "'script,right'")
 call RSetDefaultValue("g:vimrplugin_insert_mode_cmds",  1)
-call RSetDefaultValue("g:vimrplugin_permanent_libs", "'base,stats,graphics,grDevices,utils,datasets,methods'")
+call RSetDefaultValue("g:vimrplugin_indent_commented",  1)
+call RSetDefaultValue("g:vimrplugin_rcomment_string", "'# '")
+call RSetDefaultValue("g:vimrplugin_vimpager",        "'tab'")
+call RSetDefaultValue("g:vimrplugin_objbr_place",     "'script,right'")
+call RSetDefaultValue("g:vimrplugin_permanent_libs",  "'base,stats,graphics,grDevices,utils,datasets,methods'")
 
 if executable("latexmk")
     call RSetDefaultValue("g:vimrplugin_latexcmd", "'latexmk -pdf'")
@@ -3443,6 +3462,10 @@ if exists("g:vimrplugin_term_cmd")
 endif
 
 autocmd BufEnter * call RBufEnter()
+if &filetype != "rbrowser"
+    autocmd VimLeave * call RVimLeave()
+endif
+autocmd BufLeave * if exists("b:rsource") | call delete(b:rsource) | endif
 
 let g:rplugin_firstbuffer = expand("%:p")
 let g:rplugin_running_objbr = 0
@@ -3457,32 +3480,20 @@ let g:rplugin_hasRSFbutton = 0
 let g:rplugin_errlist = []
 let g:rplugin_tmuxsname = substitute("vimrplugin-" . g:rplugin_userlogin . localtime() . g:rplugin_firstbuffer, '\W', '', 'g')
 
-let $VIMINSTANCEID = substitute(g:rplugin_firstbuffer . localtime(), '\W', '', 'g')
+" If this is the Object Browser running in a Tmux pane, $VIMINSTANCEID is
+" already defined and shouldn't be changed
+if $VIMINSTANCEID == ""
+    let $VIMINSTANCEID = substitute(g:rplugin_firstbuffer . localtime(), '\W', '', 'g')
+endif
 
 let g:rplugin_obsname = toupper(substitute(substitute(expand("%:r"), '\W', '', 'g'), "_", "", "g"))
 
 let g:rplugin_docfile = $VIMRPLUGIN_TMPDIR . "/Rdoc"
 
-if g:rplugin_tmuxwasfirst
-    if $DISPLAY == ""
-        let g:rplugin_globenv_f = "/globenv_"
-        let g:rplugin_liblist_f = "/liblist_"
-        let g:rplugin_globalenvfname = $VIMRPLUGIN_TMPDIR . "/GlobalEnvList"
-    else
-        let g:rplugin_globenv_f = "/globenv_" . g:rplugin_obsname
-        let g:rplugin_liblist_f = "/liblist_" . g:rplugin_obsname
-        let g:rplugin_globalenvfname = $VIMRPLUGIN_TMPDIR . "/GlobalEnvList_" . g:rplugin_obsname
-    endif
-else
-    let g:rplugin_globenv_f = "/globenv_" . v:servername
-    let g:rplugin_liblist_f = "/liblist_" . v:servername
-    let g:rplugin_globalenvfname = $VIMRPLUGIN_TMPDIR . "/GlobalEnvList_" . v:servername
-endif
-
 " Create an empty file to avoid errors if the user do Ctrl-X Ctrl-O before
 " starting R:
 if &filetype != "rbrowser"
-    call writefile([], g:rplugin_globalenvfname)
+    call writefile([], $VIMRPLUGIN_TMPDIR . "/GlobalEnvList_" . $VIMINSTANCEID)
 endif
 
 call SetRPath()

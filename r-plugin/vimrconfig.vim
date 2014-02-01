@@ -47,6 +47,7 @@ function! RConfigRprofile()
     endif
     if filereadable($VIMRPLUGIN_TMPDIR . "/configR_result")
         let res = readfile($VIMRPLUGIN_TMPDIR . "/configR_result")
+        call delete($VIMRPLUGIN_TMPDIR . "/configR_result")
         if filereadable(res[0])
             let rpflines = readfile(res[0])
         else
