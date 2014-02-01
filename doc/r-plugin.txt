@@ -69,9 +69,9 @@ Vim-R-plugin (see |vimrplugin_source|).
       - Send lines, selection, paragraphs, functions, blocks, entire file.
       - Send commands with the object under cursor as argument: help, args,
         plot, print, str, summary, example, names.
-      - Send to R the Sweave and pdflatex commands.
-  * Omni completion (auto-completion) for R objects (.GlobalEnv and installed
-    packages). The list of installed packages must be updated manually.
+      - Send to R the Sweave, knit and pdflatex commands.
+  * Omni completion (auto-completion) for R objects (.GlobalEnv and loaded
+    packages).
   * Auto-completion of function arguments.
   * Auto-completion of knitr chunk options.
   * Ability to see R's documentation in a Vim's buffer:
@@ -105,6 +105,9 @@ The installation instructions are split in four sections:
 
 If you are using Windows, jump to section 3.2.
 
+If you are an unexperienced Vim user, start a terminal emulator and type in
+it: `vimtutor`<Enter>
+
 Before installing the plugin, you should install its dependencies:
 
    Depends:~
@@ -112,9 +115,10 @@ Before installing the plugin, you should install its dependencies:
    Vim >= 7.4: http://www.vim.org/download.php
                In addition to the most commonly used features, the plugin
                requires: |+python| or |+python3|, |+clientserver| and |+conceal|. 
+
    R >= 3.0.0: http://www.r-project.org/
 
-   vimcom.plus = 0.9-92: http://www.lepem.ufc.br/jaa/vimcom.plus.html
+   vimcom.plus = 0.9-93: http://www.lepem.ufc.br/jaa/vimcom.plus.html
 
    Tmux >= 1.5:   http://tmux.sourceforge.net
                   Tmux is necessary to send commands from Vim to R Console.
@@ -191,7 +195,7 @@ especially the tip |r-plugin-tvim| (the above command :RpluginConfig should do
 this for you).
 
 Note: On Mac OS X, in both Vim and GVim, the plugin will use AppleScript to
-send commands to the R Console application unless vimrplugin_applescript = 0.
+send commands to the R Console application unless |vimrplugin_applescript| = 0.
 Some users have reported more luck with iTerm than with the default Mac OS X
 terminal emulator.
 
@@ -207,7 +211,7 @@ dependencies:
 
     * R's version must be >= 3.0.0: http://www.r-project.org/
 
-    * vimcom.plus = 0.9-92: http://www.lepem.ufc.br/jaa/vimcom.plus.html
+    * vimcom.plus = 0.9-93: http://www.lepem.ufc.br/jaa/vimcom.plus.html
       
       Note: If you cannot build vimcom.plus yourself, you will want to
       download and install the zip file.
@@ -225,7 +229,7 @@ dependencies:
       the official GVim 7.4 binary. The default download may not match the
       Python version Vim was linked against: then you have to "View all files"
       on the download page to find the file that matches exactly the above
-      versions. Please, read |r-plugin-python| if need to use different
+      versions. Please, read |r-plugin-python| if you need to use different
       versions.
 
 Now, download the latest version of `Vim-R-plugin.vmb` from
@@ -292,8 +296,8 @@ you may prefer to install the Debian package available at:
    http://www.lepem.ufc.br/jaa/vim-r-plugin.html
 
 Did you see the message "VimCom port not found"? This means that R is not
-running, the vimcom.plus (or vimcom) package is not installed, or R was not
-started by Vim.
+running, the vimcom.plus (or vimcom) package is not installed (or is installed
+but is not loaded), or R was not started by Vim.
 
 
 3.4. Optional steps~
@@ -542,8 +546,8 @@ Vim:
 <
 The output inserted by  :Rinsert  is limited to 5012 characters.
 
-The command  :Rformat  call the function `tidy.source()` of formatR package to
-format either the entire buffer or the selected lines. The value of the
+The command  :Rformat  calls the function `tidy.source()` of formatR package
+to format either the entire buffer or the selected lines. The value of the
 `width.cutoff` argument is set to the buffer's 'textwidth' if it is not
 outside the range 20-180. Se R help on `tidy.source` for details on how to
 control the function behavior.
@@ -591,11 +595,11 @@ complete the name of a data.frame, the columns are not shown. But when the
 data.frame name is already complete, and you have inserted the '$' symbol,
 omni completion will show the column names.
 
-Vim uses one for the objects of .GlobalEnv and a list of files for all other
-objects. The .GlobalEnv list is stored in the /tmp/r-plugin-yourlogin
-directory and, thus, is deleted after each reboot. The other files are stored
-in ~/.vim/r-plugin/objlist/ and remain available until you manually delete
-them.
+Vim uses one file to store the names of .GlobalEnv objects and a list of files
+for all other objects. The .GlobalEnv list is stored in the
+/tmp/r-plugin-yourlogin directory and is deleted when you quits Vim. The other
+files are stored in ~/.vim/r-plugin/objlist/ and remain available until you
+manually delete them.
 
 
 4.5. The Object Browser~
@@ -615,6 +619,11 @@ Hat, you may want to create a symbolic link to "gvim" named "vim". You still
 have to explicitly start the server with the argument |--servername|.  To
 avoid having to type this argument every time that you start Vim, please look
 at the example in |r-plugin-bash-setup|.
+
+Note: On Mac OS X the Object Browser will not be automatically updated if you
+are using MacVim because the R package vimcom.plus has support only for
+Windows and X11 interprocess communication systems while MacVim is a Cocoa
+application.
 
 In the .GlobalEnv view, if an object has the attribute "label", it will also
 be displayed. Please, see the R help for package vimcom.plus (or vimcom) for
@@ -772,7 +781,9 @@ tmux.conf:
 
     <C-a>]          : Paste the content of Tmux paste buffer.
 
-    <C-a>z          : Hide/show all panes execpt the current one.
+    <C-a>z          : Hide/show all panes except the current one.
+		      Note: If you mistakenly press <C-a><C-z>, you have to
+		      type `fg` to get Tmux back to the foreground.
 
 While in the copy and scroll back mode, the following key bindings are very
 useful:
@@ -849,10 +860,10 @@ anything.
 
 5.1. R's source() issues~
 
-The R's `source()` function prints an extra new line between commands if the
-option echo = TRUE, and error and warning messages are printed only after the
-entire code is sourced, which makes it more difficult to find errors in the
-code sent to R. Details:
+The R's `source()` function of base package prints an extra new line between
+commands if the option echo = TRUE, and error and warning messages are printed
+only after the entire code is sourced, which makes it more difficult to find
+errors in the code sent to R. Details:
 
    https://stat.ethz.ch/pipermail/r-devel/2012-December/065352.html
 
@@ -1071,17 +1082,18 @@ it.
 
 
 6.3. Assignment operator and Rnoweb completion of code block~
-							   *vimrplugin_assign*
-						       *vimrplugin_assign_map*
 						      *vimrplugin_rnowebchunk*
-While editing R code, '_' is replaced with ' <- '. To disable this feature,
+						       *vimrplugin_assign_map*
+							   *vimrplugin_assign*
+In Rnoweb files, a '<' is replaced with '<<>>=\n@'. To disable this feature,
 put in your |vimrc|:
 >
-   let vimrplugin_assign = 0
+   let vimrplugin_rnowebchunk = 0
 <
-If want to bind other keys to be replaced by ' <- ', set the value of
-|vimrplugin_assign_map| in your |vimrc|, as in the example below which
-emulates RStudio behavior (may only works on GVim):
+While editing R code, '_' is replaced with ' <- '. If want to bind other keys
+to be replaced by ' <- ', set the value of |vimrplugin_assign_map| in your
+|vimrc|, as in the example below which emulates RStudio behavior (may only
+works on GVim):
 >
    let vimrplugin_assign_map = "<M-->"
 <
@@ -1096,10 +1108,9 @@ where `^[` is obtained by pressing CTRL-V CTRL-[ in Insert mode.
 Note: You can't map <C-=>, as StatET does because only alphabetic letters can
 be mapped in combination with the CTRL key.
 
-In Rnoweb files, a '<' is replaced with '<<>>=\n@'. To disable this feature,
-put in your |vimrc|:
+To completely disable this feature, put in your |vimrc|:
 >
-   let vimrplugin_rnowebchunk = 0
+   let vimrplugin_assign = 0
 <
 
 6.4. Object Browser options~
@@ -2308,10 +2319,12 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-0.9.9.9 (2013-12-25)
+0.9.9.9 (2014-02-01)
 
  * Minor bug fixes.
  
+ * Delete temporary files on VimLeave event.
+
  * Support to R package slidify (thanks to Michael Lerch).
 
  * New option: vimrplugin_rcomment_string.
