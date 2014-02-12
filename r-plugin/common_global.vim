@@ -3126,6 +3126,7 @@ call RSetDefaultValue("g:vimrplugin_show_args",         0)
 call RSetDefaultValue("g:vimrplugin_never_unmake_menu", 0)
 call RSetDefaultValue("g:vimrplugin_insert_mode_cmds",  1)
 call RSetDefaultValue("g:vimrplugin_indent_commented",  1)
+call RSetDefaultValue("g:vimrplugin_source",         "''")
 call RSetDefaultValue("g:vimrplugin_rcomment_string", "'# '")
 call RSetDefaultValue("g:vimrplugin_vimpager",        "'tab'")
 call RSetDefaultValue("g:vimrplugin_objbr_place",     "'script,right'")
@@ -3235,7 +3236,7 @@ endif
 
 " Check whether Tmux is OK
 if !has("win32") && !has("win64") && !has("gui_win32") && !has("gui_win64") && g:vimrplugin_applescript == 0
-    if !executable('tmux')
+    if !executable('tmux') && g:vimrplugin_source !~ "screenR"
         call RWarningMsgInp("Please, install the 'Tmux' application to enable the Vim-R-plugin.")
         let g:rplugin_failed = 1
         finish
@@ -3246,7 +3247,7 @@ if !has("win32") && !has("win64") && !has("gui_win32") && !has("gui_win64") && g
     if strlen(s:tmuxversion) != 3
         let s:tmuxversion = "1.0"
     endif
-    if s:tmuxversion < "1.5"
+    if s:tmuxversion < "1.5" && g:vimrplugin_source !~ "screenR"
         call RWarningMsgInp("Vim-R-plugin requires Tmux >= 1.5")
         let g:rplugin_failed = 1
         finish
