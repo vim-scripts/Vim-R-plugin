@@ -14,9 +14,9 @@
 
 
 ###########################################################
-#   This script builds both the zip and the deb files of  #
-#   released versions of the plugin. The files are        #
-#   created at the /tmp directory.                        #
+#   This script builds both the Vimball and the deb       #
+#   files of released versions of the plugin. The files   #
+#   are created at the /tmp directory.                    #
 ###########################################################
 
 
@@ -176,5 +176,5 @@ htmldoc:
 	    sed -i -e 's/<\/pre><hr><pre>/  --------------------------------------------------------\n/' r-plugin.html ;\
 	    mv r-plugin.html vim-stylesheet.css /tmp )
 
-all: zip deb htmldoc
+all: vimball deb htmldoc
 
