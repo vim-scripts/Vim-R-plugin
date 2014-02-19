@@ -3,7 +3,11 @@ runtime ftplugin/r.vim
 
 function SetExeCmd()
     runtime r-plugin/common_buffer.vim
-    if &filetype == "python"
+    if &filetype == "julia"
+        let b:rplugin_R = "julia"
+        let b:rplugin_r_args = " "
+        let b:quit_command = "quit()"
+    elseif &filetype == "python"
         let b:rplugin_R = "python"
         let b:rplugin_r_args = " "
         let b:quit_command = "quit()"
