@@ -171,8 +171,10 @@ files, you have to press the space bar a few times to finish the
 installation). You should, then, quit Vim.
 
 Note: If you need too install the plugin in a non default directory, do
-`:UseVimball` `[path]`. Then, create a symbolic link to `path/ftdetect/r.vim`
-into `~/.vim/ftdetect/r.vim`.
+`:UseVimball` `[path]`. In this case, the configuration of Vim's 'runtimepath'
+must be done before the command "filetype on" in both the system and the user
+|vimrc| files, otherwise, you would have to create a symbolic link to
+`path/ftdetect/r.vim` into `~/.vim/ftdetect/r.vim`.
 
 Start Vim again and edit an R script. Type <LocalLeader>rf to start R and run
 the command below to get help configuring ~/.Rprofile, ~/.vimrc, ~/.tmux.conf,
@@ -248,8 +250,10 @@ files, you have to press the space bar a few times to finish the
 installation). You should, then, quit Vim.
 
 Note: If you need too install the plugin in a non default directory, do
-`:UseVimball` `[path]`. Then, create a symbolic link to `path/ftdetect/r.vim`
-into `~/vimfiles/ftdetect/r.vim`.
+`:UseVimball` `[path]`. In this case, the configuration of Vim's 'runtimepath'
+must be done before the command "filetype on" in both the system and the user
+|vimrc| files, otherwise, you would have to create a symbolic link to
+`path/ftdetect/r.vim` into `~/.vim/ftdetect/r.vim`.
 
 Start GVim again and edit an R script. You can right click a .R file and
 choose "Edit with Vim" or create a new one with the Normal mode command:
@@ -2038,7 +2042,7 @@ useful tip is to click on the title bar of the debug window and choose "Always
 on top" or a similar option provided by your desktop manager.
 
 
-9.17. Turn the R-plugin into a global plugin~
+9.17. Turn the R-plugin into a global plugin (Linux/Unix only)~
 							     *r-plugin-global*
 The Vim-R-plugin is a file type plugin. If you want its functionality
 available for all file types, then go to your ~/.vim/plugin directory and
@@ -2048,8 +2052,9 @@ the following in a terminal emulator:
    cd ~/.vim/plugin/
    ln -s ../r-plugin/global_r_plugin.vim
 <
-On Windows, you probably will have to make a copy of the file to the
-~/vimfiles/plugin directory.
+You will then be able to type <LocalLeader>rf to start and <LocalLeader>rq to
+quit different command line interpreters (Julia, Python, Haskell, Ruby and
+Lisp) and <LocalLeader>d, l, ss, bb, etc to send code to the interpreter.
 
 
 9.18. Disable syntax highlight of R functions~
