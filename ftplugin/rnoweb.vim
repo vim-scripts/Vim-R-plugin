@@ -243,6 +243,11 @@ let b:PreviousRChunk = function("RnwPreviousChunk")
 let b:NextRChunk = function("RnwNextChunk")
 let b:SendChunkToR = function("RnwSendChunkToR")
 
+" Pointers to functions that must be different if the plugin is used as a
+" global one:
+let b:SourceLines = function("RSourceLines")
+
+
 "==========================================================================
 " Key bindings and menu items
 

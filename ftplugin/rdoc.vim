@@ -78,10 +78,11 @@ function! RdocIsInRCode(vrb)
     endif
 endfunction
 
+let b:IsInRCode = function("RdocIsInRCode")
+let b:SourceLines = function("RSourceLines")
+
 "==========================================================================
 " Key bindings and menu items
-
-let b:IsInRCode = function("RdocIsInRCode")
 
 call RCreateSendMaps()
 call RControlMaps()

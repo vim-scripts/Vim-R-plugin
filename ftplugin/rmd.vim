@@ -196,6 +196,7 @@ let b:IsInRCode = function("RmdIsInRCode")
 let b:PreviousRChunk = function("RmdPreviousChunk")
 let b:NextRChunk = function("RmdNextChunk")
 let b:SendChunkToR = function("SendRmdChunkToR")
+let b:SourceLines = function("RSourceLines")
 
 "==========================================================================
 " Key bindings and menu items

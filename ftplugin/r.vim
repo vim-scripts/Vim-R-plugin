@@ -98,10 +98,14 @@ function! DefaultIsInRCode(vrb)
     return 1
 endfunction
 
+let b:IsInRCode = function("DefaultIsInRCode")
+
+" Pointers to functions that must be different if the plugin is used as a
+" global one:
+let b:SourceLines = function("RSourceLines")
+
 "==========================================================================
 " Key bindings and menu items
-
-let b:IsInRCode = function("DefaultIsInRCode")
 
 call RCreateStartMaps()
 call RCreateEditMaps()

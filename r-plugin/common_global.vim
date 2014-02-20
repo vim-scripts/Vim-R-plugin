@@ -1413,7 +1413,7 @@ function SendMBlockToR(e, m)
         let lineB -= 1
     endif
     let lines = getline(lineA, lineB)
-    let ok = RSourceLines(lines, a:e)
+    let ok = b:SourceLines(lines, a:e)
     if ok == 0
         return
     endif
@@ -1482,7 +1482,7 @@ function SendFunctionToR(e, m)
     endif
 
     let lines = getline(firstline, lastline)
-    let ok = RSourceLines(lines, a:e)
+    let ok = b:SourceLines(lines, a:e)
     if  ok == 0
         return
     endif
@@ -1543,7 +1543,7 @@ function SendSelectionToR(e, m)
         let lines[llen] = strpart(lines[llen], 0, j)
     endif
 
-    let ok = RSourceLines(lines, a:e)
+    let ok = b:SourceLines(lines, a:e)
     if ok == 0
         return
     endif
@@ -1578,7 +1578,7 @@ function SendParagraphToR(e, m)
         endif
     endwhile
     let lines = getline(i, j)
-    let ok = RSourceLines(lines, a:e)
+    let ok = b:SourceLines(lines, a:e)
     if ok == 0
         return
     endif
@@ -1625,7 +1625,7 @@ function SendFHChunkToR()
             let idx += 1
         endif
     endwhile
-    call RSourceLines(codelines, "silent")
+    call b:SourceLines(codelines, "silent")
 endfunction
 
 " Send current line to R.
