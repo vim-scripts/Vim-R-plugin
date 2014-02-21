@@ -33,11 +33,8 @@ let b:did_r_ftplugin = 1
 let s:cpo_save = &cpo
 set cpo&vim
 
-" Don't do this if called by ../r-plugin/common_global.vim
-if &filetype == "r"
-    setlocal commentstring=#%s
-    setlocal comments=b:#,b:##,b:###,b:#'
-endif
+setlocal commentstring=#%s
+setlocal comments=b:#,b:##,b:###,b:#'
 
 " Source scripts common to R, Rnoweb, Rhelp, Rmd, Rrst and rdoc files:
 runtime r-plugin/common_global.vim
@@ -100,7 +97,7 @@ endfunction
 
 let b:IsInRCode = function("DefaultIsInRCode")
 
-" Pointers to functions that must be different if the plugin is used as a
+" Pointer to function that must be different if the plugin is used as a
 " global one:
 let b:SourceLines = function("RSourceLines")
 
@@ -122,14 +119,6 @@ call RCreateMaps("ni", '<Plug>RSpinFile',     'ks', ':call RSpin()')
 call RCreateSendMaps()
 call RControlMaps()
 call RCreateMaps("nvi", '<Plug>RSetwd',        'rd', ':call RSetWD()')
-
-" Sweave (cur file)
-"-------------------------------------
-if &filetype == "rnoweb"
-    call RCreateMaps("nvi", '<Plug>RSweave',      'sw', ':call RSweave()')
-    call RCreateMaps("nvi", '<Plug>RMakePDF',     'sp', ':call RMakePDF("nobib")')
-    call RCreateMaps("nvi", '<Plug>RIndent',      'si', ':call RnwToggleIndentSty()')
-endif
 
 
 " Menu R

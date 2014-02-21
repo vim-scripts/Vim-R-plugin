@@ -1,5 +1,29 @@
 
-runtime ftplugin/r.vim
+runtime r-plugin/common_global.vim
+if exists("g:rplugin_failed")
+    finish
+endif
+
+runtime r-plugin/common_buffer.vim
+
+" Default IsInRCode function when the plugin is used as a global plugin
+function! DefaultIsInRCode(vrb)
+    return 1
+endfunction
+
+let b:IsInRCode = function("DefaultIsInRCode")
+
+call RCreateStartMaps()
+call RCreateEditMaps()
+call RCreateSendMaps()
+call RControlMaps()
+
+" Menu R
+if has("gui_running")
+    call MakeRMenu()
+endif
+
+call RSourceOtherScripts()
 
 function SourceNotDefined(lines, e)
     echohl WarningMsg
@@ -21,6 +45,7 @@ function SetExeCmd()
         let b:rplugin_r_args = " "
         let b:quit_command = "quit()"
         let b:SourceLines = function("JuliaSourceLines")
+        call RCreateMaps("ni", '<Plug>RSendFile',     'aa', ':call JuliaSourceLines(getline(1, "$"), "silent")')
     elseif &filetype == "python"
         let b:rplugin_R = "python"
         let b:rplugin_r_args = " "

@@ -25,7 +25,9 @@
 
 " Set completion with CTRL-X CTRL-O to autoloaded function.
 if exists('&ofu')
-    setlocal ofu=rcomplete#CompleteR
+    if &filetype == "r" || &filetype == "rnoweb" || &filetype == "rdoc" || &filetype == "rhelp" || &filetype == "rrst" || &filetype == "rmd"
+        setlocal omnifunc=rcomplete#CompleteR
+    endif
 endif
 
 " This isn't the Object Browser running externally
