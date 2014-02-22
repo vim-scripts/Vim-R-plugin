@@ -34,6 +34,7 @@ let s:cpo_save = &cpo
 set cpo&vim
 
 setlocal iskeyword=@,48-57,_,.
+setlocal formatoptions-=t
 setlocal commentstring=#%s
 setlocal comments=b:#,b:##,b:###,b:#'
 
