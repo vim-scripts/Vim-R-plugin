@@ -21,15 +21,11 @@
 "==========================================================================
 
 " Only do this when not yet done for this buffer
-if exists("b:did_rmd_ftplugin") || exists("disable_r_ftplugin") || exists("b:did_ftplugin")
+if exists("b:did_ftplugin") || exists("disable_r_ftplugin") || exists("b:did_ftplugin")
     finish
 endif
 
-" Don't load another plugin for this buffer
-let b:did_rmd_ftplugin = 1
-
 runtime! ftplugin/html.vim ftplugin/html_*.vim ftplugin/html/*.vim
-unlet! b:did_ftplugin
 
 setlocal comments=fb:*,fb:-,fb:+,n:> commentstring=>\ %s
 setlocal formatoptions+=tcqln
@@ -40,7 +36,11 @@ let s:cpo_save = &cpo
 set cpo&vim
 
 " Enables pandoc if it is installed
+unlet! b:did_ftplugin
 runtime ftplugin/pandoc.vim
+
+" Don't load another plugin for this buffer
+let b:did_ftplugin = 1
 
 " Source scripts common to R, Rrst, Rnoweb, Rhelp and Rdoc:
 runtime r-plugin/common_global.vim
@@ -235,8 +235,8 @@ let &cpo = s:cpo_save
 unlet s:cpo_save
 
 if exists('b:undo_ftplugin')
-  let b:undo_ftplugin .= "|setl cms< com< fo< flp<"
+  let b:undo_ftplugin .= "|setl cms< com< fo< flp< isk< | unlet! b:IsInRCode b:SourceLines b:PreviousRChunk b:NextRChunk b:SendChunkToR"
 else
-  let b:undo_ftplugin = "setl cms< com< fo< flp<"
+  let b:undo_ftplugin = "setl cms< com< fo< flp< isk< | unlet! b:IsInRCode b:SourceLines b:PreviousRChunk b:NextRChunk b:SendChunkToR"
 endif
 

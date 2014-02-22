@@ -23,15 +23,17 @@
 "==========================================================================
 
 " Only do this when not yet done for this buffer
-if exists("b:did_rhelp_ftplugin") || exists("disable_r_ftplugin")
+if exists("b:did_ftplugin") || exists("disable_r_ftplugin")
     finish
 endif
 
 " Don't load another plugin for this buffer
-let b:did_rhelp_ftplugin = 1
+let b:did_ftplugin = 1
 
 let s:cpo_save = &cpo
 set cpo&vim
+
+setlocal iskeyword=@,48-57,_,.
 
 " Source scripts common to R, Rnoweb, Rhelp and rdoc files:
 runtime r-plugin/common_global.vim
@@ -42,8 +44,6 @@ endif
 " Some buffer variables common to R, Rnoweb, Rhelp and rdoc file need be
 " defined after the global ones:
 runtime r-plugin/common_buffer.vim
-
-setlocal iskeyword=@,48-57,_,.
 
 function! RhelpIsInRCode(vrb)
     let lastsec = search('^\\[a-z][a-z]*{', "bncW")
@@ -77,6 +77,7 @@ endif
 
 call RSourceOtherScripts()
 
+let b:undo_ftplugin = "setl isk< | unlet! b:IsInRCode b:SourceLines"
 let &cpo = s:cpo_save
 unlet s:cpo_save
 

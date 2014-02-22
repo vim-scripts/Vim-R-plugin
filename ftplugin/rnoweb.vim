@@ -20,12 +20,12 @@
 "==========================================================================
 
 " Only do this when not yet done for this buffer
-if exists("b:did_rnoweb_ftplugin") || exists("disable_r_ftplugin")
+if exists("b:did_ftplugin") || exists("disable_r_ftplugin")
     finish
 endif
 
 " Don't load another plugin for this buffer
-let b:did_rnoweb_ftplugin = 1
+let b:did_ftplugin = 1
 
 let s:cpo_save = &cpo
 set cpo&vim
@@ -33,6 +33,7 @@ set cpo&vim
 " Enables Vim-Latex-Suite, LaTeX-Box if installed
 runtime ftplugin/tex_latexSuite.vim
 runtime ftplugin/tex_LatexBox.vim
+
 setlocal iskeyword=@,48-57,_,.
 
 " Source scripts common to R, Rnoweb, Rhelp and Rdoc:
@@ -282,4 +283,10 @@ call RSourceOtherScripts()
 
 let &cpo = s:cpo_save
 unlet s:cpo_save
+
+if exists('b:undo_ftplugin')
+  let b:undo_ftplugin .= "|setl isk< | unlet! b:IsInRCode b:SourceLines b:PreviousRChunk b:NextRChunk b:SendChunkToR"
+else
+  let b:undo_ftplugin = "setl isk< | unlet! b:IsInRCode b:SourceLines b:PreviousRChunk b:NextRChunk b:SendChunkToR"
+endif
 
