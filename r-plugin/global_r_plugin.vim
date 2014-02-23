@@ -4,8 +4,6 @@ if exists("g:rplugin_failed")
     finish
 endif
 
-runtime r-plugin/common_buffer.vim
-
 " Default IsInRCode function when the plugin is used as a global plugin
 function! DefaultIsInRCode(vrb)
     return 1
