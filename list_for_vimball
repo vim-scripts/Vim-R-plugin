@@ -2,12 +2,17 @@ autoload/rcomplete.vim
 doc/r-plugin.txt
 ftdetect/r.vim
 ftplugin/r.vim
+ftplugin/r_rplugin.vim
 ftplugin/rbrowser.vim
 ftplugin/rdoc.vim
 ftplugin/rhelp.vim
+ftplugin/rhelp_rplugin.vim
 ftplugin/rmd.vim
+ftplugin/rmd_rplugin.vim
 ftplugin/rnoweb.vim
+ftplugin/rnoweb_rplugin.vim
 ftplugin/rrst.vim
+ftplugin/rrst_rplugin.vim
 indent/r.vim
 indent/rhelp.vim
 indent/rmd.vim

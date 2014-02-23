@@ -15,7 +15,7 @@ For Vim version 7.4
  5. Known bugs and workarounds                  |r-plugin-known-bugs|
  6. Options                                     |r-plugin-options|
  7. Custom key bindings                         |r-plugin-key-bindings|
- 8. Files                                       |r-plugin-files|
+ 8. License and files                           |r-plugin-files|
  9. FAQ and tips                                |r-plugin-tips|
 10. News                                        |r-plugin-news|
 
@@ -1710,11 +1710,26 @@ See also: |vimrplugin_source|.
 
 ==============================================================================
 							      *r-plugin-files*
-8. Files~
+8. License and files~
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+details.
+
+A copy of the GNU General Public License is available at
+http://www.r-project.org/Licenses/
+
+The files released with Vim runtime files are distributed under the Vim
+Charityware license.
 
 The following files are part of the plugin and should be in your ~/.vim
 directory after the installation:
-
 
    ftdetect/r.vim
    indent/r.vim
@@ -1724,12 +1739,17 @@ directory after the installation:
    indent/rhelp.vim
    autoload/rcomplete.vim
    ftplugin/r.vim
+   ftplugin/r_rplugin.vim
    ftplugin/rbrowser.vim
    ftplugin/rdoc.vim
    ftplugin/rhelp.vim
+   ftplugin/rhelp_rplugin.vim
    ftplugin/rmd.vim
+   ftplugin/rmd_rplugin.vim
    ftplugin/rrst.vim
+   ftplugin/rrst_rplugin.vim
    ftplugin/rnoweb.vim
+   ftplugin/rnoweb_rplugin.vim
    syntax/rout.vim
    syntax/r.vim
    syntax/rhelp.vim
@@ -2324,7 +2344,7 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-0.9.9.9 (2014-02-01)
+0.9.9.9 (2014-02-23)
 
  * Minor bug fixes.
  

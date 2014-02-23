@@ -59,12 +59,17 @@ deb:
 	  - doc/r-plugin.txt\n\
 	  - ftdetect/r.vim\n\
 	  - ftplugin/r.vim\n\
+	  - ftplugin/r_rplugin.vim\n\
 	  - ftplugin/rbrowser.vim\n\
 	  - ftplugin/rdoc.vim\n\
 	  - ftplugin/rhelp.vim\n\
+	  - ftplugin/rhelp_rplugin.vim\n\
 	  - ftplugin/rnoweb.vim\n\
+	  - ftplugin/rnoweb_rplugin.vim\n\
 	  - ftplugin/rmd.vim\n\
+	  - ftplugin/rmd_rplugin.vim\n\
 	  - ftplugin/rrst.vim\n\
+	  - ftplugin/rrst_rplugin.vim\n\
 	  - indent/r.vim\n\
 	  - indent/rnoweb.vim\n\
 	  - indent/rhelp.vim\n\

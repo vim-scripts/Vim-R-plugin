@@ -1,29 +1,10 @@
-"  This program is free software; you can redistribute it and/or modify
-"  it under the terms of the GNU General Public License as published by
-"  the Free Software Foundation; either version 2 of the License, or
-"  (at your option) any later version.
-"
-"  This program is distributed in the hope that it will be useful,
-"  but WITHOUT ANY WARRANTY; without even the implied warranty of
-"  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-"  GNU General Public License for more details.
-"
-"  A copy of the GNU General Public License is available at
-"  http://www.r-project.org/Licenses/
-
-"==========================================================================
-" ftplugin for R files
-"
-" Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
-"          Jose Claudio Faria
-"          
-"          Based on previous work by Johannes Ranke
-"
-" Please see doc/r-plugin.txt for usage details.
-"==========================================================================
+" Vim filetype plugin file
+" Language: R help file
+" Maintainer: Jakson Alves de Aquino <jalvesaq@gmail.com>
+" Last Change:	Sun Feb 23, 2014  04:06PM
 
 " Only do this when not yet done for this buffer
-if exists("b:did_ftplugin") || exists("disable_r_ftplugin")
+if exists("b:did_ftplugin")
     finish
 endif
 
@@ -35,49 +16,12 @@ set cpo&vim
 
 setlocal iskeyword=@,48-57,_,.
 
-" Source scripts common to R, Rnoweb, Rhelp and rdoc files:
-runtime r-plugin/common_global.vim
-if exists("g:rplugin_failed")
-    finish
+if has("gui_win32") && !exists("b:browsefilter")
+  let b:browsefilter = "R Source Files (*.R *.Rnw *.Rd *.Rmd *.Rrst)\t*.R;*.Rnw;*.Rd;*.Rmd;*.Rrst\n" .
+        \ "All Files (*.*)\t*.*\n"
 endif
 
-" Some buffer variables common to R, Rnoweb, Rhelp and rdoc file need be
-" defined after the global ones:
-runtime r-plugin/common_buffer.vim
+let b:undo_ftplugin = "setl isk< | unlet! b:browsefilter"
 
-function! RhelpIsInRCode(vrb)
-    let lastsec = search('^\\[a-z][a-z]*{', "bncW")
-    let secname = getline(lastsec)
-    if line(".") > lastsec && (secname =~ '^\\usage{' || secname =~ '^\\examples{' || secname =~ '^\\dontshow{' || secname =~ '^\\dontrun{' || secname =~ '^\\donttest{' || secname =~ '^\\testonly{')
-        return 1
-    else
-        if a:vrb
-            call RWarningMsg("Not inside an R section.")
-        endif
-        return 0
-    endif
-endfunction
-
-let b:IsInRCode = function("RhelpIsInRCode")
-let b:SourceLines = function("RSourceLines")
-
-"==========================================================================
-" Key bindings and menu items
-
-call RCreateStartMaps()
-call RCreateEditMaps()
-call RCreateSendMaps()
-call RControlMaps()
-call RCreateMaps("nvi", '<Plug>RSetwd',        'rd', ':call RSetWD()')
-
-" Menu R
-if has("gui_running")
-    call MakeRMenu()
-endif
-
-call RSourceOtherScripts()
-
-let b:undo_ftplugin = "setl isk< | unlet! b:IsInRCode b:SourceLines"
 let &cpo = s:cpo_save
 unlet s:cpo_save
-
