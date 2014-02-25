@@ -81,6 +81,7 @@ deb:
 	  - r-plugin/global_r_plugin.vim\n\
 	  - r-plugin/tex_indent.vim\n\
 	  - r-plugin/vimrconfig.vim\n\
+	  - r-plugin/functions.vim\n\
 	  - syntax/r.vim\n\
 	  - syntax/rdoc.vim\n\
 	  - syntax/rout.vim\n\

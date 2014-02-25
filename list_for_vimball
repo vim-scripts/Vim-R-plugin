@@ -27,6 +27,7 @@ r-plugin/tex_indent.vim
 r-plugin/vimcom.py
 r-plugin/vimrconfig.vim
 r-plugin/windows.py
+r-plugin/functions.vim
 syntax/r.vim
 syntax/rbrowser.vim
 syntax/rdoc.vim
