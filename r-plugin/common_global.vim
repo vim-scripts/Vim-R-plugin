@@ -3027,9 +3027,6 @@ command -nargs=? -complete=customlist,RLisObjs Rhelp :call RAskHelp(<q-args>)
 command -nargs=? -complete=dir RSourceDir :call RSourceDirectory(<q-args>)
 command RpluginConfig :runtime r-plugin/vimrconfig.vim
 
-" TODO: Delete these two commands (Nov 2013):
-command RUpdateObjList :call RWarningMsg("This command is deprecated. Now the list of objects is automatically updated by the R package vimcom.plus.")
-command -nargs=? RAddLibToList :call RWarningMsg("This command is deprecated. Now the list of objects is automatically updated by the R package vimcom.plus.")
 
 "==========================================================================
 " Global variables
@@ -3366,26 +3363,10 @@ if g:rplugin_home != g:rplugin_uservimfiles
     endif
 endif
 
-" If there is no functions.vim, copy the default one
-if !filereadable(g:rplugin_uservimfiles . "/r-plugin/functions.vim")
-    if filereadable("/usr/share/vim/addons/r-plugin/functions.vim")
-        let ffile = readfile("/usr/share/vim/addons/r-plugin/functions.vim")
-        call writefile(ffile, g:rplugin_uservimfiles . "/r-plugin/functions.vim")
-        unlet ffile
-    else
-        if g:rplugin_home != g:rplugin_uservimfiles && filereadable(g:rplugin_home . "/r-plugin/functions.vim")
-            let ffile = readfile(g:rplugin_home . "/r-plugin/functions.vim")
-            call writefile(ffile, g:rplugin_uservimfiles . "/r-plugin/functions.vim")
-            unlet ffile
-        endif
-    endif
-endif
-
 " Minimum width for the Object Browser
 if g:vimrplugin_objbr_w < 10
     let g:vimrplugin_objbr_w = 10
 endif
-
 
 " Control the menu 'R' and the tool bar buttons
 if !exists("g:rplugin_hasmenu")
