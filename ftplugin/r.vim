@@ -17,7 +17,7 @@ set cpo&vim
 setlocal iskeyword=@,48-57,_,.
 setlocal formatoptions-=t
 setlocal commentstring=#\ %s
-setlocal comments=:#,:##,:###,:#'
+setlocal comments=:#',:###,:##,:#
 
 if has("gui_win32") && !exists("b:browsefilter")
   let b:browsefilter = "R Source Files (*.R)\t*.R\n" .
