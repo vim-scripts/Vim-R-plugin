@@ -38,7 +38,16 @@ endfunction
 
 function SetExeCmd()
     runtime r-plugin/common_buffer.vim
-    if &filetype == "julia"
+    if exists("g:vimrplugin_exe") && exists("g:vimrplugin_quit")
+        let b:rplugin_R = g:vimrplugin_exe
+        if exists("g:vimrplugin_args")
+            let b:rplugin_r_args = g:vimrplugin_args
+        else
+            let b:rplugin_r_args = " "
+        endif
+        let b:quit_command = g:vimrplugin_quit
+        let b:SourceLines = function("SourceNotDefined")
+    elseif &filetype == "julia"
         let b:rplugin_R = "julia"
         let b:rplugin_r_args = " "
         let b:quit_command = "quit()"
