@@ -173,8 +173,7 @@ installation). You should, then, quit Vim.
 Note: If you need too install the plugin in a non default directory, do
 `:UseVimball` `[path]`. In this case, the configuration of Vim's 'runtimepath'
 must be done before the command "filetype on" in both the system and the user
-|vimrc| files, otherwise, you would have to create a symbolic link to
-`path/ftdetect/r.vim` into `~/.vim/ftdetect/r.vim`.
+|vimrc| files, otherwise, some file types might not be correctly recognized.
 
 Start Vim again and edit an R script. Type <LocalLeader>rf to start R and run
 the command below to get help configuring ~/.Rprofile, ~/.vimrc, ~/.tmux.conf,
@@ -252,8 +251,7 @@ installation). You should, then, quit Vim.
 Note: If you need too install the plugin in a non default directory, do
 `:UseVimball` `[path]`. In this case, the configuration of Vim's 'runtimepath'
 must be done before the command "filetype on" in both the system and the user
-|vimrc| files, otherwise, you would have to create a symbolic link to
-`path/ftdetect/r.vim` into `~/vimfiles/ftdetect/r.vim`.
+|vimrc| files, otherwise, some file types might not be correctly recognized.
 
 Start GVim again and edit an R script. You can right click a .R file and
 choose "Edit with Vim" or create a new one with the Normal mode command:
@@ -2055,17 +2053,24 @@ on top" or a similar option provided by your desktop manager.
 9.17. Turn the R-plugin into a global plugin (Linux/Unix only)~
 							     *r-plugin-global*
 The Vim-R-plugin is a file type plugin. If you want its functionality
-available for all file types, then go to your ~/.vim/plugin directory and
-create a symbolic link to ~/.vim/r-plugin/global_r_plugin.vim. That is, type
-the following in a terminal emulator:
+available for all file types, then put in your |vimrc|:
 >
-   cd ~/.vim/plugin/
-   ln -s ../r-plugin/global_r_plugin.vim
+   source path/to/Vim-R-plugin/r-plugin/global_r_plugin.vim
 <
 You will then be able to type <LocalLeader>rf to start and <LocalLeader>rq to
-quit different command line interpreters (Julia, Python, Haskell, Ruby and
-Lisp) and <LocalLeader>d, l, ss, bb, etc to send code to the interpreter.
-
+quit different command line interpreters and <LocalLeader>d, l, ss, bb, etc to
+send code to the interpreter. If you want support for a language other than
+Julia, Python, Haskell, Ruby and Lisp, you have to set the values of
+vimrplugin_exe and vimrplugin_quit as the example below does for Octave:
+>
+   let vimrplugin_exe = "octave"
+   let vimrplugin_quit = "quit"
+<
+If you use yet another interpreter, you will want to put the commands above in
+a Vim autocommand:
+>
+   autocmd BufNewFile,BufRead *.m let vimrplugin_exe = "octave" | let vimrplugin_quit = "quit"
+<
 
 9.18. Disable syntax highlight of R functions~
 
