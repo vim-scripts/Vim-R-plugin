@@ -64,6 +64,12 @@ function RWarningMsgInp(wmsg)
     let &shortmess = savedsm
 endfunction
 
+if v:version < 704
+    call RWarningMsgInp("The Vim-R-plugin requires Vim >= 7.4.")
+    let g:rplugin_failed = 1
+    finish
+endif
+
 " Set default value of some variables:
 function RSetDefaultValue(var, val)
     if !exists(a:var)
