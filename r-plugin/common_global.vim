@@ -1932,6 +1932,10 @@ function RFillLibList()
         call RUpdateFunSyntax(0)
         if &filetype != "r"
             silent exe "set filetype=" . &filetype
+            " Avoid E341 (Erro interno: lalloc(0, ))
+            if mode() == "n"
+                call feedkeys(":\<Esc>")
+            endif
         endif
     endif
 endfunction
