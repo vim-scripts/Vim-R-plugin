@@ -1948,12 +1948,6 @@ endfunction
 
 function SetRTextWidth()
     if !bufloaded(s:rdoctitle) || g:vimrplugin_newsize == 1
-        " Bug fix for Vim < 7.2.318
-        if !(has("win32") || has("win64"))
-            let curlang = v:lang
-            language C
-        endif
-
         let g:vimrplugin_newsize = 0
 
         " s:vimpager is used to calculate the width of the R help documentation
@@ -1992,9 +1986,6 @@ function SetRTextWidth()
         let htw = printf("%f", htwf)
         let g:rplugin_htw = substitute(htw, "\\..*", "", "")
         let g:rplugin_htw = g:rplugin_htw - (&number || &relativenumber) * &numberwidth
-        if !(has("win32") || has("win64"))
-            exe "language " . curlang
-        endif
     endif
 endfunction
 
@@ -3100,7 +3091,8 @@ endif
 
 " Old name of vimrplugin_assign option
 if exists("g:vimrplugin_underscore")
-    let g:vimrplugin_assign = g:vimrplugin_underscore
+    " 07/mar/2014:
+    call RWarningMsgInp("The option vimrplugin_underscore is deprecated. Use vimrplugin_assign instead.")
 endif
 
 " Variables whose default value is fixed
@@ -3163,18 +3155,13 @@ endfor
 unlet objbrplace
 unlet obpllen
 
-
-
-" python has priority over python3
+" python3 has priority over python
 if has("python3")
     command! -nargs=+ Py :py3 <args>
     command! -nargs=+ PyFile :py3file <args>
 elseif has("python")
     command! -nargs=+ Py :py <args>
     command! -nargs=+ PyFile :pyfile <args>
-elseif has("python3")
-    command! -nargs=+ Py :py3 <args>
-    command! -nargs=+ PyFile :py3file <args>
 else
     command! -nargs=+ Py :
     command! -nargs=+ PyFile :
@@ -3461,15 +3448,11 @@ autocmd BufLeave * if exists("b:rsource") | call delete(b:rsource) | endif
 
 let g:rplugin_firstbuffer = expand("%:p")
 let g:rplugin_running_objbr = 0
-let g:rplugin_has_new_lib = 0
-let g:rplugin_has_new_obj = 0
 let g:rplugin_ob_warn_shown = 0
 let g:rplugin_vimcomport = 0
 let g:rplugin_vimcom_pkg = "vimcom"
 let g:rplugin_lastrpl = ""
-let g:rplugin_ob_busy = 0
 let g:rplugin_hasRSFbutton = 0
-let g:rplugin_errlist = []
 let g:rplugin_tmuxsname = substitute("vimrplugin-" . g:rplugin_userlogin . localtime() . g:rplugin_firstbuffer, '\W', '', 'g')
 
 " If this is the Object Browser running in a Tmux pane, $VIMINSTANCEID is
@@ -3506,16 +3489,3 @@ else
     let g:rplugin_has_icons = len(globpath(&rtp, "bitmaps/RStart.png")) > 0
 endif
 
-" Compatibility with old versions (August 2013):
-if exists("g:vimrplugin_tmux")
-    call RWarningMsg("The option vimrplugin_tmux is deprecated and will be ignored.")
-endif
-if exists("g:vimrplugin_noscreenrc")
-    call RWarningMsg("The option vimrplugin_noscreenrc is deprecated and will be ignored.")
-endif
-if exists("g:vimrplugin_screenplugin")
-    call RWarningMsg("The option vimrplugin_screenplugin is deprecated and will be ignored.")
-endif
-if exists("g:vimrplugin_screenvsplit")
-    call RWarningMsg("The option vimrplugin_screenvsplit is deprecated. Please use vimrplugin_vsplit instead.")
-endif
