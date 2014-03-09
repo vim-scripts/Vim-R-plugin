@@ -3,12 +3,13 @@
 " functions should be highlighted even if R is not running. By default, the
 " functions of packages loaded by R --vanilla are highlighted.
 if !exists("g:vimrplugin_permanent_libs")
-    let g:vimrplugin_permanent_libs = "base,stats,graphics,grDevices,utils,datasets,methods"
+    let g:vimrplugin_permanent_libs = "base,stats,graphics,grDevices,utils,methods"
 endif
 
-" Store the names R package whose functions were already added to syntax
-" highlight to avoid sourcing them repeatedly.
-let b:rplugin_funls = []
+" Store the names of R package whose functions were already added to syntax
+" highlight to avoid sourcing them repeatedly. Initialize the list with two
+" libraries that don't have any visible function.
+let b:rplugin_funls = ["datasets", "setwidth"]
 
 " The function RUpdateFunSyntax() is called by the Vim-R-plugin whenever the
 " user loads a new package in R. The function should be defined only once.
