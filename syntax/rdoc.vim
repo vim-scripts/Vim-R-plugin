@@ -31,14 +31,14 @@ syn region rdocPackage start="^[A-Za-z]\S*::" end="[\s\r]" contains=rdocPackName
 syn match rdocPackName "^[A-Za-z][A-Za-z0-9\.]*" contained
 syn match rdocFuncName "::[A-Za-z0-9\.\-_]*" contained
 
-syn match rdocArgItems "\n\n.\{-}:" contains=rdocArg contained transparent
-
 syn region rdocArgReg matchgroup=rdocArgTitle start="^Arguments:" end="^[A-Z].*:$" contains=rdocArgItems,rdocArgTitle,rdocPackage,rdocFuncName,rdocStringS keepend transparent
+syn match rdocArgItems "\n\n.\{-}:" contains=rdocArg contained transparent
 syn match rdocArg "\([A-Z]\|[a-z]\|[0-9]\|\.\|_\)*" contained
-
 
 syn include @rdocR syntax/r.vim
 syn region rdocExample matchgroup=rdocExTitle start="^Examples:$" matchgroup=rdocExEnd end='^###$' contains=@rdocR keepend
+syn region rdocUsage matchgroup=rdocTitle start="^Usage:$" matchgroup=NONE end='^\t' contains=@rdocR
+
 
 " Define the default highlighting.
 "hi def link rdocArgReg Statement
