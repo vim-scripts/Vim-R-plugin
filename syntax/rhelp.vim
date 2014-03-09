@@ -2,7 +2,7 @@
 " Language:    R Help File
 " Maintainer: Jakson Aquino <jalvesaq@gmail.com>
 " Former Maintainer: Johannes Ranke <jranke@uni-bremen.de>
-" Last Change: Sat Nov 09, 2013  07:29PM
+" Last Change: Sat Mar 08, 2014  10:03PM
 " Remarks:     - Includes R syntax highlighting in the appropriate
 "                sections if an r.vim file is in the same directory or in the
 "                default debian location.
@@ -209,6 +209,8 @@ syn match rhelpError      /[)\]}]/
 syn match rhelpBraceError /[)}]/ contained
 syn match rhelpCurlyError /[)\]]/ contained
 syn match rhelpParenError /[\]}]/ contained
+
+syntax sync match rhelpSyncRcode grouphere rhelpRcode "\\examples{"
 
 " Define the default highlighting {{{1
 " For version 5.7 and earlier: only when not done already
