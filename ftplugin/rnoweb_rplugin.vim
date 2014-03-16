@@ -104,6 +104,14 @@ function! RMakePDF(bibtex, knit)
 
     if g:vimrplugin_openpdf == 0
         let pdfcmd = pdfcmd . ", view = FALSE"
+    else
+        if g:vimrplugin_openpdf == 1
+            if b:pdf_opened == 0
+                let b:pdf_opened = 1
+            else
+                let pdfcmd = pdfcmd . ", view = FALSE"
+            endif
+        endif
     endif
 
     if g:vimrplugin_openpdf_quietly
@@ -212,6 +220,8 @@ let b:SendChunkToR = function("RnwSendChunkToR")
 " Pointers to functions that must be different if the plugin is used as a
 " global one:
 let b:SourceLines = function("RSourceLines")
+
+let b:pdf_opened = 0
 
 
 "==========================================================================
