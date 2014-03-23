@@ -393,6 +393,7 @@ Send
   . Line (and new one)                                  \q
   . Left part of line (cur)                       \r<Left>
   . Right part of line (cur)                     \r<Right>
+  . Line (evaluate and insert the output as comment)    \o
 -----------------------------------------------------------
 
 Command
@@ -1616,6 +1617,7 @@ RD, "cursor down"; RED, both "echo" and "down"):
    RNRightPart
    RILeftPart
    RIRightPart
+   RDSendLineAndInsertOutput
 
    Send code to R console~
    RSendSelection
@@ -2346,7 +2348,12 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-1.0 (2014-03-07)
+1.0 (2014-03-23)
+
+ * vimrplugin_openpdf now accepts three values: 0, 1 and 2.
+
+ * New command \o sends evaluates line in R and inserts the output in the
+   script.
 
  * Minor bug fixes.
 

@@ -1234,7 +1234,7 @@ function RInsert(cmd)
     endif
 endfunction
 
-function SendLineToRAndInsertOutput ()
+function SendLineToRAndInsertOutput()
   let line = getline(".")
   call RInsert("print(" . line . ")")
   if g:rplugin_lastrpl == "R is busy." || g:rplugin_lastrpl == "UNKNOWN" || g:rplugin_lastrpl =~ "^Error" || g:rplugin_lastrpl == "INVALID" || g:rplugin_lastrpl == "ERROR" || g:rplugin_lastrpl == "EMPTY" || g:rplugin_lastrpl == "No reply"
@@ -2618,7 +2618,7 @@ function MakeRMenu()
     menu R.Send.-Sep6- <nul>
     call RCreateMenuItem("ni0", 'Send.Line', '<Plug>RSendLine', 'l', ':call SendLineToR("stay")')
     call RCreateMenuItem("ni0", 'Send.Line\ (and\ down)', '<Plug>RDSendLine', 'd', ':call SendLineToR("down")')
-    call RCreateMenuItem("ni0", 'Send.Line\ (and\ insert\ output)', '<Plug>RDSendLineAndInsertOutput', 'lo', ':call SendLineToRAndInsertOutput()')
+    call RCreateMenuItem("ni0", 'Send.Line\ (and\ insert\ output)', '<Plug>RDSendLineAndInsertOutput', 'o', ':call SendLineToRAndInsertOutput()')
     call RCreateMenuItem("i", 'Send.Line\ (and\ new\ one)', '<Plug>RSendLAndOpenNewOne', 'q', ':call SendLineToR("newline")')
     call RCreateMenuItem("n", 'Send.Left\ part\ of\ line\ (cur)', '<Plug>RNLeftPart', 'r<Left>', ':call RSendPartOfLine("left", 0)')
     call RCreateMenuItem("n", 'Send.Right\ part\ of\ line\ (cur)', '<Plug>RNRightPart', 'r<Right>', ':call RSendPartOfLine("right", 0)')
@@ -2946,7 +2946,7 @@ function RCreateSendMaps()
     "-------------------------------------
     call RCreateMaps("ni", '<Plug>RSendLine', 'l', ':call SendLineToR("stay")')
     call RCreateMaps('ni0', '<Plug>RDSendLine', 'd', ':call SendLineToR("down")')
-    call RCreateMaps('ni0', '<Plug>RDSendLineAndInsertOutput', 'lo', ':call SendLineToRAndInsertOutput()')
+    call RCreateMaps('ni0', '<Plug>RDSendLineAndInsertOutput', 'o', ':call SendLineToRAndInsertOutput()')
     call RCreateMaps('i', '<Plug>RSendLAndOpenNewOne', 'q', ':call SendLineToR("newline")')
     nmap <LocalLeader>r<Left> :call RSendPartOfLine("left", 0)<CR>
     nmap <LocalLeader>r<Right> :call RSendPartOfLine("right", 0)<CR>
