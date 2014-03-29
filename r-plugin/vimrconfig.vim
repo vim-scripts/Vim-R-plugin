@@ -235,8 +235,8 @@ function! RConfigVimrc()
     if RFindString(vlines, 'set\s*nocompatible') == 0 && RFindString(vlines, 'set\s*nocp') == 0
         let vlines += ['set nocompatible']
     endif
-    if RFindString(vlines, 'syntax\s*on') == 0
-        let vlines += ['syntax on']
+    if RFindString(vlines, 'syntax\s*on') == 0 && RFindString(vlines, 'syntax\s*enable') == 0
+        let vlines += ['syntax enable']
     endif
     if RFindString(vlines, 'filet.* plugin on') == 0
         let vlines += ['filetype plugin on']
