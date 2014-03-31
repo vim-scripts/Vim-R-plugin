@@ -1235,23 +1235,20 @@ function RInsert(cmd)
 endfunction
 
 function SendLineToRAndInsertOutput()
-  let line = getline(".")
-  call RInsert("print(" . line . ")")
-  if g:rplugin_lastrpl == "R is busy." || g:rplugin_lastrpl == "UNKNOWN" || g:rplugin_lastrpl =~ "^Error" || g:rplugin_lastrpl == "INVALID" || g:rplugin_lastrpl == "ERROR" || g:rplugin_lastrpl == "EMPTY" || g:rplugin_lastrpl == "No reply"
-    return
-  else
-    " comment the output
-    let lastLine = line("$")
-    let line = getline(".")
-    let i = line(".")
-    call cursor(i, 1)
-    while strlen(line) > 0 && i <= lastLine
-      call RSimpleCommentLine("normal", "c")
-      let i = line(".") + 1
-      call cursor(i, 1)
-      let line = substitute(getline("."), '^\s*', "", "")
-    endwhile
-  endif
+    let lin = getline(".")
+    call RInsert("print(" . lin . ")")
+    if g:rplugin_lastrpl == "R is busy." || g:rplugin_lastrpl == "UNKNOWN" || g:rplugin_lastrpl =~ "^Error" || g:rplugin_lastrpl == "INVALID" || g:rplugin_lastrpl == "ERROR" || g:rplugin_lastrpl == "EMPTY" || g:rplugin_lastrpl == "No reply"
+        return
+    else
+        let curpos = getpos(".")
+        " comment the output
+        let ilines = readfile(g:rplugin_esc_tmpdir . "/Rinsert")
+        for iln in ilines
+            call RSimpleCommentLine("normal", "c")
+            normal! j
+        endfor
+        call setpos(".", curpos)
+    endif
 endfunction
 
 " Function to send commands
