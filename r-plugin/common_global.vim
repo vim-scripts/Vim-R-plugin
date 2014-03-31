@@ -1930,9 +1930,25 @@ function RAddToLibList(nlib, verbose)
     endif
 endfunction
 
+function RCheckLibList()
+    if g:rplugin_newliblist
+        call RealRFillLibList()
+        let g:rplugin_newliblist = 0
+    endif
+endfunction
+
 " This function is called by the R package vimcom.plus whenever a library is
 " loaded.
 function RFillLibList()
+    if &filetype == "r"
+        call RealRFillLibList()
+    else
+        " Avoid E341 (Internal error: lalloc(0, ))
+        let g:rplugin_newliblist = 1
+    endif
+endfunction
+
+function RealRFillLibList()
     " Update the list of objects for omnicompletion
     if filereadable($VIMRPLUGIN_TMPDIR . "/libnames_" . $VIMINSTANCEID)
         let newls = readfile($VIMRPLUGIN_TMPDIR . "/libnames_" . $VIMINSTANCEID)
@@ -1955,10 +1971,6 @@ function RFillLibList()
         call RUpdateFunSyntax(0)
         if &filetype != "r"
             silent exe "set filetype=" . &filetype
-            " Avoid E341 (Erro interno: lalloc(0, ))
-            if mode() == "n"
-                call feedkeys(":\<Esc>")
-            endif
         endif
     endif
 endfunction
@@ -3467,6 +3479,7 @@ autocmd BufLeave * if exists("b:rsource") | call delete(b:rsource) | endif
 
 let g:rplugin_firstbuffer = expand("%:p")
 let g:rplugin_running_objbr = 0
+let g:rplugin_newliblist = 0
 let g:rplugin_ob_warn_shown = 0
 let g:rplugin_vimcomport = 0
 let g:rplugin_vimcom_pkg = "vimcom"
