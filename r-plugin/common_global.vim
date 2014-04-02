@@ -925,9 +925,8 @@ function StartObjBrowser_Tmux()
                 \ 'if has("clientserver") && v:servername != ""',
                 \ "   exe 'Py SendToVimCom(" . '"\007' . "' . v:servername . '" . '")' . "'",
                 \ 'endif',
-                \ 'Py SendToVimCom("\003GlobalEnv [OB init]")',
+                \ 'Py SendToVimCom("\001Update OB [OB init TMUX]")',
                 \ 'sleep 50m',
-                \ 'Py SendToVimCom("\004Libraries [OB init]")',
                 \ 'if v:servername == ""',
                 \ '    sleep 100m',
                 \ '    call UpdateOB("GlobalEnv")',
@@ -1052,8 +1051,8 @@ function StartObjBrowser_Vim()
         unlet g:tmp_tmuxsname
         unlet g:tmp_curbufname
         exe "PyFile " . substitute(g:rplugin_home, " ", '\\ ', "g") . "/r-plugin/vimcom.py"
-        Py SendToVimCom("\003GlobalEnv [StartObjBrowser_Vim]")
-        Py SendToVimCom("\004Libraries [StartObjBrowser_Vim]")
+        Py SendToVimCom("\001Update OB [OB init GVIM]")
+        sleep 50m
         call UpdateOB("GlobalEnv")
     endif
     if wmsg != ""
