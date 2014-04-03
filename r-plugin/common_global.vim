@@ -874,6 +874,7 @@ endfunction
 
 function ResetVimComPort()
     Py VimComPort = 0
+    let g:rplugin_vimcomport = 0
 endfunction
 
 function StartObjBrowser_Tmux()
@@ -920,7 +921,6 @@ function StartObjBrowser_Tmux()
                 \ 'set shortmess=atI',
                 \ 'set rulerformat=%3(%l%)',
                 \ 'set noruler',
-                \ 'exe "PyFile " . substitute(g:rplugin_home, " ", '. "'\\\\ '" . ', "g") . "/r-plugin/vimcom.py"',
                 \ 'let g:SendCmdToR = function("SendCmdToR_TmuxSplit")',
                 \ 'if has("clientserver") && v:servername != ""',
                 \ "   exe 'Py SendToVimCom(" . '"\007' . "' . v:servername . '" . '")' . "'",
@@ -1050,7 +1050,6 @@ function StartObjBrowser_Vim()
         unlet g:tmp_objbrtitle
         unlet g:tmp_tmuxsname
         unlet g:tmp_curbufname
-        exe "PyFile " . substitute(g:rplugin_home, " ", '\\ ', "g") . "/r-plugin/vimcom.py"
         Py SendToVimCom("\001Update OB [OB init GVIM]")
         sleep 50m
         call UpdateOB("GlobalEnv")
@@ -1093,11 +1092,6 @@ function RObjBrowser()
         else
             call StartObjBrowser_Vim()
         endif
-    endif
-    if exists("*UpdateOB")
-        Py SendToVimCom("\003GlobalEnv [RObjBrowser()]")
-        Py SendToVimCom("\004Libraries [RObjBrowser()]")
-        call UpdateOB("both")
     endif
     let g:rplugin_running_objbr = 0
     return

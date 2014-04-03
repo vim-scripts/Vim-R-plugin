@@ -30,10 +30,10 @@ def DiscoverVimComPort():
                 sock.settimeout(0.1)
                 sock.connect(sa)
                 if sys.hexversion < 0x03000000:
-                    sock.send("\002What port?")
+                    sock.send("\002What port [Python 2]?")
                     repl = sock.recv(1024)
                 else:
-                    sock.send("\002What port?".encode())
+                    sock.send("\002What port [Python 3]?".encode())
                     repl = sock.recv(1024).decode()
                 sock.close()
                 if repl.find(correct_repl):
@@ -89,7 +89,7 @@ def SendToVimCom(aString):
     if received is None:
         vim.command("let g:rplugin_lastrpl = 'NOANSWER'")
         VimComPort = 0
-        DiscoverVimComPort()
+        vim.command("let g:rplugin_vimcomport = 0")
     else:
         received = received.replace("'", "' . \"'\" . '")
         vim.command("let g:rplugin_lastrpl = '" + received + "'")
