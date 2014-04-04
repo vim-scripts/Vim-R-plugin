@@ -616,6 +616,9 @@ function StartR_TmuxSplit(rcmd)
         let g:vimrplugin_ca_ck = ca_ck
     endif
     let g:rplugin_last_rcmd = a:rcmd
+    if WaitVimComStart()
+        Py SendToVimCom("\001Update OB [StartR]")
+    endif
 endfunction
 
 
@@ -695,6 +698,9 @@ function StartR_ExternalTerm(rcmd)
         let $TMUX = tmuxenv
     endif
     let g:SendCmdToR = function('SendCmdToR_Term')
+    if WaitVimComStart()
+        Py SendToVimCom("\001Update OB [StartR]")
+    endif
 endfunction
 
 function StartR_Windows()
@@ -710,6 +716,7 @@ function StartR_Windows()
     Py StartRPy()
     lcd -
     let g:SendCmdToR = function('SendCmdToR_Windows')
+    call WaitVimComStart()
 endfunction
 
 function StartR_OSX()
@@ -732,6 +739,9 @@ function StartR_OSX()
     endif
     lcd -
     let g:SendCmdToR = function('SendCmdToR_OSX')
+    if WaitVimComStart()
+        Py SendToVimCom("\001Update OB [StartR]")
+    endif
 endfunction
 
 function IsSendCmdToRFake()
@@ -800,7 +810,10 @@ function StartR(whatr)
                 let g:vimrplugin_ca_ck = ca_ck
                 if IsExternalOBRunning()
                     call VimExprToOB('ResetVimComPort()')
-                    call WaitVimComStart()
+                    if WaitVimComStart()
+                        sleep 100m
+                        call g:SendCmdToR("\014")
+                    endif
                     exe 'Py SendToVimCom("\007' . g:rplugin_obsname . '")'
                     Py SendToVimCom("\003.GlobalEnv [Restarting R]")
                     Py SendToVimCom("\004Libraries [Restarting()]")
@@ -850,15 +863,52 @@ function StartR(whatr)
 endfunction
 
 function WaitVimComStart()
+    if g:vimrplugin_vimcom_wait < 0
+        return 0
+    endif
     sleep 300m
     let ii = 0
-    while !filereadable($VIMRPLUGIN_TMPDIR . "/vimcom_running") && ii < 20
-        let ii = ii + 1
+    let waitmsg = 0
+    while !filereadable($VIMRPLUGIN_TMPDIR . "/vimcom_running") && ii < g:vimrplugin_vimcom_wait
+        let ii = ii + 200
+        if ii == 1000
+            echo "Waiting vimcom.plus loading..."
+            let waitmsg = 1
+        endif
         sleep 200m
     endwhile
-    if filereadable($VIMRPLUGIN_TMPDIR . "/vimcom_running") && g:rplugin_tmuxwasfirst
-        sleep 100m
-        call g:SendCmdToR("\014")
+    if waitmsg
+        echon "\r                              "
+        redraw
+    endif
+    if filereadable($VIMRPLUGIN_TMPDIR . "/vimcom_running")
+        let vr = readfile($VIMRPLUGIN_TMPDIR . "/vimcom_running")
+        if vr[0] =~ "vimcom.plus"
+            let g:rplugin_vimcom_pkg = "vimcom.plus"
+        else
+            let g:rplugin_vimcom_pkg = "vimcom"
+        endif
+        if vr[2] == $VIMINSTANCEID
+            let g:rplugin_vimcom_version = vr[1]
+            if g:rplugin_vimcom_version != "1.0-0"
+                if g:rplugin_vimcom_pkg == "vimcom.plus"
+                    call RWarningMsg('This version of Vim-R-plugin requires vimcom.plus 1.0-0.')
+                else
+                    call RWarningMsg('This version of Vim-R-plugin requires vimcom.plus (or vimcom) 1.0-0.')
+                endif
+                sleep 1
+            endif
+        else
+            let g:rplugin_vimcom_version = 0
+            call RWarningMsg("Vim-R-plugin and vimcom.plus IDs don't match.")
+            sleep 1
+        endif
+        call delete($VIMRPLUGIN_TMPDIR . "/vimcom_running")
+        return 1
+    else
+        call RWarningMsg("The package vimcom.plus wasn't loaded yet.")
+        sleep 300m
+        return 0
     endif
 endfunction
 
@@ -1002,6 +1052,15 @@ function StartObjBrowser_Tmux()
 endfunction
 
 function StartObjBrowser_Vim()
+    if has("win32") || has("win64")
+	" The vimcom.plus server will stop working if starting the Object
+	" Browser is the first thing the user does.
+	if !exists("g:rplugin_liblist_filled")
+	    call RWarningMsg("Please, try again after sending at least one line of code to the R Console.!")
+	    return
+	endif
+    endif
+
     let wmsg = ""
     if v:servername == ""
         if g:rplugin_ob_warn_shown == 0
@@ -1966,6 +2025,7 @@ function RealRFillLibList()
             silent exe "set filetype=" . &filetype
         endif
     endif
+    let g:rplugin_liblist_filled = 1
 endfunction
 
 function SetRTextWidth()
@@ -3145,6 +3205,7 @@ call RSetDefaultValue("g:vimrplugin_editor_w",         66)
 call RSetDefaultValue("g:vimrplugin_help_w",           46)
 call RSetDefaultValue("g:vimrplugin_objbr_w",          40)
 call RSetDefaultValue("g:vimrplugin_external_ob",       0)
+call RSetDefaultValue("g:vimrplugin_vimcom_wait",    5000)
 call RSetDefaultValue("g:vimrplugin_show_args",         0)
 call RSetDefaultValue("g:vimrplugin_never_unmake_menu", 0)
 call RSetDefaultValue("g:vimrplugin_insert_mode_cmds",  1)
@@ -3476,6 +3537,7 @@ let g:rplugin_newliblist = 0
 let g:rplugin_ob_warn_shown = 0
 let g:rplugin_vimcomport = 0
 let g:rplugin_vimcom_pkg = "vimcom"
+let g:rplugin_vimcom_version = 0
 let g:rplugin_lastrpl = ""
 let g:rplugin_hasRSFbutton = 0
 let g:rplugin_tmuxsname = substitute("vimrplugin-" . g:rplugin_userlogin . localtime() . g:rplugin_firstbuffer, '\W', '', 'g')

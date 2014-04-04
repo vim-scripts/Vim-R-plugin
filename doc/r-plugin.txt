@@ -1033,6 +1033,7 @@ is running:
 |vimrplugin_source|            Source additional scripts
 |vimrplugin_restart|           Restart R if it is already running
 |vimrplugin_show_args|         Show extra information during omnicompletion
+|vimrplugin_vimcom_wait|       Time to wait for vimcom.plus loading
 
 
 6.1. Terminal emulator (Linux/Unix only)~
@@ -1565,6 +1566,27 @@ do omnicompletion, put in your |vimrc|:
 The preview window is not shown by default because it is more convenient to
 run <Ctrl-X><Ctrl-A> to complete the function arguments. The preview window
 will be shown only if "preview" is also included in your 'completeopt'.
+
+
+6.30. Time to wait for vimcom.plus loading~
+						      *vimrplugin_vimcom_wait*
+The Vim-R-plugin waits 5000 milliseconds for vimcom.plus (or vimcom) package
+to be loaded during R startup. It then checks whether you are using the
+correct version of vimcom.plus. On Unix, it also sends a message to R update
+the list of uploaded libraries and, then, immediately updates the syntax
+highlighting of function names. If 5000 milliseconds is not enough to your R
+startup, then set a higher value for the variable in your |vimrc|. Example:
+>
+   let vimrplugin_vimcom_wait = 10000
+<
+Note: You should have the line  `library(vimcom.plus)`  in your Rprofile. The
+Vim command  :RpluginConfig  adds that line for you.
+
+If you do not want to install the vimcom.plus (or vimcom) package, then put in
+your |vimrc|:
+>
+   let vimrplugin_vimcom_wait = -1
+<
 
 
 ==============================================================================
@@ -2348,12 +2370,14 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-1.0 (2014-04-02)
+1.0 (2014-04-04)
 
  * vimrplugin_openpdf now accepts three values: 0, 1 and 2.
 
  * New command \o sends evaluates line in R and inserts the output in the
    script.
+
+ * New option: vimrplugin_vimcom_wait.
 
  * Minor bug fixes.
 
