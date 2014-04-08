@@ -3,6 +3,7 @@ if exists("g:disable_r_ftplugin")
     finish
 endif
 
+let g:vimrplugin_assign = 0  "disable underscore assignment
 " Source scripts common to R, Rnoweb, Rhelp, Rmd, Rrst and rdoc files:
 runtime r-plugin/common_global.vim
 if exists("g:rplugin_failed")
