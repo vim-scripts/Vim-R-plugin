@@ -1466,7 +1466,7 @@ function SendMBlockToR(e, m)
         let lineB -= 1
     endif
     let lines = getline(lineA, lineB)
-    let ok = RSourceLines(lines, a:e)
+    let ok = SourceLines(lines, a:e)
     if ok == 0
         return
     endif
@@ -1535,7 +1535,7 @@ function SendFunctionToR(e, m)
     endif
 
     let lines = getline(firstline, lastline)
-    let ok = RSourceLines(lines, a:e)
+    let ok = b:SourceLines(lines, a:e)
     if  ok == 0
         return
     endif
@@ -1596,7 +1596,7 @@ function SendSelectionToR(e, m)
         let lines[llen] = strpart(lines[llen], 0, j)
     endif
 
-    let ok = RSourceLines(lines, a:e)
+    let ok = b:SourceLines(lines, a:e)
     if ok == 0
         return
     endif
@@ -1631,7 +1631,7 @@ function SendParagraphToR(e, m)
         endif
     endwhile
     let lines = getline(i, j)
-    let ok = RSourceLines(lines, a:e)
+    let ok = b:SourceLines(lines, a:e)
     if ok == 0
         return
     endif
@@ -1678,7 +1678,7 @@ function SendFHChunkToR()
             let idx += 1
         endif
     endwhile
-    call RSourceLines(codelines, "silent")
+    call b:SourceLines(codelines, "silent")
 endfunction
 
 " Send current line to R.
@@ -2609,8 +2609,8 @@ function MakeRMenu()
     " Send
     "----------------------------------------------------------------------------
     if &filetype == "r" || g:vimrplugin_never_unmake_menu
-        call RCreateMenuItem("ni", 'Send.File', '<Plug>RSendFile', 'aa', ':call SendFileToR("silent")')
-        call RCreateMenuItem("ni", 'Send.File\ (echo)', '<Plug>RESendFile', 'ae', ':call SendFileToR("echo")')
+        call RCreateMenuItem("ni", 'Send.File', '<Plug>RSendFile', 'aa', ':call SendFile("silent")')
+        call RCreateMenuItem("ni", 'Send.File\ (echo)', '<Plug>RESendFile', 'ae', ':call SendFile("echo")')
         call RCreateMenuItem("ni", 'Send.File\ (open\ \.Rout)', '<Plug>RShowRout', 'ao', ':call ShowRout()')
     endif
     "-------------------------------
