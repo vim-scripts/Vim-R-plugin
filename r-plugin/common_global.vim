@@ -612,6 +612,50 @@ function StartR_TmuxSplit(rcmd)
     let g:rplugin_last_rcmd = a:rcmd
 endfunction
 
+function StartJulia_TmuxSplit(juliacmd)
+    let g:rplugin_vim_pane = TmuxActivePane()
+    call system("tmux set-environment -g VIMRPLUGIN_TMPDIR " . g:rplugin_esc_tmpdir)
+    call system("tmux set-environment -g VIMRPLUGIN_HOME " . g:rplugin_home)
+    call system("tmux set-environment -g VIM_PANE " . g:rplugin_vim_pane)
+    if v:servername != ""
+        call system("tmux set-environment VIMEDITOR_SVRNM " . v:servername)
+    endif
+    call system("tmux set-environment VIMINSTANCEID " . $VIMINSTANCEID)
+    let tcmd = "tmux split-window "
+    if g:vimrplugin_vsplit
+        if g:vimrplugin_rconsole_width == -1
+            let tcmd .= "-h"
+        else
+            let tcmd .= "-h -l " . g:vimrplugin_rconsole_width
+        endif
+    else
+        let tcmd .= "-l " . g:vimrplugin_rconsole_height
+    endif
+    if !g:vimrplugin_restart
+        " Let Tmux automatically kill the panel when Julia quits.
+        let tcmd .= " '" . a:juliacmd . "'"
+    endif
+    let rlog = system(tcmd)
+    if v:shell_error
+        call RWarningMsg(rlog)
+        return
+    endif
+    let g:rplugin_rconsole_pane = TmuxActivePane()
+    let rlog = system("tmux select-pane -t " . g:rplugin_vim_pane)
+    if v:shell_error
+        call RWarningMsg(rlog)
+        return
+    endif
+    let g:SendCmdToR = function('SendCmdToR_TmuxSplit')
+    if g:vimrplugin_restart
+        sleep 200m
+        let ca_ck = g:vimrplugin_ca_ck
+        let g:vimrplugin_ca_ck = 0
+        call g:SendCmdToR(a:juliacmd)
+        let g:vimrplugin_ca_ck = ca_ck
+    endif
+    let g:rplugin_last_rcmd = a:juliacmd
+endfunction
 
 function StartR_ExternalTerm(rcmd)
     if $DISPLAY == ""
@@ -841,6 +885,15 @@ function StartR(whatr)
     " Go back to original directory:
     lcd -
     echon
+endfunction
+
+function StartJulia(whatjulia)
+    if g:rplugin_tmuxwasfirst
+        call StartJulia_TmuxSplit(a:whatjulia)
+    else
+        call RWarningMsg("Not implemented to start julia without tmux started first")
+    endif
+
 endfunction
 
 function WaitVimComStart()
@@ -2854,9 +2907,13 @@ endfunction
 function RCreateStartMaps()
     " Start
     "-------------------------------------
-    call RCreateMaps("nvi", '<Plug>RStart',        'rf', ':call StartR("R")')
-    call RCreateMaps("nvi", '<Plug>RVanillaStart', 'rv', ':call StartR("vanilla")')
-    call RCreateMaps("nvi", '<Plug>RCustomStart',  'rc', ':call StartR("custom")')
+    if &filetype=="r"
+        call RCreateMaps("nvi", '<Plug>RStart',        'rf', ':call StartR("R")')
+        call RCreateMaps("nvi", '<Plug>RVanillaStart', 'rv', ':call StartR("vanilla")')
+        call RCreateMaps("nvi", '<Plug>RCustomStart',  'rc', ':call StartR("custom")')
+    elseif &filetype=="julia"
+        call RCreateMaps("nvi", '<Plug>RStart',        'rf', ':call StartJulia("julia")')
+    endif
 
     " Close
     "-------------------------------------
