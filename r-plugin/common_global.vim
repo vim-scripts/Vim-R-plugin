@@ -576,7 +576,7 @@ endfunction
 function StartR_TmuxSplit(rcmd)
     let g:rplugin_vim_pane = TmuxActivePane()
     call system("tmux set-environment -g VIMRPLUGIN_TMPDIR " . g:rplugin_esc_tmpdir)
-    call system("tmux set-environment -g VIMRPLUGIN_HOME " . g:rplugin_home)
+    call system("tmux set-environment -g VIMRPLUGIN_HOME " . substitute(g:rplugin_home, ' ', '\\ ', "g"))
     call system("tmux set-environment -g VIM_PANE " . g:rplugin_vim_pane)
     if v:servername != ""
         call system("tmux set-environment VIMEDITOR_SVRNM " . v:servername)
@@ -631,7 +631,7 @@ function StartR_ExternalTerm(rcmd)
     " Create a custom tmux.conf
     let cnflines = [
                 \ 'set-environment -g VIMRPLUGIN_TMPDIR ' . g:rplugin_esc_tmpdir,
-                \ 'set-environment -g VIMRPLUGIN_HOME ' . g:rplugin_home,
+                \ 'set-environment -g VIMRPLUGIN_HOME ' . substitute(g:rplugin_home, ' ', '\\ ', "g"),
                 \ 'set-environment VIMINSTANCEID ' . $VIMINSTANCEID ]
     if v:servername != ""
         let cnflines = cnflines + [ 'set-environment VIMEDITOR_SVRNM ' . v:servername ]
@@ -661,7 +661,7 @@ function StartR_ExternalTerm(rcmd)
 	endif
 
     call system('export VIMRPLUGIN_TMPDIR=' . $VIMRPLUGIN_TMPDIR)
-    call system('export VIMRPLUGIN_HOME=' . g:rplugin_home)
+    call system('export VIMRPLUGIN_HOME=' . substitute(g:rplugin_home, ' ', '\\ ', "g"))
     call system('export VIMINSTANCEID=' . $VIMINSTANCEID)
     if v:servername != ""
         call system('export VIMEDITOR_SVRNM=' . v:servername)
@@ -3157,7 +3157,7 @@ if has("win32") || has("win64")
     endif
 endif
 
-let $VIMRPLUGIN_HOME = g:rplugin_home
+let $VIMRPLUGIN_HOME = substitute(g:rplugin_home, ' ', '\\ ', "g")
 if v:servername != ""
     let $VIMEDITOR_SVRNM = v:servername
 endif
