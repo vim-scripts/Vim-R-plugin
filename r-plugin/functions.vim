@@ -32,7 +32,7 @@ function RAddToFunList(lib, verbose)
     let fnf = split(globpath(&rtp, 'r-plugin/objlist/fun_' . a:lib . '_*'), "\n")
 
     if len(fnf) == 1
-        silent exe "source " . fnf[0]
+        silent exe "source " . substitute(fnf[0], ' ', '\\ ', "g")
         let b:rplugin_funls += [a:lib]
     elseif a:verbose && len(fnf) == 0
         echohl WarningMsg
