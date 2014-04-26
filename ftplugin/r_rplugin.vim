@@ -22,6 +22,10 @@ function! ShowRout()
         call delete(routfile)
     endif
 
+    if !exists("b:rplugin_R")
+        call SetRPath()
+    endif
+
     " if not silent, the user will have to type <Enter>
     silent update
     if has("win32") || has("win64")
