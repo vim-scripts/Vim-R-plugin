@@ -25,7 +25,7 @@ fun! rcomplete#CompleteR(findstart, base)
     endif
 
     if len(g:rplugin_liblist) == 0
-        call add(res, {'word': a:base, 'menu': " [ List is empty. Run  :RUpdateObjList ]"})
+        call add(res, {'word': a:base, 'menu': " [ List is empty. Did you load vimcom.plus package? ]"})
     endif
 
     let flines = g:rplugin_liblist + g:rplugin_globalenvlines
