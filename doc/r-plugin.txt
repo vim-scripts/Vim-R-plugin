@@ -115,6 +115,8 @@ Before installing the plugin, you should install its dependencies:
    Vim >= 7.4: http://www.vim.org/download.php
                In addition to the most commonly used features, the plugin
                requires: |+python| or |+python3|, |+clientserver| and |+conceal|. 
+	       Note: If you use Mac OS X, read about the bugs that affect
+	       MacVim: |r-plugin-macvim|.
 
    R >= 3.0.0: http://www.r-project.org/
 
@@ -584,6 +586,9 @@ highlighted only if their libraries are loaded by R (but see
 Note: If you have too many loaded packages Vim may be unable to load the list
 of functions for syntax highlight.
 
+Note: If you use Mac OS X, read about the bugs that affect MacVim:
+|r-plugin-macvim|.
+
 
 4.4. Omni completion~
 
@@ -602,15 +607,18 @@ omni completion will show the column names.
 
 Only the names of objects in .GlobalEnv and in loaded libraries are completed,
 and the |clientserver| feature is required to get the list of loaded libraries
-automatically updated. If Vim is running without the |clientserver| feature,
-only objects of libraries listed in |vimrplugin_permanent_libs| will have
-their names completed.
+automatically updated. If either R is not running or Vim is running without
+the |clientserver| feature, only objects of libraries listed in
+|vimrplugin_permanent_libs| will have their names completed.
 
 Vim uses one file to store the names of .GlobalEnv objects and a list of files
 for all other objects. The .GlobalEnv list is stored in the
 /tmp/r-plugin-yourlogin directory and is deleted when you quits Vim. The other
 files are stored in ~/.vim/r-plugin/objlist/ and remain available until you
 manually delete them.
+
+Note: If you use Mac OS X, read about the bugs that affect MacVim:
+|r-plugin-macvim|.
 
 
 4.5. The Object Browser~
@@ -631,10 +639,8 @@ have to explicitly start the server with the argument |--servername|.  To
 avoid having to type this argument every time that you start Vim, please look
 at the example in |r-plugin-bash-setup|.
 
-Note: On Mac OS X the Object Browser will not be automatically updated if you
-are using MacVim because the R package vimcom.plus has support only for
-Windows and X11 interprocess communication systems while MacVim is a Cocoa
-application.
+Note: If you use Mac OS X, read about the bugs that affect MacVim:
+|r-plugin-macvim|.
 
 In the .GlobalEnv view, if an object has the attribute "label", it will also
 be displayed. Please, see the R help for package vimcom.plus for some options
@@ -992,6 +998,21 @@ is running:
    let SendCmdToR = function('SendCmdToR_Windows')
 <
 
+5.7. Bugs that affect MacVim~
+							     *r-plugin-macvim*
+The R package vimcom.plus has support only for Windows and X11 interprocess
+communication systems while MacVim is a Cocoa application, that is,
+vimcom.plus is unable to send messages to MacVim. For the Vim-R-plugin,
+running MacVim is equivalent to running Vim without the |clientserver|
+feature, and the result are the following bugs:
+
+   * The Object Browser is not automatically updated.
+
+   * Syntax highlight of function names are not automatically updated when you
+     load a new R package and the omnicompletion may not work. For a
+     workaround, see |vimrplugin_permanent_libs|.
+
+
 ==============================================================================
 							    *r-plugin-options*
 6. Options~
@@ -1246,6 +1267,9 @@ of vimrplugin_permanent_libs:
 >
    let vimrplugin_permanent_libs = "base,stats,graphics,grDevices,utils,methods"
 <
+You may also want to define the value of vimrplugin_permanent_libs if you are
+running Vim without the |clientserver| feature.
+
 
 6.10. More colorful syntax highlight of .Rout files~
 						   *vimrplugin_routmorecolors*
@@ -2373,7 +2397,7 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-1.0 (2014-04-22)
+1.0 (2014-05-01)
 
  * vimrplugin_openpdf now accepts three values: 0, 1 and 2.
 
