@@ -578,7 +578,7 @@ function StartR_TmuxSplit(rcmd)
     call system("tmux set-environment -g VIMRPLUGIN_TMPDIR '" . $VIMRPLUGIN_TMPDIR . "'")
     call system("tmux set-environment -g VIMRPLUGIN_HOME '" . g:rplugin_home . "'")
     call system("tmux set-environment -g VIM_PANE " . g:rplugin_vim_pane)
-    if v:servername != ""
+    if v:servername != "" && !has("gui_macvim")
         call system("tmux set-environment VIMEDITOR_SVRNM " . v:servername)
     endif
     call system("tmux set-environment VIMINSTANCEID " . $VIMINSTANCEID)
@@ -633,7 +633,7 @@ function StartR_ExternalTerm(rcmd)
                 \ 'set-environment -g VIMRPLUGIN_TMPDIR "' . $VIMRPLUGIN_TMPDIR . '"',
                 \ 'set-environment -g VIMRPLUGIN_HOME "' . g:rplugin_home . '"',
                 \ 'set-environment VIMINSTANCEID ' . $VIMINSTANCEID ]
-    if v:servername != ""
+    if v:servername != "" && !has("gui_macvim")
         let cnflines = cnflines + [ 'set-environment VIMEDITOR_SVRNM ' . v:servername ]
     endif
     if g:vimrplugin_notmuxconf
@@ -663,7 +663,7 @@ function StartR_ExternalTerm(rcmd)
     call system('export VIMRPLUGIN_TMPDIR=' . $VIMRPLUGIN_TMPDIR)
     call system('export VIMRPLUGIN_HOME=' . substitute(g:rplugin_home, ' ', '\\ ', "g"))
     call system('export VIMINSTANCEID=' . $VIMINSTANCEID)
-    if v:servername != ""
+    if v:servername != "" && !has("gui_macvim")
         call system('export VIMEDITOR_SVRNM=' . v:servername)
     endif
     " Start the terminal emulator even if inside a Tmux session
@@ -881,6 +881,7 @@ function WaitVimComStart()
         echon "\r                              "
         redraw
     endif
+    sleep 100m
     if filereadable($VIMRPLUGIN_TMPDIR . "/vimcom_running")
         let vr = readfile($VIMRPLUGIN_TMPDIR . "/vimcom_running")
         if vr[0] =~ "vimcom.plus"
@@ -3158,7 +3159,7 @@ if has("win32") || has("win64")
 endif
 
 let $VIMRPLUGIN_HOME = substitute(g:rplugin_home, ' ', '\\ ', "g")
-if v:servername != ""
+if v:servername != "" && !has("gui_macvim")
     let $VIMEDITOR_SVRNM = v:servername
 endif
 
