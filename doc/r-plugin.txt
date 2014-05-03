@@ -115,8 +115,8 @@ Before installing the plugin, you should install its dependencies:
    Vim >= 7.4: http://www.vim.org/download.php
                In addition to the most commonly used features, the plugin
                requires: |+python| or |+python3|, |+clientserver| and |+conceal|. 
-	       Note: If you use Mac OS X, read about the bugs that affect
-	       MacVim: |r-plugin-macvim|.
+	       Note: If you use Mac OS X, read about the bugs that affect it:
+	       |r-plugin-mac|.
 
    R >= 3.0.0: http://www.r-project.org/
 
@@ -586,8 +586,7 @@ highlighted only if their libraries are loaded by R (but see
 Note: If you have too many loaded packages Vim may be unable to load the list
 of functions for syntax highlight.
 
-Note: If you use Mac OS X, read about the bugs that affect MacVim:
-|r-plugin-macvim|.
+Note: If you use Mac OS X, read about the bugs that affect it: |r-plugin-mac|.
 
 
 4.4. Omni completion~
@@ -617,8 +616,7 @@ for all other objects. The .GlobalEnv list is stored in the
 files are stored in ~/.vim/r-plugin/objlist/ and remain available until you
 manually delete them.
 
-Note: If you use Mac OS X, read about the bugs that affect MacVim:
-|r-plugin-macvim|.
+Note: If you use Mac OS X, read about the bugs that affect it: |r-plugin-mac|.
 
 
 4.5. The Object Browser~
@@ -639,8 +637,7 @@ have to explicitly start the server with the argument |--servername|.  To
 avoid having to type this argument every time that you start Vim, please look
 at the example in |r-plugin-bash-setup|.
 
-Note: If you use Mac OS X, read about the bugs that affect MacVim:
-|r-plugin-macvim|.
+Note: If you use Mac OS X, read about the bugs that affect it: |r-plugin-mac|.
 
 In the .GlobalEnv view, if an object has the attribute "label", it will also
 be displayed. Please, see the R help for package vimcom.plus for some options
@@ -998,19 +995,26 @@ is running:
    let SendCmdToR = function('SendCmdToR_Windows')
 <
 
-5.7. Bugs that affect MacVim~
-							     *r-plugin-macvim*
+5.7. Bugs that affect Mac OS X~
+								*r-plugin-mac*
 The R package vimcom.plus has support only for Windows and X11 interprocess
 communication systems while MacVim is a Cocoa application, that is,
-vimcom.plus is unable to send messages to MacVim. For the Vim-R-plugin,
-running MacVim is equivalent to running Vim without the |clientserver|
-feature, and the result are the following bugs:
+vimcom.plus is unable to send messages to MacVim. For vimcom.plus, running
+MacVim is equivalent to running Vim without the |clientserver| feature, and
+the result are the following bugs:
 
    * The Object Browser is not automatically updated.
 
    * Syntax highlight of function names are not automatically updated when you
      load a new R package and the omnicompletion may not work. For a
      workaround, see |vimrplugin_permanent_libs|.
+
+To get omnicompletion, syntax highlight of function names and the Object
+Browser working properly, in addition to using Vim built with X11 support, and
+not MacVim, you also have to install XQuartz server (X11.app).
+
+If you need to access an Unix remote machine through ssh, X11 forwarding must
+be enabled in the remote machine.
 
 
 ==============================================================================
