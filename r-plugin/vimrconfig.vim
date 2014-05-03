@@ -80,13 +80,10 @@ function! RConfigRprofile()
                             \ "        options(editor = '" . 'gvim -f -c "set ft=r"' . "')",
                             \ '    else',
                             \ "        options(editor = '" . 'vim -c "set ft=r"' . "')",
+                            \ '    # Choose the colors for R output among 256 options.',
+                            \ '    # You should run show256Colors() and help(setOutputColors256) to',
+                            \ '    # know how to change the colors according to your taste.',
                             \ '    library(colorout)',
-                            \ '    if(Sys.getenv("TERM") != "linux" && Sys.getenv("TERM") != ""){',
-                            \ '        # Choose the colors for R output among 256 options.',
-                            \ '        # You should run show256Colors() and help(setOutputColors256) to',
-                            \ '        # know how to change the colors according to your taste:',
-                            \ '        setOutputColors256(verbose = FALSE)',
-                            \ '    }',
                             \ '    library(setwidth)']
             endif
             let rpflines += ['    library(vimcom.plus)']
