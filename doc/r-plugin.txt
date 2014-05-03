@@ -838,7 +838,15 @@ support in Tmux. You will be able to toggle mouse support on and off by typing
 <
 
 4.8.2 Remote access~
-
+							     *r-plugin-remote*
+If you need to access Vim in a remote Unix machine through ssh, you must
+enable X11 Forwarding in the server to get omnicompletion, syntax highlight of
+function names and the Object Browser working properly. Then, you should pass
+either the `-X` or the `-Y` argument to ssh, as in the examples below:
+>
+    ssh -X yourlogin@remote.address
+    ssh -Y yourlogin@remote.address
+<
 With Tmux, you can detach the Vim-R session and reattach it latter. This is
 useful if you plan to begin the use the Vim-R-plugin in a machine and latter
 move to another computer and access remotely your previous Vim-R session.
@@ -1013,8 +1021,7 @@ To get omnicompletion, syntax highlight of function names and the Object
 Browser working properly, in addition to using Vim built with X11 support, and
 not MacVim, you also have to install XQuartz server (X11.app).
 
-If you need to access an Unix remote machine through ssh, X11 forwarding must
-be enabled in the remote machine.
+See also: |r-plugin-remote|.
 
 
 ==============================================================================
