@@ -479,6 +479,11 @@ you want to see what lines are being sourced when sending a selection of
 lines, you should do either <LocalLeader>se or <LocalLeader>sa instead of
 <LocalLeader>ss.
 
+If the cursor is over the header of an R chunk with the `child` option (from
+Rnoweb, RMarkdown or RreStructuredText document), and you use one of the
+commands that send a single line of code to R, then the plugin will send to R
+the command to knit the child document.
+
 After the commands that send, sweave or knit the current buffer, Vim will save
 the current buffer if it has any pending changes before performing the tasks.
 After <LocalLeader>ao, Vim will run "R CMD BATCH --no-restore --no-save" on

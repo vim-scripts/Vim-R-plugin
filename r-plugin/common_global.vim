@@ -1705,6 +1705,21 @@ function SendFHChunkToR()
     call b:SourceLines(codelines, "silent")
 endfunction
 
+function KnitChild(line, godown)
+    let nline = substitute(a:line, '.*child *= *', "", "")
+    let cfile = substitute(nline, nline[0], "", "")
+    let cfile = substitute(cfile, nline[0] . '.*', "", "")
+    if filereadable(cfile)
+        let ok = g:SendCmdToR("require(knitr); knit('" . cfile . "')")
+        if a:godown =~ "down"
+            call cursor(line(".")+1, 1)
+            call GoDown()
+        endif
+    else
+        call RWarningMsg("File not found: '" . cfile . "'")
+    endif
+endfunction
+
 " Send current line to R.
 function SendLineToR(godown)
     let line = getline(".")
@@ -1722,6 +1737,10 @@ function SendLineToR(godown)
             endif
             return
         endif
+        if line =~ "^<<.*child *= *"
+            call KnitChild(line, a:godown)
+            return
+        endif
         if RnwIsInRCode(1) == 0
             return
         endif
@@ -1732,6 +1751,10 @@ function SendLineToR(godown)
             if a:godown =~ "down"
                 call GoDown()
             endif
+            return
+        endif
+        if line =~ "^```.*child *= *"
+            call KnitChild(line, a:godown)
             return
         endif
         let line = substitute(line, "^\\`\\`\\?", "", "")
@@ -1745,6 +1768,10 @@ function SendLineToR(godown)
             if a:godown =~ "down"
                 call GoDown()
             endif
+            return
+        endif
+        if line =~ "^\.\. {r.*child *= *"
+            call KnitChild(line, a:godown)
             return
         endif
         let line = substitute(line, "^\\.\\. \\?", "", "")
