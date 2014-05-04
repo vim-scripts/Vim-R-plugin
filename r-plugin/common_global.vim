@@ -1710,7 +1710,7 @@ function KnitChild(line, godown)
     let cfile = substitute(nline, nline[0], "", "")
     let cfile = substitute(cfile, nline[0] . '.*', "", "")
     if filereadable(cfile)
-        let ok = g:SendCmdToR("require(knitr); knit('" . cfile . "')")
+        let ok = g:SendCmdToR("require(knitr); knit('" . cfile . "', output=tempfile())")
         if a:godown =~ "down"
             call cursor(line(".")+1, 1)
             call GoDown()
