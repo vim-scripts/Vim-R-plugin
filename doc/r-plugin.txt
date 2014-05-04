@@ -932,8 +932,16 @@ indent the code below:
             paste(labels, seq_along(levels), sep = "")
     class(x) <- c(if(ordered) "ordered", "factor")
 <
+See: https://github.com/jcfaria/Vim-R-plugin/issues/77
 
-5.5. Wrong message that "R is busy" (Windows only)~
+
+5.5. Functions are not always correctly sent to R~
+
+The plugin is only capable of recognizing functions defined using the <-
+operator. See: https://github.com/jcfaria/Vim-R-plugin/issues/94
+
+
+5.6. Wrong message that "R is busy" (Windows only)~
 
 On Windows, when code is sent from Vim to R Console, the vimcom.plus library
 sets the value of the internal variable `r_is_busy` to 1. The value is set
@@ -947,7 +955,28 @@ tell Vim that "R is busy" and Vim will display this message. Everything should
 work as expected again after any valid code is executed in the R Console.
 
 
-5.6. R must be started by Vim~
+5.7. Bugs that affect Mac OS X~
+								*r-plugin-mac*
+The R package vimcom.plus has support only for Windows and X11 interprocess
+communication systems while MacVim is a Cocoa application, that is,
+vimcom.plus is unable to send messages to MacVim. For vimcom.plus, running
+MacVim is equivalent to running Vim without the |clientserver| feature, and
+the result are the following bugs:
+
+   * The Object Browser is not automatically updated.
+
+   * Syntax highlight of function names are not automatically updated when you
+     load a new R package and the omnicompletion may not work. For a
+     workaround, see |vimrplugin_permanent_libs|.
+
+To get omnicompletion, syntax highlight of function names and the Object
+Browser working properly, in addition to using Vim built with X11 support, and
+not MacVim, you also have to install XQuartz server (X11.app).
+
+See also: |r-plugin-remote|.
+
+
+5.8. R must be started by Vim~
 
 The communication between Vim and R will work only if R was started by Vim
 through the <LocalLeader>rf command because the plugin was designed to connect
@@ -1007,27 +1036,6 @@ is running:
    let SendCmdToR = function('SendCmdToR_OSX')
    let SendCmdToR = function('SendCmdToR_Windows')
 <
-
-5.7. Bugs that affect Mac OS X~
-								*r-plugin-mac*
-The R package vimcom.plus has support only for Windows and X11 interprocess
-communication systems while MacVim is a Cocoa application, that is,
-vimcom.plus is unable to send messages to MacVim. For vimcom.plus, running
-MacVim is equivalent to running Vim without the |clientserver| feature, and
-the result are the following bugs:
-
-   * The Object Browser is not automatically updated.
-
-   * Syntax highlight of function names are not automatically updated when you
-     load a new R package and the omnicompletion may not work. For a
-     workaround, see |vimrplugin_permanent_libs|.
-
-To get omnicompletion, syntax highlight of function names and the Object
-Browser working properly, in addition to using Vim built with X11 support, and
-not MacVim, you also have to install XQuartz server (X11.app).
-
-See also: |r-plugin-remote|.
-
 
 ==============================================================================
 							    *r-plugin-options*
