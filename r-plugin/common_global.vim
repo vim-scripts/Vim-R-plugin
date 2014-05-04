@@ -2018,6 +2018,13 @@ function RCheckLibList()
     endif
 endfunction
 
+function RCheckLibListFile()
+    if filereadable($VIMRPLUGIN_TMPDIR . "/libnames_" . $VIMINSTANCEID)
+        call RealRFillLibList()
+        call delete($VIMRPLUGIN_TMPDIR . "/libnames_" . $VIMINSTANCEID)
+    endif
+endfunction
+
 " This function is called by the R package vimcom.plus whenever a library is
 " loaded.
 function RFillLibList()

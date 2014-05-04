@@ -115,8 +115,8 @@ Before installing the plugin, you should install its dependencies:
    Vim >= 7.4: http://www.vim.org/download.php
                In addition to the most commonly used features, the plugin
                requires: |+python| or |+python3|, |+clientserver| and |+conceal|. 
-	       Note: If you use Mac OS X, read about the bugs that affect it:
-	       |r-plugin-mac|.
+	       Note: If you use either Mac OS X, read about the bugs that affect it:
+	       |r-plugin-nox|.
 
    R >= 3.0.0: http://www.r-project.org/
 
@@ -184,8 +184,8 @@ and ~/.bashrc (the <LocalLeader> is `\` by default):
    :RpluginConfig
 <
 The above command will guide you through the final configuration steps, but
-if you prefer to configure everything by yourself, please, read the section
-|r-plugin-quick-setup|.
+if you prefer to configure everything by yourself, please, read the sections
+|r-plugin-nox| and |r-plugin-quick-setup|.
 
 If you start either GVim or Vim in a terminal emulator the plugin will start R
 in a external terminal emulator. If you start Vim inside of a Tmux session,
@@ -591,7 +591,7 @@ highlighted only if their libraries are loaded by R (but see
 Note: If you have too many loaded packages Vim may be unable to load the list
 of functions for syntax highlight.
 
-Note: If you use Mac OS X, read about the bugs that affect it: |r-plugin-mac|.
+Note: If you use Mac OS X, read about the bugs that affect it: |r-plugin-nox|.
 
 
 4.4. Omni completion~
@@ -621,7 +621,7 @@ for all other objects. The .GlobalEnv list is stored in the
 files are stored in ~/.vim/r-plugin/objlist/ and remain available until you
 manually delete them.
 
-Note: If you use Mac OS X, read about the bugs that affect it: |r-plugin-mac|.
+Note: If you use Mac OS X, read about the bugs that affect it: |r-plugin-nox|.
 
 
 4.5. The Object Browser~
@@ -642,7 +642,7 @@ have to explicitly start the server with the argument |--servername|.  To
 avoid having to type this argument every time that you start Vim, please look
 at the example in |r-plugin-bash-setup|.
 
-Note: If you use Mac OS X, read about the bugs that affect it: |r-plugin-mac|.
+Note: If you use Mac OS X, read about the bugs that affect it: |r-plugin-nox|.
 
 In the .GlobalEnv view, if an object has the attribute "label", it will also
 be displayed. Please, see the R help for package vimcom.plus for some options
@@ -955,23 +955,30 @@ tell Vim that "R is busy" and Vim will display this message. Everything should
 work as expected again after any valid code is executed in the R Console.
 
 
-5.7. Bugs that affect Mac OS X~
-								*r-plugin-mac*
-The R package vimcom.plus has support only for Windows and X11 interprocess
-communication systems while MacVim is a Cocoa application, that is,
-vimcom.plus is unable to send messages to MacVim. For vimcom.plus, running
-MacVim is equivalent to running Vim without the |clientserver| feature, and
-the result are the following bugs:
+5.7. Bugs that affect Mac OS X and Linux Console~
+								*r-plugin-nox*
+If you either run Vim in the Linux Console or start Vim in a terminal emulator
+without the command line argument |--servername|, Vim will not receive remote
+messages. The R package vimcom.plus has support only for Windows and X11
+interprocess communication systems while MacVim is a Cocoa application, that
+is, vimcom.plus is unable to send messages to MacVim too. For vimcom.plus,
+running MacVim is equivalent to running Vim without the |clientserver|
+feature.
 
-   * The Object Browser is not automatically updated.
+When Vim cannot receive messages, the result is:
 
-   * Syntax highlight of function names are not automatically updated when you
-     load a new R package and the omnicompletion may not work. For a
-     workaround, see |vimrplugin_permanent_libs|.
+   * The Object Browser is not automatically updated. You have to do
+     <LocalLeader>ro to update it manually.
+
+   * Syntax highlight of function names and the list of objects for
+     omnicompletion are not immediately updated after you load a new R
+     package. They are updated only after the |CursorHold| event is triggered,
+     that is, after you stay 'updatetime' milliseconds in Normal mode doing
+     nothing. For a workaround, see |vimrplugin_permanent_libs|.
 
 To get omnicompletion, syntax highlight of function names and the Object
 Browser working properly, in addition to using Vim built with X11 support, and
-not MacVim, you also have to install XQuartz server (X11.app).
+not MacVim, on Mac OS X, you also have to install XQuartz server (X11.app).
 
 See also: |r-plugin-remote|.
 
