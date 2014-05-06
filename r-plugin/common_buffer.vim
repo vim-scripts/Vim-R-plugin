@@ -72,11 +72,18 @@ if !exists("g:SendCmdToR")
     let g:SendCmdToR = function('SendCmdToR_fake')
 endif
 
-if &filetype != "r"
-    autocmd CursorMoved <buffer> call RCheckLibList()
-    if g:vimrplugin_insert_mode_cmds == 1
-        autocmd CursorMovedI <buffer> call RCheckLibList()
+if &filetype != "rbrowser"
+    if v:servername == "" || has("gui_macvim")
+        autocmd CursorHold <buffer> call RCheckLibListFile()
+    else
+        if &filetype != "r"
+            autocmd CursorMoved <buffer> call RCheckLibList()
+            if g:vimrplugin_insert_mode_cmds == 1
+                autocmd CursorMovedI <buffer> call RCheckLibList()
+            endif
+        endif
     endif
 endif
+
 
 

@@ -115,6 +115,8 @@ Before installing the plugin, you should install its dependencies:
    Vim >= 7.4: http://www.vim.org/download.php
                In addition to the most commonly used features, the plugin
                requires: |+python| or |+python3|, |+clientserver| and |+conceal|. 
+	       Note: If you use either Mac OS X, read about the bugs that affect it:
+	       |r-plugin-nox|.
 
    R >= 3.0.0: http://www.r-project.org/
 
@@ -182,8 +184,8 @@ and ~/.bashrc (the <LocalLeader> is `\` by default):
    :RpluginConfig
 <
 The above command will guide you through the final configuration steps, but
-if you prefer to configure everything by yourself, please, read the section
-|r-plugin-quick-setup|.
+if you prefer to configure everything by yourself, please, read the sections
+|r-plugin-nox| and |r-plugin-quick-setup|.
 
 If you start either GVim or Vim in a terminal emulator the plugin will start R
 in a external terminal emulator. If you start Vim inside of a Tmux session,
@@ -483,6 +485,11 @@ you want to see what lines are being sourced when sending a selection of
 lines, you should do either <LocalLeader>se or <LocalLeader>sa instead of
 <LocalLeader>ss.
 
+If the cursor is over the header of an R chunk with the `child` option (from
+Rnoweb, RMarkdown or RreStructuredText document), and you use one of the
+commands that send a single line of code to R, then the plugin will send to R
+the command to knit the child document.
+
 After the commands that send, sweave or knit the current buffer, Vim will save
 the current buffer if it has any pending changes before performing the tasks.
 After <LocalLeader>ao, Vim will run "R CMD BATCH --no-restore --no-save" on
@@ -590,6 +597,8 @@ highlighted only if their libraries are loaded by R (but see
 Note: If you have too many loaded packages Vim may be unable to load the list
 of functions for syntax highlight.
 
+Note: If you use Mac OS X, read about the bugs that affect it: |r-plugin-nox|.
+
 
 4.4. Omni completion~
 
@@ -608,15 +617,17 @@ omni completion will show the column names.
 
 Only the names of objects in .GlobalEnv and in loaded libraries are completed,
 and the |clientserver| feature is required to get the list of loaded libraries
-automatically updated. If Vim is running without the |clientserver| feature,
-only objects of libraries listed in |vimrplugin_permanent_libs| will have
-their names completed.
+automatically updated. If either R is not running or Vim is running without
+the |clientserver| feature, only objects of libraries listed in
+|vimrplugin_permanent_libs| will have their names completed.
 
 Vim uses one file to store the names of .GlobalEnv objects and a list of files
 for all other objects. The .GlobalEnv list is stored in the
 /tmp/r-plugin-yourlogin directory and is deleted when you quits Vim. The other
 files are stored in ~/.vim/r-plugin/objlist/ and remain available until you
 manually delete them.
+
+Note: If you use Mac OS X, read about the bugs that affect it: |r-plugin-nox|.
 
 
 4.5. The Object Browser~
@@ -637,10 +648,7 @@ have to explicitly start the server with the argument |--servername|.  To
 avoid having to type this argument every time that you start Vim, please look
 at the example in |r-plugin-bash-setup|.
 
-Note: On Mac OS X the Object Browser will not be automatically updated if you
-are using MacVim because the R package vimcom.plus has support only for
-Windows and X11 interprocess communication systems while MacVim is a Cocoa
-application.
+Note: If you use Mac OS X, read about the bugs that affect it: |r-plugin-nox|.
 
 In the .GlobalEnv view, if an object has the attribute "label", it will also
 be displayed. Please, see the R help for package vimcom.plus for some options
@@ -841,7 +849,15 @@ support in Tmux. You will be able to toggle mouse support on and off by typing
 <
 
 4.8.2 Remote access~
-
+							     *r-plugin-remote*
+If you need to access Vim in a remote Unix machine through ssh, you must
+enable X11 Forwarding in the server to get omnicompletion, syntax highlight of
+function names and the Object Browser working properly. Then, you should pass
+either the `-X` or the `-Y` argument to ssh, as in the examples below:
+>
+    ssh -X yourlogin@remote.address
+    ssh -Y yourlogin@remote.address
+<
 With Tmux, you can detach the Vim-R session and reattach it latter. This is
 useful if you plan to begin the use the Vim-R-plugin in a machine and latter
 move to another computer and access remotely your previous Vim-R session.
@@ -922,8 +938,16 @@ indent the code below:
             paste(labels, seq_along(levels), sep = "")
     class(x) <- c(if(ordered) "ordered", "factor")
 <
+See: https://github.com/jcfaria/Vim-R-plugin/issues/77
 
-5.5. Wrong message that "R is busy" (Windows only)~
+
+5.5. Functions are not always correctly sent to R~
+
+The plugin is only capable of recognizing functions defined using the <-
+operator. See: https://github.com/jcfaria/Vim-R-plugin/issues/94
+
+
+5.6. Wrong message that "R is busy" (Windows only)~
 
 On Windows, when code is sent from Vim to R Console, the vimcom.plus library
 sets the value of the internal variable `r_is_busy` to 1. The value is set
@@ -937,7 +961,35 @@ tell Vim that "R is busy" and Vim will display this message. Everything should
 work as expected again after any valid code is executed in the R Console.
 
 
-5.6. R must be started by Vim~
+5.7. Bugs that affect Mac OS X and Linux Console~
+								*r-plugin-nox*
+If you either run Vim in the Linux Console or start Vim in a terminal emulator
+without the command line argument |--servername|, Vim will not receive remote
+messages. The R package vimcom.plus has support only for Windows and X11
+interprocess communication systems while MacVim is a Cocoa application, that
+is, vimcom.plus is unable to send messages to MacVim too. For vimcom.plus,
+running MacVim is equivalent to running Vim without the |clientserver|
+feature.
+
+When Vim cannot receive messages, the result is:
+
+   * The Object Browser is not automatically updated. You have to do
+     <LocalLeader>ro to update it manually.
+
+   * Syntax highlight of function names and the list of objects for
+     omnicompletion are not immediately updated after you load a new R
+     package. They are updated only after the |CursorHold| event is triggered,
+     that is, after you stay 'updatetime' milliseconds in Normal mode doing
+     nothing. For a workaround, see |vimrplugin_permanent_libs|.
+
+To get omnicompletion, syntax highlight of function names and the Object
+Browser working properly, in addition to using Vim built with X11 support, and
+not MacVim, on Mac OS X, you also have to install XQuartz server (X11.app).
+
+See also: |r-plugin-remote|.
+
+
+5.8. R must be started by Vim~
 
 The communication between Vim and R will work only if R was started by Vim
 through the <LocalLeader>rf command because the plugin was designed to connect
@@ -1252,6 +1304,9 @@ of vimrplugin_permanent_libs:
 >
    let vimrplugin_permanent_libs = "base,stats,graphics,grDevices,utils,methods"
 <
+You may also want to define the value of vimrplugin_permanent_libs if you are
+running Vim without the |clientserver| feature.
+
 
 6.10. More colorful syntax highlight of .Rout files~
 						   *vimrplugin_routmorecolors*
@@ -2379,7 +2434,7 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-1.0 (2014-04-22)
+1.0 (2014-05-01)
 
  * vimrplugin_openpdf now accepts three values: 0, 1 and 2.
 
