@@ -3413,7 +3413,7 @@ if has("win32") || has("win64")
         finish
     endif
     if !exists("g:rplugin_rpathadded")
-        if exists("g:vimrplugin_r_path") && isdirectory(g:vimrplugin_r_path)
+        if exists("g:vimrplugin_r_path") && isdirectory(g:vimrplugin_r_path) && filereadable(g:vimrplugin_r_path . "\\Rgui.exe")
             let $PATH = g:vimrplugin_r_path . ";" . $PATH
             let g:rplugin_Rgui = g:vimrplugin_r_path . "\\Rgui.exe"
         else
