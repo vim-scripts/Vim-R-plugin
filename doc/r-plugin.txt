@@ -270,9 +270,9 @@ Please, click on the menu bar
 If R does not start and you get an error message instead, you may want to 
 set the path to your Rgui.exe in your |vimrc|, for example (please adapt to
 your installation)
-
+>
    let vimrplugin_r_path = 'C:\Program Files\R\R-3.1.0\bin\i386'
-
+<
 Finally, click on the menu bar
 >
    R
