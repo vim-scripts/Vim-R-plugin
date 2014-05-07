@@ -1710,7 +1710,7 @@ function KnitChild(line, godown)
     let cfile = substitute(nline, nline[0], "", "")
     let cfile = substitute(cfile, nline[0] . '.*', "", "")
     if filereadable(cfile)
-        let ok = g:SendCmdToR("require(knitr); knit('" . cfile . "', output=tempfile())")
+        let ok = g:SendCmdToR("require(knitr); knit('" . cfile . "', output=" . g:rplugin_null . ")")
         if a:godown =~ "down"
             call cursor(line(".")+1, 1)
             call GoDown()
@@ -3570,6 +3570,14 @@ endif
 " Override default settings:
 if exists("g:vimrplugin_term_cmd")
     let g:rplugin_termcmd = g:vimrplugin_term_cmd
+endif
+
+if filewritable('/dev/null')
+    let g:rplugin_null = "'/dev/null'"
+elseif has("win32") && filewritable('NUL')
+    let g:rplugin_null = "'NUL'"
+else
+    let g:rplugin_null = 'tempfile()'
 endif
 
 autocmd BufEnter * call RBufEnter()
