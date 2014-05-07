@@ -2034,6 +2034,7 @@ function RFillLibList()
         " Avoid E341 (Internal error: lalloc(0, ))
         let g:rplugin_newliblist = 1
     endif
+    return "OK"
 endfunction
 
 function RealRFillLibList()
@@ -3413,7 +3414,17 @@ if has("win32") || has("win64")
         finish
     endif
     if !exists("g:rplugin_rpathadded")
-        if exists("g:vimrplugin_r_path") && isdirectory(g:vimrplugin_r_path) && filereadable(g:vimrplugin_r_path . "\\Rgui.exe")
+        if exists("g:vimrplugin_r_path")
+            if !isdirectory(g:vimrplugin_r_path)
+                call RWarningMsgInp("vimrplugin_r_path must be a directory (check your vimrc)")
+                let g:rplugin_failed = 1
+                finish
+            endif
+            if !filereadable(g:vimrplugin_r_path . "\\Rgui.exe")
+                call RWarningMsgInp('File "' . g:vimrplugin_r_path . '\Rgui.exe" is unreadable (check vimrplugin_r_path in your vimrc).')
+                let g:rplugin_failed = 1
+                finish
+            endif
             let $PATH = g:vimrplugin_r_path . ";" . $PATH
             let g:rplugin_Rgui = g:vimrplugin_r_path . "\\Rgui.exe"
         else
