@@ -578,6 +578,9 @@ function StartR_TmuxSplit(rcmd)
     call system("tmux set-environment -g VIMRPLUGIN_TMPDIR '" . $VIMRPLUGIN_TMPDIR . "'")
     call system("tmux set-environment -g VIMRPLUGIN_HOME '" . g:rplugin_home . "'")
     call system("tmux set-environment -g VIM_PANE " . g:rplugin_vim_pane)
+    if &t_Co == 256
+        call system('tmux set -g default-terminal "' . $TERM . '"')
+    endif
     if v:servername != "" && !has("gui_macvim")
         call system("tmux set-environment VIMEDITOR_SVRNM " . v:servername)
     endif
