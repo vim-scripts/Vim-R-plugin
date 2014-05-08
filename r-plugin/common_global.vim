@@ -1679,12 +1679,15 @@ function SendFHChunkToR()
     if &filetype == "rnoweb"
         let begchk = "^<<.*>>=\$"
         let endchk = "^@"
+        let chdchk = "^<<.*child *= *"
     elseif &filetype == "rmd"
         let begchk = "^[ \t]*```[ ]*{r"
         let endchk = "^[ \t]*```$"
+        let chdchk = "^```.*child *= *"
     elseif &filetype == "rrst"
         let begchk = "^\\.\\. {r"
         let endchk = "^\\.\\. \\.\\."
+        let chdchk = "^\.\. {r.*child *= *"
     else
         " Should never happen
         call RWarningMsg('Strange filetype (SendFHChunkToR): "' . &filetype '"')
@@ -1696,11 +1699,23 @@ function SendFHChunkToR()
     let idx = 1
     while idx < here
         if curbuf[idx] =~ begchk
-            let idx += 1
-            while curbuf[idx] !~ endchk && idx < here
-                let codelines += [curbuf[idx]]
+            " Child R chunk
+            if curbuf[idx] =~ chdchk
+                " First run everything up to child chunk and reset buffer
+                call b:SourceLines(codelines, "silent")
+                let codelines = []
+
+                " Next run child chunk and continue
+                call KnitChild(curbuf[idx], 'stay')
                 let idx += 1
-            endwhile
+            " Regular R chunk
+            else
+                let idx += 1
+                while curbuf[idx] !~ endchk && idx < here
+                    let codelines += [curbuf[idx]]
+                    let idx += 1
+                endwhile
+            endif
         else
             let idx += 1
         endif
