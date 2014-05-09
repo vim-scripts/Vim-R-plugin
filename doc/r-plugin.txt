@@ -148,7 +148,8 @@ Before installing the plugin, you should install its dependencies:
    documentation.
    
 You need to activate plugins and indentation according to 'filetype'. You
-should have at least the following options in your |vimrc|:
+should have at least the following options at the top or at near the very top
+of your |vimrc|:
 >
    set nocompatible
    syntax enable
@@ -2434,7 +2435,7 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-1.0 (2014-05-01)
+1.0 (2014-05-09)
 
  * vimrplugin_openpdf now accepts three values: 0, 1 and 2.
 
