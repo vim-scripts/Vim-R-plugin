@@ -227,6 +227,19 @@ function! RConfigVimrc()
         let vlines += ['" Lines added by the Vim-R-plugin command :RpluginConfig:']
     endif
 
+    if RFindString(vlines, 'set\s*nocompatible') == 0 && RFindString(vlines, 'set\s*nocp') == 0
+        let vlines += ['set nocompatible']
+    endif
+    if RFindString(vlines, 'syntax\s*on') == 0 && RFindString(vlines, 'syntax\s*enable') == 0
+        let vlines += ['syntax enable']
+    endif
+    if RFindString(vlines, 'filet.* plugin on') == 0
+        let vlines += ['filetype plugin on']
+    endif
+    if RFindString(vlines, 'filet.* indent on') == 0
+        let vlines += ['filetype indent on']
+    endif
+
     if RFindString(vlines, "maplocalleader") == 0
         redraw
         echo " "
