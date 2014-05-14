@@ -1453,9 +1453,9 @@ vimrplugin_sweaveargs variable.
 
 6.20. Never unmake the R menu~
 						*vimrplugin_never_unmake_menu*
-Use this option if you want that the "R" menu item is not deleted when you
-change from one buffer to another, for example, when going from an .R file to
-a .txt one:
+Use this option if you want that the "R" menu item in GVim is not deleted when
+you change from one buffer to another, for example, when going from an .R file
+to a .txt one:
 >
    let vimrplugin_never_unmake_menu = 1
 <
@@ -2168,6 +2168,11 @@ If you use yet another interpreter, you will want to put the commands above in
 a Vim autocommand:
 >
    autocmd BufNewFile,BufRead *.m let vimrplugin_exe = "octave" | let vimrplugin_quit = "quit"
+<
+If you use GVim, you may also want to set |vimrplugin_never_unmake_menu| in
+your |vimrc|:
+>
+   let vimrplugin_never_unmake_menu = 1
 <
 
 9.18. Disable syntax highlight of R functions~

@@ -17,7 +17,7 @@ call RCreateSendMaps()
 call RControlMaps()
 
 " Menu R
-if has("gui_running")
+if g:vimrplugin_never_unmake_menu && has("gui_running")
     call MakeRMenu()
 endif
 
