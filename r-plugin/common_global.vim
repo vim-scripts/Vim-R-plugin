@@ -3080,11 +3080,14 @@ if v:servername != ""
     let $VIMEDITOR_SVRNM = v:servername
 endif
 
-if isdirectory("/tmp")
+if isdirectory($TMPDIR)
+    let $VIMRPLUGIN_TMPDIR = $TMPDIR . "/r-plugin-" . g:rplugin_userlogin
+elseif isdirectory("/tmp")
     let $VIMRPLUGIN_TMPDIR = "/tmp/r-plugin-" . g:rplugin_userlogin
 else
     let $VIMRPLUGIN_TMPDIR = g:rplugin_uservimfiles . "/r-plugin/tmp"
 endif
+
 let g:rplugin_esc_tmpdir = substitute($VIMRPLUGIN_TMPDIR, ' ', '\\ ', 'g')
 
 if !isdirectory($VIMRPLUGIN_TMPDIR)
