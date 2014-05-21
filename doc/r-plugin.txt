@@ -115,7 +115,7 @@ Before installing the plugin, you should install its dependencies:
    Vim >= 7.4: http://www.vim.org/download.php
                In addition to the most commonly used features, the plugin
                requires: |+python| or |+python3|, |+clientserver| and |+conceal|. 
-	       Note: If you use either Mac OS X, read about the bugs that affect it:
+	       Note: If you use Mac OS X, read about the bugs that affect it:
 	       |r-plugin-nox|.
 
    R >= 3.0.0: http://www.r-project.org/
@@ -136,8 +136,8 @@ Before installing the plugin, you should install its dependencies:
                   whenever the terminal is resized.
 
    ncurses-term:  http://invisible-island.net/ncurses
-                  Might be useful if you want support for 256 colors at the
-                  terminal emulator.
+		  Might be necessary if you want support for 256 colors at the
+		  terminal emulator.
 
    latexmk:       Automate the compilation of LaTeX documents.
                   See examples in |vimrplugin_latexcmd|.
@@ -2472,7 +2472,7 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 
  * vimrplugin_openpdf now accepts three values: 0, 1 and 2.
 
- * New command \o sends evaluates line in R and inserts the output in the
+ * New command \o evaluates current line in R and inserts the output in the
    script.
 
  * New option: vimrplugin_vimcom_wait.
