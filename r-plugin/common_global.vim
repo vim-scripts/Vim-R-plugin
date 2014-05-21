@@ -718,7 +718,9 @@ function StartR_Windows()
         endif
     endif
     Py StartRPy()
-    lcd -
+    if !exists("g:vimrplugin_vim_wd") || g:vimrplugin_vim_wd == 0
+        lcd -
+    endif
     let g:SendCmdToR = function('SendCmdToR_Windows')
     call WaitVimComStart()
 endfunction
@@ -741,7 +743,9 @@ function StartR_OSX()
     if v:shell_error
         call RWarningMsg(rlog)
     endif
-    lcd -
+    if !exists("g:vimrplugin_vim_wd") || g:vimrplugin_vim_wd == 0
+        lcd -
+    endif
     let g:SendCmdToR = function('SendCmdToR_OSX')
     if WaitVimComStart()
         Py SendToVimCom("\001Update OB [StartR]")
@@ -773,7 +777,9 @@ function StartR(whatr)
     endif
 
     " Change to buffer's directory before starting R
-    lcd %:p:h
+    if !exists("g:vimrplugin_vim_wd") || g:vimrplugin_vim_wd == 0
+        lcd %:p:h
+    endif
 
     if a:whatr =~ "vanilla"
         let b:rplugin_r_args = "--vanilla"
@@ -797,7 +803,9 @@ function StartR(whatr)
 
     if g:vimrplugin_only_in_tmux && $TMUX_PANE == ""
         call RWarningMsg("Not inside Tmux.")
-        lcd -
+        if !exists("g:vimrplugin_vim_wd") || g:vimrplugin_vim_wd == 0
+            lcd -
+        endif
         return
     endif
 
@@ -862,7 +870,9 @@ function StartR(whatr)
     endif
 
     " Go back to original directory:
-    lcd -
+    if !exists("g:vimrplugin_vim_wd") || g:vimrplugin_vim_wd == 0
+        lcd -
+    endif
     echon
 endfunction
 

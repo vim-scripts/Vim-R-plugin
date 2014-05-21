@@ -1117,6 +1117,7 @@ is running:
 |vimrplugin_restart|           Restart R if it is already running
 |vimrplugin_show_args|         Show extra information during omnicompletion
 |vimrplugin_vimcom_wait|       Time to wait for vimcom.plus loading
+|vimrplugin_vim_wd|            Start R in working directory of Vim
 
 
 6.1. Terminal emulator (Linux/Unix only)~
@@ -1674,6 +1675,14 @@ If you do not want to install the vimcom.plus package, then put in your
    let vimrplugin_vimcom_wait = -1
 <
 
+6.31 Start R in working directory of Vim
+						      *vimrplugin_vim_wd*
+The Vim-R-plugin starts R such R's working directory contains the file in the
+current vim buffer.  If you want R's working directory to be the same as Vim's
+working directory, put in your vimrc:
+>
+    let vimrplugin_vim_wd = 1
+<
 
 ==============================================================================
 						       *r-plugin-key-bindings*
