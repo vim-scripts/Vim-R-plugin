@@ -46,6 +46,7 @@ if &encoding != "utf-8"
 endif
 
 syn match rbrowserTab contained "\t"
+syn match rbrowserErr /Error: label isn't "character"./
 if has("conceal")
     syn match rbrowserDelim contained /'#\|"#\|(#\|\[#\|{#\|%#\|##\|<#\|=#/ conceal
 else
@@ -64,6 +65,7 @@ hi def link rbrowserFunction	Function
 hi def link rbrowserS4  	Statement
 hi def link rbrowserUnknown	Normal
 hi def link rbrowserWarn	WarningMsg
+hi def link rbrowserErr 	ErrorMsg
 hi def link rbrowserTreePart	Comment
 hi def link rbrowserDelim	Ignore
 hi def link rbrowserTab		Ignore
