@@ -3227,12 +3227,22 @@ if v:servername != "" && !has("gui_macvim")
     let $VIMEDITOR_SVRNM = v:servername
 endif
 
-if isdirectory($TMPDIR)
-    let $VIMRPLUGIN_TMPDIR = $TMPDIR . "/r-plugin-" . g:rplugin_userlogin
-elseif isdirectory("/tmp")
-    let $VIMRPLUGIN_TMPDIR = "/tmp/r-plugin-" . g:rplugin_userlogin
+if has("win32") || has("win64")
+    if isdirectory($TMP)
+        let $VIMRPLUGIN_TMPDIR = $TMP . "/r-plugin-" . g:rplugin_userlogin
+    elseif isdirectory($TEMP)
+        let $VIMRPLUGIN_TMPDIR = $TEMP . "/r-plugin-" . g:rplugin_userlogin
+    else
+        let $VIMRPLUGIN_TMPDIR = g:rplugin_uservimfiles . "/r-plugin/tmp"
+    endif
 else
-    let $VIMRPLUGIN_TMPDIR = g:rplugin_uservimfiles . "/r-plugin/tmp"
+    if isdirectory($TMPDIR)
+        let $VIMRPLUGIN_TMPDIR = $TMPDIR . "/r-plugin-" . g:rplugin_userlogin
+    elseif isdirectory("/tmp")
+        let $VIMRPLUGIN_TMPDIR = "/tmp/r-plugin-" . g:rplugin_userlogin
+    else
+        let $VIMRPLUGIN_TMPDIR = g:rplugin_uservimfiles . "/r-plugin/tmp"
+    endif
 endif
 
 let g:rplugin_esc_tmpdir = substitute($VIMRPLUGIN_TMPDIR, ' ', '\\ ', 'g')
