@@ -980,12 +980,21 @@ work as expected again after any valid code is executed in the R Console.
 								*r-plugin-nox*
 If you either run Vim in the Linux Console or start Vim in a terminal emulator
 without the command line argument |--servername|, Vim will not receive remote
-messages. The R package vimcom.plus has support only for Windows and X11
-interprocess communication systems while MacVim is a Cocoa application, that
-is, vimcom.plus is unable to send messages to MacVim too. For vimcom.plus,
-running MacVim is equivalent to running Vim without the |clientserver|
-feature.
+messages and the vimcom.plus package will display the following message:
 
+   vimcom.plus: Vim's servername is unknown.
+                Please, in Vim, enter Normal mode and type:
+	        :h r-plugin-nox
+
+To avoid this message, you should either start vim with the |--servername|
+argument, as below:
+>
+   vim --servername VIM script.R
+<
+Or put in your ~/.Rprofile:
+>
+   options(vimcom.verbose = -1)
+<
 When Vim cannot receive messages, the result is:
 
    * The Object Browser is not automatically updated. You have to do
@@ -996,6 +1005,11 @@ When Vim cannot receive messages, the result is:
      package. They are updated only after the |CursorHold| event is triggered,
      that is, after you stay 'updatetime' milliseconds in Normal mode doing
      nothing. For a workaround, see |vimrplugin_permanent_libs|.
+
+The R package vimcom.plus has support only for Windows and X11 interprocess
+communication systems while MacVim is a Cocoa application, that is,
+vimcom.plus is unable to send messages to MacVim too. For vimcom.plus, running
+MacVim is equivalent to running Vim without the |clientserver| feature.
 
 On Mac OS X, to get omnicompletion, syntax highlight of function names and the
 Object Browser working properly, in addition to using Vim built with X11
