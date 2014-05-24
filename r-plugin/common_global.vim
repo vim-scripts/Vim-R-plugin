@@ -718,7 +718,7 @@ function StartR_Windows()
         endif
     endif
     Py StartRPy()
-    if !exists("g:vimrplugin_vim_wd") || g:vimrplugin_vim_wd == 0
+    if g:vimrplugin_vim_wd == 0
         lcd -
     endif
     let g:SendCmdToR = function('SendCmdToR_Windows')
@@ -743,7 +743,7 @@ function StartR_OSX()
     if v:shell_error
         call RWarningMsg(rlog)
     endif
-    if !exists("g:vimrplugin_vim_wd") || g:vimrplugin_vim_wd == 0
+    if g:vimrplugin_vim_wd == 0
         lcd -
     endif
     let g:SendCmdToR = function('SendCmdToR_OSX')
@@ -777,7 +777,7 @@ function StartR(whatr)
     endif
 
     " Change to buffer's directory before starting R
-    if !exists("g:vimrplugin_vim_wd") || g:vimrplugin_vim_wd == 0
+    if g:vimrplugin_vim_wd == 0
         lcd %:p:h
     endif
 
@@ -803,7 +803,7 @@ function StartR(whatr)
 
     if g:vimrplugin_only_in_tmux && $TMUX_PANE == ""
         call RWarningMsg("Not inside Tmux.")
-        if !exists("g:vimrplugin_vim_wd") || g:vimrplugin_vim_wd == 0
+        if g:vimrplugin_vim_wd == 0
             lcd -
         endif
         return
@@ -870,7 +870,7 @@ function StartR(whatr)
     endif
 
     " Go back to original directory:
-    if !exists("g:vimrplugin_vim_wd") || g:vimrplugin_vim_wd == 0
+    if g:vimrplugin_vim_wd == 0
         lcd -
     endif
     echon
@@ -3270,6 +3270,7 @@ call RSetDefaultValue("g:vimrplugin_openpdf_quietly",   0)
 call RSetDefaultValue("g:vimrplugin_openhtml",          0)
 call RSetDefaultValue("g:vimrplugin_i386",              0)
 call RSetDefaultValue("g:vimrplugin_Rterm",             0)
+call RSetDefaultValue("g:vimrplugin_vim_wd",            0)
 call RSetDefaultValue("g:vimrplugin_restart",           0)
 call RSetDefaultValue("g:vimrplugin_vsplit",            0)
 call RSetDefaultValue("g:vimrplugin_rconsole_width",   -1)
@@ -3584,15 +3585,27 @@ let g:rplugin_termcmd = g:vimrplugin_term . " -e"
 
 if g:vimrplugin_term == "gnome-terminal" || g:vimrplugin_term == "xfce4-terminal" || g:vimrplugin_term == "terminal" || g:vimrplugin_term == "lxterminal"
     " Cannot set gnome-terminal icon: http://bugzilla.gnome.org/show_bug.cgi?id=126081
-    let g:rplugin_termcmd = g:vimrplugin_term . " --working-directory='" . expand("%:p:h") . "' --title R -e"
+    if g:vimrplugin_vim_wd
+        let g:rplugin_termcmd = g:vimrplugin_term . " --title R -e"
+    else
+        let g:rplugin_termcmd = g:vimrplugin_term . " --working-directory='" . expand("%:p:h") . "' --title R -e"
+    endif
 endif
 
 if g:vimrplugin_term == "terminator"
-    let g:rplugin_termcmd = "terminator --working-directory='" . expand("%:p:h") . "' --title R -x"
+    if g:vimrplugin_vim_wd
+        let g:rplugin_termcmd = "terminator --title R -x"
+    else
+        let g:rplugin_termcmd = "terminator --working-directory='" . expand("%:p:h") . "' --title R -x"
+    endif
 endif
 
 if g:vimrplugin_term == "konsole"
-    let g:rplugin_termcmd = "konsole --workdir '" . expand("%:p:h") . "' --icon " . g:rplugin_home . "/bitmaps/ricon.png -e"
+    if g:vimrplugin_vim_wd
+        let g:rplugin_termcmd = "konsole --icon " . g:rplugin_home . "/bitmaps/ricon.png -e"
+    else
+        let g:rplugin_termcmd = "konsole --workdir '" . expand("%:p:h") . "' --icon " . g:rplugin_home . "/bitmaps/ricon.png -e"
+    endif
 endif
 
 if g:vimrplugin_term == "Eterm"
@@ -3601,7 +3614,11 @@ endif
 
 if g:vimrplugin_term == "roxterm"
     " Cannot set icon: http://bugzilla.gnome.org/show_bug.cgi?id=126081
-    let g:rplugin_termcmd = "roxterm --directory='" . expand("%:p:h") . "' --title R -e"
+    if g:vimrplugin_vim_wd
+        let g:rplugin_termcmd = "roxterm --title R -e"
+    else
+        let g:rplugin_termcmd = "roxterm --directory='" . expand("%:p:h") . "' --title R -e"
+    endif
 endif
 
 if g:vimrplugin_term == "xterm" || g:vimrplugin_term == "uxterm"
