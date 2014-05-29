@@ -581,8 +581,8 @@ function StartR_TmuxSplit(rcmd)
     if &t_Co == 256
         call system('tmux set -g default-terminal "' . $TERM . '"')
     endif
-    if v:servername != "" && !has("gui_macvim")
-        call system("tmux set-environment VIMEDITOR_SVRNM " . v:servername)
+    if v:servername != ""
+        call system("tmux set-environment VIMEDITOR_SVRNM " . $VIMEDITOR_SVRNM)
     endif
     call system("tmux set-environment VIMINSTANCEID " . $VIMINSTANCEID)
     let tcmd = "tmux split-window "
@@ -636,8 +636,8 @@ function StartR_ExternalTerm(rcmd)
                 \ 'set-environment -g VIMRPLUGIN_TMPDIR "' . $VIMRPLUGIN_TMPDIR . '"',
                 \ 'set-environment -g VIMRPLUGIN_HOME "' . g:rplugin_home . '"',
                 \ 'set-environment VIMINSTANCEID ' . $VIMINSTANCEID ]
-    if v:servername != "" && !has("gui_macvim")
-        let cnflines = cnflines + [ 'set-environment VIMEDITOR_SVRNM ' . v:servername ]
+    if v:servername != ""
+        let cnflines = cnflines + [ 'set-environment VIMEDITOR_SVRNM ' . $VIMEDITOR_SVRNM ]
     endif
     if g:vimrplugin_notmuxconf
         let cnflines = cnflines + [ 'source-file ~/.tmux.conf' ]
@@ -667,8 +667,8 @@ function StartR_ExternalTerm(rcmd)
     call system('export VIMRPLUGIN_TMPDIR=' . $VIMRPLUGIN_TMPDIR)
     call system('export VIMRPLUGIN_HOME=' . substitute(g:rplugin_home, ' ', '\\ ', "g"))
     call system('export VIMINSTANCEID=' . $VIMINSTANCEID)
-    if v:servername != "" && !has("gui_macvim")
-        call system('export VIMEDITOR_SVRNM=' . v:servername)
+    if v:servername != ""
+        call system('export VIMEDITOR_SVRNM=' . $VIMEDITOR_SVRNM)
     endif
     " Start the terminal emulator even if inside a Tmux session
     if $TMUX != ""
@@ -3223,8 +3223,12 @@ if has("win32") || has("win64")
 endif
 
 let $VIMRPLUGIN_HOME = substitute(g:rplugin_home, ' ', '\\ ', "g")
-if v:servername != "" && !has("gui_macvim")
-    let $VIMEDITOR_SVRNM = v:servername
+if has("gui_macvim")
+    let $VIMEDITOR_SVRNM = "Mac\002Vim"
+else
+    if v:servername != ""
+        let $VIMEDITOR_SVRNM = v:servername
+    endif
 endif
 
 if has("win32") || has("win64")
