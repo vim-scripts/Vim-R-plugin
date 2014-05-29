@@ -598,8 +598,6 @@ highlighted only if their libraries are loaded by R (but see
 Note: If you have too many loaded packages Vim may be unable to load the list
 of functions for syntax highlight.
 
-Note: If you use Mac OS X, read about the bugs that affect it: |r-plugin-nox|.
-
 
 4.4. Omni completion~
 
@@ -628,8 +626,6 @@ for all other objects. The .GlobalEnv list is stored in the
 files are stored in ~/.vim/r-plugin/objlist/ and remain available until you
 manually delete them.
 
-Note: If you use Mac OS X, read about the bugs that affect it: |r-plugin-nox|.
-
 
 4.5. The Object Browser~
 
@@ -640,16 +636,6 @@ first line of the Object Browser it will toggle the view between the objects
 in .GlobalEnv and the currently loaded libraries. The Object Browser requires
 the |+clientserver| feature to be automatically updated and the |+conceal|
 feature to correctly align list items.
-
-Note: On Linux you may find Vim binaries without the |clientserver| feature if
-you install packages such as vim-nox on Debian/Ubuntu or vim-enhanced on
-Fedora/Red Hat. If you want to use Vim in a terminal emulator in Fedora/Red
-Hat, you may want to create a symbolic link to "gvim" named "vim". You still
-have to explicitly start the server with the argument |--servername|.  To
-avoid having to type this argument every time that you start Vim, please look
-at the example in |r-plugin-bash-setup|.
-
-Note: If you use Mac OS X, read about the bugs that affect it: |r-plugin-nox|.
 
 In the .GlobalEnv view, if an object has the attribute "label", it will also
 be displayed. Please, see the R help for package vimcom.plus for some options
@@ -976,22 +962,30 @@ tell Vim that "R is busy" and Vim will display this message. Everything should
 work as expected again after any valid code is executed in the R Console.
 
 
-5.7. Bugs that affect Mac OS X and Linux Console~
+5.7. Bugs that affect Mac OS X, Linux Console and ...~
 								*r-plugin-nox*
-If you either run Vim in the Linux Console or start Vim in a terminal emulator
-without the command line argument |--servername|, Vim will not receive remote
-messages and the vimcom.plus package will display the following message:
+If you use MacVim, run Vim in the Linux Console or start Vim in a terminal
+emulator without the command line argument |--servername|, Vim will not
+receive remote messages and the vimcom.plus package will display one of the
+following messages:
+
+   vimcom.plus: Are you running MacVim?
+                MacVim isn't fully supported by vimcom.plus.
+
+   vimcom.plus: There is no X Server running.
 
    vimcom.plus: Vim's servername is unknown.
-                Please, in Vim, enter Normal mode and type:
-	        :h r-plugin-nox
 
-To avoid this message, you should either start vim with the |--servername|
-argument, as below:
+To avoid the message, you should start vim with the |--servername| argument,
+as below:
 >
    vim --servername VIM script.R
 <
-Or put in your ~/.Rprofile:
+To avoid having to type this argument every time that you start Vim, please
+either run `:RpluginConfig` or look at the example in |r-plugin-bash-setup|.
+
+If the |--servername| argument does not work in your case, you can put the
+following line in your ~/.Rprofile to suppress the message:
 >
    options(vimcom.verbose = -1)
 <
@@ -1005,6 +999,12 @@ When Vim cannot receive messages, the result is:
      package. They are updated only after the |CursorHold| event is triggered,
      that is, after you stay 'updatetime' milliseconds in Normal mode doing
      nothing. For a workaround, see |vimrplugin_permanent_libs|.
+
+On Linux you may find Vim binaries without the |clientserver| feature if
+you install packages such as vim-nox on Debian/Ubuntu or vim-enhanced on
+Fedora/Red Hat. If you want to use Vim in a terminal emulator in Fedora/Red
+Hat, you may want to create a symbolic link to "gvim" named "vim". You still
+have to explicitly start the server with the argument |--servername|.
 
 The R package vimcom.plus has support only for Windows and X11 interprocess
 communication systems while MacVim is a Cocoa application, that is,
