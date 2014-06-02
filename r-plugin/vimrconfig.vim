@@ -36,6 +36,14 @@ function! RConfigRprofile()
                 \ '        stop("HOME environment variable not set.")',
                 \ '    } else {',
                 \ '        .rpf <- paste0(Sys.getenv("HOME"), "/.Rprofile")',
+                \ '        if(length(find.package("colorout", quiet = TRUE)) > 0)',
+                \ '            .rpf <- c(.rpf, "HasColorout")',
+                \ '        else',
+                \ '            .rpf <- c(.rpf, "NoColorout")',
+                \ '        if(length(find.package("setwidth", quiet = TRUE)) > 0)',
+                \ '            .rpf <- c(.rpf, "HasSetwidth")',
+                \ '        else',
+                \ '            .rpf <- c(.rpf, "NoSetwidth")',
                 \ '    }',
                 \ '}',
                 \ 'writeLines(.rpf, con = paste0(Sys.getenv("VIMRPLUGIN_TMPDIR"), "/configR_result"))',
@@ -46,10 +54,10 @@ function! RConfigRprofile()
         sleep 2
     endif
     if filereadable($VIMRPLUGIN_TMPDIR . "/configR_result")
-        let res = readfile($VIMRPLUGIN_TMPDIR . "/configR_result")
+        let resp = readfile($VIMRPLUGIN_TMPDIR . "/configR_result")
         call delete($VIMRPLUGIN_TMPDIR . "/configR_result")
-        if filereadable(res[0])
-            let rpflines = readfile(res[0])
+        if filereadable(resp[0])
+            let rpflines = readfile(resp[0])
         else
             let rpflines = []
         endif
@@ -80,9 +88,17 @@ function! RConfigRprofile()
                             \ "        options(editor = '" . 'gvim -f -c "set ft=r"' . "')",
                             \ '    else',
                             \ "        options(editor = '" . 'vim -c "set ft=r"' . "')",
-                            \ '    # See ?setOutputColors256 to know how to customize R output colors',
-                            \ '    library(colorout)',
-                            \ '    library(setwidth)']
+                            \ '    # See ?setOutputColors256 to know how to customize R output colors']
+                if len(resp) > 1 && resp[1] == "HasColorout"
+                    let rpflines += ['    library(colorout)']
+                else
+                    let rpflines += ['    # library(colorout)']
+                endif
+                if len(resp) > 2 && resp[2] == "HasSetwidth"
+                    let rpflines += ['    library(setwidth)']
+                else
+                    let rpflines += ['    # library(setwidth)']
+                endif
             endif
             let rpflines += ['    library(vimcom.plus)']
 
@@ -137,7 +153,7 @@ function! RConfigRprofile()
             endif
 
             let rpflines += ["}"]
-            call writefile(rpflines, res[0])
+            call writefile(rpflines, resp[0])
             redraw
             echo " "
             echohl WarningMsg
@@ -150,14 +166,14 @@ function! RConfigRprofile()
             let what = input("Do you want to see your .Rprofile now? [y/N]: ")
             echohl Normal
             if RGetYesOrNo(what)
-                silent exe "tabnew " . res[0]
+                silent exe "tabnew " . resp[0]
             endif
         else
             echohl Question
             let what = input("Do you want to see your .Rprofile along with tips on how to\nconfigure it? [y/N]: ")
             echohl Normal
             if RGetYesOrNo(what)
-                silent exe "tabnew " . res[0]
+                silent exe "tabnew " . resp[0]
                 silent help r-plugin-R-setup
             endif
         endif
