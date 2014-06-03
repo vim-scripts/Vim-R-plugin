@@ -132,6 +132,17 @@ function! RMakePDFrmd(t)
     if exists("g:vimrplugin_pandoc_args")
         let pdfcmd = pdfcmd . ", pandoc_args = '" . g:vimrplugin_pandoc_args . "'"
     endif
+    if g:vimrplugin_openpdf == 0
+        let pdfcmd = pdfcmd . ", view = FALSE"
+    else
+        if g:vimrplugin_openpdf == 1
+            if b:pdf_opened == 0
+                let b:pdf_opened = 1
+            else
+                let pdfcmd = pdfcmd . ", view = FALSE"
+            endif
+        endif
+    endif
     let pdfcmd = pdfcmd . ")"
     call g:SendCmdToR(pdfcmd)
 endfunction  
