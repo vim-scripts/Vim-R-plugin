@@ -3218,13 +3218,13 @@ endif
 
 let $VIMRPLUGIN_HOME = substitute(g:rplugin_home, ' ', '\\ ', "g")
 if has("gui_macvim")
-    let $VIMEDITOR_SVRNM = "Mac\002Vim"
+    let $VIMEDITOR_SVRNM = "MacVim"
+elseif has("neovim")
+    let $VIMEDITOR_SVRNM = "NeoVim"
+elseif v:servername == ""
+    let $VIMEDITOR_SVRNM = "NoServerName"
 else
-    if v:servername == ""
-        let $VIMEDITOR_SVRNM = "NoServerName"
-    else
-        let $VIMEDITOR_SVRNM = v:servername
-    endif
+    let $VIMEDITOR_SVRNM = v:servername
 endif
 
 if has("win32") || has("win64")
