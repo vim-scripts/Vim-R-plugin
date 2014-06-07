@@ -775,6 +775,16 @@ endfunction
 
 " Start R
 function StartR(whatr)
+    if $VIMEDITOR_SVRNM == ""
+        if v:servername == ""
+            if $DISPLAY != ""
+                let $VIMEDITOR_SVRNM = "NoServerName"
+            endif
+        else
+            let $VIMEDITOR_SVRNM = v:servername
+        endif
+    endif
+
     call writefile([], $VIMRPLUGIN_TMPDIR . "/globenv_" . $VIMINSTANCEID)
     call writefile([], $VIMRPLUGIN_TMPDIR . "/liblist_" . $VIMINSTANCEID)
     if filereadable($VIMRPLUGIN_TMPDIR . "/libnames_" . $VIMINSTANCEID)
@@ -3238,12 +3248,6 @@ elseif has("neovim")
     let $VIMEDITOR_SVRNM = "NeoVim"
 elseif !has("clientserver")
     let $VIMEDITOR_SVRNM = "NoClientServer"
-elseif v:servername == ""
-    if $DISPLAY != ""
-        let $VIMEDITOR_SVRNM = "NoServerName"
-    endif
-else
-    let $VIMEDITOR_SVRNM = v:servername
 endif
 
 if has("win32") || has("win64")
