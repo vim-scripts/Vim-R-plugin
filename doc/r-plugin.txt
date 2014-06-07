@@ -184,9 +184,9 @@ and ~/.bashrc (the <LocalLeader> is `\` by default):
 >
    :RpluginConfig
 <
-The above command will guide you through the final configuration steps, but
-if you prefer to configure everything by yourself, please, read the sections
-|r-plugin-nox| and |r-plugin-quick-setup|.
+The above command will guide you through the final configuration steps if you
+answer `y` to all questions, but if you prefer to configure everything by
+yourself, please, read the sections |r-plugin-nox| and |r-plugin-quick-setup|.
 
 If you start either GVim or Vim in a terminal emulator the plugin will start R
 in a external terminal emulator. If you start Vim inside of a Tmux session,
@@ -279,7 +279,8 @@ Finally, click on the menu bar
    R
    Configure (Vim-R)
 <
-The above command will guide you through the final configuration steps.
+The above command will guide you through the final configuration steps if you
+answer `y` to all questions.
 
 You may have to adjust the value of |vimrplugin_sleeptime|.
 
@@ -969,12 +970,12 @@ emulator without the command line argument |--servername|, Vim will not
 receive remote messages and the vimcom.plus package will display one of the
 following messages:
 
-   vimcom.plus: Are you running MacVim?
-                MacVim isn't fully supported by vimcom.plus.
-
-   vimcom.plus: There is no X Server running.
-
-   vimcom.plus: Vim's servername is unknown.
+   MacVim isn't fully supported by vimcom.plus.
+   NeoVim isn't fully supported by vimcom.plus.
+   Vim was built without the 'clientserver' feature.
+   Did you pass the --servername argument to Vim?
+   There is no X Server running.
+   Vim's servername is unknown.
 
 To avoid the message, you should start vim with the |--servername| argument,
 as below:
@@ -2484,7 +2485,7 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-1.0 (2014-05-24)
+1.0 (2014-06-07)
 
  * vimrplugin_openpdf now accepts three values: 0, 1 and 2.
 
