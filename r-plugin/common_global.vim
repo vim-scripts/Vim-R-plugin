@@ -170,19 +170,34 @@ function! CompleteChunkOptions()
     else
         let newbase = '^' . substitute(base, "\\$$", "", "")
     endif
-    let ktopt = ["animation.fun=;hook_ffmpeg_html", "aniopts=;'controls.loop'", "autodep=;FALSE", "background=;'#F7F7F7'",
-                \ "cache.path=;'cache/'", "cache.vars=; ", "cache=;FALSE", "child=; ", "comment=;'##'",
-                \ "dependson=;''", "dev.args=; ", "dev=; ", "dpi=;72", "echo=;TRUE",
-                \ "engine=;'R'", "error=;TRUE", "eval=;TRUE", "external=;TRUE",
-                \ "fig.align=;'left|right|center'", "fig.cap=;''", "fig.env=;'figure'",
-                \ "fig.ext=; ", "fig.height=;7", "fig.keep=;'high|none|all|first|last'",
-                \ "fig.lp=;'fig:'", "fig.path=; ", "fig.pos=;''", "fig.scap=;''", "fig.subcap=; ",
-                \ "fig.show=;'asis|hold|animate|hide'", "fig.width=;7", "highlight=;TRUE",
-                \ "include=;TRUE", "interval=;1", "message=;TRUE", "opts.label=;''",
-                \ "out.extra=; ", "out.height=;'7in'", "out.width=;'7in'",
-                \ "prompt=;FALSE", "purl=;TRUE", "ref.label=; ", "resize.height=; ",
-                \ "resize.width=; ", "results=;'markup|asis|hold|hide'", "sanitize=;FALSE",
-                \ "size=;'normalsize'", "split=;FALSE", "tidy=;TRUE", "tidy.opts=; ", "warning=;TRUE"]
+
+    let ktopt = ["eval=;TRUE", "echo=;TRUE", "results=;'markup|asis|hold|hide'",
+                \ "warning=;TRUE", "error=;TRUE", "message=;TRUE", "split=;FALSE",
+                \ "include=;TRUE", "strip.white=;TRUE", "tidy=;FALSE", "tidy.opts=; ",
+                \ "prompt=;FALSE", "comment=;'##'", "highlight=;TRUE", "background=;'#F7F7F7'",
+                \ "cache=;FALSE", "cache.path=;'cache/'", "cache.vars=; ",
+                \ "cache.lazy=;TRUE", "cache.comments=; ", "dependson=;''",
+                \ "autodep=;FALSE", "fig.path=; ", "fig.keep=;'high|none|all|first|last'",
+                \ "fig.show=;'asis|hold|animate|hide'", "dev=; ", "dev.args=; ",
+                \ "fig.ext=; ", "dpi=;72", "fig.width=;7", "fig.height=;7",
+                \ "out.width=;'7in'", "out.height=;'7in'", "out.extra=; ",
+                \ "resize.width=; ", "resize.height=; ", "fig.align=;'left|right|center'",
+                \ "fig.env=;'figure'", "fig.cap=;''", "fig.scap=;''", "fig.lp=;'fig:'",
+                \ "fig.pos=;''", "fig.subcap=; ", "fig.process=; ", "interval=;1",
+                \ "aniopts=;'controls.loop'", "code=; ", "ref.label=; ",
+                \ "child=; ", "engine=;'R'", "opts.label=;''", "purl=;TRUE",
+                \ 'R.options=; ']
+    if &filetype == "rnoweb"
+        let ktopt += ["external=;TRUE", "sanitize=;FALSE", "size=;'normalsize'"]
+    endif
+    if &filetype == "rmd" || &filetype == "rrst"
+        let ktopt += ["fig.retina=;1"]
+        if &filetype == "rmd"
+            let ktopt += ["collapse=;FALSE"]
+        endif
+    endif
+    call sort(ktopt)
+
     for kopt in ktopt
       if kopt =~ newbase
         let tmp1 = split(kopt, ";")
