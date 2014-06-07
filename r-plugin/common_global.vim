@@ -3236,8 +3236,12 @@ if has("gui_macvim")
     let $VIMEDITOR_SVRNM = "MacVim"
 elseif has("neovim")
     let $VIMEDITOR_SVRNM = "NeoVim"
+elseif !has("clientserver")
+    let $VIMEDITOR_SVRNM = "NoClientServer"
 elseif v:servername == ""
-    let $VIMEDITOR_SVRNM = "NoServerName"
+    if $DISPLAY != ""
+        let $VIMEDITOR_SVRNM = "NoServerName"
+    endif
 else
     let $VIMEDITOR_SVRNM = v:servername
 endif
