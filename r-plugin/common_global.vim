@@ -3245,7 +3245,7 @@ let $VIMRPLUGIN_HOME = substitute(g:rplugin_home, ' ', '\\ ', "g")
 if has("gui_macvim")
     let $VIMEDITOR_SVRNM = "MacVim"
 elseif has("neovim")
-    let $VIMEDITOR_SVRNM = "NeoVim"
+    let $VIMEDITOR_SVRNM = "Neovim"
 elseif !has("clientserver")
     let $VIMEDITOR_SVRNM = "NoClientServer"
 endif
