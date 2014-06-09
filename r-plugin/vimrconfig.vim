@@ -100,7 +100,12 @@ function! RConfigRprofile()
                     let rpflines += ['    # library(setwidth)']
                 endif
             endif
-            let rpflines += ['    library(vimcom.plus)']
+            if has("win32") || has("win64")
+                let rpflines += ['    if(Sys.getenv("VIMRPLUGIN_TMPDIR") != "")',
+                            \ '        library(vimcom.plus)']
+            else
+                let rpflines += ['    library(vimcom.plus)']
+            endif
 
             if !(has("win32") || has("win64"))
                 redraw
