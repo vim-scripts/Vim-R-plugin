@@ -971,7 +971,7 @@ receive remote messages and the vimcom.plus package will display one of the
 following messages:
 
    MacVim isn't fully supported by vimcom.plus.
-   NeoVim isn't fully supported by vimcom.plus.
+   Neovim isn't fully supported by vimcom.plus.
    Vim was built without the 'clientserver' feature.
    Did you pass the --servername argument to Vim?
    There is no X Server running.
@@ -1021,6 +1021,8 @@ A user reported success with the following procedure:
    tmux
    /usr/local/Cellar/vim/7.4.273/bin/vim --servername VIM r_script.R
 <
+Neovim msgpack API is not supported by vimcom.plus yet.
+
 See also: |r-plugin-remote|.
 
 
@@ -1990,16 +1992,17 @@ Vim can jump to a function definition if it finds a "tags" file with the
 information about the place where the function is defined. To generate the
 tags file, use the R function `rtags()`, which will build an Emacs tags file.
 If Vim was compiled with the feature |emacs_tags|, it will be able to read the
-tags file. Otherwise, you can use the function `etags2ctags()` from the script
-located at ~/.vim/r-plugin/etags2ctags.R to convert the Emacs tags file into a
-Vim's one. To jump to a function definition, put the cursor over the function
-name and hit CTRL-]. Please, read |tagsrch.txt| for details on how to use tags
-files, specially the section |tags-option|.
+tags file. Otherwise, you can use the vimcom.plus function `etags2ctags()` to
+convert the Emacs tags file into a Vim's one. To jump to a function
+definition, put the cursor over the function name and hit CTRL-]. Please, read
+|tagsrch.txt| for details on how to use tags files, specially the section
+|tags-option|.
 
 You could, for example, download and unpack R's source code, start R inside
 the ~/.vim directory and do the following command:
 >
    rtags(path = "/path/to/R/source/code", recursive = TRUE, ofile = "RTAGS")
+   etags2ctags("RTAGS", "Rtags")
 <
 Then, you would quit R and do the following command in the terminal emulator:
 >
@@ -2007,10 +2010,10 @@ Then, you would quit R and do the following command in the terminal emulator:
 <
 Finally, you would put the following in your |vimrc|, inside an |autocmd-group|:
 >
-   autocmd FileType r set tags+=~/.vim/RTAGS,~/.vim/RsrcTags
-   autocmd FileType rnoweb set tags+=~/.vim/RTAGS,~/.vim/RsrcTags
+   autocmd FileType r set tags+=~/.vim/Rtags,~/.vim/RsrcTags
+   autocmd FileType rnoweb set tags+=~/.vim/Rtags,~/.vim/RsrcTags
 <
-Note: While defining the autocmd, the RTAGS path must be put before RsrcTags.
+Note: While defining the autocmd, the Rtags path must be put before RsrcTags.
 
 Example on how to test whether your setup is ok:
 
@@ -2485,7 +2488,7 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-1.0 (2014-06-07)
+1.0 (2014-06-09)
 
  * vimrplugin_openpdf now accepts three values: 0, 1 and 2.
 
