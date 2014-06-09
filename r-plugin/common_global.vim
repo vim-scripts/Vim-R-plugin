@@ -145,7 +145,11 @@ function RCheckVimCom(msg)
         return 1
     endif
     if g:rplugin_vimcomport == 0
-        Py DiscoverVimComPort()
+        if has("neovim")
+            call jobwrite(g:rplugin_job, "DiscoverVimComPort\n")
+        else
+            Py DiscoverVimComPort()
+        endif
     endif
     if g:rplugin_vimcomport && g:rplugin_vimcom_pkg == "vimcom"
 	call RWarningMsg("The R package vimcom.plus is required to " . a:msg)
@@ -212,7 +216,7 @@ function RCompleteArgs()
     let line = getline(".")
     if (&filetype == "rnoweb" && line =~ "^<<.*>>=$") || (&filetype == "rmd" && line =~ "^``` *{r.*}$") || (&filetype == "rrst" && line =~ "^.. {r.*}$") || (&filetype == "r" && line =~ "^#\+")
         call CompleteChunkOptions()
-      return ''
+        return ''
     endif
     let lnum = line(".")
     let cpos = getpos(".")
@@ -262,18 +266,18 @@ function RCompleteArgs()
             " If R is running, use it
             call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
             if classfor == ""
-                exe 'Py SendToVimCom("' . g:rplugin_vimcom_pkg . ':::vim.args(' . "'" . rkeyword0 . "', '" . argkey . "')" . '")'
+                call g:SendToVimCom(g:rplugin_vimcom_pkg . ':::vim.args("' . rkeyword0 . '", "' . argkey . '")')
             else
-                exe 'Py SendToVimCom("' . g:rplugin_vimcom_pkg . ':::vim.args(' . "'" . rkeyword0 . "', '" . argkey . "', classfor = " . classfor . ")" . '")'
+                call g:SendToVimCom(g:rplugin_vimcom_pkg . ':::vim.args("' . rkeyword0 . '", "' . argkey . '", classfor = ' . classfor . ')')
             endif
             if g:rplugin_vimcomport > 0
-                let g:rplugin_lastrpl = ReadEvalReply()
-                if g:rplugin_lastrpl != "NOT_EXISTS" && g:rplugin_lastrpl != "NO_ARGS" && g:rplugin_lastrpl != "R is busy." && g:rplugin_lastrpl != "NOANSWER" && g:rplugin_lastrpl != "INVALID" && g:rplugin_lastrpl != "" && g:rplugin_lastrpl != "No reply"
+                let g:rplugin_lastev = ReadEvalReply()
+                if g:rplugin_lastev != "NOT_EXISTS" && g:rplugin_lastev != "NO_ARGS" && g:rplugin_lastev != "R is busy." && g:rplugin_lastev != "NOANSWER" && g:rplugin_lastev != "INVALID" && g:rplugin_lastev != "" && g:rplugin_lastev != "No reply"
                     let args = []
-                    if g:rplugin_lastrpl[0] == "\x04" && len(split(g:rplugin_lastrpl, "\x04")) == 1
+                    if g:rplugin_lastev[0] == "\x04" && len(split(g:rplugin_lastev, "\x04")) == 1
                         return ''
                     endif
-                    let tmp0 = split(g:rplugin_lastrpl, "\x04")
+                    let tmp0 = split(g:rplugin_lastev, "\x04")
                     let tmp = split(tmp0[0], "\x09")
                     if(len(tmp) > 0)
                         for id in range(len(tmp))
@@ -633,7 +637,7 @@ function StartR_TmuxSplit(rcmd)
     endif
     let g:rplugin_last_rcmd = a:rcmd
     if WaitVimComStart()
-        Py SendToVimCom("\001Update OB [StartR]")
+        call g:SendToVimCom("\001Update OB [StartR]")
     endif
 endfunction
 
@@ -712,7 +716,7 @@ function StartR_ExternalTerm(rcmd)
     endif
     let g:SendCmdToR = function('SendCmdToR_Term')
     if WaitVimComStart()
-        Py SendToVimCom("\001Update OB [StartR]")
+        call g:SendToVimCom("\001Update OB [StartR]")
     endif
 endfunction
 
@@ -726,10 +730,13 @@ function StartR_Windows()
             return
         endif
     endif
+    let vrph = $VIMRPLUGIN_HOME
+    let $VIMRPLUGIN_HOME = substitute($VIMRPLUGIN_HOME, "\\\\ ", " ", "g")
     Py StartRPy()
     if g:vimrplugin_vim_wd == 0
         lcd -
     endif
+    let $VIMRPLUGIN_HOME = vrph
     let g:SendCmdToR = function('SendCmdToR_Windows')
     call WaitVimComStart()
 endfunction
@@ -757,7 +764,7 @@ function StartR_OSX()
     endif
     let g:SendCmdToR = function('SendCmdToR_OSX')
     if WaitVimComStart()
-        Py SendToVimCom("\001Update OB [StartR]")
+        call g:SendToVimCom("\001Update OB [StartR]")
     endif
 endfunction
 
@@ -845,9 +852,9 @@ function StartR(whatr)
                         sleep 100m
                         call g:SendCmdToR("\014")
                     endif
-                    exe 'Py SendToVimCom("\007' . g:rplugin_obsname . '")'
-                    Py SendToVimCom("\003.GlobalEnv [Restarting R]")
-                    Py SendToVimCom("\004Libraries [Restarting()]")
+                    call g:SendToVimCom("\007" . g:rplugin_obsname)
+                    call g:SendToVimCom("\003.GlobalEnv [Restarting R]")
+                    call g:SendToVimCom("\004Libraries [Restarting()]")
                     " vimcom automatically update the libraries view, but not
                     " the GlobalEnv one because vimcom_count_objects() returns 0.
                     call VimExprToOB('UpdateOB("GlobalEnv")')
@@ -879,9 +886,9 @@ function StartR(whatr)
         call StartR_ExternalTerm(rcmd)
         if g:vimrplugin_restart && bufloaded(b:objbrtitle)
             call WaitVimComStart()
-            exe 'Py SendToVimCom("\007' . v:servername . '")'
-            Py SendToVimCom("\003.GlobalEnv [Restarting R]")
-            Py SendToVimCom("\004Libraries [Restarting()]")
+            call g:SendToVimCom("\007" . v:servername)
+            call g:SendToVimCom("\003.GlobalEnv [Restarting R]")
+            call g:SendToVimCom("\004Libraries [Restarting()]")
             if exists("*UpdateOB")
                 call UpdateOB("GlobalEnv")
             endif
@@ -970,9 +977,9 @@ function StartObjBrowser_Tmux()
 
     " Don't start the Object Browser if it already exists
     if IsExternalOBRunning()
-        Py SendToVimCom("\003GlobalEnv [OB StartObjBrowser_Tmux]")
+        call g:SendToVimCom("\003GlobalEnv [OB StartObjBrowser_Tmux]")
         sleep 50m
-        Py SendToVimCom("\004Libraries [OB StartObjBrowser_Tmux]")
+        call g:SendToVimCom("\004Libraries [OB StartObjBrowser_Tmux]")
         sleep 50m
         if $DISPLAY == "" && exists("g:rplugin_ob_pane")
             let slog = system("tmux set-buffer ':silent call UpdateOB(\"both\")\<C-M>:\<Esc>' && tmux paste-buffer -t " . g:rplugin_ob_pane . " && tmux select-pane -t " . g:rplugin_ob_pane)
@@ -1007,9 +1014,9 @@ function StartObjBrowser_Tmux()
                 \ 'set noruler',
                 \ 'let g:SendCmdToR = function("SendCmdToR_TmuxSplit")',
                 \ 'if has("clientserver") && v:servername != ""',
-                \ "   exe 'Py SendToVimCom(" . '"\007' . "' . v:servername . '" . '")' . "'",
+                \ '   call g:SendToVimCom("\007" . v:servername)',
                 \ 'endif',
-                \ 'Py SendToVimCom("\001Update OB [OB init TMUX]")',
+                \ 'call g:SendToVimCom("\001Update OB [OB init TMUX]")',
                 \ 'sleep 50m',
                 \ 'if v:servername == ""',
                 \ '    sleep 100m',
@@ -1110,7 +1117,7 @@ function StartObjBrowser_Vim()
         endif
         let g:rplugin_ob_warn_shown = 1
     else
-        exe 'Py SendToVimCom("\007' . v:servername . '")'
+        call g:SendToVimCom("\007" . v:servername)
     endif
 
     " Either load or reload the Object Browser
@@ -1143,7 +1150,7 @@ function StartObjBrowser_Vim()
         unlet g:tmp_objbrtitle
         unlet g:tmp_tmuxsname
         unlet g:tmp_curbufname
-        Py SendToVimCom("\001Update OB [OB init GVIM]")
+        call g:SendToVimCom("\001Update OB [OB init GVIM]")
         sleep 50m
         call UpdateOB("GlobalEnv")
     endif
@@ -1155,7 +1162,7 @@ endfunction
 
 " Open an Object Browser window
 function RObjBrowser()
-    if !has("python") && !has("python3")
+    if !has("python") && !has("python3") && !has("neovim")
         call RWarningMsg("Python support is required to run the Object Browser.")
         return
     endif
@@ -1191,7 +1198,7 @@ function RObjBrowser()
 endfunction
 
 function VimExprToOB(msg)
-    if serverlist() =~ "\\<" . g:rplugin_obsname . "\n"
+    if !has("neovim") && serverlist() =~ "\\<" . g:rplugin_obsname . "\n"
         return remote_expr(g:rplugin_obsname, a:msg)
     endif
     return "Vim server not found"
@@ -1223,7 +1230,7 @@ function RBrowserOpenCloseLists(status)
 
     " Avoid possibly freezing cross messages between Vim and R
     if exists("g:rplugin_curview") && v:servername != ""
-        Py SendToVimCom("\x08Stop updating info [RBrowserOpenCloseLists()]")
+        call g:SendToVimCom("\x08Stop updating info [RBrowserOpenCloseLists()]")
         let stt = a:status
     else
         let stt = a:status + 2
@@ -1237,7 +1244,7 @@ function RBrowserOpenCloseLists(status)
         let switchedbuf = 1
     endif
 
-    exe 'Py SendToVimCom("' . "\006" . stt . '")'
+    call g:SendToVimCom("\006" . stt)
 
     if g:rplugin_lastrpl == "R is busy."
         call RWarningMsg("R is busy.")
@@ -1250,17 +1257,21 @@ function RBrowserOpenCloseLists(status)
     if exists("g:rplugin_curview")
         call UpdateOB("both")
         if v:servername != ""
-            exe 'Py SendToVimCom("\007' . v:servername . '")'
+            call g:SendToVimCom("\007" . v:servername)
         endif
     elseif IsExternalOBRunning()
         call VimExprToOB('UpdateOB("GlobalEnv")')
-        exe 'Py SendToVimCom("\007' . g:rplugin_obsname . '")'
+        call g:SendToVimCom("\007" . g:rplugin_obsname)
     endif
 endfunction
 
 function RFormatCode() range
     if g:rplugin_vimcomport == 0
-        exe "Py DiscoverVimComPort()"
+        if has("neovim")
+            call jobwrite(g:rplugin_job, "DiscoverVimComPort\n")
+        else
+            Py DiscoverVimComPort()
+        endif
         if g:rplugin_vimcomport == 0
             return
         endif
@@ -1283,10 +1294,10 @@ function RFormatCode() range
         let wco = 180
     endif
     call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
-    exe "Py SendToVimCom('formatR::tidy.source(\"" . $VIMRPLUGIN_TMPDIR . "/unformatted_code" . "\", file = \"" . $VIMRPLUGIN_TMPDIR . "/formatted_code\", width.cutoff = " . wco . ")')"
-    let g:rplugin_lastrpl = ReadEvalReply()
-    if g:rplugin_lastrpl == "R is busy." || g:rplugin_lastrpl == "UNKNOWN" || g:rplugin_lastrpl =~ "^Error" || g:rplugin_lastrpl == "INVALID" || g:rplugin_lastrpl == "ERROR" || g:rplugin_lastrpl == "EMPTY" || g:rplugin_lastrpl == "No reply"
-        call RWarningMsg(g:rplugin_lastrpl)
+    call g:SendToVimCom('formatR::tidy.source("' . $VIMRPLUGIN_TMPDIR . '/unformatted_code", file = "' . $VIMRPLUGIN_TMPDIR . '/formatted_code", width.cutoff = ' . wco . ')')
+    let g:rplugin_lastev = ReadEvalReply()
+    if g:rplugin_lastev == "R is busy." || g:rplugin_lastev == "UNKNOWN" || g:rplugin_lastev =~ "^Error" || g:rplugin_lastev == "INVALID" || g:rplugin_lastev == "ERROR" || g:rplugin_lastev == "EMPTY" || g:rplugin_lastev == "No reply"
+        call RWarningMsg(g:rplugin_lastev)
         return
     endif
     let lns = readfile($VIMRPLUGIN_TMPDIR . "/formatted_code")
@@ -1297,7 +1308,11 @@ endfunction
 
 function RInsert(cmd)
     if g:rplugin_vimcomport == 0
-        exe "Py DiscoverVimComPort()"
+        if has("neovim")
+            call jobwrite(g:rplugin_job, "DiscoverVimComPort\n")
+        else
+            Py DiscoverVimComPort()
+        endif
         if g:rplugin_vimcomport == 0
             return
         endif
@@ -1311,10 +1326,10 @@ function RInsert(cmd)
 
     call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
     call delete($VIMRPLUGIN_TMPDIR . "/Rinsert")
-    exe "Py SendToVimCom('capture.output(" . a:cmd . ', file = "' . $VIMRPLUGIN_TMPDIR . "/Rinsert" . '")' . "')"
-    let g:rplugin_lastrpl = ReadEvalReply()
-    if g:rplugin_lastrpl == "R is busy." || g:rplugin_lastrpl == "UNKNOWN" || g:rplugin_lastrpl =~ "^Error" || g:rplugin_lastrpl == "INVALID" || g:rplugin_lastrpl == "ERROR" || g:rplugin_lastrpl == "EMPTY" || g:rplugin_lastrpl == "No reply"
-        call RWarningMsg(g:rplugin_lastrpl)
+    call g:SendToVimCom('capture.output(' . a:cmd . ', file = "' . $VIMRPLUGIN_TMPDIR . '/Rinsert")')
+    let g:rplugin_lastev = ReadEvalReply()
+    if g:rplugin_lastev == "R is busy." || g:rplugin_lastev == "UNKNOWN" || g:rplugin_lastev =~ "^Error" || g:rplugin_lastev == "INVALID" || g:rplugin_lastev == "ERROR" || g:rplugin_lastev == "EMPTY" || g:rplugin_lastev == "No reply"
+        call RWarningMsg(g:rplugin_lastev)
     else
         silent exe "read " . g:rplugin_esc_tmpdir . "/Rinsert"
     endif
@@ -1988,19 +2003,19 @@ function BuildROmniList()
     let omnilistcmd = omnilistcmd . ')'
 
     call delete($VIMRPLUGIN_TMPDIR . "/vimbol_finished")
-        call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
-        exe "Py SendToVimCom('" . omnilistcmd . "')"
-        if g:rplugin_vimcomport == 0
-            sleep 500m
-            return
-        endif
-        let g:rplugin_lastrpl = ReadEvalReply()
-        if g:rplugin_lastrpl == "R is busy." || g:rplugin_lastrpl == "No reply"
-            call RWarningMsg(g:rplugin_lastrpl)
-            sleep 800m
-            return
-        endif
-        sleep 20m
+    call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
+    call g:SendToVimCom(omnilistcmd)
+    if g:rplugin_vimcomport == 0
+        sleep 500m
+        return
+    endif
+    let g:rplugin_lastev = ReadEvalReply()
+    if g:rplugin_lastev == "R is busy." || g:rplugin_lastev == "No reply"
+        call RWarningMsg(g:rplugin_lastev)
+        sleep 800m
+        return
+    endif
+    sleep 20m
     let ii = 0
     while !filereadable($VIMRPLUGIN_TMPDIR . "/vimbol_finished") && ii < 5
         let ii += 1
@@ -2243,7 +2258,7 @@ endfunction
 " Show R's help doc in Vim's buffer
 " (based  on pydoc plugin)
 function ShowRDoc(rkeyword, package, getclass)
-    if !has("python") && !has("python3")
+    if !has("python") && !has("python3") && !has("neovim")
         call RWarningMsg("Python support is required to see R documentation on Vim.")
         return
     endif
@@ -2288,33 +2303,35 @@ function ShowRDoc(rkeyword, package, getclass)
 
     call SetRTextWidth()
 
-    let g:rplugin_lastrpl = "R did not reply."
     call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
     if classfor == "" && a:package == ""
-        exe 'Py SendToVimCom("vim.help(' . "'" . a:rkeyword . "', " . g:rplugin_htw . 'L)")'
+        call g:SendToVimCom('vim.help("' . a:rkeyword . '", ' . g:rplugin_htw . 'L)')
     elseif a:package != ""
-        exe 'Py SendToVimCom("vim.help(' . "'" . a:rkeyword . "', " . g:rplugin_htw . "L, package='" . a:package  . "')". '")'
+        call g:SendToVimCom('vim.help("' . a:rkeyword . '", ' . g:rplugin_htw . 'L, package="' . a:package  . '")')
     else
         let classfor = substitute(classfor, '\\', "", "g")
         let classfor = substitute(classfor, '"', '\\"', "g")
-        exe 'Py SendToVimCom("vim.help(' . "'" . a:rkeyword . "', " . g:rplugin_htw . "L, " . classfor . ")". '")'
+        call g:SendToVimCom('vim.help("' . a:rkeyword . '", ' . g:rplugin_htw . 'L, ' . classfor . ')')
     endif
-    let g:rplugin_lastrpl = ReadEvalReply()
-    if g:rplugin_lastrpl != "VIMHELP"
-        if g:rplugin_lastrpl =~ "^MULTILIB"
-            echo "The topic '" . a:rkeyword . "' was found in more than one library:"
-            let libs = split(g:rplugin_lastrpl)
+    let g:rplugin_lastev = ReadEvalReply()
+    if g:rplugin_lastev != "VIMHELP"
+        if g:rplugin_lastev =~ "^MULTILIB"
+            let msg = "The topic '" . a:rkeyword . "' was found in more than one library:\n"
+            let libs = split(g:rplugin_lastev)
             for idx in range(1, len(libs) - 1)
-                echo idx . " : " . libs[idx]
+                let msg .= idx . " : " . libs[idx] . "\n"
             endfor
-            let chn = input("Please, select one of them: ")
+            redraw
+            let chn = input(msg . "Please, select one of them: ")
             if chn > 0 && chn < len(libs)
                 call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
-                exe 'Py SendToVimCom("vim.help(' . "'" . a:rkeyword . "', " . g:rplugin_htw . "L, package='" . libs[chn] . "')" . '")'
-                let g:rplugin_lastrpl = ReadEvalReply()
+                call g:SendToVimCom('vim.help("' . a:rkeyword . '", ' . g:rplugin_htw . 'L, package="' . libs[chn] . '")')
+                let g:rplugin_lastev = ReadEvalReply()
+            else
+                return
             endif
         else
-            call RWarningMsg(g:rplugin_lastrpl)
+            call RWarningMsg(g:rplugin_lastev)
             return
         endif
     endif
@@ -3258,6 +3275,7 @@ if has("win32") || has("win64")
     else
         let $VIMRPLUGIN_TMPDIR = g:rplugin_uservimfiles . "/r-plugin/tmp"
     endif
+    let $VIMRPLUGIN_TMPDIR = substitute($VIMRPLUGIN_TMPDIR, "\\", "/", "g")
 else
     if isdirectory($TMPDIR)
         let $VIMRPLUGIN_TMPDIR = $TMPDIR . "/r-plugin-" . g:rplugin_userlogin
@@ -3342,6 +3360,30 @@ endfor
 unlet objbrplace
 unlet obpllen
 
+function RJobEvent()
+    if v:job_data[1] == 'stdout'
+        let cmd = substitute(v:job_data[2], "\n$", "", "")
+        exe cmd
+        let g:last_job_output = cmd
+    elseif v:job_data[1] == 'stderr'
+        let str = 'neovim.py error: ' . v:job_data[2]
+        call RWarningMsg(str)
+    else
+        let g:rplugin_job = 0
+    endif
+endfunction
+
+function SendToVimCom_Vim(cmd)
+    exe "Py SendToVimCom('" . a:cmd . "')"
+endfunction
+
+function SendToVimCom_Neovim(cmd)
+    let g:nvimcom_py_Input = a:cmd
+    call jobwrite(g:rplugin_job, "SendToVimCom " . a:cmd . "\n")
+endfunction
+
+let g:SendToVimCom = function("SendToVimCom_Vim")
+
 " python3 has priority over python
 if has("python3")
     command! -nargs=+ Py :py3 <args>
@@ -3349,12 +3391,13 @@ if has("python3")
 elseif has("python")
     command! -nargs=+ Py :py <args>
     command! -nargs=+ PyFile :pyfile <args>
+elseif has("neovim")
+    let g:SendToVimCom = function("SendToVimCom_Neovim")
 else
     command! -nargs=+ Py :
     command! -nargs=+ PyFile :
 endif
 
-exe "PyFile " . substitute(g:rplugin_home, " ", '\\ ', "g") . "/r-plugin/vimcom.py"
 
 " ^K (\013) cleans from cursor to the right and ^U (\025) cleans from cursor
 " to the left. However, ^U causes a beep if there is nothing to clean. The
@@ -3675,6 +3718,7 @@ let g:rplugin_vimcomport = 0
 let g:rplugin_vimcom_pkg = "vimcom"
 let g:rplugin_vimcom_version = 0
 let g:rplugin_lastrpl = ""
+let g:rplugin_lastev = ""
 let g:rplugin_hasRSFbutton = 0
 let g:rplugin_tmuxsname = substitute("vimrplugin-" . g:rplugin_userlogin . localtime() . g:rplugin_firstbuffer, '\W', '', 'g')
 
@@ -3692,6 +3736,17 @@ let g:rplugin_docfile = $VIMRPLUGIN_TMPDIR . "/Rdoc"
 " starting R:
 if &filetype != "rbrowser"
     call writefile([], $VIMRPLUGIN_TMPDIR . "/GlobalEnvList_" . $VIMINSTANCEID)
+endif
+
+if has("neovim")
+    if executable("python")
+        let g:rplugin_job = jobstart('vimcom', 'python', [g:rplugin_home . '/r-plugin/nvimcom.py'])
+        autocmd JobActivity vimcom call RJobEvent()
+    else
+        call RWarningMsgInp("Python executable not found.")
+    endif
+else
+    exe "PyFile " . substitute(g:rplugin_home, " ", '\\ ', "g") . "/r-plugin/vimcom.py"
 endif
 
 call SetRPath()
