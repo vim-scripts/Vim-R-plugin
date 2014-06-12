@@ -115,6 +115,11 @@ Before installing the plugin, you should install its dependencies:
    Vim >= 7.4: http://www.vim.org/download.php
                In addition to the most commonly used features, the plugin
                requires: |+python| or |+python3|, |+clientserver| and |+conceal|. 
+
+	       Note: If you use Neovim, |+python|, |+python3| and
+	       |+clientserver| features are not required, but the python
+	       executable must be in your PATH.
+
 	       Note: If you use Mac OS X, read about the bugs that affect it:
 	       |r-plugin-nox|.
 
@@ -735,6 +740,8 @@ other for Tmux. Then, it's useful (but not required) to know some Tmux
 commands. After you finished editing the file, you have to type `exit` to quit
 the Tmux session.
 
+Note: Neovim does not require the --servername VIM argument.
+
 
 4.8.1 tvim~
 							       *r-plugin-tvim*
@@ -838,6 +845,9 @@ support in Tmux. You will be able to toggle mouse support on and off by typing
 
 4.8.2 Remote access~
 							     *r-plugin-remote*
+Note: Neovim does not require the --servername VIM argument. Thus, you also do
+not need to enable the X11 Forwarding for omnicompletion, etc.
+
 If you need to access Vim in a remote Unix machine through ssh, and if you
 want to get omnicompletion, syntax highlight of function names and the Object
 Browser working properly, then you have to:
@@ -965,6 +975,8 @@ work as expected again after any valid code is executed in the R Console.
 
 5.7. Bugs that affect Mac OS X, Linux Console and ...~
 								*r-plugin-nox*
+Note: The bug described in this section does not affect Neovim.
+
 If you use MacVim, run Vim in the Linux Console or start Vim in a terminal
 emulator without the command line argument |--servername|, Vim will not
 receive remote messages and the vimcom.plus package will display one of the
@@ -2313,7 +2325,7 @@ please read this document from the beginning.
    endif
 <
 							 *r-plugin-bash-setup*
-   ~/.bashrc:~
+   ~/.bashrc for Vim:~
 >
    # Change the TERM environment variable (to get 256 colors) and make Vim
    # connecting to X Server even if running in a terminal emulator (to get
@@ -2340,6 +2352,26 @@ please read this document from the beginning.
        else
            function tvim(){ tmux new-session "vim $@" ; }
        fi
+   fi
+<
+
+   ~/.bashrc for Neovim:~
+>
+   # Change the TERM environment variable (to get 256 colors):
+   if [ "x$DISPLAY" != "x" ]
+   then
+       if [ "screen" = "$TERM" ]
+       then
+           export TERM=screen-256color
+       else
+           export TERM=xterm-256color
+       fi
+   fi
+   if [ "x$TERM" == "xxterm" ] || [ "x$TERM" == "xxterm-256color" ]
+   then
+       function tvim(){ tmux -2 new-session "TERM=screen-256color nvim $@" ; }
+   else
+       function tvim(){ tmux new-session "nvim $@" ; }
    fi
 <
 
