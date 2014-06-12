@@ -803,9 +803,7 @@ function StartR(whatr)
 
     call writefile([], $VIMRPLUGIN_TMPDIR . "/globenv_" . $VIMINSTANCEID)
     call writefile([], $VIMRPLUGIN_TMPDIR . "/liblist_" . $VIMINSTANCEID)
-    if filereadable($VIMRPLUGIN_TMPDIR . "/libnames_" . $VIMINSTANCEID)
-        call delete($VIMRPLUGIN_TMPDIR . "/libnames_" . $VIMINSTANCEID)
-    endif
+    call delete($VIMRPLUGIN_TMPDIR . "/libnames_" . $VIMINSTANCEID)
 
     if !exists("b:rplugin_R")
         call SetRPath()
@@ -919,9 +917,54 @@ function StartR(whatr)
     echon
 endfunction
 
+function ReceiveVimComStartMsg(msg)
+    let vmsg = split(a:msg)
+    if len(vmsg) == 4
+        if vmsg[0] == "vimcom"
+            let g:rplugin_vimcom_pkg = "vimcom"
+        elseif vmsg[0] == "vimcom.plus"
+            let g:rplugin_vimcom_pkg = "vimcom.plus"
+        else
+            call RWarningMsg("Invalid package name: " . vmsg[0])
+        endif
+        if vmsg[1] != "1.0-0_a2"
+            call RWarningMsg('This version of Vim-R-plugin requires vimcom.plus 1.0-0_a2.')
+        endif
+        if vmsg[2] != $VIMINSTANCEID
+            call RWarningMsg("Invalid ID: " . vmsg[2] . " [Correct = " . $VIMINSTANCEID . "]")
+        endif
+        if vmsg[3] > "10000" && vmsg[3] < "10049"
+            let g:rplugin_vimcomport = vmsg[3]
+            " Give vimcom some time to complete its startup process
+            sleep 20m
+        else
+            call RWarningMsg("Invalid vimcom.plus port: " . vmsg[2])
+        endif
+    endif
+endfunction
+
+function NoLongerWaitVimCom()
+    if filereadable($VIMRPLUGIN_TMPDIR . "/vimcom_running")
+        call delete($VIMRPLUGIN_TMPDIR . "/vimcom_running")
+    else
+        call RWarningMsg("The package vimcom.plus wasn't loaded yet.")
+    endif
+endfunction
+
+" Neovim don't need this function:
 function WaitVimComStart()
-    if g:vimrplugin_vimcom_wait < 0
-        return 0
+    if has("neovim")
+        if executable(g:rplugin_home . "/r-plugin/timer.sh")
+            let wjob = jobstart('waitvc', g:rplugin_home . '/r-plugin/timer.sh', [string(g:vimrplugin_vimcom_wait / 1000), 'call NoLongerWaitVimCom()'])
+            autocmd JobActivity waitvc call RServerEvent()
+        else
+            call RWarningMsg("File '" . g:rplugin_home . "/r-plugin/timer.sh" . "' not found.")
+        endif
+        return
+    else
+        if g:vimrplugin_vimcom_wait < 0
+            return 0
+        endif
     endif
     sleep 300m
     let ii = 0
@@ -948,8 +991,8 @@ function WaitVimComStart()
         endif
         if vr[2] == $VIMINSTANCEID
             let g:rplugin_vimcom_version = vr[1]
-            if g:rplugin_vimcom_version != "1.0-0_a1"
-                call RWarningMsg('This version of Vim-R-plugin requires vimcom.plus 1.0-0_a1.')
+            if g:rplugin_vimcom_version != "1.0-0_a2"
+                call RWarningMsg('This version of Vim-R-plugin requires vimcom.plus 1.0-0_a2.')
                 sleep 1
             endif
         else
@@ -2055,7 +2098,10 @@ function RQuit(how)
     call delete($VIMRPLUGIN_TMPDIR . "/liblist_" . $VIMINSTANCEID)
     call delete($VIMRPLUGIN_TMPDIR . "/libnames_" . $VIMINSTANCEID)
     call delete($VIMRPLUGIN_TMPDIR . "/GlobalEnvList_" . $VIMINSTANCEID)
+    call delete($VIMRPLUGIN_TMPDIR . "/vimcom_running")
     let g:SendCmdToR = function('SendCmdToR_fake')
+    let g:rplugin_vimcomport = 0
+    let g:rplugin_vimcom_pkg = "vimcom"
 endfunction
 
 " knit the current buffer content
@@ -3360,7 +3406,11 @@ call RSetDefaultValue("g:vimrplugin_editor_w",         66)
 call RSetDefaultValue("g:vimrplugin_help_w",           46)
 call RSetDefaultValue("g:vimrplugin_objbr_w",          40)
 call RSetDefaultValue("g:vimrplugin_external_ob",       0)
-call RSetDefaultValue("g:vimrplugin_vimcom_wait",    5000)
+if has("neovim")
+    call RSetDefaultValue("g:vimrplugin_vimcom_wait", 15000)
+else
+    call RSetDefaultValue("g:vimrplugin_vimcom_wait", 5000)
+endif
 call RSetDefaultValue("g:vimrplugin_show_args",         0)
 call RSetDefaultValue("g:vimrplugin_never_unmake_menu", 0)
 call RSetDefaultValue("g:vimrplugin_insert_mode_cmds",  1)

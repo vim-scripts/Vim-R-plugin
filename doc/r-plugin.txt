@@ -1695,6 +1695,11 @@ value for the variable in your |vimrc|. Example:
 Note: You should have the line  `library(vimcom.plus)`  in your Rprofile. The
 Vim command  :RpluginConfig  adds that line for you.
 
+The plugin has a different behavior with Neovim: it receives a message from
+vimcom.plus as soon as it is loaded and warns if the package was not loaded
+after 15 seconds of sending the command to start R. If you need more than 15
+seconds, change the value of vimrplugin_vimcom_wait.
+
 If you do not want to install the vimcom.plus package, then put in your
 |vimrc|:
 >
