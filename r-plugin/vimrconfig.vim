@@ -1,4 +1,3 @@
-
 function! RFindString(lll, sss)
     for line in a:lll
         if line =~ a:sss
@@ -87,7 +86,7 @@ function! RConfigRprofile()
                 let rpflines += ['    if(nchar(Sys.getenv("DISPLAY")) > 1)',
                             \ "        options(editor = '" . 'gvim -f -c "set ft=r"' . "')",
                             \ '    else',
-                            \ "        options(editor = '" . 'vim -c "set ft=r"' . "')",
+                            \ "        options(editor = '" . s:vimprog . ' -c "set ft=r"' . "')",
                             \ '    # See ?setOutputColors256 to know how to customize R output colors']
                 if len(resp) > 1 && resp[1] == "HasColorout"
                     let rpflines += ['    library(colorout)']
@@ -118,7 +117,7 @@ function! RConfigRprofile()
                     let rpflines += ['    # See R documentation on Vim buffer even if asking for help in R Console:']
                     if ($PATH =~ "\\~/bin" || $PATH =~ expand("~/bin")) && filewritable(expand("~/bin")) == 2 && !filereadable(expand("~/bin/vimrpager"))
                         call writefile(['#!/bin/sh',
-                                    \ 'cat | vim -c "set ft=rdoc" -'], expand("~/bin/vimrpager"))
+                                    \ 'cat | ' . s:vimprog . ' -c "set ft=rdoc" -'], expand("~/bin/vimrpager"))
                         call system("chmod +x " . expand("~/bin/vimrpager"))
                         let rpflines += ['    options(help_type = "text", pager = "' . expand("~/bin/vimrpager") . '")']
                     endif
@@ -196,20 +195,19 @@ endfunction
 " Configure vimrc
 function! RConfigVimrc()
     if has("win32") || has("win64")
-        if filereadable($HOME . "/_vimrc")
-            let uvimrc = $HOME . "/_vimrc"
-        elseif filereadable($HOME . "/vimfiles/vimrc")
+        let uvimrc = $HOME . "/_vimrc"
+        if !filereadable(uvimrc) && filereadable($HOME . "/vimfiles/vimrc")
             let uvimrc = $HOME . "/vimfiles/vimrc"
-        else
-            let uvimrc = $HOME . "/_vimrc"
+        endif
+    elseif has("neovim")
+        let uvimrc = $HOME . "/.nvimrc"
+        if !filereadable(uvimrc) && filereadable($HOME . "/.nvim/nvimrc")
+            let uvimrc = $HOME . "/.nvim/nvimrc"
         endif
     else
-        if filereadable($HOME . "/.vimrc")
-            let uvimrc = $HOME . "/.vimrc"
-        elseif filereadable($HOME . "/.vim/vimrc")
+        let uvimrc = $HOME . "/.vimrc"
+        if !filereadable(uvimrc) && filereadable($HOME . "/.vim/vimrc")
             let uvimrc = $HOME . "/.vim/vimrc"
-        else
-            let uvimrc = $HOME . "/.vimrc"
         endif
     endif
 
@@ -248,9 +246,6 @@ function! RConfigVimrc()
         let vlines += ['" Lines added by the Vim-R-plugin command :RpluginConfig:']
     endif
 
-    if RFindString(vlines, 'set\s*nocompatible') == 0 && RFindString(vlines, 'set\s*nocp') == 0
-        let vlines += ['set nocompatible']
-    endif
     if RFindString(vlines, 'syntax\s*on') == 0 && RFindString(vlines, 'syntax\s*enable') == 0
         let vlines += ['syntax enable']
     endif
@@ -423,8 +418,10 @@ function! RConfigBash()
             echo "but we have to configure the TERM environment variable for that."
             echo "Instead of starting Tmux and then starting Vim, we can configure"
             echo "Bash to start both at once with the 'tvim' command."
-            echo "The serverclient feature must be enabled for automatic update of the"
-            echo "Object Browser and syntax highlight of function names."
+            if !has("neovim")
+                echo "The 'clientserver' feature must be enabled for automatic update of"
+                echo "the Object Browser and syntax highlight of function names."
+            endif
             echohl Question
             let what = input("Do you want that all these features are added to your .bashrc? [y/N]: ")
             echohl Normal
@@ -435,35 +432,55 @@ function! RConfigBash()
                 else
                     let blines += ['# Lines added by the Vim-R-plugin command :RpluginConfig:']
                 endif
-                let blines += ['# Change the TERM environment variable (to get 256 colors) and make Vim',
-                            \ '# connecting to X Server even if running in a terminal emulator (to get',
-                            \ '# dynamic update of syntax highlight and Object Browser):',
-                            \ 'if [ "$TERM" = "xterm" ] || [ "$TERM" = "xterm-256color" ]',
-                            \ 'then',
-                            \ '    export TERM=xterm-256color',
-                            \ '    export HAS_256_COLORS=yes',
-                            \ 'fi',
-                            \ 'if [ "$TERM" = "screen" ] && [ "$HAS_256_COLORS" = "yes" ]',
-                            \ 'then',
-                            \ '    export TERM=screen-256color',
-                            \ 'fi',
-                            \ 'if [ "x$DISPLAY" != "x" ]',
-                            \ 'then',
-                            \ '    alias vim="vim --servername VIM"',
-                            \ '    if [ "$HAS_256_COLORS" = "yes" ]',
-                            \ '    then',
-                            \ '        function tvim(){ tmux new-session "TERM=screen-256color vim --servername VIM $@" ; }',
-                            \ '    else',
-                            \ '        function tvim(){ tmux new-session "vim --servername VIM $@" ; }',
-                            \ '    fi',
-                            \ 'else',
-                            \ '    if [ "$HAS_256_COLORS" = "yes" ]',
-                            \ '    then',
-                            \ '        function tvim(){ tmux new-session "TERM=screen-256color vim $@" ; }',
-                            \ '    else',
-                            \ '        function tvim(){ tmux new-session "vim $@" ; }',
-                            \ '    fi',
-                            \ 'fi' ]
+                if has("neovim")
+                    let blines += ['# Change the TERM environment variable (to get 256 colors) and creates',
+                                \ '# a function to run Tmux and Neovim at once:',
+                                \ 'if [ "$TERM" = "xterm" ] || [ "$TERM" = "xterm-256color" ]',
+                                \ 'then',
+                                \ '    export TERM=xterm-256color',
+                                \ '    export HAS_256_COLORS=yes',
+                                \ 'fi',
+                                \ 'if [ "$TERM" = "screen" ] && [ "$HAS_256_COLORS" = "yes" ]',
+                                \ 'then',
+                                \ '    export TERM=screen-256color',
+                                \ 'fi',
+                                \ 'if [ "$HAS_256_COLORS" = "yes" ]',
+                                \ 'then',
+                                \ '    function tvim(){ tmux new-session "TERM=screen-256color nvim $@" ; }',
+                                \ 'else',
+                                \ '    function tvim(){ tmux new-session "nvim $@" ; }',
+                                \ 'fi' ]
+                else
+                    let blines += ['# Change the TERM environment variable (to get 256 colors) and make Vim',
+                                \ '# connecting to X Server even if running in a terminal emulator (to get',
+                                \ '# dynamic update of syntax highlight and Object Browser):',
+                                \ 'if [ "$TERM" = "xterm" ] || [ "$TERM" = "xterm-256color" ]',
+                                \ 'then',
+                                \ '    export TERM=xterm-256color',
+                                \ '    export HAS_256_COLORS=yes',
+                                \ 'fi',
+                                \ 'if [ "$TERM" = "screen" ] && [ "$HAS_256_COLORS" = "yes" ]',
+                                \ 'then',
+                                \ '    export TERM=screen-256color',
+                                \ 'fi',
+                                \ 'if [ "x$DISPLAY" != "x" ]',
+                                \ 'then',
+                                \ '    alias vim="vim --servername VIM"',
+                                \ '    if [ "$HAS_256_COLORS" = "yes" ]',
+                                \ '    then',
+                                \ '        function tvim(){ tmux new-session "TERM=screen-256color vim --servername VIM $@" ; }',
+                                \ '    else',
+                                \ '        function tvim(){ tmux new-session "vim --servername VIM $@" ; }',
+                                \ '    fi',
+                                \ 'else',
+                                \ '    if [ "$HAS_256_COLORS" = "yes" ]',
+                                \ '    then',
+                                \ '        function tvim(){ tmux new-session "TERM=screen-256color vim $@" ; }',
+                                \ '    else',
+                                \ '        function tvim(){ tmux new-session "vim $@" ; }',
+                                \ '    fi',
+                                \ 'fi' ]
+                endif
                 call writefile(blines, $HOME . "/.bashrc")
                 if !has("gui_running")
                     redraw
@@ -539,6 +556,12 @@ function! RConfigTmux()
 endfunction
 
 function! RConfigVimR()
+    if has("neovim")
+        let s:vimprog = "nvim"
+    else
+        let s:vimprog = "vim"
+    endif
+    exe "helptags " . g:rplugin_uservimfiles . "/doc"
     if string(g:SendCmdToR) == "function('SendCmdToR_fake')"
         if hasmapto("<Plug>RStart", "n")
             let cmd = RNMapCmd("<Plug>RStart")
