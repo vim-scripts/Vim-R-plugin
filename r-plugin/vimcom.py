@@ -12,7 +12,7 @@ def DiscoverVimComPort():
     global VimComPort
     global VimComFamily
     HOST = "localhost"
-    VimComPort = 9998
+    VimComPort = 10000
     repl = "NOTHING"
     correct_repl = vim.eval("$VIMINSTANCEID")
     if correct_repl is None:
@@ -21,7 +21,7 @@ def DiscoverVimComPort():
             vim.command("call RWarningMsg('VIMINSTANCEID not found.')")
             return
 
-    while repl.find(correct_repl) < 0 and VimComPort < 10050:
+    while repl.find(correct_repl) < 0 and VimComPort < 10049:
         VimComPort = VimComPort + 1
         for res in socket.getaddrinfo(HOST, VimComPort, socket.AF_UNSPEC, socket.SOCK_DGRAM):
             af, socktype, proto, canonname, sa = res
@@ -43,7 +43,7 @@ def DiscoverVimComPort():
                 sock = None
                 continue
 
-    if VimComPort >= 10050:
+    if VimComPort >= 10049:
         VimComPort = 0
         vim.command("let g:rplugin_vimcomport = 0")
         if not PortWarn:
@@ -52,8 +52,8 @@ def DiscoverVimComPort():
     else:
         vim.command("let g:rplugin_vimcomport = " + str(VimComPort))
         PortWarn = False
-        if repl.find("1.0-0_a1") != 0:
-            vim.command("call RWarningMsg('This version of Vim-R-plugin requires vimcom.plus 1.0-0_a1.')")
+        if repl.find("1.0-0_a2") != 0:
+            vim.command("call RWarningMsg('This version of Vim-R-plugin requires vimcom.plus 1.0-0_a2.')")
             vim.command("sleep 1")
     return(VimComPort)
 
