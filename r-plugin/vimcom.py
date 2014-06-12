@@ -30,10 +30,10 @@ def DiscoverVimComPort():
                 sock.settimeout(0.1)
                 sock.connect(sa)
                 if sys.hexversion < 0x03000000:
-                    sock.send("\002What port [Python 2]?")
+                    sock.send("\001What port [Python 2]?")
                     repl = sock.recv(1024)
                 else:
-                    sock.send("\002What port [Python 3]?".encode())
+                    sock.send("\001What port [Python 3]?".encode())
                     repl = sock.recv(1024).decode()
                 sock.close()
                 if repl.find(correct_repl):

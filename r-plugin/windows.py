@@ -70,7 +70,7 @@ def FindRConsole():
 def SendToRConsole(aString):
     global RConsole
     global Rterm
-    SendToVimCom("\x09Set R as busy [SendToRConsole()]")
+    SendToVimCom("\003Set R as busy [SendToRConsole()]")
     if sys.hexversion < 0x03000000:
         finalString = aString.decode("latin-1") + "\n"
     else:
@@ -121,7 +121,7 @@ def RaiseRConsole():
 def SendQuitMsg(aString):
     global RConsole
     global Rterm
-    SendToVimCom("\x09Set R as busy [SendQuitMsg()]")
+    SendToVimCom("\003Set R as busy [SendQuitMsg()]")
     if sys.hexversion < 0x03000000:
         finalString = aString.decode("latin-1") + "\n"
     else:

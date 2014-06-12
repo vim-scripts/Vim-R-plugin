@@ -644,7 +644,7 @@ function StartR_TmuxSplit(rcmd)
     endif
     let g:rplugin_last_rcmd = a:rcmd
     if WaitVimComStart()
-        call g:SendToVimCom("\001Update OB [StartR]")
+        call g:SendToVimCom("\005B Update OB [StartR]")
     endif
 endfunction
 
@@ -723,7 +723,7 @@ function StartR_ExternalTerm(rcmd)
     endif
     let g:SendCmdToR = function('SendCmdToR_Term')
     if WaitVimComStart()
-        call g:SendToVimCom("\001Update OB [StartR]")
+        call g:SendToVimCom("\005B Update OB [StartR]")
     endif
 endfunction
 
@@ -771,7 +771,7 @@ function StartR_OSX()
     endif
     let g:SendCmdToR = function('SendCmdToR_OSX')
     if WaitVimComStart()
-        call g:SendToVimCom("\001Update OB [StartR]")
+        call g:SendToVimCom("\005B Update OB [StartR]")
     endif
 endfunction
 
@@ -862,10 +862,10 @@ function StartR(whatr)
                     endif
                     call VimExprToOB('ResetVimComPort()')
                     if !has("neovim")
-                        call g:SendToVimCom("\007" . g:rplugin_obsname)
+                        call g:SendToVimCom("\002" . g:rplugin_obsname)
                     endif
-                    call g:SendToVimCom("\003.GlobalEnv [Restarting R]")
-                    call g:SendToVimCom("\004Libraries [Restarting()]")
+                    call g:SendToVimCom("\005G .GlobalEnv [Restarting R]")
+                    call g:SendToVimCom("\005L Libraries [Restarting()]")
                     " vimcom automatically update the libraries view, but not
                     " the GlobalEnv one because vimcom_count_objects() returns 0.
                     if !has("neovim")
@@ -900,12 +900,12 @@ function StartR(whatr)
         if g:vimrplugin_restart && bufloaded(b:objbrtitle)
             call WaitVimComStart()
             if has("neovim")
-                call g:SendToVimCom("\007" . g:rplugin_myport)
+                call g:SendToVimCom("\002" . g:rplugin_myport)
             else
-                call g:SendToVimCom("\007" . v:servername)
+                call g:SendToVimCom("\002" . v:servername)
             endif
-            call g:SendToVimCom("\003.GlobalEnv [Restarting R]")
-            call g:SendToVimCom("\004Libraries [Restarting()]")
+            call g:SendToVimCom("\005G .GlobalEnv [Restarting R]")
+            call g:SendToVimCom("\005L Libraries [Restarting()]")
             if exists("*UpdateOB")
                 call UpdateOB("GlobalEnv")
             endif
@@ -996,9 +996,9 @@ function StartObjBrowser_Tmux()
         return
     endif
 
-    call g:SendToVimCom("\003GlobalEnv [OB StartObjBrowser_Tmux]")
+    call g:SendToVimCom("\005G GlobalEnv [OB StartObjBrowser_Tmux]")
     sleep 50m
-    call g:SendToVimCom("\004Libraries [OB StartObjBrowser_Tmux]")
+    call g:SendToVimCom("\005L Libraries [OB StartObjBrowser_Tmux]")
     sleep 50m
 
     " Don't start the Object Browser if it already exists
@@ -1040,7 +1040,7 @@ function StartObjBrowser_Tmux()
                 \ 'set noruler',
                 \ 'let g:SendCmdToR = function("SendCmdToR_TmuxSplit")',
                 \ 'if has("clientserver") && v:servername != ""',
-                \ '    call g:SendToVimCom("\007" . v:servername)',
+                \ '    call g:SendToVimCom("\002" . v:servername)',
                 \ 'endif',
                 \ 'if !has("neovim")',
                 \ '    sleep 150m',
@@ -1147,9 +1147,9 @@ function StartObjBrowser_Vim()
         let g:rplugin_ob_warn_shown = 1
     else
         if has("neovim")
-            call g:SendToVimCom("\007" . g:rplugin_myport)
+            call g:SendToVimCom("\002" . g:rplugin_myport)
         else
-            call g:SendToVimCom("\007" . v:servername)
+            call g:SendToVimCom("\002" . v:servername)
         endif
     endif
 
@@ -1183,7 +1183,7 @@ function StartObjBrowser_Vim()
         unlet g:tmp_objbrtitle
         unlet g:tmp_tmuxsname
         unlet g:tmp_curbufname
-        call g:SendToVimCom("\001Update OB [OB init GVIM]")
+        call g:SendToVimCom("\005B Update OB [OB init GVIM]")
         sleep 50m
         call UpdateOB("GlobalEnv")
     endif
@@ -1264,7 +1264,7 @@ function RBrOpenCloseLs_Vim(status)
 
     " Avoid possibly freezing cross messages between Vim and R
     if exists("g:rplugin_curview") && v:servername != ""
-        call g:SendToVimCom("\x08Stop updating info [RBrOpenCloseLs()]")
+        call g:SendToVimCom("\005Stop updating info [RBrOpenCloseLs()]")
         let stt = a:status
     else
         let stt = a:status + 2
@@ -1278,7 +1278,7 @@ function RBrOpenCloseLs_Vim(status)
         let switchedbuf = 1
     endif
 
-    call g:SendToVimCom("\006" . stt)
+    call g:SendToVimCom("\007" . stt)
 
     if g:rplugin_lastrpl == "R is busy."
         call RWarningMsg("R is busy.")
@@ -1291,7 +1291,7 @@ function RBrOpenCloseLs_Vim(status)
     if exists("g:rplugin_curview")
         call UpdateOB("both")
         if v:servername != ""
-            call g:SendToVimCom("\007" . v:servername)
+            call g:SendToVimCom("\002" . v:servername)
         endif
     endif
 endfunction
@@ -1311,7 +1311,7 @@ function RBrOpenCloseLs_TmuxVim(status)
         endif
     endif
 
-    call g:SendToVimCom("\006" . a:status)
+    call g:SendToVimCom("\007" . a:status)
 
     if g:rplugin_lastrpl == "R is busy."
         call RWarningMsg("R is busy.")
@@ -1332,7 +1332,7 @@ function RBrOpenCloseLs_TmuxNeovim(status)
             return
         endif
     endif
-    call g:SendToVimCom("\006" . a:status)
+    call g:SendToVimCom("\007" . a:status)
 endfunction
 
 function RBrOpenCloseLs_TmuxOB(status)
@@ -1344,7 +1344,7 @@ function RBrOpenCloseLs_TmuxOB(status)
         normal! :<Esc>
         return
     endif
-    call g:SendToVimCom("\006" . a:status)
+    call g:SendToVimCom("\007" . a:status)
     if !has("neovim") && v:servername == ""
         call UpdateOB("both")
     endif
@@ -3402,13 +3402,13 @@ unlet obpllen
 function RSetMyPort(p)
     let g:rplugin_myport = a:p
     if &filetype == "rbrowser"
-        call g:SendToVimCom("\007" . a:p)
-        call g:SendToVimCom("\001Update OB [RSetMyPort]")
+        call g:SendToVimCom("\002" . a:p)
+        call g:SendToVimCom("\005B Update OB [RSetMyPort]")
     endif
 endfunction
 
 function SendObjPortToVimCom(p)
-    call g:SendToVimCom("\007" . a:p)
+    call g:SendToVimCom("\002" . a:p)
 endfunction
 
 function RClientEvent()
