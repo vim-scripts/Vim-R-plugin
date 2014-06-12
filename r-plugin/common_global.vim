@@ -948,12 +948,8 @@ function WaitVimComStart()
         endif
         if vr[2] == $VIMINSTANCEID
             let g:rplugin_vimcom_version = vr[1]
-            if g:rplugin_vimcom_version != "1.0-0"
-                if g:rplugin_vimcom_pkg == "vimcom.plus"
-                    call RWarningMsg('This version of Vim-R-plugin requires vimcom.plus 1.0-0.')
-                else
-                    call RWarningMsg('This version of Vim-R-plugin requires vimcom.plus (or vimcom) 1.0-0.')
-                endif
+            if g:rplugin_vimcom_version != "1.0-0_a1"
+                call RWarningMsg('This version of Vim-R-plugin requires vimcom.plus 1.0-0_a1.')
                 sleep 1
             endif
         else

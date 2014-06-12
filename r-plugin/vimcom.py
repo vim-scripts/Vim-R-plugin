@@ -38,8 +38,6 @@ def DiscoverVimComPort():
                 sock.close()
                 if repl.find(correct_repl):
                     VimComFamily = af
-                    if repl.find(" vimcom.plus ") > -1:
-                        vim.command("let g:rplugin_vimcom_pkg = 'vimcom.plus'")
                     break
             except:
                 sock = None
@@ -54,8 +52,8 @@ def DiscoverVimComPort():
     else:
         vim.command("let g:rplugin_vimcomport = " + str(VimComPort))
         PortWarn = False
-        if repl.find("1.0-0") != 0:
-            vim.command("call RWarningMsg('This version of Vim-R-plugin requires vimcom.plus (or vimcom) 1.0-0.')")
+        if repl.find("1.0-0_a1") != 0:
+            vim.command("call RWarningMsg('This version of Vim-R-plugin requires vimcom.plus 1.0-0_a1.')")
             vim.command("sleep 1")
     return(VimComPort)
 

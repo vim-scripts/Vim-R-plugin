@@ -7,13 +7,11 @@ import re
 VimComPort = 0
 PortWarn = False
 VimComFamily = None
-VimComPkg = "vimcom"
 
 def DiscoverVimComPort():
     global PortWarn
     global VimComPort
     global VimComFamily
-    global VimComPkg
     HOST = "localhost"
     VimComPort = 9998
     repl = "NOTHING"
@@ -40,8 +38,6 @@ def DiscoverVimComPort():
                 sock.close()
                 if repl.find(correct_repl):
                     VimComFamily = af
-                    if repl.find(" vimcom.plus ") > -1:
-                        VimComPkg = "vimcom.plus"
                     break
             except:
                 sock = None
@@ -60,8 +56,8 @@ def DiscoverVimComPort():
         print "let g:rplugin_vimcomport = " + str(VimComPort) + "\n"
         sys.stdout.flush()
         PortWarn = False
-        if repl.find("1.0-0") != 0:
-            print "call RWarningMsg('This version of Vim-R-plugin requires vimcom.plus (or vimcom) 1.0-0.')\n"
+        if repl.find("1.0-0_a1") != 0:
+            print "call RWarningMsg('This version of Vim-R-plugin requires vimcom.plus 1.0-0_a1.')\n"
             sys.stdout.flush()
         return
 
