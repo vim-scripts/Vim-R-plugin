@@ -104,7 +104,8 @@ while True:
     if line.find("SendToVimCom") != -1:
         line = line.replace("SendToVimCom ", "")
         rpl = SendToVimCom(line)
-        print "let g:rplugin_lastrpl = '" + rpl + "'\n"
+        if not line.find("I\002") == 0:
+            print "let g:rplugin_lastrpl = '" + rpl + "'\n"
     else:
         if line.find("DiscoverVimComPort") != -1:
             DiscoverVimComPort()

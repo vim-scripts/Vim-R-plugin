@@ -971,7 +971,6 @@ receive remote messages and the vimcom.plus package will display one of the
 following messages:
 
    MacVim isn't fully supported by vimcom.plus.
-   Neovim isn't fully supported by vimcom.plus.
    Vim was built without the 'clientserver' feature.
    Did you pass the --servername argument to Vim?
    There is no X Server running.
@@ -1021,8 +1020,6 @@ A user reported success with the following procedure:
    tmux
    /usr/local/Cellar/vim/7.4.273/bin/vim --servername VIM r_script.R
 <
-Neovim msgpack API is not supported by vimcom.plus yet.
-
 See also: |r-plugin-remote|.
 
 
@@ -1999,7 +1996,7 @@ definition, put the cursor over the function name and hit CTRL-]. Please, read
 |tags-option|.
 
 You could, for example, download and unpack R's source code, start R inside
-the ~/.vim directory and do the following command:
+the ~/.vim directory and do the following commands:
 >
    rtags(path = "/path/to/R/source/code", recursive = TRUE, ofile = "RTAGS")
    etags2ctags("RTAGS", "Rtags")
@@ -2008,7 +2005,8 @@ Then, you would quit R and do the following command in the terminal emulator:
 >
    ctags --languages=C,Fortran,Java,Tcl -R -f RsrcTags /path/to/R/source/code
 <
-Finally, you would put the following in your |vimrc|, inside an |autocmd-group|:
+Finally, you would put the following in your |vimrc|, optionally inside an
+|autocmd-group|:
 >
    autocmd FileType r set tags+=~/.vim/Rtags,~/.vim/RsrcTags
    autocmd FileType rnoweb set tags+=~/.vim/Rtags,~/.vim/RsrcTags
@@ -2488,7 +2486,7 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-1.0 (2014-06-09)
+1.0 (2014-06-11)
 
  * vimrplugin_openpdf now accepts three values: 0, 1 and 2.
 
