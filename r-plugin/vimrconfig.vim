@@ -535,6 +535,7 @@ function! RConfigTmux()
             let tlines += ["set-option -g prefix C-a",
                         \ "unbind-key C-b",
                         \ "bind-key C-a send-prefix",
+                        \ '# Set "status on" if you usually create new Tmux windows',
                         \ "set -g status off",
                         \ "set-window-option -g mode-keys vi",
                         \ "set -g terminal-overrides 'xterm*:smcup@:rmcup@'",

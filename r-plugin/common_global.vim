@@ -643,6 +643,9 @@ function StartR_TmuxSplit(rcmd)
         let g:vimrplugin_ca_ck = ca_ck
     endif
     let g:rplugin_last_rcmd = a:rcmd
+    if g:vimrplugin_tmux_title != "automatic" && g:vimrplugin_tmux_title != ""
+        call system("tmux rename-window " . g:vimrplugin_tmux_title)
+    endif
     if WaitVimComStart()
         call g:SendToVimCom("\005B Update OB [StartR]")
     endif
@@ -2102,6 +2105,9 @@ function RQuit(how)
     let g:SendCmdToR = function('SendCmdToR_fake')
     let g:rplugin_vimcomport = 0
     let g:rplugin_vimcom_pkg = "vimcom"
+    if g:rplugin_tmuxwasfirst && g:vimrplugin_tmux_title != "automatic" && g:vimrplugin_tmux_title != ""
+        call system("tmux set automatic-rename on")
+    endif
 endfunction
 
 " knit the current buffer content
@@ -3397,6 +3403,7 @@ call RSetDefaultValue("g:vimrplugin_restart",           0)
 call RSetDefaultValue("g:vimrplugin_vsplit",            0)
 call RSetDefaultValue("g:vimrplugin_rconsole_width",   -1)
 call RSetDefaultValue("g:vimrplugin_rconsole_height",  15)
+call RSetDefaultValue("g:vimrplugin_tmux_title", "'VimR'")
 call RSetDefaultValue("g:vimrplugin_listmethods",       0)
 call RSetDefaultValue("g:vimrplugin_specialplot",       0)
 call RSetDefaultValue("g:vimrplugin_notmuxconf",        0)

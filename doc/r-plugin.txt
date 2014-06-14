@@ -1120,9 +1120,11 @@ is running:
 |vimrplugin_routnotab|         Show output of R CMD BATCH in new window
 |vimrplugin_indent_commented|  Indent lines commented with the \xx command
 |vimrplugin_sleeptime|         Delay while sending commands in MS Windows
+|vimrplugin_notmuxconf|        Don't use a specially built Tmux config file
 |vimrplugin_rconsole_height|   The number of lines of R Console (Tmux split)
 |vimrplugin_vsplit|            Make Tmux split the window vertically
 |vimrplugin_rconsole_width|    The number of columns of R Console (Tmux split)
+|vimrplugin_tmux_title|        Set Tmux window title to "VimR"
 |vimrplugin_applescript|       Use osascript in Mac OS X
 |vimrplugin_listmethods|       Do `vim.list.args()` instead of `args()`
 |vimrplugin_specialplot|       Do `vim.plot()` instead of `plot()`
@@ -1143,7 +1145,7 @@ is running:
 |vimrplugin_restart|           Restart R if it is already running
 |vimrplugin_show_args|         Show extra information during omnicompletion
 |vimrplugin_vimcom_wait|       Time to wait for vimcom.plus loading
-|vimrplugin_vim_wd|            Start R in working directory of Vim
+|vimrplugin_vim_wd|            Start R in Vim's working directory
 
 
 6.1. Terminal emulator (Linux/Unix only)~
@@ -1426,6 +1428,7 @@ file (~/.tmux.conf).
 						  *vimrplugin_rconsole_height*
 							   *vimrplugin_vsplit*
 						   *vimrplugin_rconsole_width*
+						       *vimrplugin_tmux_title*
 These three options are valid only when Vim is started inside a Tmux session.
 In this case, when you type <LocalLeader>rf, the terminal will be split in two
 regions and R will run in one of them. By default, the Vim-R-plugin will tell
@@ -1442,6 +1445,16 @@ If you prefer to split it vertically:
 In this case, you can choose the initial number of columns of R Console:
 >
    let vimrplugin_rconsole_width = 15
+<
+Tmux automatically renames window titles to the command currently running. The
+Vim-R-plugin sets the title of the window where Vim and R are running to
+"VimR". This title will be visible only if Tmux status bar is "on", and it is
+useful only if you have created new windows with the <C-a>c command. You
+can change the value of vimrplugin_tmux_title to either set a different title
+or let Tmux set the title automatically. Examples:
+>
+   let vimrplugin_tmux_title = "Vim-R"
+   let vimrplugin_tmux_title = "automatic"
 <
 
 6.16. Integration with AppleScript (OS X only)~
@@ -2386,12 +2399,22 @@ please read this document from the beginning.
    set-option -g prefix C-a
    unbind-key C-b
    bind-key C-a send-prefix
+   # Set "status on" if you usually create new Tmux windows
    set -g status off
-   set-window-option -g mode-keys vi
    set -g terminal-overrides 'xterm*:smcup@:rmcup@'
    set -g mode-mouse on
    set -g mouse-select-pane on
    set -g mouse-resize-pane on
+   # Act more like vim:
+   set-window-option -g mode-keys vi
+   bind h select-pane -L
+   bind j select-pane -D
+   bind k select-pane -U
+   bind l select-pane -R
+   unbind p
+   bind p paste-buffer
+   bind -t vi-copy v begin-selection
+   bind -t vi-copy y copy-selection
 <
 
 							    *r-plugin-R-setup*
@@ -2523,14 +2546,17 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-1.0 (2014-06-11)
+1.0 (2014-06-14)
+
+ * Neovim support.
 
  * vimrplugin_openpdf now accepts three values: 0, 1 and 2.
 
  * New command \o evaluates current line in R and inserts the output in the
    script.
 
- * New options: vimrplugin_vimcom_wait and vimrplugin_vim_wd.
+ * New options: vimrplugin_vimcom_wait, vimrplugin_vim_wd, and
+   vimrplugin_tmux_title.
 
  * Minor bug fixes.
 
