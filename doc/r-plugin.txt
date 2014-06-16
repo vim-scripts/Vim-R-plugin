@@ -1157,7 +1157,7 @@ list:
     3. xfce4-terminal,
     4. iterm,
     5. Eterm,
-    6. rxvt,
+    6. (u)rxvt,
     7. aterm,
     8. roxterm,
     9. terminator,

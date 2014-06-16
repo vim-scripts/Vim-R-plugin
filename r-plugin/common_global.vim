@@ -675,6 +675,12 @@ function StartR_ExternalTerm(rcmd)
                     \ 'set -g status off',
                     \ 'set -g default-terminal "screen-256color"',
                     \ "set -g terminal-overrides 'xterm*:smcup@:rmcup@'" ]
+
+        if g:vimrplugin_term == "rxvt" || g:vimrplugin_term == "urxvt"
+            let cnflines = cnflines + [
+                    \ "set -g terminal-overrides 'rxvt*:smcup@:rmcup@'" ]
+        endif
+
         if g:vimrplugin_external_ob || !has("gui_running")
             call extend(cnflines, ['set -g mode-mouse on', 'set -g mouse-select-pane on', 'set -g mouse-resize-pane on'])
         endif
@@ -3758,7 +3764,7 @@ if has("win32") || has("win64") || g:vimrplugin_applescript || $DISPLAY == "" ||
     " No external terminal emulator will be called, so any value is good
     let g:vimrplugin_term = "xterm"
 else
-    let s:terminals = ['gnome-terminal', 'konsole', 'xfce4-terminal', 'terminal', 'Eterm', 'rxvt', 'aterm', 'roxterm', 'terminator', 'lxterminal', 'xterm']
+    let s:terminals = ['gnome-terminal', 'konsole', 'xfce4-terminal', 'terminal', 'Eterm', 'rxvt', 'urxvt', 'aterm', 'roxterm', 'terminator', 'lxterminal', 'xterm']
     if has('mac')
         let s:terminals = ['iTerm', 'Terminal', 'Terminal.app'] + s:terminals
     endif
@@ -3828,6 +3834,10 @@ endif
 
 if g:vimrplugin_term == "xterm" || g:vimrplugin_term == "uxterm"
     let g:rplugin_termcmd = g:vimrplugin_term . " -xrm '*iconPixmap: " . g:rplugin_home . "/bitmaps/ricon.xbm' -e"
+endif
+
+if g:vimrplugin_term == "rxvt" || g:vimrplugin_term == "urxvt"
+    let g:rplugin_termcmd = g:vimrplugin_term . " -cd '" . expand("%:p:h") . "' -title R -xrm '*iconPixmap: " . g:rplugin_home . "/bitmaps/ricon.xbm' -e"
 endif
 
 " Override default settings:
