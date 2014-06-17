@@ -3,7 +3,7 @@
 " Maintainer:	      Jakson Aquino <jalvesaq@gmail.com>
 " Former Maintainers: Vaidotas Zemlys <zemlys@gmail.com>
 " 		      Tom Payne <tom@tompayne.org>
-" Last Change:	      Wed May 07, 2014  11:18AM
+" Last Change:	      Tue Jun 17, 2014  06:52PM
 " Filenames:	      *.R *.r *.Rhistory *.Rt
 " 
 " NOTE: The highlighting of R functions is defined in the
@@ -39,6 +39,7 @@ syn match rOKeyword contained "@\(S3method\|TODO\|aliases\|alias\|assignee\|auth
 syn match rOKeyword contained "@\(callGraphPrimitives\|concept\|exportClass\|exportMethod\|exportPattern\|export\|formals\)"
 syn match rOKeyword contained "@\(format\|importClassesFrom\|importFrom\|importMethodsFrom\|import\|keywords\)"
 syn match rOKeyword contained "@\(method\|noRd\|note\|references\|seealso\|setClass\|slot\|source\|title\|usage\)"
+syn match rOKeyword contained "@\(family\|template\|templateVar\|description\|details\|inheritsParams\)"
 syn match rOComment contains=@Spell,rOKeyword "#'.*"
 
 
