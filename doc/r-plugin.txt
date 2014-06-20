@@ -1919,6 +1919,8 @@ directory after the installation:
    syntax/rbrowser.vim
    doc/r-plugin.txt
    r-plugin/vimcom.py
+   r-plugin/nvimcom.py
+   r-plugin/nvimserver.py
    r-plugin/global_r_plugin.vim
    r-plugin/windows.py
    r-plugin/objlist/README
