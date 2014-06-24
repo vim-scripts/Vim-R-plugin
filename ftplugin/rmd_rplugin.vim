@@ -103,7 +103,11 @@ endfunction
 
 function! RMakePDFrmd(t)
     if g:rplugin_vimcomport == 0
-        exe "Py DiscoverVimComPort()"
+        if has("neovim")
+            call jobwrite(g:rplugin_clt_job, "DiscoverVimComPort\n")
+        else
+            Py DiscoverVimComPort()
+        endif
         if g:rplugin_vimcomport == 0
             call RWarningMsg("The vimcom package is required to make and open the PDF.")
         endif
