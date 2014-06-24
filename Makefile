@@ -78,6 +78,8 @@ deb:
 	  - r-plugin/common_buffer.vim\n\
 	  - r-plugin/common_global.vim\n\
 	  - r-plugin/vimcom.py\n\
+	  - r-plugin/nvimcom.py\n
+	  - r-plugin/nvimserver.py\n
 	  - r-plugin/global_r_plugin.vim\n\
 	  - r-plugin/tex_indent.vim\n\
 	  - r-plugin/vimrconfig.vim\n\
@@ -91,7 +93,7 @@ deb:
 	  - syntax/rbrowser.vim\n\
 	" > /tmp/vim-r-plugin-tmp/usr/share/vim/registry/vim-r-plugin.yaml
 	# Create the copyright
-	echo "Copyright (C) 2011 Jakson Aquino\n\
+	echo "Copyright (C) 2011-2014 Jakson Aquino\n\
 	\n\
 	License: GPLv2+\n\
 	\n\
@@ -128,7 +130,7 @@ deb:
 	Architecture: all\n\
 	Maintainer: Jakson Alves de Aquino <jalvesaq@gmail.com>\n\
 	Installed-Size: $(INSTALLEDSIZE)\n\
-	Depends: vim | vim-gtk | vim-gnome, tmux (>= 1.5), ncurses-term, vim-addon-manager, r-base-core\n\
+	Depends: vim | vim-gtk | vim-gnome, tmux (>= 1.8), ncurses-term, vim-addon-manager, r-base-core\n\
 	Enhances: vim\n\
 	Section: text\n\
 	Priority: extra\n\
