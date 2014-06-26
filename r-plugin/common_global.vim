@@ -653,7 +653,7 @@ endfunction
 
 
 function StartR_ExternalTerm(rcmd)
-    if $DISPLAY == ""
+    if $DISPLAY == "" && !has("gui_macvim")
         call RWarningMsg("Start 'tmux' before Vim. The X Window system is required to run R in an external terminal.")
         return
     endif
@@ -1051,7 +1051,7 @@ function StartObjBrowser_Tmux()
 
     " Don't start the Object Browser if it already exists
     if IsExternalOBRunning()
-        if $DISPLAY == "" && exists("g:rplugin_ob_pane")
+        if !has("neovim") && (has("gui_macvim") || $DISPLAY == "") && exists("g:rplugin_ob_pane")
             let slog = system("tmux set-buffer ':silent call UpdateOB(\"both\")\<C-M>:\<Esc>' && tmux paste-buffer -t " . g:rplugin_ob_pane . " && tmux select-pane -t " . g:rplugin_ob_pane)
             if v:shell_error
                 call RWarningMsg(slog)
@@ -1194,7 +1194,10 @@ function StartObjBrowser_Vim()
         endif
         let g:rplugin_ob_warn_shown = 1
     else
-        if has("neovim")
+        if has("gui_macvim")
+            let wmsg ="MacVim cannot automatically updated the Object Browser."
+            let g:rplugin_ob_warn_shown = 1
+        elseif has("neovim")
             call g:SendToVimCom("\002" . g:rplugin_myport)
         else
             call g:SendToVimCom("\002" . v:servername)
@@ -3870,12 +3873,15 @@ let g:rplugin_vimcom_version = 0
 let g:rplugin_lastrpl = ""
 let g:rplugin_lastev = ""
 let g:rplugin_hasRSFbutton = 0
-let g:rplugin_tmuxsname = substitute("vimrplugin-" . g:rplugin_userlogin . localtime() . g:rplugin_firstbuffer, '\W', '', 'g')
+let g:rplugin_tmuxsname = "VimR-" . substitute(localtime(), '.*\(...\)', '\1', '')
 
 " If this is the Object Browser running in a Tmux pane, $VIMINSTANCEID is
 " already defined and shouldn't be changed
 if $VIMINSTANCEID == ""
-    let $VIMINSTANCEID = substitute(g:rplugin_firstbuffer . localtime(), '\W', '', 'g')
+    let $VIMINSTANCEID = substitute(g:rplugin_firstbuffer, '\W', '', 'g') . substitute(localtime(), '.*\(...\)', '\1', '')
+    if strlen($VIMINSTANCEID) > 64
+        let $VIMINSTANCEID = substitute($VIMINSTANCEID, '.*\(...............................................................\)', '\1', '')
+    endif
 endif
 
 let g:rplugin_obsname = toupper(substitute(substitute(expand("%:r"), '\W', '', 'g'), "_", "", "g"))
