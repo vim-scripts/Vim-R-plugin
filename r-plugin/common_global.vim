@@ -212,6 +212,20 @@ function! CompleteChunkOptions()
     call complete(idx1 + 1, rr)
 endfunction
 
+function IsFirstRArg(lnum, cpos)
+    let line = getline(a:lnum)
+    let ii = a:cpos[2] - 2
+    let cchar = line[ii]
+    while ii > 0 && cchar != '('
+        let cchar = line[ii]
+        if cchar == ','
+            return 0
+        endif
+        let ii -= 1
+    endwhile
+    return 1
+endfunction
+
 function RCompleteArgs()
     let line = getline(".")
     if (&filetype == "rnoweb" && line =~ "^<<.*>>=$") || (&filetype == "rmd" && line =~ "^``` *{r.*}$") || (&filetype == "rrst" && line =~ "^.. {r.*}$") || (&filetype == "r" && line =~ "^#\+")
@@ -265,15 +279,26 @@ function RCompleteArgs()
             if string(g:SendCmdToR) != "function('SendCmdToR_fake')"
                 call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
                 if has("neovim")
-                    let beginmsg = "I\002" . g:rplugin_vimcom_pkg . ':::vim.args("'
+                    let msg = "I\002" . g:rplugin_vimcom_pkg . ':::vim.args("'
                 else
-                    let beginmsg = g:rplugin_vimcom_pkg . ':::vim.args("'
+                    let msg = g:rplugin_vimcom_pkg . ':::vim.args("'
                 endif
                 if classfor == ""
-                    call g:SendToVimCom(beginmsg . rkeyword0 . '", "' . argkey . '")')
+                    let msg = msg . rkeyword0 . '", "' . argkey . '"'
                 else
-                    call g:SendToVimCom(beginmsg . rkeyword0 . '", "' . argkey . '", classfor = ' . classfor . ')')
+                    let msg = msg . rkeyword0 . '", "' . argkey . '", classfor = ' . classfor
                 endif
+                if rkeyword0 == "library" || rkeyword0 == "require"
+                    let isfirst = IsFirstRArg(lnum, cpos)
+                else
+                    let isfirst = 0
+                endif
+                if isfirst
+                    let msg = msg . ', firstLibArg = TRUE)'
+                else
+                    let msg = msg . ')'
+                endif
+                call g:SendToVimCom(msg)
 
                 if g:rplugin_vimcomport > 0
                     let g:rplugin_lastev = ReadEvalReply()
@@ -287,7 +312,7 @@ function RCompleteArgs()
                         if(len(tmp) > 0)
                             for id in range(len(tmp))
                                 let tmp2 = split(tmp[id], "\x07")
-                                if tmp2[0] == '...'
+                                if tmp2[0] == '...' || isfirst
                                     let tmp3 = tmp2[0]
                                 else
                                     let tmp3 = tmp2[0] . " = "
@@ -936,8 +961,8 @@ function ReceiveVimComStartMsg(msg)
         else
             call RWarningMsg("Invalid package name: " . vmsg[0])
         endif
-        if vmsg[1] != "1.0-0_a2"
-            call RWarningMsg('This version of Vim-R-plugin requires vimcom.plus 1.0-0_a2.')
+        if vmsg[1] != "1.0-0_a3"
+            call RWarningMsg('This version of Vim-R-plugin requires vimcom.plus 1.0-0_a3.')
         endif
         if vmsg[2] != $VIMINSTANCEID
             call RWarningMsg("Invalid ID: " . vmsg[2] . " [Correct = " . $VIMINSTANCEID . "]")
@@ -1000,8 +1025,8 @@ function WaitVimComStart()
         endif
         if vr[2] == $VIMINSTANCEID
             let g:rplugin_vimcom_version = vr[1]
-            if g:rplugin_vimcom_version != "1.0-0_a2"
-                call RWarningMsg('This version of Vim-R-plugin requires vimcom.plus 1.0-0_a2.')
+            if g:rplugin_vimcom_version != "1.0-0_a3"
+                call RWarningMsg('This version of Vim-R-plugin requires vimcom.plus 1.0-0_a3.')
                 sleep 1
             endif
         else

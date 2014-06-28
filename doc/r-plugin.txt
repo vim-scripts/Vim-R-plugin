@@ -545,7 +545,9 @@ Vim-R-plugin usage). Otherwise, the pop up menu for completion of function
 arguments will include an additional line with the name of the library where
 the function is (if the function name can be found in more than one library)
 and the function method (if what is being shown are the arguments of a method
-and not of the function itself).
+and not of the function itself). For library() and require(), when completing
+the first argument, the popup list shows the names of installed packages, but
+only if R is running.
 
 To get help on an R topic, type in Vim (Normal mode):
 >
