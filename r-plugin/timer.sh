@@ -1,9 +1,5 @@
 #!/bin/sh
 
-for i in $(seq 1 $1)
-do
-    sleep 1
-done
-
+sleep $1
 echo $2
 
