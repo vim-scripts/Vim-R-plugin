@@ -988,8 +988,8 @@ endfunction
 " Neovim don't need this function:
 function WaitVimComStart()
     if has("neovim")
-        if executable(g:rplugin_home . "/r-plugin/timer.sh")
-            let wjob = jobstart('waitvc', g:rplugin_home . '/r-plugin/timer.sh', [string(g:vimrplugin_vimcom_wait / 1000), 'call NoLongerWaitVimCom()'])
+        if filereadable(g:rplugin_home . "/r-plugin/timer.sh")
+            let wjob = jobstart('waitvc', "sh", [g:rplugin_home . '/r-plugin/timer.sh', string(g:vimrplugin_vimcom_wait / 1000), 'call NoLongerWaitVimCom()'])
             autocmd JobActivity waitvc call RServerEvent()
         else
             call RWarningMsg("File '" . g:rplugin_home . "/r-plugin/timer.sh" . "' not found.")
