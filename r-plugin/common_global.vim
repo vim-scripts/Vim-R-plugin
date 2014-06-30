@@ -51,13 +51,8 @@ function RWarningMsgInp(wmsg)
     let savedsm = &shortmess
     set shortmess-=T
     echohl WarningMsg
-    echomsg a:wmsg
+    call input(a:wmsg . " [Press <Enter> to continue] ")
     echohl Normal
-    " The message disappears if starting to edit an empty buffer
-    if line("$") == 1 && strlen(getline("$")) == 0
-        sleep 2
-    endif
-    call input("[Press <Enter> to continue] ")
     if savedlz == 0
         set nolazyredraw
     endif
@@ -152,7 +147,7 @@ function RCheckVimCom(msg)
         endif
     endif
     if g:rplugin_vimcomport && g:rplugin_vimcom_pkg == "vimcom"
-	call RWarningMsg("The R package vimcom.plus is required to " . a:msg)
+	call RWarningMsg("The R package vimcom is required to " . a:msg)
         return 1
     endif
     return 0
@@ -956,13 +951,13 @@ function ReceiveVimComStartMsg(msg)
     if len(vmsg) == 4
         if vmsg[0] == "vimcom"
             let g:rplugin_vimcom_pkg = "vimcom"
-        elseif vmsg[0] == "vimcom.plus"
-            let g:rplugin_vimcom_pkg = "vimcom.plus"
+        elseif vmsg[0] == "vimcom"
+            let g:rplugin_vimcom_pkg = "vimcom"
         else
             call RWarningMsg("Invalid package name: " . vmsg[0])
         endif
-        if vmsg[1] != "1.0-0_a3"
-            call RWarningMsg('This version of Vim-R-plugin requires vimcom.plus 1.0-0_a3.')
+        if vmsg[1] != "1.0-0_a4"
+            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.0-0_a4.')
         endif
         if vmsg[2] != $VIMINSTANCEID
             call RWarningMsg("Invalid ID: " . vmsg[2] . " [Correct = " . $VIMINSTANCEID . "]")
@@ -972,7 +967,7 @@ function ReceiveVimComStartMsg(msg)
             " Give vimcom some time to complete its startup process
             sleep 20m
         else
-            call RWarningMsg("Invalid vimcom.plus port: " . vmsg[2])
+            call RWarningMsg("Invalid vimcom port: " . vmsg[2])
         endif
     endif
 endfunction
@@ -981,7 +976,7 @@ function NoLongerWaitVimCom()
     if filereadable($VIMRPLUGIN_TMPDIR . "/vimcom_running")
         call delete($VIMRPLUGIN_TMPDIR . "/vimcom_running")
     else
-        call RWarningMsg("The package vimcom.plus wasn't loaded yet.")
+        call RWarningMsg("The package vimcom wasn't loaded yet.")
     endif
 endfunction
 
@@ -1006,7 +1001,7 @@ function WaitVimComStart()
     while !filereadable($VIMRPLUGIN_TMPDIR . "/vimcom_running") && ii < g:vimrplugin_vimcom_wait
         let ii = ii + 200
         if ii == 1000
-            echo "Waiting vimcom.plus loading..."
+            echo "Waiting vimcom loading..."
             let waitmsg = 1
         endif
         sleep 200m
@@ -1018,26 +1013,26 @@ function WaitVimComStart()
     sleep 100m
     if filereadable($VIMRPLUGIN_TMPDIR . "/vimcom_running")
         let vr = readfile($VIMRPLUGIN_TMPDIR . "/vimcom_running")
-        if vr[0] =~ "vimcom.plus"
-            let g:rplugin_vimcom_pkg = "vimcom.plus"
+        if vr[0] =~ "vimcom"
+            let g:rplugin_vimcom_pkg = "vimcom"
         else
             let g:rplugin_vimcom_pkg = "vimcom"
         endif
         if vr[2] == $VIMINSTANCEID
             let g:rplugin_vimcom_version = vr[1]
-            if g:rplugin_vimcom_version != "1.0-0_a3"
-                call RWarningMsg('This version of Vim-R-plugin requires vimcom.plus 1.0-0_a3.')
+            if g:rplugin_vimcom_version != "1.0-0_a4"
+                call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.0-0_a4.')
                 sleep 1
             endif
         else
             let g:rplugin_vimcom_version = 0
-            call RWarningMsg("Vim-R-plugin and vimcom.plus IDs don't match.")
+            call RWarningMsg("Vim-R-plugin and vimcom IDs don't match.")
             sleep 1
         endif
         call delete($VIMRPLUGIN_TMPDIR . "/vimcom_running")
         return 1
     else
-        call RWarningMsg("The package vimcom.plus wasn't loaded yet.")
+        call RWarningMsg("The package vimcom wasn't loaded yet.")
         sleep 300m
         return 0
     endif
@@ -1196,7 +1191,7 @@ endfunction
 
 function StartObjBrowser_Vim()
     if has("win32") || has("win64")
-	" The vimcom.plus server will stop working if starting the Object
+	" The vimcom server will stop working if starting the Object
 	" Browser is the first thing the user does.
 	if !exists("g:rplugin_liblist_filled")
 	    call RWarningMsg("Please, try again after sending at least one line of code to the R Console.!")
@@ -2207,7 +2202,7 @@ function RCheckLibListFile()
     endif
 endfunction
 
-" This function is called by the R package vimcom.plus whenever a library is
+" This function is called by the R package vimcom whenever a library is
 " loaded.
 function RFillLibList()
     if &filetype == "r" || has("neovim")
@@ -3951,5 +3946,22 @@ if has("win32") || has("win64")
     let g:rplugin_has_icons = len(globpath(&rtp, "bitmaps/RStart.bmp")) > 0
 else
     let g:rplugin_has_icons = len(globpath(&rtp, "bitmaps/RStart.png")) > 0
+endif
+
+" Check whether the user has the vimcom.plus string in the Rprofile
+if filereadable(expand("~/.Rprofile"))
+    let s:rpf = expand("~/.Rprofile")
+elseif filereadable(expand("~/Documents/.Rprofile"))
+    let s:rpf = expand("~/Documents/.Rprofile")
+endif
+if exists("s:rpf")
+    let s:rplines = readfile(s:rpf)
+    for line in s:rplines
+        if line =~ "library\.*vimcom.plus" || line =~ "require.*vimcom\.plus"
+            call RWarningMsgInp('The string "vimcom.plus" was found in "' . s:rpf . '". However, the package "vimcom.plus" no longer exists, and you should rename it to "vimcom" in your Rprofile.')
+            break
+        endif
+    endfor
+    unlet s:rpf
 endif
 

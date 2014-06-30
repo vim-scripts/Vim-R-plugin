@@ -125,7 +125,7 @@ Before installing the plugin, you should install its dependencies:
 
    R >= 3.0.0: http://www.r-project.org/
 
-   vimcom.plus = 1.0-0: http://www.lepem.ufc.br/jaa/vimcom.plus.html
+   vimcom = 1.0-0: http://www.lepem.ufc.br/jaa/vimcom.html
 
    Tmux >= 1.8:   http://tmux.sourceforge.net
                   Tmux is necessary to send commands from Vim to R Console.
@@ -220,9 +220,9 @@ dependencies:
 
     * R's version must be >= 3.0.0: http://www.r-project.org/
 
-    * vimcom.plus = 1.0-0: http://www.lepem.ufc.br/jaa/vimcom.plus.html
+    * vimcom = 1.0-0: http://www.lepem.ufc.br/jaa/vimcom.html
 
-      Note: If you cannot build vimcom.plus yourself, you will want to
+      Note: If you cannot build vimcom yourself, you will want to
       download and install the zip file.
 
     * Vim's version must be >= 7.4: http://www.vim.org/download.php
@@ -314,7 +314,7 @@ you may prefer to install the Debian package available at:
    http://www.lepem.ufc.br/jaa/vim-r-plugin.html
 
 Did you see the message "VimCom port not found"? This means that R is not
-running, the vimcom.plus package is not installed (or is installed but is not
+running, the vimcom package is not installed (or is installed but is not
 loaded), or R was not started by Vim.
 
 
@@ -646,7 +646,7 @@ the |+clientserver| feature to be automatically updated and the |+conceal|
 feature to correctly align list items.
 
 In the .GlobalEnv view, if an object has the attribute "label", it will also
-be displayed. Please, see the R help for package vimcom.plus for some options
+be displayed. Please, see the R help for package vimcom for some options
 to control the Object Browser behavior. In the Object Browser window, while in
 Normal mode, you can either press <Enter> or double click (GVim only) over a
 data.frame or list to show/hide its elements (not if viewing the content of
@@ -963,13 +963,13 @@ operator. See: https://github.com/jcfaria/Vim-R-plugin/issues/94
 
 5.6. Wrong message that "R is busy" (Windows only)~
 
-On Windows, when code is sent from Vim to R Console, the vimcom.plus library
+On Windows, when code is sent from Vim to R Console, the vimcom library
 sets the value of the internal variable `r_is_busy` to 1. The value is set
 back to 0 when any code is successfully evaluated. If you send invalid code to
 R, there will be no successful evaluation of code and, thus, the value of
 `r_is_busy` will remain set to 1. Then, if you try to update the object
 browser, see the R documentation for any function, or do other tasks that
-require the hidden evaluation of code by R, the vimcom.plus library will
+require the hidden evaluation of code by R, the vimcom library will
 refuse to do the tasks to avoid any risk of corrupting R's memory. It will
 tell Vim that "R is busy" and Vim will display this message. Everything should
 work as expected again after any valid code is executed in the R Console.
@@ -981,10 +981,10 @@ Note: The bug described in this section does not affect Neovim.
 
 If you use MacVim, run Vim in the Linux Console or start Vim in a terminal
 emulator without the command line argument |--servername|, Vim will not
-receive remote messages and the vimcom.plus package will display one of the
+receive remote messages and the vimcom package will display one of the
 following messages:
 
-   MacVim isn't fully supported by vimcom.plus.
+   MacVim isn't fully supported by vimcom.
    Vim was built without the 'clientserver' feature.
    Did you pass the --servername argument to Vim?
    There is no X Server running.
@@ -1020,9 +1020,9 @@ Fedora/Red Hat. If you want to use Vim in a terminal emulator in Fedora/Red
 Hat, you may want to create a symbolic link to "gvim" named "vim". You still
 have to explicitly start the server with the argument |--servername|.
 
-The R package vimcom.plus has support only for Windows and X11 interprocess
+The R package vimcom has support only for Windows and X11 interprocess
 communication systems while MacVim is a Cocoa application, that is,
-vimcom.plus is unable to send messages to MacVim too. For vimcom.plus, running
+vimcom is unable to send messages to MacVim too. For vimcom, running
 MacVim is equivalent to running Vim without the |clientserver| feature.
 
 On Mac OS X, to get omnicompletion, syntax highlight of function names and the
@@ -1044,7 +1044,7 @@ through the <LocalLeader>rf command because the plugin was designed to connect
 each Vim instance with its own R instance. If you start R before Vim, it will
 not inherit from Vim the environment variables VIMRPLUGIN_TMPDIR,
 VIMRPLUGIN_HOME, VIMEDITOR_SVRNM and VIMINSTANCEID. The first one is the path
-used by the R package vimcom.plus to save temporary files used by the Vim-R-plugin
+used by the R package vimcom to save temporary files used by the Vim-R-plugin
 to: perform omnicompletion, show R documentation in a Vim buffer, and update
 the Object Browser. The last one is used by the Vim-R-plugin to know that it is
 not connecting to an R instance initiated by another Vim instance. If you use
@@ -1066,9 +1066,9 @@ procedures are necessary for all cases):
 <
    In R do:
 >
-   detach("package:vimcom.plus", unload = TRUE)
+   detach("package:vimcom", unload = TRUE)
    Sys.setenv(VIMRPLUGIN_TMPDIR="T") # where "T" is what Vim has echoed
-   library(vimcom.plus)
+   library(vimcom)
    Sys.setenv(VIMINSTANCEID="I")     # where "I" is what Vim has echoed
    Sys.setenv(VIMEDITOR_SVRNM"="S")  # where "S" is what Vim has echoed
    Sys.setenv(VIMRPLUGIN_HOME"="H")  # where "H" is what Vim has echoed
@@ -1146,7 +1146,7 @@ is running:
 |vimrplugin_source|            Source additional scripts
 |vimrplugin_restart|           Restart R if it is already running
 |vimrplugin_show_args|         Show extra information during omnicompletion
-|vimrplugin_vimcom_wait|       Time to wait for vimcom.plus loading
+|vimrplugin_vimcom_wait|       Time to wait for vimcom loading
 |vimrplugin_vim_wd|            Start R in Vim's working directory
 
 
@@ -1499,7 +1499,7 @@ Example:
 6.19. LaTeX command~
 							 *vimrplugin_latexcmd*
 						       *vimrplugin_sweaveargs*
-On Windows, the vimcom.plus package calls `tools::texi2dvi()` to build the pdf
+On Windows, the vimcom package calls `tools::texi2dvi()` to build the pdf
 from the generated .tex file. On Linux/Unix, by default, it calls
 `latexmk` `-pdf` to produce a pdf document from the .tex file produced by
 either `Sweave()` or `knit()` command. If `latexmk` is not installed, it calls
@@ -1696,26 +1696,26 @@ run <Ctrl-X><Ctrl-A> to complete the function arguments. The preview window
 will be shown only if "preview" is also included in your 'completeopt'.
 
 
-6.30. Time to wait for vimcom.plus loading~
+6.30. Time to wait for vimcom loading~
 						      *vimrplugin_vimcom_wait*
-The Vim-R-plugin waits 5000 milliseconds for vimcom.plus package to be loaded
+The Vim-R-plugin waits 5000 milliseconds for vimcom package to be loaded
 during R startup. It then checks whether you are using the correct version of
-vimcom.plus. On Unix, it also sends a message to R update the list of uploaded
+vimcom. On Unix, it also sends a message to R update the list of uploaded
 libraries and, then, immediately updates the syntax highlighting of function
 names. If 5000 milliseconds is not enough to your R startup, then set a higher
 value for the variable in your |vimrc|. Example:
 >
    let vimrplugin_vimcom_wait = 10000
 <
-Note: You should have the line  `library(vimcom.plus)`  in your Rprofile. The
+Note: You should have the line  `library(vimcom)`  in your Rprofile. The
 Vim command  :RpluginConfig  adds that line for you.
 
 The plugin has a different behavior with Neovim: it receives a message from
-vimcom.plus as soon as it is loaded and warns if the package was not loaded
+vimcom as soon as it is loaded and warns if the package was not loaded
 after 15 seconds of sending the command to start R. If you need more than 15
 seconds, change the value of vimrplugin_vimcom_wait.
 
-If you do not want to install the vimcom.plus package, then put in your
+If you do not want to install the vimcom package, then put in your
 |vimrc|:
 >
    let vimrplugin_vimcom_wait = -1
@@ -2023,7 +2023,7 @@ Vim can jump to a function definition if it finds a "tags" file with the
 information about the place where the function is defined. To generate the
 tags file, use the R function `rtags()`, which will build an Emacs tags file.
 If Vim was compiled with the feature |emacs_tags|, it will be able to read the
-tags file. Otherwise, you can use the vimcom.plus function `etags2ctags()` to
+tags file. Otherwise, you can use the vimcom function `etags2ctags()` to
 convert the Emacs tags file into a Vim's one. To jump to a function
 definition, put the cursor over the function name and hit CTRL-]. Please, read
 |tagsrch.txt| for details on how to use tags files, specially the section
@@ -2449,9 +2449,9 @@ please read this document from the beginning.
        }
        # Load the setwidth library:
        library(setwidth)
-       # Load the vimcom.plus library only if R was started by Vim:
+       # Load the vimcom library only if R was started by Vim:
        if(Sys.getenv("VIMRPLUGIN_TMPDIR") != ""){
-           library(vimcom.plus)
+           library(vimcom)
            # See R documentation on Vim buffer even if asking for help in R Console:
            if(Sys.getenv("VIM_PANE") != "")
                options(help_type = "text", pager = vim.pager)
@@ -2550,7 +2550,10 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-1.0 (2014-06-14)
+1.0 (2014-06-30)
+
+ * The package now depends on vimcom (which is fully featured and is no longer
+   on CRAN).
 
  * Neovim support.
 

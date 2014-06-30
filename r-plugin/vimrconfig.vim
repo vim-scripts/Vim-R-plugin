@@ -101,9 +101,9 @@ function! RConfigRprofile()
             endif
             if has("win32") || has("win64")
                 let rpflines += ['    if(Sys.getenv("VIMRPLUGIN_TMPDIR") != "")',
-                            \ '        library(vimcom.plus)']
+                            \ '        library(vimcom)']
             else
-                let rpflines += ['    library(vimcom.plus)']
+                let rpflines += ['    library(vimcom)']
             endif
 
             if !(has("win32") || has("win64"))

@@ -11,4 +11,4 @@ http://www.vim.org/scripts/script.php?script_id=2628
 Please, read the file *doc/r-plugin.txt* for usage details.
 
 If you decide to use this version, you will also need the development version
-of vimcom.plus: https://github.com/jalvesaq/VimCom
+of vimcom: https://github.com/jalvesaq/VimCom

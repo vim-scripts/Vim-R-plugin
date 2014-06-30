@@ -79,7 +79,7 @@ fun! rcomplete#CompleteR(findstart, base)
         endif
 
         if len(g:rplugin_liblist) == 0
-            call add(resp, {'word': a:base, 'menu': " [ List is empty. Did you load vimcom.plus package? ]"})
+            call add(resp, {'word': a:base, 'menu': " [ List is empty. Did you load vimcom package? ]"})
         endif
 
         let flines = g:rplugin_liblist + g:rplugin_globalenvlines
