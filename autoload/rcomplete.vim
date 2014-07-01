@@ -9,17 +9,6 @@ function BuildROmniList()
     if string(g:SendCmdToR) == "function('SendCmdToR_fake')"
         return
     endif
-    if has("win32") || has("win64") && g:rplugin_vimcom_pkg == "vimcom"
-        if !exists("g:rplugin_vimcom_omni_warn")
-            let g:rplugin_vimcom_omni_warn = 1
-            if RCheckVimCom("complete the names of objects from R's workspace.")
-                sleep 2
-                return
-            endif
-        else
-            return
-        endif
-    endif
 
     let omnilistcmd = 'vim.bol("' . $VIMRPLUGIN_TMPDIR . "/GlobalEnvList_" . $VIMINSTANCEID . '"'
     if g:vimrplugin_allnames == 1

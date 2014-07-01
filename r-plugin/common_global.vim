@@ -135,24 +135,6 @@ function! ReadEvalReply()
     return reply
 endfunction
 
-function RCheckVimCom(msg)
-    if exists("g:rplugin_vimcom_checked")
-        return 1
-    endif
-    if g:rplugin_vimcomport == 0
-        if has("neovim")
-            call jobwrite(g:rplugin_clt_job, "DiscoverVimComPort\n")
-        else
-            Py DiscoverVimComPort()
-        endif
-    endif
-    if g:rplugin_vimcomport && g:rplugin_vimcom_pkg == "vimcom"
-	call RWarningMsg("The R package vimcom is required to " . a:msg)
-        return 1
-    endif
-    return 0
-endfunction
-
 function! CompleteChunkOptions()
     let cline = getline(".")
     let cpos = getpos(".")
@@ -249,12 +231,6 @@ function RCompleteArgs()
     let np = 1
     let nl = 0
 
-    if has("win32") || has("win64") && g:rplugin_vimcom_pkg == "vimcom"
-        if RCheckVimCom("complete function arguments.")
-            return
-        endif
-    endif
-
     while np != 0 && nl < 10
         if line[idx] == '('
             let np -= 1
@@ -274,9 +250,9 @@ function RCompleteArgs()
             if string(g:SendCmdToR) != "function('SendCmdToR_fake')"
                 call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
                 if has("neovim")
-                    let msg = "I\002" . g:rplugin_vimcom_pkg . ':::vim.args("'
+                    let msg = "I\002" . 'vimcom:::vim.args("'
                 else
-                    let msg = g:rplugin_vimcom_pkg . ':::vim.args("'
+                    let msg = 'vimcom:::vim.args("'
                 endif
                 if classfor == ""
                     let msg = msg . rkeyword0 . '", "' . argkey . '"'
@@ -949,11 +925,7 @@ endfunction
 function ReceiveVimComStartMsg(msg)
     let vmsg = split(a:msg)
     if len(vmsg) == 4
-        if vmsg[0] == "vimcom"
-            let g:rplugin_vimcom_pkg = "vimcom"
-        elseif vmsg[0] == "vimcom"
-            let g:rplugin_vimcom_pkg = "vimcom"
-        else
+        if vmsg[0] != "vimcom"
             call RWarningMsg("Invalid package name: " . vmsg[0])
         endif
         if vmsg[1] != "1.0-0_a4"
@@ -1013,11 +985,6 @@ function WaitVimComStart()
     sleep 100m
     if filereadable($VIMRPLUGIN_TMPDIR . "/vimcom_running")
         let vr = readfile($VIMRPLUGIN_TMPDIR . "/vimcom_running")
-        if vr[0] =~ "vimcom"
-            let g:rplugin_vimcom_pkg = "vimcom"
-        else
-            let g:rplugin_vimcom_pkg = "vimcom"
-        endif
         if vr[2] == $VIMINSTANCEID
             let g:rplugin_vimcom_version = vr[1]
             if g:rplugin_vimcom_version != "1.0-0_a4"
@@ -1277,12 +1244,6 @@ function RObjBrowser()
         return
     endif
 
-    if has("win32") || has("win64") && g:rplugin_vimcom_pkg == "vimcom"
-        if RCheckVimCom("run the Object Browser on Windows.")
-            return
-        endif
-    endif
-
     if g:rplugin_running_objbr == 1
         " Called twice due to BufEnter event
         return
@@ -1433,12 +1394,6 @@ function RFormatCode() range
         endif
     endif
 
-    if has("win32") || has("win64") && g:rplugin_vimcom_pkg == "vimcom"
-        if RCheckVimCom("run :Rformat.")
-            return
-        endif
-    endif
-
     let lns = getline(a:firstline, a:lastline)
     call writefile(lns, $VIMRPLUGIN_TMPDIR . "/unformatted_code")
     let wco = &textwidth
@@ -1474,12 +1429,6 @@ function RInsert(cmd)
             Py DiscoverVimComPort()
         endif
         if g:rplugin_vimcomport == 0
-            return
-        endif
-    endif
-
-    if has("win32") || has("win64") && g:rplugin_vimcom_pkg == "vimcom"
-        if RCheckVimCom("run :Rinsert.")
             return
         endif
     endif
@@ -2133,7 +2082,6 @@ function RQuit(how)
     call delete($VIMRPLUGIN_TMPDIR . "/vimcom_running")
     let g:SendCmdToR = function('SendCmdToR_fake')
     let g:rplugin_vimcomport = 0
-    let g:rplugin_vimcom_pkg = "vimcom"
     if g:rplugin_tmuxwasfirst && g:vimrplugin_tmux_title != "automatic" && g:vimrplugin_tmux_title != ""
         call system("tmux set automatic-rename on")
     endif
@@ -2376,12 +2324,6 @@ function ShowRDoc(rkeyword, package, getclass)
     if !has("python") && !has("python3") && !has("neovim")
         call RWarningMsg("Python support is required to see R documentation on Vim.")
         return
-    endif
-
-    if (has("win32") || has("win64")) && g:rplugin_vimcom_pkg == "vimcom"
-        if RCheckVimCom("see R help on Vim buffer.")
-            return
-        endif
     endif
 
     if filewritable(g:rplugin_docfile)
@@ -3888,7 +3830,6 @@ let g:rplugin_newliblist = 0
 let g:rplugin_ob_warn_shown = 0
 let g:rplugin_myport = 0
 let g:rplugin_vimcomport = 0
-let g:rplugin_vimcom_pkg = "vimcom"
 let g:rplugin_vimcom_version = 0
 let g:rplugin_lastrpl = ""
 let g:rplugin_lastev = ""
