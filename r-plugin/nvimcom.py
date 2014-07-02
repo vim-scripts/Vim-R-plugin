@@ -1,8 +1,9 @@
 
+import sys
 import socket
-import vim
 import os
 import re
+
 VimComPort = 0
 PortWarn = False
 VimComFamily = None
@@ -14,12 +15,11 @@ def DiscoverVimComPort():
     HOST = "localhost"
     VimComPort = 10000
     repl = "NOTHING"
-    correct_repl = vim.eval("$VIMINSTANCEID")
+    correct_repl = os.getenv("VIMINSTANCEID")
     if correct_repl is None:
-        correct_repl = os.getenv("VIMINSTANCEID")
-        if correct_repl is None:
-            vim.command("call RWarningMsg('VIMINSTANCEID not found.')")
-            return
+        print "call RWarningMsg('VIMINSTANCEID not found by nvimcom.py.')\n"
+        sys.stdout.flush()
+        return
 
     while repl.find(correct_repl) < 0 and VimComPort < 10049:
         VimComPort = VimComPort + 1
@@ -45,17 +45,21 @@ def DiscoverVimComPort():
 
     if VimComPort >= 10049:
         VimComPort = 0
-        vim.command("let g:rplugin_vimcomport = 0")
         if not PortWarn:
-            vim.command("call RWarningMsg('VimCom port not found.')")
-        PortWarn = True
+            PortWarn = True
+            print "let g:rplugin_vimcomport = 0\n"
+            sys.stdout.flush()
+            print "call RWarningMsg('VimCom port not found.')\n"
+            sys.stdout.flush()
+        return
     else:
-        vim.command("let g:rplugin_vimcomport = " + str(VimComPort))
+        print "let g:rplugin_vimcomport = " + str(VimComPort) + "\n"
+        sys.stdout.flush()
         PortWarn = False
         if repl.find("1.0-0") != 0:
-            vim.command("call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.0-0.')")
-            vim.command("sleep 1")
-    return(VimComPort)
+            print "call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.0-0.')\n"
+            sys.stdout.flush()
+        return
 
 
 def SendToVimCom(aString):
@@ -63,9 +67,9 @@ def SendToVimCom(aString):
     global VimComPort
     global VimComFamily
     if VimComPort == 0:
-        VimComPort = DiscoverVimComPort()
+        DiscoverVimComPort()
         if VimComPort == 0:
-            return
+            return "NoPort"
     received = None
 
     sock = socket.socket(VimComFamily, socket.SOCK_DGRAM)
@@ -85,10 +89,23 @@ def SendToVimCom(aString):
         sock.close()
 
     if received is None:
-        vim.command("let g:rplugin_lastrpl = 'NOANSWER'")
         VimComPort = 0
-        vim.command("let g:rplugin_vimcomport = 0")
+        return "NOANSWER"
     else:
         received = received.replace("'", "' . \"'\" . '")
-        vim.command("let g:rplugin_lastrpl = '" + received + "'")
+        return received
+
+while True:
+    line = raw_input()
+    if line.find("SendToVimCom") != -1:
+        line = line.replace("SendToVimCom ", "")
+        rpl = SendToVimCom(line)
+        if not line.find("I\002") == 0:
+            print "let g:rplugin_lastrpl = '" + rpl + "'\n"
+    else:
+        if line.find("DiscoverVimComPort") != -1:
+            DiscoverVimComPort()
+        else:
+            print "call RWarningMsg('nvimcom.py: Unknown command: '" + line + "'.\n"
+    sys.stdout.flush()
 

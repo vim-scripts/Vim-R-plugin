@@ -25,7 +25,9 @@
 
 " Set completion with CTRL-X CTRL-O to autoloaded function.
 if exists('&ofu')
-    setlocal ofu=rcomplete#CompleteR
+    if &filetype == "r" || &filetype == "rnoweb" || &filetype == "rdoc" || &filetype == "rhelp" || &filetype == "rrst" || &filetype == "rmd"
+        setlocal omnifunc=rcomplete#CompleteR
+    endif
 endif
 
 " This isn't the Object Browser running externally
@@ -69,5 +71,21 @@ let g:rplugin_lastft = &filetype
 if !exists("g:SendCmdToR")
     let g:SendCmdToR = function('SendCmdToR_fake')
 endif
+
+if !has("neovim")
+    if &filetype != "rbrowser"
+        if v:servername == "" || has("gui_macvim")
+            autocmd CursorHold <buffer> call RCheckLibListFile()
+        else
+            if &filetype != "r"
+                autocmd CursorMoved <buffer> call RCheckLibList()
+                if g:vimrplugin_insert_mode_cmds == 1
+                    autocmd CursorMovedI <buffer> call RCheckLibList()
+                endif
+            endif
+        endif
+    endif
+endif
+
 
 

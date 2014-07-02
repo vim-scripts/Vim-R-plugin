@@ -1,225 +1,35 @@
-"  This program is free software; you can redistribute it and/or modify
-"  it under the terms of the GNU General Public License as published by
-"  the Free Software Foundation; either version 2 of the License, or
-"  (at your option) any later version.
-"
-"  This program is distributed in the hope that it will be useful,
-"  but WITHOUT ANY WARRANTY; without even the implied warranty of
-"  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-"  GNU General Public License for more details.
-"
-"  A copy of the GNU General Public License is available at
-"  http://www.r-project.org/Licenses/
-
-"==========================================================================
-" ftplugin for Rrst files
-"
-" Authors: Jakson Alves de Aquino <jalvesaq@gmail.com>
-"          Jose Claudio Faria
-"          Alex Zvoleff
-"
-"==========================================================================
+" Vim filetype plugin file
+" Language: reStructuredText documentation format with R code
+" Maintainer: Jakson Alves de Aquino <jalvesaq@gmail.com>
+" Last Change:	Sun Feb 23, 2014  04:07PM
+" Original work by Alex Zvoleff
 
 " Only do this when not yet done for this buffer
-if exists("b:did_rrst_ftplugin") || exists("disable_r_ftplugin")
+if exists("b:did_ftplugin")
     finish
 endif
 
 " Don't load another plugin for this buffer
-let b:did_rrst_ftplugin = 1
+let b:did_ftplugin = 1
 
 let s:cpo_save = &cpo
 set cpo&vim
-
-" Source scripts common to R, Rrst, Rnoweb, Rhelp and Rdoc:
-runtime r-plugin/common_global.vim
-if exists("g:rplugin_failed")
-    finish
-endif
 
 setlocal comments=fb:*,fb:-,fb:+,n:> commentstring=>\ %s
 setlocal formatoptions+=tcqln
 setlocal formatlistpat=^\\s*\\d\\+\\.\\s\\+\\\|^\\s*[-*+]\\s\\+
 setlocal iskeyword=@,48-57,_,.
 
-" Some buffer variables common to R, Rrst, Rnoweb, Rhelp and Rdoc need to be 
-" defined after the global ones:
-runtime r-plugin/common_buffer.vim
-
-function! RrstIsInRCode(vrb)
-    let chunkline = search("^\\.\\. {r", "bncW")
-    let docline = search("^\\.\\. \\.\\.", "bncW")
-    if chunkline > docline && chunkline != line(".")
-        return 1
-    else
-        if a:vrb
-            call RWarningMsg("Not inside an R code chunk.")
-        endif
-        return 0
-    endif
-endfunction
-
-function! RrstPreviousChunk() range
-    let rg = range(a:firstline, a:lastline)
-    let chunk = len(rg)
-    for var in range(1, chunk)
-        let curline = line(".")
-        if RrstIsInRCode(0)
-            let i = search("^\\.\\. {r", "bnW")
-            if i != 0
-                call cursor(i-1, 1)
-            endif
-        endif
-        let i = search("^\\.\\. {r", "bnW")
-        if i == 0
-            call cursor(curline, 1)
-            call RWarningMsg("There is no previous R code chunk to go.")
-            return
-        else
-            call cursor(i+1, 1)
-        endif
-    endfor
-    return
-endfunction
-
-function! RrstNextChunk() range
-    let rg = range(a:firstline, a:lastline)
-    let chunk = len(rg)
-    for var in range(1, chunk)
-        let i = search("^\\.\\. {r", "nW")
-        if i == 0
-            call RWarningMsg("There is no next R code chunk to go.")
-            return
-        else
-            call cursor(i+1, 1)
-        endif
-    endfor
-    return
-endfunction
-
-function! RMakeHTMLrrst(t)
-    call RSetWD()
-    update
-    if g:rplugin_has_rst2pdf == 0
-        if executable("rst2pdf")
-            let g:rplugin_has_rst2pdf = 1
-        else
-            call RWarningMsg("Is 'rst2pdf' application installed? Cannot convert into HTML/ODT: 'rst2pdf' executable not found.")
-            return
-        endif
-    endif
-
-    let rcmd = 'require(knitr)'
-    if g:vimrplugin_strict_rst
-        let rcmd = rcmd . '; render_rst(strict=TRUE)'
-    endif
-    let rcmd = rcmd . '; knit("' . expand("%:t") . '")'
-    
-    if a:t == "odt"
-        let rcmd = rcmd . '; system("rst2odt ' . expand("%:r:t") . ".rst " . expand("%:r:t") . '.odt")'
-    else
-        let rcmd = rcmd . '; system("rst2html ' . expand("%:r:t") . ".rst " . expand("%:r:t") . '.html")'
-    endif
-
-    if g:vimrplugin_openhtml && a:t == "html"
-        let rcmd = rcmd . '; browseURL("' . expand("%:r:t") . '.html")'
-    endif
-    call g:SendCmdToR(rcmd)
-endfunction
-
-function! RMakePDFrrst()
-    if g:rplugin_vimcomport == 0
-        exe "Py DiscoverVimComPort()"
-        if g:rplugin_vimcomport == 0
-            call RWarningMsg("The vimcom package is required to make and open the PDF.")
-        endif
-    endif
-    update
-    call RSetWD()
-    if g:rplugin_has_rst2pdf == 0
-        if exists("g:vimrplugin_rst2pdfpath") && executable(g:vimrplugin_rst2pdfpath)
-            let g:rplugin_has_rst2pdf = 1
-        elseif executable("rst2pdf")
-            let g:rplugin_has_rst2pdf = 1
-        else
-            call RWarningMsg("Is 'rst2pdf' application installed? Cannot convert into PDF: 'rst2pdf' executable not found.")
-            return
-        endif
-    endif
-
-    let pdfcmd = "vim.interlace.rrst('" . expand("%:t") . "'"
-    if exists("g:vimrplugin_rrstcompiler")
-        let pdfcmd = pdfcmd . ", compiler='" . g:vimrplugin_rrstcompiler . "'"
-    endif
-    if exists("g:vimrplugin_knitargs")
-        let pdfcmd = pdfcmd . ", " . g:vimrplugin_knitargs
-    endif
-    if exists("g:vimrplugin_rst2pdfpath")
-        let pdfcmd = pdfcmd . ", rst2pdfpath='" . g:vimrplugin_rst2pdfpath . "'"
-    endif
-    if exists("g:vimrplugin_rst2pdfargs")
-        let pdfcmd = pdfcmd . ", " . g:vimrplugin_rst2pdfargs
-    endif
-    let pdfcmd = pdfcmd . ")"
-    let ok = g:SendCmdToR(pdfcmd)
-    if ok == 0
-        return
-    endif
-endfunction  
-
-" Send Rrst chunk to R
-function! SendRrstChunkToR(e, m)
-    if RrstIsInRCode(0) == 0
-        call RWarningMsg("Not inside an R code chunk.")
-        return
-    endif
-    let chunkline = search("^\\.\\. {r", "bncW") + 1
-    let docline = search("^\\.\\. \\.\\.", "ncW") - 1
-    let lines = getline(chunkline, docline)
-    let ok = RSourceLines(lines, a:e)
-    if ok == 0
-        return
-    endif
-    if a:m == "down"
-        call RrstNextChunk()
-    endif  
-endfunction
-
-let b:IsInRCode = function("RrstIsInRCode")
-let b:PreviousRChunk = function("RrstPreviousChunk")
-let b:NextRChunk = function("RrstNextChunk")
-let b:SendChunkToR = function("SendRrstChunkToR")
-
-"==========================================================================
-" Key bindings and menu items
-
-call RCreateStartMaps()
-call RCreateEditMaps()
-call RCreateSendMaps()
-call RControlMaps()
-call RCreateMaps("nvi", '<Plug>RSetwd',        'rd', ':call RSetWD()')
-
-" Only .Rrst files use these functions:
-call RCreateMaps("nvi", '<Plug>RKnit',        'kn', ':call RKnit()')
-call RCreateMaps("nvi", '<Plug>RMakePDFK',    'kp', ':call RMakePDFrrst()')
-call RCreateMaps("nvi", '<Plug>RMakeHTML',    'kh', ':call RMakeHTMLrrst("html")')
-call RCreateMaps("nvi", '<Plug>RMakeODT',     'ko', ':call RMakeHTMLrrst("odt")')
-call RCreateMaps("nvi", '<Plug>RIndent',      'si', ':call RrstToggleIndentSty()')
-call RCreateMaps("ni",  '<Plug>RSendChunk',   'cc', ':call b:SendChunkToR("silent", "stay")')
-call RCreateMaps("ni",  '<Plug>RESendChunk',  'ce', ':call b:SendChunkToR("echo", "stay")')
-call RCreateMaps("ni",  '<Plug>RDSendChunk',  'cd', ':call b:SendChunkToR("silent", "down")')
-call RCreateMaps("ni",  '<Plug>REDSendChunk', 'ca', ':call b:SendChunkToR("echo", "down")')
-nmap <buffer><silent> gn :call b:NextRChunk()<CR>
-nmap <buffer><silent> gN :call b:PreviousRChunk()<CR>
-
-" Menu R
-if has("gui_running")
-    call MakeRMenu()
+if has("gui_win32") && !exists("b:browsefilter")
+  let b:browsefilter = "R Source Files (*.R *.Rnw *.Rd *.Rmd *.Rrst)\t*.R;*.Rnw;*.Rd;*.Rmd;*.Rrst\n" .
+        \ "All Files (*.*)\t*.*\n"
 endif
 
-let g:rplugin_has_rst2pdf = 0
-
-call RSourceOtherScripts()
+if exists('b:undo_ftplugin')
+  let b:undo_ftplugin .= " | setl cms< com< fo< flp< isk< | unlet! b:browsefilter"
+else
+  let b:undo_ftplugin = "setl cms< com< fo< flp< isk< | unlet! b:browsefilter"
+endif
 
 let &cpo = s:cpo_save
 unlet s:cpo_save

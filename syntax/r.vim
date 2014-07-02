@@ -3,7 +3,7 @@
 " Maintainer:	      Jakson Aquino <jalvesaq@gmail.com>
 " Former Maintainers: Vaidotas Zemlys <zemlys@gmail.com>
 " 		      Tom Payne <tom@tompayne.org>
-" Last Change:	      Mon Nov 11, 2013  10:12PM
+" Last Change:	      Tue Jun 17, 2014  06:52PM
 " Filenames:	      *.R *.r *.Rhistory *.Rt
 " 
 " NOTE: The highlighting of R functions is defined in the
@@ -38,7 +38,8 @@ syn match rOKeyword contained "@\(param\|return\|name\|rdname\|examples\|include
 syn match rOKeyword contained "@\(S3method\|TODO\|aliases\|alias\|assignee\|author\|callGraphDepth\|callGraph\)"
 syn match rOKeyword contained "@\(callGraphPrimitives\|concept\|exportClass\|exportMethod\|exportPattern\|export\|formals\)"
 syn match rOKeyword contained "@\(format\|importClassesFrom\|importFrom\|importMethodsFrom\|import\|keywords\)"
-syn match rOKeyword contained "@\(method\|nord\|note\|references\|seealso\|setClass\|slot\|source\|title\|usage\)"
+syn match rOKeyword contained "@\(method\|noRd\|note\|references\|seealso\|setClass\|slot\|source\|title\|usage\)"
+syn match rOKeyword contained "@\(family\|template\|templateVar\|description\|details\|inheritsParams\)"
 syn match rOComment contains=@Spell,rOKeyword "#'.*"
 
 
@@ -120,7 +121,7 @@ if &filetype != "rmd" && &filetype != "rrst"
 else
     syn match rOperator    "[|!<>^~`/:]"
 endif
-syn match rOperator    "%\{2}\|%\S*%"
+syn match rOperator    "%\{2}\|%\S\{-}%"
 syn match rOpError  '\*\{3}'
 syn match rOpError  '//'
 syn match rOpError  '&&&'
@@ -149,6 +150,10 @@ syn match rError      "[)\]}]"
 syn match rBraceError "[)}]" contained
 syn match rCurlyError "[)\]]" contained
 syn match rParenError "[\]}]" contained
+
+" Source list of R functions. The list is produced by the Vim-R-plugin
+" http://www.vim.org/scripts/script.php?script_id=2628
+runtime r-plugin/functions.vim
 
 syn match rDollar display contained "\$"
 syn match rDollar display contained "@"
@@ -215,78 +220,5 @@ hi def link rType        Type
 hi def link rOKeyword    Title
 
 let b:current_syntax="r"
-
-" The code below is used by the Vim-R-plugin:
-" http://www.vim.org/scripts/script.php?script_id=2628
-
-" Users may define the value of g:vimrplugin_permanent_libs to determine what
-" functions should be highlighted even if R is not running. By default, the
-" functions of packages loaded by R --vanilla are highlighted.
-if !exists("g:vimrplugin_permanent_libs")
-    let g:vimrplugin_permanent_libs = "base,stats,graphics,grDevices,utils,datasets,methods"
-endif
-
-" Store the names R package whose functions were already added to syntax
-" highlight to avoid sourcing them repeatedly.
-let b:rplugin_funls = []
-
-" The function RUpdateFunSyntax() is called by the Vim-R-plugin whenever the
-" user loads a new package in R. The function should be defined only once.
-" Thus, if it's already defined, call it and finish.
-if exists("*RUpdateFunSyntax")
-    call RUpdateFunSyntax(0)
-    finish
-endif
-
-function RAddToFunList(lib, verbose)
-    " Only run once for each package:
-    for pkg in b:rplugin_funls
-        if pkg == a:lib
-            return
-        endif
-    endfor
-
-    " The fun_ files list functions of R packages and are created by the
-    " Vim-R-plugin:
-    let fnf = split(globpath(&rtp, 'r-plugin/objlist/fun_' . a:lib . '_*'), "\n")
-
-    if len(fnf) == 1
-        silent exe "source " . fnf[0]
-        let b:rplugin_funls += [a:lib]
-    elseif a:verbose && len(fnf) == 0
-        echohl WarningMsg
-        echomsg 'Fun_ file for "' . a:lib . '" not found.'
-        echohl Normal
-        return
-    elseif a:verbose && len(fnf) > 1
-        echohl WarningMsg
-        echomsg 'There is more than one fun_ file for "' . a:lib . '":'
-        for fff in fnf
-            echomsg fff
-        endfor
-        echohl Normal
-        return
-    endif
-endfunction
-
-function RUpdateFunSyntax(verbose)
-    " Do nothing if called at a buffer that doesn't include R syntax:
-    if !exists("b:rplugin_funls")
-        return
-    endif
-    if exists("g:rplugin_libls")
-        for lib in g:rplugin_libls
-            call RAddToFunList(lib, a:verbose)
-        endfor
-    else
-        if exists("g:vimrplugin_permanent_libs")
-            for lib in split(g:vimrplugin_permanent_libs, ",")
-                call RAddToFunList(lib, a:verbose)
-            endfor
-        endif
-    endif
-endfunction
-
-call RUpdateFunSyntax(0)
 
 " vim: ts=8 sw=4
