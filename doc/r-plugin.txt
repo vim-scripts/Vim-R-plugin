@@ -2550,7 +2550,7 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-1.0 (2014-06-30)
+1.0 (2014-07-02)
 
  * The package now depends on vimcom (which is fully featured and is no longer
    on CRAN).
