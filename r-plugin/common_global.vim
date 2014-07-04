@@ -1047,6 +1047,10 @@ function StartObjBrowser_Tmux()
         return
     endif
 
+    " The $VIMINSTANCEID may have been reset by another Vim instance in the
+    " same Tmux session:
+    call system("tmux set-environment VIMINSTANCEID " . $VIMINSTANCEID)
+
     let objbrowserfile = $VIMRPLUGIN_TMPDIR . "/objbrowserInit"
     let tmxs = " "
 
@@ -3838,7 +3842,11 @@ let g:rplugin_tmuxsname = "VimR-" . substitute(localtime(), '.*\(...\)', '\1', '
 
 " If this is the Object Browser running in a Tmux pane, $VIMINSTANCEID is
 " already defined and shouldn't be changed
-if $VIMINSTANCEID == ""
+if &filetype == "rbrowser"
+    if $VIMINSTANCEID == ""
+        call RWarningMsgInp("VIMINSTANCEID is undefined")
+    endif
+else
     let $VIMINSTANCEID = substitute(g:rplugin_firstbuffer, '\W', '', 'g') . substitute(localtime(), '.*\(...\)', '\1', '')
     if strlen($VIMINSTANCEID) > 64
         let $VIMINSTANCEID = substitute($VIMINSTANCEID, '.*\(...............................................................\)', '\1', '')
