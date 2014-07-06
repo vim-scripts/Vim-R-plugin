@@ -1047,10 +1047,6 @@ function StartObjBrowser_Tmux()
         return
     endif
 
-    " The $VIMINSTANCEID may have been reset by another Vim instance in the
-    " same Tmux session:
-    call system("tmux set-environment VIMINSTANCEID " . $VIMINSTANCEID)
-
     let objbrowserfile = $VIMRPLUGIN_TMPDIR . "/objbrowserInit"
     let tmxs = " "
 
@@ -1069,6 +1065,7 @@ function StartObjBrowser_Tmux()
                 \ 'let g:rplugin_vim_pane = "' . g:rplugin_vim_pane . '"',
                 \ 'let g:rplugin_rconsole_pane = "' . g:rplugin_rconsole_pane . '"',
                 \ 'let b:objbrtitle = "' . b:objbrtitle . '"',
+                \ 'let $VIMINSTANCEID = "' . $VIMINSTANCEID . '"',
                 \ 'let showmarks_enable = 0',
                 \ 'let g:rplugin_tmuxsname = "' . g:rplugin_tmuxsname . '"',
                 \ 'let b:rscript_buffer = "' . bufname("%") . '"',
