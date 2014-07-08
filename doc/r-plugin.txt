@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 1.0
+Version: 1.0.1
 For Vim version 7.4
 
  1. Overview                                    |r-plugin-overview|
@@ -2006,6 +2006,21 @@ You may also want to remap <C-x><C-o>:
 
    http://stackoverflow.com/questions/2269005/how-can-i-change-the-keybinding-used-to-autocomplete-in-vim
 
+You can also use Vim's 'clientserver' feature to send remote messages to Vim.
+For example, if you want a keyboard shortcut that sends to Vim the command to
+send the current line to R and go down to the next line of code, then use your
+desktop configuration tools to create a global shortcut to the following
+command:
+>
+   vim --remote-expr 'SendLineToR("down")'
+<
+The command above will work properly only if there is a single Vim instance
+running. Otherwise, the |--servername| argument would have to be used to send
+the message to the correct Vim instance. If the command works properly, you
+will be able to send lines of code from Vim to R even if the window
+currently focused is not the Vim's window (either the terminal emulator where
+Vim is running or GVim).
+
 
 9.6. Remap the <LocalLeader>~
 							*r-plugin-localleader*
@@ -2549,6 +2564,10 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 ==============================================================================
 							       *r-plugin-news*
 10. News~
+
+1.0.1 (2014-07-07)
+
+ * Minor bug fixes.
 
 1.0 (2014-07-02)
 
