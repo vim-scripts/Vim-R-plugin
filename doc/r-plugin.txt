@@ -2248,20 +2248,16 @@ on top" or a similar option provided by your desktop manager.
 The Vim-R-plugin is a file type plugin. If you want its functionality
 available for all file types, then put in your |vimrc|:
 >
-   source path/to/Vim-R-plugin/r-plugin/global_r_plugin.vim
+   runtime r-plugin/global_r_plugin.vim
 <
 You will then be able to type <LocalLeader>rf to start and <LocalLeader>rq to
 quit different command line interpreters and <LocalLeader>d, l, ss, bb, etc to
 send code to the interpreter. If you want support for a language other than
 Julia, Python, Haskell, Ruby and Lisp, you have to set the values of
-vimrplugin_exe and vimrplugin_quit as the example below does for Octave:
+vimrplugin_exe and vimrplugin_quit in two Vim auto commands in your |vimrc|,
+BEFORE the `runtime` command above. Example:
 >
-   let vimrplugin_exe = "octave"
-   let vimrplugin_quit = "quit"
-<
-If you use yet another interpreter, you will want to put the commands above in
-a Vim autocommand:
->
+   autocmd FileType matlab let vimrplugin_exe = "octave" | let vimrplugin_quit = "quit"
    autocmd BufNewFile,BufRead *.m let vimrplugin_exe = "octave" | let vimrplugin_quit = "quit"
 <
 If you use GVim, you may also want to set |vimrplugin_never_unmake_menu| in
