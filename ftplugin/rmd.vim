@@ -1,12 +1,12 @@
 " Vim filetype plugin file
 " Language: R help file
 " Maintainer: Jakson Alves de Aquino <jalvesaq@gmail.com>
-" Last Change:	Sun Feb 23, 2014  04:06PM
+" Last Change:	Wed Jul 09, 2014  06:23PM
 " Original work by Alex Zvoleff (adjusted for rmd by Michel Kuhlmann)
 
 " Only do this when not yet done for this buffer
 if exists("b:did_ftplugin")
-    finish
+  finish
 endif
 
 runtime! ftplugin/html.vim ftplugin/html_*.vim ftplugin/html/*.vim
@@ -39,3 +39,5 @@ endif
 
 let &cpo = s:cpo_save
 unlet s:cpo_save
+
+" vim: sw=2

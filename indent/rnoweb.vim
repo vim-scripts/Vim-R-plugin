@@ -1,7 +1,7 @@
 " Vim indent file
 " Language:	Rnoweb
 " Author:	Jakson Alves de Aquino <jalvesaq@gmail.com>
-" Last Change:	Thu Jul 10, 2014  06:56PM
+" Last Change:	Thu Jul 10, 2014  07:11PM
 
 
 " Only load this indent file when no other was loaded.
@@ -23,12 +23,13 @@ if exists("*GetRnowebIndent")
 endif
 
 function GetRnowebIndent()
-    if getline(".") =~ "^<<.*>>=$"
-       return 0
-    endif
-    if search("^<<", "bncW") > search("^@", "bncW")
-       return s:RIndent()
-    endif
-    return s:TeXIndent()
+  if getline(".") =~ "^<<.*>>=$"
+    return 0
+  endif
+  if search("^<<", "bncW") > search("^@", "bncW")
+    return s:RIndent()
+  endif
+  return s:TeXIndent()
 endfunction
 
+" vim: sw=2

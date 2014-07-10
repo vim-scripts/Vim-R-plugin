@@ -1,7 +1,7 @@
 " reStructured Text with R statements
 " Language: reST with R code chunks
 " Maintainer: Alex Zvoleff, azvoleff@mail.sdsu.edu
-" Last Change: Sat Nov 09, 2013  07:28PM
+" Last Change: Wed Jul 09, 2014  10:29PM
 "
 " CONFIGURATION:
 "   To highlight chunk headers as R code, put in your vimrc:
@@ -9,9 +9,9 @@
 
 " for portability
 if version < 600
-    syntax clear
+  syntax clear
 elseif exists("b:current_syntax")
-    finish
+  finish
 endif
 
 " load all of the rst info
@@ -25,11 +25,11 @@ setlocal iskeyword=@,48-57,_,.
 
 " highlight R chunks
 if exists("g:rrst_syn_hl_chunk")
-    " highlight R code inside chunk header
-    syntax match rrstChunkDelim "^\.\. {r" contained
-    syntax match rrstChunkDelim "}$" contained
+  " highlight R code inside chunk header
+  syntax match rrstChunkDelim "^\.\. {r" contained
+  syntax match rrstChunkDelim "}$" contained
 else
-    syntax match rrstChunkDelim "^\.\. {r .*}$" contained
+  syntax match rrstChunkDelim "^\.\. {r .*}$" contained
 endif
 syntax match rrstChunkDelim "^\.\. \.\.$" contained
 syntax region rrstChunk start="^\.\. {r.*}$" end="^\.\. \.\.$" contains=@R,rrstChunkDelim keepend transparent fold
@@ -44,4 +44,4 @@ hi def link rrstInlineDelim Special
 
 let b:current_syntax = "rrst"
 
-" vim: ts=8 sw=4
+" vim: ts=8 sw=2
