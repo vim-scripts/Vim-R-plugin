@@ -82,7 +82,6 @@ deb:
 	  - r-plugin/nvimserver.py\n\
 	  - r-plugin/timer.sh\n\
 	  - r-plugin/global_r_plugin.vim\n\
-	  - r-plugin/tex_indent.vim\n\
 	  - r-plugin/vimrconfig.vim\n\
 	  - r-plugin/functions.vim\n\
 	  - syntax/r.vim\n\

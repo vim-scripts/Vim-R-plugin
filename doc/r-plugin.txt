@@ -1926,7 +1926,6 @@ directory after the installation:
    r-plugin/global_r_plugin.vim
    r-plugin/windows.py
    r-plugin/objlist/README
-   r-plugin/tex_indent.vim
    r-plugin/r.snippets
    r-plugin/common_buffer.vim
    r-plugin/common_global.vim
@@ -2561,7 +2560,7 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-1.0.1 (2014-07-07)
+1.0.1 (2014-07-10)
 
  * Minor bug fixes.
 
