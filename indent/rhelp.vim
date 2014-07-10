@@ -1,8 +1,7 @@
 " Vim indent file
 " Language:	R Documentation (Help), *.Rd
 " Author:	Jakson Alves de Aquino <jalvesaq@gmail.com>
-" URL:		http://www.vim.org/scripts/script.php?script_id=2628
-" Last Change:	Fri Feb 15, 2013  09:46PM
+" Last Change:	Thu Jul 10, 2014  06:50PM
 
 
 " Only load this indent file when no other was loaded.
@@ -10,6 +9,7 @@ if exists("b:did_indent")
     finish
 endif
 runtime indent/r.vim
+let s:RIndent = function(substitute(&indentexpr, "()", "", ""))
 let b:did_indent = 1
 
 setlocal indentkeys=0{,0},:,!^F,o,O,e
@@ -102,7 +102,7 @@ function GetCorrectRHelpIndent()
     let lastsection = search('^\\[a-z]*{', "bncW")
     let secname = getline(lastsection)
     if secname =~ '^\\usage{' || secname =~ '^\\examples{' || secname =~ '^\\dontshow{' || secname =~ '^\\dontrun{' || secname =~ '^\\donttest{' || secname =~ '^\\testonly{' || secname =~ '^\\method{.*}{.*}('
-        return GetRIndent()
+        return s:RIndent()
     else
         return GetRHelpIndent()
     endif

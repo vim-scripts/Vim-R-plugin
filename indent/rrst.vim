@@ -1,8 +1,7 @@
 " Vim indent file
 " Language:	Rrst
 " Author:	Jakson Alves de Aquino <jalvesaq@gmail.com>
-" URL:		http://www.vim.org/scripts/script.php?script_id=2628
-" Last Change:	Fri Feb 15, 2013  09:47PM
+" Last Change:	Thu Jul 10, 2014  07:01PM
 
 
 " Only load this indent file when no other was loaded.
@@ -10,6 +9,7 @@ if exists("b:did_indent")
   finish
 endif
 runtime indent/r.vim
+let s:RIndent = function(substitute(&indentexpr, "()", "", ""))
 let b:did_indent = 1
 
 setlocal indentkeys=0{,0},:,!^F,o,O,e
@@ -34,12 +34,12 @@ endfunction
 
 function GetRrstIndent()
     if getline(".") =~ '^\.\. {r .*}$' || getline(".") =~ '^\.\. \.\.$'
-	return 0
+       return 0
     endif
     if search('^\.\. {r', "bncW") > search('^\.\. \.\.$', "bncW")
-	return GetRIndent()
+       return s:RIndent()
     else
-	return GetRstIndent()
+       return GetRstIndent()
     endif
 endfunction
 
