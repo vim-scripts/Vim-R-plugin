@@ -3,9 +3,9 @@
 " Maintainer:	      Jakson Aquino <jalvesaq@gmail.com>
 " Former Maintainers: Vaidotas Zemlys <zemlys@gmail.com>
 " 		      Tom Payne <tom@tompayne.org>
-" Last Change:	      Tue Jun 17, 2014  06:52PM
+" Last Change:	      Thu Jul 10, 2014  01:27PM
 " Filenames:	      *.R *.r *.Rhistory *.Rt
-" 
+"
 " NOTE: The highlighting of R functions is defined in the
 " r-plugin/functions.vim, which is part of vim-r-plugin2:
 " http://www.vim.org/scripts/script.php?script_id=2628
@@ -79,12 +79,12 @@ syn keyword rRepeat      for in repeat while
 syn keyword rConstant T F LETTERS letters month.abb month.name pi
 syn keyword rConstant R.version.string
 
-syn keyword rNumber   NA_integer_ NA_real_ NA_complex_ NA_character_ 
+syn keyword rNumber   NA_integer_ NA_real_ NA_complex_ NA_character_
 
 " Constants
 syn keyword rConstant NULL
 syn keyword rBoolean  FALSE TRUE
-syn keyword rNumber   NA Inf NaN 
+syn keyword rNumber   NA Inf NaN
 
 " integer
 syn match rInteger "\<\d\+L"
@@ -93,7 +93,7 @@ syn match rInteger "\<\d\+[Ee]+\=\d\+L"
 
 " number with no fractional part or exponent
 syn match rNumber "\<\d\+\>"
-" hexadecimal number 
+" hexadecimal number
 syn match rNumber "\<0x\([0-9]\|[a-f]\|[A-F]\)\+"
 
 " floating point number with integer and fractional parts and optional exponent
@@ -171,7 +171,7 @@ if &filetype == "rhelp"
 endif
 
 " Type
-syn keyword rType array category character complex double function integer list logical matrix numeric vector data.frame 
+syn keyword rType array category character complex double function integer list logical matrix numeric vector data.frame
 
 " Name of object with spaces
 if &filetype != "rmd" && &filetype != "rrst"
@@ -179,9 +179,15 @@ if &filetype != "rmd" && &filetype != "rrst"
 endif
 
 if &filetype == "rhelp"
-    syn match rhPreProc "^#ifdef.*" 
-    syn match rhPreProc "^#endif.*" 
+    syn match rhPreProc "^#ifdef.*"
+    syn match rhPreProc "^#endif.*"
     syn match rhSection "\\dontrun\>"
+endif
+
+if exists("r_syn_minlines")
+    exe "syn sync minlines=" . r_syn_minlines
+else
+    syn sync minlines=40
 endif
 
 " Define the default highlighting.
