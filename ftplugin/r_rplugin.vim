@@ -87,6 +87,7 @@ call RCreateMaps("ni", '<Plug>RSpinFile',     'ks', ':call RSpin()')
 
 call RCreateSendMaps()
 call RControlMaps()
+call RDevMaps()
 call RCreateMaps("nvi", '<Plug>RSetwd',        'rd', ':call RSetWD()')
 
 

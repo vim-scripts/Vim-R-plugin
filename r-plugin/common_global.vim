@@ -2688,6 +2688,76 @@ function RBrowserMenu()
     let g:rplugin_hasmenu = 1
 endfunction
 
+" ##########################################################################################################
+" #Development package additions
+" ##########################################################################################################
+"
+"___________________________________________________________________________
+function Search_root_dir()
+python << EOF
+import vim
+import os
+import sys 
+path=os.getcwd()
+required=["DESCRITION", "R", "man"]
+current_dir_cont=os.listdir(path)
+while set(current_dir_cont).isdisjoint(required):
+     current_dir_cont=os.listdir(os.path.dirname(str(os.getcwd())))
+# if the required files and dirs are not in the current dir, go up one level
+     os.chdir(str("../"))
+
+path=os.getcwd()
+vim.command("let root_dir= '%s'" % path)
+EOF
+return(root_dir)
+endfunction
+"___________________________________________________________________________
+
+" A functtion that toggles dov_mode()
+function RToogleDevmode()
+    update
+    call g:SendCmdToR('require(devtools); dev_mode()')
+endfunction
+
+" A functtion that does load_all()
+function RDevLoadAll()
+    update
+    let a:current_dir=getcwd()
+    let a:root_dir=Search_root_dir()
+
+    let a:root_dir=join(['setwd("', a:root_dir, '");'], '')
+    let a:current_dir=join(['setwd("', a:current_dir, '");'], '')
+    let rcmd=join(['require(devtools);', a:root_dir, 'load_all();', a:current_dir], '')
+    call g:SendCmdToR(rcmd)
+endfunction
+
+" A functtion that does document()
+function RDevDocument()
+    update
+    let a:current_dir=getcwd()
+    let a:root_dir=Search_root_dir()
+    let a:root_dir=join(['setwd("', a:root_dir, '");'], '')
+    let a:current_dir=join(['setwd("', a:current_dir, '");'], '')
+    let rcmd=join(['require(devtools);', a:root_dir, 'document();', a:current_dir], '')
+    call g:SendCmdToR(rcmd)
+endfunction
+
+function RDevMenu()
+    call RCreateMenuItem("nvi", 'Package\ development.Devmode', '<Plug>RToogleDevmode', 'ld', ':call RToogleDevmode()')
+    call RCreateMenuItem("nvi", 'Package\ development.Load\ all', '<Plug>RDevLoadAll', 'll', ':call RDevLoadAll()')
+    call RCreateMenuItem("nvi", 'Package\ development.Document', '<Plug>RDevDocument', 'lv', ':call RDevDocument()')
+    let g:rplugin_hasmenu = 1
+endfunction
+
+function RDevMaps()
+    "-------------------------------------
+    call RCreateMaps("nvi", '<Plug>RToogleDevmode', 'ld', ':call RToogleDevmode()')
+    call RCreateMaps("nvi", '<Plug>RDevLoadAll', 'll', ':call RDevLoadAll()')
+    call RCreateMaps("nvi", '<Plug>RDevDocument', 'lv', ':call RDevDocument()')
+endfunction
+
+"##########################################################################################################
+
 function RControlMenu()
     call RCreateMenuItem("nvi", 'Command.List\ space', '<Plug>RListSpace', 'rl', ':call g:SendCmdToR("ls()")')
     call RCreateMenuItem("nvi", 'Command.Clear\ console\ screen', '<Plug>RClearConsole', 'rr', ':call RClearConsole()')
@@ -2956,6 +3026,11 @@ function MakeRMenu()
     " Object Browser
     "----------------------------------------------------------------------------
     call RBrowserMenu()
+
+    "----------------------------------------------------------------------------
+    " Package Development
+    "----------------------------------------------------------------------------
+    call RDevMenu()
 
     "----------------------------------------------------------------------------
     " Help
