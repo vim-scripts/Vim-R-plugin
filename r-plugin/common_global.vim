@@ -1675,7 +1675,8 @@ function SendFunctionToR(e, m)
         return
     endif
     let functionline = i
-    while i > 0 && line !~ "<-"
+    " while i > 0 && line !~ "<-"
+    while i > 0 && line !~ "="
         let i -= 1
         let line = SanitizeRLine(getline(i))
     endwhile
