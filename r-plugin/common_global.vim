@@ -1806,6 +1806,9 @@ function SendParagraphToR(e, m)
         if &filetype == "rnoweb" && line =~ "^@$"
             let j -= 1
             break
+        elseif &filetype == "rmd" && line =~ "^[ \t]*```$"
+            let j -= 1
+            break
         endif
         if line =~ '^\s*$'
             break
