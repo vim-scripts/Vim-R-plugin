@@ -2455,7 +2455,8 @@ function ShowRDoc(rkeyword, package, getclass)
     normal! gg
     let @@ = save_unnamed_reg
     setlocal nomodified
-    setlocal nomodifiable
+    setlocal modifiable
+    setlocal readonly
     redraw
 endfunction
 
