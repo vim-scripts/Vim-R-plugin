@@ -2766,21 +2766,21 @@ function RCreateMaps(type, plug, combo, target)
     if a:type =~ "n"
         if hasmapto(a:plug, "n")
             exec 'noremap <buffer><silent> ' . a:plug . ' ' . tg
-        else
+        elseif g:vimrplugin_user_maps_only == 0
             exec 'noremap <buffer><silent> <LocalLeader>' . a:combo . ' ' . tg
         endif
     endif
     if a:type =~ "v"
         if hasmapto(a:plug, "v")
             exec 'vnoremap <buffer><silent> ' . a:plug . ' <Esc>' . tg
-        else
+        elseif g:vimrplugin_user_maps_only == 0
             exec 'vnoremap <buffer><silent> <LocalLeader>' . a:combo . ' <Esc>' . tg
         endif
     endif
     if g:vimrplugin_insert_mode_cmds == 1 && a:type =~ "i"
         if hasmapto(a:plug, "i")
             exec 'inoremap <buffer><silent> ' . a:plug . ' <Esc>' . tg . il
-        else
+        elseif g:vimrplugin_user_maps_only == 0
             exec 'inoremap <buffer><silent> <LocalLeader>' . a:combo . ' <Esc>' . tg . il
         endif
     endif
@@ -3401,6 +3401,7 @@ call RSetDefaultValue("g:vimrplugin_rcomment_string", "'# '")
 call RSetDefaultValue("g:vimrplugin_vimpager",        "'tab'")
 call RSetDefaultValue("g:vimrplugin_objbr_place",     "'script,right'")
 call RSetDefaultValue("g:vimrplugin_permanent_libs",  "'base,stats,graphics,grDevices,utils,datasets,methods'")
+call RSetDefaultValue("g:vimrplugin_user_maps_only", 0)
 
 if executable("latexmk")
     call RSetDefaultValue("g:vimrplugin_latexcmd", "'latexmk -pdf'")

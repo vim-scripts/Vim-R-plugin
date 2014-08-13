@@ -1148,6 +1148,7 @@ is running:
 |vimrplugin_show_args|         Show extra information during omnicompletion
 |vimrplugin_vimcom_wait|       Time to wait for vimcom loading
 |vimrplugin_vim_wd|            Start R in Vim's working directory
+vimrplugin_user_maps_only    Only set user specified keybindings
 
 
 6.1. Terminal emulator (Linux/Unix only)~
