@@ -1148,6 +1148,7 @@ is running:
 |vimrplugin_show_args|         Show extra information during omnicompletion
 |vimrplugin_vimcom_wait|       Time to wait for vimcom loading
 |vimrplugin_vim_wd|            Start R in Vim's working directory
+|vimrplugin_user_maps_only|    Only set user specified key bindings
 
 
 6.1. Terminal emulator (Linux/Unix only)~
@@ -1730,6 +1731,16 @@ your |vimrc|:
     let vimrplugin_vim_wd = 1
 <
 This option is useful only for those who did not enable 'autochdir'.
+
+
+6.32 Only set key bindings that are user specified
+						  *vimrplugin_user_maps_only*
+The Vim-R-plugin sets many default key bindings.  The user can set custom
+key bindings (|r-plugin-key-bindings|).  If you wish the Vim-R-plugin to only
+set those key-bindings specified by the user, put in your vimrc:
+>
+    let vimrplugin_user_maps_only = 1
+<
 
 
 ==============================================================================
