@@ -97,5 +97,8 @@ endif
 
 call RSourceOtherScripts()
 
-
-let b:undo_ftplugin .= " | unlet! b:IsInRCode b:SourceLines"
+if exists("b:undo_ftplugin")
+    let b:undo_ftplugin .= " | unlet! b:IsInRCode b:SourceLines"
+else
+    let b:undo_ftplugin = "unlet! b:IsInRCode b:SourceLines"   
+endif
