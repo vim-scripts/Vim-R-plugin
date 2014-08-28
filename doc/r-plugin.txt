@@ -612,9 +612,9 @@ of functions for syntax highlight.
 Vim can automatically complete the names of R objects when CTRL-X CTRL-O is
 pressed in insert mode (see |omni-completion| for details). Omni completion
 shows in a pop up menu the name of the object, its class and its environment
-(most frequently, its package name). If the object is a function, its
-arguments are shown in a separate window (see 'completeopt' if you want to
-disable the preview window).
+(most frequently, its package name). If the object is a function, the plugin
+can also show the function arguments in a separate preview window (this
+feature is disabled by default: see |vimrplugin_show_args|).
 
 If a data.frame is found, while building the list of objects, the columns in
 the data.frame are added to the list. When you try to use omni completion to
