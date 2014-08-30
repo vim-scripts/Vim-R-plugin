@@ -106,16 +106,6 @@ function! RMakeRmd(t)
     call g:SendCmdToR(rcmd)
 endfunction
 
-function! RMakeSlidesrmd()
-    call RSetWD()
-    update
-    let rcmd = 'require(slidify); slidify("' . expand("%:t") . '")'
-    if g:vimrplugin_openhtml
-        let rcmd = rcmd . '; browseURL("' . expand("%:r:t") . '.html")'
-    endif
-    call g:SendCmdToR(rcmd)
-endfunction
-
 " Send Rmd chunk to R
 function! SendRmdChunkToR(e, m)
     if RmdIsInRCode(0) == 0
@@ -156,7 +146,6 @@ call RCreateMaps("nvi", '<Plug>RMakeAll',     'ka', ':call RMakeRmd("all")')
 call RCreateMaps("nvi", '<Plug>RMakePDFK',    'kp', ':call RMakeRmd("pdf")')
 call RCreateMaps("nvi", '<Plug>RMakePDFKb',   'kl', ':call RMakeRmd("beamer")')
 call RCreateMaps("nvi", '<Plug>RMakeHTML',    'kh', ':call RMakeRmd("html")')
-call RCreateMaps("nvi", '<Plug>RMakeSlides',  'sl', ':call RMakeSlidesrmd()')
 call RCreateMaps("nvi", '<Plug>RMakeODT',     'ko', ':call RMakeRmd("odt")')
 call RCreateMaps("ni",  '<Plug>RSendChunk',   'cc', ':call b:SendChunkToR("silent", "stay")')
 call RCreateMaps("ni",  '<Plug>RESendChunk',  'ce', ':call b:SendChunkToR("echo", "stay")')
