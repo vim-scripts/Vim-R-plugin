@@ -1844,6 +1844,8 @@ RD, "cursor down"; RED, both "echo" and "down"):
    RMakePDF   (Sweave)
    RMakePDFK  (Knitr)
    RMakePDFKb (.Rmd, beamer)
+   RMakeRmd   (rmarkdown default)
+   RMakeAll   (rmarkdown all in yaml)
    ROpenPDF
    RSpinFile
    RMakeSlides (Slidify)
