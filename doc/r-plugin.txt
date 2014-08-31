@@ -442,7 +442,6 @@ Command
   . Knit and HTML (cur file, verbose) (only .Rmd)      \kh
   . Knit and PDF (cur file, verbose) (Windows)         \kv
   . Spin (cur file) (only .R)                          \ks
-  . Slidify (cur file) (only .Rmd)                     \sl
   --------------------------------------------------------
   . Open PDF (cur file)                                \op
   --------------------------------------------------------
@@ -1844,9 +1843,10 @@ RD, "cursor down"; RED, both "echo" and "down"):
    RMakePDF   (Sweave)
    RMakePDFK  (Knitr)
    RMakePDFKb (.Rmd, beamer)
+   RMakeRmd   (rmarkdown default)
+   RMakeAll   (rmarkdown all in yaml)
    ROpenPDF
    RSpinFile
-   RMakeSlides (Slidify)
 
    Object browser~
    RUpdateObjBrowser
