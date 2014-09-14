@@ -33,10 +33,10 @@ function GetMdIndent()
 endfunction
 
 function GetRmdIndent()
-  if getline(".") =~ '^```{r .*}$' || getline(".") =~ '^```$'
+  if getline(".") =~ '^[ \t]*```{r .*}$' || getline(".") =~ '^[ \t]*```$'
     return 0
   endif
-  if search('^```{r', "bncW") > search('^```$', "bncW")
+  if search('^[ \t]*```{r', "bncW") > search('^[ \t]*```$', "bncW")
     return s:RIndent()
   else
     return GetMdIndent()
