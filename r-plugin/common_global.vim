@@ -91,9 +91,9 @@ function ReplaceUnderS()
         else
             if synName == "rString"
                 let isString = 1
-                if s[j-1] == '"' || s[j-1] == "'"
+                if s[j-1] == '"' || s[j-1] == "'" && g:vimrplugin_assign == 1
                     let synName = synIDattr(synID(line("."), j-2, 1), "name")
-                    if (synName == "rString" || synName == "rSpecial") && g:vimrplugin_assign == 1
+                    if (synName == "rString" || synName == "rSpecial")
                         let isString = 0
                     endif
                 endif
