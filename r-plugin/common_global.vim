@@ -78,7 +78,7 @@ function ReplaceUnderS()
     else
         let j = col(".")
         let s = getline(".")
-        if g:vimrplugin_assign_map == "_" && j > 3 && s[j-3] == "<" && s[j-2] == "-" && s[j-1] == " "
+        if g:vimrplugin_assign == 1 && g:vimrplugin_assign_map == "_" && j > 3 && s[j-3] == "<" && s[j-2] == "-" && s[j-1] == " "
             let save_unnamed_reg = @@
             exe "normal! 3h3xr_"
             let @@ = save_unnamed_reg
@@ -95,6 +95,19 @@ function ReplaceUnderS()
                     let synName = synIDattr(synID(line("."), j-2, 1), "name")
                     if synName == "rString" || synName == "rSpecial"
                         let isString = 0
+                    endif
+                endif
+            else
+                if g:vimrplugin_assign == 2
+                    if s[j-1] != "_" && !(j > 3 && s[j-3] == "<" && s[j-2] == "-" && s[j-1] == " ")
+                        let isString = 1
+                    elseif j > 3 && s[j-3] == "<" && s[j-2] == "-" && s[j-1] == " "
+                        let save_unnamed_reg = @@
+                        exe "normal! 3h3xr_a_"
+                        let @@ = save_unnamed_reg
+                        return
+                    else
+                        exe "normal! 1x"
                     endif
                 endif
             endif
@@ -2924,7 +2937,7 @@ function MakeRMenu()
     " Edit
     "----------------------------------------------------------------------------
     if &filetype == "r" || &filetype == "rnoweb" || &filetype == "rrst" || &filetype == "rhelp" || g:vimrplugin_never_unmake_menu
-        if g:vimrplugin_assign == 1
+        if g:vimrplugin_assign == 1 || g:vimrplugin_assign == 2
             silent exe 'imenu <silent> R.Edit.Insert\ \"\ <-\ \"<Tab>' . g:vimrplugin_assign_map . ' <Esc>:call ReplaceUnderS()<CR>a'
         endif
         imenu <silent> R.Edit.Complete\ object\ name<Tab>^X^O <C-X><C-O>
@@ -3129,7 +3142,7 @@ function RCreateEditMaps()
     call RCreateMaps("ni", '<Plug>RRightComment',   ';', ':call MovePosRCodeComment("normal")')
     call RCreateMaps("v", '<Plug>RRightComment',    ';', ':call MovePosRCodeComment("selection")')
     " Replace 'underline' with '<-'
-    if g:vimrplugin_assign == 1
+    if g:vimrplugin_assign == 1 || g:vimrplugin_assign == 2
         silent exe 'imap <buffer><silent> ' . g:vimrplugin_assign_map . ' <Esc>:call ReplaceUnderS()<CR>a'
     endif
     if hasmapto("<Plug>RCompleteArgs", "i")
