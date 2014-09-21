@@ -2019,6 +2019,13 @@ You may also want to remap <C-x><C-o>:
 
    http://stackoverflow.com/questions/2269005/how-can-i-change-the-keybinding-used-to-autocomplete-in-vim
 
+Note: Not all mappings work in all versions of Vim. Some mappings may not work
+on GVim on Windows, and others may not work on Vim running in a terminal
+emulator or in Linux Console. The use of <Shift>, <Alt> and <Fn> keys in
+mappings are particularly problematic. See:
+
+   https://github.com/jcfaria/Vim-R-plugin/issues/111
+
 You can also use Vim's 'clientserver' feature to send remote messages to Vim.
 For example, if you want a keyboard shortcut that sends to Vim the command to
 send the current line to R and go down to the next line of code, then use your
@@ -2574,7 +2581,7 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-1.0.1 (2014-09-20)
+1.0.1 (2014-09-21)
 
  * Minor bug fixes.
 
