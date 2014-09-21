@@ -107,7 +107,7 @@ function ReplaceUnderS()
                         let @@ = save_unnamed_reg
                         return
                     else
-                        if j == len(getline("."))
+                        if j == len(s)
                             exe "normal! 1x"
                         else
                             let save_unnamed_reg = @@
