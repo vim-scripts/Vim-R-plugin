@@ -1205,13 +1205,13 @@ it.
 						      *vimrplugin_rnowebchunk*
 						       *vimrplugin_assign_map*
 							   *vimrplugin_assign*
-In Rnoweb files, a '<' is replaced with '<<>>=\n@'. To disable this feature,
+In Rnoweb files, a `<` is replaced with `<<>>=\n@`. To disable this feature,
 put in your |vimrc|:
 >
    let vimrplugin_rnowebchunk = 0
 <
-While editing R code, '_' is replaced with ' <- '. If want to bind other keys
-to be replaced by ' <- ', set the value of |vimrplugin_assign_map| in your
+While editing R code, `_` is replaced with `<-`. If want to bind other keys
+to be replaced by `<-`, set the value of |vimrplugin_assign_map| in your
 |vimrc|, as in the example below which emulates RStudio behavior (may only
 works on GVim):
 >
@@ -1232,6 +1232,9 @@ To completely disable this feature, put in your |vimrc|:
 >
    let vimrplugin_assign = 0
 <
+If you need to type many object names with underscores, you may want to change
+the value vimrplugin_assign to 2. Then, you will have to type two `_` to get
+them converted into `<-`.
 
 6.4. Object Browser options~
 						      *vimrplugin_objbr_place*
@@ -2571,9 +2574,11 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-1.0.1 (2014-07-10)
+1.0.1 (2014-09-20)
 
  * Minor bug fixes.
+
+ * The option vimrplugin_assign now accepts the values 0, 1 and 2.
 
 1.0 (2014-07-02)
 
