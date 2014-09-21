@@ -107,7 +107,14 @@ function ReplaceUnderS()
                         let @@ = save_unnamed_reg
                         return
                     else
-                        exe "normal! 1x"
+                        if s[j+1] == $
+                            exe "normal! 1x"
+                        else
+                            let save_unnamed_reg = @@
+                            exe "normal! 1xi <- "
+                            let @@ = save_unnamed_reg
+                            return
+                        endif
                     endif
                 endif
             endif
