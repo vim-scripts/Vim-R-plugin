@@ -76,10 +76,10 @@ function ReplaceUnderS()
     if &filetype != "r" && b:IsInRCode(0) == 0
         let isString = 1
     else
+        let save_unnamed_reg = @@
         let j = col(".")
         let s = getline(".")
         if g:vimrplugin_assign == 1 && g:vimrplugin_assign_map == "_" && j > 3 && s[j-3] == "<" && s[j-2] == "-" && s[j-1] == " "
-            let save_unnamed_reg = @@
             exe "normal! 3h3xr_"
             let @@ = save_unnamed_reg
             return
@@ -102,15 +102,14 @@ function ReplaceUnderS()
                     if s[j-1] != "_" && !(j > 3 && s[j-3] == "<" && s[j-2] == "-" && s[j-1] == " ")
                         let isString = 1
                     elseif j > 3 && s[j-3] == "<" && s[j-2] == "-" && s[j-1] == " "
-                        let save_unnamed_reg = @@
                         exe "normal! 3h3xr_a_"
                         let @@ = save_unnamed_reg
                         return
                     else
                         if j == len(s)
                             exe "normal! 1x"
+                            let @@ = save_unnamed_reg
                         else
-                            let save_unnamed_reg = @@
                             exe "normal! 1xi <- "
                             let @@ = save_unnamed_reg
                             return
