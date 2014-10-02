@@ -4,7 +4,7 @@ import vim
 import os
 import re
 VimComPort = 0
-PortWarn = False
+PortWarn = 0
 VimComFamily = None
 
 def DiscoverVimComPort():
@@ -20,8 +20,14 @@ def DiscoverVimComPort():
         if vii is None:
             vim.command("call RWarningMsg('VIMINSTANCEID not found.')")
             return
+    scrt = vim.eval("$VIMRPLUGINSECRET")
+    if scrt is None:
+        scrt = os.getenv("VIMRPLUGINSECRET")
+        if scrt is None:
+            vim.command("call RWarningMsg('VIMRPLUGINSECRET not found.')")
+            return
 
-    while repl.find("Correct_VIMINSTANCEID") < 0 and VimComPort < 10049:
+    while repl.find(scrt) < 0 and VimComPort < 10049:
         VimComPort = VimComPort + 1
         for res in socket.getaddrinfo(HOST, VimComPort, socket.AF_UNSPEC, socket.SOCK_DGRAM):
             af, socktype, proto, canonname, sa = res
@@ -36,7 +42,7 @@ def DiscoverVimComPort():
                     sock.send("\001" + vii + " What port [Python 3]?".encode())
                     repl = sock.recv(1024).decode()
                 sock.close()
-                if repl.find("Correct_VIMINSTANCEID"):
+                if repl.find(scrt):
                     VimComFamily = af
                     break
             except:
@@ -46,12 +52,12 @@ def DiscoverVimComPort():
     if VimComPort >= 10049:
         VimComPort = 0
         vim.command("let g:rplugin_vimcomport = 0")
-        if not PortWarn:
+        if PortWarn < 2:
             vim.command("call RWarningMsg('VimCom port not found.')")
-        PortWarn = True
+        PortWarn = PortWarn + 1
     else:
         vim.command("let g:rplugin_vimcomport = " + str(VimComPort))
-        PortWarn = False
+        PortWarn = 0
         if repl.find("1.0-0") != 0:
             vim.command("call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.0-0.')")
             vim.command("sleep 1")

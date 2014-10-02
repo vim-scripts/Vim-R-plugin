@@ -624,6 +624,7 @@ function StartR_TmuxSplit(rcmd)
     endif
     call system("tmux set-environment VIMEDITOR_SVRNM " . $VIMEDITOR_SVRNM)
     call system("tmux set-environment VIMINSTANCEID " . $VIMINSTANCEID)
+    call system("tmux set-environment VIMRPLUGINSECRET " . $VIMRPLUGINSECRET)
     let tcmd = "tmux split-window "
     if g:vimrplugin_vsplit
         if g:vimrplugin_rconsole_width == -1
@@ -678,6 +679,7 @@ function StartR_ExternalTerm(rcmd)
                 \ 'set-environment -g VIMRPLUGIN_TMPDIR "' . $VIMRPLUGIN_TMPDIR . '"',
                 \ 'set-environment -g VIMRPLUGIN_HOME "' . g:rplugin_home . '"',
                 \ 'set-environment VIMINSTANCEID ' . $VIMINSTANCEID ,
+                \ 'set-environment VIMRPLUGINSECRET ' . $VIMRPLUGINSECRET ,
                 \ 'set-environment VIMEDITOR_SVRNM ' . $VIMEDITOR_SVRNM ]
     if g:vimrplugin_notmuxconf
         let cnflines = cnflines + [ 'source-file ~/.tmux.conf' ]
@@ -700,19 +702,21 @@ function StartR_ExternalTerm(rcmd)
             call extend(cnflines, ['set -g mode-mouse on', 'set -g mouse-select-pane on', 'set -g mouse-resize-pane on'])
         endif
     endif
-    call extend(cnflines, ['set-environment VIMINSTANCEID "' . $VIMINSTANCEID . '"'])
+    call extend(cnflines, ['set-environment VIMINSTANCEID "' . $VIMINSTANCEID . '"',
+                \ 'set-environment VIMRPLUGINSECRET "' . $VIMRPLUGINSECRET . '"'])
     call writefile(cnflines, s:tmxcnf)
 	
 	let is_bash = system('echo $BASH')
 	if v:shell_error || len(is_bash) == 0 || empty(matchstr(tolower(is_bash),'undefined variable')) == 0
 		let rcmd = a:rcmd
 	else
-		let rcmd = "VIMINSTANCEID=" . $VIMINSTANCEID . " " . a:rcmd
+		let rcmd = "VIMINSTANCEID=" . $VIMINSTANCEID . " VIMRPLUGINSECRET=" . $VIMRPLUGINSECRET . " " . a:rcmd
 	endif
 
     call system('export VIMRPLUGIN_TMPDIR=' . $VIMRPLUGIN_TMPDIR)
     call system('export VIMRPLUGIN_HOME=' . substitute(g:rplugin_home, ' ', '\\ ', "g"))
     call system('export VIMINSTANCEID=' . $VIMINSTANCEID)
+    call system('export VIMRPLUGINSECRET=' . $VIMRPLUGINSECRET)
     call system('export VIMEDITOR_SVRNM=' . $VIMEDITOR_SVRNM)
     " Start the terminal emulator even if inside a Tmux session
     if $TMUX != ""
@@ -939,28 +943,6 @@ function StartR(whatr)
         lcd -
     endif
     echon
-endfunction
-
-function ReceiveVimComStartMsg(msg)
-    let vmsg = split(a:msg)
-    if len(vmsg) == 4
-        if vmsg[0] != "vimcom"
-            call RWarningMsg("Invalid package name: " . vmsg[0])
-        endif
-        if vmsg[1] != "1.0-0"
-            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.0-0.')
-        endif
-        if vmsg[2] != $VIMINSTANCEID
-            call RWarningMsg("Invalid ID: " . vmsg[2] . " [Correct = " . $VIMINSTANCEID . "]")
-        endif
-        if vmsg[3] > "10000" && vmsg[3] < "10049"
-            let g:rplugin_vimcomport = vmsg[3]
-            " Give vimcom some time to complete its startup process
-            sleep 20m
-        else
-            call RWarningMsg("Invalid vimcom port: " . vmsg[2])
-        endif
-    endif
 endfunction
 
 function NoLongerWaitVimCom()
@@ -3870,11 +3852,13 @@ else
         Py import base64
         Py import vim
         Py vim.command("let g:rplugin_random = '" + base64.b64encode(os.urandom(16)).decode() + "'")
+        let $VIMRPLUGINSECRET = substitute(g:rplugin_random, '\W', '', 'g')
+        Py vim.command("let g:rplugin_random = '" + base64.b64encode(os.urandom(16)).decode() + "'")
     endif
     if !exists("g:rplugin_random")
         let g:rplugin_random = substitute(localtime(), '.*\(...\)', '\1', '')
     endif
-    let $VIMINSTANCEID = substitute(g:rplugin_firstbuffer, '\W', '', 'g') . g:rplugin_random
+    let $VIMINSTANCEID = substitute(g:rplugin_firstbuffer . g:rplugin_random, '\W', '', 'g')
     if strlen($VIMINSTANCEID) > 64
         let $VIMINSTANCEID = substitute($VIMINSTANCEID, '.*\(...............................................................\)', '\1', '')
     endif
