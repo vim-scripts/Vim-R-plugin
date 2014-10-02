@@ -3866,9 +3866,10 @@ if &filetype == "rbrowser"
     endif
 else
     if !has("neovim")
-        Py import random
+        Py import os
+        Py import base64
         Py import vim
-        Py vim.command("let g:rplugin_random = '" + str(random.randrange(0, 1000000000)) + "'")
+        Py vim.command("let g:rplugin_random = '" + base64.b64encode(os.urandom(16)).decode() + "'")
     endif
     if !exists("g:rplugin_random")
         let g:rplugin_random = substitute(localtime(), '.*\(...\)', '\1', '')
