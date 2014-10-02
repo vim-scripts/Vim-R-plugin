@@ -14,14 +14,14 @@ def DiscoverVimComPort():
     HOST = "localhost"
     VimComPort = 10000
     repl = "NOTHING"
-    correct_repl = vim.eval("$VIMINSTANCEID")
-    if correct_repl is None:
-        correct_repl = os.getenv("VIMINSTANCEID")
-        if correct_repl is None:
+    vii = vim.eval("$VIMINSTANCEID")
+    if vii is None:
+        vii = os.getenv("VIMINSTANCEID")
+        if vii is None:
             vim.command("call RWarningMsg('VIMINSTANCEID not found.')")
             return
 
-    while repl.find(correct_repl) < 0 and VimComPort < 10049:
+    while repl.find("Correct_VIMINSTANCEID") < 0 and VimComPort < 10049:
         VimComPort = VimComPort + 1
         for res in socket.getaddrinfo(HOST, VimComPort, socket.AF_UNSPEC, socket.SOCK_DGRAM):
             af, socktype, proto, canonname, sa = res
@@ -30,13 +30,13 @@ def DiscoverVimComPort():
                 sock.settimeout(0.1)
                 sock.connect(sa)
                 if sys.hexversion < 0x03000000:
-                    sock.send("\001What port [Python 2]?")
+                    sock.send("\001" + vii + " What port [Python 2]?")
                     repl = sock.recv(1024)
                 else:
-                    sock.send("\001What port [Python 3]?".encode())
+                    sock.send("\001" + vii + " What port [Python 3]?".encode())
                     repl = sock.recv(1024).decode()
                 sock.close()
-                if repl.find(correct_repl):
+                if repl.find("Correct_VIMINSTANCEID"):
                     VimComFamily = af
                     break
             except:
