@@ -288,7 +288,7 @@ function RCompleteArgs()
                 else
                     let msg = msg . ')'
                 endif
-                call g:SendToVimCom(msg)
+                call g:SendToVimCom('\x08' . $VIMINSTANCEID . msg)
 
                 if g:rplugin_vimcomport > 0
                     let g:rplugin_lastev = ReadEvalReply()
@@ -1426,9 +1426,9 @@ function RFormatCode() range
     endif
     call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
     if has("neovim")
-        call g:SendToVimCom("I\002" . 'formatR::tidy.source("' . $VIMRPLUGIN_TMPDIR . '/unformatted_code", file = "' . $VIMRPLUGIN_TMPDIR . '/formatted_code", width.cutoff = ' . wco . ')')
+        call g:SendToVimCom('\x08' . $VIMINSTANCEID . "I\002" . 'formatR::tidy.source("' . $VIMRPLUGIN_TMPDIR . '/unformatted_code", file = "' . $VIMRPLUGIN_TMPDIR . '/formatted_code", width.cutoff = ' . wco . ')')
     else
-        call g:SendToVimCom('formatR::tidy.source("' . $VIMRPLUGIN_TMPDIR . '/unformatted_code", file = "' . $VIMRPLUGIN_TMPDIR . '/formatted_code", width.cutoff = ' . wco . ')')
+        call g:SendToVimCom('\x08' . $VIMINSTANCEID . 'formatR::tidy.source("' . $VIMRPLUGIN_TMPDIR . '/unformatted_code", file = "' . $VIMRPLUGIN_TMPDIR . '/formatted_code", width.cutoff = ' . wco . ')')
     endif
     let g:rplugin_lastev = ReadEvalReply()
     if g:rplugin_lastev == "R is busy." || g:rplugin_lastev == "UNKNOWN" || g:rplugin_lastev =~ "^Error" || g:rplugin_lastev == "INVALID" || g:rplugin_lastev == "ERROR" || g:rplugin_lastev == "EMPTY" || g:rplugin_lastev == "No reply"
@@ -1455,7 +1455,7 @@ function RInsert(cmd)
 
     call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
     call delete($VIMRPLUGIN_TMPDIR . "/Rinsert")
-    call g:SendToVimCom('capture.output(' . a:cmd . ', file = "' . $VIMRPLUGIN_TMPDIR . '/Rinsert")')
+    call g:SendToVimCom('\x08' . $VIMINSTANCEID . 'capture.output(' . a:cmd . ', file = "' . $VIMRPLUGIN_TMPDIR . '/Rinsert")')
     let g:rplugin_lastev = ReadEvalReply()
     if g:rplugin_lastev == "R is busy." || g:rplugin_lastev == "UNKNOWN" || g:rplugin_lastev =~ "^Error" || g:rplugin_lastev == "INVALID" || g:rplugin_lastev == "ERROR" || g:rplugin_lastev == "EMPTY" || g:rplugin_lastev == "No reply"
         call RWarningMsg(g:rplugin_lastev)
@@ -2395,9 +2395,9 @@ function ShowRDoc(rkeyword, package, getclass)
     endif
 
     if has("neovim")
-        call g:SendToVimCom("I\002" . rcmd)
+        call g:SendToVimCom('\x08' . $VIMINSTANCEID . "I\002" . rcmd)
     else
-        call g:SendToVimCom(rcmd)
+        call g:SendToVimCom('\x08' . $VIMINSTANCEID . rcmd)
     endif
 
     let g:rplugin_lastev = ReadEvalReply()
@@ -2412,7 +2412,7 @@ function ShowRDoc(rkeyword, package, getclass)
             let chn = input(msg . "Please, select one of them: ")
             if chn > 0 && chn < len(libs)
                 call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
-                call g:SendToVimCom('vim.help("' . a:rkeyword . '", ' . g:rplugin_htw . 'L, package="' . libs[chn] . '")')
+                call g:SendToVimCom('\x08' . $VIMINSTANCEID . 'vim.help("' . a:rkeyword . '", ' . g:rplugin_htw . 'L, package="' . libs[chn] . '")')
                 let g:rplugin_lastev = ReadEvalReply()
             else
                 return
