@@ -3865,10 +3865,19 @@ if &filetype == "rbrowser"
         call RWarningMsgInp("VIMINSTANCEID is undefined")
     endif
 else
-    let $VIMINSTANCEID = substitute(g:rplugin_firstbuffer, '\W', '', 'g') . substitute(localtime(), '.*\(...\)', '\1', '')
+    if !has("neovim")
+        Py import random
+        Py import vim
+        Py vim.command("let g:rplugin_random = '" + str(random.randrange(0, 1000000000)) + "'")
+    endif
+    if !exists("g:rplugin_random")
+        let g:rplugin_random = substitute(localtime(), '.*\(...\)', '\1', '')
+    endif
+    let $VIMINSTANCEID = substitute(g:rplugin_firstbuffer, '\W', '', 'g') . g:rplugin_random
     if strlen($VIMINSTANCEID) > 64
         let $VIMINSTANCEID = substitute($VIMINSTANCEID, '.*\(...............................................................\)', '\1', '')
     endif
+    unlet g:rplugin_random
 endif
 
 let g:rplugin_obsname = toupper(substitute(substitute(expand("%:r"), '\W', '', 'g'), "_", "", "g"))
