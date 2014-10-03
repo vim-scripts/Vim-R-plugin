@@ -199,7 +199,7 @@ function! RConfigVimrc()
         if !filereadable(uvimrc) && filereadable($HOME . "/vimfiles/vimrc")
             let uvimrc = $HOME . "/vimfiles/vimrc"
         endif
-    elseif has("neovim")
+    elseif has("nvim")
         let uvimrc = $HOME . "/.nvimrc"
         if !filereadable(uvimrc) && filereadable($HOME . "/.nvim/nvimrc")
             let uvimrc = $HOME . "/.nvim/nvimrc"
@@ -418,7 +418,7 @@ function! RConfigBash()
             echo "but we have to configure the TERM environment variable for that."
             echo "Instead of starting Tmux and then starting Vim, we can configure"
             echo "Bash to start both at once with the 'tvim' command."
-            if !has("neovim")
+            if !has("nvim")
                 echo "The 'clientserver' feature must be enabled for automatic update of"
                 echo "the Object Browser and syntax highlight of function names."
             endif
@@ -432,7 +432,7 @@ function! RConfigBash()
                 else
                     let blines += ['# Lines added by the Vim-R-plugin command :RpluginConfig:']
                 endif
-                if has("neovim")
+                if has("nvim")
                     let blines += ['# Change the TERM environment variable (to get 256 colors) and creates',
                                 \ '# a function to run Tmux and Neovim at once:',
                                 \ 'if [ "$TERM" = "xterm" ] || [ "$TERM" = "xterm-256color" ]',
@@ -557,7 +557,7 @@ function! RConfigTmux()
 endfunction
 
 function! RConfigVimR()
-    if has("neovim")
+    if has("nvim")
         let s:vimprog = "nvim"
     else
         let s:vimprog = "vim"

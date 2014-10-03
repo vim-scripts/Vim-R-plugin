@@ -77,7 +77,7 @@ endfunction
 " Sweave and compile the current buffer content
 function! RMakePDF(bibtex, knit)
     if g:rplugin_vimcomport == 0
-        if has("neovim")
+        if has("nvim")
             call jobwrite(g:rplugin_clt_job, "DiscoverVimComPort\n")
         else
             Py DiscoverVimComPort()
