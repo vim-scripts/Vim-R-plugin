@@ -72,7 +72,7 @@ if !exists("g:SendCmdToR")
     let g:SendCmdToR = function('SendCmdToR_fake')
 endif
 
-if !has("neovim")
+if !has("nvim")
     if &filetype != "rbrowser"
         if v:servername == "" || has("gui_macvim")
             autocmd CursorHold <buffer> call RCheckLibListFile()

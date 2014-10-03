@@ -268,7 +268,7 @@ function RCompleteArgs()
             " If R is running, use it
             if string(g:SendCmdToR) != "function('SendCmdToR_fake')"
                 call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
-                if has("neovim")
+                if has("nvim")
                     let msg = "I\002" . 'vimcom:::vim.args("'
                 else
                     let msg = 'vimcom:::vim.args("'
@@ -819,7 +819,7 @@ endfunction
 function StartR(whatr)
     if has("gui_macvim")
         let $VIMEDITOR_SVRNM = "MacVim"
-    elseif has("neovim")
+    elseif has("nvim")
         let $VIMEDITOR_SVRNM = "Neovim_" . g:rplugin_myport
     elseif !has("clientserver")
         let $VIMEDITOR_SVRNM = "NoClientServer"
@@ -887,14 +887,14 @@ function StartR(whatr)
                         call g:SendCmdToR("\014")
                     endif
                     call VimExprToOB('ResetVimComPort()')
-                    if !has("neovim")
+                    if !has("nvim")
                         call g:SendToVimCom("\002" . g:rplugin_obsname)
                     endif
                     call g:SendToVimCom("\005G .GlobalEnv [Restarting R]")
                     call g:SendToVimCom("\005L Libraries [Restarting()]")
                     " vimcom automatically update the libraries view, but not
                     " the GlobalEnv one because vimcom_count_objects() returns 0.
-                    if !has("neovim")
+                    if !has("nvim")
                         call VimExprToOB('UpdateOB("GlobalEnv")')
                     endif
                 endif
@@ -925,7 +925,7 @@ function StartR(whatr)
         call StartR_ExternalTerm(rcmd)
         if g:vimrplugin_restart && bufloaded(b:objbrtitle)
             call WaitVimComStart()
-            if has("neovim")
+            if has("nvim")
                 call g:SendToVimCom("\002" . g:rplugin_myport)
             else
                 call g:SendToVimCom("\002" . v:servername)
@@ -955,7 +955,7 @@ endfunction
 
 " Neovim don't need this function:
 function WaitVimComStart()
-    if has("neovim")
+    if has("nvim")
         if filereadable(g:rplugin_home . "/r-plugin/timer.sh")
             let wjob = jobstart('waitvc', "sh", [g:rplugin_home . '/r-plugin/timer.sh', string(g:vimrplugin_vimcom_wait / 1000), 'call NoLongerWaitVimCom()'])
             autocmd JobActivity waitvc call RServerEvent()
@@ -1017,7 +1017,7 @@ function IsExternalOBRunning()
 endfunction
 
 function ResetVimComPort()
-    if has("neovim")
+    if has("nvim")
         call jobwrite(g:rplugin_clt_job, "DiscoverVimComPort\n")
     else
         Py VimComPort = 0
@@ -1039,7 +1039,7 @@ function StartObjBrowser_Tmux()
 
     " Don't start the Object Browser if it already exists
     if IsExternalOBRunning()
-        if !has("neovim") && (has("gui_macvim") || $DISPLAY == "") && exists("g:rplugin_ob_pane")
+        if !has("nvim") && (has("gui_macvim") || $DISPLAY == "") && exists("g:rplugin_ob_pane")
             let slog = system("tmux set-buffer ':silent call UpdateOB(\"both\")\<C-M>:\<Esc>' && tmux paste-buffer -t " . g:rplugin_ob_pane . " && tmux select-pane -t " . g:rplugin_ob_pane)
             if v:shell_error
                 call RWarningMsg(slog)
@@ -1051,7 +1051,7 @@ function StartObjBrowser_Tmux()
     let objbrowserfile = $VIMRPLUGIN_TMPDIR . "/objbrowserInit"
     let tmxs = " "
 
-    if has("neovim")
+    if has("nvim")
         let myservername = g:rplugin_myport
     else
         if v:servername == ""
@@ -1079,7 +1079,7 @@ function StartObjBrowser_Tmux()
                 \ 'if has("clientserver") && v:servername != ""',
                 \ '    call g:SendToVimCom("\002" . v:servername)',
                 \ 'endif',
-                \ 'if !has("neovim")',
+                \ 'if !has("nvim")',
                 \ '    sleep 150m',
                 \ '    call UpdateOB("GlobalEnv")',
                 \ 'endif'], objbrowserfile)
@@ -1114,7 +1114,7 @@ function StartObjBrowser_Tmux()
         let obsname = " "
     endif
 
-    if has("neovim")
+    if has("nvim")
         let vimname = "nvim"
     else
         let vimname = "vim"
@@ -1144,11 +1144,11 @@ function StartObjBrowser_Tmux()
         endif
     endif
     if g:rplugin_ob_warn_shown == 0
-        if !has("clientserver") && !has("neovim")
+        if !has("clientserver") && !has("nvim")
             call RWarningMsg("The +clientserver feature is required to automatically update the Object Browser.")
             sleep 200m
         else
-            if $DISPLAY == "" && !has("neovim")
+            if $DISPLAY == "" && !has("nvim")
                 call RWarningMsg("The X Window system is required to automatically update the Object Browser.")
                 sleep 200m
             endif
@@ -1169,7 +1169,7 @@ function StartObjBrowser_Vim()
     endif
 
     let wmsg = ""
-    if v:servername == "" && !has("neovim")
+    if v:servername == "" && !has("nvim")
         if g:rplugin_ob_warn_shown == 0
             if !has("clientserver")
                 let wmsg = "The +clientserver feature is required to automatically update the Object Browser."
@@ -1186,7 +1186,7 @@ function StartObjBrowser_Vim()
         if has("gui_macvim")
             let wmsg ="MacVim cannot automatically updated the Object Browser."
             let g:rplugin_ob_warn_shown = 1
-        elseif has("neovim")
+        elseif has("nvim")
             call g:SendToVimCom("\002" . g:rplugin_myport)
         else
             call g:SendToVimCom("\002" . v:servername)
@@ -1235,7 +1235,7 @@ endfunction
 
 " Open an Object Browser window
 function RObjBrowser()
-    if !has("python") && !has("python3") && !has("neovim")
+    if !has("python") && !has("python3") && !has("nvim")
         call RWarningMsg("Python support is required to run the Object Browser.")
         return
     endif
@@ -1265,7 +1265,7 @@ function RObjBrowser()
 endfunction
 
 function VimExprToOB(msg)
-    if !has("neovim") && serverlist() =~ "\\<" . g:rplugin_obsname . "\n"
+    if !has("nvim") && serverlist() =~ "\\<" . g:rplugin_obsname . "\n"
         return remote_expr(g:rplugin_obsname, a:msg)
     else
         if IsExternalOBRunning()
@@ -1379,14 +1379,14 @@ function RBrOpenCloseLs_TmuxOB(status)
         return
     endif
     call g:SendToVimCom("\007" . a:status)
-    if !has("neovim") && v:servername == ""
+    if !has("nvim") && v:servername == ""
         call UpdateOB("both")
     endif
 endfunction
 
 function RFormatCode() range
     if g:rplugin_vimcomport == 0
-        if has("neovim")
+        if has("nvim")
             call jobwrite(g:rplugin_clt_job, "DiscoverVimComPort\n")
         else
             Py DiscoverVimComPort()
@@ -1407,7 +1407,7 @@ function RFormatCode() range
         let wco = 180
     endif
     call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
-    if has("neovim")
+    if has("nvim")
         call g:SendToVimCom('\x08' . $VIMINSTANCEID . "I\002" . 'formatR::tidy.source("' . $VIMRPLUGIN_TMPDIR . '/unformatted_code", file = "' . $VIMRPLUGIN_TMPDIR . '/formatted_code", width.cutoff = ' . wco . ')')
     else
         call g:SendToVimCom('\x08' . $VIMINSTANCEID . 'formatR::tidy.source("' . $VIMRPLUGIN_TMPDIR . '/unformatted_code", file = "' . $VIMRPLUGIN_TMPDIR . '/formatted_code", width.cutoff = ' . wco . ')')
@@ -1425,7 +1425,7 @@ endfunction
 
 function RInsert(cmd)
     if g:rplugin_vimcomport == 0
-        if has("neovim")
+        if has("nvim")
             call jobwrite(g:rplugin_clt_job, "DiscoverVimComPort\n")
         else
             Py DiscoverVimComPort()
@@ -2158,7 +2158,7 @@ endfunction
 " This function is called by the R package vimcom whenever a library is
 " loaded.
 function RFillLibList()
-    if &filetype == "r" || has("neovim")
+    if &filetype == "r" || has("nvim")
         call RealRFillLibList()
     else
         " Avoid E341 (Internal error: lalloc(0, ))
@@ -2326,7 +2326,7 @@ endfunction
 " Show R's help doc in Vim's buffer
 " (based  on pydoc plugin)
 function ShowRDoc(rkeyword, package, getclass)
-    if !has("python") && !has("python3") && !has("neovim")
+    if !has("python") && !has("python3") && !has("nvim")
         call RWarningMsg("Python support is required to see R documentation on Vim.")
         return
     endif
@@ -2376,7 +2376,7 @@ function ShowRDoc(rkeyword, package, getclass)
         let rcmd = 'vim.help("' . a:rkeyword . '", ' . g:rplugin_htw . 'L, ' . classfor . ')'
     endif
 
-    if has("neovim")
+    if has("nvim")
         call g:SendToVimCom('\x08' . $VIMINSTANCEID . "I\002" . rcmd)
     else
         call g:SendToVimCom('\x08' . $VIMINSTANCEID . rcmd)
@@ -2531,7 +2531,7 @@ function RAction(rcmd)
                         if g:rplugin_vim_pane == "none"
                             call RWarningMsg("Cmd not available.")
                         else
-                            if g:rplugin_editor_sname == "" || has("neovim")
+                            if g:rplugin_editor_sname == "" || has("nvim")
                                 let slog = system("tmux set-buffer '" . "\<C-\>\<C-N>" . ':call ShowRDoc("' . rkeyword . '", "' . pkg . '", 0)' . "\<C-M>' && tmux paste-buffer -t " . g:rplugin_vim_pane . " && tmux select-pane -t " . g:rplugin_vim_pane)
                                 if v:shell_error
                                     call RWarningMsg(slog)
@@ -3387,7 +3387,7 @@ call RSetDefaultValue("g:vimrplugin_editor_w",         66)
 call RSetDefaultValue("g:vimrplugin_help_w",           46)
 call RSetDefaultValue("g:vimrplugin_objbr_w",          40)
 call RSetDefaultValue("g:vimrplugin_external_ob",       0)
-if has("neovim")
+if has("nvim")
     call RSetDefaultValue("g:vimrplugin_vimcom_wait", 15000)
 else
     call RSetDefaultValue("g:vimrplugin_vimcom_wait", 5000)
@@ -3487,7 +3487,7 @@ if has("python3")
 elseif has("python")
     command! -nargs=+ Py :py <args>
     command! -nargs=+ PyFile :pyfile <args>
-elseif has("neovim")
+elseif has("nvim")
     command! -nargs=+ Py :call RWarningMsg("Py command not implemented yet: '" . <args> . "'")
     let g:SendToVimCom = function("SendToVimCom_Neovim")
 else
@@ -3552,7 +3552,7 @@ if g:rplugin_tmuxwasfirst
     if &filetype == "rbrowser"
         let g:RBrOpenCloseLs = function("RBrOpenCloseLs_TmuxOB")
     else
-        if has("neovim")
+        if has("nvim")
             let g:RBrOpenCloseLs = function("RBrOpenCloseLs_TmuxNeovim")
         else
             let g:RBrOpenCloseLs = function("RBrOpenCloseLs_TmuxVim")
@@ -3847,7 +3847,7 @@ if &filetype == "rbrowser"
         call RWarningMsgInp("VIMINSTANCEID is undefined")
     endif
 else
-    if !has("neovim")
+    if !has("nvim")
         Py import os
         Py import base64
         Py import vim
@@ -3875,7 +3875,7 @@ if &filetype != "rbrowser"
     call writefile([], $VIMRPLUGIN_TMPDIR . "/GlobalEnvList_" . $VIMINSTANCEID)
 endif
 
-if has("neovim")
+if has("nvim")
     if executable("python")
         if &filetype == "rbrowser"
             let $THIS_IS_ObjBrowser = "yes"
