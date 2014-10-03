@@ -3847,7 +3847,7 @@ if &filetype == "rbrowser"
         call RWarningMsgInp("VIMINSTANCEID is undefined")
     endif
 else
-    if !has("nvim")
+    if has("python") || has("python3")
         Py import os
         Py import base64
         Py import vim
@@ -3856,7 +3856,8 @@ else
         Py vim.command("let g:rplugin_random = '" + base64.b64encode(os.urandom(16)).decode() + "'")
     endif
     if !exists("g:rplugin_random")
-        let g:rplugin_random = substitute(localtime(), '.*\(...\)', '\1', '')
+        let $VIMRPLUGINSECRET = substitute(strftime("%c"), '\W', '', 'g')
+        let g:rplugin_random = localtime()
     endif
     let $VIMINSTANCEID = substitute(g:rplugin_firstbuffer . g:rplugin_random, '\W', '', 'g')
     if strlen($VIMINSTANCEID) > 64
