@@ -3856,8 +3856,16 @@ else
         Py vim.command("let g:rplugin_random = '" + base64.b64encode(os.urandom(16)).decode() + "'")
     endif
     if !exists("g:rplugin_random")
-        let $VIMRPLUGINSECRET = substitute(strftime("%c"), '\W', '', 'g')
-        let g:rplugin_random = localtime()
+        if !has("win32") && !has("win64") && !has("gui_win32") && !has("gui_win64")
+            let g:rplugin_random = system("echo $RANDOM")
+        endif
+        if exists("g:rplugin_random")
+            let $VIMRPLUGINSECRET = substitute(g:rplugin_random, '\W', '', 'g')
+            let g:rplugin_random = system("echo $RANDOM")
+        else
+            let $VIMRPLUGINSECRET = substitute(strftime("%c"), '\W', '', 'g')
+            let g:rplugin_random = localtime()
+        endif
     endif
     let $VIMINSTANCEID = substitute(g:rplugin_firstbuffer . g:rplugin_random, '\W', '', 'g')
     if strlen($VIMINSTANCEID) > 64
