@@ -1075,7 +1075,9 @@ function StartObjBrowser_Tmux()
                 \ 'if has("clientserver") && v:servername != ""',
                 \ '    call g:SendToVimCom("\002" . v:servername)',
                 \ 'endif',
-                \ 'if !has("nvim")',
+                \ 'if has("nvim")',
+                \ '    call system("kill -s SIGWINCH ' . getpid() . '")',
+                \ 'else',
                 \ '    sleep 150m',
                 \ '    call UpdateOB("GlobalEnv")',
                 \ 'endif'], objbrowserfile)
