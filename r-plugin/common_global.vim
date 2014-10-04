@@ -945,6 +945,28 @@ function StartR(whatr)
     echon
 endfunction
 
+function ReceiveVimComStartMsg(msg)
+    let vmsg = split(a:msg)
+    if len(vmsg) == 4
+        if vmsg[0] != "vimcom"
+            call RWarningMsg("Invalid package name: " . vmsg[0])
+        endif
+        if vmsg[1] != "1.0-0"
+            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.0-0.')
+        endif
+        if vmsg[2] != $VIMINSTANCEID
+            call RWarningMsg("Invalid ID: " . vmsg[2] . " [Correct = " . $VIMINSTANCEID . "]")
+        endif
+        if vmsg[3] > "10000" && vmsg[3] < "10049"
+            let g:rplugin_vimcomport = vmsg[3]
+            " Give vimcom some time to complete its startup process
+            sleep 20m
+        else
+            call RWarningMsg("Invalid vimcom port: " . vmsg[2])
+        endif
+    endif
+endfunction
+
 function NoLongerWaitVimCom()
     if filereadable($VIMRPLUGIN_TMPDIR . "/vimcom_running")
         call delete($VIMRPLUGIN_TMPDIR . "/vimcom_running")
