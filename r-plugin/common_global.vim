@@ -616,15 +616,18 @@ endfunction
 
 function StartR_TmuxSplit(rcmd)
     let g:rplugin_vim_pane = TmuxActivePane()
-    call system("tmux set-environment -g VIMRPLUGIN_TMPDIR '" . $VIMRPLUGIN_TMPDIR . "'")
-    call system("tmux set-environment -g VIMRPLUGIN_HOME '" . g:rplugin_home . "'")
-    call system("tmux set-environment -g VIM_PANE " . g:rplugin_vim_pane)
+    let tmuxconf = ['set-environment VIMRPLUGIN_TMPDIR "' . $VIMRPLUGIN_TMPDIR . '"',
+                \ 'set-environment VIMRPLUGIN_HOME "' . g:rplugin_home . '"',
+                \ 'set-environment VIM_PANE ' . g:rplugin_vim_pane ,
+                \ 'set-environment VIMEDITOR_SVRNM ' . $VIMEDITOR_SVRNM ,
+                \ 'set-environment VIMINSTANCEID ' . $VIMINSTANCEID ,
+                \ 'set-environment VIMRPLUGINSECRET ' . $VIMRPLUGINSECRET ]
     if &t_Co == 256
-        call system('tmux set -g default-terminal "' . $TERM . '"')
+        call extend(tmuxconf, ['set -g default-terminal "' . $TERM . '"'])
     endif
-    call system("tmux set-environment VIMEDITOR_SVRNM " . $VIMEDITOR_SVRNM)
-    call system("tmux set-environment VIMINSTANCEID " . $VIMINSTANCEID)
-    call system("tmux set-environment VIMRPLUGINSECRET " . $VIMRPLUGINSECRET)
+    call writefile(tmuxconf, $VIMRPLUGIN_TMPDIR . "/tmux" . $VIMINSTANCEID . ".conf")
+    call system("tmux source-file '" . $VIMRPLUGIN_TMPDIR . "/tmux" . $VIMINSTANCEID . ".conf" . "'")
+    call delete($VIMRPLUGIN_TMPDIR . "/tmux" . $VIMINSTANCEID . ".conf")
     let tcmd = "tmux split-window "
     if g:vimrplugin_vsplit
         if g:vimrplugin_rconsole_width == -1
@@ -674,18 +677,11 @@ function StartR_ExternalTerm(rcmd)
         return
     endif
 
-    " Create a custom tmux.conf
-    let cnflines = [
-                \ 'set-environment -g VIMRPLUGIN_TMPDIR "' . $VIMRPLUGIN_TMPDIR . '"',
-                \ 'set-environment -g VIMRPLUGIN_HOME "' . g:rplugin_home . '"',
-                \ 'set-environment VIMINSTANCEID ' . $VIMINSTANCEID ,
-                \ 'set-environment VIMRPLUGINSECRET ' . $VIMRPLUGINSECRET ,
-                \ 'set-environment VIMEDITOR_SVRNM ' . $VIMEDITOR_SVRNM ]
     if g:vimrplugin_notmuxconf
-        let cnflines = cnflines + [ 'source-file ~/.tmux.conf' ]
+        let tmuxcnf = ' '
     else
-        let cnflines = cnflines + [
-                    \ 'set-option -g prefix C-a',
+        " Create a custom tmux.conf
+        let cnflines = ['set-option -g prefix C-a',
                     \ 'unbind-key C-b',
                     \ 'bind-key C-a send-prefix',
                     \ 'set-window-option -g mode-keys vi',
@@ -701,30 +697,11 @@ function StartR_ExternalTerm(rcmd)
         if g:vimrplugin_external_ob || !has("gui_running")
             call extend(cnflines, ['set -g mode-mouse on', 'set -g mouse-select-pane on', 'set -g mouse-resize-pane on'])
         endif
+        call writefile(cnflines, $VIMRPLUGIN_TMPDIR . "/tmux.conf")
+        let tmuxcnf = '-f "' . $VIMRPLUGIN_TMPDIR . "/tmux.conf" . '"'
     endif
-    call extend(cnflines, ['set-environment VIMINSTANCEID "' . $VIMINSTANCEID . '"',
-                \ 'set-environment VIMRPLUGINSECRET "' . $VIMRPLUGINSECRET . '"'])
-    call writefile(cnflines, s:tmxcnf)
-	
-	let is_bash = system('echo $BASH')
-	if v:shell_error || len(is_bash) == 0 || empty(matchstr(tolower(is_bash),'undefined variable')) == 0
-		let rcmd = a:rcmd
-	else
-		let rcmd = "VIMINSTANCEID=" . $VIMINSTANCEID . " VIMRPLUGINSECRET=" . $VIMRPLUGINSECRET . " " . a:rcmd
-	endif
 
-    call system('export VIMRPLUGIN_TMPDIR=' . $VIMRPLUGIN_TMPDIR)
-    call system('export VIMRPLUGIN_HOME=' . substitute(g:rplugin_home, ' ', '\\ ', "g"))
-    call system('export VIMINSTANCEID=' . $VIMINSTANCEID)
-    call system('export VIMRPLUGINSECRET=' . $VIMRPLUGINSECRET)
-    call system('export VIMEDITOR_SVRNM=' . $VIMEDITOR_SVRNM)
-    " Start the terminal emulator even if inside a Tmux session
-    if $TMUX != ""
-        let tmuxenv = $TMUX
-        let $TMUX = ""
-        call system('tmux set-option -ga update-environment " TMUX_PANE VIMRPLUGIN_TMPDIR VIMINSTANCEID"')
-    endif
-    let tmuxcnf = '-f "' . s:tmxcnf . '"'
+    let rcmd = 'VIMRPLUGIN_TMPDIR="' . $VIMRPLUGIN_TMPDIR . '" VIMRPLUGIN_HOME="' . $VIMRPLUGIN_HOME . '" VIMINSTANCEID="' . $VIMINSTANCEID . '" VIMRPLUGINSECRET="' . $VIMRPLUGINSECRET . '" VIMEDITOR_SVRNM="' . $VIMEDITOR_SVRNM . '" ' . a:rcmd
 
     call system("tmux has-session -t " . g:rplugin_tmuxsname)
     if v:shell_error
@@ -745,9 +722,6 @@ function StartR_ExternalTerm(rcmd)
     if v:shell_error
         call RWarningMsg(rlog)
         return
-    endif
-    if exists("tmuxenv")
-        let $TMUX = tmuxenv
     endif
     let g:SendCmdToR = function('SendCmdToR_Term')
     if WaitVimComStart()
@@ -3613,10 +3587,6 @@ if !has("win32") && !has("win64") && !has("gui_win32") && !has("gui_win64") && g
         finish
     endif
     unlet s:tmuxversion
-
-    " To get 256 colors you have to set the $TERM environment variable to
-    " xterm-256color. See   :h r-plugin-tips
-    let s:tmxcnf = $VIMRPLUGIN_TMPDIR . "/tmux.conf"
 endif
 
 " Start with an empty list of objects in the workspace
