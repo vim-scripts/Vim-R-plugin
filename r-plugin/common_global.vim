@@ -268,11 +268,7 @@ function RCompleteArgs()
             " If R is running, use it
             if string(g:SendCmdToR) != "function('SendCmdToR_fake')"
                 call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
-                if has("nvim")
-                    let msg = "I\002" . 'vimcom:::vim.args("'
-                else
-                    let msg = 'vimcom:::vim.args("'
-                endif
+                let msg = 'vimcom:::vim.args("'
                 if classfor == ""
                     let msg = msg . rkeyword0 . '", "' . argkey . '"'
                 else
@@ -288,7 +284,7 @@ function RCompleteArgs()
                 else
                     let msg = msg . ')'
                 endif
-                call g:SendToVimCom("\x08" . $VIMINSTANCEID . msg)
+                call g:SendToVimCom("\x08" . $VIMINSTANCEID . msg, "I")
 
                 if g:rplugin_vimcomport > 0
                     let g:rplugin_lastev = ReadEvalReply()
@@ -1405,11 +1401,7 @@ function RFormatCode() range
         let wco = 180
     endif
     call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
-    if has("nvim")
-        call g:SendToVimCom("\x08" . $VIMINSTANCEID . "I\002" . 'formatR::tidy.source("' . $VIMRPLUGIN_TMPDIR . '/unformatted_code", file = "' . $VIMRPLUGIN_TMPDIR . '/formatted_code", width.cutoff = ' . wco . ')')
-    else
-        call g:SendToVimCom("\x08" . $VIMINSTANCEID . 'formatR::tidy.source("' . $VIMRPLUGIN_TMPDIR . '/unformatted_code", file = "' . $VIMRPLUGIN_TMPDIR . '/formatted_code", width.cutoff = ' . wco . ')')
-    endif
+    call g:SendToVimCom("\x08" . $VIMINSTANCEID . 'formatR::tidy.source("' . $VIMRPLUGIN_TMPDIR . '/unformatted_code", file = "' . $VIMRPLUGIN_TMPDIR . '/formatted_code", width.cutoff = ' . wco . ')', "I")
     let g:rplugin_lastev = ReadEvalReply()
     if g:rplugin_lastev == "R is busy." || g:rplugin_lastev == "UNKNOWN" || g:rplugin_lastev =~ "^Error" || g:rplugin_lastev == "INVALID" || g:rplugin_lastev == "ERROR" || g:rplugin_lastev == "EMPTY" || g:rplugin_lastev == "No reply"
         call RWarningMsg(g:rplugin_lastev)
@@ -2374,11 +2366,7 @@ function ShowRDoc(rkeyword, package, getclass)
         let rcmd = 'vim.help("' . a:rkeyword . '", ' . g:rplugin_htw . 'L, ' . classfor . ')'
     endif
 
-    if has("nvim")
-        call g:SendToVimCom("\x08" . $VIMINSTANCEID . "I\002" . rcmd)
-    else
-        call g:SendToVimCom("\x08" . $VIMINSTANCEID . rcmd)
-    endif
+    call g:SendToVimCom("\x08" . $VIMINSTANCEID . rcmd, "I")
 
     let g:rplugin_lastev = ReadEvalReply()
     if g:rplugin_lastev != "VIMHELP"
@@ -3467,13 +3455,18 @@ function RServerEvent()
     endif
 endfunction
 
-function SendToVimCom_Vim(cmd)
-    exe "Py SendToVimCom('" . a:cmd . "')"
+function SendToVimCom_Vim(...)
+    exe "Py SendToVimCom('" . a:1 . "')"
 endfunction
 
-function SendToVimCom_Neovim(cmd)
-    let g:nvimcom_py_Input = a:cmd
-    call jobsend(g:rplugin_clt_job, "SendToVimCom " . a:cmd . "\n")
+function SendToVimCom_Neovim(...)
+    let g:nvimcom_py_Input = a:1
+    if a:0 == 2 && a:2 == "I"
+        " Ignore reply due to https://github.com/neovim/neovim/issues/834
+        call jobsend(g:rplugin_clt_job, "SendToVimCom I\002" . a:1 . "\n")
+    else
+        call jobsend(g:rplugin_clt_job, "SendToVimCom " . a:1 . "\n")
+    endif
 endfunction
 
 let g:SendToVimCom = function("SendToVimCom_Vim")
