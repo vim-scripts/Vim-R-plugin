@@ -97,7 +97,7 @@ endfunction
 function! RMakePDFrrst()
     if g:rplugin_vimcomport == 0
         if has("nvim")
-            call jobwrite(g:rplugin_clt_job, "DiscoverVimComPort\n")
+            call jobsend(g:rplugin_clt_job, "DiscoverVimComPort\n")
         else
             Py DiscoverVimComPort()
         endif

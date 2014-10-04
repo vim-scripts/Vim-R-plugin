@@ -288,7 +288,7 @@ function RCompleteArgs()
                 else
                     let msg = msg . ')'
                 endif
-                call g:SendToVimCom('\x08' . $VIMINSTANCEID . msg)
+                call g:SendToVimCom("\x08" . $VIMINSTANCEID . msg)
 
                 if g:rplugin_vimcomport > 0
                     let g:rplugin_lastev = ReadEvalReply()
@@ -1040,7 +1040,7 @@ endfunction
 
 function ResetVimComPort()
     if has("nvim")
-        call jobwrite(g:rplugin_clt_job, "DiscoverVimComPort\n")
+        call jobsend(g:rplugin_clt_job, "DiscoverVimComPort\n")
     else
         Py VimComPort = 0
     endif
@@ -1409,7 +1409,7 @@ endfunction
 function RFormatCode() range
     if g:rplugin_vimcomport == 0
         if has("nvim")
-            call jobwrite(g:rplugin_clt_job, "DiscoverVimComPort\n")
+            call jobsend(g:rplugin_clt_job, "DiscoverVimComPort\n")
         else
             Py DiscoverVimComPort()
         endif
@@ -1430,9 +1430,9 @@ function RFormatCode() range
     endif
     call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
     if has("nvim")
-        call g:SendToVimCom('\x08' . $VIMINSTANCEID . "I\002" . 'formatR::tidy.source("' . $VIMRPLUGIN_TMPDIR . '/unformatted_code", file = "' . $VIMRPLUGIN_TMPDIR . '/formatted_code", width.cutoff = ' . wco . ')')
+        call g:SendToVimCom("\x08" . $VIMINSTANCEID . "I\002" . 'formatR::tidy.source("' . $VIMRPLUGIN_TMPDIR . '/unformatted_code", file = "' . $VIMRPLUGIN_TMPDIR . '/formatted_code", width.cutoff = ' . wco . ')')
     else
-        call g:SendToVimCom('\x08' . $VIMINSTANCEID . 'formatR::tidy.source("' . $VIMRPLUGIN_TMPDIR . '/unformatted_code", file = "' . $VIMRPLUGIN_TMPDIR . '/formatted_code", width.cutoff = ' . wco . ')')
+        call g:SendToVimCom("\x08" . $VIMINSTANCEID . 'formatR::tidy.source("' . $VIMRPLUGIN_TMPDIR . '/unformatted_code", file = "' . $VIMRPLUGIN_TMPDIR . '/formatted_code", width.cutoff = ' . wco . ')')
     endif
     let g:rplugin_lastev = ReadEvalReply()
     if g:rplugin_lastev == "R is busy." || g:rplugin_lastev == "UNKNOWN" || g:rplugin_lastev =~ "^Error" || g:rplugin_lastev == "INVALID" || g:rplugin_lastev == "ERROR" || g:rplugin_lastev == "EMPTY" || g:rplugin_lastev == "No reply"
@@ -1448,7 +1448,7 @@ endfunction
 function RInsert(cmd)
     if g:rplugin_vimcomport == 0
         if has("nvim")
-            call jobwrite(g:rplugin_clt_job, "DiscoverVimComPort\n")
+            call jobsend(g:rplugin_clt_job, "DiscoverVimComPort\n")
         else
             Py DiscoverVimComPort()
         endif
@@ -1459,7 +1459,7 @@ function RInsert(cmd)
 
     call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
     call delete($VIMRPLUGIN_TMPDIR . "/Rinsert")
-    call g:SendToVimCom('\x08' . $VIMINSTANCEID . 'capture.output(' . a:cmd . ', file = "' . $VIMRPLUGIN_TMPDIR . '/Rinsert")')
+    call g:SendToVimCom("\x08" . $VIMINSTANCEID . 'capture.output(' . a:cmd . ', file = "' . $VIMRPLUGIN_TMPDIR . '/Rinsert")')
     let g:rplugin_lastev = ReadEvalReply()
     if g:rplugin_lastev == "R is busy." || g:rplugin_lastev == "UNKNOWN" || g:rplugin_lastev =~ "^Error" || g:rplugin_lastev == "INVALID" || g:rplugin_lastev == "ERROR" || g:rplugin_lastev == "EMPTY" || g:rplugin_lastev == "No reply"
         call RWarningMsg(g:rplugin_lastev)
@@ -2399,9 +2399,9 @@ function ShowRDoc(rkeyword, package, getclass)
     endif
 
     if has("nvim")
-        call g:SendToVimCom('\x08' . $VIMINSTANCEID . "I\002" . rcmd)
+        call g:SendToVimCom("\x08" . $VIMINSTANCEID . "I\002" . rcmd)
     else
-        call g:SendToVimCom('\x08' . $VIMINSTANCEID . rcmd)
+        call g:SendToVimCom("\x08" . $VIMINSTANCEID . rcmd)
     endif
 
     let g:rplugin_lastev = ReadEvalReply()
@@ -2416,7 +2416,7 @@ function ShowRDoc(rkeyword, package, getclass)
             let chn = input(msg . "Please, select one of them: ")
             if chn > 0 && chn < len(libs)
                 call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
-                call g:SendToVimCom('\x08' . $VIMINSTANCEID . 'vim.help("' . a:rkeyword . '", ' . g:rplugin_htw . 'L, package="' . libs[chn] . '")')
+                call g:SendToVimCom("\x08" . $VIMINSTANCEID . 'vim.help("' . a:rkeyword . '", ' . g:rplugin_htw . 'L, package="' . libs[chn] . '")')
                 let g:rplugin_lastev = ReadEvalReply()
             else
                 return
@@ -3497,7 +3497,7 @@ endfunction
 
 function SendToVimCom_Neovim(cmd)
     let g:nvimcom_py_Input = a:cmd
-    call jobwrite(g:rplugin_clt_job, "SendToVimCom " . a:cmd . "\n")
+    call jobsend(g:rplugin_clt_job, "SendToVimCom " . a:cmd . "\n")
 endfunction
 
 let g:SendToVimCom = function("SendToVimCom_Vim")
