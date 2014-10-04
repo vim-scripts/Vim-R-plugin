@@ -5,7 +5,7 @@ import os
 import re
 
 VimComPort = 0
-PortWarn = False
+PortWarn = 0
 VimComFamily = None
 
 def DiscoverVimComPort():
@@ -15,13 +15,18 @@ def DiscoverVimComPort():
     HOST = "localhost"
     VimComPort = 10000
     repl = "NOTHING"
-    correct_repl = os.getenv("VIMINSTANCEID")
-    if correct_repl is None:
+    vii = os.getenv("VIMINSTANCEID")
+    if vii is None:
         print "call RWarningMsg('VIMINSTANCEID not found by nvimcom.py.')\n"
         sys.stdout.flush()
         return
+    scrt = os.getenv("VIMRPLUGINSECRET")
+    if scrt is None:
+        print "call RWarningMsg('VIMRPLUGINSECRET not found by nvimcom.py.')\n"
+        sys.stdout.flush()
+        return
 
-    while repl.find(correct_repl) < 0 and VimComPort < 10049:
+    while repl.find(scrt) < 0 and VimComPort < 10049:
         VimComPort = VimComPort + 1
         for res in socket.getaddrinfo(HOST, VimComPort, socket.AF_UNSPEC, socket.SOCK_DGRAM):
             af, socktype, proto, canonname, sa = res
@@ -30,13 +35,13 @@ def DiscoverVimComPort():
                 sock.settimeout(0.1)
                 sock.connect(sa)
                 if sys.hexversion < 0x03000000:
-                    sock.send("\001What port [Python 2]?")
+                    sock.send("\001" + vii + " What port [Python 2]?")
                     repl = sock.recv(1024)
                 else:
-                    sock.send("\001What port [Python 3]?".encode())
+                    sock.send("\001" + vii + " What port [Python 3]?".encode())
                     repl = sock.recv(1024).decode()
                 sock.close()
-                if repl.find(correct_repl):
+                if repl.find(scrt):
                     VimComFamily = af
                     break
             except:
