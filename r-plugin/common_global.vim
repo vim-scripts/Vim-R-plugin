@@ -120,7 +120,7 @@ function ReplaceUnderS()
         endif
     endif
     if isString
-        exe "normal! a_"
+        exe "normal! a" . g:vimrplugin_assign_map
     else
         exe "normal! a <- "
     endif
