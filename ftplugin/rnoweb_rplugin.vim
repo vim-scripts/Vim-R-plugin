@@ -74,6 +74,17 @@ function! RnwNextChunk() range
     return
 endfunction
 
+" knit the current buffer content
+function! RKnitRnw()
+    update
+    call RSetWD()
+    if g:vimrplugin_synctex == "none"
+        call g:SendCmdToR('vim.interlace.rnoweb("' . expand("%:t") . '", buildpdf = FALSE, synctex = FALSE)')
+    else
+        call g:SendCmdToR('vim.interlace.rnoweb("' . expand("%:t") . '", buildpdf = FALSE)')
+    endif
+endfunction
+
 " Sweave and compile the current buffer content
 function! RMakePDF(bibtex, knit)
     if g:rplugin_vimcomport == 0
@@ -90,12 +101,20 @@ function! RMakePDF(bibtex, knit)
     call RSetWD()
     let pdfcmd = "vim.interlace.rnoweb('" . expand("%:t") . "'"
 
-    if a:knit
-        let pdfcmd = pdfcmd . ', knit = TRUE'
+    if a:knit == 0
+        let pdfcmd = pdfcmd . ', knit = FALSE'
     endif
 
-    if g:vimrplugin_latexcmd != "pdflatex"
+    if g:rplugin_has_latexmk == 0
+        let pdfcmd = pdfcmd . ', latexmk = FALSE'
+    endif
+
+    if g:vimrplugin_latexcmd != "default"
         let pdfcmd = pdfcmd . ", latexcmd = '" . g:vimrplugin_latexcmd . "'"
+    endif
+
+    if g:vimrplugin_synctex == "none"
+        let pdfcmd = pdfcmd . ", synctex = FALSE"
     endif
 
     if a:bibtex == "bibtex"
@@ -241,7 +260,7 @@ call RCreateMaps("nvi", '<Plug>RSetwd',        'rd', ':call RSetWD()')
 call RCreateMaps("nvi", '<Plug>RSweave',      'sw', ':call RSweave()')
 call RCreateMaps("nvi", '<Plug>RMakePDF',     'sp', ':call RMakePDF("nobib", 0)')
 call RCreateMaps("nvi", '<Plug>RBibTeX',      'sb', ':call RMakePDF("bibtex", 0)')
-call RCreateMaps("nvi", '<Plug>RKnit',        'kn', ':call RKnit()')
+call RCreateMaps("nvi", '<Plug>RKnit',        'kn', ':call RKnitRnw()')
 call RCreateMaps("nvi", '<Plug>RMakePDFK',    'kp', ':call RMakePDF("nobib", 1)')
 call RCreateMaps("nvi", '<Plug>RBibTeXK',     'kb', ':call RMakePDF("bibtex", 1)')
 call RCreateMaps("nvi", '<Plug>ROpenPDF',     'op', ':call ROpenPDF()')
@@ -257,6 +276,140 @@ nmap <buffer><silent> gN :call RnwPreviousChunk()<CR>
 if has("gui_running")
     call MakeRMenu()
 endif
+
+"==========================================================================
+" SyncTeX support:
+
+function! SyncTeX_backward(fname, ln)
+    let g:lastfname = [a:fname, a:ln]
+    let basenm = substitute(a:fname, "\....$", "", "") " Delete extension
+    let basenm = substitute(basenm, 'file://', '', '') " Evince
+    let basenm = substitute(basenm, '/\./', '/', '')   " Okular
+    if filereadable(basenm . "-concordance.tex")
+        let conc = join(readfile(basenm . "-concordance.tex"), "")
+        let rnwf = substitute(basenm, '\(.*\)/.*', '\1/', '') . substitute(conc, '\\Sconcordance{concordance:.\{-}:\(.*\):%.*', '\1', "g")
+        let conc = substitute(conc, '\\Sconcordance{.*:%', "", "g")
+        let conc = substitute(conc, "%", " ", "g")
+        let conc = substitute(conc, "}", "", "")
+        let concl = split(conc)
+
+        " See http://www.stats.uwo.ca/faculty/murdoch/9864/Sweave.pdf page 25
+        let idx = 0
+        let maxidx = len(concl) - 2
+        let texln = concl[0]
+        let rnwln = 1
+        let eureka = 0
+        while rnwln < a:ln && idx < maxidx && eureka == 0
+            let idx += 1
+            let lnrange = range(1, concl[idx])
+            let idx += 1
+            for iii in lnrange
+                let rnwln += concl[idx]
+                let texln += 1
+                if texln >= a:ln
+                    let eureka = 1
+                    break
+                endif
+            endfor
+        endwhile
+    else
+        if filereadable(basenm . "Rnw") || filereadable(basenm . "rnw")
+            call RWarningMsg('SyncTeX [Vim-R-plugin]: "' . basenm . '-concordance.tex" not found.')
+            return
+        endif
+        " Jump to LaTeX source since there is no Rnoweb file
+        let rnwf = a:fname
+        let rnwln = a:ln
+    endif
+
+    if bufname("%") != rnwf
+        if bufloaded(rnwf)
+            let savesb = &switchbuf
+            set switchbuf=useopen,usetab
+            exe "sb " . rnwf
+            exe "set switchbuf=" . savesb
+        else
+            exe "tabnew " . rnwf
+        endif
+    endif
+    exe rnwln
+    redraw
+    if g:rplugin_has_wmctrl
+        call system("wmctrl -xa " . g:vimrplugin_vim_window)
+    endif
+endfunction
+
+function! SyncTeX_forward(fname, ln)
+    let basenm = substitute(a:fname, "\....$", "", "")
+    if filereadable(basenm . "-concordance.tex")
+        let conc = join(readfile(basenm . "-concordance.tex"), "")
+        let conc = substitute(conc, '\\Sconcordance{.*:%', "", "g")
+        let conc = substitute(conc, "%", " ", "g")
+        let conc = substitute(conc, "}", "", "")
+        let concl = split(conc)
+        let idx = 0
+        let maxidx = len(concl) - 2
+        let texln = concl[0]
+        let rnwln = 1
+        let eureka = 0
+        while rnwln < a:ln && idx < maxidx && eureka == 0
+            let idx += 1
+            let lnrange = range(1, concl[idx])
+            let idx += 1
+            for iii in lnrange
+                let rnwln += concl[idx]
+                let texln += 1
+                if rnwln >= a:ln
+                    let eureka = 1
+                    break
+                endif
+            endfor
+        endwhile
+    else
+        if &filetype == "rnoweb"
+            call RWarningMsg('SyncTeX [Vim-R-plugin]: "' . basenm . '-concordance.tex" not found.')
+            return
+        elseif &filetype == "tex"
+            " No conversion needed
+            let texln = a:ln
+        else
+            return
+        endif
+    endif
+    if g:vimrplugin_synctex == "okular"
+        call system("okular --unique " . expand("%:r") . ".pdf#src:" . texln . expand("%:p:h") . "/./" . expand("%:r") . ".tex &")
+    elseif g:vimrplugin_synctex == "evince"
+        call system("python " . g:rplugin_home . "/r-plugin/synctex_evince_forward.py " . expand("%:r") . ".pdf " . texln . " " . expand("%:r") . ".tex &")
+        if g:rplugin_has_wmctrl
+            call system("wmctrl -a '" . expand("%:t:r") . ".pdf'")
+        endif
+    else
+        call RWarningMsg('SyncTeX support for "' . g:vimrplugin_synctex . '" not implemented yet.')
+    endif
+endfunction
+
+function! SyncTeX_SetPID(pid)
+    let g:rplugin_synctexpid = a:pid
+endfunction
+
+function! Kill_SyncTeX()
+    if g:rplugin_synctexpid
+        call system("kill " . g:rplugin_synctexpid)
+    endif
+endfunction
+
+function! Handle_SyncTeX_backward()
+    if v:job_data[1] == 'stdout'
+      let g:lastjobdata = v:job_data[2]
+        let fname = substitute(v:job_data[2], '|.*', '', '') 
+        let ln = substitute(v:job_data[2], '.*|\([0-9]*\).*', '\1', '')
+        call SyncTeX_backward(fname, ln)
+    elseif v:job_data[1] == 'stderr'
+        call RWarningMsg(v:job_data[2])
+    else
+        let g:rplugin_stx_job = 0
+    endif
+endfunction
 
 call RSourceOtherScripts()
 

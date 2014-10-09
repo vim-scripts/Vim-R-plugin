@@ -86,6 +86,7 @@ Vim-R-plugin (see |vimrplugin_source|).
       - Send commands with the object under cursor as argument.
       - Call R's `help()` with the object under cursor as argument.
       - Syntax highlighting of the Object Browser.
+  * SyncTeX support on Linux.
   * Most of the plugin's behavior is customizable.
 
 For screenshots see: http://www.lepem.ufc.br/jaa/vim-r-plugin.html
@@ -129,6 +130,10 @@ Before installing the plugin, you should install its dependencies:
 
    Tmux >= 1.8:   http://tmux.sourceforge.net
                   Tmux is necessary to send commands from Vim to R Console.
+
+   wmctrl:     http://tomas.styblo.name/wmctrl/
+               Required for SyncTeX support in Rnoweb files.
+
 
    Suggests:~
 
@@ -444,6 +449,7 @@ Command
   . Spin (cur file) (only .R)                          \ks
   --------------------------------------------------------
   . Open PDF (cur file)                                \op
+  . Search forward (SyncTeX)                           \gp
   --------------------------------------------------------
   . Build tags file (cur dir)                  :RBuildTags
 -----------------------------------------------------------
@@ -742,6 +748,7 @@ commands. After you finished editing the file, you have to type `exit` to quit
 the Tmux session.
 
 Note: Neovim does not require the --servername VIM argument.
+Note: Starting GVim within a Tmux session is not supported.
 
 
 4.8.1 tvim~
@@ -974,7 +981,13 @@ tell Vim that "R is busy" and Vim will display this message. Everything should
 work as expected again after any valid code is executed in the R Console.
 
 
-5.7. Bugs that affect Mac OS X, Linux Console and ...~
+5.7. SyncTeX support is a Linux only feature~
+
+There is no SyncTeX support for Windows and Mac OS X. If you can write the
+code, please, do it.
+
+
+5.8. Bugs that affect Mac OS X, Linux Console and ...~
 								*r-plugin-nox*
 Note: The bug described in this section does not affect Neovim.
 
@@ -1036,7 +1049,7 @@ A user reported success with the following procedure:
 See also: |r-plugin-remote|.
 
 
-5.8. R must be started by Vim~
+5.9. R must be started by Vim~
 
 The communication between Vim and R will work only if R was started by Vim
 through the <LocalLeader>rf command because the plugin was designed to connect
@@ -1148,6 +1161,7 @@ is running:
 |vimrplugin_vimcom_wait|       Time to wait for vimcom loading
 |vimrplugin_vim_wd|            Start R in Vim's working directory
 |vimrplugin_user_maps_only|    Only set user specified key bindings
+|SyncTeX|                      Options for SyncTeX
 
 
 6.1. Terminal emulator (Linux/Unix only)~
@@ -1504,10 +1518,12 @@ Example:
 						       *vimrplugin_sweaveargs*
 On Windows, the vimcom package calls `tools::texi2dvi()` to build the pdf
 from the generated .tex file. On Linux/Unix, by default, it calls
-`latexmk` `-pdf` to produce a pdf document from the .tex file produced by
-either `Sweave()` or `knit()` command. If `latexmk` is not installed, it calls
-`pdflatex`. You can use the option vimrplugin_latexcmd to change this
-behavior. Example:
+>
+   latexmk -pdflatex="pdflatex -file-line-error -synctex=1" -pdf 
+<
+to produce a pdf document from the .tex file produced by either `Sweave()` or
+`knit()` command. If `latexmk` is not installed, it calls `pdflatex`. You can
+use the option vimrplugin_latexcmd to change this behavior. Example:
 >
    let vimrplugin_latexcmd = "latex"
 <
@@ -1744,6 +1760,91 @@ set those key-bindings specified by the user, put in your vimrc:
     let vimrplugin_user_maps_only = 1
 <
 
+6.32 SyncTeX support (Linux only)~
+								     *SyncTeX*
+SyncTeX is a set of communication systems used by some PDF viewers and by some
+text editors which allow users to jump from a specific line in the text editor
+to the corresponding line in the PDF viewer and vice-versa. The Vim-R-plugin
+has support for Evince and Okular SyncTeX systems.
+
+The application `wmctrl` is required to raise both the PDF viewer and Vim
+windows. Limitation: the Vim-R-plugin may raise the wrong terminal window or
+GVim window if there is more than one open.
+
+
+6.32.1 Evince configuration~
+
+If you run either GVim or Vim in Gnome Terminal, no configuration is required.
+If you run Vim in another terminal emulator, you have to set the value of
+|vimrplugin_vim_window|, as explained below.
+
+Note: If Evince is not started yet when you try to jump to the PDF document
+for the first time, it will start, but will not jump to desired line.
+
+
+6.32.2 Okular configuration~
+
+You have to configure Okular to call Vim during backward searches.
+In Okular, click in:
+>
+   Settings
+   Configure Okular
+   Editor
+   Dropdown menu: Custom Text Editor
+         Command: vim --remote-expr "SyncTeX_backward('%f', %l)"
+
+In the command above, replace `vim` with `gvim` if you use GVim.
+
+If Evince is not installed in your system, the Vim-R-plugin will automatically
+use Okular as the PDF viewer. Otherwise, you have to set the value of
+|vimrplugin_synctex| to "okular".
+
+If you run Vim (and not GVim) and are not using Konsole as the terminal
+emulator, you have to set the value of |vimrplugin_vim_window|, as explained
+below.
+
+Note: If the PDF document is already open the first time that you jump to it,
+and if Okular was not started with the `--unique` argument, another instance
+of Okular will be started.
+
+Note: Neovim has issues in the search forward (from Neovim to Okular).
+
+
+6.32.3 Configuring the PDF editor and Vim's window title~
+							  *vimrplugin_synctex*
+						       *vimrplugin_vim_window*
+If SyncTeX does not work (see above), you may try to set in your |vimrc| the
+values of vimrplugin_synctex and vimrplugin_vim_window.
+
+The valid values for vimrplugin_synctex are "evince" and "okular".
+
+To know the correct value of vimrplugin_vim_window, type in the terminal
+emulator:
+>
+   wmctrl -xl
+<
+This command will list the windows currently running under the X Window
+system. You must set the value of vimrplugin_vim_window as a string that is
+part of the title of the window where Vim is running ("GVim", "Terminal",
+"Konsole", "yourlogin", "vim", etc).
+
+Example of |vimrc| configuration:
+>
+   let vimrplugin_synctex = "okular"
+   let vimrplugin_vim_window = "XTerm"
+<
+To completely disable SyncTeX support, put in your |vimrc|:
+>
+   let vimrplugin_synctex = "none"
+<
+
+6.32.4 Support for Sumatra (Windows) and Skim (Mac OS X)~
+
+Both Sumatra and Skim have support for SyncTeX, but the Vim-R-plugin is not
+ready to communicate with them. If you can, please write the necessary code to
+support anyone of them and submit a push request on github:
+https://github.com/jcfaria/Vim-R-plugin
+
 
 ==============================================================================
 						       *r-plugin-key-bindings*
@@ -1849,6 +1950,7 @@ RD, "cursor down"; RED, both "echo" and "down"):
    RMakeRmd   (rmarkdown default)
    RMakeAll   (rmarkdown all in yaml)
    ROpenPDF
+   RSyncFor   (SyncTeX search forward)
    RSpinFile
 
    Object browser~

@@ -2865,7 +2865,11 @@ function MakeRMenu()
             endif
         endif
         menu R.Command.-Sep6- <nul>
-        call RCreateMenuItem("nvi", 'Command.Knit\ (cur\ file)', '<Plug>RKnit', 'kn', ':call RKnit()')
+        if &filetype == "rnoweb"
+            call RCreateMenuItem("nvi", 'Command.Knit\ (cur\ file)', '<Plug>RKnit', 'kn', ':call RKnitRnw()')
+        else
+            call RCreateMenuItem("nvi", 'Command.Knit\ (cur\ file)', '<Plug>RKnit', 'kn', ':call RKnit()')
+        endif
         if &filetype == "rnoweb" || g:vimrplugin_never_unmake_menu
             call RCreateMenuItem("nvi", 'Command.Knit\ and\ PDF\ (cur\ file)', '<Plug>RMakePDFK', 'kp', ':call RMakePDF("nobib", 1)')
             if has("win32") || has("win64")
@@ -2887,12 +2891,9 @@ function MakeRMenu()
         endif
         menu R.Command.-Sep61- <nul>
         call RCreateMenuItem("nvi", 'Command.Open\ PDF\ (cur\ file)', '<Plug>ROpenPDF', 'op', ':call ROpenPDF()')
-    endif
-    "-------------------------------
-    if &filetype == "rrst" || g:vimrplugin_never_unmake_menu
-        menu R.Command.-Sep5- <nul>
-        call RCreateMenuItem("nvi", 'Command.Knit\ (cur\ file)', '<Plug>RKnit', 'kn', ':call RKnit()')
-        call RCreateMenuItem("nvi", 'Command.Knit\ and\ PDF\ (cur\ file)', '<Plug>RMakePDF', 'kp', ':call RMakePDF("nobib")')
+        if ($DISPLAY != "" && g:vimrplugin_synctex != "none" && &filetype == "rnoweb") || g:vimrplugin_never_unmake_menu
+            call RCreateMenuItem("nvi", 'Command.Search\ forward\ (SyncTeX)', '<Plug>RSyncFor', 'op', ':call ROpenPDF()')
+        endif
     endif
     "-------------------------------
     if &filetype == "r" || g:vimrplugin_never_unmake_menu
@@ -3388,12 +3389,51 @@ call RSetDefaultValue("g:vimrplugin_vimpager",        "'tab'")
 call RSetDefaultValue("g:vimrplugin_objbr_place",     "'script,right'")
 call RSetDefaultValue("g:vimrplugin_permanent_libs",  "'base,stats,graphics,grDevices,utils,datasets,methods'")
 call RSetDefaultValue("g:vimrplugin_user_maps_only", 0)
+call RSetDefaultValue("g:vimrplugin_latexcmd", "'default'")
 
-if executable("latexmk")
-    call RSetDefaultValue("g:vimrplugin_latexcmd", "'latexmk -pdf'")
+" SyncTeX options
+let g:rplugin_has_wmctrl = 0
+let g:rplugin_synctexpid = 0
+
+" Try to guess what PDF viewer is used:
+if executable("evince")
+    call RSetDefaultValue("g:vimrplugin_synctex", "'evince'")
+elseif executable("okular")
+    call RSetDefaultValue("g:vimrplugin_synctex", "'okular'")
 else
-    call RSetDefaultValue("g:vimrplugin_latexcmd", "'pdflatex'")
+    call RSetDefaultValue("g:vimrplugin_synctex", "'none'")
 endif
+let g:vimrplugin_synctex = tolower(g:vimrplugin_synctex)
+
+" Try to guess the title of the window where Vim is running:
+if has("gui_running")
+    call RSetDefaultValue("g:vimrplugin_vim_window", "'GVim'")
+elseif g:vimrplugin_synctex == "evince"
+    call RSetDefaultValue("g:vimrplugin_vim_window", "'Terminal'")
+elseif g:vimrplugin_synctex == "okular"
+    call RSetDefaultValue("g:vimrplugin_vim_window", "'Konsole'")
+else
+    call RSetDefaultValue("g:vimrplugin_vim_window", "'term'")
+endif
+
+if $DISPLAY != "" && g:vimrplugin_synctex != "none"
+    if executable("wmctrl")
+        let g:rplugin_has_wmctrl = 1
+    endif
+    if g:vimrplugin_synctex == "evince"
+        if has("nvim")
+            let g:rplugin_stx_job = jobstart("synctex", "python", [g:rplugin_home . "/r-plugin/synctex_evince_backward.py", expand("%:r") . ".pdf", "nvim"])
+            autocmd JobActivity synctex call Handle_SyncTeX_backward()
+        else
+            if v:servername != ""
+                autocmd VimLeave * call Kill_SyncTeX()
+                call system("python " . g:rplugin_home . "/r-plugin/synctex_evince_backward.py '" . expand("%:r") . ".pdf' " . v:servername . " &")
+            endif
+        endif
+    endif
+    call RCreateMaps("ni", '<Plug>RSyncFor',        'gp', ':call SyncTeX_forward(bufname("%"), line("."))')
+endif
+
 
 " Look for invalid options
 let objbrplace = split(g:vimrplugin_objbr_place, ",")
@@ -3582,6 +3622,10 @@ if !has("win32") && !has("win64") && !has("gui_win32") && !has("gui_win64") && g
         finish
     endif
     unlet s:tmuxversion
+endif
+
+if executable("latexmk")
+    let g:rplugin_has_latexmk = 1
 endif
 
 " Start with an empty list of objects in the workspace
