@@ -26,6 +26,9 @@ r-plugin/r.snippets
 r-plugin/nvimcom.py
 r-plugin/nvimserver.py
 r-plugin/timer.sh
+r-plugin/synctex_evince_backward.py
+r-plugin/synctex_evince_forward.py
+r-plugin/synctex_okular_backward.sh
 r-plugin/vimcom.py
 r-plugin/vimrconfig.vim
 r-plugin/windows.py
