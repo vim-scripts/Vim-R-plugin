@@ -3430,6 +3430,11 @@ if $DISPLAY != "" && g:vimrplugin_synctex != "none"
                 call system("python " . g:rplugin_home . "/r-plugin/synctex_evince_backward.py '" . expand("%:r") . ".pdf' " . v:servername . " &")
             endif
         endif
+    elseif g:vimrplugin_synctex == "okular" && has("nvim")
+        call writefile([], $VIMRPLUGIN_TMPDIR . "/okular_search")
+        let g:rplugin_stx_job = jobstart("synctex", "tail", ["-f", $VIMRPLUGIN_TMPDIR . "/okular_search"])
+        autocmd JobActivity synctex call Handle_SyncTeX_backward()
+        autocmd VimLeave * call delete($VIMRPLUGIN_TMPDIR . "/okular_search")
     endif
     call RCreateMaps("ni", '<Plug>RSyncFor',        'gp', ':call SyncTeX_forward(bufname("%"), line("."))')
 endif

@@ -281,7 +281,6 @@ endif
 " SyncTeX support:
 
 function! SyncTeX_backward(fname, ln)
-    let g:lastfname = [a:fname, a:ln]
     let basenm = substitute(a:fname, "\....$", "", "") " Delete extension
     let basenm = substitute(basenm, 'file://', '', '') " Evince
     let basenm = substitute(basenm, '/\./', '/', '')   " Okular
@@ -377,7 +376,7 @@ function! SyncTeX_forward(fname, ln)
         endif
     endif
     if g:vimrplugin_synctex == "okular"
-        call system("okular --unique " . expand("%:r") . ".pdf#src:" . texln . expand("%:p:h") . "/./" . expand("%:r") . ".tex &")
+        call system("okular --unique " . expand("%:r") . ".pdf#src:" . texln . expand("%:p:h") . "/./" . expand("%:r") . ".tex 2> /dev/null >/dev/null &")
     elseif g:vimrplugin_synctex == "evince"
         call system("python " . g:rplugin_home . "/r-plugin/synctex_evince_forward.py " . expand("%:r") . ".pdf " . texln . " " . expand("%:r") . ".tex &")
         if g:rplugin_has_wmctrl
@@ -400,8 +399,11 @@ endfunction
 
 function! Handle_SyncTeX_backward()
     if v:job_data[1] == 'stdout'
-      let g:lastjobdata = v:job_data[2]
+        let g:lastjobdata = v:job_data[2]
         let fname = substitute(v:job_data[2], '|.*', '', '') 
+        if g:vimrplugin_synctex == "okular"
+            let fname = substitute(fname, '/\./', '/', '')
+        endif
         let ln = substitute(v:job_data[2], '.*|\([0-9]*\).*', '\1', '')
         call SyncTeX_backward(fname, ln)
     elseif v:job_data[1] == 'stderr'

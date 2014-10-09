@@ -1807,7 +1807,26 @@ Note: If the PDF document is already open the first time that you jump to it,
 and if Okular was not started with the `--unique` argument, another instance
 of Okular will be started.
 
-Note: Neovim has issues in the search forward (from Neovim to Okular).
+Note: If you are using Neovim, the configuration of Okular backward search
+requires additional steps because Neovim does not have the argument
+`--remote-expr`:
+
+   - Copy the file synctex_okular_backward.sh from the Vim-R-plugin directory
+     to your path (for example, ~/bin or /usr/local/bin).
+
+   - Turn the file executable. In the terminal, go to the directory where you
+     have copied the file and do:
+>
+     chmod +x synctex_okular_backward.sh
+<
+   - Edit the file synctex_okular_backward.sh and replace the string
+     "yourlogin" with your actual login name. Adjust the directory used by the
+     Vim-R-plugin as temporary directory if necessary.
+
+   - In Okular, put the following in the Custom Editor Command field:
+>
+     synctex_okular_backward.sh '%f' %l
+<
 
 
 6.32.3 Configuring the PDF editor and Vim's window title~
@@ -2045,6 +2064,9 @@ directory after the installation:
    r-plugin/r.snippets
    r-plugin/common_buffer.vim
    r-plugin/common_global.vim
+   r-plugin/synctex_evince_backward.py
+   r-plugin/synctex_evince_forward.py
+   r-plugin/synctex_okular_backward.sh
    r-plugin/vimrconfig.vim
 
 
@@ -2683,7 +2705,7 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-1.0.1 (2014-09-21)
+1.0.1 (2014-10-09)
 
  * Minor bug fixes.
 
