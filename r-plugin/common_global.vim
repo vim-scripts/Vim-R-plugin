@@ -664,6 +664,10 @@ function StartR_TmuxSplit(rcmd)
     if WaitVimComStart()
         call g:SendToVimCom("\005B Update OB [StartR]")
     endif
+    if has("nvim")
+        " Force Neovim to update the window size
+        mode
+    endif
 endfunction
 
 
@@ -954,7 +958,7 @@ function WaitVimComStart()
         else
             call RWarningMsg("File '" . g:rplugin_home . "/r-plugin/timer.sh" . "' not found.")
         endif
-        return
+        return 0
     else
         if g:vimrplugin_vimcom_wait < 0
             return 0
@@ -1071,9 +1075,7 @@ function StartObjBrowser_Tmux()
                 \ 'if has("clientserver") && v:servername != ""',
                 \ '    call g:SendToVimCom("\002" . v:servername)',
                 \ 'endif',
-                \ 'if has("nvim")',
-                \ '    call system("kill -s SIGWINCH ' . getpid() . '")',
-                \ 'else',
+                \ 'if !has("nvim")',
                 \ '    sleep 150m',
                 \ '    call UpdateOB("GlobalEnv")',
                 \ 'endif'], objbrowserfile)
@@ -1148,6 +1150,10 @@ function StartObjBrowser_Tmux()
             endif
         endif
         let g:rplugin_ob_warn_shown = 1
+    endif
+    if has("nvim")
+        " Force Neovim to update the window size
+        mode
     endif
     return
 endfunction
@@ -2079,6 +2085,10 @@ function RQuit(how)
     let g:rplugin_vimcomport = 0
     if g:rplugin_tmuxwasfirst && g:vimrplugin_tmux_title != "automatic" && g:vimrplugin_tmux_title != ""
         call system("tmux set automatic-rename on")
+    endif
+    if has("nvim")
+        " Force Neovim to update the window size
+        mode
     endif
 endfunction
 
