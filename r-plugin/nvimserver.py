@@ -8,6 +8,7 @@ def NeovimServer():
     FinishNow = False
     UDP_IP = "127.0.0.1"
     MyPort = 1899
+    VimSecret = os.getenv("VIMRPLUGIN_SECRET")
 
     while True and MyPort < 1999:
         try:
@@ -31,8 +32,8 @@ def NeovimServer():
     while FinishNow == False:
         try:
             data, addr = sock.recvfrom( 1024 ) # buffer size is 1024 bytes
-            if re.match("EXPR ", data):
-                print re.sub("^EXPR ", "", data) + "\n"
+            if re.match(VimSecret, data):
+                print re.sub(VimSecret, "", data) + "\n"
                 sys.stdout.flush()
             else:
                 if data != "":
