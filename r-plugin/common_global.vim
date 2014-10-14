@@ -617,7 +617,7 @@ function StartR_TmuxSplit(rcmd)
                 \ 'set-environment VIM_PANE ' . g:rplugin_vim_pane ,
                 \ 'set-environment VIMEDITOR_SVRNM ' . $VIMEDITOR_SVRNM ,
                 \ 'set-environment VIMINSTANCEID ' . $VIMINSTANCEID ,
-                \ 'set-environment VIMRPLUGINSECRET ' . $VIMRPLUGINSECRET ]
+                \ 'set-environment VIMRPLUGIN_SECRET ' . $VIMRPLUGIN_SECRET ]
     if &t_Co == 256
         call extend(tmuxconf, ['set -g default-terminal "' . $TERM . '"'])
     endif
@@ -701,7 +701,7 @@ function StartR_ExternalTerm(rcmd)
         let tmuxcnf = '-f "' . $VIMRPLUGIN_TMPDIR . "/tmux.conf" . '"'
     endif
 
-    let rcmd = 'VIMRPLUGIN_TMPDIR="' . $VIMRPLUGIN_TMPDIR . '" VIMRPLUGIN_HOME="' . $VIMRPLUGIN_HOME . '" VIMINSTANCEID="' . $VIMINSTANCEID . '" VIMRPLUGINSECRET="' . $VIMRPLUGINSECRET . '" VIMEDITOR_SVRNM="' . $VIMEDITOR_SVRNM . '" ' . a:rcmd
+    let rcmd = 'VIMRPLUGIN_TMPDIR="' . $VIMRPLUGIN_TMPDIR . '" VIMRPLUGIN_HOME="' . $VIMRPLUGIN_HOME . '" VIMINSTANCEID="' . $VIMINSTANCEID . '" VIMRPLUGIN_SECRET="' . $VIMRPLUGIN_SECRET . '" VIMEDITOR_SVRNM="' . $VIMEDITOR_SVRNM . '" ' . a:rcmd
 
     call system("tmux has-session -t " . g:rplugin_tmuxsname)
     if v:shell_error
@@ -3898,7 +3898,7 @@ else
         Py import base64
         Py import vim
         Py vim.command("let g:rplugin_random = '" + base64.b64encode(os.urandom(16)).decode() + "'")
-        let $VIMRPLUGINSECRET = substitute(g:rplugin_random, '\W', '', 'g')
+        let $VIMRPLUGIN_SECRET = substitute(g:rplugin_random, '\W', '', 'g')
         Py vim.command("let g:rplugin_random = '" + base64.b64encode(os.urandom(16)).decode() + "'")
     endif
     if !exists("g:rplugin_random")
@@ -3906,10 +3906,10 @@ else
             let g:rplugin_random = system("echo $RANDOM")
         endif
         if exists("g:rplugin_random")
-            let $VIMRPLUGINSECRET = substitute(g:rplugin_random, '\W', '', 'g')
+            let $VIMRPLUGIN_SECRET = substitute(g:rplugin_random, '\W', '', 'g')
             let g:rplugin_random = system("echo $RANDOM")
         else
-            let $VIMRPLUGINSECRET = substitute(strftime("%c"), '\W', '', 'g')
+            let $VIMRPLUGIN_SECRET = substitute(strftime("%c"), '\W', '', 'g')
             let g:rplugin_random = localtime()
         endif
     endif

@@ -20,11 +20,11 @@ def DiscoverVimComPort():
         if vii is None:
             vim.command("call RWarningMsg('VIMINSTANCEID not found.')")
             return
-    scrt = vim.eval("$VIMRPLUGINSECRET")
+    scrt = vim.eval("$VIMRPLUGIN_SECRET")
     if scrt is None:
-        scrt = os.getenv("VIMRPLUGINSECRET")
+        scrt = os.getenv("VIMRPLUGIN_SECRET")
         if scrt is None:
-            vim.command("call RWarningMsg('VIMRPLUGINSECRET not found.')")
+            vim.command("call RWarningMsg('VIMRPLUGIN_SECRET not found.')")
             return
 
     while repl.find(scrt) < 0 and VimComPort < 10049:

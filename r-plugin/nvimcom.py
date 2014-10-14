@@ -20,9 +20,9 @@ def DiscoverVimComPort():
         print "call RWarningMsg('VIMINSTANCEID not found by nvimcom.py.')\n"
         sys.stdout.flush()
         return
-    scrt = os.getenv("VIMRPLUGINSECRET")
+    scrt = os.getenv("VIMRPLUGIN_SECRET")
     if scrt is None:
-        print "call RWarningMsg('VIMRPLUGINSECRET not found by nvimcom.py.')\n"
+        print "call RWarningMsg('VIMRPLUGIN_SECRET not found by nvimcom.py.')\n"
         sys.stdout.flush()
         return
 
