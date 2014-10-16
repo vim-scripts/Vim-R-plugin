@@ -605,7 +605,8 @@ the knitr package and <LocalLeader>kp compiles the pdf. On Linux, if using
 either Evince or Okular, you can jump from the Rnoweb file to the PDF with the
 command <LocalLeader>jp. To jump from a specific location in the PDF to the
 corresponding line in the Rnoweb, in Evince you should press <C-LeftMouse>,
-and in Okular <S-LeftMouse> (see |SyncTeX| for configuration details).
+and in Okular <S-LeftMouse> (see |r-plugin-SyncTeX| for configuration
+details).
 
 
 4.3. Omni completion and the highlighting of functions~
@@ -989,7 +990,7 @@ work as expected again after any valid code is executed in the R Console.
 
 
 5.7. SyncTeX support is a Linux only feature~
-						  *SyncTeX-win*  *SyncTeX-mac*
+				*r-plugin-SyncTeX-win*  *r-plugin-SyncTeX-mac*
 There is no SyncTeX support for Windows and Mac OS X. Both Sumatra (Windows)
 and Skim (Mac OS X) have support for SyncTeX, but the Vim-R-plugin is not
 ready to communicate with them. If you can, please write the necessary code to
@@ -1171,7 +1172,7 @@ is running:
 |vimrplugin_vimcom_wait|       Time to wait for vimcom loading
 |vimrplugin_vim_wd|            Start R in Vim's working directory
 |vimrplugin_user_maps_only|    Only set user specified key bindings
-|SyncTeX|                      Options for SyncTeX
+|r-plugin-SyncTeX|             Options for SyncTeX
 
 
 6.1. Terminal emulator (Linux/Unix only)~
@@ -1771,7 +1772,7 @@ set those key-bindings specified by the user, put in your vimrc:
 <
 
 6.32 SyncTeX support (Linux only)~
-								     *SyncTeX*
+							    *r-plugin-SyncTeX*
 SyncTeX is a set of communication systems used by some PDF viewers and by some
 text editors which allow users to jump from a specific line in the text editor
 to the corresponding line in the PDF viewer and vice-versa. The Vim-R-plugin
@@ -1781,6 +1782,8 @@ The application `wmctrl` is required to raise both the PDF viewer and Vim
 windows. Limitation: the Vim-R-plugin may raise the wrong terminal window or
 GVim window if there is more than one open.
 
+Note: The Vim-R-plugin does not support Rnoweb master documents that have
+child documents.
 
 6.32.1 Evince configuration~
 
@@ -1867,8 +1870,8 @@ To completely disable SyncTeX support, put in your |vimrc|:
    let vimrplugin_synctex = "none"
 <
 
-There is no support for Windows and Mac OS X. See |SyncTeX-win| and
-|SyncTeX-mac|.
+There is no support for Windows and Mac OS X. See |r-plugin-SyncTeX-win| and
+|r-plugin-SyncTeX-mac|.
 
 
 ==============================================================================
@@ -2711,7 +2714,7 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-1.0.1 (2014-10-09)
+1.0.1 (2014-10-16)
 
  * Minor bug fixes.
 
