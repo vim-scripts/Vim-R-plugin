@@ -269,6 +269,7 @@ call RCreateMaps("ni",  '<Plug>RSendChunk',   'cc', ':call b:SendChunkToR("silen
 call RCreateMaps("ni",  '<Plug>RESendChunk',  'ce', ':call b:SendChunkToR("echo", "stay")')
 call RCreateMaps("ni",  '<Plug>RDSendChunk',  'cd', ':call b:SendChunkToR("silent", "down")')
 call RCreateMaps("ni",  '<Plug>REDSendChunk', 'ca', ':call b:SendChunkToR("echo", "down")')
+call RCreateMaps("ni",  '<Plug>RSyncFor',     'gp', ':call SyncTeX_forward(bufname("%"), line("."))')
 nmap <buffer><silent> gn :call RnwNextChunk()<CR>
 nmap <buffer><silent> gN :call RnwPreviousChunk()<CR>
 
@@ -387,19 +388,39 @@ function! SyncTeX_forward(fname, ln)
     endif
 endfunction
 
-function! SyncTeX_SetPID(pid)
-    let g:rplugin_synctexpid = a:pid
+function! SyncTeX_SetPID(spid)
+    exe 'autocmd VimLeave * call system("kill ' . a:spid . '")'
 endfunction
 
-function! Kill_SyncTeX()
-    if g:rplugin_synctexpid
-        call system("kill " . g:rplugin_synctexpid)
+function! Run_SyncTeX()
+    if $DISPLAY == "" || g:vimrplugin_synctex == "none" || exists("b:did_synctex")
+        return
+    endif
+    let b:did_synctex = 1
+
+    if executable("wmctrl")
+        let g:rplugin_has_wmctrl = 1
+    endif
+    if g:vimrplugin_synctex == "evince"
+        if has("nvim")
+            let g:rplugin_stx_job = jobstart("synctex", "python", [g:rplugin_home . "/r-plugin/synctex_evince_backward.py", expand("%:r") . ".pdf", "nvim"])
+            autocmd JobActivity synctex call Handle_SyncTeX_backward()
+        else
+            if v:servername != ""
+                call system("python " . g:rplugin_home . "/r-plugin/synctex_evince_backward.py '" . expand("%:r") . ".pdf' " . v:servername . " &")
+            endif
+        endif
+    elseif g:vimrplugin_synctex == "okular" && has("nvim") && !exists("g:rplugin_okular_search")
+        let g:rplugin_okular_search = 1
+        call writefile([], $VIMRPLUGIN_TMPDIR . "/okular_search")
+        let g:rplugin_stx_job = jobstart("synctex", "tail", ["-f", $VIMRPLUGIN_TMPDIR . "/okular_search"])
+        autocmd JobActivity synctex call Handle_SyncTeX_backward()
+        autocmd VimLeave * call delete($VIMRPLUGIN_TMPDIR . "/okular_search")
     endif
 endfunction
 
 function! Handle_SyncTeX_backward()
     if v:job_data[1] == 'stdout'
-        let g:lastjobdata = v:job_data[2]
         let fname = substitute(v:job_data[2], '|.*', '', '') 
         if g:vimrplugin_synctex == "okular"
             let fname = substitute(fname, '/\./', '/', '')
@@ -412,6 +433,8 @@ function! Handle_SyncTeX_backward()
         let g:rplugin_stx_job = 0
     endif
 endfunction
+
+call Run_SyncTeX()
 
 call RSourceOtherScripts()
 

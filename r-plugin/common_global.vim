@@ -3402,10 +3402,6 @@ call RSetDefaultValue("g:vimrplugin_permanent_libs",  "'base,stats,graphics,grDe
 call RSetDefaultValue("g:vimrplugin_user_maps_only", 0)
 call RSetDefaultValue("g:vimrplugin_latexcmd", "'default'")
 
-" SyncTeX options
-let g:rplugin_has_wmctrl = 0
-let g:rplugin_synctexpid = 0
-
 " Try to guess what PDF viewer is used:
 if executable("evince")
     call RSetDefaultValue("g:vimrplugin_synctex", "'evince'")
@@ -3426,30 +3422,6 @@ elseif g:vimrplugin_synctex == "okular"
 else
     call RSetDefaultValue("g:vimrplugin_vim_window", "'term'")
 endif
-
-if $DISPLAY != "" && g:vimrplugin_synctex != "none"
-    if executable("wmctrl")
-        let g:rplugin_has_wmctrl = 1
-    endif
-    if g:vimrplugin_synctex == "evince"
-        if has("nvim")
-            let g:rplugin_stx_job = jobstart("synctex", "python", [g:rplugin_home . "/r-plugin/synctex_evince_backward.py", expand("%:r") . ".pdf", "nvim"])
-            autocmd JobActivity synctex call Handle_SyncTeX_backward()
-        else
-            if v:servername != ""
-                autocmd VimLeave * call Kill_SyncTeX()
-                call system("python " . g:rplugin_home . "/r-plugin/synctex_evince_backward.py '" . expand("%:r") . ".pdf' " . v:servername . " &")
-            endif
-        endif
-    elseif g:vimrplugin_synctex == "okular" && has("nvim")
-        call writefile([], $VIMRPLUGIN_TMPDIR . "/okular_search")
-        let g:rplugin_stx_job = jobstart("synctex", "tail", ["-f", $VIMRPLUGIN_TMPDIR . "/okular_search"])
-        autocmd JobActivity synctex call Handle_SyncTeX_backward()
-        autocmd VimLeave * call delete($VIMRPLUGIN_TMPDIR . "/okular_search")
-    endif
-    call RCreateMaps("ni", '<Plug>RSyncFor',        'gp', ':call SyncTeX_forward(bufname("%"), line("."))')
-endif
-
 
 " Look for invalid options
 let objbrplace = split(g:vimrplugin_objbr_place, ",")
@@ -3887,6 +3859,12 @@ let g:rplugin_lastrpl = ""
 let g:rplugin_lastev = ""
 let g:rplugin_hasRSFbutton = 0
 let g:rplugin_tmuxsname = "VimR-" . substitute(localtime(), '.*\(...\)', '\1', '')
+
+" SyncTeX options
+let g:rplugin_has_wmctrl = 0
+let g:rplugin_synctexpid = 0
+let g:rplugin_stx_job = 0
+
 
 " If this is the Object Browser running in a Tmux pane, $VIMINSTANCEID is
 " already defined and shouldn't be changed
