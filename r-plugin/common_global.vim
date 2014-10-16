@@ -925,8 +925,8 @@ function ReceiveVimComStartMsg(msg)
         if vmsg[0] != "vimcom"
             call RWarningMsg("Invalid package name: " . vmsg[0])
         endif
-        if vmsg[1] != "1.0-0"
-            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.0-0.')
+        if vmsg[1] != "1.0-1"
+            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.0-1.')
         endif
         if vmsg[2] != $VIMINSTANCEID
             call RWarningMsg("Invalid ID: " . vmsg[2] . " [Correct = " . $VIMINSTANCEID . "]")
@@ -984,8 +984,8 @@ function WaitVimComStart()
         let vr = readfile($VIMRPLUGIN_TMPDIR . "/vimcom_running")
         if vr[2] == $VIMINSTANCEID
             let g:rplugin_vimcom_version = vr[1]
-            if g:rplugin_vimcom_version != "1.0-0"
-                call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.0-0.')
+            if g:rplugin_vimcom_version != "1.0-1"
+                call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.0-1.')
                 sleep 1
             endif
         else
@@ -2088,6 +2088,7 @@ function RQuit(how)
     endif
     if has("nvim")
         " Force Neovim to update the window size
+        sleep 500m
         mode
     endif
 endfunction
@@ -3524,7 +3525,11 @@ function SendToVimCom_Neovim(...)
     endif
 endfunction
 
-let g:SendToVimCom = function("SendToVimCom_Vim")
+if has("nvim")
+    let g:SendToVimCom = function("SendToVimCom_Neovim")
+else
+    let g:SendToVimCom = function("SendToVimCom_Vim")
+endif
 
 " python3 has priority over python
 if has("python3")
@@ -3533,9 +3538,6 @@ if has("python3")
 elseif has("python")
     command! -nargs=+ Py :py <args>
     command! -nargs=+ PyFile :pyfile <args>
-elseif has("nvim")
-    command! -nargs=+ Py :call RWarningMsg("Py command not implemented yet: '" . <args> . "'")
-    let g:SendToVimCom = function("SendToVimCom_Neovim")
 else
     command! -nargs=+ Py :
     command! -nargs=+ PyFile :

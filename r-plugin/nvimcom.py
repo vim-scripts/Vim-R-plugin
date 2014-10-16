@@ -61,8 +61,8 @@ def DiscoverVimComPort():
         print "let g:rplugin_vimcomport = " + str(VimComPort) + "\n"
         sys.stdout.flush()
         PortWarn = False
-        if repl.find("1.0-0") != 0:
-            print "call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.0-0.')\n"
+        if repl.find("1.0-1") != 0:
+            print "call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.0-1.')\n"
             sys.stdout.flush()
         return
 
