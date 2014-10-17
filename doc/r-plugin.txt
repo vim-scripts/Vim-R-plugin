@@ -1782,8 +1782,17 @@ The application `wmctrl` is required to raise both the PDF viewer and Vim
 windows. Limitation: the Vim-R-plugin may raise the wrong terminal window or
 GVim window if there is more than one open.
 
-Note: The Vim-R-plugin does not support Rnoweb master documents that have
-child documents.
+If you work with a master document and child subdocuments, each child
+subdocument should have the following line:
+>
+   % !Rnw root = master.Rnw
+<
+where `master.Rnw` must be replace with the name of the actual master
+document.
+
+Note: The Vim-R-plugin only supports Rnoweb documents processed by knitr with
+the command <LocalLeader>kn or <LocalLeader>kp.
+
 
 6.32.1 Evince configuration~
 
@@ -2714,7 +2723,7 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-1.0.1 (2014-10-16)
+1.0.1 (2014-10-17)
 
  * Minor bug fixes.
 

@@ -269,7 +269,7 @@ call RCreateMaps("ni",  '<Plug>RSendChunk',   'cc', ':call b:SendChunkToR("silen
 call RCreateMaps("ni",  '<Plug>RESendChunk',  'ce', ':call b:SendChunkToR("echo", "stay")')
 call RCreateMaps("ni",  '<Plug>RDSendChunk',  'cd', ':call b:SendChunkToR("silent", "down")')
 call RCreateMaps("ni",  '<Plug>REDSendChunk', 'ca', ':call b:SendChunkToR("echo", "down")')
-call RCreateMaps("ni",  '<Plug>RSyncFor',     'gp', ':call SyncTeX_forward(bufname("%"), line("."))')
+call RCreateMaps("ni",  '<Plug>RSyncFor',     'gp', ':call SyncTeX_forward()')
 nmap <buffer><silent> gn :call RnwNextChunk()<CR>
 nmap <buffer><silent> gN :call RnwPreviousChunk()<CR>
 
@@ -339,49 +339,71 @@ function! SyncTeX_backward(fname, ln)
     endif
 endfunction
 
-function! SyncTeX_forward(fname, ln)
-    let basenm = substitute(a:fname, "\....$", "", "")
+function! SyncTeX_forward()
+    let basenm = expand("%:t:r")
+    let lnum = 0
+
     if filereadable(basenm . "-concordance.tex")
-        let conc = join(readfile(basenm . "-concordance.tex"), "")
-        let conc = substitute(conc, '\\Sconcordance{.*:%', "", "g")
-        let conc = substitute(conc, "%", " ", "g")
-        let conc = substitute(conc, "}", "", "")
-        let concl = split(conc)
-        let idx = 0
-        let maxidx = len(concl) - 2
-        let texln = concl[0]
-        let rnwln = 1
-        let eureka = 0
-        while rnwln < a:ln && idx < maxidx && eureka == 0
-            let idx += 1
-            let lnrange = range(1, concl[idx])
-            let idx += 1
-            for iii in lnrange
-                let rnwln += concl[idx]
-                let texln += 1
-                if rnwln >= a:ln
-                    let eureka = 1
-                    break
-                endif
-            endfor
-        endwhile
+        let lnum = line(".")
     else
-        if &filetype == "rnoweb"
-            call RWarningMsg('SyncTeX [Vim-R-plugin]: "' . basenm . '-concordance.tex" not found.')
-            return
-        elseif &filetype == "tex"
-            " No conversion needed
-            let texln = a:ln
+        let ischild = search('% *!Rnw *root *=', 'bwn')
+        if ischild
+            let mfile = substitute(getline(ischild), '.*% *!Rnw *root *= *\(.*\) *', '\1', '')
+            let basenm = substitute(mfile, "\....$", "", "")
+            if filereadable(basenm . "-concordance.tex")
+                let mlines = readfile(mfile)
+                for ii in range(len(mlines))
+                    if mlines[ii] =~ '<<.*child *= *["' . "']" . bufname("%") . '["' . "']"
+                        let lnum = ii + 1
+                        break
+                    endif
+                endfor
+                if lnum == 0
+                    call RWarningMsg('Could not find "child=' . bufname("%") . '" in ' . mfile . '.')
+                    return
+                endif
+            else
+                call RWarningMsg('SyncTeX [Vim-R-plugin]: "' . basenm . '-concordance.tex" not found.')
+                return
+            endif
         else
+            call RWarningMsg('SyncTeX [Vim-R-plugin]: "' . basenm . '-concordance.tex" not found.')
             return
         endif
     endif
+
+    let conc = join(readfile(basenm . "-concordance.tex"), "")
+    let conc = substitute(conc, '\\Sconcordance{.*:%', "", "g")
+    let conc = substitute(conc, "%", " ", "g")
+    let conc = substitute(conc, "}", "", "")
+    let concl = split(conc)
+    let idx = 0
+    let maxidx = len(concl) - 2
+    let texln = concl[0]
+    let rnwln = 1
+    let eureka = 0
+    while rnwln < lnum && idx < maxidx && eureka == 0
+        let idx += 1
+        let lnrange = range(1, concl[idx])
+        let idx += 1
+        for iii in lnrange
+            let rnwln += concl[idx]
+            let texln += 1
+            if rnwln >= lnum
+                let eureka = 1
+                break
+            endif
+        endfor
+    endwhile
+
+    let g:last_calc = [lnum, rnwln, texln]
+
     if g:vimrplugin_synctex == "okular"
-        call system("okular --unique " . expand("%:r") . ".pdf#src:" . texln . expand("%:p:h") . "/./" . expand("%:r") . ".tex 2> /dev/null >/dev/null &")
+        call system("okular --unique " . basenm . ".pdf#src:" . texln . expand("%:p:h") . "/./" . basenm . ".tex 2> /dev/null >/dev/null &")
     elseif g:vimrplugin_synctex == "evince"
-        call system("python " . g:rplugin_home . "/r-plugin/synctex_evince_forward.py " . expand("%:r") . ".pdf " . texln . " " . expand("%:r") . ".tex &")
+        call system("python " . g:rplugin_home . "/r-plugin/synctex_evince_forward.py " . basenm . ".pdf " . texln . " " . basenm . ".tex &")
         if g:rplugin_has_wmctrl
-            call system("wmctrl -a '" . expand("%:t:r") . ".pdf'")
+            call system("wmctrl -a '" . basenm . ".pdf'")
         endif
     else
         call RWarningMsg('SyncTeX support for "' . g:vimrplugin_synctex . '" not implemented yet.')
