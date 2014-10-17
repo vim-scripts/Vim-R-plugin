@@ -1,7 +1,7 @@
 " Vim indent file
 " Language:	R
 " Author:	Jakson Alves de Aquino <jalvesaq@gmail.com>
-" Last Change:	Thu Jul 10, 2014  07:11PM
+" Last Change:	Fri Oct 17, 2014  10:02AM
 
 
 " Only load this indent file when no other was loaded.
@@ -203,6 +203,9 @@ function SanitizeRLine(line)
   let newline = s:RDelete_parens(newline)
   let newline = substitute(newline, '#.*', "", "")
   let newline = substitute(newline, '\s*$', "", "")
+  if &filetype == "rhelp" && newline =~ '^\\method{.*}{.*}(.*'
+    let newline = substitute(newline, '^\\method{\(.*\)}{.*}', '\1', "")
+  endif
   return newline
 endfunction
 
@@ -252,9 +255,6 @@ function GetRIndent()
     endif
     if line =~ '^\\examples{' || line =~ '^\\usage{' || line =~ '^\\dontshow{' || line =~ '^\\dontrun{' || line =~ '^\\donttest{' || line =~ '^\\testonly{'
       return 0
-    endif
-    if line =~ '^\\method{.*}{.*}(.*'
-      let line = substitute(line, '^\\method{\(.*\)}{.*}', '\1', "")
     endif
   endif
 
