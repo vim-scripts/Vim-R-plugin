@@ -601,12 +601,15 @@ to R Console. The command <LocalLeader>ch sends the R code from the first
 chunk up to the current line.
 
 The commands <LocalLeader>kn builds the .tex file from the Rnoweb one using
-the knitr package and <LocalLeader>kp compiles the pdf. On Linux, if using
-either Evince or Okular, you can jump from the Rnoweb file to the PDF with the
-command <LocalLeader>jp. To jump from a specific location in the PDF to the
-corresponding line in the Rnoweb, in Evince you should press <C-LeftMouse>,
-and in Okular <S-LeftMouse> (see |r-plugin-SyncTeX| for configuration
-details).
+the knitr package and <LocalLeader>kp compiles the pdf; for Sweave, the
+commands are, respectively <LocalLeader>sw and <LocalLeader>sp. On Linux, if
+using either Evince or Okular, you can jump from the Rnoweb file to the PDF
+with the command <LocalLeader>gp. To jump from a specific location in the PDF
+to the corresponding line in the Rnoweb, in Evince you should press
+<C-LeftMouse>, and in Okular <S-LeftMouse>. No configuration is required if
+you use Evince, Gnome-Terminal and the knitr package, and work with single
+file Rnoweb documents. Otherwise, see |r-plugin-SyncTeX| for configuration
+details.
 
 
 4.3. Omni completion and the highlighting of functions~
@@ -1782,26 +1785,33 @@ The application `wmctrl` is required to raise both the PDF viewer and Vim
 windows. Limitation: the Vim-R-plugin may raise the wrong terminal window or
 GVim window if there is more than one open.
 
+No configuration is required if you use Evince, Gnome-Terminal, the knitr
+package, and single file Rnoweb documents. Otherwise, keep reading...
+
+If you use `Sweave()` rather than `knit()`, you must put in your Rnoweb
+document:
+>
+   \SweaveOpts{concordance=TRUE}
+<
 If you work with a master document and child subdocuments, each child
-subdocument should have the following line:
+subdocument should include the following line:
 >
    % !Rnw root = master.Rnw
 <
-where `master.Rnw` must be replace with the name of the actual master
+where `master.Rnw` must be replaced with the name of the actual master
 document.
-
-Note: The Vim-R-plugin only supports Rnoweb documents processed by knitr with
-the command <LocalLeader>kn or <LocalLeader>kp.
 
 
 6.32.1 Evince configuration~
 
-If you run either GVim or Vim in Gnome Terminal, no configuration is required.
+If you have Evince installed, the Vim-R-plugin assumes that you are using it
+to view PDF documents and that you run either GVim or Vim in Gnome-Terminal.
 If you run Vim in another terminal emulator, you have to set the value of
 |vimrplugin_vim_window|, as explained below.
 
 Note: If Evince is not started yet when you try to jump to the PDF document
-for the first time, it will start, but will not jump to desired line.
+for the first time, it will start, but will not jump to desired line; you have
+to press <LocalLeader>gp again.
 
 
 6.32.2 Okular configuration~
@@ -1821,7 +1831,8 @@ If Evince is not installed in your system, the Vim-R-plugin will automatically
 use Okular as the PDF viewer. Otherwise, you have to set the value of
 |vimrplugin_synctex| to "okular".
 
-If you run Vim (and not GVim) and are not using Konsole as the terminal
+If the Vim-R-plugin is set to use Okular as the PDF viewer, it assumes that
+you run either GVim or Vim in Konsole. If you run Vim in another terminal
 emulator, you have to set the value of |vimrplugin_vim_window|, as explained
 below.
 
