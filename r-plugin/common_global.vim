@@ -2903,7 +2903,7 @@ function MakeRMenu()
         menu R.Command.-Sep61- <nul>
         call RCreateMenuItem("nvi", 'Command.Open\ PDF\ (cur\ file)', '<Plug>ROpenPDF', 'op', ':call ROpenPDF()')
         if ($DISPLAY != "" && g:vimrplugin_synctex != "none" && &filetype == "rnoweb") || g:vimrplugin_never_unmake_menu
-            call RCreateMenuItem("nvi", 'Command.Search\ forward\ (SyncTeX)', '<Plug>RSyncFor', 'op', ':call ROpenPDF()')
+            call RCreateMenuItem("nvi", 'Command.Search\ forward\ (SyncTeX)', '<Plug>RSyncFor', 'gp', ':call ROpenPDF()')
         endif
     endif
     "-------------------------------
