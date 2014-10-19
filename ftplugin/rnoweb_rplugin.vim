@@ -438,10 +438,13 @@ function! SyncTeX_forward()
     if g:vimrplugin_synctex == "okular"
         call system("okular --unique " . basenm . ".pdf#src:" . texln . expand("%:p:h") . "/./" . basenm . ".tex 2> /dev/null >/dev/null &")
     elseif g:vimrplugin_synctex == "evince"
-        call system("python " . g:rplugin_home . "/r-plugin/synctex_evince_forward.py " . basenm . ".pdf " . texln . " " . basenm . ".tex &")
+        call system("python " . g:rplugin_home . "/r-plugin/synctex_evince_forward.py " . basenm . ".pdf " . texln . " " . basenm . ".tex 2> /dev/null >/dev/null &")
         if g:rplugin_has_wmctrl
             call system("wmctrl -a '" . basenm . ".pdf'")
         endif
+    elseif g:vimrplugin_synctex = "skim"
+        " This command is based on Skim wiki (not tested)
+        call system("/Applications/Skim.app/Contents/SharedSupport/displayline " . texln . " '" . basenm . ".pdf' 2> /dev/null >/dev/null &")
     else
         call RWarningMsg('SyncTeX support for "' . g:vimrplugin_synctex . '" not implemented yet.')
     endif
