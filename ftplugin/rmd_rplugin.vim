@@ -66,8 +66,9 @@ function! RmdNextChunk() range
 endfunction
 
 function! RMakeRmd(t)
-    call RSetWD()
     update
+
+    call g:SendCmdToR('.vim_oldwd <- getwd(); setwd("' . expand("%:p:h") . '")')
 
     let rcmd = 'require(rmarkdown); render("' . expand("%:t") . '"'
     if a:t == "odt"
@@ -104,6 +105,7 @@ function! RMakeRmd(t)
         let rcmd = rcmd . '; system("' . g:rplugin_soffbin . ' --invisible --convert-to odt ' . expand("%:r:t") . '.html")'
     endif
     call g:SendCmdToR(rcmd)
+    call g:SendCmdToR('setwd(.vim_oldwd); rm(.vim_oldwd)')
 endfunction
 
 " Send Rmd chunk to R
