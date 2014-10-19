@@ -118,7 +118,7 @@ function! RMakePDFrrst()
         endif
     endif
 
-    let pdfcmd = "vim.interlace.rrst('" . expand("%:t") . "'"
+    let pdfcmd = 'vim.interlace.rrst("' . expand("%:t") . '", rrstdir = "' . expand("%:p:h") . '"'
     if exists("g:vimrplugin_rrstcompiler")
         let pdfcmd = pdfcmd . ", compiler='" . g:vimrplugin_rrstcompiler . "'"
     endif

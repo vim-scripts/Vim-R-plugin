@@ -77,11 +77,10 @@ endfunction
 " knit the current buffer content
 function! RKnitRnw()
     update
-    call RSetWD()
     if g:vimrplugin_synctex == "none"
-        call g:SendCmdToR('vim.interlace.rnoweb("' . expand("%:t") . '", buildpdf = FALSE, synctex = FALSE)')
+        call g:SendCmdToR('vim.interlace.rnoweb("' . expand("%:t") . '", rnwdir = "' . expand("%:p:h") . '", buildpdf = FALSE, synctex = FALSE)')
     else
-        call g:SendCmdToR('vim.interlace.rnoweb("' . expand("%:t") . '", buildpdf = FALSE)')
+        call g:SendCmdToR('vim.interlace.rnoweb("' . expand("%:t") . '", rnwdir = "' . expand("%:p:h") . '", buildpdf = FALSE)')
     endif
 endfunction
 
@@ -98,8 +97,7 @@ function! RMakePDF(bibtex, knit)
         endif
     endif
     update
-    call RSetWD()
-    let pdfcmd = "vim.interlace.rnoweb('" . expand("%:t") . "'"
+    let pdfcmd = 'vim.interlace.rnoweb("' . expand("%:t") . '", rnwdir = "' . expand("%:p:h") . '"'
 
     if a:knit == 0
         let pdfcmd = pdfcmd . ', knit = FALSE'
@@ -173,8 +171,7 @@ endfunction
 " Sweave the current buffer content
 function! RSweave()
     update
-    call RSetWD()
-    let scmd = 'vim.interlace.rnoweb("' . expand("%:t") . '", knit = FALSE, buildpdf = FALSE'
+    let scmd = 'vim.interlace.rnoweb("' . expand("%:t") . '", rnwdir = "' . expand("%:p:h") . '", knit = FALSE, buildpdf = FALSE'
     if exists("g:vimrplugin_sweaveargs")
         let scmd .= ', ' . g:vimrplugin_sweaveargs
     endif

@@ -55,8 +55,7 @@ endfunction
 " Convert R script into Rmd, md and, then, html.
 function! RSpin()
     update
-    call RSetWD()
-    call g:SendCmdToR('require(knitr); spin("' . expand("%:t") . '")')
+    call g:SendCmdToR('require(knitr); .vim_oldwd <- getwd(); setwd("' . expand("%:p:h") . '"); spin("' . expand("%:t") . '"); setwd(.vim_oldwd); rm(.vim_oldwd)')
 endfunction
 
 " Default IsInRCode function when the plugin is used as a global plugin

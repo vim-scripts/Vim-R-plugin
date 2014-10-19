@@ -925,8 +925,8 @@ function ReceiveVimComStartMsg(msg)
         if vmsg[0] != "vimcom"
             call RWarningMsg("Invalid package name: " . vmsg[0])
         endif
-        if vmsg[1] != "1.0-1"
-            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.0-1.')
+        if vmsg[1] != "1.0-2"
+            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.0-2.')
         endif
         if vmsg[2] != $VIMINSTANCEID
             call RWarningMsg("Invalid ID: " . vmsg[2] . " [Correct = " . $VIMINSTANCEID . "]")
@@ -984,8 +984,8 @@ function WaitVimComStart()
         let vr = readfile($VIMRPLUGIN_TMPDIR . "/vimcom_running")
         if vr[2] == $VIMINSTANCEID
             let g:rplugin_vimcom_version = vr[1]
-            if g:rplugin_vimcom_version != "1.0-1"
-                call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.0-1.')
+            if g:rplugin_vimcom_version != "1.0-2"
+                call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.0-2.')
                 sleep 1
             endif
         else
@@ -2096,8 +2096,7 @@ endfunction
 " knit the current buffer content
 function! RKnit()
     update
-    call RSetWD()
-    call g:SendCmdToR('require(knitr); knit("' . expand("%:t") . '")')
+    call g:SendCmdToR('require(knitr); .vim_oldwd <- getwd(); setwd("' . expand("%:p:h") . '"); knit("' . expand("%:t") . '"); setwd(.vim_oldwd); rm(.vim_oldwd)')
 endfunction
 
 function RRemoveFromLibls(nlib)
