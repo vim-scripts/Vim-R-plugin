@@ -130,9 +130,6 @@ path_output  = os.getcwd() + '/' + sys.argv[1]
 line_number = int(sys.argv[2])
 path_input   = os.getcwd() + '/' + sys.argv[3]
 
-if not os.path.isfile(path_output):
-    print_usage()
-
 dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 logger = logging.getLogger("evince_dbus")
 logger.setLevel(logging.DEBUG)
