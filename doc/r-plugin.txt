@@ -603,13 +603,13 @@ chunk up to the current line.
 The commands <LocalLeader>kn builds the .tex file from the Rnoweb one using
 the knitr package and <LocalLeader>kp compiles the pdf; for Sweave, the
 commands are, respectively <LocalLeader>sw and <LocalLeader>sp. On Linux, if
-using either Evince or Okular, you can jump from the Rnoweb file to the PDF
+using Evince, Okular or Zathura, you can jump from the Rnoweb file to the PDF
 with the command <LocalLeader>gp. To jump from a specific location in the PDF
-to the corresponding line in the Rnoweb, in Evince you should press
-<C-LeftMouse>, and in Okular <S-LeftMouse>. No configuration is required if
-you use Evince, Gnome-Terminal and the knitr package, and work with single
-file Rnoweb documents. Otherwise, see |r-plugin-SyncTeX| for configuration
-details.
+to the corresponding line in the Rnoweb, in either Evince or Zathura you
+should press <C-LeftMouse>, and in Okular <S-LeftMouse>. No configuration is
+required if you use Evince, Gnome-Terminal and the knitr package, and work
+with single file Rnoweb documents. Otherwise, see |r-plugin-SyncTeX| for
+configuration details.
 
 
 4.3. Omni completion and the highlighting of functions~
@@ -1782,7 +1782,7 @@ set those key-bindings specified by the user, put in your vimrc:
 SyncTeX is a set of communication systems used by some PDF viewers and by some
 text editors which allow users to jump from a specific line in the text editor
 to the corresponding line in the PDF viewer and vice-versa. The Vim-R-plugin
-has support for Evince and Okular SyncTeX systems.
+has support for Evince, Zathura and Okular SyncTeX systems.
 
 The application `wmctrl` is required to raise both the PDF viewer and Vim
 windows. Limitation: the Vim-R-plugin may raise the wrong terminal window or
@@ -1802,7 +1802,8 @@ subdocument (TeX and Rnoweb alike) should include the following line:
    % !Rnw root = master.Rnw
 <
 where `master.Rnw` must be replaced with the name of the actual master
-document.
+document. Note, however, that the knitr package (version 1.7) has no SyncTeX
+support for child documents.
 
 
 6.32.1 Evince configuration~
@@ -1863,6 +1864,16 @@ requires additional steps because Neovim does not have the argument
 >
      synctex_okular_backward.sh '%f' %l
 <
+
+6.32.1 Zathura configuration~
+
+Zathura (version >= 0.3.1) is also supported. If the terminal emulator is not
+raised during backward search (from PDF to Vim), you have to set the value of
+|vimrplugin_vim_window|, as explained below.
+
+Note: If Zathura is not started yet when you try to jump to the PDF document
+for the first time, it will start, but will not jump to desired line; you have
+to press <LocalLeader>gp again.
 
 
 6.32.3 Configuring the PDF editor and Vim's window title~
@@ -2737,13 +2748,13 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-1.0.1 (2014-10-20)
+1.0.1 (2014-10-24)
 
  * Minor bug fixes.
 
  * The option vimrplugin_assign now accepts the values 0, 1 and 2.
 
- * SyncTeX support (Evince and Okular)
+ * SyncTeX support (Evince, Okular and Zathura)
 
 1.0 (2014-07-02)
 

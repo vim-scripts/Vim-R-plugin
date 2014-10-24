@@ -498,6 +498,20 @@ function! SyncTeX_forward()
         if g:rplugin_has_wmctrl
             call system("wmctrl -a '" . basenm . ".pdf'")
         endif
+    elseif g:vimrplugin_synctex == "zathura"
+        if g:rplugin_zathura_pid[basenm] == 0
+            exe "Py Start_Zathura('" . basenm . "', '" . v:servername . "')"
+        elseif g:rplugin_zathura_pid[basenm]
+            let result = system("zathura --synctex-forward=" . texln . ":1:" . basenm . ".tex --synctex-pid=" . g:rplugin_zathura_pid[basenm] . " " . basenm . ".pdf")
+            if v:shell_error
+                " Maybe Zathura was closed.
+                let g:rplugin_zathura_pid[basenm] = 0
+                exe "Py Start_Zathura('" . basenm . "', '" . v:servername . "')"
+            endif
+            if g:rplugin_has_wmctrl
+                call system("wmctrl -a '" . basenm . ".pdf'")
+            endif
+        endif
     elseif g:vimrplugin_synctex = "skim"
         " This command is based on Skim wiki (not tested)
         call system("/Applications/Skim.app/Contents/SharedSupport/displayline " . texln . " '" . basenm . ".pdf' 2> /dev/null >/dev/null &")
@@ -562,6 +576,11 @@ function! Handle_SyncTeX_backward()
         let g:rplugin_stx_job = 0
     endif
 endfunction
+
+if !exists("g:rplugin_zathura_pid")
+    let g:rplugin_zathura_pid = {}
+endif
+let g:rplugin_zathura_pid[expand("%:r")] = 0
 
 call Run_SyncTeX()
 

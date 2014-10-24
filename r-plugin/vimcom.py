@@ -3,6 +3,7 @@ import socket
 import vim
 import os
 import re
+import subprocess
 VimComPort = 0
 PortWarn = 0
 VimComFamily = None
@@ -97,4 +98,14 @@ def SendToVimCom(aString):
     else:
         received = received.replace("'", "' . \"'\" . '")
         vim.command("let g:rplugin_lastrpl = '" + received + "'")
+
+
+def Start_Zathura(basenm, sname):
+    a1 = '--synctex-editor-command'
+    a2 = 'vim --servername ' + sname + " --remote-expr SyncTeX_backward(\\'%{input}\\',%{line})"
+    a3 = basenm + ".pdf"
+    #zpid = os.spawnlp(os.P_NOWAIT, "zathura", "zathura", a1, a2, a3)
+    FNULL = open(os.devnull, 'w')
+    zpid = subprocess.Popen(["zathura", a1, a2, a3], stdout = FNULL, stderr = FNULL).pid
+    vim.command("let g:rplugin_zathura_pid['" + basenm + "'] = " + str(zpid))
 
