@@ -88,7 +88,7 @@ function! RMakeRmd(t)
     if g:vimrplugin_openhtml && a:t == "html"
         let rcmd = rcmd . '; browseURL("' . expand("%:r:t") . '.html")'
     elseif g:vimrplugin_openpdf && (a:t == "pdf" || a:t == "beamer")
-        let rcmd = rcmd . '; vim.openpdf("' . expand("%r:t") . '.pdf")'
+        call ROpenPDF(expand("%r:t") . '.pdf')
     elseif a:t == "odt"
         if g:rplugin_has_soffice == 0
             if has("win32") || has("win64")
@@ -163,6 +163,8 @@ endif
 
 let g:rplugin_has_pandoc = 0
 let g:rplugin_has_soffice = 0
+
+call RSetPDFViewer()
 
 call RSourceOtherScripts()
 

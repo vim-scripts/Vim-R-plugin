@@ -77,7 +77,7 @@ endfunction
 " knit the current buffer content
 function! RKnitRnw()
     update
-    if g:vimrplugin_synctex == "none"
+    if g:vimrplugin_synctex == 0
         call g:SendCmdToR('vim.interlace.rnoweb("' . expand("%:t") . '", rnwdir = "' . expand("%:p:h") . '", buildpdf = FALSE, synctex = FALSE)')
     else
         call g:SendCmdToR('vim.interlace.rnoweb("' . expand("%:t") . '", rnwdir = "' . expand("%:p:h") . '", buildpdf = FALSE)')
@@ -111,7 +111,7 @@ function! RMakePDF(bibtex, knit)
         let pdfcmd = pdfcmd . ", latexcmd = '" . g:vimrplugin_latexcmd . "'"
     endif
 
-    if g:vimrplugin_synctex == "none"
+    if g:vimrplugin_synctex == 0
         let pdfcmd = pdfcmd . ", synctex = FALSE"
     endif
 
@@ -133,10 +133,6 @@ function! RMakePDF(bibtex, knit)
                 let pdfcmd = pdfcmd . ", view = FALSE"
             endif
         endif
-    endif
-
-    if g:vimrplugin_openpdf_quietly
-        let pdfcmd = pdfcmd . ", pdfquiet = TRUE"
     endif
 
     if a:knit == 0 && exists("g:vimrplugin_sweaveargs")
@@ -175,57 +171,10 @@ function! RSweave()
     if exists("g:vimrplugin_sweaveargs")
         let scmd .= ', ' . g:vimrplugin_sweaveargs
     endif
-    if g:vimrplugin_synctex == "none"
+    if g:vimrplugin_synctex == 0
         let scmd .= ", synctex = FALSE"
     endif
     call g:SendCmdToR(scmd . ')')
-endfunction
-
-function! ROpenPDF()
-    if has("win32") || has("win64")
-        exe 'Py OpenPDF("' . expand("%:t:r") . '.pdf")'
-        return
-    endif
-
-    if !exists("g:rplugin_pdfviewer")
-        let g:rplugin_pdfviewer = "none"
-        if has("gui_macvim") || has("gui_mac") || has("mac") || has("macunix")
-            if $R_PDFVIEWER == ""
-                let pdfvl = ["open"]
-            else
-                let pdfvl = [$R_PDFVIEWER, "open"]
-            endif
-        else
-            if $R_PDFVIEWER == ""
-                let pdfvl = ["xdg-open"]
-            else
-                let pdfvl = [$R_PDFVIEWER, "xdg-open"]
-            endif
-        endif
-        " List from R configure script:
-        let pdfvl += ["evince", "okular", "xpdf", "gv", "gnome-gv", "ggv", "kpdf", "gpdf", "kghostview,", "acroread", "acroread4"]
-        for prog in pdfvl
-            if executable(prog)
-                let g:rplugin_pdfviewer = prog
-                break
-            endif
-        endfor
-    endif
-
-    if g:rplugin_pdfviewer == "none"
-        if g:vimrplugin_openpdf_quietly
-            call g:SendCmdToR('vim.openpdf("' . expand("%:p:r") . ".pdf" . '", TRUE)')
-        else
-            call g:SendCmdToR('vim.openpdf("' . expand("%:p:r") . ".pdf" . '")')
-        endif
-    else
-        let openlog = system(g:rplugin_pdfviewer . " '" . expand("%:p:r") . ".pdf" . "'")
-        if v:shell_error
-            let rlog = substitute(openlog, "\n", " ", "g")
-            let rlog = substitute(openlog, "\r", " ", "g")
-            call RWarningMsg(openlog)
-        endif
-    endif
 endfunction
 
 if g:vimrplugin_rnowebchunk == 1
@@ -263,7 +212,7 @@ call RCreateMaps("nvi", '<Plug>RBibTeX',      'sb', ':call RMakePDF("bibtex", 0)
 call RCreateMaps("nvi", '<Plug>RKnit',        'kn', ':call RKnitRnw()')
 call RCreateMaps("nvi", '<Plug>RMakePDFK',    'kp', ':call RMakePDF("nobib", 1)')
 call RCreateMaps("nvi", '<Plug>RBibTeXK',     'kb', ':call RMakePDF("bibtex", 1)')
-call RCreateMaps("nvi", '<Plug>ROpenPDF',     'op', ':call ROpenPDF()')
+call RCreateMaps("nvi", '<Plug>ROpenPDF',     'op', ':call ROpenPDF("Get Master")')
 call RCreateMaps("nvi", '<Plug>RIndent',      'si', ':call RnwToggleIndentSty()')
 call RCreateMaps("ni",  '<Plug>RSendChunk',   'cc', ':call b:SendChunkToR("silent", "stay")')
 call RCreateMaps("ni",  '<Plug>RESendChunk',  'ce', ':call b:SendChunkToR("echo", "stay")')
@@ -354,6 +303,7 @@ function! SyncTeX_readconc(basenm)
 endfunction
 
 function! SyncTeX_backward(fname, ln)
+    let g:last_backward = [a:fname, a:ln]
     let flnm = substitute(a:fname, 'file://', '', '') " Evince
     let flnm = substitute(flnm, '/\./', '/', '')      " Okular
     let basenm = substitute(flnm, "\....$", "", "")   " Delete extension
@@ -491,32 +441,30 @@ function! SyncTeX_forward()
         let basedir = ''
     endif
 
-    if g:vimrplugin_synctex == "okular"
+    if g:rplugin_pdfviewer == "okular"
         call system("okular --unique " . basenm . ".pdf#src:" . texln . expand("%:p:h") . "/./" . basenm . ".tex 2> /dev/null >/dev/null &")
-    elseif g:vimrplugin_synctex == "evince"
+    elseif g:rplugin_pdfviewer == "evince"
         call system("python " . g:rplugin_home . "/r-plugin/synctex_evince_forward.py " . basenm . ".pdf " . texln . " '" . basenm . ".tex' 2> /dev/null >/dev/null &")
         if g:rplugin_has_wmctrl
             call system("wmctrl -a '" . basenm . ".pdf'")
         endif
-    elseif g:vimrplugin_synctex == "zathura"
-        if g:rplugin_zathura_pid[basenm] == 0
-            exe "Py Start_Zathura('" . basenm . "', '" . v:servername . "')"
-        elseif g:rplugin_zathura_pid[basenm]
+    elseif g:rplugin_pdfviewer == "zathura"
+        if system("wmctrl -xl") =~ 'Zathura.*' . basenm . '.pdf' && g:rplugin_zathura_pid[basenm] != 0
             let result = system("zathura --synctex-forward=" . texln . ":1:" . basenm . ".tex --synctex-pid=" . g:rplugin_zathura_pid[basenm] . " " . basenm . ".pdf")
             if v:shell_error
-                " Maybe Zathura was closed.
                 let g:rplugin_zathura_pid[basenm] = 0
-                exe "Py Start_Zathura('" . basenm . "', '" . v:servername . "')"
+                call RWarningMsg(result)
             endif
-            if g:rplugin_has_wmctrl
-                call system("wmctrl -a '" . basenm . ".pdf'")
-            endif
+        else
+            let g:rplugin_zathura_pid[basenm] = 0
+            exe "Py Start_Zathura('" . basenm . "', '" . v:servername . "')"
         endif
-    elseif g:vimrplugin_synctex = "skim"
+        call system("wmctrl -a '" . basenm . ".pdf'")
+    elseif g:rplugin_pdfviewer == "skim"
         " This command is based on Skim wiki (not tested)
         call system("/Applications/Skim.app/Contents/SharedSupport/displayline " . texln . " '" . basenm . ".pdf' 2> /dev/null >/dev/null &")
     else
-        call RWarningMsg('SyncTeX support for "' . g:vimrplugin_synctex . '" not implemented yet.')
+        call RWarningMsg('SyncTeX support for "' . g:rplugin_pdfviewer . '" not implemented.')
     endif
     if basedir != ''
         cd -
@@ -528,16 +476,12 @@ function! SyncTeX_SetPID(spid)
 endfunction
 
 function! Run_SyncTeX()
-    if $DISPLAY == "" || g:vimrplugin_synctex == "none" || exists("b:did_synctex")
+    if $DISPLAY == "" || g:rplugin_pdfviewer == "none" || exists("b:did_synctex")
         return
     endif
     let b:did_synctex = 1
 
-    if executable("wmctrl")
-        let g:rplugin_has_wmctrl = 1
-    endif
-
-    if g:vimrplugin_synctex == "evince"
+    if g:rplugin_pdfviewer == "evince"
         let [basenm, basedir] = SyncTeX_GetMaster()
         if basedir != '.'
             exe "cd " . basedir
@@ -553,7 +497,7 @@ function! Run_SyncTeX()
         if basedir != '.'
             cd -
         endif
-    elseif g:vimrplugin_synctex == "okular" && has("nvim") && !exists("g:rplugin_okular_search")
+    elseif g:rplugin_pdfviewer == "okular" && has("nvim") && !exists("g:rplugin_okular_search")
         let g:rplugin_okular_search = 1
         call writefile([], $VIMRPLUGIN_TMPDIR . "/okular_search")
         let g:rplugin_stx_job = jobstart("synctex", "tail", ["-f", $VIMRPLUGIN_TMPDIR . "/okular_search"])
@@ -565,7 +509,7 @@ endfunction
 function! Handle_SyncTeX_backward()
     if v:job_data[1] == 'stdout'
         let fname = substitute(v:job_data[2], '|.*', '', '') 
-        if g:vimrplugin_synctex == "okular"
+        if g:rplugin_pdfviewer == "okular"
             let fname = substitute(fname, '/\./', '/', '')
         endif
         let ln = substitute(v:job_data[2], '.*|\([0-9]*\).*', '\1', '')
@@ -577,12 +521,13 @@ function! Handle_SyncTeX_backward()
     endif
 endfunction
 
-if !exists("g:rplugin_zathura_pid")
-    let g:rplugin_zathura_pid = {}
-endif
+let g:rplugin_zathura_pid = {}
 let g:rplugin_zathura_pid[expand("%:r")] = 0
 
-call Run_SyncTeX()
+call RSetPDFViewer()
+if g:rplugin_pdfviewer != "none"
+    call Run_SyncTeX()
+endif
 
 call RSourceOtherScripts()
 

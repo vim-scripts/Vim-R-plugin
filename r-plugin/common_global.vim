@@ -925,8 +925,8 @@ function ReceiveVimComStartMsg(msg)
         if vmsg[0] != "vimcom"
             call RWarningMsg("Invalid package name: " . vmsg[0])
         endif
-        if vmsg[1] != "1.0-2"
-            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.0-2.')
+        if vmsg[1] != "1.0-3"
+            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.0-3.')
         endif
         if vmsg[2] != $VIMINSTANCEID
             call RWarningMsg("Invalid ID: " . vmsg[2] . " [Correct = " . $VIMINSTANCEID . "]")
@@ -984,8 +984,8 @@ function WaitVimComStart()
         let vr = readfile($VIMRPLUGIN_TMPDIR . "/vimcom_running")
         if vr[2] == $VIMINSTANCEID
             let g:rplugin_vimcom_version = vr[1]
-            if g:rplugin_vimcom_version != "1.0-2"
-                call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.0-2.')
+            if g:rplugin_vimcom_version != "1.0-3"
+                call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.0-3.')
                 sleep 1
             endif
         else
@@ -2455,6 +2455,102 @@ function ShowRDoc(rkeyword, package, getclass)
     redraw
 endfunction
 
+function RSetPDFViewer()
+    if exists("g:vimrplugin_pdfviewer") && g:vimrplugin_pdfviewer != "none"
+        let g:rplugin_pdfviewer = tolower(g:vimrplugin_pdfviewer)
+    else
+        " Try to guess what PDF viewer is used:
+        if executable("evince")
+            let g:rplugin_pdfviewer = "evince"
+        elseif executable("okular")
+            let g:rplugin_pdfviewer = "okular"
+        else
+            let g:rplugin_pdfviewer = "none"
+            if has("gui_macvim") || has("gui_mac") || has("mac") || has("macunix")
+                if $R_PDFVIEWER == ""
+                    let pdfvl = ["open"]
+                else
+                    let pdfvl = [$R_PDFVIEWER, "open"]
+                endif
+            else
+                if $R_PDFVIEWER == ""
+                    let pdfvl = ["xdg-open"]
+                else
+                    let pdfvl = [$R_PDFVIEWER, "xdg-open"]
+                endif
+            endif
+            " List from R configure script:
+            let pdfvl += ["evince", "okular", "zathura", "xpdf", "gv", "gnome-gv", "ggv", "kpdf", "gpdf", "kghostview,", "acroread", "acroread4"]
+            for prog in pdfvl
+                if executable(prog)
+                    let g:rplugin_pdfviewer = prog
+                    break
+                endif
+            endfor
+        endif
+    endif
+
+    if executable("wmctrl")
+        let g:rplugin_has_wmctrl = 1
+    else
+        let g:rplugin_has_wmctrl = 0
+    endif
+
+    if g:rplugin_pdfviewer == "zathura" && g:rplugin_has_wmctrl == 0
+        let g:rplugin_pdfviewer = "none"
+        call RWarningMsgInp("The application wmctrl must be installed to use Zathura as PDF viewer.")
+    endif
+
+    " Try to guess the title of the window where Vim is running:
+    if has("gui_running")
+        call RSetDefaultValue("g:vimrplugin_vim_window", "'GVim'")
+    elseif g:rplugin_pdfviewer == "evince"
+        call RSetDefaultValue("g:vimrplugin_vim_window", "'Terminal'")
+    elseif g:rplugin_pdfviewer == "okular"
+        call RSetDefaultValue("g:vimrplugin_vim_window", "'Konsole'")
+    else
+        call RSetDefaultValue("g:vimrplugin_vim_window", "'term'")
+    endif
+
+endfunction
+
+function ROpenPDF(path)
+    if a:path == "Get Master"
+        let tmpvar = SyncTeX_GetMaster()
+        let pdfpath = tmpvar[1] . '/' . tmpvar[0] . '.pdf'
+    else
+        let pdfpath = a:path
+    endif
+    let basenm = substitute(substitute(pdfpath, '.*/', '', ''), '\.pdf$', '', '')
+
+    if has("win32") || has("win64")
+        exe 'Py OpenPDF("' . pdfpath . '")'
+        return
+    endif
+
+    if g:rplugin_pdfviewer == "none"
+        call RWarningMsg("Could not find a PDF viewer, and vimrplugin_pdfviewer is not defined.")
+    else
+        if g:rplugin_pdfviewer == "okular"
+            let pcmd = "okular --unique '" .  pdfpath . "' 2>/dev/null >/dev/null &"
+        elseif g:rplugin_pdfviewer == "zathura"
+            if system("wmctrl -xl") =~ 'Zathura.*' . basenm . '.pdf' && g:rplugin_zathura_pid[basenm] != 0
+                call system("wmctrl -a '" . basenm . ".pdf'")
+            else
+                let g:rplugin_zathura_pid[basenm] = 0
+                exe "Py Start_Zathura('" . basenm . "', '" . v:servername . "')"
+            endif
+            return
+        else
+            let pcmd = g:rplugin_pdfviewer . " '" . pdfpath . "' 2>/dev/null >/dev/null &"
+        endif
+        call system(pcmd)
+        if g:rplugin_has_wmctrl
+            call system("wmctrl -a '" . basenm . ".pdf'")
+        endif
+    endif
+endfunction
+
 
 function RLisObjs(arglead, cmdline, curpos)
     let lob = []
@@ -2900,9 +2996,9 @@ function MakeRMenu()
             call RCreateMenuItem("nvi", 'Command.Knit\ and\ ODT\ (cur\ file)', '<Plug>RMakeODT', 'ko', ':call RMakeHTMLrrst("odt")')
         endif
         menu R.Command.-Sep61- <nul>
-        call RCreateMenuItem("nvi", 'Command.Open\ PDF\ (cur\ file)', '<Plug>ROpenPDF', 'op', ':call ROpenPDF()')
-        if ($DISPLAY != "" && g:vimrplugin_synctex != "none" && &filetype == "rnoweb") || g:vimrplugin_never_unmake_menu
-            call RCreateMenuItem("nvi", 'Command.Search\ forward\ (SyncTeX)', '<Plug>RSyncFor', 'gp', ':call ROpenPDF()')
+        call RCreateMenuItem("nvi", 'Command.Open\ PDF\ (cur\ file)', '<Plug>ROpenPDF', 'op', ':call ROpenPDF("Get Master")')
+        if ($DISPLAY != "" && g:vimrplugin_synctex && &filetype == "rnoweb") || g:vimrplugin_never_unmake_menu
+            call RCreateMenuItem("nvi", 'Command.Search\ forward\ (SyncTeX)', '<Plug>RSyncFor', 'gp', ':call ROpenPDF("Get Master")')
         endif
     endif
     "-------------------------------
@@ -3356,6 +3452,11 @@ if exists("g:vimrplugin_underscore")
     call RWarningMsgInp("The option vimrplugin_underscore is deprecated. Use vimrplugin_assign instead.")
 endif
 
+if exists("g:vimrplugin_openpdf_quietly")
+    " 25/oct/2014
+    call RWarningMsgInp("The option vimrplugin_openpdf_quietly is deprecated.")
+endif
+
 " Variables whose default value is fixed
 call RSetDefaultValue("g:vimrplugin_map_r",             0)
 call RSetDefaultValue("g:vimrplugin_allnames",          0)
@@ -3365,7 +3466,7 @@ call RSetDefaultValue("g:vimrplugin_assign_map",    "'_'")
 call RSetDefaultValue("g:vimrplugin_rnowebchunk",       1)
 call RSetDefaultValue("g:vimrplugin_strict_rst",        1)
 call RSetDefaultValue("g:vimrplugin_openpdf",           0)
-call RSetDefaultValue("g:vimrplugin_openpdf_quietly",   0)
+call RSetDefaultValue("g:vimrplugin_synctex",           1)
 call RSetDefaultValue("g:vimrplugin_openhtml",          0)
 call RSetDefaultValue("g:vimrplugin_i386",              0)
 call RSetDefaultValue("g:vimrplugin_Rterm",             0)
@@ -3400,27 +3501,6 @@ call RSetDefaultValue("g:vimrplugin_objbr_place",     "'script,right'")
 call RSetDefaultValue("g:vimrplugin_permanent_libs",  "'base,stats,graphics,grDevices,utils,datasets,methods'")
 call RSetDefaultValue("g:vimrplugin_user_maps_only", 0)
 call RSetDefaultValue("g:vimrplugin_latexcmd", "'default'")
-
-" Try to guess what PDF viewer is used:
-if executable("evince")
-    call RSetDefaultValue("g:vimrplugin_synctex", "'evince'")
-elseif executable("okular")
-    call RSetDefaultValue("g:vimrplugin_synctex", "'okular'")
-else
-    call RSetDefaultValue("g:vimrplugin_synctex", "'none'")
-endif
-let g:vimrplugin_synctex = tolower(g:vimrplugin_synctex)
-
-" Try to guess the title of the window where Vim is running:
-if has("gui_running")
-    call RSetDefaultValue("g:vimrplugin_vim_window", "'GVim'")
-elseif g:vimrplugin_synctex == "evince"
-    call RSetDefaultValue("g:vimrplugin_vim_window", "'Terminal'")
-elseif g:vimrplugin_synctex == "okular"
-    call RSetDefaultValue("g:vimrplugin_vim_window", "'Konsole'")
-else
-    call RSetDefaultValue("g:vimrplugin_vim_window", "'term'")
-endif
 
 " Look for invalid options
 let objbrplace = split(g:vimrplugin_objbr_place, ",")
@@ -3614,6 +3694,8 @@ endif
 
 if executable("latexmk")
     let g:rplugin_has_latexmk = 1
+else
+    let g:rplugin_has_latexmk = 0
 endif
 
 " Start with an empty list of objects in the workspace

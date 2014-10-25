@@ -59,8 +59,8 @@ def DiscoverVimComPort():
     else:
         vim.command("let g:rplugin_vimcomport = " + str(VimComPort))
         PortWarn = 0
-        if repl.find("1.0-2") != 0:
-            vim.command("call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.0-2.')")
+        if repl.find("1.0-3") != 0:
+            vim.command("call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.0-3.')")
             vim.command("sleep 1")
     return(VimComPort)
 
@@ -104,7 +104,6 @@ def Start_Zathura(basenm, sname):
     a1 = '--synctex-editor-command'
     a2 = 'vim --servername ' + sname + " --remote-expr SyncTeX_backward(\\'%{input}\\',%{line})"
     a3 = basenm + ".pdf"
-    #zpid = os.spawnlp(os.P_NOWAIT, "zathura", "zathura", a1, a2, a3)
     FNULL = open(os.devnull, 'w')
     zpid = subprocess.Popen(["zathura", a1, a2, a3], stdout = FNULL, stderr = FNULL).pid
     vim.command("let g:rplugin_zathura_pid['" + basenm + "'] = " + str(zpid))
