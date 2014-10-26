@@ -441,6 +441,18 @@ function! SyncTeX_forward()
         let basedir = ''
     endif
 
+    if !filereadable(basenm . ".pdf")
+        call RWarningMsg('SyncTeX forward cannot be done because the file "' . basenm . '.pdf" is missing.')
+        return
+    endif
+    if !filereadable(basenm . ".synctex.gz")
+        call RWarningMsg('SyncTeX forward cannot be done because the file "' . basenm . '.synctex.gz" is missing.')
+        if g:vimrplugin_latexcmd != "default" && g:vimrplugin_latexcmd !~ "synctex"
+            call RWarningMsg('Note: The string "-synctex=1" is not in your vimrplugin_latexcmd. Please check your vimrc.')
+        endif
+        return
+    endif
+
     if g:rplugin_pdfviewer == "okular"
         call system("okular --unique " . basenm . ".pdf#src:" . texln . expand("%:p:h") . "/./" . basenm . ".tex 2> /dev/null >/dev/null &")
     elseif g:rplugin_pdfviewer == "evince"
