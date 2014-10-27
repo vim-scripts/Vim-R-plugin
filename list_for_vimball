@@ -23,6 +23,7 @@ r-plugin/common_global.vim
 r-plugin/global_r_plugin.vim
 r-plugin/objlist/README
 r-plugin/r.snippets
+r-plugin/rmd.snippets
 r-plugin/nvimcom.py
 r-plugin/nvimserver.py
 r-plugin/timer.sh
