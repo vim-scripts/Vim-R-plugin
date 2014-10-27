@@ -867,6 +867,12 @@ support in Tmux. You will be able to toggle mouse support on and off by typing
 Note: Neovim does not require the --servername VIM argument. Thus, you also do
 not need to enable the X11 Forwarding for omnicompletion, etc.
 
+You can not send commands from a local Vim to an remote R, but you can access
+the remote machine through ssh and run Tmux, Vim and R in the remote machine.
+Tmux should not be running in the local machine because some environment
+variables could pass from the local to the remote Tmux and make the plugin
+confuse.
+
 If you need to access Vim in a remote Unix machine through ssh, and if you
 want to get omnicompletion, syntax highlight of function names and the Object
 Browser working properly, then you have to:
@@ -1846,16 +1852,12 @@ requires additional steps because Neovim does not have the argument
 >
      chmod +x synctex_okular_backward.sh
 <
-   - Edit the file synctex_okular_backward.sh and replace the string
-     "yourlogin" with your actual login name. Adjust the directory used by the
-     Vim-R-plugin as temporary directory if necessary.
-
    - In Okular, put the following in the Custom Editor Command field:
 >
      synctex_okular_backward.sh '%f' %l
 <
 
-6.32.1 Zathura configuration~
+6.32.3 Zathura configuration~
 
 Zathura (version >= 0.3.1) is also supported. If the terminal emulator is not
 raised during backward search (from PDF to Vim), you have to set the value of
@@ -1866,14 +1868,14 @@ for the first time, it will start, but will not jump to desired line; you have
 to press <LocalLeader>gp again.
 
 
-6.32.3 Configuring the PDF editor and Vim's window title~
+6.32.4 Configuring the PDF editor and Vim's window title~
 							  *vimrplugin_synctex*
-							*vimrplugin_pdfviewer*
 						       *vimrplugin_vim_window*
 If SyncTeX does not work (see above), you may try to set in your |vimrc| the
-values of vimrplugin_pdfviewer and vimrplugin_vim_window.
+values of |vimrplugin_pdfviewer| and vimrplugin_vim_window.
 
-The valid values for vimrplugin_pdfviewer are "evince" and "okular".
+The valid values for |vimrplugin_pdfviewer| are "evince", "okular" and
+"zathura".
 
 To know the correct value of vimrplugin_vim_window, type in the terminal
 emulator:
@@ -2739,7 +2741,7 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-1.0.1 (2014-10-25)
+1.0.1 (2014-10-26)
 
  * Minor bug fixes.
 

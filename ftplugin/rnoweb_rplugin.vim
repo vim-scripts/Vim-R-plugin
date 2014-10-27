@@ -469,7 +469,11 @@ function! SyncTeX_forward()
             endif
         else
             let g:rplugin_zathura_pid[basenm] = 0
-            exe "Py Start_Zathura('" . basenm . "', '" . v:servername . "')"
+            if has("nvim")
+                call RStart_Zathura(basenm)
+            else
+                exe "Py Start_Zathura('" . basenm . "', '" . v:servername . "')"
+            endif
         endif
         call system("wmctrl -a '" . basenm . ".pdf'")
     elseif g:rplugin_pdfviewer == "skim"
@@ -509,12 +513,12 @@ function! Run_SyncTeX()
         if basedir != '.'
             cd -
         endif
-    elseif g:rplugin_pdfviewer == "okular" && has("nvim") && !exists("g:rplugin_okular_search")
-        let g:rplugin_okular_search = 1
-        call writefile([], $VIMRPLUGIN_TMPDIR . "/okular_search")
-        let g:rplugin_stx_job = jobstart("synctex", "tail", ["-f", $VIMRPLUGIN_TMPDIR . "/okular_search"])
+    elseif has("nvim") && (g:rplugin_pdfviewer == "okular" || g:rplugin_pdfviewer == "zathura") && !exists("g:rplugin_tail_follow")
+        let g:rplugin_tail_follow = 1
+        call writefile([], $VIMRPLUGIN_TMPDIR . "/" . g:rplugin_pdfviewer . "_search")
+        let g:rplugin_stx_job = jobstart("synctex", "tail", ["-f", $VIMRPLUGIN_TMPDIR . "/" . g:rplugin_pdfviewer . "_search"])
         autocmd JobActivity synctex call Handle_SyncTeX_backward()
-        autocmd VimLeave * call delete($VIMRPLUGIN_TMPDIR . "/okular_search")
+        autocmd VimLeave * call delete($VIMRPLUGIN_TMPDIR . "/" . g:rplugin_pdfviewer . "_search") | call delete($VIMRPLUGIN_TMPDIR . "/synctex_back.sh")
     endif
 endfunction
 
@@ -533,11 +537,25 @@ function! Handle_SyncTeX_backward()
     endif
 endfunction
 
-let g:rplugin_zathura_pid = {}
-let g:rplugin_zathura_pid[expand("%:r")] = 0
-
 call RSetPDFViewer()
 if g:rplugin_pdfviewer != "none"
+    if g:rplugin_pdfviewer == "zathura"
+        let s:this_master = SyncTeX_GetMaster()[0]
+        let s:key_list = keys(g:rplugin_zathura_pid)
+        let s:has_key = 0
+        for kk in s:key_list
+            if kk == s:this_master
+                let s:has_key = 1
+                break
+            endif
+        endfor
+        if s:has_key == 0
+            let g:rplugin_zathura_pid[s:this_master] = 0
+        endif
+        unlet s:this_master
+        unlet s:key_list
+        unlet s:has_key
+    endif
     call Run_SyncTeX()
 endif
 

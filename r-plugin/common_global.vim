@@ -2514,6 +2514,24 @@ function RSetPDFViewer()
 
 endfunction
 
+function RStart_Zathura(basenm)
+    let shcode = ['#!/bin/sh', 'echo "$1|$2" >> "' . $VIMRPLUGIN_TMPDIR . '/zathura_search"']
+    call writefile(shcode, $VIMRPLUGIN_TMPDIR . "/synctex_back.sh")
+    let pycode = ["import subprocess",
+                \ "import os",
+                \ "FNULL = open(os.devnull, 'w')",
+                \ "a1 = '--synctex-editor-command'",
+                \ "a2 = 'sh " . $VIMRPLUGIN_TMPDIR . "/synctex_back.sh %{input} %{line}'",
+                \ "a3 = '" . a:basenm . ".pdf'",
+                \ "zpid = subprocess.Popen(['zathura', a1, a2, a3], stdout = FNULL, stderr = FNULL).pid",
+                \ "print str(zpid)" ]
+    call writefile(pycode, $VIMRPLUGIN_TMPDIR . "/start_zathura.py")
+    let pid = system("python '" . $VIMRPLUGIN_TMPDIR . "/start_zathura.py" . "'")
+    let pid = substitute(pid, '\n', '', '')
+    let g:rplugin_zathura_pid[a:basenm] = pid
+    call delete($VIMRPLUGIN_TMPDIR . "/start_zathura.py")
+endfunction
+
 function ROpenPDF(path)
     if a:path == "Get Master"
         let tmpvar = SyncTeX_GetMaster()
@@ -2538,7 +2556,11 @@ function ROpenPDF(path)
                 call system("wmctrl -a '" . basenm . ".pdf'")
             else
                 let g:rplugin_zathura_pid[basenm] = 0
-                exe "Py Start_Zathura('" . basenm . "', '" . v:servername . "')"
+                if has("nvim")
+                    call RStart_Zathura(basenm)
+                else
+                    exe "Py Start_Zathura('" . basenm . "', '" . v:servername . "')"
+                endif
             endif
             return
         else
@@ -3945,6 +3967,7 @@ let g:rplugin_tmuxsname = "VimR-" . substitute(localtime(), '.*\(...\)', '\1', '
 let g:rplugin_has_wmctrl = 0
 let g:rplugin_synctexpid = 0
 let g:rplugin_stx_job = 0
+let g:rplugin_zathura_pid = {}
 
 
 " If this is the Object Browser running in a Tmux pane, $VIMINSTANCEID is
