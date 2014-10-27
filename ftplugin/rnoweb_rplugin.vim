@@ -303,7 +303,6 @@ function! SyncTeX_readconc(basenm)
 endfunction
 
 function! SyncTeX_backward(fname, ln)
-    let g:last_backward = [a:fname, a:ln]
     let flnm = substitute(a:fname, 'file://', '', '') " Evince
     let flnm = substitute(flnm, '/\./', '/', '')      " Okular
     let basenm = substitute(flnm, "\....$", "", "")   " Delete extension
@@ -379,7 +378,12 @@ function! SyncTeX_forward()
     endif
     let basenm = expand("%:t:r")
     let lnum = 0
-    let rnwf = bufname("%")
+    let rnwf = expand("%:t")
+
+    let olddir = getcwd()
+    if olddir != expand("%:p:h")
+        exe "cd " . expand("%:p:h")
+    endif
 
     if filereadable(basenm . "-concordance.tex")
         let lnum = line(".")
@@ -405,14 +409,17 @@ function! SyncTeX_forward()
                 endfor
                 if lnum == 0
                     call RWarningMsg('Could not find "child=' . bufname("%") . '" in ' . mfile . '.')
+                    exe "cd " . olddir
                     return
                 endif
             else
                 call RWarningMsg('Vim-R-plugin [SyncTeX]: "' . basenm . '-concordance.tex" not found.')
+                exe "cd " . olddir
                 return
             endif
         else
             call RWarningMsg('SyncTeX [Vim-R-plugin]: "' . basenm . '-concordance.tex" not found.')
+            exe "cd " . olddir
             return
         endif
     endif
@@ -431,6 +438,7 @@ function! SyncTeX_forward()
 
     if texln == 0
         call RWarningMsg("Error: did not find LaTeX line.")
+        exe "cd " . olddir
         return
     endif
     if basenm =~ '/'
@@ -443,6 +451,7 @@ function! SyncTeX_forward()
 
     if !filereadable(basenm . ".pdf")
         call RWarningMsg('SyncTeX forward cannot be done because the file "' . basenm . '.pdf" is missing.')
+        exe "cd " . olddir
         return
     endif
     if !filereadable(basenm . ".synctex.gz")
@@ -450,6 +459,7 @@ function! SyncTeX_forward()
         if g:vimrplugin_latexcmd != "default" && g:vimrplugin_latexcmd !~ "synctex"
             call RWarningMsg('Note: The string "-synctex=1" is not in your vimrplugin_latexcmd. Please check your vimrc.')
         endif
+        exe "cd " . olddir
         return
     endif
 
@@ -482,9 +492,7 @@ function! SyncTeX_forward()
     else
         call RWarningMsg('SyncTeX support for "' . g:rplugin_pdfviewer . '" not implemented.')
     endif
-    if basedir != ''
-        cd -
-    endif
+    exe "cd " . olddir
 endfunction
 
 function! SyncTeX_SetPID(spid)
@@ -496,6 +504,11 @@ function! Run_SyncTeX()
         return
     endif
     let b:did_synctex = 1
+
+    let olddir = getcwd()
+    if olddir != expand("%:p:h")
+        exe "cd " . expand("%:p:h")
+    endif
 
     if g:rplugin_pdfviewer == "evince"
         let [basenm, basedir] = SyncTeX_GetMaster()
@@ -520,6 +533,7 @@ function! Run_SyncTeX()
         autocmd JobActivity synctex call Handle_SyncTeX_backward()
         autocmd VimLeave * call delete($VIMRPLUGIN_TMPDIR . "/" . g:rplugin_pdfviewer . "_search") | call delete($VIMRPLUGIN_TMPDIR . "/synctex_back.sh")
     endif
+    exe "cd " . olddir
 endfunction
 
 function! Handle_SyncTeX_backward()
