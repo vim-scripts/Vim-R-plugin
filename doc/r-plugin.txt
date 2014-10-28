@@ -867,11 +867,11 @@ support in Tmux. You will be able to toggle mouse support on and off by typing
 Note: Neovim does not require the --servername VIM argument. Thus, you also do
 not need to enable the X11 Forwarding for omnicompletion, etc.
 
-You can not send commands from a local Vim to an remote R, but you can access
-the remote machine through ssh and run Tmux, Vim and R in the remote machine.
-Tmux should not be running in the local machine because some environment
-variables could pass from the local to the remote Tmux and make the plugin
-confuse.
+The Vim-R-plugin can not send commands from a local Vim to a remote R, but
+you can access the remote machine through ssh and run Tmux, Vim and R in the
+remote machine. Tmux should not be running in the local machine because some
+environment variables could pass from the local to the remote Tmux and make
+the plugin confuse.
 
 If you need to access Vim in a remote Unix machine through ssh, and if you
 want to get omnicompletion, syntax highlight of function names and the Object
@@ -984,7 +984,15 @@ The plugin is only capable of recognizing functions defined using the `<-`
 operator. See: https://github.com/jcfaria/Vim-R-plugin/issues/94
 
 
-5.6. Wrong message that "R is busy" (Windows only)~
+5.6. Objects Browser does not support knitr cache=TRUE~
+
+When processing Rnoweb documents with the knitr package, if the chunk option
+`cache` is `TRUE`, the Object Browser will not be able to detect the classes
+of objects because knitr uses R's lazy load feature. The workaround for this
+issue is to define the chunk option `cache.lazy=FALSE`.
+
+
+5.7. Wrong message that "R is busy" (Windows only)~
 
 On Windows, when code is sent from Vim to R Console, the vimcom library
 sets the value of the internal variable `r_is_busy` to 1. The value is set
@@ -998,7 +1006,7 @@ tell Vim that "R is busy" and Vim will display this message. Everything should
 work as expected again after any valid code is executed in the R Console.
 
 
-5.7. SyncTeX support is a Linux only feature~
+5.8. SyncTeX support is a Linux only feature~
 				*r-plugin-SyncTeX-win*  *r-plugin-SyncTeX-mac*
 There is no SyncTeX support for Windows and Mac OS X. Both Sumatra (Windows)
 and Skim (Mac OS X) have support for SyncTeX, but the Vim-R-plugin is not
@@ -1007,7 +1015,7 @@ support anyone of them and submit a push request on github:
 https://github.com/jcfaria/Vim-R-plugin
 
 
-5.8. Bugs that affect Mac OS X, Linux Console and ...~
+5.9. Bugs that affect Mac OS X, Linux Console and ...~
 								*r-plugin-nox*
 Note: The bug described in this section does not affect Neovim.
 
@@ -1069,7 +1077,7 @@ A user reported success with the following procedure:
 See also: |r-plugin-remote|.
 
 
-5.9. R must be started by Vim~
+5.10. R must be started by Vim~
 
 The communication between Vim and R will work only if R was started by Vim
 through the <LocalLeader>rf command because the plugin was designed to connect
@@ -2748,7 +2756,7 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
  * The option vimrplugin_assign now accepts the values 0, 1 and 2.
 
  * SyncTeX support (Evince, Okular and Zathura):
-   - New options: vimrplugin_synctex and vimrplugin_pdfviewer.
+   - New options: vimrplugin_synctex and vimrplugin_vim_window.
    - Deprecated option: vimrplugin_openpdf_quietly
 
 1.0 (2014-07-02)
