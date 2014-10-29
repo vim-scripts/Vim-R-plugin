@@ -347,18 +347,18 @@ function! SyncTeX_backward(fname, ln)
         if bufloaded(basedir . '/' . rnwf)
             let savesb = &switchbuf
             set switchbuf=useopen,usetab
-            exe "sb " . basedir . '/' . rnwf
+            exe "sb " . substitute(basedir . '/' . rnwf, ' ', '\\ ', 'g')
             exe "set switchbuf=" . savesb
         elseif bufloaded(rnwf)
             let savesb = &switchbuf
             set switchbuf=useopen,usetab
-            exe "sb " . rnwf
+            exe "sb " . substitute(rnwf, ' ', '\\ ', 'g')
             exe "set switchbuf=" . savesb
         else
             if filereadable(basedir . '/' . rnwf)
-                exe "tabnew " . basedir . '/' . rnwf
+                exe "tabnew " . substitute(basedir . '/' . rnwf, ' ', '\\ ', 'g')
             elseif filereadable(rnwf)
-                exe "tabnew " . rnwf
+                exe "tabnew " . substitute(rnwf, ' ', '\\ ', 'g')
             else
                 call RWarningMsg('Could not find either "' . rnwbn . ' or "' . rnwf . '" in "' . basedir . '".')
                 return
@@ -373,16 +373,13 @@ function! SyncTeX_backward(fname, ln)
 endfunction
 
 function! SyncTeX_forward()
-    if expand("%:p") =~ ' '
-        call RWarningMsg('SyncTeX will not work because there is empty space in this file path: "' . expand("%:p") . '"')
-    endif
     let basenm = expand("%:t:r")
     let lnum = 0
     let rnwf = expand("%:t")
 
     let olddir = getcwd()
     if olddir != expand("%:p:h")
-        exe "cd " . expand("%:p:h")
+        exe "cd " . substitute(expand("%:p:h"), ' ', '\\ ', 'g')
     endif
 
     if filereadable(basenm . "-concordance.tex")
@@ -409,17 +406,17 @@ function! SyncTeX_forward()
                 endfor
                 if lnum == 0
                     call RWarningMsg('Could not find "child=' . bufname("%") . '" in ' . mfile . '.')
-                    exe "cd " . olddir
+                    exe "cd " . substitute(olddir, ' ', '\\ ', 'g')
                     return
                 endif
             else
                 call RWarningMsg('Vim-R-plugin [SyncTeX]: "' . basenm . '-concordance.tex" not found.')
-                exe "cd " . olddir
+                exe "cd " . substitute(olddir, ' ', '\\ ', 'g')
                 return
             endif
         else
             call RWarningMsg('SyncTeX [Vim-R-plugin]: "' . basenm . '-concordance.tex" not found.')
-            exe "cd " . olddir
+            exe "cd " . substitute(olddir, ' ', '\\ ', 'g')
             return
         endif
     endif
@@ -438,20 +435,20 @@ function! SyncTeX_forward()
 
     if texln == 0
         call RWarningMsg("Error: did not find LaTeX line.")
-        exe "cd " . olddir
+        exe "cd " . substitute(olddir, ' ', '\\ ', 'g')
         return
     endif
     if basenm =~ '/'
         let basedir = substitute(basenm, '\(.*\)/.*', '\1', '')
         let basenm = substitute(basenm, '.*/', '', '')
-        exe "cd " . basedir
+        exe "cd " . substitute(basedir, ' ', '\\ ', 'g')
     else
         let basedir = ''
     endif
 
     if !filereadable(basenm . ".pdf")
         call RWarningMsg('SyncTeX forward cannot be done because the file "' . basenm . '.pdf" is missing.')
-        exe "cd " . olddir
+        exe "cd " . substitute(olddir, ' ', '\\ ', 'g')
         return
     endif
     if !filereadable(basenm . ".synctex.gz")
@@ -459,7 +456,7 @@ function! SyncTeX_forward()
         if g:vimrplugin_latexcmd != "default" && g:vimrplugin_latexcmd !~ "synctex"
             call RWarningMsg('Note: The string "-synctex=1" is not in your vimrplugin_latexcmd. Please check your vimrc.')
         endif
-        exe "cd " . olddir
+        exe "cd " . substitute(olddir, ' ', '\\ ', 'g')
         return
     endif
 
@@ -492,7 +489,7 @@ function! SyncTeX_forward()
     else
         call RWarningMsg('SyncTeX support for "' . g:rplugin_pdfviewer . '" not implemented.')
     endif
-    exe "cd " . olddir
+    exe "cd " . substitute(olddir, ' ', '\\ ', 'g')
 endfunction
 
 function! SyncTeX_SetPID(spid)
@@ -507,17 +504,17 @@ function! Run_SyncTeX()
 
     let olddir = getcwd()
     if olddir != expand("%:p:h")
-        exe "cd " . expand("%:p:h")
+        exe "cd " . substitute(expand("%:p:h"), ' ', '\\ ', 'g')
     endif
 
     if g:rplugin_pdfviewer == "evince"
         let [basenm, basedir] = SyncTeX_GetMaster()
         if basedir != '.'
-            exe "cd " . basedir
+            exe "cd " . substitute(basedir, ' ', '\\ ', 'g')
         endif
         if has("nvim")
-            let g:rplugin_stx_job = jobstart("synctex", "python", [g:rplugin_home . "/r-plugin/synctex_evince_backward.py", basenm . ".pdf", "nvim"])
-            autocmd JobActivity synctex call Handle_SyncTeX_backward()
+            let g:rplugin_stx_job = jobstart("RnwSyncTeX", "python", [g:rplugin_home . "/r-plugin/synctex_evince_backward.py", basenm . ".pdf", "nvim"])
+            autocmd JobActivity RnwSyncTeX call Handle_SyncTeX_backward()
         else
             if v:servername != ""
                 call system("python " . g:rplugin_home . "/r-plugin/synctex_evince_backward.py '" . basenm . ".pdf' " . v:servername . " &")
@@ -529,11 +526,11 @@ function! Run_SyncTeX()
     elseif has("nvim") && (g:rplugin_pdfviewer == "okular" || g:rplugin_pdfviewer == "zathura") && !exists("g:rplugin_tail_follow")
         let g:rplugin_tail_follow = 1
         call writefile([], $VIMRPLUGIN_TMPDIR . "/" . g:rplugin_pdfviewer . "_search")
-        let g:rplugin_stx_job = jobstart("synctex", "tail", ["-f", $VIMRPLUGIN_TMPDIR . "/" . g:rplugin_pdfviewer . "_search"])
-        autocmd JobActivity synctex call Handle_SyncTeX_backward()
+        let g:rplugin_stx_job = jobstart("RnwSyncTeX", "tail", ["-f", $VIMRPLUGIN_TMPDIR . "/" . g:rplugin_pdfviewer . "_search"])
+        autocmd JobActivity RnwSyncTeX call Handle_SyncTeX_backward()
         autocmd VimLeave * call delete($VIMRPLUGIN_TMPDIR . "/" . g:rplugin_pdfviewer . "_search") | call delete($VIMRPLUGIN_TMPDIR . "/synctex_back.sh")
     endif
-    exe "cd " . olddir
+    exe "cd " . substitute(olddir, ' ', '\\ ', 'g')
 endfunction
 
 function! Handle_SyncTeX_backward()

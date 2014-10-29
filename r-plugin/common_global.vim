@@ -2543,12 +2543,12 @@ function ROpenPDF(path)
 
     let olddir = getcwd()
     if olddir != expand("%:p:h")
-        exe "cd " . expand("%:p:h")
+        exe "cd " . substitute(expand("%:p:h"), ' ', '\\ ', 'g')
     endif
 
     if has("win32") || has("win64")
         exe 'Py OpenPDF("' . pdfpath . '")'
-        exe "cd " . olddir
+        exe "cd " . substitute(olddir, ' ', '\\ ', 'g')
         return
     endif
 
@@ -2568,7 +2568,7 @@ function ROpenPDF(path)
                     exe "Py Start_Zathura('" . basenm . "', '" . v:servername . "')"
                 endif
             endif
-            exe "cd " . olddir
+            exe "cd " . substitute(olddir, ' ', '\\ ', 'g')
             return
         else
             let pcmd = g:rplugin_pdfviewer . " '" . pdfpath . "' 2>/dev/null >/dev/null &"
@@ -2578,7 +2578,7 @@ function ROpenPDF(path)
             call system("wmctrl -a '" . basenm . ".pdf'")
         endif
     endif
-    exe "cd " . olddir
+    exe "cd " . substitute(olddir, ' ', '\\ ', 'g')
 endfunction
 
 
