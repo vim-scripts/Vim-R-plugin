@@ -1905,8 +1905,17 @@ subdocument (TeX and Rnoweb alike) should include the following line:
    % !Rnw root = master.Rnw
 <
 where `master.Rnw` must be replaced with the name of the actual master
-document. Note, however, that the knitr package (version 1.7) has no SyncTeX
-support for child documents.
+document.
+
+Note: The current knitr package (version 1.7) has at least two limitations:
+
+   - It has no SyncTeX support for child documents. The correspondence data
+     point to lines right below child chunks in the master document and not to
+     somewhere in the child documents themselves.
+
+   - It only starts registering the concordance after the first chunk. So, it
+     is recommended that you put the first chunk of R code just after the
+     `\begin{document}` command.
 
 
 ------------------------------------------------------------------------------
