@@ -2496,9 +2496,17 @@ function RSetPDFViewer()
         let g:rplugin_has_wmctrl = 0
     endif
 
-    if g:rplugin_pdfviewer == "zathura" && g:rplugin_has_wmctrl == 0
-        let g:rplugin_pdfviewer = "none"
-        call RWarningMsgInp("The application wmctrl must be installed to use Zathura as PDF viewer.")
+    if g:rplugin_pdfviewer == "zathura"
+        if g:rplugin_has_wmctrl == 0
+            let g:rplugin_pdfviewer = "none"
+            call RWarningMsgInp("The application wmctrl must be installed to use Zathura as PDF viewer.")
+        else
+            if executable("dbus-send")
+                let g:rplugin_has_dbussend = 1
+            else
+                let g:rplugin_has_dbussend = 0
+            endif
+        endif
     endif
 
     " Try to guess the title of the window where Vim is running:
