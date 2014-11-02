@@ -525,12 +525,12 @@ test <- this('the function works',
                  x <- 0
              })
 
-############################################################################
-## indent/r.vim starts to make mistakes here
-
 test <- this('the function works', {
                  x <- 0
              })
+
+############################################################################
+## indent/r.vim starts to make mistakes here
 
 data.frame <- function(..., row.names = NULL, check.rows = FALSE, check.names = TRUE,
                        stringsAsFactors = default.stringsAsFactors())

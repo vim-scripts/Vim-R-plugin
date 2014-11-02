@@ -1,7 +1,7 @@
 " Vim indent file
 " Language:	R
 " Author:	Jakson Alves de Aquino <jalvesaq@gmail.com>
-" Last Change:	Fri Oct 17, 2014  10:02AM
+" Last Change:	Sun Nov 02, 2014  10:55AM
 
 
 " Only load this indent file when no other was loaded.
@@ -288,9 +288,13 @@ function GetRIndent()
     return indent(lnum) + &sw
   endif
 
+  let s:curtabstop = repeat(' ', &tabstop)
+  if pb > 0 && line =~ '{$'
+    return s:Get_last_paren_idx(line, '(', ')', pb) + &sw
+  endif
+
   let bb = s:Get_paren_balance(line, '[', ']')
 
-  let s:curtabstop = repeat(' ', &tabstop)
   if g:r_indent_align_args == 1
 
     if pb == 0 && bb == 0 && (line =~ '.*[,&|\-\*+<>]$' || cline =~ '^\s*[,&|\-\*+<>]')
