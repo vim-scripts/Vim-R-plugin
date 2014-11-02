@@ -1,7 +1,7 @@
 " Vim indent file
 " Language:	R
 " Author:	Jakson Alves de Aquino <jalvesaq@gmail.com>
-" Last Change:	Sun Nov 02, 2014  10:55AM
+" Last Change:	Sun Nov 02, 2014  01:25PM
 
 
 " Only load this indent file when no other was loaded.
@@ -389,6 +389,7 @@ function GetRIndent()
     endif
   endif
 
+  let bb = s:Get_paren_balance(line, '[', ']')
   if bb < 0 && line =~ '.*]'
     while bb < 0 && lnum > 0
       let lnum -= 1

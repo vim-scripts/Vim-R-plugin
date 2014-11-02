@@ -520,6 +520,12 @@ foo <- function(){
     res
 }
 
+if(TRUE){
+    x <- xx[, c("abc", "bdc", "cde", "def", "efg", "fgh", "ghi", "hij", "ijk",
+                "jkl", "klm", "lmn", "mno", "nop")]
+    x <- NULL
+}
+
 test <- this('the function works',
              {
                  x <- 0
@@ -531,6 +537,12 @@ test <- this('the function works', {
 
 ############################################################################
 ## indent/r.vim starts to make mistakes here
+
+test <- this('the function works',
+             {
+                 x <- 0
+             }
+            )
 
 data.frame <- function(..., row.names = NULL, check.rows = FALSE, check.names = TRUE,
                        stringsAsFactors = default.stringsAsFactors())
@@ -600,6 +612,5 @@ x <- 1 / 2 / 3 /
     4 / 5
 
 cat("The End\n")
-
 
 ## vim: expandtab sw=4 cursorcolumn
