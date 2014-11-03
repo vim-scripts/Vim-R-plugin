@@ -522,21 +522,21 @@ test <- this('the function works',
         x <- 0
     })
 
-test <- this('the function works', {
-                 x <- 0
-    })
-
 test_that('the function works',
     {
         x <- 0
     })
 
-test_that('the function works', {
-              x <- 0
-    })
-
 ############################################################################
 ## indent/r.vim starts to make mistakes here
+
+test <- this('the function works', {
+        x <- 0
+    })
+
+test_that('the function works', {
+        x <- 0
+    })
 
 test <- this('the function works',
     {
@@ -545,15 +545,15 @@ test <- this('the function works',
 )
 
 that('the function works', {
-         x <- 0
+        x <- 0
     }
 )
 
 test_that('my unit test', {
-              if (some <- condition)
-                  result
-              else
-                  other <- result
+        if (some <- condition)
+            result
+        else
+             other <- result
     }
 )
 
