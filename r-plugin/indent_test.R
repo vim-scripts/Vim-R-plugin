@@ -196,8 +196,6 @@ if(F)
     x
 }
 
-                                        # The code below will be wrongly indented:
-
 latlon.format <- function(lat, lon, digits=max(6, getOption("digits") - 1))
 {
     n <- length(lon)
@@ -535,6 +533,15 @@ test <- this('the function works', {
                  x <- 0
              })
 
+test_that('the function works',
+          {
+              x <- 0
+          })
+
+test_that('the function works', {
+              x <- 0
+          })
+
 ############################################################################
 ## indent/r.vim starts to make mistakes here
 
@@ -543,6 +550,17 @@ test <- this('the function works',
                  x <- 0
              }
             )
+
+that('the function works', {
+         x <- 0
+     })
+
+test_that('my unit test', {
+              if (some <- condition)
+                  result
+              else
+                  other <- result
+          })
 
 data.frame <- function(..., row.names = NULL, check.rows = FALSE, check.names = TRUE,
                        stringsAsFactors = default.stringsAsFactors())
@@ -570,9 +588,9 @@ data.frame <- function(..., row.names = NULL, check.rows = FALSE, check.names = 
 foo <- function(){
     xxx
     if (ismat) for (i in seq_len(differences)) r <- r[i1, , drop = FALSE] -
-       r[-nrow(r):-(nrow(r) - lag + 1), , drop = FALSE]
+        r[-nrow(r):-(nrow(r) - lag + 1), , drop = FALSE]
     else for (i in seq_len(differences))
-       r <- r[i1] - r[-length(r):-(length(r) - lag + 1L)]
+        r <- r[i1] - r[-length(r):-(length(r) - lag + 1L)]
     r
     if(is.null(width)) width <- 0L
     else if(width < 0L) { flag <- "-"; width <- -width }
