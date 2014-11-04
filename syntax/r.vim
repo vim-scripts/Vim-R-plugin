@@ -39,7 +39,7 @@ syn match rOKeyword contained "@\(S3method\|TODO\|aliases\|alias\|assignee\|auth
 syn match rOKeyword contained "@\(callGraphPrimitives\|concept\|exportClass\|exportMethod\|exportPattern\|export\|formals\)"
 syn match rOKeyword contained "@\(format\|importClassesFrom\|importFrom\|importMethodsFrom\|import\|keywords\|useDynLib\)"
 syn match rOKeyword contained "@\(method\|noRd\|note\|references\|seealso\|setClass\|slot\|source\|title\|usage\)"
-syn match rOKeyword contained "@\(family\|template\|templateVar\|description\|details\|inheritsParams\)"
+syn match rOKeyword contained "@\(family\|template\|templateVar\|description\|details\|inheritParams\)"
 syn match rOComment contains=@Spell,rOKeyword "#'.*"
 
 
