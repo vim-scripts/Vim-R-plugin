@@ -1407,7 +1407,7 @@ function RFormatCode() range
         let wco = 180
     endif
     call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
-    call g:SendToVimCom("\x08" . $VIMINSTANCEID . 'formatR::tidy.source("' . $VIMRPLUGIN_TMPDIR . '/unformatted_code", file = "' . $VIMRPLUGIN_TMPDIR . '/formatted_code", width.cutoff = ' . wco . ')', "I")
+    call g:SendToVimCom("\x08" . $VIMINSTANCEID . 'formatR::tidy_source("' . $VIMRPLUGIN_TMPDIR . '/unformatted_code", file = "' . $VIMRPLUGIN_TMPDIR . '/formatted_code", width.cutoff = ' . wco . ')', "I")
     let g:rplugin_lastev = ReadEvalReply()
     if g:rplugin_lastev == "R is busy." || g:rplugin_lastev == "UNKNOWN" || g:rplugin_lastev =~ "^Error" || g:rplugin_lastev == "INVALID" || g:rplugin_lastev == "ERROR" || g:rplugin_lastev == "EMPTY" || g:rplugin_lastev == "No reply"
         call RWarningMsg(g:rplugin_lastev)
@@ -2443,6 +2443,7 @@ function ShowRDoc(rkeyword, package, getclass)
     let b:objbrtitle = g:tmp_objbrtitle
     let g:rplugin_tmuxsname = g:tmp_tmuxsname
     unlet g:tmp_objbrtitle
+    unlet g:tmp_tmuxsname
 
     let save_unnamed_reg = @@
     sil normal! ggdG
@@ -3574,7 +3575,6 @@ function RClientEvent()
     if v:job_data[1] == 'stdout'
         let cmd = substitute(v:job_data[2], "\n$", "", "")
         exe cmd
-        let g:last_clt_output = cmd
     elseif v:job_data[1] == 'stderr'
         let str = 'nvimcom.py error: ' . v:job_data[2]
         call RWarningMsg(str)
@@ -3586,7 +3586,6 @@ endfunction
 function RServerEvent()
     if v:job_data[1] == 'stdout'
         let cmd = substitute(v:job_data[2], "\n$", "", "")
-        let g:last_svr_output = cmd
         if cmd =~ "^call " || cmd  =~ "^let "
             exe cmd
         elseif len(cmd) > 0
@@ -3605,7 +3604,6 @@ function SendToVimCom_Vim(...)
 endfunction
 
 function SendToVimCom_Neovim(...)
-    let g:nvimcom_py_Input = a:1
     if a:0 == 2 && a:2 == "I"
         " Ignore reply due to https://github.com/neovim/neovim/issues/834
         call jobsend(g:rplugin_clt_job, "SendToVimCom I\002" . a:1 . "\n")
@@ -3985,6 +3983,28 @@ let g:rplugin_synctexpid = 0
 let g:rplugin_stx_job = 0
 let g:rplugin_zathura_pid = {}
 
+function GetRandomNumber()
+    if executable("python")
+        let pycode = ["import os",
+                    \ "import base64",
+                    \ "import sys",
+                    \ "sys.stdout.write(base64.b64encode(os.urandom(16)).decode())" ]
+        call writefile(pycode, $VIMRPLUGIN_TMPDIR . "/getRandomNumber.py")
+        let randnum = system("python " . $VIMRPLUGIN_TMPDIR . "/getRandomNumber.py")
+    elseif has("python") || has("python3")
+        Py import os
+        Py import base64
+        Py import vim
+        Py vim.command("let g:rplugin_random = '" + base64.b64encode(os.urandom(16)).decode() + "'")
+        let randnum = g:rplugin_random
+        unlet g:rplugin_random
+    elseif !has("win32") && !has("win64") && !has("gui_win32") && !has("gui_win64")
+        let randnum = system("echo $RANDOM")
+    else
+        let randnum = localtime()
+    endif
+    return substitute(randnum, '\W', '', 'g')
+endfunction
 
 " If this is the Object Browser running in a Tmux pane, $VIMINSTANCEID is
 " already defined and shouldn't be changed
@@ -3993,31 +4013,11 @@ if &filetype == "rbrowser"
         call RWarningMsgInp("VIMINSTANCEID is undefined")
     endif
 else
-    if has("python") || has("python3")
-        Py import os
-        Py import base64
-        Py import vim
-        Py vim.command("let g:rplugin_random = '" + base64.b64encode(os.urandom(16)).decode() + "'")
-        let $VIMRPLUGIN_SECRET = substitute(g:rplugin_random, '\W', '', 'g')
-        Py vim.command("let g:rplugin_random = '" + base64.b64encode(os.urandom(16)).decode() + "'")
-    endif
-    if !exists("g:rplugin_random")
-        if !has("win32") && !has("win64") && !has("gui_win32") && !has("gui_win64")
-            let g:rplugin_random = system("echo $RANDOM")
-        endif
-        if exists("g:rplugin_random")
-            let $VIMRPLUGIN_SECRET = substitute(g:rplugin_random, '\W', '', 'g')
-            let g:rplugin_random = system("echo $RANDOM")
-        else
-            let $VIMRPLUGIN_SECRET = substitute(strftime("%c"), '\W', '', 'g')
-            let g:rplugin_random = localtime()
-        endif
-    endif
-    let $VIMINSTANCEID = substitute(g:rplugin_firstbuffer . g:rplugin_random, '\W', '', 'g')
+    let $VIMRPLUGIN_SECRET = GetRandomNumber()
+    let $VIMINSTANCEID = substitute(g:rplugin_firstbuffer . GetRandomNumber(), '\W', '', 'g')
     if strlen($VIMINSTANCEID) > 64
         let $VIMINSTANCEID = substitute($VIMINSTANCEID, '.*\(...............................................................\)', '\1', '')
     endif
-    unlet g:rplugin_random
 endif
 
 let g:rplugin_obsname = toupper(substitute(substitute(expand("%:r"), '\W', '', 'g'), "_", "", "g"))

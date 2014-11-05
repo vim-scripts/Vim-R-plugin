@@ -22,27 +22,27 @@ def NeovimServer():
 
     if sock == None:
         MyPort = 0
-        print "RWarningMsg('Could not bind to any port.')\n"
-        sys.stdout.flush()
+        sys.stderr.write("Could not bind to any port.")
+        sys.stderr.flush()
         return
     else:
-        print "RSetMyPort(" + str(MyPort) + ")\n"
+        sys.stdout.write("RSetMyPort(" + str(MyPort) + ")\n")
         sys.stdout.flush()
 
     while FinishNow == False:
         try:
             data, addr = sock.recvfrom( 1024 ) # buffer size is 1024 bytes
             if re.match(VimSecret, data):
-                print re.sub(VimSecret, "", data) + "\n"
+                sys.stdout.write(re.sub(VimSecret, "", data) + "\n")
                 sys.stdout.flush()
             else:
                 if data != "":
-                    print "RWarningMsg('Strange string received: " + '"' + data + '"' + "')\n"
-                    sys.stdout.flush()
+                    sys.stderr.write('Strange string received: "' + data + '"')
+                    sys.stderr.flush()
 
         except Exception as errmsg:
-            print "RWarningMsg('Server failed to read data: " + str(errmsg) + "')\n"
-            sys.stdout.flush()
+            sys.stderr.write('Server failed to read data: "' + str(errmsg) + '"')
+            sys.stderr.flush()
             MyPort = 0
             try:
                 sock.shutdown(socket.SHUT_RD)
@@ -60,7 +60,7 @@ def NeovimServer():
                 sock = socket.socket( socket.AF_INET, socket.SOCK_DGRAM )
                 sock.bind( (UDP_IP,MyPort) )
             except Exception as errmsg:
-                print "let g:rplugin_myport = 0 | call RWarningMsg('" + str(errmsg) + "')\n"
+                sys.stdout.write("let g:rplugin_myport = 0 | call RWarningMsg('" + str(errmsg) + "')\n")
                 sys.stdout.flush()
                 pass
 

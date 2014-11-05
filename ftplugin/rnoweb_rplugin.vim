@@ -463,7 +463,12 @@ function! SyncTeX_forward()
     if g:rplugin_pdfviewer == "okular"
         call system("okular --unique " . basenm . ".pdf#src:" . texln . expand("%:p:h") . "/./" . basenm . ".tex 2> /dev/null >/dev/null &")
     elseif g:rplugin_pdfviewer == "evince"
-        call system("python " . g:rplugin_home . "/r-plugin/synctex_evince_forward.py " . basenm . ".pdf " . texln . " '" . basenm . ".tex' 2> /dev/null >/dev/null &")
+        if has("nvim")
+            call jobstart("RnwSyncFor", "python", [g:rplugin_home . "/r-plugin/synctex_evince_forward.py",  basenm . ".pdf", string(texln), basenm . ".tex"])
+            autocmd JobActivity RnwSyncFor call Handle_SyncTeX_forward()
+        else
+            call system("python " . g:rplugin_home . "/r-plugin/synctex_evince_forward.py " . basenm . ".pdf " . texln . " '" . basenm . ".tex' 2> /dev/null >/dev/null &")
+        endif
         if g:rplugin_has_wmctrl
             call system("wmctrl -a '" . basenm . ".pdf'")
         endif
@@ -535,6 +540,16 @@ function! Run_SyncTeX()
         autocmd VimLeave * call delete($VIMRPLUGIN_TMPDIR . "/" . g:rplugin_pdfviewer . "_search") | call delete($VIMRPLUGIN_TMPDIR . "/synctex_back.sh")
     endif
     exe "cd " . substitute(olddir, ' ', '\\ ', 'g')
+endfunction
+
+function! Handle_SyncTeX_forward()
+    if v:job_data[1] == 'stdout'
+        call RWarningMsg("SyncTeX forward [1]: " . v:job_data[2])
+    elseif v:job_data[1] == 'stderr'
+        call RWarningMsg(v:job_data[2])
+    else
+        let g:rplugin_stx_job = 0
+    endif
 endfunction
 
 function! Handle_SyncTeX_backward()

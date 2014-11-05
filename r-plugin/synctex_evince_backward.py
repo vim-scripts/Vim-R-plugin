@@ -20,7 +20,7 @@
 # Modified to Vim-R-plugin by Jakson Aquino
 
 import dbus, subprocess, time
-import dbus.mainloop.glib, sys, os, logging
+import dbus.mainloop.glib, sys, os, signal
 from gi.repository import GObject
 
 RUNNING, CLOSED = range(2)
@@ -39,8 +39,7 @@ class EvinceWindowProxy:
     daemon = None
     bus = None
 
-    def __init__(self, uri, spawn = False, logger = None):
-        self._log = logger
+    def __init__(self, uri, spawn = False):
         self.uri = uri
         self.spawn = spawn
         self.status = CLOSED
@@ -60,9 +59,9 @@ class EvinceWindowProxy:
             self._get_dbus_name(False)
 
         except dbus.DBusException:
-            if self._log:
-                self._log.debug("Could not connect to the Evince Daemon")
-                loop.quit()
+            sys.stderr.write("Could not connect to the Evince Daemon")
+            sys.stderr.flush()
+            loop.quit()
 
     def _on_doc_loaded(self, uri, **keyargs):
         if uri == self.uri and self._handler is None:
@@ -75,8 +74,8 @@ class EvinceWindowProxy:
                      dbus_interface = EV_DAEMON_IFACE)
 
     def handle_find_document_error(self, error):
-        if self._log:
-            self._log.debug("FindDocument DBus call has failed")
+        sys.stderr.write("FindDocument DBus call has failed")
+        sys.stderr.flush()
 
     def handle_find_document_reply(self, evince_name):
         if self._handler is not None:
@@ -92,8 +91,8 @@ class EvinceWindowProxy:
                           error_handler = self.handle_get_window_list_error)
 
     def handle_get_window_list_error (self, e):
-        if self._log:
-            self._log.debug("GetWindowList DBus call has failed")
+        sys.stderr.write("GetWindowList DBus call has failed")
+        sys.stderr.flush()
 
     def handle_get_window_list_reply (self, window_list):
         if len(window_list) > 0:
@@ -103,8 +102,8 @@ class EvinceWindowProxy:
             self.window.connect_to_signal("SyncSource", self.on_sync_source)
         else:
             #That should never happen. 
-            if self._log:
-                self._log.debug("GetWindowList returned empty list")
+            sys.stderr.write("GetWindowList returned empty list")
+            sys.stderr.flush()
 
     def on_window_close(self):
         self.window = None
@@ -112,15 +111,12 @@ class EvinceWindowProxy:
 
     def on_sync_source(self, input_file, source_link, timestamp):
         if vimnm == "nvim":
-            print input_file + "|" + str(source_link[0]) + "\n"
+            sys.stdout.write(input_file + "|" + str(source_link[0]) + "\n")
             sys.stdout.flush()
         else:
             os.system(vimexec + ' --servername ' + vimnm + ' --remote-expr "' + "SyncTeX_backward('" + input_file + "', " + str(source_link[0]) + ')"')
 
-
 path_output = os.getcwd() + '/' + sys.argv[1]
-if not os.path.isfile(path_output):
-    print "Error file not found: " + path_output
 
 vimnm = sys.argv[2]
 if vimnm != "nvim":
@@ -133,17 +129,8 @@ if vimnm != "nvim":
 
 
 dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
-logger = logging.getLogger("evince_dbus")
-logger.setLevel(logging.DEBUG)
-ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
 
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
-ch.setFormatter(formatter)
-
-logger.addHandler(ch)    
-a = EvinceWindowProxy('file://' + path_output, True,logger=logger)
+a = EvinceWindowProxy('file://' + path_output, True)
 
 loop = GObject.MainLoop()
 loop.run() 

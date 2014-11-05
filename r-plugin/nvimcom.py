@@ -17,13 +17,13 @@ def DiscoverVimComPort():
     repl = "NOTHING"
     vii = os.getenv("VIMINSTANCEID")
     if vii is None:
-        print "call RWarningMsg('VIMINSTANCEID not found by nvimcom.py.')\n"
-        sys.stdout.flush()
+        sys.stderr.write("VIMINSTANCEID not found.")
+        sys.stderr.flush()
         return
     scrt = os.getenv("VIMRPLUGIN_SECRET")
     if scrt is None:
-        print "call RWarningMsg('VIMRPLUGIN_SECRET not found by nvimcom.py.')\n"
-        sys.stdout.flush()
+        sys.stderr.write("VIMRPLUGIN_SECRET not found")
+        sys.stderr.flush()
         return
 
     while repl.find(scrt) < 0 and VimComPort < 10049:
@@ -52,18 +52,18 @@ def DiscoverVimComPort():
         VimComPort = 0
         if not PortWarn:
             PortWarn = True
-            print "let g:rplugin_vimcomport = 0\n"
+            sys.stdout.write("let g:rplugin_vimcomport = 0\n")
             sys.stdout.flush()
-            print "call RWarningMsg('VimCom port not found.')\n"
-            sys.stdout.flush()
+            sys.stderr.write("VimCom port not found.")
+            sys.stderr.flush()
         return
     else:
-        print "let g:rplugin_vimcomport = " + str(VimComPort) + "\n"
+        sys.stdout.write("let g:rplugin_vimcomport = " + str(VimComPort) + "\n")
         sys.stdout.flush()
         PortWarn = False
         if repl.find("1.0-5") != 0:
-            print "call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.0-5.')\n"
-            sys.stdout.flush()
+            sys.stderr.write("This version of Vim-R-plugin requires vimcom 1.0-5.")
+            sys.stderr.flush()
         return
 
 
@@ -111,11 +111,13 @@ while True:
             printreply = True
         rpl = SendToVimCom(line)
         if printreply:
-            print "let g:rplugin_lastrpl = '" + rpl + "'\n"
+            sys.stdout.write("let g:rplugin_lastrpl = '" + rpl + "'\n")
+            sys.stdout.flush()
     else:
         if line.find("DiscoverVimComPort") != -1:
             DiscoverVimComPort()
         else:
-            print "call RWarningMsg('nvimcom.py: Unknown command: '" + line + "'.\n"
-    sys.stdout.flush()
+            sys.stderr.write("Unknown command: '" + line + "'.")
+            sys.stderr.flush()
+
 
