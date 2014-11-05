@@ -3984,14 +3984,20 @@ let g:rplugin_synctexpid = 0
 let g:rplugin_stx_job = 0
 let g:rplugin_zathura_pid = {}
 
-function GetRandomNumber()
-    if executable("python")
-        let pycode = ["import os",
-                    \ "import base64",
-                    \ "import sys",
-                    \ "sys.stdout.write(base64.b64encode(os.urandom(16)).decode())" ]
+let g:rplugin_py_exec = "none"
+if executable("python")
+    let g:rplugin_py_exec = "python"
+elseif executable("python3")
+    let g:rplugin_py_exec = "python3"
+endif
+
+function GetRandomNumber(width)
+    if g:rplugin_py_exec != "none"
+        let pycode = ["import os, sys, base64",
+                    \ "sys.stdout.write(base64.b64encode(os.urandom(" . a:width . ")).decode())" ]
         call writefile(pycode, $VIMRPLUGIN_TMPDIR . "/getRandomNumber.py")
-        let randnum = system("python " . $VIMRPLUGIN_TMPDIR . "/getRandomNumber.py")
+        let randnum = system(g:rplugin_py_exec . " " . $VIMRPLUGIN_TMPDIR . "/getRandomNumber.py")
+        call delete($VIMRPLUGIN_TMPDIR . "/getRandomNumber.py")
     elseif has("python") || has("python3")
         Py import os
         Py import base64
@@ -4014,8 +4020,8 @@ if &filetype == "rbrowser"
         call RWarningMsgInp("VIMINSTANCEID is undefined")
     endif
 else
-    let $VIMRPLUGIN_SECRET = GetRandomNumber()
-    let $VIMINSTANCEID = substitute(g:rplugin_firstbuffer . GetRandomNumber(), '\W', '', 'g')
+    let $VIMRPLUGIN_SECRET = GetRandomNumber(16)
+    let $VIMINSTANCEID = substitute(g:rplugin_firstbuffer . GetRandomNumber(16), '\W', '', 'g')
     if strlen($VIMINSTANCEID) > 64
         let $VIMINSTANCEID = substitute($VIMINSTANCEID, '.*\(...............................................................\)', '\1', '')
     endif
@@ -4032,12 +4038,12 @@ if &filetype != "rbrowser"
 endif
 
 if has("nvim")
-    if executable("python")
+    if g:rplugin_py_exec != "none"
         if &filetype == "rbrowser"
             let $THIS_IS_ObjBrowser = "yes"
         endif
-        let g:rplugin_clt_job = jobstart('vimcom', 'python', [g:rplugin_home . '/r-plugin/nvimcom.py'])
-        let g:rplugin_svr_job = jobstart('udpsvr', 'python', [g:rplugin_home . '/r-plugin/nvimserver.py'])
+        let g:rplugin_clt_job = jobstart('vimcom', g:rplugin_py_exec, [g:rplugin_home . '/r-plugin/nvimcom.py'])
+        let g:rplugin_svr_job = jobstart('udpsvr', g:rplugin_py_exec, [g:rplugin_home . '/r-plugin/nvimserver.py'])
         autocmd JobActivity vimcom call RClientEvent()
         autocmd JobActivity udpsvr call RServerEvent()
     else
