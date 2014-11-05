@@ -1850,7 +1850,7 @@ function SendFHChunkToR()
     let codelines = []
     let here = line(".")
     let curbuf = getline(1, "$")
-    let idx = 1
+    let idx = 0
     while idx < here
         if curbuf[idx] =~ begchk
             " Child R chunk
