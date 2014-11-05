@@ -212,13 +212,14 @@ call RCreateMaps("nvi", '<Plug>RBibTeX',      'sb', ':call RMakePDF("bibtex", 0)
 call RCreateMaps("nvi", '<Plug>RKnit',        'kn', ':call RKnitRnw()')
 call RCreateMaps("nvi", '<Plug>RMakePDFK',    'kp', ':call RMakePDF("nobib", 1)')
 call RCreateMaps("nvi", '<Plug>RBibTeXK',     'kb', ':call RMakePDF("bibtex", 1)')
-call RCreateMaps("nvi", '<Plug>ROpenPDF',     'op', ':call ROpenPDF("Get Master")')
 call RCreateMaps("nvi", '<Plug>RIndent',      'si', ':call RnwToggleIndentSty()')
 call RCreateMaps("ni",  '<Plug>RSendChunk',   'cc', ':call b:SendChunkToR("silent", "stay")')
 call RCreateMaps("ni",  '<Plug>RESendChunk',  'ce', ':call b:SendChunkToR("echo", "stay")')
 call RCreateMaps("ni",  '<Plug>RDSendChunk',  'cd', ':call b:SendChunkToR("silent", "down")')
 call RCreateMaps("ni",  '<Plug>REDSendChunk', 'ca', ':call b:SendChunkToR("echo", "down")')
+call RCreateMaps("nvi", '<Plug>ROpenPDF',     'op', ':call ROpenPDF("Get Master")')
 call RCreateMaps("ni",  '<Plug>RSyncFor',     'gp', ':call SyncTeX_forward()')
+call RCreateMaps("ni",  '<Plug>RSyncFor',     'gt', ':call SyncTeX_forward(1)')
 nmap <buffer><silent> gn :call RnwNextChunk()<CR>
 nmap <buffer><silent> gN :call RnwPreviousChunk()<CR>
 
@@ -302,6 +303,34 @@ function! SyncTeX_readconc(basenm)
     return {"texlnum": lstexln, "rnwfile": lsrnwf, "rnwline": lsrnwl}
 endfunction
 
+function! GoToBuf(rnwbn, rnwf, basedir, rnwln)
+    if bufname("%") != a:rnwbn
+        if bufloaded(a:basedir . '/' . a:rnwf)
+            let savesb = &switchbuf
+            set switchbuf=useopen,usetab
+            exe "sb " . substitute(a:basedir . '/' . a:rnwf, ' ', '\\ ', 'g')
+            exe "set switchbuf=" . savesb
+        elseif bufloaded(a:rnwf)
+            let savesb = &switchbuf
+            set switchbuf=useopen,usetab
+            exe "sb " . substitute(a:rnwf, ' ', '\\ ', 'g')
+            exe "set switchbuf=" . savesb
+        else
+            if filereadable(a:basedir . '/' . a:rnwf)
+                exe "tabnew " . substitute(a:basedir . '/' . a:rnwf, ' ', '\\ ', 'g')
+            elseif filereadable(a:rnwf)
+                exe "tabnew " . substitute(a:rnwf, ' ', '\\ ', 'g')
+            else
+                call RWarningMsg('Could not find either "' . a:rnwbn . ' or "' . a:rnwf . '" in "' . a:basedir . '".')
+                return 0
+            endif
+        endif
+    endif
+    exe a:rnwln
+    redraw
+    return 1
+endfunction
+
 function! SyncTeX_backward(fname, ln)
     let flnm = substitute(a:fname, 'file://', '', '') " Evince
     let flnm = substitute(flnm, '/\./', '/', '')      " Okular
@@ -312,6 +341,10 @@ function! SyncTeX_backward(fname, ln)
         let basedir = '.'
     endif
     if filereadable(basenm . "-concordance.tex")
+        if !filereadable(basenm . ".tex")
+            call RWarningMsg('SyncTeX [Vim-R-plugin]: "' . basenm . '.tex" not found.')
+            return
+        endif
         let concdata = SyncTeX_readconc(basenm)
         let texlnum = concdata["texlnum"]
         let rnwfile = concdata["rnwfile"]
@@ -343,36 +376,12 @@ function! SyncTeX_backward(fname, ln)
     let rnwbn = substitute(rnwf, '.*/', '', '')
     let rnwf = substitute(rnwf, '^\./', '', '')
 
-    if bufname("%") != rnwbn
-        if bufloaded(basedir . '/' . rnwf)
-            let savesb = &switchbuf
-            set switchbuf=useopen,usetab
-            exe "sb " . substitute(basedir . '/' . rnwf, ' ', '\\ ', 'g')
-            exe "set switchbuf=" . savesb
-        elseif bufloaded(rnwf)
-            let savesb = &switchbuf
-            set switchbuf=useopen,usetab
-            exe "sb " . substitute(rnwf, ' ', '\\ ', 'g')
-            exe "set switchbuf=" . savesb
-        else
-            if filereadable(basedir . '/' . rnwf)
-                exe "tabnew " . substitute(basedir . '/' . rnwf, ' ', '\\ ', 'g')
-            elseif filereadable(rnwf)
-                exe "tabnew " . substitute(rnwf, ' ', '\\ ', 'g')
-            else
-                call RWarningMsg('Could not find either "' . rnwbn . ' or "' . rnwf . '" in "' . basedir . '".')
-                return
-            endif
-        endif
-    endif
-    exe rnwln
-    redraw
-    if g:rplugin_has_wmctrl
+    if GoToBuf(rnwbn, rnwf, basedir, rnwln) && g:rplugin_has_wmctrl
         call system("wmctrl -xa " . g:vimrplugin_vim_window)
     endif
 endfunction
 
-function! SyncTeX_forward()
+function! SyncTeX_forward(...)
     let basenm = expand("%:t:r")
     let lnum = 0
     let rnwf = expand("%:t")
@@ -421,6 +430,11 @@ function! SyncTeX_forward()
         endif
     endif
 
+    if !filereadable(basenm . ".tex")
+        call RWarningMsg('"' . basenm . '.tex" not found.')
+        exe "cd " . substitute(olddir, ' ', '\\ ', 'g')
+        return
+    endif
     let concdata = SyncTeX_readconc(basenm)
     let texlnum = concdata["texlnum"]
     let rnwfile = concdata["rnwfile"]
@@ -444,6 +458,12 @@ function! SyncTeX_forward()
         exe "cd " . substitute(basedir, ' ', '\\ ', 'g')
     else
         let basedir = ''
+    endif
+
+    if a:0 && a:1
+        call GoToBuf(basenm . ".tex", basenm . ".tex", basedir, texln)
+        exe "cd " . substitute(olddir, ' ', '\\ ', 'g')
+        return
     endif
 
     if !filereadable(basenm . ".pdf")
