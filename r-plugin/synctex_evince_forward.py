@@ -20,7 +20,7 @@
 # Modified to Vim-R-plugin by Jakson Aquino
 
 import dbus, subprocess, time
-import dbus.mainloop.glib, sys, os, logging
+import dbus.mainloop.glib, sys, os
 from gi.repository import GObject
 
 RUNNING, CLOSED = range(2)
@@ -41,8 +41,7 @@ class EvinceWindowProxy:
     daemon = None
     bus = None
 
-    def __init__(self, uri, spawn = False, logger = None):
-        self._log = logger
+    def __init__(self, uri, spawn = False):
         self.uri = uri
         self.spawn = spawn
         self.status = CLOSED
@@ -63,8 +62,8 @@ class EvinceWindowProxy:
             self._get_dbus_name(False)
 
         except dbus.DBusException:
-            if self._log:
-                self._log.debug("Could not connect to the Evince Daemon")
+            sys.stderr.write("Could not connect to the Evince Daemon")
+            sys.stderr.flush()
 
     def _on_doc_loaded(self, uri, **keyargs):
         if uri == self.uri and self._handler is None:
@@ -77,8 +76,8 @@ class EvinceWindowProxy:
                      dbus_interface = EV_DAEMON_IFACE)
 
     def handle_find_document_error(self, error):
-        if self._log:
-            self._log.debug("FindDocument DBus call has failed")
+        sys.stderr.write("FindDocument DBus call has failed")
+        sys.stderr.flush()
 
     def handle_find_document_reply(self, evince_name):
         if self._handler is not None:
@@ -94,8 +93,8 @@ class EvinceWindowProxy:
                           error_handler = self.handle_get_window_list_error)
 
     def handle_get_window_list_error (self, e):
-        if self._log:
-            self._log.debug("GetWindowList DBus call has failed")
+        sys.stderr.write("GetWindowList DBus call has failed")
+        sys.stderr.flush()
 
     def handle_get_window_list_reply (self, window_list):
         if len(window_list) > 0:
@@ -103,8 +102,8 @@ class EvinceWindowProxy:
             self.window = dbus.Interface(window_obj,EV_WINDOW_IFACE)
         else:
             #That should never happen. 
-            if self._log:
-                self._log.debug("GetWindowList returned empty list")
+            sys.stderr.write("GetWindowList returned empty list")
+            sys.stderr.flush()
 
 
     def SyncView(self, input_file, data, time):
@@ -131,17 +130,8 @@ line_number = int(sys.argv[2])
 path_input   = os.getcwd() + '/' + sys.argv[3]
 
 dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
-logger = logging.getLogger("evince_dbus")
-logger.setLevel(logging.DEBUG)
-ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
 
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
-ch.setFormatter(formatter)
-
-logger.addHandler(ch)    
-a = EvinceWindowProxy('file://' + path_output, True,logger=logger)
+a = EvinceWindowProxy('file://' + path_output, True)
 
 def sync_view(ev_window, path_input, line_number):
     ev_window.SyncView(path_input, (line_number, 1), 0)
