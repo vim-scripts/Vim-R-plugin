@@ -68,44 +68,28 @@ endfunction
 function! RMakeRmd(t)
     update
 
-    call g:SendCmdToR('.vim_oldwd <- getwd(); setwd("' . expand("%:p:h") . '")')
-
-    let rcmd = 'require(rmarkdown); render("' . expand("%:t") . '"'
     if a:t == "odt"
-        let rcmd = rcmd . ', "html_document"'
-    elseif a:t == "html"
-        let rcmd = rcmd . ', "html_document"'
-    elseif a:t == "pdf"
-        let rcmd = rcmd . ', "pdf_document"'
-    elseif a:t == "beamer"
-        let rcmd = rcmd . ', "beamer_presentation"'
-    elseif a:t == "all"
-        let rcmd = rcmd . ', "all"'
-    endif
-
-    let rcmd = rcmd . ')'
-
-    if g:vimrplugin_openhtml && a:t == "html"
-        let rcmd = rcmd . '; browseURL("' . expand("%:r:t") . '.html")'
-    elseif g:vimrplugin_openpdf && (a:t == "pdf" || a:t == "beamer")
-        call ROpenPDF(expand("%r:t") . '.pdf')
-    elseif a:t == "odt"
-        if g:rplugin_has_soffice == 0
-            if has("win32") || has("win64")
-                let g:rplugin_soffbin = "soffice.exe"
-            else
-                let g:rplugin_soffbin = "soffice"
-            endif
-            if executable(g:rplugin_soffbin)
-                let g:rplugin_has_soffice = 1
-            else
-                call RWarningMsg("Is Libre Office installed? Cannot convert into ODT: '" . g:rplugin_soffbin . "' not found.")
-            endif
+        if has("win32") || has("win64")
+            let g:rplugin_soffbin = "soffice.exe"
+        else
+            let g:rplugin_soffbin = "soffice"
         endif
-        let rcmd = rcmd . '; system("' . g:rplugin_soffbin . ' --invisible --convert-to odt ' . expand("%:r:t") . '.html")'
+        if !executable(g:rplugin_soffbin)
+            call RWarningMsg("Is Libre Office installed? Cannot convert into ODT: '" . g:rplugin_soffbin . "' not found.")
+            return
+        endif
     endif
+
+    if a:t == "default"
+        let rcmd = 'vim.interlace.rmd("' . expand("%:t") . '", rmddir = "' . expand("%:p:h") . '"'
+    else
+        let rcmd = 'vim.interlace.rmd("' . expand("%:t") . '", outform = "' . a:t .'", rmddir = "' . expand("%:p:h") . '"'
+    endif
+    if (g:vimrplugin_openhtml  == 0 && a:t == "html_document") || (g:vimrplugin_openpdf == 0 && (a:t == "pdf_document" || a:t == "beamer_presentation"))
+        let rcmd .= ", view = FALSE"
+    endif
+    let rcmd = rcmd . ')'
     call g:SendCmdToR(rcmd)
-    call g:SendCmdToR('setwd(.vim_oldwd); rm(.vim_oldwd)')
 endfunction
 
 " Send Rmd chunk to R
@@ -145,9 +129,9 @@ call RCreateMaps("nvi", '<Plug>RSetwd',        'rd', ':call RSetWD()')
 call RCreateMaps("nvi", '<Plug>RKnit',        'kn', ':call RKnit()')
 call RCreateMaps("nvi", '<Plug>RMakeRmd',     'kr', ':call RMakeRmd("default")')
 call RCreateMaps("nvi", '<Plug>RMakeAll',     'ka', ':call RMakeRmd("all")')
-call RCreateMaps("nvi", '<Plug>RMakePDFK',    'kp', ':call RMakeRmd("pdf")')
-call RCreateMaps("nvi", '<Plug>RMakePDFKb',   'kl', ':call RMakeRmd("beamer")')
-call RCreateMaps("nvi", '<Plug>RMakeHTML',    'kh', ':call RMakeRmd("html")')
+call RCreateMaps("nvi", '<Plug>RMakePDFK',    'kp', ':call RMakeRmd("pdf_document")')
+call RCreateMaps("nvi", '<Plug>RMakePDFKb',   'kl', ':call RMakeRmd("beamer_presentation")')
+call RCreateMaps("nvi", '<Plug>RMakeHTML',    'kh', ':call RMakeRmd("html_document")')
 call RCreateMaps("nvi", '<Plug>RMakeODT',     'ko', ':call RMakeRmd("odt")')
 call RCreateMaps("ni",  '<Plug>RSendChunk',   'cc', ':call b:SendChunkToR("silent", "stay")')
 call RCreateMaps("ni",  '<Plug>RESendChunk',  'ce', ':call b:SendChunkToR("echo", "stay")')
