@@ -80,7 +80,6 @@ deb:
 	  - r-plugin/vimcom.py\n\
 	  - r-plugin/nvimcom.py\n\
 	  - r-plugin/nvimserver.py\n\
-	  - r-plugin/timer.sh\n\
 	  - r-plugin/synctex_evince_backward.py\n\
 	  - r-plugin/synctex_evince_forward.py\n\
 	  - r-plugin/synctex_okular_backward.sh\n\
