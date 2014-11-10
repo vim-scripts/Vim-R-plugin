@@ -925,8 +925,8 @@ function ReceiveVimComStartMsg(msg)
         if vmsg[0] != "vimcom"
             call RWarningMsg("Invalid package name: " . vmsg[0])
         endif
-        if vmsg[1] != "1.0-6"
-            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.0-6.')
+        if vmsg[1] != "1.0-7"
+            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.0-7.')
         endif
         if vmsg[2] != $VIMINSTANCEID
             call RWarningMsg("Invalid ID: " . vmsg[2] . " [Correct = " . $VIMINSTANCEID . "]")
@@ -954,7 +954,7 @@ function WaitVimComStart()
     if has("nvim")
         if filereadable(g:rplugin_home . "/r-plugin/timer.sh")
             let wjob = jobstart('waitvc', "sh", [g:rplugin_home . '/r-plugin/timer.sh', string(g:vimrplugin_vimcom_wait / 1000), 'call NoLongerWaitVimCom()'])
-            autocmd JobActivity waitvc call RServerEvent()
+            autocmd JobActivity waitvc call ROnJobActivity()
         else
             call RWarningMsg("File '" . g:rplugin_home . "/r-plugin/timer.sh" . "' not found.")
         endif
@@ -984,8 +984,8 @@ function WaitVimComStart()
         let vr = readfile($VIMRPLUGIN_TMPDIR . "/vimcom_running")
         if vr[2] == $VIMINSTANCEID
             let g:rplugin_vimcom_version = vr[1]
-            if g:rplugin_vimcom_version != "1.0-6"
-                call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.0-6.')
+            if g:rplugin_vimcom_version != "1.0-7"
+                call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.0-7.')
                 sleep 1
             endif
         else
@@ -2524,7 +2524,7 @@ function RSetPDFViewer()
 endfunction
 
 function RStart_Zathura(basenm)
-    let shcode = ['#!/bin/sh', 'echo "$1|$2" >> "' . $VIMRPLUGIN_TMPDIR . '/zathura_search"']
+    let shcode = ['#!/bin/sh', 'echo "call SyncTeX_backward(' . "'$1'" . ', $2)" >> "' . $VIMRPLUGIN_TMPDIR . '/zathura_search"']
     call writefile(shcode, $VIMRPLUGIN_TMPDIR . "/synctex_back.sh")
     let pycode = ["import subprocess",
                 \ "import os",
@@ -3572,31 +3572,29 @@ function SendObjPortToVimCom(p)
     call g:SendToVimCom("\002" . a:p)
 endfunction
 
-function RClientEvent()
-    if v:job_data[1] == 'stdout'
-        let cmd = substitute(v:job_data[2], "\n$", "", "")
-        exe cmd
-    elseif v:job_data[1] == 'stderr'
-        let str = 'nvimcom.py error: ' . v:job_data[2]
-        call RWarningMsg(str)
-    else
-        let g:rplugin_clt_job = 0
-    endif
-endfunction
-
-function RServerEvent()
-    if v:job_data[1] == 'stdout'
-        let cmd = substitute(v:job_data[2], "\n$", "", "")
-        if cmd =~ "^call " || cmd  =~ "^let "
-            exe cmd
-        elseif len(cmd) > 0
-            exe "call " . cmd
+function ROnJobActivity()
+    let g:last_job_data = v:job_data
+    if v:job_data[1] == 'exit'
+        if v:job_data[0] == g:rplugin_stx_job
+            let g:rplugin_stx_job = 0
+        elseif v:job_data[0] == g:rplugin_svr_job
+            let g:rplugin_svr_job = 0
+        elseif v:job_data[0] == g:rplugin_stx_job
+            let g:rplugin_stx_job = 0
         endif
-    elseif v:job_data[1] == 'stderr'
-        let str = 'nvimserver.py error: ' . v:job_data[2]
-        call RWarningMsg(str)
     else
-        let g:rplugin_svr_job = 0
+        if v:job_data[1] == 'stdout'
+            for idx in range(0, len(v:job_data[2]) - 1)
+                let cmd = v:job_data[2][idx]
+                if cmd =~ "^call " || cmd  =~ "^let "
+                    exe cmd
+                else
+                    call RWarningMsg("[JobActivity] Unknown command: " . cmd)
+                endif
+            endfor
+        elseif v:job_data[1] == 'stderr'
+            call RWarningMsg('JobActivity error: ' . join(v:job_data[2]))
+        endif
     endif
 endfunction
 
@@ -4044,8 +4042,8 @@ if has("nvim")
         endif
         let g:rplugin_clt_job = jobstart('vimcom', g:rplugin_py_exec, [g:rplugin_home . '/r-plugin/nvimcom.py'])
         let g:rplugin_svr_job = jobstart('udpsvr', g:rplugin_py_exec, [g:rplugin_home . '/r-plugin/nvimserver.py'])
-        autocmd JobActivity vimcom call RClientEvent()
-        autocmd JobActivity udpsvr call RServerEvent()
+        autocmd JobActivity vimcom call ROnJobActivity()
+        autocmd JobActivity udpsvr call ROnJobActivity()
     else
         call RWarningMsgInp("Python executable not found.")
     endif

@@ -26,7 +26,7 @@ def NeovimServer():
         sys.stderr.flush()
         return
     else:
-        sys.stdout.write("RSetMyPort(" + str(MyPort) + ")\n")
+        sys.stdout.write("call RSetMyPort(" + str(MyPort) + ")\n")
         sys.stdout.flush()
 
     while FinishNow == False:

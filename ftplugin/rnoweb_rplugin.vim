@@ -219,7 +219,7 @@ call RCreateMaps("ni",  '<Plug>RDSendChunk',  'cd', ':call b:SendChunkToR("silen
 call RCreateMaps("ni",  '<Plug>REDSendChunk', 'ca', ':call b:SendChunkToR("echo", "down")')
 call RCreateMaps("nvi", '<Plug>ROpenPDF',     'op', ':call ROpenPDF("Get Master")')
 call RCreateMaps("ni",  '<Plug>RSyncFor',     'gp', ':call SyncTeX_forward()')
-call RCreateMaps("ni",  '<Plug>RSyncFor',     'gt', ':call SyncTeX_forward(1)')
+call RCreateMaps("ni",  '<Plug>RGoToTeX',     'gt', ':call SyncTeX_forward(1)')
 nmap <buffer><silent> gn :call RnwNextChunk()<CR>
 nmap <buffer><silent> gN :call RnwPreviousChunk()<CR>
 
@@ -386,6 +386,10 @@ function! SyncTeX_forward(...)
     let lnum = 0
     let rnwf = expand("%:t")
 
+    if g:rplugin_pdfviewer == "evince" && expand("%:p") =~ " "
+        call RWarningMsg('SyncTeX may not work because there is space in the file path "' . expand("%:p") . '".')
+    endif
+
     let olddir = getcwd()
     if olddir != expand("%:p:h")
         exe "cd " . substitute(expand("%:p:h"), ' ', '\\ ', 'g')
@@ -481,13 +485,13 @@ function! SyncTeX_forward(...)
     endif
 
     if g:rplugin_pdfviewer == "okular"
-        call system("okular --unique " . basenm . ".pdf#src:" . texln . expand("%:p:h") . "/./" . basenm . ".tex 2> /dev/null >/dev/null &")
+        call system("okular --unique " . basenm . ".pdf#src:" . texln . substitute(expand("%:p:h"), ' ', '\\ ', 'g') . "/./" . substitute(basenm, ' ', '\\ ', 'g') . ".tex 2> /dev/null >/dev/null &")
     elseif g:rplugin_pdfviewer == "evince"
         if has("nvim")
             call jobstart("RnwSyncFor", "python", [g:rplugin_home . "/r-plugin/synctex_evince_forward.py",  basenm . ".pdf", string(texln), basenm . ".tex"])
-            autocmd JobActivity RnwSyncFor call Handle_SyncTeX_forward()
+            autocmd JobActivity RnwSyncFor call ROnJobActivity()
         else
-            call system("python " . g:rplugin_home . "/r-plugin/synctex_evince_forward.py " . basenm . ".pdf " . texln . " '" . basenm . ".tex' 2> /dev/null >/dev/null &")
+            call system("python " . g:rplugin_home . "/r-plugin/synctex_evince_forward.py '" . basenm . ".pdf' " . texln . " '" . basenm . ".tex' 2> /dev/null >/dev/null &")
         endif
         if g:rplugin_has_wmctrl
             call system("wmctrl -a '" . basenm . ".pdf'")
@@ -542,8 +546,8 @@ function! Run_SyncTeX()
             exe "cd " . substitute(basedir, ' ', '\\ ', 'g')
         endif
         if has("nvim")
-            let g:rplugin_stx_job = jobstart("RnwSyncTeX", "python", [g:rplugin_home . "/r-plugin/synctex_evince_backward.py", basenm . ".pdf", "nvim"])
-            autocmd JobActivity RnwSyncTeX call Handle_SyncTeX_backward()
+            call jobstart("RnwSyncTeX", "python", [g:rplugin_home . "/r-plugin/synctex_evince_backward.py", basenm . ".pdf", "nvim"])
+            autocmd JobActivity RnwSyncTeX call ROnJobActivity()
         else
             if v:servername != ""
                 call system("python " . g:rplugin_home . "/r-plugin/synctex_evince_backward.py '" . basenm . ".pdf' " . v:servername . " &")
@@ -555,36 +559,11 @@ function! Run_SyncTeX()
     elseif has("nvim") && (g:rplugin_pdfviewer == "okular" || g:rplugin_pdfviewer == "zathura") && !exists("g:rplugin_tail_follow")
         let g:rplugin_tail_follow = 1
         call writefile([], $VIMRPLUGIN_TMPDIR . "/" . g:rplugin_pdfviewer . "_search")
-        let g:rplugin_stx_job = jobstart("RnwSyncTeX", "tail", ["-f", $VIMRPLUGIN_TMPDIR . "/" . g:rplugin_pdfviewer . "_search"])
-        autocmd JobActivity RnwSyncTeX call Handle_SyncTeX_backward()
+        call jobstart("RnwSyncTeX", "tail", ["-f", $VIMRPLUGIN_TMPDIR . "/" . g:rplugin_pdfviewer . "_search"])
+        autocmd JobActivity RnwSyncTeX call ROnJobActivity()
         autocmd VimLeave * call delete($VIMRPLUGIN_TMPDIR . "/" . g:rplugin_pdfviewer . "_search") | call delete($VIMRPLUGIN_TMPDIR . "/synctex_back.sh")
     endif
     exe "cd " . substitute(olddir, ' ', '\\ ', 'g')
-endfunction
-
-function! Handle_SyncTeX_forward()
-    if v:job_data[1] == 'stdout'
-        call RWarningMsg("SyncTeX forward [1]: " . v:job_data[2])
-    elseif v:job_data[1] == 'stderr'
-        call RWarningMsg(v:job_data[2])
-    else
-        let g:rplugin_stx_job = 0
-    endif
-endfunction
-
-function! Handle_SyncTeX_backward()
-    if v:job_data[1] == 'stdout'
-        let fname = substitute(v:job_data[2], '|.*', '', '') 
-        if g:rplugin_pdfviewer == "okular"
-            let fname = substitute(fname, '/\./', '/', '')
-        endif
-        let ln = substitute(v:job_data[2], '.*|\([0-9]*\).*', '\1', '')
-        call SyncTeX_backward(fname, ln)
-    elseif v:job_data[1] == 'stderr'
-        call RWarningMsg(v:job_data[2])
-    else
-        let g:rplugin_stx_job = 0
-    endif
 endfunction
 
 call RSetPDFViewer()
