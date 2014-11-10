@@ -3574,27 +3574,17 @@ endfunction
 
 function ROnJobActivity()
     let g:last_job_data = v:job_data
-    if v:job_data[1] == 'exit'
-        if v:job_data[0] == g:rplugin_stx_job
-            let g:rplugin_stx_job = 0
-        elseif v:job_data[0] == g:rplugin_svr_job
-            let g:rplugin_svr_job = 0
-        elseif v:job_data[0] == g:rplugin_stx_job
-            let g:rplugin_stx_job = 0
-        endif
-    else
-        if v:job_data[1] == 'stdout'
-            for idx in range(0, len(v:job_data[2]) - 1)
-                let cmd = v:job_data[2][idx]
-                if cmd =~ "^call " || cmd  =~ "^let "
-                    exe cmd
-                else
-                    call RWarningMsg("[JobActivity] Unknown command: " . cmd)
-                endif
-            endfor
-        elseif v:job_data[1] == 'stderr'
-            call RWarningMsg('JobActivity error: ' . join(v:job_data[2]))
-        endif
+    if v:job_data[1] == 'stdout'
+        for idx in range(0, len(v:job_data[2]) - 1)
+            let cmd = v:job_data[2][idx]
+            if cmd =~ "^call " || cmd  =~ "^let "
+                exe cmd
+            else
+                call RWarningMsg("[JobActivity] Unknown command: " . cmd)
+            endif
+        endfor
+    elseif v:job_data[1] == 'stderr'
+        call RWarningMsg('JobActivity error: ' . join(v:job_data[2]))
     endif
 endfunction
 
@@ -3979,7 +3969,6 @@ let g:rplugin_tmuxsname = "VimR-" . substitute(localtime(), '.*\(...\)', '\1', '
 " SyncTeX options
 let g:rplugin_has_wmctrl = 0
 let g:rplugin_synctexpid = 0
-let g:rplugin_stx_job = 0
 let g:rplugin_zathura_pid = {}
 
 let g:rplugin_py_exec = "none"
@@ -4041,7 +4030,7 @@ if has("nvim")
             let $THIS_IS_ObjBrowser = "yes"
         endif
         let g:rplugin_clt_job = jobstart('vimcom', g:rplugin_py_exec, [g:rplugin_home . '/r-plugin/nvimcom.py'])
-        let g:rplugin_svr_job = jobstart('udpsvr', g:rplugin_py_exec, [g:rplugin_home . '/r-plugin/nvimserver.py'])
+        call jobstart('udpsvr', g:rplugin_py_exec, [g:rplugin_home . '/r-plugin/nvimserver.py'])
         autocmd JobActivity vimcom call ROnJobActivity()
         autocmd JobActivity udpsvr call ROnJobActivity()
     else
