@@ -2551,7 +2551,7 @@ function ROpenPDF(path)
         exe "cd " . substitute(expand("%:p:h"), ' ', '\\ ', 'g')
     endif
 
-    if has("win32") || has("win64")
+    if (has("win32") || has("win64")) && g:rplugin_pdfviewer == "none"
         exe 'Py OpenPDF("' . pdfpath . '")'
         exe "cd " . substitute(olddir, ' ', '\\ ', 'g')
         return
@@ -2575,6 +2575,8 @@ function ROpenPDF(path)
             endif
             exe "cd " . substitute(olddir, ' ', '\\ ', 'g')
             return
+        elseif g:rplugin_pdfviewer == "sumatra"
+            call system('SumatraPDF -inverse-search "gvim --servername ' . v:servername . " --remote-expr SyncTeX_backward(\\'%{input}\\',%{line})" . '"')
         else
             let pcmd = g:rplugin_pdfviewer . " '" . pdfpath . "' 2>/dev/null >/dev/null &"
         endif

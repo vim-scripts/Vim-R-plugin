@@ -516,6 +516,8 @@ function! SyncTeX_forward(...)
             endif
         endif
         call system("wmctrl -a '" . basenm . ".pdf'")
+    elseif g:rplugin_pdfviewer == "sumatra"
+        Py OpenSumatra(basenm . ".pdf", substitute(expand("%:p:h"), ' ', '\\ ', 'g') . "/" . basenm . ".tex", texln)
     elseif g:rplugin_pdfviewer == "skim"
         " This command is based on Skim wiki (not tested)
         call system("/Applications/Skim.app/Contents/SharedSupport/displayline " . texln . " '" . basenm . ".pdf' 2> /dev/null >/dev/null &")

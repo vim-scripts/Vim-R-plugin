@@ -12,6 +12,8 @@ try:
     import win32com.client
     import win32con
     import win32gui
+    import win32ui
+    import dde
 except ImportError:
     import platform
     myPyVersion = platform.python_version()
@@ -227,4 +229,20 @@ def OpenPDF(fn):
         vim.command("call RWarningMsg('" + errstr + "')")
         pass
 
+# The code below is adapted from fwdsumatra.py:
+# Copyright: Julien Cornebise
+# Date: February 20, 2009
+# Description: This file calls ForwardSearch DDE function of SumatraPDF
+def OpenSumatra(pdf, tex, line):
+    # Convert backslashes to slashes, for Unix-style calling from vimlatex
+    pdf = pdf.replace("/", "\\")
+    # Connect to SumatraPDF
+    server = dde.CreateServer()
+    server.Create("LatexSuite")
+    conversation = dde.CreateConversation(server)
+    conversation.ConnectTo("SUMATRA", "control")
+    # Build the DDE call
+    execString='[ForwardSearch("'+pdf+'","'+tex+'",'+line+',0,0,1)'
+    # Call !
+    conversation.Exec(execString)
 
