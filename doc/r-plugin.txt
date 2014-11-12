@@ -1302,7 +1302,7 @@ put in your |vimrc|:
 While editing R code, `_` is replaced with `<-`. If want to bind other keys
 to be replaced by `<-`, set the value of |vimrplugin_assign_map| in your
 |vimrc|, as in the example below which emulates RStudio behavior (may only
-works on GVim):
+work on GVim):
 >
    let vimrplugin_assign_map = "<M-->"
 <
