@@ -3539,6 +3539,7 @@ call RSetDefaultValue("g:vimrplugin_objbr_place",     "'script,right'")
 call RSetDefaultValue("g:vimrplugin_permanent_libs",  "'base,stats,graphics,grDevices,utils,datasets,methods'")
 call RSetDefaultValue("g:vimrplugin_user_maps_only", 0)
 call RSetDefaultValue("g:vimrplugin_latexcmd", "'default'")
+call RSetDefaultValue("g:vimrplugin_rmd_environment", "'.GlobalEnv'")
 
 " Look for invalid options
 let objbrplace = split(g:vimrplugin_objbr_place, ",")

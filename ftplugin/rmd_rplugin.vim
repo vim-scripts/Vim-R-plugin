@@ -88,7 +88,7 @@ function! RMakeRmd(t)
     if (g:vimrplugin_openhtml  == 0 && a:t == "html_document") || (g:vimrplugin_openpdf == 0 && (a:t == "pdf_document" || a:t == "beamer_presentation"))
         let rcmd .= ", view = FALSE"
     endif
-    let rcmd = rcmd . ')'
+    let rcmd = rcmd . ', envir = ' . g:vimrplugin_rmd_environment . ')'
     call g:SendCmdToR(rcmd)
 endfunction
 
