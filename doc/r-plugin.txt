@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 1.0.1
+Version: 1.1
 For Vim version 7.4
 
  1. Overview                                    |r-plugin-overview|
@@ -127,7 +127,7 @@ Before installing the plugin, you should install its dependencies:
 
    R >= 3.0.0: http://www.r-project.org/
 
-   vimcom = 1.0-0: http://www.lepem.ufc.br/jaa/vimcom.html
+   vimcom = 1.1-0: http://www.lepem.ufc.br/jaa/vimcom.html
 
    Tmux >= 1.8:   http://tmux.sourceforge.net
                   Tmux is necessary to send commands from Vim to R Console.
@@ -222,12 +222,15 @@ If you want to uninstall the plugin, do
 ------------------------------------------------------------------------------
 3.2. Instructions for Windows ~
 
+Note: This version was not tested on Windows. If it does not work well in your
+system, please try version 1.0.
+
 Before installing the plugin, you should install several external
 dependencies:
 
     * R's version must be >= 3.0.0: http://www.r-project.org/
 
-    * vimcom = 1.0-0: http://www.lepem.ufc.br/jaa/vimcom.html
+    * vimcom = 1.1-0: http://www.lepem.ufc.br/jaa/vimcom.html
 
       Note: If you cannot build vimcom yourself, you will want to
       download and install the zip file.
@@ -1299,8 +1302,8 @@ put in your |vimrc|:
 >
    let vimrplugin_rnowebchunk = 0
 <
-While editing R code, `_` is replaced with `<-`. If want to bind other keys
-to be replaced by `<-`, set the value of |vimrplugin_assign_map| in your
+While editing R code, `_` is replaced with `<-`. If you want to bind other
+keys to be replaced by `<-`, set the value of |vimrplugin_assign_map| in your
 |vimrc|, as in the example below which emulates RStudio behavior (may only
 work on GVim):
 >
@@ -1916,7 +1919,8 @@ Note: The current knitr package (version 1.7) has at least two limitations:
 
    - It has no SyncTeX support for child documents. The correspondence data
      point to lines right below child chunks in the master document and not to
-     somewhere in the child documents themselves.
+     somewhere in the child documents themselves. See:
+     https://github.com/yihui/knitr/issues/225
 
    - It only starts registering the concordance after the first chunk. So, it
      is recommended that you put the first chunk of R code just after the
@@ -2906,7 +2910,9 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-1.0.1 (2014-10-26)
+1.1 (2014-11-13)
+
+ * Version update for Linux/Unix only. May not work on Windows or Mac.
 
  * Minor bug fixes.
 

@@ -111,7 +111,7 @@ class EvinceWindowProxy:
 
     def on_sync_source(self, input_file, source_link, timestamp):
         if vimnm == "nvim":
-            sys.stdout.write(input_file + "|" + str(source_link[0]) + "\n")
+            sys.stdout.write("call SyncTeX_backward('" + input_file + "', " + str(source_link[0]) + ")\n")
             sys.stdout.flush()
         else:
             os.system(vimexec + ' --servername ' + vimnm + ' --remote-expr "' + "SyncTeX_backward('" + input_file + "', " + str(source_link[0]) + ')"')
