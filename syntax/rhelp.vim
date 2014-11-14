@@ -2,7 +2,7 @@
 " Language:    R Help File
 " Maintainer: Jakson Aquino <jalvesaq@gmail.com>
 " Former Maintainer: Johannes Ranke <jranke@uni-bremen.de>
-" Last Change: Sat Mar 08, 2014  10:03PM
+" Last Change: Wed Jul 09, 2014  10:28PM
 " Remarks:     - Includes R syntax highlighting in the appropriate
 "                sections if an r.vim file is in the same directory or in the
 "                default debian location.
@@ -16,9 +16,9 @@
 " For version 5.x: Clear all syntax items
 " For version 6.x and 7.x: Quit when a syntax file was already loaded
 if version < 600 
-    syntax clear
+  syntax clear
 elseif exists("b:current_syntax")
-    finish
+  finish
 endif 
 
 setlocal iskeyword=@,48-57,_,.
@@ -53,9 +53,9 @@ syn region rhelpRcode matchgroup=Delimiter start="\\synopsis{" matchgroup=Delimi
 syn region rhelpRcode matchgroup=Delimiter start="\\special{" matchgroup=Delimiter transparent end="}" contains=@R
 
 if v:version > 703
-    syn region rhelpRcode matchgroup=Delimiter start="\\code{" skip='\\\@1<!{.\{-}\\\@1<!}' transparent end="}" contains=@R,rhelpDots,rhelpString,rhelpSpecialChar,rhelpLink keepend
+  syn region rhelpRcode matchgroup=Delimiter start="\\code{" skip='\\\@1<!{.\{-}\\\@1<!}' transparent end="}" contains=@R,rhelpDots,rhelpString,rhelpSpecialChar,rhelpLink keepend
 else
-    syn region rhelpRcode matchgroup=Delimiter start="\\code{" skip='\\\@<!{.\{-}\\\@<!}' transparent end="}" contains=@R,rhelpDots,rhelpString,rhelpSpecialChar,rhelpLink keepend
+  syn region rhelpRcode matchgroup=Delimiter start="\\code{" skip='\\\@<!{.\{-}\\\@<!}' transparent end="}" contains=@R,rhelpDots,rhelpString,rhelpSpecialChar,rhelpLink keepend
 endif
 syn region rhelpS4method matchgroup=Delimiter start="\\S4method{.*}(" matchgroup=Delimiter transparent end=")" contains=@R,rhelpDots
 syn region rhelpSexpr matchgroup=Delimiter start="\\Sexpr{" matchgroup=Delimiter transparent end="}" contains=@R
@@ -133,11 +133,11 @@ syn region rhelpLink matchgroup=rhelpSection start="\\linkS4class{" end="}" cont
 
 " Verbatim like {{{1
 if v:version > 703
-    syn region rhelpVerbatim matchgroup=rhelpType start="\\samp{" skip='\\\@1<!{.\{-}\\\@1<!}' end="}" contains=rhelpSpecialChar,rhelpComment
-    syn region rhelpVerbatim matchgroup=rhelpType start="\\verb{" skip='\\\@1<!{.\{-}\\\@1<!}' end="}" contains=rhelpSpecialChar,rhelpComment
+  syn region rhelpVerbatim matchgroup=rhelpType start="\\samp{" skip='\\\@1<!{.\{-}\\\@1<!}' end="}" contains=rhelpSpecialChar,rhelpComment
+  syn region rhelpVerbatim matchgroup=rhelpType start="\\verb{" skip='\\\@1<!{.\{-}\\\@1<!}' end="}" contains=rhelpSpecialChar,rhelpComment
 else
-    syn region rhelpVerbatim matchgroup=rhelpType start="\\samp{" skip='\\\@<!{.\{-}\\\@<!}' end="}" contains=rhelpSpecialChar,rhelpComment
-    syn region rhelpVerbatim matchgroup=rhelpType start="\\verb{" skip='\\\@<!{.\{-}\\\@<!}' end="}" contains=rhelpSpecialChar,rhelpComment
+  syn region rhelpVerbatim matchgroup=rhelpType start="\\samp{" skip='\\\@<!{.\{-}\\\@<!}' end="}" contains=rhelpSpecialChar,rhelpComment
+  syn region rhelpVerbatim matchgroup=rhelpType start="\\verb{" skip='\\\@<!{.\{-}\\\@<!}' end="}" contains=rhelpSpecialChar,rhelpComment
 endif
 
 " Type Styles {{{1
@@ -216,34 +216,34 @@ syntax sync match rhelpSyncRcode grouphere rhelpRcode "\\examples{"
 " For version 5.7 and earlier: only when not done already
 " For version 5.8 and later: only when an item doesn't have highlighting yet
 if version >= 508 || !exists("did_rhelp_syntax_inits")
-    if version < 508
-        let did_rhelp_syntax_inits = 1
-        command -nargs=+ HiLink hi link <args>
-    else
-        command -nargs=+ HiLink hi def link <args>
-    endif
-    HiLink rhelpVerbatim    String
-    HiLink rhelpDelimiter   Delimiter
-    HiLink rhelpIdentifier  Identifier
-    HiLink rhelpString      String
-    HiLink rhelpCodeSpecial Special
-    HiLink rhelpKeyword     Keyword
-    HiLink rhelpDots        Keyword
-    HiLink rhelpLink        Underlined
-    HiLink rhelpType        Type
-    HiLink rhelpSection     PreCondit
-    HiLink rhelpError       Error
-    HiLink rhelpBraceError  Error
-    HiLink rhelpCurlyError  Error
-    HiLink rhelpParenError  Error
-    HiLink rhelpPreProc     PreProc
-    HiLink rhelpDelimiter   Delimiter
-    HiLink rhelpComment     Comment
-    HiLink rhelpRComment    Comment
-    HiLink rhelpSpecialChar SpecialChar
-    delcommand HiLink
+  if version < 508
+    let did_rhelp_syntax_inits = 1
+    command -nargs=+ HiLink hi link <args>
+  else
+    command -nargs=+ HiLink hi def link <args>
+  endif
+  HiLink rhelpVerbatim    String
+  HiLink rhelpDelimiter   Delimiter
+  HiLink rhelpIdentifier  Identifier
+  HiLink rhelpString      String
+  HiLink rhelpCodeSpecial Special
+  HiLink rhelpKeyword     Keyword
+  HiLink rhelpDots        Keyword
+  HiLink rhelpLink        Underlined
+  HiLink rhelpType        Type
+  HiLink rhelpSection     PreCondit
+  HiLink rhelpError       Error
+  HiLink rhelpBraceError  Error
+  HiLink rhelpCurlyError  Error
+  HiLink rhelpParenError  Error
+  HiLink rhelpPreProc     PreProc
+  HiLink rhelpDelimiter   Delimiter
+  HiLink rhelpComment     Comment
+  HiLink rhelpRComment    Comment
+  HiLink rhelpSpecialChar SpecialChar
+  delcommand HiLink
 endif 
 
 let   b:current_syntax = "rhelp"
 
-" vim: foldmethod=marker sw=4
+" vim: foldmethod=marker sw=2

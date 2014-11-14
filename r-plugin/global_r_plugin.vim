@@ -23,6 +23,11 @@ endif
 
 call RSourceOtherScripts()
 
+if exists("g:rplugin_did_sourcelines")
+    finish
+endif
+let g:rplugin_did_sourcelines = 1
+
 function SourceNotDefined(lines, e)
     echohl WarningMsg
     echo 'The function to source "' . &filetype . '" lines is not defined.'

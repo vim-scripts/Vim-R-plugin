@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:    R output Files
 " Maintainer:  Jakson Aquino <jalvesaq@gmail.com>
-" Last Change: Sat Nov 09, 2013  07:29PM
+" Last Change: Sun Nov 02, 2014  08:47PM
 "
 
 " Version Clears: {{{1
@@ -70,6 +70,11 @@ syn match routIndex /^\s*\[\d\+\]/
 " Errors and warnings
 syn match routError "^Error.*"
 syn match routWarn "^Warning.*"
+
+if v:lang =~ "^da"
+    syn match routError	"^Fejl.*"
+    syn match routWarn	"^Advarsel.*"
+endif
 
 if v:lang =~ "^de"
     syn match routError	"^Fehler.*"

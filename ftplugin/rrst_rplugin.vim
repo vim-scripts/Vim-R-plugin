@@ -96,8 +96,8 @@ endfunction
 
 function! RMakePDFrrst()
     if g:rplugin_vimcomport == 0
-        if has("neovim")
-            call jobwrite(g:rplugin_clt_job, "DiscoverVimComPort\n")
+        if has("nvim")
+            call jobsend(g:rplugin_clt_job, "DiscoverVimComPort\n")
         else
             Py DiscoverVimComPort()
         endif
@@ -118,7 +118,7 @@ function! RMakePDFrrst()
         endif
     endif
 
-    let pdfcmd = "vim.interlace.rrst('" . expand("%:t") . "'"
+    let pdfcmd = 'vim.interlace.rrst("' . expand("%:t") . '", rrstdir = "' . expand("%:p:h") . '"'
     if exists("g:vimrplugin_rrstcompiler")
         let pdfcmd = pdfcmd . ", compiler='" . g:vimrplugin_rrstcompiler . "'"
     endif
