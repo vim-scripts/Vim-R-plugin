@@ -3971,10 +3971,10 @@ let g:rplugin_synctexpid = 0
 let g:rplugin_zathura_pid = {}
 
 let g:rplugin_py_exec = "none"
-if executable("python")
-    let g:rplugin_py_exec = "python"
-elseif executable("python3")
+if executable("python3")
     let g:rplugin_py_exec = "python3"
+elseif executable("python")
+    let g:rplugin_py_exec = "python"
 endif
 
 function GetRandomNumber(width)

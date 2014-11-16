@@ -40,7 +40,9 @@ def DiscoverVimComPort():
                     sock.send("\001" + vii + " What port [Python 2]?")
                     repl = sock.recv(1024)
                 else:
-                    sock.send("\001" + vii + " What port [Python 3]?".encode())
+                    msg = "\001" + vii + " What port [Python 3]?"
+                    msg = msg.encode()
+                    sock.send(msg)
                     repl = sock.recv(1024).decode()
                 sock.close()
                 if repl.find(scrt):
