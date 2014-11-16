@@ -50,10 +50,10 @@ def DiscoverVimComPort():
 
     if VimComPort >= 10049:
         VimComPort = 0
+        sys.stdout.write("let g:rplugin_vimcomport = 0\n")
+        sys.stdout.flush()
         if not PortWarn:
             PortWarn = True
-            sys.stdout.write("let g:rplugin_vimcomport = 0\n")
-            sys.stdout.flush()
             sys.stderr.write("VimCom port not found.")
             sys.stderr.flush()
         return
@@ -101,7 +101,7 @@ def SendToVimCom(aString):
         return received
 
 while True:
-    line = raw_input()
+    line = sys.stdin.readline()
     if line.find("SendToVimCom") != -1:
         line = line.replace("SendToVimCom ", "")
         if line.find("I\002") != -1:

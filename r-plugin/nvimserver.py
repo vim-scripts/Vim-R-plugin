@@ -31,7 +31,11 @@ def NeovimServer():
 
     while FinishNow == False:
         try:
-            data, addr = sock.recvfrom( 1024 ) # buffer size is 1024 bytes
+            if sys.hexversion >= 0x03000000:
+                bdata, addr = sock.recvfrom( 1024 ) # buffer size is 1024 bytes
+                data = bdata.decode()
+            else:
+                data, addr = sock.recvfrom( 1024 ) # buffer size is 1024 bytes
             if re.match(VimSecret, data):
                 sys.stdout.write(re.sub(VimSecret, "", data) + "\n")
                 sys.stdout.flush()
