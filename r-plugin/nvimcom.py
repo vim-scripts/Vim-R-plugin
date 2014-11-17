@@ -28,7 +28,7 @@ def DiscoverVimComPort():
 
     while repl.find(scrt) < 0 and VimComPort < 10049:
         VimComPort = VimComPort + 1
-        for res in socket.getaddrinfo(HOST, VimComPort, socket.AF_UNSPEC, socket.SOCK_DGRAM):
+        for res in socket.getaddrinfo(HOST, VimComPort, socket.AF_INET, socket.SOCK_DGRAM):
             af, socktype, proto, canonname, sa = res
             try:
                 sock = socket.socket(af, socktype, proto)
