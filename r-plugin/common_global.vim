@@ -846,7 +846,7 @@ function StartR(whatr)
 
     " R was already started. Should restart it or warn?
     if string(g:SendCmdToR) != "function('SendCmdToR_fake')"
-        if g:rplugin_tmuxwasfirst
+        if g:rplugin_do_tmux_split
             if g:vimrplugin_restart
                 call g:SendCmdToR('quit(save = "no")')
                 sleep 100m
@@ -890,7 +890,7 @@ function StartR(whatr)
         let rcmd = b:rplugin_R . " " . b:rplugin_r_args
     endif
 
-    if g:rplugin_tmuxwasfirst
+    if g:rplugin_do_tmux_split
         call StartR_TmuxSplit(rcmd)
     else
         if g:vimrplugin_restart && bufloaded(b:objbrtitle)
@@ -1250,7 +1250,7 @@ function RObjBrowser()
     let g:rplugin_running_objbr = 1
 
     if !b:rplugin_extern_ob
-        if g:rplugin_tmuxwasfirst
+        if g:rplugin_do_tmux_split
             call StartObjBrowser_Tmux()
         else
             call StartObjBrowser_Vim()
@@ -2051,7 +2051,7 @@ function RQuit(how)
         exe "Py SendQuitMsg('" . qcmd . "')"
     else
         call g:SendCmdToR(qcmd)
-        if g:rplugin_tmuxwasfirst
+        if g:rplugin_do_tmux_split
             if a:how == "save"
                 sleep 200m
             endif
@@ -2079,7 +2079,7 @@ function RQuit(how)
     call delete($VIMRPLUGIN_TMPDIR . "/vimcom_running")
     let g:SendCmdToR = function('SendCmdToR_fake')
     let g:rplugin_vimcomport = 0
-    if g:rplugin_tmuxwasfirst && g:vimrplugin_tmux_title != "automatic" && g:vimrplugin_tmux_title != ""
+    if g:rplugin_do_tmux_split && g:vimrplugin_tmux_title != "automatic" && g:vimrplugin_tmux_title != ""
         call system("tmux set automatic-rename on")
     endif
     if has("nvim")
@@ -3630,7 +3630,7 @@ call RSetDefaultValue("g:vimrplugin_ca_ck", 0)
 " Set default mean of communication with R
 
 if has('gui_running')
-    let g:rplugin_tmuxwasfirst = 0
+    let g:rplugin_do_tmux_split = 0
 endif
 
 if has("win32") || has("win64")
@@ -3660,18 +3660,18 @@ if g:vimrplugin_applescript
 endif
 
 if $TMUX != ""
-    let g:rplugin_tmuxwasfirst = 1
+    let g:rplugin_do_tmux_split = 1
     let g:vimrplugin_applescript = 0
 else
     let g:vimrplugin_external_ob = 0
-    let g:rplugin_tmuxwasfirst = 0
+    let g:rplugin_do_tmux_split = 0
 endif
 
 
 " ========================================================================
 " Set function open/close lists in Object Browser
 
-if g:rplugin_tmuxwasfirst
+if g:rplugin_do_tmux_split
     if &filetype == "rbrowser"
         let g:RBrOpenCloseLs = function("RBrOpenCloseLs_TmuxOB")
     else
@@ -3854,7 +3854,7 @@ let s:all_marks = "abcdefghijklmnopqrstuvwxyz"
 
 
 " Choose a terminal (code adapted from screen.vim)
-if has("win32") || has("win64") || g:vimrplugin_applescript || $DISPLAY == "" || g:rplugin_tmuxwasfirst
+if has("win32") || has("win64") || g:vimrplugin_applescript || $DISPLAY == "" || g:rplugin_do_tmux_split
     " No external terminal emulator will be called, so any value is good
     let g:vimrplugin_term = "xterm"
 else
@@ -3951,7 +3951,6 @@ autocmd BufEnter * call RBufEnter()
 if &filetype != "rbrowser"
     autocmd VimLeave * call RVimLeave()
 endif
-autocmd BufLeave * if exists("b:rsource") | call delete(b:rsource) | endif
 
 let g:rplugin_firstbuffer = expand("%:p")
 let g:rplugin_running_objbr = 0
