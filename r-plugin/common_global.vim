@@ -850,7 +850,7 @@ function StartR(whatr)
             if g:vimrplugin_restart
                 call g:SendCmdToR('quit(save = "no")')
                 sleep 100m
-                call delete($VIMRPLUGIN_TMPDIR . "/vimcom_running")
+                call delete($VIMRPLUGIN_TMPDIR . "/vimcom_running_" . $VIMINSTANCEID)
                 let ca_ck = g:vimrplugin_ca_ck
                 let g:vimrplugin_ca_ck = 0
                 call g:SendCmdToR(g:rplugin_last_rcmd)
@@ -894,7 +894,7 @@ function StartR(whatr)
         call StartR_TmuxSplit(rcmd)
     else
         if g:vimrplugin_restart && bufloaded(b:objbrtitle)
-            call delete($VIMRPLUGIN_TMPDIR . "/vimcom_running")
+            call delete($VIMRPLUGIN_TMPDIR . "/vimcom_running_" . $VIMINSTANCEID)
         endif
         call StartR_ExternalTerm(rcmd)
         if g:vimrplugin_restart && bufloaded(b:objbrtitle)
@@ -919,51 +919,24 @@ function StartR(whatr)
     echon
 endfunction
 
-function ReceiveVimComStartMsg(msg)
-    let vmsg = split(a:msg)
-    if len(vmsg) == 4
-        if vmsg[0] != "vimcom"
-            call RWarningMsg("Invalid package name: " . vmsg[0])
-        endif
-        if vmsg[1] != "1.1-0-dev1"
-            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.1-0-dev1.')
-        endif
-        if vmsg[2] != $VIMINSTANCEID
-            call RWarningMsg("Invalid ID: " . vmsg[2] . " [Correct = " . $VIMINSTANCEID . "]")
-        endif
-        if vmsg[3] > "10000" && vmsg[3] < "10049"
-            let g:rplugin_vimcomport = vmsg[3]
-            " Give vimcom some time to complete its startup process
-            sleep 20m
-        else
-            call RWarningMsg("Invalid vimcom port: " . vmsg[2])
-        endif
-    endif
-endfunction
-
-function NoLongerWaitVimCom()
-    if filereadable($VIMRPLUGIN_TMPDIR . "/vimcom_running")
-        call delete($VIMRPLUGIN_TMPDIR . "/vimcom_running")
+function RSetNeovimPort(p)
+    let g:rplugin_myport = a:p
+    if &filetype == "rbrowser" && g:rplugin_do_tmux_split
+        call g:SendToVimCom("\002" . a:p)
     else
-        call RWarningMsg("The package vimcom wasn't loaded yet.")
+        call g:SendToVimCom("\001" . a:p)
     endif
 endfunction
 
 " Neovim don't need this function:
 function WaitVimComStart()
-    if has("nvim")
-        call jobstart('waitvc', "sh", ['-c', 'sleep ' . string(g:vimrplugin_vimcom_wait / 1000) . '; echo "call NoLongerWaitVimCom()"'])
-        autocmd JobActivity waitvc call ROnJobActivity()
+    if g:vimrplugin_vimcom_wait < 0
         return 0
-    else
-        if g:vimrplugin_vimcom_wait < 0
-            return 0
-        endif
     endif
     sleep 300m
     let ii = 0
     let waitmsg = 0
-    while !filereadable($VIMRPLUGIN_TMPDIR . "/vimcom_running") && ii < g:vimrplugin_vimcom_wait
+    while !filereadable($VIMRPLUGIN_TMPDIR . "/vimcom_running_" . $VIMINSTANCEID) && ii < g:vimrplugin_vimcom_wait
         let ii = ii + 200
         if ii == 1000
             echo "Waiting vimcom loading..."
@@ -976,20 +949,34 @@ function WaitVimComStart()
         redraw
     endif
     sleep 100m
-    if filereadable($VIMRPLUGIN_TMPDIR . "/vimcom_running")
-        let vr = readfile($VIMRPLUGIN_TMPDIR . "/vimcom_running")
-        if vr[2] == $VIMINSTANCEID
-            let g:rplugin_vimcom_version = vr[1]
-            if g:rplugin_vimcom_version != "1.1-0-dev1"
-                call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.1-0-dev1.')
-                sleep 1
-            endif
-        else
-            let g:rplugin_vimcom_version = 0
-            call RWarningMsg("Vim-R-plugin and vimcom IDs don't match.")
+    if filereadable($VIMRPLUGIN_TMPDIR . "/vimcom_running_" . $VIMINSTANCEID)
+        let vr = readfile($VIMRPLUGIN_TMPDIR . "/vimcom_running_" . $VIMINSTANCEID)
+        let g:rplugin_vimcom_version = vr[0]
+        if g:rplugin_vimcom_version != "1.1-0-dev2"
+            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.1-0-dev2.')
             sleep 1
         endif
-        call delete($VIMRPLUGIN_TMPDIR . "/vimcom_running")
+        let g:rplugin_vimcom_home = vr[1]
+        let g:rplugin_vimcomport = vr[2]
+        if has("nvim")
+            if g:rplugin_clt_job
+                call jobstop(g:rplugin_clt_job)
+                let g:rplugin_clt_job = 0
+            endif
+            if filereadable(g:rplugin_vimcom_home . "/bin/nvimclient")
+                let g:rplugin_clt_job = jobstart('vimcom', g:rplugin_vimcom_home . "/bin/nvimclient", [g:rplugin_vimcomport])
+                autocmd JobActivity vimcom call ROnJobActivity()
+            else
+                call RWarningMsg('Application "' . g:rplugin_vimcom_home . "/bin/nvimclient" . '" not found.")
+            endif
+            if filereadable(g:rplugin_vimcom_home . "/bin/nvimserver") && !exists("g:rplugin_srv_job")
+                let g:rplugin_srv_job = jobstart('udpsvr', g:rplugin_vimcom_home . "/bin/nvimserver")
+                autocmd JobActivity udpsvr call ROnJobActivity()
+            else
+                call RWarningMsg('Application "' . g:rplugin_vimcom_home . "/bin/nvimserver" . '" not found.")
+            endif
+        endif
+        call delete($VIMRPLUGIN_TMPDIR . "/vimcom_running_" . $VIMINSTANCEID)
         return 1
     else
         call RWarningMsg("The package vimcom wasn't loaded yet.")
@@ -1068,10 +1055,15 @@ function StartObjBrowser_Tmux()
                 \ 'set rulerformat=%3(%l%)',
                 \ 'set noruler',
                 \ 'let g:SendCmdToR = function("SendCmdToR_TmuxSplit")',
-                \ 'if has("clientserver") && v:servername != ""',
-                \ '    call g:SendToVimCom("\002" . v:servername)',
-                \ 'endif',
-                \ 'if !has("nvim")',
+                \ 'if has("nvim")',
+                \ '    let g:rplugin_clt_job = jobstart("vimcom", "' . g:rplugin_vimcom_home . "/bin/nvimclient" . '", ["' . g:rplugin_vimcomport . '"])',
+                \ '    let g:rplugin_srv_job = jobstart("udpsvr", "' . g:rplugin_vimcom_home . "/bin/nvimserver" . '")',
+                \ '    autocmd JobActivity udpsvr call ROnJobActivity()',
+                \ 'else',
+                \ '    if has("clientserver") && v:servername != ""',
+                \ '        let g:rplugin_vimcomport = ' . g:rplugin_vimcomport,
+                \ '        call g:SendToVimCom("\002" . v:servername)',
+                \ '    endif',
                 \ '    sleep 150m',
                 \ '    call UpdateOB("GlobalEnv")',
                 \ 'endif'], objbrowserfile)
@@ -2076,7 +2068,7 @@ function RQuit(how)
     call delete($VIMRPLUGIN_TMPDIR . "/liblist_" . $VIMINSTANCEID)
     call delete($VIMRPLUGIN_TMPDIR . "/libnames_" . $VIMINSTANCEID)
     call delete($VIMRPLUGIN_TMPDIR . "/GlobalEnvList_" . $VIMINSTANCEID)
-    call delete($VIMRPLUGIN_TMPDIR . "/vimcom_running")
+    call delete($VIMRPLUGIN_TMPDIR . "/vimcom_running_" . $VIMINSTANCEID)
     let g:SendCmdToR = function('SendCmdToR_fake')
     let g:rplugin_vimcomport = 0
     if g:rplugin_do_tmux_split && g:vimrplugin_tmux_title != "automatic" && g:vimrplugin_tmux_title != ""
@@ -3370,7 +3362,7 @@ function RVimLeave()
     call delete($VIMRPLUGIN_TMPDIR . "/tmux.conf")
     call delete($VIMRPLUGIN_TMPDIR . "/unformatted_code")
     call delete($VIMRPLUGIN_TMPDIR . "/vimbol_finished")
-    call delete($VIMRPLUGIN_TMPDIR . "/vimcom_running")
+    call delete($VIMRPLUGIN_TMPDIR . "/vimcom_running_" . $VIMINSTANCEID)
 endfunction
 
 function SetRPath()
@@ -3572,7 +3564,6 @@ function SendObjPortToVimCom(p)
 endfunction
 
 function ROnJobActivity()
-    let g:last_job_data = v:job_data
     if v:job_data[1] == 'stdout'
         for idx in range(0, len(v:job_data[2]) - 1)
             let cmd = v:job_data[2][idx]
@@ -3588,16 +3579,19 @@ function ROnJobActivity()
 endfunction
 
 function SendToVimCom_Vim(...)
-    exe "Py SendToVimCom('" . a:1 . "')"
+    if g:rplugin_vimcomport == 0
+        call RWarningMsg("VimCom port is unknown.")
+        return
+    endif
+    exe "Py SendToVimCom('" . a:1 . "', " . g:rplugin_vimcomport . ")"
 endfunction
 
 function SendToVimCom_Neovim(...)
-    if a:0 == 2 && a:2 == "I"
-        " Ignore reply due to https://github.com/neovim/neovim/issues/834
-        call jobsend(g:rplugin_clt_job, "SendToVimCom I\002" . a:1 . "\n")
-    else
-        call jobsend(g:rplugin_clt_job, "SendToVimCom " . a:1 . "\n")
+    if g:rplugin_clt_job == 0
+        call RWarningMsg("VimCom client not runing.")
+        return
     endif
+    call jobsend(g:rplugin_clt_job, a:1 . "\n")
 endfunction
 
 if has("nvim")
@@ -3956,8 +3950,10 @@ let g:rplugin_firstbuffer = expand("%:p")
 let g:rplugin_running_objbr = 0
 let g:rplugin_newliblist = 0
 let g:rplugin_ob_warn_shown = 0
+let g:rplugin_clt_job = 0
 let g:rplugin_myport = 0
 let g:rplugin_vimcomport = 0
+let g:rplugin_vimcom_home = ""
 let g:rplugin_vimcom_version = 0
 let g:rplugin_lastrpl = ""
 let g:rplugin_lastev = ""
@@ -4027,10 +4023,6 @@ if has("nvim")
         if &filetype == "rbrowser"
             let $THIS_IS_ObjBrowser = "yes"
         endif
-        let g:rplugin_clt_job = jobstart('vimcom', g:rplugin_py_exec, [g:rplugin_home . '/r-plugin/nvimcom.py'])
-        call jobstart('udpsvr', g:rplugin_py_exec, [g:rplugin_home . '/r-plugin/nvimserver.py'])
-        autocmd JobActivity vimcom call ROnJobActivity()
-        autocmd JobActivity udpsvr call ROnJobActivity()
     else
         call RWarningMsgInp("Python executable not found.")
     endif
