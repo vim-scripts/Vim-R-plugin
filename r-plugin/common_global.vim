@@ -777,6 +777,45 @@ function StartR_OSX()
     endif
 endfunction
 
+function! StartR_Neovim()
+    if string(g:SendCmdToR) != "function('SendCmdToR_fake')"
+        return
+    endif
+    let g:rplugin_do_tmux_split = 0
+
+    let g:SendCmdToR = function('SendCmdToR_Neovim')
+
+    let vimrplugin_vimpager = "vertical"
+
+    let edbuf = bufname("%")
+    set switchbuf=useopen
+    vsplit R_Output
+    let b:winwidth = 0
+    set filetype=rout
+    setlocal noswapfile
+    set buftype=nofile
+    syn region routStdErr start='^: ' end="$" contains=routConceal
+    syn region routError start='^: .*Error.*' end='^>' contains=routConceal
+    syn region routWarn start='^: .*Warn.*' end='^>' contains=routConceal
+    syn match routConceal '^: ' conceal contained
+    hi def link routStdErr Function
+    hi def link routError ErrorMsg
+    hi def link routWarn WarningMsg
+    hi def link routConceal Ignore
+    setlocal conceallevel=2
+    imap <buffer> <CR> <Esc>:call EnterRCmd()<CR>o
+    exe "sbuffer " . edbuf
+
+    nmap <LocalLeader><LocalLeader> :call OpenRScratch()<CR>
+
+    let savedterm = $TERM
+    let $TERM="NeovimTerm"
+    let g:rjob = jobstart("test", 'R', ['--no-readline', '--slave', '--interactive'])
+    autocmd JobActivity test call GetRActivity()
+    exe 'let $TERM="' . savedterm . '"'
+    call WaitVimComStart()
+endfunction
+
 function IsSendCmdToRFake()
     if string(g:SendCmdToR) != "function('SendCmdToR_fake')"
 	if exists("g:maplocalleader")
@@ -824,6 +863,11 @@ function StartR(whatr)
             let b:rplugin_r_args = input('Enter parameters for R: ')
             call inputrestore()
         endif
+    endif
+
+    if g:vimrplugin_r_in_buffer
+        call StartR_Neovim()
+        return
     endif
 
     if g:vimrplugin_applescript
@@ -917,6 +961,59 @@ function StartR(whatr)
         lcd -
     endif
     echon
+endfunction
+
+function GetRActivity()
+    if v:job_data[1] == 'stdout' || v:job_data[1] == 'stderr'
+        for lin in v:job_data[2]
+            let edbuf = bufname("%")
+            sbuffer R_Output
+            if v:job_data[1] == 'stderr'
+                let lin = ': ' . lin
+            endif
+            call append(line("$"), lin)
+            if edbuf == "R_Output"
+                call append(line("$"), "")
+            endif
+            call cursor("$", 1)
+            exe "sbuffer " . edbuf
+        endfor
+    else
+        call RWarningMsg("R finished")
+    endif
+endfunction
+
+function SendCmdToR_Neovim(rcmd)
+    let edbuf = bufname("%")
+    sbuffer R_Output
+    if winwidth(0) != b:winwidth
+        let b:winwidth = winwidth(0)
+        call g:SendToVimCom("\x08" . $VIMINSTANCEID . "options(width=" . b:winwidth . ")", "I")
+    endif
+    call append(line("$"), "> " . a:rcmd)
+    call cursor("$", 1)
+    exe "sbuffer " . edbuf
+    let ok = jobsend(g:rjob, a:rcmd . "\n")
+    return ok
+endfunction
+
+function EnterRCmd()
+    if line(".") != line("$")
+        return
+    endif
+    let lin = getline(".")
+    call setline(".", "")
+    call SendCmdToR_Neovim(lin)
+endfunction
+
+function OpenRScratch()
+    below 6split R_Scratch
+    set filetype=r
+    setlocal noswapfile
+    set buftype=nofile
+    nmap <buffer><silent> <Esc> :quit<CR>
+    nmap <buffer><silent> q :quit<CR>
+    startinsert
 endfunction
 
 function RSetNeovimPort(p)
@@ -2074,10 +2171,14 @@ function RQuit(how)
     if g:rplugin_do_tmux_split && g:vimrplugin_tmux_title != "automatic" && g:vimrplugin_tmux_title != ""
         call system("tmux set automatic-rename on")
     endif
-    if has("nvim")
-        " Force Neovim to update the window size
-        sleep 500m
-        mode
+    if has("nvim") 
+        if g:rplugin_do_tmux_split
+            " Force Neovim to update the window size
+            sleep 500m
+            mode
+        elseif g:vimrplugin_r_in_buffer
+            bunload R_Output
+        endif
     endif
 endfunction
 
@@ -3517,7 +3618,9 @@ call RSetDefaultValue("g:vimrplugin_objbr_w",          40)
 call RSetDefaultValue("g:vimrplugin_external_ob",       0)
 if has("nvim")
     call RSetDefaultValue("g:vimrplugin_vimcom_wait", 15000)
+    call RSetDefaultValue("g:vimrplugin_r_in_buffer",     0)
 else
+    let g:vimrplugin_r_in_buffer = 0
     call RSetDefaultValue("g:vimrplugin_vimcom_wait", 5000)
 endif
 call RSetDefaultValue("g:vimrplugin_show_args",         0)
@@ -3526,7 +3629,11 @@ call RSetDefaultValue("g:vimrplugin_insert_mode_cmds",  1)
 call RSetDefaultValue("g:vimrplugin_indent_commented",  1)
 call RSetDefaultValue("g:vimrplugin_source",         "''")
 call RSetDefaultValue("g:vimrplugin_rcomment_string", "'# '")
-call RSetDefaultValue("g:vimrplugin_vimpager",        "'tab'")
+if g:vimrplugin_r_in_buffer
+    call RSetDefaultValue("g:vimrplugin_vimpager", "'vertical'")
+else
+    call RSetDefaultValue("g:vimrplugin_vimpager",      "'tab'")
+endif
 call RSetDefaultValue("g:vimrplugin_objbr_place",     "'script,right'")
 call RSetDefaultValue("g:vimrplugin_permanent_libs",  "'base,stats,graphics,grDevices,utils,datasets,methods'")
 call RSetDefaultValue("g:vimrplugin_user_maps_only", 0)

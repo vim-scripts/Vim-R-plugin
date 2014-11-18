@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 1.1
+Version: 1.1.1
 For Vim version 7.4
 
  1. Overview                                    |r-plugin-overview|
@@ -184,7 +184,7 @@ Press <Enter> and the plugin will be installed (because the plugin has many
 files, you have to press the space bar a few times to finish the
 installation). You should, then, quit Vim.
 
-Note: If you need too install the plugin in a non default directory, do
+Note: If you need to install the plugin in a non default directory, do
 `:UseVimball` `[path]`. In this case, the configuration of Vim's 'runtimepath'
 must be done before the command "filetype on" in both the system and the user
 |vimrc| files, otherwise, some file types might not be correctly recognized.
@@ -266,7 +266,7 @@ Press <Enter> and the plugin will be installed (because the plugin has many
 files, you have to press the space bar a few times to finish the
 installation). You should, then, quit Vim.
 
-Note: If you need too install the plugin in a non default directory, do
+Note: If you need to install the plugin in a non default directory, do
 `:UseVimball` `[path]`. In this case, the configuration of Vim's 'runtimepath'
 must be done before the command "filetype on" in both the system and the user
 |vimrc| files, otherwise, some file types might not be correctly recognized.
@@ -1189,6 +1189,7 @@ is running:
 |vimrplugin_term|              External terminal to be used
 |vimrplugin_term_cmd|          Complete command to open an external terminal
 |vimrplugin_Rterm|             On Windows, use Rterm.exe
+|vimrplugin_r_in_buffer|       Run R in Neovim buffer
 |vimrplugin_assign|            Convert '_' into ' <- '
 |vimrplugin_assign_map|        Choose what to convert into ' <- '
 |vimrplugin_rnowebchunk|       Convert '<' into '<<>>=\n@' in Rnoweb files
@@ -1290,6 +1291,26 @@ However, neither the Windows 7 PowerShell nor the Windows XP Command Prompt
 has a keyboard shortcut to "paste". The solution is to set the "Quick Edit
 Mode" on either PowerShell or Command Prompt and to send a "Right click" to
 it.
+
+
+------------------------------------------------------------------------------
+						      *vimrplugin_r_in_buffer*
+6.3. Run R in Neovim buffer (experimental feature)~
+
+If you are running Neovim and want to try this experimental feature, put in
+your |vimrc|:
+>
+   let vimrplugin_r_in_buffer = 1
+<
+R will run as a Neovim job (see |job-control|) and the output will be
+displayed in a buffer. In addition to sending code from the R script buffer to
+R, you can also press <LocalLeader><LocalLeader> in Normal mode to open an R
+scratch buffer to type commands that want to see evaluated by R but do not
+want in your final script because in the scratch buffer omnicompletion and
+syntax highlight will be active.
+
+Note: This is an experimental feature to test Neovim capabilities and may be
+removed in the future.
 
 
 ------------------------------------------------------------------------------
@@ -1644,7 +1665,7 @@ If you want to pass arguments do the `Sweave()` function, set the value of the
 vimrplugin_sweaveargs variable.
 
 ------------------------------------------------------------------------------
-						*vimrplugin_rmd_environment*
+						  *vimrplugin_rmd_environment*
 6.20. Rmd environment~
 
 When rendering an Rmd file, the code can be evaluated (and saved) in a
@@ -1890,8 +1911,10 @@ your |vimrc|:
 This option is useful only for those who did not enable 'autochdir'.
 
 
-6.33 Only set key bindings that are user specified
+------------------------------------------------------------------------------
 						   *vimrplugin_user_maps_only*
+6.33 Only set key bindings that are user specified~
+
 The Vim-R-plugin sets many default key bindings.  The user can set custom
 key bindings (|r-plugin-key-bindings|).  If you wish the Vim-R-plugin to only
 set those key-bindings specified by the user, put in your vimrc:
@@ -2236,8 +2259,6 @@ directory after the installation:
    syntax/rbrowser.vim
    doc/r-plugin.txt
    r-plugin/vimcom.py
-   r-plugin/nvimcom.py
-   r-plugin/nvimserver.py
    r-plugin/global_r_plugin.vim
    r-plugin/windows.py
    r-plugin/objlist/README
@@ -2922,6 +2943,10 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 ==============================================================================
 							       *r-plugin-news*
 10. News~
+
+1.1.1 (2014-11-17)
+
+ * New option (Neovim only): vimrplugin_r_in_buffer.
 
 1.1 (2014-11-13)
 
