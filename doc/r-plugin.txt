@@ -1306,8 +1306,10 @@ R will run as a Neovim job (see |job-control|) and the output will be
 displayed in a buffer. In addition to sending code from the R script buffer to
 R, you can also press <LocalLeader><LocalLeader> in Normal mode to open an R
 scratch buffer to type commands that want to see evaluated by R but do not
-want in your final script because in the scratch buffer omnicompletion and
-syntax highlight will be active.
+want in your final script. Syntax highlight and omnicompletion will be
+available in the scratch buffer. If the cursor is in the last line of the
+R_Output buffer and Neovim is in Insert mode, an <Enter> will submit the line
+to R evaluation.
 
 Note: This is an experimental feature to test Neovim capabilities and may be
 removed in the future.

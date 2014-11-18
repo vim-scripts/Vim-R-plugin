@@ -789,7 +789,19 @@ function! StartR_Neovim()
 
     let edbuf = bufname("%")
     set switchbuf=useopen
-    vsplit R_Output
+    if g:vimrplugin_vsplit
+        if g:vimrplugin_rconsole_width > 16 && g:vimrplugin_rconsole_width < (winwidth(0) - 16)
+            exe "belowright " . g:vimrplugin_rconsole_width . "vsplit R_Output"
+        else
+            belowright vsplit R_Output
+        endif
+    else
+        if g:vimrplugin_rconsole_height > 6 && g:vimrplugin_rconsole_height < (winheight(0) - 6)
+            exe "belowright " . g:vimrplugin_rconsole_height . "split R_Output"
+        else
+            belowright split R_Output
+        endif
+    endif
     let b:winwidth = 0
     set filetype=rout
     setlocal noswapfile
@@ -804,13 +816,14 @@ function! StartR_Neovim()
     hi def link routConceal Ignore
     setlocal conceallevel=2
     imap <buffer> <CR> <Esc>:call EnterRCmd()<CR>o
+    call cursor("$", 1)
     exe "sbuffer " . edbuf
 
     nmap <LocalLeader><LocalLeader> :call OpenRScratch()<CR>
 
     let savedterm = $TERM
     let $TERM="NeovimTerm"
-    let g:rjob = jobstart("test", 'R', ['--no-readline', '--slave', '--interactive'])
+    let g:rplugin_rjob = jobstart("test", 'R', ['--no-readline', '--slave', '--interactive'])
     autocmd JobActivity test call GetRActivity()
     exe 'let $TERM="' . savedterm . '"'
     call WaitVimComStart()
@@ -979,7 +992,15 @@ function GetRActivity()
             exe "sbuffer " . edbuf
         endfor
     else
-        call RWarningMsg("R finished")
+        let g:rplugin_rjob = 0
+        let g:SendCmdToR = function('SendCmdToR_fake')
+        if bufname("%") == "R_Output"
+            call append("$", ':    ---  R Finished  ---')
+            call cursor("$", 25)
+        endif
+        if mode() == "n"
+            call RWarningMsg("R finished")
+        endif
     endif
 endfunction
 
@@ -993,7 +1014,7 @@ function SendCmdToR_Neovim(rcmd)
     call append(line("$"), "> " . a:rcmd)
     call cursor("$", 1)
     exe "sbuffer " . edbuf
-    let ok = jobsend(g:rjob, a:rcmd . "\n")
+    let ok = jobsend(g:rplugin_rjob, a:rcmd . "\n")
     return ok
 endfunction
 
