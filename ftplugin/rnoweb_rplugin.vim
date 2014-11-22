@@ -77,10 +77,14 @@ endfunction
 " knit the current buffer content
 function! RKnitRnw()
     update
+    let rnwdir = expand("%:p:h")
+    if has("win32") || has("win64")
+        let rnwdif = substitute(rnwdir, '\\', '/', 'g')
+    endif
     if g:vimrplugin_synctex == 0
-        call g:SendCmdToR('vim.interlace.rnoweb("' . expand("%:t") . '", rnwdir = "' . expand("%:p:h") . '", buildpdf = FALSE, synctex = FALSE)')
+        call g:SendCmdToR('vim.interlace.rnoweb("' . expand("%:t") . '", rnwdir = "' . rnwdir . '", buildpdf = FALSE, synctex = FALSE)')
     else
-        call g:SendCmdToR('vim.interlace.rnoweb("' . expand("%:t") . '", rnwdir = "' . expand("%:p:h") . '", buildpdf = FALSE)')
+        call g:SendCmdToR('vim.interlace.rnoweb("' . expand("%:t") . '", rnwdir = "' . rnwdir . '", buildpdf = FALSE)')
     endif
 endfunction
 
@@ -97,7 +101,11 @@ function! RMakePDF(bibtex, knit)
         endif
     endif
     update
-    let pdfcmd = 'vim.interlace.rnoweb("' . expand("%:t") . '", rnwdir = "' . expand("%:p:h") . '"'
+    let rnwdir = expand("%:p:h")
+    if has("win32") || has("win64")
+        let rnwdif = substitute(rnwdir, '\\', '/', 'g')
+    endif
+    let pdfcmd = 'vim.interlace.rnoweb("' . expand("%:t") . '", rnwdir = "' . rnwdir . '"'
 
     if a:knit == 0
         let pdfcmd = pdfcmd . ', knit = FALSE'
@@ -144,7 +152,7 @@ function! RMakePDF(bibtex, knit)
     if ok == 0
         return
     endif
-endfunction  
+endfunction
 
 " Send Sweave chunk to R
 function! RnwSendChunkToR(e, m)
@@ -161,13 +169,17 @@ function! RnwSendChunkToR(e, m)
     endif
     if a:m == "down"
         call RnwNextChunk()
-    endif  
+    endif
 endfunction
 
 " Sweave the current buffer content
 function! RSweave()
     update
-    let scmd = 'vim.interlace.rnoweb("' . expand("%:t") . '", rnwdir = "' . expand("%:p:h") . '", knit = FALSE, buildpdf = FALSE'
+    let rnwdir = expand("%:p:h")
+    if has("win32") || has("win64")
+        let rnwdif = substitute(rnwdir, '\\', '/', 'g')
+    endif
+    let scmd = 'vim.interlace.rnoweb("' . expand("%:t") . '", rnwdir = "' . rnwdir . '", knit = FALSE, buildpdf = FALSE'
     if exists("g:vimrplugin_sweaveargs")
         let scmd .= ', ' . g:vimrplugin_sweaveargs
     endif

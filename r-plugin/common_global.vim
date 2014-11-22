@@ -785,8 +785,6 @@ function! StartR_Neovim()
 
     let g:SendCmdToR = function('SendCmdToR_Neovim')
 
-    let vimrplugin_vimpager = "vertical"
-
     let edbuf = bufname("%")
     set switchbuf=useopen
     if g:vimrplugin_vsplit
@@ -2206,7 +2204,11 @@ endfunction
 " knit the current buffer content
 function! RKnit()
     update
-    call g:SendCmdToR('require(knitr); .vim_oldwd <- getwd(); setwd("' . expand("%:p:h") . '"); knit("' . expand("%:t") . '"); setwd(.vim_oldwd); rm(.vim_oldwd)')
+    if has("win32") || has("win64")
+        call g:SendCmdToR('require(knitr); .vim_oldwd <- getwd(); setwd("' . substitute(expand("%:p:h"), '\\', '/', 'g') . '"); knit("' . expand("%:t") . '"); setwd(.vim_oldwd); rm(.vim_oldwd)')
+    else
+        call g:SendCmdToR('require(knitr); .vim_oldwd <- getwd(); setwd("' . expand("%:p:h") . '"); knit("' . expand("%:t") . '"); setwd(.vim_oldwd); rm(.vim_oldwd)')
+    endif
 endfunction
 
 function RRemoveFromLibls(nlib)

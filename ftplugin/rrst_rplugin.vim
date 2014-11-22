@@ -9,7 +9,7 @@ if exists("g:rplugin_failed")
     finish
 endif
 
-" Some buffer variables common to R, Rrst, Rnoweb, Rhelp and Rdoc need to be 
+" Some buffer variables common to R, Rrst, Rnoweb, Rhelp and Rdoc need to be
 " defined after the global ones:
 runtime r-plugin/common_buffer.vim
 
@@ -81,7 +81,7 @@ function! RMakeHTMLrrst(t)
         let rcmd = rcmd . '; render_rst(strict=TRUE)'
     endif
     let rcmd = rcmd . '; knit("' . expand("%:t") . '")'
-    
+
     if a:t == "odt"
         let rcmd = rcmd . '; system("rst2odt ' . expand("%:r:t") . ".rst " . expand("%:r:t") . '.odt")'
     else
@@ -118,7 +118,11 @@ function! RMakePDFrrst()
         endif
     endif
 
-    let pdfcmd = 'vim.interlace.rrst("' . expand("%:t") . '", rrstdir = "' . expand("%:p:h") . '"'
+    let rrstdir = expand("%:p:h")
+    if has("win32") || has("win64")
+        let rnwdif = substitute(rnwdir, '\\', '/', 'g')
+    endif
+    let pdfcmd = 'vim.interlace.rrst("' . expand("%:t") . '", rrstdir = "' . rrstdir . '"'
     if exists("g:vimrplugin_rrstcompiler")
         let pdfcmd = pdfcmd . ", compiler='" . g:vimrplugin_rrstcompiler . "'"
     endif
@@ -136,7 +140,7 @@ function! RMakePDFrrst()
     if ok == 0
         return
     endif
-endfunction  
+endfunction
 
 " Send Rrst chunk to R
 function! SendRrstChunkToR(e, m)
@@ -153,7 +157,7 @@ function! SendRrstChunkToR(e, m)
     endif
     if a:m == "down"
         call RrstNextChunk()
-    endif  
+    endif
 endfunction
 
 let b:IsInRCode = function("RrstIsInRCode")
