@@ -82,7 +82,7 @@ function! RMakeRmd(t)
 
     let rmddir = expand("%:p:h")
     if has("win32") || has("win64")
-        let rnwdif = substitute(rnwdir, '\\', '/', 'g')
+        let rmddir = substitute(rnwdir, '\\', '/', 'g')
     endif
     if a:t == "default"
         let rcmd = 'vim.interlace.rmd("' . expand("%:t") . '", rmddir = "' . rmdir . '"'

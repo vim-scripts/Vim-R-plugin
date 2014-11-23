@@ -120,7 +120,7 @@ function! RMakePDFrrst()
 
     let rrstdir = expand("%:p:h")
     if has("win32") || has("win64")
-        let rnwdif = substitute(rnwdir, '\\', '/', 'g')
+        let rrstdir = substitute(rrstdir, '\\', '/', 'g')
     endif
     let pdfcmd = 'vim.interlace.rrst("' . expand("%:t") . '", rrstdir = "' . rrstdir . '"'
     if exists("g:vimrplugin_rrstcompiler")

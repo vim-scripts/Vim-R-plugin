@@ -79,7 +79,7 @@ function! RKnitRnw()
     update
     let rnwdir = expand("%:p:h")
     if has("win32") || has("win64")
-        let rnwdif = substitute(rnwdir, '\\', '/', 'g')
+        let rnwdir = substitute(rnwdir, '\\', '/', 'g')
     endif
     if g:vimrplugin_synctex == 0
         call g:SendCmdToR('vim.interlace.rnoweb("' . expand("%:t") . '", rnwdir = "' . rnwdir . '", buildpdf = FALSE, synctex = FALSE)')
@@ -103,7 +103,7 @@ function! RMakePDF(bibtex, knit)
     update
     let rnwdir = expand("%:p:h")
     if has("win32") || has("win64")
-        let rnwdif = substitute(rnwdir, '\\', '/', 'g')
+        let rnwdir = substitute(rnwdir, '\\', '/', 'g')
     endif
     let pdfcmd = 'vim.interlace.rnoweb("' . expand("%:t") . '", rnwdir = "' . rnwdir . '"'
 
@@ -177,7 +177,7 @@ function! RSweave()
     update
     let rnwdir = expand("%:p:h")
     if has("win32") || has("win64")
-        let rnwdif = substitute(rnwdir, '\\', '/', 'g')
+        let rnwdir = substitute(rnwdir, '\\', '/', 'g')
     endif
     let scmd = 'vim.interlace.rnoweb("' . expand("%:t") . '", rnwdir = "' . rnwdir . '", knit = FALSE, buildpdf = FALSE'
     if exists("g:vimrplugin_sweaveargs")
