@@ -803,16 +803,8 @@ function! StartR_Neovim()
     let b:winwidth = 0
     set filetype=rout
     setlocal noswapfile
+    setlocal bufhidden=hide
     set buftype=nofile
-    syn region routStdErr start='^: ' end="$" contains=routConceal
-    syn region routError start='^: .*Error.*' end='^>' contains=routConceal
-    syn region routWarn start='^: .*Warn.*' end='^>' contains=routConceal
-    syn match routConceal '^: ' conceal contained
-    hi def link routStdErr Function
-    hi def link routError ErrorMsg
-    hi def link routWarn WarningMsg
-    hi def link routConceal Ignore
-    setlocal conceallevel=2
     imap <buffer> <CR> <Esc>:call EnterRCmd()<CR>o
     call cursor("$", 1)
     exe "sbuffer " . edbuf
@@ -821,8 +813,7 @@ function! StartR_Neovim()
 
     let savedterm = $TERM
     let $TERM="NeovimTerm"
-    let g:rplugin_rjob = jobstart("test", 'R', ['--no-readline', '--slave', '--interactive'])
-    autocmd JobActivity test call GetRActivity()
+    let g:rplugin_rjob = jobstart("Rjob", 'R', ['--no-readline', '--slave', '--interactive'])
     exe 'let $TERM="' . savedterm . '"'
     call WaitVimComStart()
 endfunction
@@ -976,9 +967,15 @@ endfunction
 
 function GetRActivity()
     if v:job_data[1] == 'stdout' || v:job_data[1] == 'stderr'
+        let edbuf = bufname("%")
+        sbuffer R_Output
         for lin in v:job_data[2]
-            let edbuf = bufname("%")
-            sbuffer R_Output
+            if lin =~ ".\x0d."
+                let lin = substitute(lin, ".*\x0d", "", "g")
+            endif
+            if lin =~ "\x0d$"
+                let lin = substitute(lin, "\x0d$", "", "g")
+            endif
             if v:job_data[1] == 'stderr'
                 let lin = ': ' . lin
             endif
@@ -986,15 +983,17 @@ function GetRActivity()
             if edbuf == "R_Output"
                 call append(line("$"), "")
             endif
-            call cursor("$", 1)
-            exe "sbuffer " . edbuf
         endfor
+        call cursor("$", 1)
+        exe "sbuffer " . edbuf
     else
         let g:rplugin_rjob = 0
         let g:SendCmdToR = function('SendCmdToR_fake')
         if bufname("%") == "R_Output"
             call append("$", ':    ---  R Finished  ---')
-            call cursor("$", 25)
+            call append("$", "")
+            sleep 500m
+            quit
         endif
         if mode() == "n"
             call RWarningMsg("R finished")
@@ -1085,11 +1084,13 @@ function WaitVimComStart()
             else
                 call RWarningMsg('Application "' . g:rplugin_vimcom_home . "/bin/nvimclient" . '" not found.")
             endif
-            if filereadable(g:rplugin_vimcom_home . "/bin/nvimserver") && !exists("g:rplugin_srv_job")
-                let g:rplugin_srv_job = jobstart('udpsvr', g:rplugin_vimcom_home . "/bin/nvimserver")
-                autocmd JobActivity udpsvr call ROnJobActivity()
+            if filereadable(g:rplugin_vimcom_home . "/bin/nvimserver")
+                if !exists("g:rplugin_srv_job")
+                    let g:rplugin_srv_job = jobstart('udpsvr', g:rplugin_vimcom_home . "/bin/nvimserver")
+                    autocmd JobActivity udpsvr call ROnJobActivity()
+                endif
             else
-                call RWarningMsg('Application "' . g:rplugin_vimcom_home . "/bin/nvimserver" . '" not found.")
+                call RWarningMsg('Application "' . g:rplugin_vimcom_home . "/bin/nvimserver" . '" not found.')
             endif
         endif
         call delete($VIMRPLUGIN_TMPDIR . "/vimcom_running_" . $VIMINSTANCEID)
@@ -3654,6 +3655,7 @@ call RSetDefaultValue("g:vimrplugin_source",         "''")
 call RSetDefaultValue("g:vimrplugin_rcomment_string", "'# '")
 if g:vimrplugin_r_in_buffer
     call RSetDefaultValue("g:vimrplugin_vimpager", "'vertical'")
+    autocmd JobActivity Rjob call GetRActivity()
 else
     call RSetDefaultValue("g:vimrplugin_vimpager",      "'tab'")
 endif

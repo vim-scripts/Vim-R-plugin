@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:    R output Files
 " Maintainer:  Jakson Aquino <jalvesaq@gmail.com>
-" Last Change: Sun Nov 02, 2014  08:47PM
+" Last Change: Sun Nov 23, 2014  04:27PM
 "
 
 " Version Clears: {{{1
@@ -14,55 +14,72 @@ elseif exists("b:current_syntax")
 endif 
 
 setlocal iskeyword=@,48-57,_,.
+setlocal conceallevel=2
 
 syn case match
+
+" Normal text
+syn match routNormal "."
 
 " Strings
 syn region routString start=/"/ skip=/\\\\\|\\"/ end=/"/ end=/$/
 
 " Constants
-syn keyword rConstant NULL
-syn keyword rBoolean  FALSE TRUE
-syn keyword rNumber   NA Inf NaN 
+syn keyword routConst  NULL NA
+syn keyword routBool   FALSE TRUE
+syn keyword routNumber Inf NaN
+syn match routConst "\<Na's\>"
 
 " integer
-syn match rInteger "\<\d\+L"
-syn match rInteger "\<0x\([0-9]\|[a-f]\|[A-F]\)\+L"
-syn match rInteger "\<\d\+[Ee]+\=\d\+L"
+syn match routInteger "\<\d\+L"
+syn match routInteger "\<0x\([0-9]\|[a-f]\|[A-F]\)\+L"
+syn match routInteger "\<\d\+[Ee]+\=\d\+L"
 
 " number with no fractional part or exponent
-syn match rNumber "\<\d\+\>"
+syn match routNumber "\<\d\+\>"
+syn match routNegNum "-\<\d\+\>"
 " hexadecimal number 
-syn match rNumber "\<0x\([0-9]\|[a-f]\|[A-F]\)\+"
+syn match routNumber "\<0x\([0-9]\|[a-f]\|[A-F]\)\+"
 
 " floating point number with integer and fractional parts and optional exponent
-syn match rFloat "\<\d\+\.\d*\([Ee][-+]\=\d\+\)\="
+syn match routFloat "\<\d\+\.\d*\([Ee][-+]\=\d\+\)\="
+syn match routNegFlt "-\<\d\+\.\d*\([Ee][-+]\=\d\+\)\="
 " floating point number with no integer part and optional exponent
-syn match rFloat "\<\.\d\+\([Ee][-+]\=\d\+\)\="
+syn match routFloat "\<\.\d\+\([Ee][-+]\=\d\+\)\="
+syn match routNegFlt "-\<\.\d\+\([Ee][-+]\=\d\+\)\="
 " floating point number with no fractional part and optional exponent
-syn match rFloat "\<\d\+[Ee][-+]\=\d\+"
+syn match routFloat "\<\d\+[Ee][-+]\=\d\+"
+syn match routNegFlt "-\<\d\+[Ee][-+]\=\d\+"
 
 " complex number
-syn match rComplex "\<\d\+i"
-syn match rComplex "\<\d\++\d\+i"
-syn match rComplex "\<0x\([0-9]\|[a-f]\|[A-F]\)\+i"
-syn match rComplex "\<\d\+\.\d*\([Ee][-+]\=\d\+\)\=i"
-syn match rComplex "\<\.\d\+\([Ee][-+]\=\d\+\)\=i"
-syn match rComplex "\<\d\+[Ee][-+]\=\d\+i"
+syn match routComplex "\<\d\+i"
+syn match routComplex "\<\d\++\d\+i"
+syn match routComplex "\<0x\([0-9]\|[a-f]\|[A-F]\)\+i"
+syn match routComplex "\<\d\+\.\d*\([Ee][-+]\=\d\+\)\=i"
+syn match routComplex "\<\.\d\+\([Ee][-+]\=\d\+\)\=i"
+syn match routComplex "\<\d\+[Ee][-+]\=\d\+i"
+
+" dates
+syn match routDate "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][-0-9]"
 
 if !exists("g:vimrplugin_routmorecolors")
     let g:vimrplugin_routmorecolors = 0
 endif
 
-if g:vimrplugin_routmorecolors == 1
+if g:vimrplugin_routmorecolors
     syn include @routR syntax/r.vim
     syn region routColoredR start="^> " end='$' contains=@routR keepend
     syn region routColoredR start="^+ " end='$' contains=@routR keepend
 else
-    " Comment
-    syn match routComment /^> .*/
-    syn match routComment /^+ .*/
+    " Input
+    syn match routInput /^> .*/
+    syn match routInput /^+ .*/
 endif
+
+syn region routStdErr start='^: ' end="$" contains=routConceal
+syn region routError start='^: .*Error.*' end='^>' contains=routConceal
+syn region routWarn start='^: .*Warn.*' end='^>' contains=routConceal
+syn match routConceal '^: ' conceal contained
 
 " Index of vectors
 syn match routIndex /^\s*\[\d\+\]/
@@ -123,18 +140,118 @@ endif
 
 " Define the default highlighting.
 if g:vimrplugin_routmorecolors == 0
-    hi def link routComment	Comment
+    hi def link routInput	Comment
 endif
-hi def link rNumber	Number
-hi def link rComplex	Number
-hi def link rInteger	Number
-hi def link rBoolean	Boolean
-hi def link rConstant	Constant
-hi def link rFloat	Float
-hi def link routString	String
-hi def link routError	Error
-hi def link routWarn	WarningMsg
-hi def link routIndex	Special
+
+if exists("g:rout_follow_colorscheme") && g:rout_follow_colorscheme
+    " Default when following :colorscheme
+    hi def link routNormal	Normal
+    hi def link routNumber	Number
+    hi def link routInteger	Number
+    hi def link routFloat	Float
+    hi def link routComplex	Number
+    hi def link routNegNum	Number
+    hi def link routNegFlt	Float
+    hi def link routDate	Number
+    hi def link routBool	Boolean
+    hi def link routConst	Constant
+    hi def link routString	String
+    hi def link routError	Error
+    hi def link routWarn	WarningMsg
+    hi def link routIndex	Special
+    hi def link routStdErr	Function
+    hi def link routError	ErrorMsg
+    hi def link routWarn	WarningMsg
+    hi def link routConceal	Ignore
+else
+    if &t_Co == 256
+        " Defalt 256 colors scheme for R output:
+        hi routInput	ctermfg=247
+        hi routNormal	ctermfg=40
+        hi routNumber	ctermfg=214
+        hi routInteger	ctermfg=214
+        hi routFloat	ctermfg=214
+        hi routComplex	ctermfg=214
+        hi routNegNum	ctermfg=209
+        hi routNegFlt	ctermfg=209
+        hi routDate	ctermfg=179
+        hi routBool	ctermfg=35
+        hi routConst	ctermfg=35
+        hi routString	ctermfg=85
+        hi routStdErr	ctermfg=117
+        hi routError	ctermfg=15 ctermbg=1
+        hi routWarn	ctermfg=1
+        hi routIndex	ctermfg=186
+    else
+        " Defalt 16 colors scheme for R output:
+        hi routInput	ctermfg=gray
+        hi routNormal	ctermfg=darkgreen
+        hi routNumber	ctermfg=darkyellow
+        hi routInteger	ctermfg=darkyellow
+        hi routFloat	ctermfg=darkyellow
+        hi routComplex	ctermfg=darkyellow
+        hi routNegNum	ctermfg=darkyellow
+        hi routNegFlt	ctermfg=darkyellow
+        hi routDate	ctermfg=darkyellow
+        hi routBool	ctermfg=magenta
+        hi routConst	ctermfg=magenta
+        hi routString	ctermfg=darkcyan
+        hi routStdErr	ctermfg=cyan
+        hi routError	ctermfg=white ctermbg=red
+        hi routWarn	ctermfg=red
+        hi routIndex	ctermfg=darkgreen
+    endif
+
+    " Change colors under user request:
+    if exists("g:rout_color_input")
+        exe "hi routInput ctermfg=" . g:rout_color_input
+    endif
+    if exists("g:rout_color_normal")
+        exe "hi routNormal ctermfg=" . g:rout_color_normal
+    endif
+    if exists("g:rout_color_number")
+        exe "hi routNumber ctermfg=" . g:rout_color_number
+    endif
+    if exists("g:rout_color_integer")
+        exe "hi routInteger ctermfg=" . g:rout_color_integer
+    endif
+    if exists("g:rout_color_float")
+        exe "hi routFloat ctermfg=" . g:rout_color_float
+    endif
+    if exists("g:rout_color_complex")
+        exe "hi routComplex ctermfg=" . g:rout_color_complex
+    endif
+    if exists("g:rout_color_negnum")
+        exe "hi routNegNum ctermfg=" . g:rout_color_negnum
+    endif
+    if exists("g:rout_color_negfloat")
+        exe "hi routNegFlt ctermfg=" . g:rout_color_negfloat
+    endif
+    if exists("g:rout_color_date")
+        exe "hi routDate ctermfg=" . g:rout_color_date
+    endif
+    if exists("g:rout_color_bool")
+        exe "hi routBool ctermfg=" . g:rout_color_bool
+    endif
+    if exists("g:rout_color_constant")
+        exe "hi routConst ctermfg=" . g:rout_color_constant
+    endif
+    if exists("g:rout_color_string")
+        exe "hi routString ctermfg=" . g:rout_color_string
+    endif
+    if exists("g:rout_color_stderr")
+        exe "hi routStdErr ctermfg=" . g:rout_color_stderr
+    endif
+    if exists("g:rout_color_error")
+        exe "hi routError ctermfg=" . g:rout_color_error
+    endif
+    if exists("g:rout_color_warn")
+        exe "hi routWarn ctermfg=" . g:rout_color_warn
+    endif
+    if exists("g:rout_color_index")
+        exe "hi routIndex ctermfg=" . g:rout_color_index
+    endif
+endif
 
 let   b:current_syntax = "rout"
 
