@@ -22,7 +22,7 @@
 
 
 PLUGINHOME=`pwd`
-PLUGINVERSION=1.1
+PLUGINVERSION=1.1.1
 DEBIANTIME=`date -R`
 PLUGINRELEASEDATE=`date +"%Y-%m-%d"`
 VIM2HTML=/usr/local/share/vim/vim74/doc/vim2html.pl 
@@ -77,7 +77,6 @@ deb:
 	  - indent/rrst.vim\n\
 	  - r-plugin/common_buffer.vim\n\
 	  - r-plugin/common_global.vim\n\
-	  - r-plugin/vimcom.py\n\
 	  - r-plugin/synctex_evince_backward.py\n\
 	  - r-plugin/synctex_evince_forward.py\n\
 	  - r-plugin/synctex_okular_backward.sh\n\
@@ -117,9 +116,6 @@ deb:
 	" > /tmp/vim-r-plugin-tmp/usr/share/doc/vim-r-plugin/copyright
 	# Unpack the plugin
 	vim -c 'set nomore' -c 'let g:vimball_home="/tmp/vim-r-plugin-tmp/usr/share/vim/addons"' -c "so %" -c "q" /tmp/Vim-R-plugin.vmb
-	# Delete file unnecessary in a Debian system
-	(cd /tmp/vim-r-plugin-tmp/usr/share/vim/addons ;\
-	    rm r-plugin/windows.py )
 	# Create the DEBIAN directory
 	( cd /tmp/vim-r-plugin-tmp ;\
 	    mkdir DEBIAN ;\

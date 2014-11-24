@@ -731,17 +731,24 @@ endfunction
 
 function StartR_Windows()
     if string(g:SendCmdToR) != "function('SendCmdToR_fake')"
-        Py FindRConsole()
-        Py vim.command("let g:rplugin_rconsole_hndl = " + str(RConsole))
-        if g:rplugin_rconsole_hndl != 0
-            call RWarningMsg("There is already a window called '" . g:rplugin_R_window_ttl . "'.")
-            unlet g:rplugin_R_window_ttl
+        let repl = libcall(g:rplugin_vimcom_lib, "FindRConsole", 'R Console')
+        if repl == "NotFound"
+            let g:SendCmdToR = function('SendCmdToR_fake')
+            call RWarningMsg('There is already a window called "R Console".')
             return
         endif
     endif
     let vrph = $VIMRPLUGIN_HOME
     let $VIMRPLUGIN_HOME = substitute($VIMRPLUGIN_HOME, "\\\\ ", " ", "g")
-    Py StartRPy()
+
+    let rcmd = g:rplugin_Rgui
+    if g:vimrplugin_Rterm
+        let rcmd = substitute(rcmd, "Rgui", "Rterm", "")
+    endif
+    let rcmd = '"' . rcmd . '" ' . g:vimrplugin_r_args
+
+    silent exe "!start " . rcmd
+
     if g:vimrplugin_vim_wd == 0
         lcd -
     endif
@@ -1073,11 +1080,18 @@ function WaitVimComStart()
     if filereadable($VIMRPLUGIN_TMPDIR . "/vimcom_running_" . $VIMINSTANCEID)
         let vr = readfile($VIMRPLUGIN_TMPDIR . "/vimcom_running_" . $VIMINSTANCEID)
         let g:rplugin_vimcom_version = vr[0]
-        if g:rplugin_vimcom_version != "1.1-0-dev3"
-            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.1-0-dev3.')
+        if g:rplugin_vimcom_version != "1.1-0-dev4"
+            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.1-0-dev4.')
             sleep 1
         endif
         let g:rplugin_vimcom_home = vr[1]
+        if has("win32")
+            let g:rplugin_vimcom_lib = g:rplugin_vimcom_home . "/libs/i386/vimcom.dll"
+        elseif has("win64")
+            let g:rplugin_vimcom_lib = g:rplugin_vimcom_home . "/libs/x64/vimcom.dll"
+        else
+            let g:rplugin_vimcom_lib = g:rplugin_vimcom_home . "/libs/vimcom.so"
+        endif
         let g:rplugin_vimcomport = vr[2]
         if has("nvim")
             if g:rplugin_clt_job
@@ -1129,11 +1143,6 @@ function IsExternalOBRunning()
 endfunction
 
 function ResetVimComPort()
-    if has("nvim")
-        call jobsend(g:rplugin_clt_job, "DiscoverVimComPort\n")
-    else
-        Py VimComPort = 0
-    endif
     let g:rplugin_vimcomport = 0
 endfunction
 
@@ -1177,12 +1186,13 @@ function StartObjBrowser_Tmux()
                 \ 'let g:rplugin_editor_sname = ' . myservername,
                 \ 'let g:rplugin_vim_pane = "' . g:rplugin_vim_pane . '"',
                 \ 'let g:rplugin_rconsole_pane = "' . g:rplugin_rconsole_pane . '"',
-                \ 'let b:objbrtitle = "' . b:objbrtitle . '"',
                 \ 'let $VIMINSTANCEID = "' . $VIMINSTANCEID . '"',
                 \ 'let showmarks_enable = 0',
                 \ 'let g:rplugin_tmuxsname = "' . g:rplugin_tmuxsname . '"',
                 \ 'let b:rscript_buffer = "' . bufname("%") . '"',
                 \ 'set filetype=rbrowser',
+                \ 'let g:rplugin_vimcom_home = "' . g:rplugin_vimcom_home . '"',
+                \ 'let b:objbrtitle = "' . b:objbrtitle . '"',
                 \ 'let b:rplugin_extern_ob = 1',
                 \ 'set shortmess=atI',
                 \ 'set rulerformat=%3(%l%)',
@@ -1356,13 +1366,6 @@ endfunction
 
 " Open an Object Browser window
 function RObjBrowser()
-    if !has("nvim")
-        if !has("python") && !has("python3")
-            call RWarningMsg("Python support is required to run the Object Browser.")
-            return
-        endif
-    endif
-
     " Only opens the Object Browser if R is running
     if string(g:SendCmdToR) == "function('SendCmdToR_fake')"
         call RWarningMsg("The Object Browser can be opened only if R is running.")
@@ -1509,14 +1512,7 @@ endfunction
 
 function RFormatCode() range
     if g:rplugin_vimcomport == 0
-        if has("nvim")
-            call jobsend(g:rplugin_clt_job, "DiscoverVimComPort\n")
-        else
-            Py DiscoverVimComPort()
-        endif
-        if g:rplugin_vimcomport == 0
-            return
-        endif
+        return
     endif
 
     let lns = getline(a:firstline, a:lastline)
@@ -1544,14 +1540,7 @@ endfunction
 
 function RInsert(cmd)
     if g:rplugin_vimcomport == 0
-        if has("nvim")
-            call jobsend(g:rplugin_clt_job, "DiscoverVimComPort\n")
-        else
-            Py DiscoverVimComPort()
-        endif
-        if g:rplugin_vimcomport == 0
-            return
-        endif
+        return
     endif
 
     call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
@@ -1626,7 +1615,7 @@ function SendCmdToR_Windows(cmd)
     for i in range(0, slen)
         let str = str . printf("\\x%02X", char2nr(cmd[i]))
     endfor
-    exe "Py" . " SendToRConsole(b'" . str . "')"
+    let repl = libcall(g:rplugin_vimcom_lib, "SendToRConsole", str)
     return 1
 endfunction
 
@@ -2120,7 +2109,14 @@ endfunction
 " Clear the console screen
 function RClearConsole()
     if (has("win32") || has("win64"))
-        Py RClearConsolePy()
+        if g:vimrplugin_Rterm
+            let repl = libcall(g:rplugin_vimcom_lib, "RClearConsole()", "Rterm")
+        else
+            let repl = libcall(g:rplugin_vimcom_lib, "RClearConsole()", "Rgui")
+        endif
+        if repl != "OK"
+            call RWarningMsg(repl)
+        endif
     else
         if g:vimrplugin_r_in_buffer
             let edbuf = bufname("%")
@@ -2183,7 +2179,7 @@ function RQuit(how)
     endif
 
     if has("win32") || has("win64")
-        exe "Py SendQuitMsg('" . qcmd . "')"
+        let repl = libcall(g:rplugin_vimcom_lib, "SendQuitMsg", qcmd)
     else
         call g:SendCmdToR(qcmd)
         if g:rplugin_do_tmux_split
@@ -2465,13 +2461,6 @@ endfunction
 " Show R's help doc in Vim's buffer
 " (based  on pydoc plugin)
 function ShowRDoc(rkeyword, package, getclass)
-    if !has("nvim")
-        if !has("python") && !has("python3")
-            call RWarningMsg("Python support is required to see R documentation on Vim.")
-            return
-        endif
-    endif
-
     if filewritable(g:rplugin_docfile)
         call delete(g:rplugin_docfile)
     endif
@@ -2666,19 +2655,24 @@ function RSetPDFViewer()
 endfunction
 
 function RStart_Zathura(basenm)
-    let shcode = ['#!/bin/sh', 'echo "call SyncTeX_backward(' . "'$1'" . ', $2)" >> "' . $VIMRPLUGIN_TMPDIR . '/zathura_search"']
-    call writefile(shcode, $VIMRPLUGIN_TMPDIR . "/synctex_back.sh")
+    if has("nvim")
+        let shcode = ['#!/bin/sh', 'echo "call SyncTeX_backward(' . "'$1'" . ', $2)" >> "' . $VIMRPLUGIN_TMPDIR . '/zathura_search"']
+        call writefile(shcode, $VIMRPLUGIN_TMPDIR . "/synctex_back.sh")
+        let a2 = "a2 = 'sh " . $VIMRPLUGIN_TMPDIR . "/synctex_back.sh %{input} %{line}'",
+    else
+        let a2 = 'a2 = "vim --servername ' . v:servername . " --remote-expr \\\"SyncTeX_backward('%{input}',%{line})\\\"" . '"'
+    endif
     let pycode = ["import subprocess",
                 \ "import os",
+                \ "import sys",
                 \ "FNULL = open(os.devnull, 'w')",
                 \ "a1 = '--synctex-editor-command'",
-                \ "a2 = 'sh " . $VIMRPLUGIN_TMPDIR . "/synctex_back.sh %{input} %{line}'",
+                \ a2,
                 \ "a3 = '" . a:basenm . ".pdf'",
                 \ "zpid = subprocess.Popen(['zathura', a1, a2, a3], stdout = FNULL, stderr = FNULL).pid",
-                \ "print str(zpid)" ]
+                \ "sys.stdout.write(str(zpid))" ]
     call writefile(pycode, $VIMRPLUGIN_TMPDIR . "/start_zathura.py")
     let pid = system("python '" . $VIMRPLUGIN_TMPDIR . "/start_zathura.py" . "'")
-    let pid = substitute(pid, '\n', '', '')
     let g:rplugin_zathura_pid[a:basenm] = pid
     call delete($VIMRPLUGIN_TMPDIR . "/start_zathura.py")
 endfunction
@@ -2698,7 +2692,10 @@ function ROpenPDF(path)
     endif
 
     if (has("win32") || has("win64")) && g:rplugin_pdfviewer == "none"
-        exe 'Py OpenPDF("' . pdfpath . '")'
+        let repl = libcall(g:rplugin_vimcom_lib, 'OpenPDF', pdfpath)
+        if repl != "OK"
+            call RWarningMsg(repl)
+        endif
         exe "cd " . substitute(olddir, ' ', '\\ ', 'g')
         return
     endif
@@ -2713,11 +2710,7 @@ function ROpenPDF(path)
                 call system("wmctrl -a '" . basenm . ".pdf'")
             else
                 let g:rplugin_zathura_pid[basenm] = 0
-                if has("nvim")
-                    call RStart_Zathura(basenm)
-                else
-                    exe "Py Start_Zathura('" . basenm . "', '" . v:servername . "')"
-                endif
+                call RStart_Zathura(basenm)
             endif
             exe "cd " . substitute(olddir, ' ', '\\ ', 'g')
             return
@@ -3583,7 +3576,15 @@ endif
 " From changelog.vim, with bug fixed by "Si" ("i5ivem")
 " Windows logins can include domain, e.g: 'DOMAIN\Username', need to remove
 " the backslash from this as otherwise cause file path problems.
-let g:rplugin_userlogin = substitute(system('whoami'), "\\", "-", "")
+if executable("whoami")
+    let g:rplugin_userlogin = substitute(system('whoami'), "\\", "-", "")
+elseif $USER != ""
+    let g:rplugin_userlogin = $USER
+else
+    call RWarningMsgInp("Could not determine user name.")
+    let g:rplugin_failed = 1
+    finish
+endif
 
 if v:shell_error
     let g:rplugin_userlogin = 'unknown'
@@ -3744,7 +3745,10 @@ function SendToVimCom_Vim(...)
         call RWarningMsg("VimCom port is unknown.")
         return
     endif
-    exe "Py SendToVimCom('" . a:1 . "', " . g:rplugin_vimcomport . ")"
+    let repl = libcall(g:rplugin_vimcom_lib, "SendToVimCom", g:rplugin_vimcomport . " " . a:1)
+    if repl != "OK"
+        call RWarningMsg(repl)
+    endif
 endfunction
 
 function SendToVimCom_Neovim(...)
@@ -3759,20 +3763,6 @@ if has("nvim")
     let g:SendToVimCom = function("SendToVimCom_Neovim")
 else
     let g:SendToVimCom = function("SendToVimCom_Vim")
-endif
-
-if !has("nvim")
-    " python3 has priority over python
-    if has("python3")
-        command! -nargs=+ Py :py3 <args>
-        command! -nargs=+ PyFile :py3file <args>
-    elseif has("python")
-        command! -nargs=+ Py :py <args>
-        command! -nargs=+ PyFile :pyfile <args>
-    else
-        command! -nargs=+ Py :
-        command! -nargs=+ PyFile :
-    endif
 endif
 
 
@@ -3883,40 +3873,6 @@ endif
 let g:rplugin_globalenvlines = []
 
 if has("win32") || has("win64")
-
-    if !has("python") && !has("python3")
-        redir => s:vimversion
-        silent version
-        redir END
-        let s:haspy2 = stridx(s:vimversion, '+python ')
-        if s:haspy2 < 0
-            let s:haspy2 = stridx(s:vimversion, '+python/dyn')
-        endif
-        let s:haspy3 = stridx(s:vimversion, '+python3')
-        if s:haspy2 > 0 || s:haspy3 > 0
-            let s:pyver = ""
-            if s:haspy2 > 0 && s:haspy3 > 0
-                let s:pyver = " (" . substitute(s:vimversion, '.*\(python2.\.dll\).*', '\1', '') . ", "
-                let s:pyver = s:pyver . substitute(s:vimversion, '.*\(python3.\.dll\).*', '\1', '') . ")"
-            elseif s:haspy3 > 0 && s:haspy2 < 0
-                let s:pyver = " (" . substitute(s:vimversion, '.*\(python3.\.dll\).*', '\1', '') . ")"
-            elseif s:haspy2 > 0 && s:haspy3 < 0
-                let s:pyver = " (" . substitute(s:vimversion, '.*\(python2.\.dll\).*', '\1', '') . ")"
-            endif
-            let s:xx = substitute(s:vimversion, '.*\([0-9][0-9]-bit\).*', '\1', "")
-            call RWarningMsgInp("This version of Vim was compiled against Python" . s:pyver . ", but Python was not found. Please, install " . s:xx . " Python from www.python.org.")
-        else
-            call RWarningMsgInp("This version of Vim was not compiled with Python support.")
-        endif
-        let g:rplugin_failed = 1
-        finish
-    endif
-    let rplugin_pywin32 = 1
-    exe "PyFile " . substitute(g:rplugin_home, " ", '\\ ', "g") . '\r-plugin\windows.py'
-    if rplugin_pywin32 == 0
-        let g:rplugin_failed = 1
-        finish
-    endif
     if !exists("g:rplugin_rpathadded")
         if exists("g:vimrplugin_r_path")
             if !isdirectory(g:vimrplugin_r_path)
@@ -4139,13 +4095,6 @@ function GetRandomNumber(width)
         call writefile(pycode, $VIMRPLUGIN_TMPDIR . "/getRandomNumber.py")
         let randnum = system(g:rplugin_py_exec . " " . $VIMRPLUGIN_TMPDIR . "/getRandomNumber.py")
         call delete($VIMRPLUGIN_TMPDIR . "/getRandomNumber.py")
-    elseif has("python") || has("python3")
-        Py import os
-        Py import base64
-        Py import vim
-        Py vim.command("let g:rplugin_random = '" + base64.b64encode(os.urandom(16)).decode() + "'")
-        let randnum = g:rplugin_random
-        unlet g:rplugin_random
     elseif !has("win32") && !has("win64") && !has("gui_win32") && !has("gui_win64")
         let randnum = system("echo $RANDOM")
     else
@@ -4176,10 +4125,6 @@ let g:rplugin_docfile = $VIMRPLUGIN_TMPDIR . "/Rdoc"
 " starting R:
 if &filetype != "rbrowser"
     call writefile([], $VIMRPLUGIN_TMPDIR . "/GlobalEnvList_" . $VIMINSTANCEID)
-endif
-
-if !has("nvim")
-    exe "PyFile " . substitute(g:rplugin_home, " ", '\\ ', "g") . "/r-plugin/vimcom.py"
 endif
 
 call SetRPath()

@@ -116,11 +116,10 @@ Before installing the plugin, you should install its dependencies:
 
    Vim >= 7.4: http://www.vim.org/download.php
                In addition to the most commonly used features, the plugin
-               requires: |+python| or |+python3|, |+clientserver| and |+conceal|.
+               requires: |+clientserver| and |+conceal|.
 
-	       Note: If you use Neovim, |+python|, |+python3| and
-	       |+clientserver| features are not required, but the python
-	       executable must be in your PATH.
+	       Note: If you use Neovim, the |+clientserver| feature is not
+	       required.
 
 	       Note: If you use Mac OS X, read about the bugs that affect it:
 	       |r-plugin-nox|.
@@ -236,20 +235,6 @@ dependencies:
       download and install the zip file.
 
     * Vim's version must be >= 7.4: http://www.vim.org/download.php
-
-    * Python 2.7.6 (32 bit):
-      http://www.python.org/ftp/python/2.7.6/python-2.7.6.msi
-      Do not choose the X86-64 version because it will not work.
-
-    * pywin32:
-      http://sourceforge.net/projects/pywin32/files/pywin32/Build%20218/pywin32-218.win32-py2.7.exe/download
-
-      Note: The above versions of Python and pywin32 are known to work with
-      the official GVim 7.4 binary. The default download may not match the
-      Python version Vim was linked against: then you have to "View all files"
-      on the download page to find the file that matches exactly the above
-      versions. Please, read |r-plugin-python| if you need to use different
-      versions.
 
 Now, download the latest version of `Vim-R-plugin.vmb` from
 
@@ -1445,10 +1430,11 @@ The valid values of vimrplugin_vimpager are:
 
    "tab"       : Show the help document in a new tab. If there is already a
                  tab with an R help document tab, use it.
-                 This is the default.
+                 This is the default if vimrplugin_r_in_buffer = 0.
    "vertical"  : Split the window vertically if the editor width is large
                  enough; otherwise, split the window horizontally and attempt
                  to set the window height to at least 20 lines.
+                 This is the default if vimrplugin_r_in_buffer = 1.
    "horizontal": Split the window horizontally.
    "tabnew"    : Show the help document in a new tab.
    "no"        : Do not show R documentation in Vim.
@@ -2293,9 +2279,7 @@ directory after the installation:
    syntax/rdoc.vim
    syntax/rbrowser.vim
    doc/r-plugin.txt
-   r-plugin/vimcom.py
    r-plugin/global_r_plugin.vim
-   r-plugin/windows.py
    r-plugin/objlist/README
    r-plugin/r.snippets
    r-plugin/common_buffer.vim
@@ -2926,33 +2910,8 @@ Finally, if you want to use vi key bindings in Bash:
 <
 
 ------------------------------------------------------------------------------
-							     *r-plugin-python*
-9.22. Python versions~
-
-Are you using Windows and need to use a specific version of either Python or
-pywin32? The official Vim is 32 bit and, thus, Python must be 32 bit too.
-However, Vim and R run as independent processes, that is, you may have 32 bit
-Vim sending commands to 64 bit R. Be careful to download the correct Python
-version because Vim needs a specific version of Python DLL. For example, the
-official Vim 7.4 for Windows needs either Python 2.7 or 3.2. If Python was not
-installed or was not found, the Vim-R-plugin will output information about
-what Python version Vim was compiled against. Do the following if you want to
-discover this information manually:
-
-   1. Type  :version  in Vim (normal mode).
-
-   2. Look for a string like -DDYNAMIC_PYTHON_DLL="python27.dll".
-
-   3. Install the Python version which corresponds to the version which Vim
-   was linked against. In the example of step 2 (python27.dll) the required
-   Python version is 2.7.x.
-
-    * pywin32: http://sourceforge.net/projects/pywin32/
-
-
-------------------------------------------------------------------------------
 							    *r-plugin-toolbar*
-9.23. Add tool bar icons and hide unused buttons~
+9.22. Add tool bar icons and hide unused buttons~
 
 If you want to add some R buttons to GVim tool bar download the zip file
 http://www.lepem.ufc.br/jaa/bitmaps.zip and unpack it at either ~/.vim
@@ -2966,22 +2925,25 @@ below to know how to hide buttons on the toolbar:
 
 ------------------------------------------------------------------------------
 
-9.24. Integration with GNU Screen, screen plugin, Conque Shell or VimShell~
+9.23. Integration with GNU Screen, screen plugin, Conque Shell or VimShell~
 
 The plugin used to be able to use GNU Screen (through screen plugin), Conque
 Shell or VimShell to send commands to R. This integration was removed on
 August 20, 2013. People wanting this integration back into the plugin may want
 to use the old Vim-R-plugin code as a starting point to create scripts to be
 sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
+See also |vimrplugin_r_in_buffer|.
 
 
 ==============================================================================
 							       *r-plugin-news*
 10. News~
 
-1.1.1 (2014-11-22)
+1.1.1 (2014-11-24)
 
  * New option (Neovim only): vimrplugin_r_in_buffer.
+
+ * No longer requires +python feature.
 
 1.1 (2014-11-13)
 

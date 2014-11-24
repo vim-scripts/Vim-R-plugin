@@ -91,14 +91,7 @@ endfunction
 " Sweave and compile the current buffer content
 function! RMakePDF(bibtex, knit)
     if g:rplugin_vimcomport == 0
-        if has("nvim")
-            call jobsend(g:rplugin_clt_job, "DiscoverVimComPort\n")
-        else
-            Py DiscoverVimComPort()
-        endif
-        if g:rplugin_vimcomport == 0
-            call RWarningMsg("The vimcom package is required to make and open the PDF.")
-        endif
+        call RWarningMsg("The vimcom package is required to make and open the PDF.")
     endif
     update
     let rnwdir = expand("%:p:h")
@@ -521,15 +514,12 @@ function! SyncTeX_forward(...)
             endif
         else
             let g:rplugin_zathura_pid[basenm] = 0
-            if has("nvim")
-                call RStart_Zathura(basenm)
-            else
-                exe "Py Start_Zathura('" . basenm . "', '" . v:servername . "')"
+            call RStart_Zathura(basenm)
             endif
         endif
         call system("wmctrl -a '" . basenm . ".pdf'")
     elseif g:rplugin_pdfviewer == "sumatra"
-        Py OpenSumatra(basenm . ".pdf", substitute(expand("%:p:h"), ' ', '\\ ', 'g') . "/" . basenm . ".tex", texln)
+        call RWarningMsg("Support for Sumatra not implemented yet.")
     elseif g:rplugin_pdfviewer == "skim"
         " This command is based on Skim wiki (not tested)
         call system("/Applications/Skim.app/Contents/SharedSupport/displayline " . texln . " '" . basenm . ".pdf' 2> /dev/null >/dev/null &")
