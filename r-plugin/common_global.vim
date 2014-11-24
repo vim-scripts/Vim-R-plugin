@@ -3932,35 +3932,32 @@ if has("win32") || has("win64")
             let $PATH = g:vimrplugin_r_path . ";" . $PATH
             let g:rplugin_Rgui = g:vimrplugin_r_path . "\\Rgui.exe"
         else
-            Py GetRPath()
-            if exists("s:rinstallpath")
-                if s:rinstallpath == "Key not found"
-                    call RWarningMsgInp("Could not find R key in Windows Registry. Please, either install R or set the value of 'vimrplugin_r_path'.")
-                    let g:rplugin_failed = 1
-                    finish
-                endif
-                if s:rinstallpath == "Path not found"
-                    call RWarningMsgInp("Could not find R path in Windows Registry. Please, either install R or set the value of 'vimrplugin_r_path'.")
-                    let g:rplugin_failed = 1
-                    finish
-                endif
-                if isdirectory(s:rinstallpath . '\bin\i386')
-                    if !isdirectory(s:rinstallpath . '\bin\x64')
-                        let g:vimrplugin_i386 = 1
-                    endif
-                    if g:vimrplugin_i386
-                        let $PATH = s:rinstallpath . '\bin\i386;' . $PATH
-                        let g:rplugin_Rgui = s:rinstallpath . '\bin\i386\Rgui.exe'
-                    else
-                        let $PATH = s:rinstallpath . '\bin\x64;' . $PATH
-                        let g:rplugin_Rgui = s:rinstallpath . '\bin\x64\Rgui.exe'
-                    endif
-                else
-                    let $PATH = s:rinstallpath . '\bin;' . $PATH
-                    let g:rplugin_Rgui = s:rinstallpath . '\bin\Rgui.exe'
-                endif
-                unlet s:rinstallpath
+            let rip = filter(split(system('reg.exe QUERY "HKLM\SOFTWARE\R-core\R" /s'), "\n"), 'v:val =~ ".*InstallPath.*REG_SZ"')
+            if len(rip) > 0
+                let s:rinstallpath = substitute(rip[0], "InstallPath.*REG_SZ *", "", "")
             endif
+
+            if !exists("s:rinstallpath")
+                call RWarningMsgInp("Could not find R path in Windows Registry. If you have already installed R, please, set the value of 'vimrplugin_r_path'.")
+                let g:rplugin_failed = 1
+                finish
+            endif
+            if isdirectory(s:rinstallpath . '\bin\i386')
+                if !isdirectory(s:rinstallpath . '\bin\x64')
+                    let g:vimrplugin_i386 = 1
+                endif
+                if g:vimrplugin_i386
+                    let $PATH = s:rinstallpath . '\bin\i386;' . $PATH
+                    let g:rplugin_Rgui = s:rinstallpath . '\bin\i386\Rgui.exe'
+                else
+                    let $PATH = s:rinstallpath . '\bin\x64;' . $PATH
+                    let g:rplugin_Rgui = s:rinstallpath . '\bin\x64\Rgui.exe'
+                endif
+            else
+                let $PATH = s:rinstallpath . '\bin;' . $PATH
+                let g:rplugin_Rgui = s:rinstallpath . '\bin\Rgui.exe'
+            endif
+            unlet s:rinstallpath
         endif
         let g:rplugin_rpathadded = 1
     endif

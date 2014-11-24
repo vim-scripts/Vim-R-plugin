@@ -12,8 +12,6 @@ try:
     import win32com.client
     import win32con
     import win32gui
-    # import win32ui
-    # import dde
 except ImportError:
     import platform
     myPyVersion = platform.python_version()
@@ -147,34 +145,6 @@ def SendQuitMsg(aString):
         RightClick()
         RConsole = 0
 
-def GetRPath():
-    keyName = "SOFTWARE\\R-core\\R"
-    kHandle = None
-    try:
-        kHandle = win32api.RegOpenKeyEx(win32con.HKEY_LOCAL_MACHINE, keyName, 0, win32con.KEY_READ)
-        rVersion, reserved, kclass, lastwrite = win32api.RegEnumKeyEx(kHandle)[-1]
-        win32api.RegCloseKey(kHandle)
-        kHandle = None
-        keyName = keyName + "\\" + rVersion
-        kHandle = win32api.RegOpenKeyEx(win32con.HKEY_LOCAL_MACHINE, keyName, 0, win32con.KEY_READ)
-    except:
-        try:
-            kHandle = win32api.RegOpenKeyEx(win32con.HKEY_CURRENT_USER, keyName, 0, win32con.KEY_READ)
-            rVersion, reserved, kclass, lastwrite = win32api.RegEnumKeyEx(kHandle)[-1]
-            win32api.RegCloseKey(kHandle)
-            kHandle = None
-            keyName = keyName + "\\" + rVersion
-            kHandle = win32api.RegOpenKeyEx(win32con.HKEY_CURRENT_USER, keyName, 0, win32con.KEY_READ)
-        except:
-            vim.command("let s:rinstallpath =  'Key not found'")
-    if kHandle:
-        (kname, rpath, vtype) = win32api.RegEnumValue(kHandle, 0)
-        win32api.RegCloseKey(kHandle)
-        if kname == 'InstallPath':
-            vim.command("let s:rinstallpath = '" + rpath + "'")
-        else:
-            vim.command("let s:rinstallpath =  'Path not found'")
-
 def StartRPy():
     global Rterm
     if vim.eval("g:vimrplugin_Rterm") == "1":
@@ -228,21 +198,4 @@ def OpenPDF(fn):
         errstr = errstr.replace("'", '"')
         vim.command("call RWarningMsg('" + errstr + "')")
         pass
-
-# # The code below is adapted from fwdsumatra.py:
-# # Copyright: Julien Cornebise
-# # Date: February 20, 2009
-# # Description: This file calls ForwardSearch DDE function of SumatraPDF
-# def OpenSumatra(pdf, tex, line):
-#     # Convert backslashes to slashes, for Unix-style calling from vimlatex
-#     pdf = pdf.replace("/", "\\")
-#     # Connect to SumatraPDF
-#     server = dde.CreateServer()
-#     server.Create("LatexSuite")
-#     conversation = dde.CreateConversation(server)
-#     conversation.ConnectTo("SUMATRA", "control")
-#     # Build the DDE call
-#     execString='[ForwardSearch("'+pdf+'","'+tex+'",'+line+',0,0,1)'
-#     # Call !
-#     conversation.Exec(execString)
 
