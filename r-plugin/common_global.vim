@@ -1192,6 +1192,7 @@ function StartObjBrowser_Tmux()
                 \ 'let b:rscript_buffer = "' . bufname("%") . '"',
                 \ 'set filetype=rbrowser',
                 \ 'let g:rplugin_vimcom_home = "' . g:rplugin_vimcom_home . '"',
+                \ 'let g:rplugin_vimcom_lib = "' . g:rplugin_vimcom_lib . '"',
                 \ 'let b:objbrtitle = "' . b:objbrtitle . '"',
                 \ 'let b:rplugin_extern_ob = 1',
                 \ 'set shortmess=atI',
