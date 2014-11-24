@@ -789,15 +789,15 @@ function! StartR_Neovim()
     set switchbuf=useopen
     if g:vimrplugin_vsplit
         if g:vimrplugin_rconsole_width > 16 && g:vimrplugin_rconsole_width < (winwidth(0) - 16)
-            exe "belowright " . g:vimrplugin_rconsole_width . "vsplit R_Output"
+            silent exe "belowright " . g:vimrplugin_rconsole_width . "vsplit R_Output"
         else
-            belowright vsplit R_Output
+            silent belowright vsplit R_Output
         endif
     else
         if g:vimrplugin_rconsole_height > 6 && g:vimrplugin_rconsole_height < (winheight(0) - 6)
-            exe "belowright " . g:vimrplugin_rconsole_height . "split R_Output"
+            silent exe "belowright " . g:vimrplugin_rconsole_height . "split R_Output"
         else
-            belowright split R_Output
+            silent belowright split R_Output
         endif
     endif
     let b:winwidth = 0
@@ -1340,9 +1340,11 @@ endfunction
 
 " Open an Object Browser window
 function RObjBrowser()
-    if !has("python") && !has("python3") && !has("nvim")
-        call RWarningMsg("Python support is required to run the Object Browser.")
-        return
+    if !has("nvim")
+        if !has("python") && !has("python3")
+            call RWarningMsg("Python support is required to run the Object Browser.")
+            return
+        endif
     endif
 
     " Only opens the Object Browser if R is running
@@ -2104,7 +2106,15 @@ function RClearConsole()
     if (has("win32") || has("win64"))
         Py RClearConsolePy()
     else
-        call g:SendCmdToR("\014")
+        if g:vimrplugin_r_in_buffer
+            let edbuf = bufname("%")
+            sbuffer R_Output
+            call cursor("$", 1)
+            normal! zt
+            exe "sbuffer " . edbuf
+        else
+            call g:SendCmdToR("\014")
+        endif
     endif
 endfunction
 
@@ -2439,9 +2449,11 @@ endfunction
 " Show R's help doc in Vim's buffer
 " (based  on pydoc plugin)
 function ShowRDoc(rkeyword, package, getclass)
-    if !has("python") && !has("python3") && !has("nvim")
-        call RWarningMsg("Python support is required to see R documentation on Vim.")
-        return
+    if !has("nvim")
+        if !has("python") && !has("python3")
+            call RWarningMsg("Python support is required to see R documentation on Vim.")
+            return
+        endif
     endif
 
     if filewritable(g:rplugin_docfile)
@@ -3732,16 +3744,18 @@ else
     let g:SendToVimCom = function("SendToVimCom_Vim")
 endif
 
-" python3 has priority over python
-if has("python3")
-    command! -nargs=+ Py :py3 <args>
-    command! -nargs=+ PyFile :py3file <args>
-elseif has("python")
-    command! -nargs=+ Py :py <args>
-    command! -nargs=+ PyFile :pyfile <args>
-else
-    command! -nargs=+ Py :
-    command! -nargs=+ PyFile :
+if !has("nvim")
+    " python3 has priority over python
+    if has("python3")
+        command! -nargs=+ Py :py3 <args>
+        command! -nargs=+ PyFile :py3file <args>
+    elseif has("python")
+        command! -nargs=+ Py :py <args>
+        command! -nargs=+ PyFile :pyfile <args>
+    else
+        command! -nargs=+ Py :
+        command! -nargs=+ PyFile :
+    endif
 endif
 
 
@@ -4150,15 +4164,7 @@ if &filetype != "rbrowser"
     call writefile([], $VIMRPLUGIN_TMPDIR . "/GlobalEnvList_" . $VIMINSTANCEID)
 endif
 
-if has("nvim")
-    if g:rplugin_py_exec != "none"
-        if &filetype == "rbrowser"
-            let $THIS_IS_ObjBrowser = "yes"
-        endif
-    else
-        call RWarningMsgInp("Python executable not found.")
-    endif
-else
+if !has("nvim")
     exe "PyFile " . substitute(g:rplugin_home, " ", '\\ ', "g") . "/r-plugin/vimcom.py"
 endif
 
