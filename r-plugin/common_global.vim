@@ -786,6 +786,8 @@ function! StartR_Neovim()
     let g:SendCmdToR = function('SendCmdToR_Neovim')
 
     let edbuf = bufname("%")
+    let g:tmp_objbrtitle = b:objbrtitle
+    let g:tmp_curbufname = bufname("%")
     set switchbuf=useopen
     if g:vimrplugin_vsplit
         if g:vimrplugin_rconsole_width > 16 && g:vimrplugin_rconsole_width < (winwidth(0) - 16)
@@ -805,6 +807,10 @@ function! StartR_Neovim()
     setlocal noswapfile
     setlocal bufhidden=hide
     set buftype=nofile
+    let b:objbrtitle = g:tmp_objbrtitle
+    let b:rscript_buffer = g:tmp_curbufname
+    unlet g:tmp_objbrtitle
+    unlet g:tmp_curbufname
     imap <buffer> <CR> <Esc>:call EnterRCmd()<CR>o
     call cursor("$", 1)
     exe "sbuffer " . edbuf
@@ -1067,8 +1073,8 @@ function WaitVimComStart()
     if filereadable($VIMRPLUGIN_TMPDIR . "/vimcom_running_" . $VIMINSTANCEID)
         let vr = readfile($VIMRPLUGIN_TMPDIR . "/vimcom_running_" . $VIMINSTANCEID)
         let g:rplugin_vimcom_version = vr[0]
-        if g:rplugin_vimcom_version != "1.1-0-dev2"
-            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.1-0-dev2.')
+        if g:rplugin_vimcom_version != "1.1-0-dev3"
+            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.1-0-dev3.')
             sleep 1
         endif
         let g:rplugin_vimcom_home = vr[1]
@@ -1078,22 +1084,32 @@ function WaitVimComStart()
                 call jobstop(g:rplugin_clt_job)
                 let g:rplugin_clt_job = 0
             endif
-            if filereadable(g:rplugin_vimcom_home . "/bin/nvimclient")
-                let g:rplugin_clt_job = jobstart('vimcom', g:rplugin_vimcom_home . "/bin/nvimclient", [g:rplugin_vimcomport])
+            if has("win32") || has("win64")
+                let nvc = g:rplugin_vimcom_home . "/bin/nvimclient.exe"
+                let nvs = g:rplugin_vimcom_home . "/bin/nvimserver.exe"
+            else
+                let nvc = g:rplugin_vimcom_home . "/bin/nvimclient"
+                let nvs = g:rplugin_vimcom_home . "/bin/nvimserver"
+            endif
+            if filereadable(nvc)
+                let g:rplugin_clt_job = jobstart('vimcom', nvc, [g:rplugin_vimcomport])
                 autocmd JobActivity vimcom call ROnJobActivity()
             else
-                call RWarningMsg('Application "' . g:rplugin_vimcom_home . "/bin/nvimclient" . '" not found.")
+                call RWarningMsg('Application "' . nvc . '" not found.")
             endif
-            if filereadable(g:rplugin_vimcom_home . "/bin/nvimserver")
+            if filereadable(nvs)
                 if !exists("g:rplugin_srv_job")
-                    let g:rplugin_srv_job = jobstart('udpsvr', g:rplugin_vimcom_home . "/bin/nvimserver")
+                    let g:rplugin_srv_job = jobstart('udpsvr', nvs)
                     autocmd JobActivity udpsvr call ROnJobActivity()
                 endif
             else
-                call RWarningMsg('Application "' . g:rplugin_vimcom_home . "/bin/nvimserver" . '" not found.')
+                call RWarningMsg('Application "' . nvs . '" not found.')
             endif
         endif
         call delete($VIMRPLUGIN_TMPDIR . "/vimcom_running_" . $VIMINSTANCEID)
+        if has("nvim") && g:vimrplugin_vimpager != "no"
+            call g:SendToVimCom("\x08" . $VIMINSTANCEID . "options(pager = vimcom:::vim.hmsg)", "I")
+        endif
         return 1
     else
         call RWarningMsg("The package vimcom wasn't loaded yet.")
@@ -2461,7 +2477,7 @@ function ShowRDoc(rkeyword, package, getclass)
     endif
 
     let classfor = ""
-    if bufname("%") =~ "Object_Browser"
+    if bufname("%") =~ "Object_Browser" || bufname("%") == "R_Output"
         let savesb = &switchbuf
         set switchbuf=useopen,usetab
         exe "sb " . b:rscript_buffer
@@ -2579,6 +2595,7 @@ function ShowRDoc(rkeyword, package, getclass)
     let @@ = save_unnamed_reg
     setlocal nomodified
     redraw
+    stopinsert
 endfunction
 
 function RSetPDFViewer()
