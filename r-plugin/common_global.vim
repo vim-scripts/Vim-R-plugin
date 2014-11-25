@@ -741,6 +741,21 @@ function StartR_Windows()
     let vrph = $VIMRPLUGIN_HOME
     let $VIMRPLUGIN_HOME = substitute($VIMRPLUGIN_HOME, "\\\\ ", " ", "g")
 
+    if !executable(g:rplugin_Rgui)
+        call RWarningMsg('R executable "' . g:rplugin_Rgui . '" not found.')
+        return
+    endif
+
+    " R and Vim use different values for the $HOME variable.
+    let saved_home = $HOME
+    let prs = system('reg.exe QUERY "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders" /v "Personal"')
+    if len(prs) > 0
+        let prs = substitute(prs, '.*REG_SZ\s*', '', '')
+        let prs = substitute(prs, '\n', '', 'g')
+        let prs = substitute(prs, '\s*$', '', 'g')
+        let $HOME = prs
+    endif
+
     let rcmd = g:rplugin_Rgui
     if g:vimrplugin_Rterm
         let rcmd = substitute(rcmd, "Rgui", "Rterm", "")
@@ -748,6 +763,8 @@ function StartR_Windows()
     let rcmd = '"' . rcmd . '" ' . g:vimrplugin_r_args
 
     silent exe "!start " . rcmd
+
+    let $HOME = saved_home
 
     if g:vimrplugin_vim_wd == 0
         lcd -
@@ -1080,8 +1097,8 @@ function WaitVimComStart()
     if filereadable($VIMRPLUGIN_TMPDIR . "/vimcom_running_" . $VIMINSTANCEID)
         let vr = readfile($VIMRPLUGIN_TMPDIR . "/vimcom_running_" . $VIMINSTANCEID)
         let g:rplugin_vimcom_version = vr[0]
-        if g:rplugin_vimcom_version != "1.1-0-dev4"
-            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.1-0-dev4.')
+        if g:rplugin_vimcom_version != "1.1.5"
+            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.1.5.')
             sleep 1
         endif
         let g:rplugin_vimcom_home = vr[1]
@@ -3252,7 +3269,6 @@ function MakeRMenu()
     endif
     if has("gui_win32") || has("gui_win64")
         amenu R.Help\ (plugin).Options.Use\ 32\ bit\ version\ of\ R :help vimrplugin_i386<CR>
-        amenu R.Help\ (plugin).Options.Sleep\ time :help vimrplugin_sleeptime<CR>
     endif
     amenu R.Help\ (plugin).Options.R\ path :help vimrplugin_r_path<CR>
     amenu R.Help\ (plugin).Options.Arguments\ to\ R :help vimrplugin_r_args<CR>
@@ -3891,7 +3907,7 @@ if has("win32") || has("win64")
         else
             let rip = filter(split(system('reg.exe QUERY "HKLM\SOFTWARE\R-core\R" /s'), "\n"), 'v:val =~ ".*InstallPath.*REG_SZ"')
             if len(rip) > 0
-                let s:rinstallpath = substitute(rip[0], "InstallPath.*REG_SZ *", "", "")
+                let s:rinstallpath = substitute(rip[0], "InstallPath.*REG_SZ\s*", "", "")
             endif
 
             if !exists("s:rinstallpath")
@@ -3925,9 +3941,6 @@ if has("win32") || has("win64")
     let g:vimrplugin_term = "none"
     if !exists("g:vimrplugin_r_args")
         let g:vimrplugin_r_args = "--sdi"
-    endif
-    if !exists("g:vimrplugin_sleeptime")
-        let g:vimrplugin_sleeptime = 0.02
     endif
     if g:vimrplugin_Rterm
         let g:rplugin_Rgui = substitute(g:rplugin_Rgui, "Rgui", "Rterm", "")

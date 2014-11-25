@@ -229,7 +229,7 @@ dependencies:
 
     * R's version must be >= 3.0.0: http://www.r-project.org/
 
-    * vimcom = 1.1-0: http://www.lepem.ufc.br/jaa/vimcom.html
+    * vimcom = 1.2-0: http://www.lepem.ufc.br/jaa/vimcom.html
 
       Note: If you cannot build vimcom yourself, you will want to
       download and install the zip file.
@@ -256,6 +256,11 @@ Note: If you need to install the plugin in a non default directory, do
 must be done before the command "filetype on" in both the system and the user
 |vimrc| files, otherwise, some file types might not be correctly recognized.
 
+Add the following lines to your `Rprofile`:
+>
+   if(Sys.getenv("VIMRPLUGIN_TMPDIR") != "")
+       library(vimcom)
+<
 Start GVim again and edit an R script. You can right click a .R file and
 choose "Edit with Vim" or create a new one with the Normal mode command:
 >
@@ -281,8 +286,6 @@ Finally, click on the menu bar
 <
 The above command will guide you through the final configuration steps if you
 answer `y` to all questions.
-
-You may have to adjust the value of |vimrplugin_sleeptime|.
 
 If you want to uninstall the plugin, do
 >
@@ -1191,7 +1194,6 @@ is running:
 |vimrplugin_routmorecolors|    More syntax highlighting in R output
 |vimrplugin_routnotab|         Show output of R CMD BATCH in new window
 |vimrplugin_indent_commented|  Indent lines commented with the \xx command
-|vimrplugin_sleeptime|         Delay while sending commands in MS Windows
 |vimrplugin_notmuxconf|        Don't use a specially built Tmux config file
 |vimrplugin_rconsole_height|   The number of lines of R Console (Tmux split)
 |vimrplugin_vsplit|            Make Tmux split the window vertically
@@ -1468,7 +1470,7 @@ Vim will run the first R executable in the path. You can set an alternative R
 path in your |vimrc| as in the examples:
 >
    let vimrplugin_r_path = "/path/to/my/preferred/R/version/bin"
-   let vimrplugin_r_path = "C:\\Program Files\\R\\R-3.0.1\\bin\\i386"
+   let vimrplugin_r_path = "C:\\Program Files\\R\\R-3.1.2\\bin\\i386"
 <
 On Windows, Vim will try to find the R install path in the Windows Registry.
 
@@ -1560,19 +1562,8 @@ table below (see |r-plugin-indenting|):
 <
 
 ------------------------------------------------------------------------------
-							*vimrplugin_sleeptime*
-6.13. Sleep time (Windows only)~
-
-The plugin gives to R a small amount of time to process the paste command. The
-default value is 0.2 second, but you should experiment different values. The
-example show how to adjust the value of sleeptime in your |vimrc|:
->
-   let vimrplugin_sleeptime = 0.1
-<
-
-------------------------------------------------------------------------------
 						       *vimrplugin_notmuxconf*
-6.14. Tmux configuration (Linux/Unix only)~
+6.13. Tmux configuration (Linux/Unix only)~
 
 
 GVim (or Vim running R in an external terminal emulator) runs Tmux with a
@@ -1592,7 +1583,7 @@ file (~/.tmux.conf).
                                                   *vimrplugin_vsplit*
 			                          *vimrplugin_rconsole_width*
                                                   *vimrplugin_tmux_title*
-6.15. Integration with Tmux (Linux/Unix only)~
+6.14. Integration with Tmux (Linux/Unix only)~
 
 These three options are valid only when Vim is started inside a Tmux session.
 In this case, when you type <LocalLeader>rf, the terminal will be split in two
@@ -1624,7 +1615,7 @@ or let Tmux set the title automatically. Examples:
 
 ------------------------------------------------------------------------------
                                                       *vimrplugin_applescript*
-6.16. Integration with AppleScript (OS X only)~
+6.15. Integration with AppleScript (OS X only)~
 
 In Mac OS X, the plugin will try to send commands to R gui using AppleScript.
 If you prefer either to run R and Vim in the same terminal emulator split in
@@ -1640,7 +1631,7 @@ Otherwise, R will start in an external terminal emulator.
 ------------------------------------------------------------------------------
 						      *vimrplugin_listmethods*
                                                       *vimrplugin_specialplot*
-6.17. Special R functions~
+6.16. Special R functions~
 
 The R function `args()` lists the arguments of a function, but not the arguments
 of its methods. If you want that the plugin calls the function
@@ -1657,7 +1648,7 @@ after <LocalLeader>rg if you put the following line in your |vimrc|:
 
 ------------------------------------------------------------------------------
 						       *vimrplugin_maxdeparse*
-6.18. maxdeparse~
+6.17. maxdeparse~
 
 You can set the argument maxdeparse to be passed to R's `source()` function.
 Example:
@@ -1668,7 +1659,7 @@ Example:
 ------------------------------------------------------------------------------
 						       *vimrplugin_sweaveargs*
 						       *vimrplugin_latexcmd*
-6.19. LaTeX command~
+6.18. LaTeX command~
 
 On Windows, the vimcom package calls `tools::texi2dvi()` to build the pdf
 from the generated .tex file. On Linux/Unix, by default, it calls
@@ -1687,7 +1678,7 @@ vimrplugin_sweaveargs variable.
 
 ------------------------------------------------------------------------------
 						  *vimrplugin_rmd_environment*
-6.20. Rmd environment~
+6.19. Rmd environment~
 
 When rendering an Rmd file, the code can be evaluated (and saved) in a
 specified environment.  The default value is `.GlobalEnv` which makes the
@@ -1700,7 +1691,7 @@ you can set
 
 ------------------------------------------------------------------------------
 						*vimrplugin_never_unmake_menu*
-6.21. Never unmake the R menu~
+6.20. Never unmake the R menu~
 
 Use this option if you want that the "R" menu item in GVim is not deleted when
 you change from one buffer to another, for example, when going from an .R file
@@ -1716,7 +1707,7 @@ different file type buffers.
 
 ------------------------------------------------------------------------------
 							    *vimrplugin_map_r*
-6.22. Map 'r'~
+6.21. Map 'r'~
 
 If the variable |vimrplugin_map_r| exists, the plugin will map the letter 'r'
 to send lines to R when there are visually selected lines, for compatibility
@@ -1736,7 +1727,7 @@ Emacs:
 
 ------------------------------------------------------------------------------
 							    *vimrplugin_ca_ck*
-6.23. Add ^A^K to the beginning of commands~
+6.22. Add ^A^K to the beginning of commands~
 
 When one types <C-a> in the R Console the cursor goes to the beginning of the
 line and when one types <C-k> the characters to the right of the cursor are
@@ -1752,7 +1743,7 @@ in your |vimrc|:
 	                                                *vimrplugin_pdfviewer*
                                                         *vimrplugin_openpdf*
                                                         *vimrplugin_openhtml*
-6.24. Open PDF after processing rnoweb, rmd or rrst files~
+6.23. Open PDF after processing rnoweb, rmd or rrst files~
 
 The plugin can automatically open the pdf file generated by pdflatex, after
 either `Sweave()` or `knit()`. This behavior is controlled by the variable
@@ -1790,7 +1781,7 @@ The html file will be automatically opened if you put the following in your
 			                             *vimrplugin_strict_rst*
                                                      *vimrplugin_rst2pdfpath*
 			                             *vimrplugin_rst2pdfargs*
-6.25. Support to RreStructuredText file~
+6.24. Support to RreStructuredText file~
 
 By default, the Vim-R-plugin sends the command `render_rst(strict=TRUE)` to R
 before using R's `knit()` function to convert an Rrst file into an rst one. If
@@ -1806,7 +1797,7 @@ to R function knit2pdf).
 
 ------------------------------------------------------------------------------
 						 *vimrplugin_insert_mode_cmds*
-6.26. Allow R commands in insert mode~
+6.25. Allow R commands in insert mode~
 
 Vim-R commands are designed to work in insert mode as well as normal mode.
 However, depending on your <LocalLeader>, this can make it very difficult to
@@ -1826,7 +1817,7 @@ See also: |r-plugin-localleader|.
 ------------------------------------------------------------------------------
 							 *vimrplugin_allnames*
 							 *vimrplugin_rmhidden*
-6.27. Show/remove hidden objects~
+6.26. Show/remove hidden objects~
 
 Hidden objects are not included in the list of objects for omni completion. If
 you prefer to include them, put in your |vimrc|:
@@ -1841,7 +1832,7 @@ you prefer to remove only visible objects, put in your |vimrc|:
 
 ------------------------------------------------------------------------------
 							   *vimrplugin_source*
-6.28. Source additional scripts~
+6.27. Source additional scripts~
 
 This variable should contain a comma separated list of Vim scripts to be
 sourced by the Vim-R-plugin. These scripts may provide additional
@@ -1862,7 +1853,7 @@ features:
 
 ------------------------------------------------------------------------------
 							  *vimrplugin_restart*
-6.29. Restart R if it is already running (Linux/Unix only)~
+6.28. Restart R if it is already running (Linux/Unix only)~
 
 When R is already running and you type one of the commands to start R before
 you have done <LocalLeader>rq, the Vim-R-plugin does one of the following:
@@ -1880,7 +1871,7 @@ do <LocalLeader>rf, <LocalLeader>rv or <LocalLeader>rc, then, put in your
 
 ------------------------------------------------------------------------------
 							*vimrplugin_show_args*
-6.30. Show extra information during omnicompletion~
+6.29. Show extra information during omnicompletion~
 
 If you want that Vim shows a preview window with the function arguments as you
 do omnicompletion, put in your |vimrc|:
@@ -1894,7 +1885,7 @@ will be shown only if "preview" is also included in your 'completeopt'.
 
 ------------------------------------------------------------------------------
 						      *vimrplugin_vimcom_wait*
-6.31. Time to wait for vimcom loading~
+6.30. Time to wait for vimcom loading~
 
 The Vim-R-plugin waits 5000 milliseconds for vimcom package to be loaded
 during R startup. It then checks whether you are using the correct version of
@@ -1921,7 +1912,7 @@ If you do not want to install the vimcom package, then put in your
 
 ------------------------------------------------------------------------------
 							   *vimrplugin_vim_wd*
-6.32 Start R in working directory of Vim~
+6.31 Start R in working directory of Vim~
 
 The Vim-R-plugin starts R in the directory where the current buffer is. If you
 want R's working directory to be the same as Vim's working directory, put in
@@ -1934,7 +1925,7 @@ This option is useful only for those who did not enable 'autochdir'.
 
 ------------------------------------------------------------------------------
 						   *vimrplugin_user_maps_only*
-6.33 Only set key bindings that are user specified~
+6.32 Only set key bindings that are user specified~
 
 The Vim-R-plugin sets many default key bindings.  The user can set custom
 key bindings (|r-plugin-key-bindings|).  If you wish the Vim-R-plugin to only
@@ -1945,7 +1936,7 @@ set those key-bindings specified by the user, put in your vimrc:
 
 ------------------------------------------------------------------------------
 							    *r-plugin-SyncTeX*
-6.34 SyncTeX support (Linux only)~
+6.33 SyncTeX support (Linux only)~
 
 SyncTeX is a set of communication systems used by some PDF viewers and by some
 text editors which allow users to jump from a specific line in the text editor
@@ -1985,7 +1976,7 @@ Note: The current knitr package (version 1.7) has at least two limitations:
 
 
 ------------------------------------------------------------------------------
-6.34.1 Evince configuration~
+6.33.1 Evince configuration~
 
 If you have Evince installed, the Vim-R-plugin assumes that you are using it
 to view PDF documents and that you run either GVim or Vim in Gnome-Terminal.
@@ -1998,7 +1989,7 @@ to press <LocalLeader>gp again.
 
 
 ------------------------------------------------------------------------------
-6.34.2 Okular configuration~
+6.33.2 Okular configuration~
 
 You have to configure Okular to call Vim during backward searches.
 In Okular, click in:
@@ -2042,7 +2033,7 @@ requires additional steps because Neovim does not have the argument
 <
 
 ------------------------------------------------------------------------------
-6.34.3 Zathura configuration~
+6.33.3 Zathura configuration~
 
 Zathura (version >= 0.3.1) is also supported. If the terminal emulator is not
 raised during backward search (from PDF to Vim), you have to set the value of
@@ -2056,7 +2047,7 @@ to press <LocalLeader>gp again.
 ------------------------------------------------------------------------------
                                                        *vimrplugin_vim_window*
 				                       *vimrplugin_synctex*
-6.34.4 Configuring the PDF editor and Vim's window title~
+6.33.4 Configuring the PDF editor and Vim's window title~
 
 If SyncTeX does not work (see above), you may try to set in your |vimrc| the
 values of |vimrplugin_pdfviewer| and vimrplugin_vim_window.
@@ -2944,6 +2935,8 @@ See also |vimrplugin_r_in_buffer|.
  * New option (Neovim only): vimrplugin_r_in_buffer.
 
  * No longer requires +python feature.
+
+ * Removed option vimrplugin_sleeptime.
 
 1.1 (2014-11-13)
 
