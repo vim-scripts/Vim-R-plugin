@@ -831,6 +831,12 @@ function! StartR_Neovim()
     setlocal noswapfile
     setlocal bufhidden=hide
     set buftype=nofile
+    set omnifunc=rcomplete#CompleteR
+    if hasmapto("<Plug>RCompleteArgs", "i")
+        imap <buffer><silent> <Plug>RCompleteArgs <C-R>=RCompleteArgs()<CR>
+    else
+        imap <buffer><silent> <C-X><C-A> <C-R>=RCompleteArgs()<CR>
+    endif
     let b:objbrtitle = g:tmp_objbrtitle
     let b:rscript_buffer = g:tmp_curbufname
     unlet g:tmp_objbrtitle

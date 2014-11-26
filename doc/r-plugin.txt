@@ -1292,13 +1292,17 @@ your |vimrc|:
 >
    let vimrplugin_r_in_buffer = 1
 <
-R will run as a Neovim job and the output will be displayed in a buffer. In
-addition to sending code from the R script buffer to R, you can also press
-<LocalLeader><LocalLeader> in Normal mode to open an R scratch buffer to type
-commands that want to see evaluated by R but do not want in your final script.
-Syntax highlight and omnicompletion will be available in the scratch buffer.
-If the cursor is in the last line of the R_Output buffer and Neovim is in
-Insert mode, an <Enter> will submit the line to R evaluation.
+R will run as a Neovim job and the output will be displayed in a buffer. If
+the cursor is in the last line of the R_Output buffer and Neovim is in Insert
+mode, an <Enter> will submit the line to R evaluation. You can use <C-x><C-o>
+to complete names of objects and <C-x><C-a> to complete the names of function
+arguments.
+
+Whether you are in the R script buffer or in the R_Output buffer, you can also
+press <LocalLeader><LocalLeader> in Normal mode to open an R scratch buffer to
+type commands that you want to see evaluated by R but do not want in your
+final script. The keys <Esc> and <q> are mapped in Normal mode to quit the
+scratch buffer.
 
 You can set the foreground colors of R output in your |vimrc| when you are
 running Neovim in a terminal emulator. The example below is for a terminal
@@ -2930,7 +2934,7 @@ See also |vimrplugin_r_in_buffer|.
 							       *r-plugin-news*
 10. News~
 
-1.1.1 (2014-11-24)
+1.1.1 (2014-11-26)
 
  * New option (Neovim only): vimrplugin_r_in_buffer.
 
