@@ -1097,19 +1097,12 @@ function WaitVimComStart()
     if filereadable($VIMRPLUGIN_TMPDIR . "/vimcom_running_" . $VIMINSTANCEID)
         let vr = readfile($VIMRPLUGIN_TMPDIR . "/vimcom_running_" . $VIMINSTANCEID)
         let g:rplugin_vimcom_version = vr[0]
+        let g:rplugin_vimcom_home = vr[1]
+        let g:rplugin_vimcomport = vr[2]
         if g:rplugin_vimcom_version != "1.1.5"
             call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.1.5.')
             sleep 1
         endif
-        let g:rplugin_vimcom_home = vr[1]
-        if has("win32")
-            let g:rplugin_vimcom_lib = g:rplugin_vimcom_home . "/libs/i386/vimcom.dll"
-        elseif has("win64")
-            let g:rplugin_vimcom_lib = g:rplugin_vimcom_home . "/libs/x64/vimcom.dll"
-        else
-            let g:rplugin_vimcom_lib = g:rplugin_vimcom_home . "/libs/vimcom.so"
-        endif
-        let g:rplugin_vimcomport = vr[2]
         if has("nvim")
             if g:rplugin_clt_job
                 call jobstop(g:rplugin_clt_job)
@@ -1135,6 +1128,17 @@ function WaitVimComStart()
                 endif
             else
                 call RWarningMsg('Application "' . nvs . '" not found.')
+            endif
+        else
+            if has("win32")
+                let g:rplugin_vimcom_lib = g:rplugin_vimcom_home . "/libs/i386/vimcom.dll"
+            elseif has("win64")
+                let g:rplugin_vimcom_lib = g:rplugin_vimcom_home . "/libs/x64/vimcom.dll"
+            else
+                let g:rplugin_vimcom_lib = g:rplugin_vimcom_home . "/libs/vimcom.so"
+            endif
+            if !filereadable(g:rplugin_vimcom_lib)
+                call RWarningMsg('Could not find "' . g:rplugin_vimcom_lib . '".')
             endif
         endif
         call delete($VIMRPLUGIN_TMPDIR . "/vimcom_running_" . $VIMINSTANCEID)
@@ -1742,7 +1746,7 @@ function SendFileToR(e)
 endfunction
 
 " Send block to R
-" Adapted of the plugin marksbrowser
+" Adapted from marksbrowser plugin
 " Function to get the marks which the cursor is between
 function SendMBlockToR(e, m)
     if &filetype != "r" && b:IsInRCode(1) == 0
@@ -2676,7 +2680,7 @@ function RStart_Zathura(basenm)
     if has("nvim")
         let shcode = ['#!/bin/sh', 'echo "call SyncTeX_backward(' . "'$1'" . ', $2)" >> "' . $VIMRPLUGIN_TMPDIR . '/zathura_search"']
         call writefile(shcode, $VIMRPLUGIN_TMPDIR . "/synctex_back.sh")
-        let a2 = "a2 = 'sh " . $VIMRPLUGIN_TMPDIR . "/synctex_back.sh %{input} %{line}'",
+        let a2 = "a2 = 'sh " . $VIMRPLUGIN_TMPDIR . "/synctex_back.sh %{input} %{line}'"
     else
         let a2 = 'a2 = "vim --servername ' . v:servername . " --remote-expr \\\"SyncTeX_backward('%{input}',%{line})\\\"" . '"'
     endif
@@ -3770,7 +3774,7 @@ endfunction
 
 function SendToVimCom_Neovim(...)
     if g:rplugin_clt_job == 0
-        call RWarningMsg("VimCom client not runing.")
+        call RWarningMsg("VimCom client not running.")
         return
     endif
     call jobsend(g:rplugin_clt_job, a:1 . "\n")

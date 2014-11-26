@@ -515,7 +515,6 @@ function! SyncTeX_forward(...)
         else
             let g:rplugin_zathura_pid[basenm] = 0
             call RStart_Zathura(basenm)
-            endif
         endif
         call system("wmctrl -a '" . basenm . ".pdf'")
     elseif g:rplugin_pdfviewer == "sumatra"
