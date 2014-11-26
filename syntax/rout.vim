@@ -1,20 +1,15 @@
 " Vim syntax file
 " Language:    R output Files
 " Maintainer:  Jakson Aquino <jalvesaq@gmail.com>
-" Last Change: Sun Nov 23, 2014  04:27PM
-"
 
-" Version Clears: {{{1
-" For version 5.x: Clear all syntax items
-" For version 6.x and 7.x: Quit when a syntax file was already loaded
-if version < 600 
-    syntax clear
-elseif exists("b:current_syntax")
+
+if exists("b:current_syntax")
     finish
 endif 
 
 setlocal iskeyword=@,48-57,_,.
-setlocal conceallevel=2
+setlocal conceallevel=3
+set concealcursor="n"
 
 syn case match
 
@@ -181,7 +176,7 @@ else
         hi routStdErr	ctermfg=117
         hi routError	ctermfg=15 ctermbg=1
         hi routWarn	ctermfg=1
-        hi routIndex	ctermfg=186
+        hi routIndex	ctermfg=109
     else
         " Defalt 16 colors scheme for R output:
         hi routInput	ctermfg=gray
