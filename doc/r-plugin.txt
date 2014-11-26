@@ -107,8 +107,8 @@ The installation instructions are split in four sections:
 
 If you are using Windows, jump to section 3.2.
 
-If you are an unexperienced Vim user, start a terminal emulator and type in
-it: `vimtutor`<Enter>
+If you are an inexperienced Vim user, start a terminal emulator and type:
+`vimtutor`<Enter>
 
 Before installing the plugin, you should install its dependencies:
 
@@ -498,18 +498,17 @@ The plugin commands that send code to R Console are the most commonly used. If
 the code to be sent to R has a single line it is sent directly to R Console,
 but if it has more than one line (a selection of lines, a block of lines
 between two marks, a paragraph etc) the lines are written to a file and the
-plugin sends to R the command to source the file. You should type quickly
-<LocalLeader>d to send to R Console the line currently under the cursor. If
-you want to see what lines are being sourced when sending a selection of
-lines, you should do either <LocalLeader>se or <LocalLeader>sa instead of
-<LocalLeader>ss.
+plugin sends to R the command to source the file. To send to R Console the
+line currently under the cursor you should type <LocalLeader>d. If you want to
+see what lines are being sourced when sending a selection of lines, you can
+use either <LocalLeader>se or <LocalLeader>sa instead of <LocalLeader>ss.
 
 If the cursor is over the header of an R chunk with the `child` option (from
 Rnoweb, RMarkdown or RreStructuredText document), and you use one of the
 commands that send a single line of code to R, then the plugin will send to R
 the command to knit the child document.
 
-After the commands that send, sweave or knit the current buffer, Vim will save
+After the commands that send sweave or knit the current buffer, Vim will save
 the current buffer if it has any pending changes before performing the tasks.
 After <LocalLeader>ao, Vim will run "R CMD BATCH --no-restore --no-save" on
 the current file and show the resulting .Rout file in a new tab. Please see
@@ -664,10 +663,10 @@ manually delete them.
 ------------------------------------------------------------------------------
 4.5. The Object Browser~
 
-You have to do <LocalLeader>ro to either start or updated the Object Browser.
+You have to do <LocalLeader>ro to either start or update the Object Browser.
 The Object Browser has two views: .GlobalEnv and Libraries. If you either
 press <Enter> or double click (GVim or Vim with 'mouse' set to "a") on the
-first line of the Object Browser it will toggle the view between the objects
+first line of the Object Browser, you will toggle the view between the objects
 in .GlobalEnv and the currently loaded libraries. The Object Browser requires
 the |+clientserver| feature to be automatically updated and the |+conceal|
 feature to correctly align list items.
@@ -682,9 +681,9 @@ UTF-8 is part of either LC_MESSAGES or LC_ALL variables, unicode line drawing
 characters will be used to draw lines in the Object Browser. This is the case
 of most Linux distributions.
 
-In the Libraries view, you can either double click or press <Enter> over a
-library to see its objects. In the Object Browser, the libraries have the
-color defined by the PreProc highlighting group, and the other objects have
+In the Libraries view, you can either double click or press <Enter> on a
+library name to see its objects. In the Object Browser the libraries have the
+color defined by the PreProc highlighting group. The other objects have
 their colors defined by the return value of some R functions. Each line in the
 table below shows a highlighting group and the corresponding R function (if
 any) used to classify the objects:
@@ -789,11 +788,11 @@ Vim by typing:
 >
    tvim filename.R
 <
-Using the `tvim` function, the Tmux session is finished when you quits Vim.
+Using the `tvim` function, the Tmux session is finished when you quit Vim.
 That is, the main advantage of using `tvim` is that you do not have to type
-`tmux` before and `exit` after the edition of the file. Moreover, the `tvim`
-command also pass the |--servername| argument to Vim, which is required to
-update the Object Browser and functions highlight.
+`tmux` before and `exit` after editing the file. Moreover, the `tvim` command
+also passes the |--servername| argument to Vim, which is required to update the
+Object Browser and functions highlight.
 
 If you are going to run Vim inside Tmux, than you should create your
 ~/.tmux.conf if it does not exist yet. You may put the lines below in your
@@ -821,8 +820,8 @@ copy/scroll back mode (see below).
 
 The configuration script also sets <C-a> as the Tmux escape character (the
 default is <C-b>), that is, you have to type <C-a> before typing a Tmux
-command. Below are the most useful key bindings to use Tmux with the above
-tmux.conf:
+command. Below are the most useful key bindings for Tmux with the tmux.conf
+shown above in section 4.8.1.
 
     <C-a>arrow keys : Move the cursor to the Tmux panel above, below, at the
                       right or at the left of the current one.
@@ -889,11 +888,11 @@ support in Tmux. You will be able to toggle mouse support on and off by typing
 Note: Neovim does not require the --servername VIM argument. Thus, you also do
 not need to enable the X11 Forwarding for omnicompletion, etc.
 
-The Vim-R-plugin can not send commands from a local Vim to a remote R, but
-you can access the remote machine through ssh and run Tmux, Vim and R in the
+The Vim-R-plugin can not send commands from a local Vim to a remote R, but you
+can access the remote machine through ssh and run Tmux, Vim and R in the
 remote machine. Tmux should not be running in the local machine because some
-environment variables could pass from the local to the remote Tmux and make
-the plugin confuse.
+environment variables could pass from the local to the remote Tmux and confuse
+the plugin.
 
 If you need to access Vim in a remote Unix machine through ssh, and if you
 want to get omnicompletion, syntax highlight of function names and the Object
@@ -916,10 +915,10 @@ Browser working properly, then you have to:
      tmux
      vim --servername VIM script.R
 <
-With Tmux, you can detach the Vim-R session and reattach it latter (but the
+With Tmux, you can detach the Vim-R session and reattach it later (but the
 connection with the XServer could be lost in the process). This is useful if
-you plan to begin the use the Vim-R-plugin in a machine and latter move to
-another computer and access remotely your previous Vim-R session. Below is the
+you plan to begin the use the Vim-R-plugin in a machine and later move to
+another computer and access your previous Vim-R session remotely. Below is the
 step-by-step procedure to run the Vim-R remotely:
 
   - Start Tmux:
@@ -935,8 +934,9 @@ step-by-step procedure to run the Vim-R remotely:
     The command will be <C-b>d if you have not set <C-a> as the escape
     character in your ~/.tmux.conf.
 
-  - Some time latter (even if accessing the machine remotely) reattach the
+  - Some time later (even if accessing the machine remotely) reattach the
     Tmux session:
+      
       tmux attach
 
 
@@ -944,19 +944,18 @@ step-by-step procedure to run the Vim-R remotely:
 							 *r-plugin-known-bugs*
 5. Known bugs and workarounds~
 
-The bugs that are known to exist but that will not be fixed are listed in this
-section. Some of them can not be fixed because they depend on either R or Vim
-missing features; others would be very time consuming to fix without breaking
-anything.
+Known bugs that will not be fixed are listed in this section. Some of them can
+not be fixed because they depend on missing features in either R or Vim;
+others would be very time consuming to fix without breaking anything.
 
 
 ------------------------------------------------------------------------------
 5.1. R's source() issues~
 
-The R's `source()` function of base package prints an extra new line between
-commands if the option echo = TRUE, and error and warning messages are printed
-only after the entire code is sourced, which makes it more difficult to find
-errors in the code sent to R. Details:
+The R's `source()` function of the base package prints an extra new line
+between commands if the option echo = TRUE, and error and warning messages are
+printed only after the entire code is sourced. This makes it more difficult to
+find errors in the code sent to R. Details:
 
    https://stat.ethz.ch/pipermail/r-devel/2012-December/065352.html
 
@@ -981,8 +980,8 @@ Normal, Visual and Insert modes.
 5.4. Syntactically correct code may be wrongly indented~
 
 If the Vim-R-plugin indents your code wrongly you may get the correct
-indentation by adding braces and line breaks to it. For example, try to
-indent the code below:
+indentation by adding braces and line breaks to it. For example, try to indent
+the code below:
 >
     # This code will be wrongly indented:
 
@@ -1030,8 +1029,8 @@ On Windows, when code is sent from Vim to R Console, the vimcom library
 sets the value of the internal variable `r_is_busy` to 1. The value is set
 back to 0 when any code is successfully evaluated. If you send invalid code to
 R, there will be no successful evaluation of code and, thus, the value of
-`r_is_busy` will remain set to 1. Then, if you try to update the object
-browser, see the R documentation for any function, or do other tasks that
+`r_is_busy` will remain set to 1. If you then try to update the Object
+Browser, see the R documentation for any function, or do other tasks that
 require the hidden evaluation of code by R, the vimcom library will
 refuse to do the tasks to avoid any risk of corrupting R's memory. It will
 tell Vim that "R is busy" and Vim will display this message. Everything should
@@ -1047,7 +1046,8 @@ There is no SyncTeX support for Windows and Mac OS X. Both Sumatra (Windows)
 and Skim (Mac OS X) have support for SyncTeX, but the Vim-R-plugin is not
 ready to communicate with them. If you can, please write the necessary code to
 support anyone of them and submit a push request on github:
-https://github.com/jcfaria/Vim-R-plugin
+
+    https://github.com/jcfaria/Vim-R-plugin
 
 
 ------------------------------------------------------------------------------
@@ -1331,7 +1331,7 @@ them converted into `<-`.
 						      *vimrplugin_external_ob*
 6.4. Object Browser options~
 
-By default, the object browser will be created with 40 columns. The minimum
+By default, the Object Browser will be created with 40 columns. The minimum
 width of the Object Browser window is 9 columns. You can change the object
 browser's default width by setting the value of |vimrplugin_objbr_w| in your
 |vimrc|, as below:
@@ -3115,7 +3115,7 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 110222 (2011-02-22)
  * Added syntax/rhelp.vim.
  * New command for rnoweb files: BibTeX current file (\sb).
- * New commands for the object browser: open visible lists (\r=) and close
+ * New commands for the Object Browser: open visible lists (\r=) and close
    visible lists (\r-).
  * Reorganization of the GUI menu.
 
