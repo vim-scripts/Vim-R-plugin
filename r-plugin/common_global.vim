@@ -841,7 +841,7 @@ function! StartR_Neovim()
     let b:rscript_buffer = g:tmp_curbufname
     unlet g:tmp_objbrtitle
     unlet g:tmp_curbufname
-    imap <buffer> <CR> <Esc>:call EnterRCmd()<CR>o
+    imap <buffer> <CR> <Esc>:call EnterRCmd()<CR>A
     call cursor("$", 1)
     exe "sbuffer " . edbuf
 
@@ -849,7 +849,7 @@ function! StartR_Neovim()
 
     let savedterm = $TERM
     let $TERM="NeovimTerm"
-    let g:rplugin_rjob = jobstart("Rjob", 'R', ['--no-readline', '--slave', '--interactive'])
+    let g:rplugin_rjob = jobstart("Rjob", 'R', ['--no-readline', '--interactive'])
     exe 'let $TERM="' . savedterm . '"'
     call WaitVimComStart()
 endfunction
@@ -1004,7 +1004,12 @@ endfunction
 function GetRActivity()
     if v:job_data[1] == 'stdout' || v:job_data[1] == 'stderr'
         let edbuf = bufname("%")
-        sbuffer R_Output
+        if edbuf == "R_Output"
+            let isrout = 1
+        else
+            let isrout = 0
+            sbuffer R_Output
+        endif
         for lin in v:job_data[2]
             if lin =~ ".\x0d."
                 let lin = substitute(lin, ".*\x0d", "", "g")
@@ -1015,13 +1020,22 @@ function GetRActivity()
             if v:job_data[1] == 'stderr'
                 let lin = ': ' . lin
             endif
-            call append(line("$"), lin)
-            if edbuf == "R_Output"
-                call append(line("$"), "")
+            if lin != "#<#"
+                if lin == "#>#"
+                    call append(line("$"), "> ")
+                    call cursor("$", 2)
+                    if isrout
+                        startinsert!
+                    endif
+                else
+                    call append(line("$"), lin)
+                    call cursor("$", 1)
+                endif
             endif
         endfor
-        call cursor("$", 1)
-        exe "sbuffer " . edbuf
+        if !isrout
+            exe "sbuffer " . edbuf
+        endif
     else
         let g:rplugin_rjob = 0
         let g:SendCmdToR = function('SendCmdToR_fake')
@@ -1038,25 +1052,34 @@ function GetRActivity()
 endfunction
 
 function SendCmdToR_Neovim(rcmd)
-    let edbuf = bufname("%")
+    let curbuf = bufname("%")
     sbuffer R_Output
     if winwidth(0) != b:winwidth
         let b:winwidth = winwidth(0)
         call g:SendToVimCom("\x08" . $VIMINSTANCEID . "options(width=" . b:winwidth . ")", "I")
     endif
-    call append(line("$"), "> " . a:rcmd)
-    call cursor("$", 1)
-    exe "sbuffer " . edbuf
+    if getline("$") == "> "
+        call setline(line("$"), "> " . a:rcmd)
+    else
+        call append(line("$"), "> " . a:rcmd)
+    endif
+    exe "sbuffer " . curbuf
     let ok = jobsend(g:rplugin_rjob, a:rcmd . "\n")
     return ok
 endfunction
 
 function EnterRCmd()
     if line(".") != line("$")
+        call append(".", "")
+        call cursor(line(".")+1, 1)
         return
     endif
-    let lin = getline(".")
-    call setline(".", "")
+    " First delete only the less than sign because the user may have manually
+    " deleted the space:
+    let lin = substitute(getline("."), '^>', '', '')
+    " Now delete one space in the beginning, if there any:
+    let lin = substitute(lin, '^ ', '', '')
+    call setline(line("."), "> ")
     call SendCmdToR_Neovim(lin)
 endfunction
 
@@ -1079,7 +1102,6 @@ function RSetNeovimPort(p)
     endif
 endfunction
 
-" Neovim don't need this function:
 function WaitVimComStart()
     if g:vimrplugin_vimcom_wait < 0
         return 0
@@ -1105,8 +1127,8 @@ function WaitVimComStart()
         let g:rplugin_vimcom_version = vr[0]
         let g:rplugin_vimcom_home = vr[1]
         let g:rplugin_vimcomport = vr[2]
-        if g:rplugin_vimcom_version != "1.1.5"
-            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.1.5.')
+        if g:rplugin_vimcom_version != "1.1.6"
+            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.1.6.')
             sleep 1
         endif
         if has("nvim")
@@ -1135,17 +1157,16 @@ function WaitVimComStart()
             else
                 call RWarningMsg('Application "' . nvs . '" not found.')
             endif
+        endif
+        if has("win32")
+            let g:rplugin_vimcom_lib = g:rplugin_vimcom_home . "/libs/i386/vimcom.dll"
+        elseif has("win64")
+            let g:rplugin_vimcom_lib = g:rplugin_vimcom_home . "/libs/x64/vimcom.dll"
         else
-            if has("win32")
-                let g:rplugin_vimcom_lib = g:rplugin_vimcom_home . "/libs/i386/vimcom.dll"
-            elseif has("win64")
-                let g:rplugin_vimcom_lib = g:rplugin_vimcom_home . "/libs/x64/vimcom.dll"
-            else
-                let g:rplugin_vimcom_lib = g:rplugin_vimcom_home . "/libs/vimcom.so"
-            endif
-            if !filereadable(g:rplugin_vimcom_lib)
-                call RWarningMsg('Could not find "' . g:rplugin_vimcom_lib . '".')
-            endif
+            let g:rplugin_vimcom_lib = g:rplugin_vimcom_home . "/libs/vimcom.so"
+        endif
+        if !filereadable(g:rplugin_vimcom_lib)
+            call RWarningMsg('Could not find "' . g:rplugin_vimcom_lib . '".')
         endif
         call delete($VIMRPLUGIN_TMPDIR . "/vimcom_running_" . $VIMINSTANCEID)
         if has("nvim") && g:vimrplugin_vimpager != "no"
