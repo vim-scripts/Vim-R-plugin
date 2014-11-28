@@ -8,8 +8,6 @@ if exists("b:current_syntax")
 endif 
 
 setlocal iskeyword=@,48-57,_,.
-setlocal conceallevel=3
-set concealcursor="n"
 
 syn case match
 
@@ -71,10 +69,18 @@ else
     syn match routInput /^+ .*/
 endif
 
-syn region routStdErr start='^: ' end="$" contains=routConceal
-syn region routError start='^: .*Error.*' end='^>' contains=routConceal
-syn region routWarn start='^: .*Warn.*' end='^>' contains=routConceal
-syn match routConceal '^: ' conceal contained
+if has("conceal")
+    setlocal conceallevel=3
+    set concealcursor=n
+    syn match routConceal '^: ' conceal contained
+    syn region routStdErr start='^: ' end="$" contains=routConceal
+    syn region routError start='^: .*Error.*' end='^>' contains=routConceal
+    syn region routWarn start='^: .*Warn.*' end='^>' contains=routConceal
+else
+    syn region routStdErr start='^: ' end="$"
+    syn region routError start='^: .*Error.*' end='^>'
+    syn region routWarn start='^: .*Warn.*' end='^>'
+endif
 
 " Index of vectors
 syn match routIndex /^\s*\[\d\+\]/
@@ -138,6 +144,7 @@ if g:vimrplugin_routmorecolors == 0
     hi def link routInput	Comment
 endif
 
+hi def link routConceal	Ignore
 if exists("g:rout_follow_colorscheme") && g:rout_follow_colorscheme
     " Default when following :colorscheme
     hi def link routNormal	Normal
@@ -157,7 +164,6 @@ if exists("g:rout_follow_colorscheme") && g:rout_follow_colorscheme
     hi def link routStdErr	Function
     hi def link routError	ErrorMsg
     hi def link routWarn	WarningMsg
-    hi def link routConceal	Ignore
 else
     if &t_Co == 256
         " Defalt 256 colors scheme for R output:
