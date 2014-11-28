@@ -561,7 +561,8 @@ trigger the autocompletion of R objects names or hit CTRL-D to list the
 possible completions (see |cmdline-completion| for details on the various ways
 of getting command-line completion). The list of objects used for
 completion is the same available for omnicompletion (see
-|vimrplugin_permanent_libs|).
+|vimrplugin_permanent_libs|). You may close the R documentation buffer by
+simply pressing `q`.
 
 You can source all .R files in a directory with the Normal mode command
 :RSourceDir, which accepts an optional argument (the directory to be sourced).
@@ -1336,7 +1337,10 @@ put in your vimrc:
 >
    let rout_follow_colorscheme = 1
 <
-Note: See |job-control| if you want to know more about Neovim jobs.
+Note: The Vim-R-plugin relies on special values of `options("continue")` and
+`options("prompt")` set by the vimcom package to recognize the end of output
+and add the prompt symbol. If you need to change either of these two options,
+please, open an issue at https://github.com/jcfaria/Vim-R-plugin/issues
 
 
 ------------------------------------------------------------------------------
