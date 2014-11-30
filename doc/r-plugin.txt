@@ -372,6 +372,7 @@ Start/Close
   . Start R (custom)                                   \rc
   --------------------------------------------------------
   . Close R (no save)                                  \rq
+  . Stop R                                          :RStop
 -----------------------------------------------------------
 
 Send
@@ -1286,7 +1287,7 @@ it.
 6.3. Run R in Neovim buffer (experimental feature)~
 
 Note: This is an experimental feature to test Neovim capabilities and may be
-removed in the future.
+removed in the future. See bugs at the end of this section.
 
 If you are running Neovim and want to try this experimental feature, put in
 your |vimrc|:
@@ -1295,15 +1296,21 @@ your |vimrc|:
 <
 R will run as a Neovim job and the output will be displayed in a buffer. If
 the cursor is in the last line of the R_Output buffer and Neovim is in Insert
-mode, an <Enter> will submit the line to R evaluation. You can use <C-x><C-o>
-to complete names of objects and <C-x><C-a> to complete the names of function
-arguments.
+mode, an <Enter> will submit the line to R evaluation, <C-x><C-o> will
+complete names of objects, <C-x><C-a> will complete the names of function
+arguments, and <Up> and <Down> will cycle through the history of sent
+commands. Finally, if you type part of a previously issued command, you can
+press <C-H> to complete the line from the history.
 
 Whether you are in the R script buffer or in the R_Output buffer, you can also
 press <LocalLeader><LocalLeader> in Normal mode to open an R scratch buffer to
 type commands that you want to see evaluated by R but do not want in your
 final script. The keys <Esc> and <q> are mapped in Normal mode to quit the
 scratch buffer.
+
+The R command `history()` will not work, but you can do `:Rhistory` in Neovim
+to open a buffer with the history of commands in a new tab. Commands starting
+with the string "base::source" are not added to the history.
 
 You can set the foreground colors of R output in your |vimrc| when you are
 running Neovim in a terminal emulator. The example below is for a terminal
@@ -1341,8 +1348,17 @@ Note: The Vim-R-plugin relies on special values of `options("continue")` and
 `options("prompt")` set by the vimcom package to recognize the end of output
 and add the prompt symbol. If you need to change either of these two options,
 please, open an issue at https://github.com/jcfaria/Vim-R-plugin/issues
+because it would be possible to add options to customize them.
 
-
+Note: Output that does not end in a newline character does not generate
+JobActivity and therefore is shown only after an output with a newline. That
+is, if R asks for user input, the question will not be shown. For example,
+this will not work:
+>
+   par(ask=TRUE)
+   plot(1,1)
+<
+The plugin relies 
 ------------------------------------------------------------------------------
 						      *vimrplugin_rnowebchunk*
 	                                              *vimrplugin_assign_map*
@@ -2295,8 +2311,8 @@ directory after the installation:
 
 9.1. Is it possible to stop R from within Vim?~
 
-Sorry, it is not possible. The plugin can only send the `quit()` command. If you
-want to stop R, you have to press ^C into R's Console.
+Yes. In Normal mode do `:RStop` and Vim will send SIGINT to R which is the
+same signal sent when you press CTRL-C into R's Console.
 
 
 ------------------------------------------------------------------------------
@@ -2938,9 +2954,11 @@ See also |vimrplugin_r_in_buffer|.
 							       *r-plugin-news*
 10. News~
 
-1.1.1 (2014-11-26)
+1.1.1 (2014-11-29)
 
- * New option (Neovim only): vimrplugin_r_in_buffer.
+ * New option (Neovim only): vimrplugin_r_in_buffer and :Rhistory.
+
+ * New command: :RStop.
 
  * No longer requires +python feature.
 

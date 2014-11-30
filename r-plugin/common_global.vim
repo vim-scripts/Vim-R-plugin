@@ -734,6 +734,7 @@ function StartR_Windows()
         let repl = libcall(g:rplugin_vimcom_lib, "FindRConsole", 'R Console')
         if repl == "NotFound"
             let g:SendCmdToR = function('SendCmdToR_fake')
+            let g:rplugin_r_pid = 0
             call RWarningMsg('There is already a window called "R Console".')
             return
         endif
@@ -842,6 +843,10 @@ function! StartR_Neovim()
     unlet g:tmp_objbrtitle
     unlet g:tmp_curbufname
     imap <buffer> <CR> <Esc>:call EnterRCmd()<CR>A
+    imap <buffer> <C-C> <Esc>:RStop<CR>a
+    imap <buffer> <Up> <Esc>:call RConsoleArrow("up")<CR>A
+    imap <buffer> <Down> <Esc>:call RConsoleArrow("down")<CR>A
+    imap <buffer><silent> <C-H> <C-R>=CompleteFromHistory()<CR>
     call cursor("$", 1)
     exe "sbuffer " . edbuf
 
@@ -1038,6 +1043,7 @@ function GetRActivity()
         endif
     else
         let g:rplugin_rjob = 0
+        let g:rplugin_r_pid = 0
         let g:SendCmdToR = function('SendCmdToR_fake')
         if bufname("%") == "R_Output"
             call append("$", ':    ---  R Finished  ---')
@@ -1049,6 +1055,37 @@ function GetRActivity()
             call RWarningMsg("R finished")
         endif
     endif
+endfunction
+
+function CompleteFromHistory()
+    if line(".") != line("$")
+        return
+    endif
+
+    let key = substitute(getline("."), '^>', '', '')
+    let key = substitute(key, '^ ', '', '')
+    let key = substitute(key, '^\s*\(.*\)\s*', '\1', '')
+    let histlin = [key]
+    call setline(".", "> ")
+    for lin in g:rplugin_rhistory
+        if lin =~ key
+            let histlin += [lin]
+        endif
+    endfor
+    call complete(3, histlin)
+    return ''
+endfunction
+
+function ShowRhistory()
+    tabnew R_history
+    call setline(".", g:rplugin_rhistory)
+    set ft=r
+endfunction
+
+function AddToRHistory(rcmd)
+    let g:rplugin_rhist_pos += 1
+    let g:rplugin_dyn_rhist_pos = g:rplugin_rhist_pos
+    let g:rplugin_rhistory += [a:rcmd]
 endfunction
 
 function SendCmdToR_Neovim(rcmd)
@@ -1063,11 +1100,51 @@ function SendCmdToR_Neovim(rcmd)
     else
         call append(line("$"), "> " . a:rcmd)
     endif
+    let g:rplugin_addedtohist = 0
+    if a:rcmd !~ '^base::source('
+        call AddToRHistory(a:rcmd)
+    endif
     exe "sbuffer " . curbuf
     let ok = jobsend(g:rplugin_rjob, a:rcmd . "\n")
     return ok
 endfunction
 
+" Send SIGINT to R
+function StopR()
+    if g:rplugin_r_pid
+        call system("kill -s SIGINT " . g:rplugin_r_pid)
+    endif
+endfunction
+
+function RConsoleArrow(dir)
+    if line(".") != line("$")
+        return
+    endif
+
+    " Check if current last typed line of R_Output is already in history
+    if g:rplugin_addedtohist == 0
+        let lin = substitute(getline("."), '^>', '', '')
+        let lin = substitute(lin, '^ ', '', '')
+        call AddToRHistory(lin)
+        let g:rplugin_addedtohist = 1
+    endif
+
+    if a:dir == "down"
+        let g:rplugin_dyn_rhist_pos += 1
+        if g:rplugin_dyn_rhist_pos > g:rplugin_rhist_pos
+            let g:rplugin_dyn_rhist_pos -= 1
+            return
+        endif
+    else
+        let g:rplugin_dyn_rhist_pos -= 1
+        if g:rplugin_dyn_rhist_pos < 0
+            let g:rplugin_dyn_rhist_pos = 0
+            return
+        endif
+    endif
+    call setline(".", "> " . g:rplugin_rhistory[g:rplugin_dyn_rhist_pos])
+endfunction
+    
 function EnterRCmd()
     if line(".") != line("$")
         call append(".", "")
@@ -1127,8 +1204,9 @@ function WaitVimComStart()
         let g:rplugin_vimcom_version = vr[0]
         let g:rplugin_vimcom_home = vr[1]
         let g:rplugin_vimcomport = vr[2]
-        if g:rplugin_vimcom_version != "1.1.6"
-            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.1.6.')
+        let g:rplugin_r_pid = vr[3]
+        if g:rplugin_vimcom_version != "1.1.7"
+            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.1.7.')
             sleep 1
         endif
         if has("nvim")
@@ -1136,9 +1214,12 @@ function WaitVimComStart()
                 call jobstop(g:rplugin_clt_job)
                 let g:rplugin_clt_job = 0
             endif
-            if has("win32") || has("win64")
-                let nvc = g:rplugin_vimcom_home . "/bin/nvimclient.exe"
-                let nvs = g:rplugin_vimcom_home . "/bin/nvimserver.exe"
+            if has("win64")
+                let nvc = g:rplugin_vimcom_home . "/bin/x64/nvimclient.exe"
+                let nvs = g:rplugin_vimcom_home . "/bin/x64/nvimserver.exe"
+            elseif has("win32")
+                let nvc = g:rplugin_vimcom_home . "/bin/i386/nvimclient.exe"
+                let nvs = g:rplugin_vimcom_home . "/bin/i386/nvimserver.exe"
             else
                 let nvc = g:rplugin_vimcom_home . "/bin/nvimclient"
                 let nvs = g:rplugin_vimcom_home . "/bin/nvimserver"
@@ -1646,6 +1727,7 @@ function SendCmdToR_TmuxSplit(cmd)
         let rlog = substitute(rlog, "\r", " ", "g")
         call RWarningMsg(rlog)
         let g:SendCmdToR = function('SendCmdToR_fake')
+        let g:rplugin_r_pid = 0
         return 0
     endif
     return 1
@@ -1706,6 +1788,7 @@ function SendCmdToR_Term(cmd)
         let rlog = substitute(rlog, '\r', ' ', 'g')
         call RWarningMsg(rlog)
         let g:SendCmdToR = function('SendCmdToR_fake')
+        let g:rplugin_r_pid = 0
         return 0
     endif
     return 1
@@ -2258,6 +2341,7 @@ function RQuit(how)
     call delete($VIMRPLUGIN_TMPDIR . "/GlobalEnvList_" . $VIMINSTANCEID)
     call delete($VIMRPLUGIN_TMPDIR . "/vimcom_running_" . $VIMINSTANCEID)
     let g:SendCmdToR = function('SendCmdToR_fake')
+    let g:rplugin_r_pid = 0
     let g:rplugin_vimcomport = 0
     if g:rplugin_do_tmux_split && g:vimrplugin_tmux_title != "automatic" && g:vimrplugin_tmux_title != ""
         call system("tmux set automatic-rename on")
@@ -3121,6 +3205,9 @@ function MakeRMenu()
     "-------------------------------
     menu R.Start/Close.-Sep1- <nul>
     call RCreateMenuItem("nvi", 'Start/Close.Close\ R\ (no\ save)', '<Plug>RClose', 'rq', ":call RQuit('no')")
+    menu R.Start/Close.-Sep2- <nul>
+
+    nmenu <silent> R.Start/Close.Stop\ R<Tab>:RStop :RStop<CR>
 
     "----------------------------------------------------------------------------
     " Send
@@ -3598,6 +3685,8 @@ command RBuildTags :call g:SendCmdToR('rtags(ofile = "TAGS")')
 command -nargs=? -complete=customlist,RLisObjs Rhelp :call RAskHelp(<q-args>)
 command -nargs=? -complete=dir RSourceDir :call RSourceDirectory(<q-args>)
 command RpluginConfig :runtime r-plugin/vimrconfig.vim
+command RStop :call StopR()
+command Rhistory :call ShowRhistory()
 
 
 "==========================================================================
@@ -3732,6 +3821,9 @@ call RSetDefaultValue("g:vimrplugin_indent_commented",  1)
 call RSetDefaultValue("g:vimrplugin_source",         "''")
 call RSetDefaultValue("g:vimrplugin_rcomment_string", "'# '")
 if g:vimrplugin_r_in_buffer
+    let g:rplugin_rhistory = [ ]
+    let g:rplugin_rhist_pos = -1
+    let g:rplugin_addedtohist = 0
     call RSetDefaultValue("g:vimrplugin_vimpager", "'vertical'")
     autocmd JobActivity Rjob call GetRActivity()
 else
@@ -4112,6 +4204,7 @@ let g:rplugin_running_objbr = 0
 let g:rplugin_newliblist = 0
 let g:rplugin_ob_warn_shown = 0
 let g:rplugin_clt_job = 0
+let g:rplugin_r_pid = 0
 let g:rplugin_myport = 0
 let g:rplugin_vimcomport = 0
 let g:rplugin_vimcom_home = ""
