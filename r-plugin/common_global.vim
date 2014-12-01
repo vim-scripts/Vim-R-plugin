@@ -735,6 +735,7 @@ function StartR_Windows()
         if repl == "NotFound"
             let g:SendCmdToR = function('SendCmdToR_fake')
             let g:rplugin_r_pid = 0
+        else
             call RWarningMsg('There is already a window called "R Console".')
             return
         endif
@@ -831,6 +832,7 @@ function! StartR_Neovim()
     set filetype=rout
     setlocal noswapfile
     setlocal bufhidden=hide
+    setlocal formatoptions=
     set buftype=nofile
     set omnifunc=rcomplete#CompleteR
     if hasmapto("<Plug>RCompleteArgs", "i")
@@ -1076,6 +1078,20 @@ function CompleteFromHistory()
     return ''
 endfunction
 
+" To be called by edit() in R running in Neovim buffer.
+function ShowRObject(fname)
+    call RWarningMsg("ShowRObject not implemented yet: '" . a:fname . "'")
+    let fcont = readfile(a:fname)
+    let s:finalA = $VIMRPLUGIN_TMPDIR . "/vimcom_edit_" . $VIMINSTANCEID . "_A"
+    let finalB = $VIMRPLUGIN_TMPDIR . "/vimcom_edit_" . $VIMINSTANCEID . "_B"
+    let finalB = substitute(finalB, ' ', '\\ ', 'g')
+    exe "tabnew " . finalB
+    call setline(".", fcont)
+    set ft=r
+    stopinsert
+    autocmd BufUnload <buffer> call delete(s:finalA) | unlet s:finalA | startinsert
+endfunction
+
 function ShowRhistory()
     tabnew R_history
     call setline(".", g:rplugin_rhistory)
@@ -1100,6 +1116,7 @@ function SendCmdToR_Neovim(rcmd)
     else
         call append(line("$"), "> " . a:rcmd)
     endif
+    call cursor("$", 1)
     let g:rplugin_addedtohist = 0
     if a:rcmd !~ '^base::source('
         call AddToRHistory(a:rcmd)
@@ -1205,8 +1222,8 @@ function WaitVimComStart()
         let g:rplugin_vimcom_home = vr[1]
         let g:rplugin_vimcomport = vr[2]
         let g:rplugin_r_pid = vr[3]
-        if g:rplugin_vimcom_version != "1.1.7"
-            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.1.7.')
+        if g:rplugin_vimcom_version != "1.1.8"
+            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.1.8.')
             sleep 1
         endif
         if has("nvim")
@@ -1735,18 +1752,11 @@ endfunction
 
 function SendCmdToR_Windows(cmd)
     if g:vimrplugin_ca_ck
-        let cmd = "\001" . "\013" . a:cmd
+        let cmd = "\001" . "\013" . a:cmd . "\n"
     else
-        let cmd = a:cmd
+        let cmd = a:cmd . "\n"
     endif
-
-    let cmd = cmd . "\n"
-    let slen = len(cmd)
-    let str = ""
-    for i in range(0, slen)
-        let str = str . printf("\\x%02X", char2nr(cmd[i]))
-    endfor
-    let repl = libcall(g:rplugin_vimcom_lib, "SendToRConsole", str)
+    let repl = libcall(g:rplugin_vimcom_lib, "SendToRConsole", cmd)
     return 1
 endfunction
 
@@ -2311,7 +2321,7 @@ function RQuit(how)
     endif
 
     if has("win32") || has("win64")
-        let repl = libcall(g:rplugin_vimcom_lib, "SendQuitMsg", qcmd)
+        let repl = libcall(g:rplugin_vimcom_lib, "SendQuitMsg", qcmd . "\n")
     else
         call g:SendCmdToR(qcmd)
         if g:rplugin_do_tmux_split
