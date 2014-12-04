@@ -223,8 +223,10 @@ call RCreateMaps("ni",  '<Plug>RESendChunk',  'ce', ':call b:SendChunkToR("echo"
 call RCreateMaps("ni",  '<Plug>RDSendChunk',  'cd', ':call b:SendChunkToR("silent", "down")')
 call RCreateMaps("ni",  '<Plug>REDSendChunk', 'ca', ':call b:SendChunkToR("echo", "down")')
 call RCreateMaps("nvi", '<Plug>ROpenPDF',     'op', ':call ROpenPDF("Get Master")')
-call RCreateMaps("ni",  '<Plug>RSyncFor',     'gp', ':call SyncTeX_forward()')
-call RCreateMaps("ni",  '<Plug>RGoToTeX',     'gt', ':call SyncTeX_forward(1)')
+if g:vimrplugin_synctex
+    call RCreateMaps("ni",  '<Plug>RSyncFor',     'gp', ':call SyncTeX_forward()')
+    call RCreateMaps("ni",  '<Plug>RGoToTeX',     'gt', ':call SyncTeX_forward(1)')
+endif
 nmap <buffer><silent> gn :call RnwNextChunk()<CR>
 nmap <buffer><silent> gN :call RnwPreviousChunk()<CR>
 
@@ -588,7 +590,9 @@ if g:rplugin_pdfviewer != "none"
         unlet s:key_list
         unlet s:has_key
     endif
-    call Run_SyncTeX()
+    if g:vimrplugin_synctex
+        call Run_SyncTeX()
+    endif
 endif
 
 call RSourceOtherScripts()
