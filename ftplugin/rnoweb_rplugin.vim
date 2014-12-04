@@ -74,6 +74,49 @@ function! RnwNextChunk() range
     return
 endfunction
 
+
+" Because this function delete files, it will not be documented.
+" If you want to try it, put in your vimrc:
+"
+" let vimrplugin_rm_knit_cache = 1
+"
+" If don't want to answer the question about deleting files, and
+" if you trust this code more than I do, put in your vimrc:
+"
+" let vimrplugin_ask_rm_knitr_cache = 0
+"
+" Note that if you have the string "cache.path=" in more than one place only
+" the first one above the cursor position will be found. The path must be
+" surrounded by quotes; if it's an R object, it will not be recognized.
+function! RKnitRmCache()
+    let lnum = search('\<cache\.path\>\s*=', 'bnwc')
+    if lnum == 0
+        let pathdir = "cache"
+    else
+        let pathregexpr = '.*\<cache\.path\>\s*=\s*[' . "'" . '"]\(.\{-}\)[' . "'" . '"].*'
+        let pathdir = substitute(getline(lnum), pathregexpr, '\1', '')
+        if pathdir !~ '/$'
+            let pathdir .= '/'
+        endif
+    endif
+    if exists("g:vimrplugin_ask_rm_knitr_cache") && g:vimrplugin_ask_rm_knitr_cache == 0
+        let cleandir = 1
+    else
+        call inputsave()
+        let answer = input('Delete all files from "' . pathdir . '"? [y/n]: ')
+        call inputrestore()
+        if answer == "y"
+            let cleandir = 1
+        else
+            let cleandir = 0
+        endif
+    endif
+    normal! :<Esc>
+    if cleandir
+        call g:SendCmdToR('rm(list=ls(all.names=TRUE)); unlink("' . pathdir . '*")')
+    endif
+endfunction
+
 " knit the current buffer content
 function! RKnitRnw()
     update
@@ -214,6 +257,9 @@ call RCreateMaps("nvi", '<Plug>RSetwd',        'rd', ':call RSetWD()')
 call RCreateMaps("nvi", '<Plug>RSweave',      'sw', ':call RSweave()')
 call RCreateMaps("nvi", '<Plug>RMakePDF',     'sp', ':call RMakePDF("nobib", 0)')
 call RCreateMaps("nvi", '<Plug>RBibTeX',      'sb', ':call RMakePDF("bibtex", 0)')
+if exists("g:vimrplugin_rm_knit_cache") && g:vimrplugin_rm_knit_cache == 1
+    call RCreateMaps("nvi", '<Plug>RKnitRmCache', 'kr', ':call RKnitRmCache()')
+endif
 call RCreateMaps("nvi", '<Plug>RKnit',        'kn', ':call RKnitRnw()')
 call RCreateMaps("nvi", '<Plug>RMakePDFK',    'kp', ':call RMakePDF("nobib", 1)')
 call RCreateMaps("nvi", '<Plug>RBibTeXK',     'kb', ':call RMakePDF("bibtex", 1)')
