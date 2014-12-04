@@ -10,7 +10,7 @@ function BuildROmniList()
         return
     endif
 
-    let omnilistcmd = 'vim.bol("' . $VIMRPLUGIN_TMPDIR . "/GlobalEnvList_" . $VIMINSTANCEID . '"'
+    let omnilistcmd = 'vimcom:::vim.bol("' . $VIMRPLUGIN_TMPDIR . "/GlobalEnvList_" . $VIMINSTANCEID . '"'
     if g:vimrplugin_allnames == 1
         let omnilistcmd = omnilistcmd . ', allnames = TRUE'
     endif

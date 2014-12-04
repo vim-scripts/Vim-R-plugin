@@ -127,31 +127,30 @@ function ReplaceUnderS()
 endfunction
 
 function! ReadEvalReply()
-    let reply = "No reply"
+    let reply = ["No reply"]
     let haswaitwarn = 0
     let ii = 0
     while ii < 20
         sleep 100m
         if filereadable($VIMRPLUGIN_TMPDIR . "/eval_reply")
-            let tmp = readfile($VIMRPLUGIN_TMPDIR . "/eval_reply")
-            if len(tmp) > 0
-                let reply = tmp[0]
+            let reply = readfile($VIMRPLUGIN_TMPDIR . "/eval_reply")
+            if len(reply) > 0
                 break
             endif
         endif
         let ii += 1
         if ii == 2
             echohl WarningMsg
-            echon "\rWaiting for reply"
+            echon "\rWaiting..."
             echohl Normal
             let haswaitwarn = 1
         endif
     endwhile
     if haswaitwarn
-        echon "\r                 "
+        echon "\r              "
         redraw
     endif
-    return reply
+    return reply[0]
 endfunction
 
 function! CompleteChunkOptions()
@@ -619,7 +618,7 @@ function StartR_TmuxSplit(rcmd)
                 \ 'set-environment VIMINSTANCEID ' . $VIMINSTANCEID ,
                 \ 'set-environment VIMRPLUGIN_SECRET ' . $VIMRPLUGIN_SECRET ]
     if &t_Co == 256
-        call extend(tmuxconf, ['set -g default-terminal "' . $TERM . '"'])
+        call extend(tmuxconf, ['set default-terminal "' . $TERM . '"'])
     endif
     call writefile(tmuxconf, $VIMRPLUGIN_TMPDIR . "/tmux" . $VIMINSTANCEID . ".conf")
     call system("tmux source-file '" . $VIMRPLUGIN_TMPDIR . "/tmux" . $VIMINSTANCEID . ".conf" . "'")
@@ -681,21 +680,21 @@ function StartR_ExternalTerm(rcmd)
         let tmuxcnf = ' '
     else
         " Create a custom tmux.conf
-        let cnflines = ['set-option -g prefix C-a',
+        let cnflines = ['set-option prefix C-a',
                     \ 'unbind-key C-b',
                     \ 'bind-key C-a send-prefix',
-                    \ 'set-window-option -g mode-keys vi',
-                    \ 'set -g status off',
-                    \ 'set -g default-terminal "screen-256color"',
-                    \ "set -g terminal-overrides 'xterm*:smcup@:rmcup@'" ]
+                    \ 'set-window-option mode-keys vi',
+                    \ 'set status off',
+                    \ 'set default-terminal "screen-256color"',
+                    \ "set terminal-overrides 'xterm*:smcup@:rmcup@'" ]
 
         if g:vimrplugin_term == "rxvt" || g:vimrplugin_term == "urxvt"
             let cnflines = cnflines + [
-                    \ "set -g terminal-overrides 'rxvt*:smcup@:rmcup@'" ]
+                    \ "set terminal-overrides 'rxvt*:smcup@:rmcup@'" ]
         endif
 
         if g:vimrplugin_external_ob || !has("gui_running")
-            call extend(cnflines, ['set -g mode-mouse on', 'set -g mouse-select-pane on', 'set -g mouse-resize-pane on'])
+            call extend(cnflines, ['set mode-mouse on', 'set mouse-select-pane on', 'set mouse-resize-pane on'])
         endif
         call writefile(cnflines, $VIMRPLUGIN_TMPDIR . "/tmux.conf")
         let tmuxcnf = '-f "' . $VIMRPLUGIN_TMPDIR . "/tmux.conf" . '"'
@@ -1197,24 +1196,20 @@ function RSetNeovimPort(p)
 endfunction
 
 function WaitVimComStart()
-    if g:vimrplugin_vimcom_wait < 0
-        return 0
+    if g:vimrplugin_vimcom_wait < 300
+        g:vimrplugin_vimcom_wait = 300
     endif
+    redraw
+    echo "Waiting vimcom loading..."
     sleep 300m
-    let ii = 0
+    let ii = 300
     let waitmsg = 0
     while !filereadable($VIMRPLUGIN_TMPDIR . "/vimcom_running_" . $VIMINSTANCEID) && ii < g:vimrplugin_vimcom_wait
         let ii = ii + 200
-        if ii == 1000
-            echo "Waiting vimcom loading..."
-            let waitmsg = 1
-        endif
         sleep 200m
     endwhile
-    if waitmsg
-        echon "\r                              "
-        redraw
-    endif
+    echon "\r                              "
+    redraw
     sleep 100m
     if filereadable($VIMRPLUGIN_TMPDIR . "/vimcom_running_" . $VIMINSTANCEID)
         let vr = readfile($VIMRPLUGIN_TMPDIR . "/vimcom_running_" . $VIMINSTANCEID)
@@ -1222,8 +1217,8 @@ function WaitVimComStart()
         let g:rplugin_vimcom_home = vr[1]
         let g:rplugin_vimcomport = vr[2]
         let g:rplugin_r_pid = vr[3]
-        if g:rplugin_vimcom_version != "1.1.8"
-            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.1.8.')
+        if g:rplugin_vimcom_version != "1.1.9"
+            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.1.9.')
             sleep 1
         endif
         if has("nvim")
@@ -1267,13 +1262,10 @@ function WaitVimComStart()
             call RWarningMsg('Could not find "' . g:rplugin_vimcom_lib . '".')
         endif
         call delete($VIMRPLUGIN_TMPDIR . "/vimcom_running_" . $VIMINSTANCEID)
-        if has("nvim") && g:vimrplugin_vimpager != "no"
-            call g:SendToVimCom("\x08" . $VIMINSTANCEID . "options(pager = vimcom:::vim.hmsg)", "I")
-        endif
         return 1
     else
         call RWarningMsg("The package vimcom wasn't loaded yet.")
-        sleep 300m
+        sleep 500m
         return 0
     endif
 endfunction
@@ -2210,7 +2202,7 @@ function SendLineToR(godown)
         if getline(1) =~ '^The topic'
             let topic = substitute(line, '.*::', '', "")
             let package = substitute(line, '::.*', '', "")
-            call ShowRDoc(topic, package, 1)
+            call AskRDoc(topic, package, 1)
             return
         endif
         if RdocIsInRCode(1) == 0
@@ -2473,7 +2465,18 @@ function RealRFillLibList()
     let g:rplugin_liblist_filled = 1
 endfunction
 
-function SetRTextWidth()
+function SetRTextWidth(rkeyword)
+    if g:vimrplugin_vimpager == "tabnew"
+        let s:rdoctitle = a:rkeyword . "\\ (help)"
+    else
+        let s:tnr = tabpagenr()
+        if g:vimrplugin_vimpager != "tab" && s:tnr > 1
+            let s:rdoctitle = "R_doc" . s:tnr
+        else
+            let s:rdoctitle = "R_doc"
+        endif
+        unlet s:tnr
+    endif
     if !bufloaded(s:rdoctitle) || g:vimrplugin_newsize == 1
         let g:vimrplugin_newsize = 0
 
@@ -2603,7 +2606,7 @@ endfunction
 
 " Show R's help doc in Vim's buffer
 " (based  on pydoc plugin)
-function ShowRDoc(rkeyword, package, getclass)
+function AskRDoc(rkeyword, package, getclass)
     if filewritable(g:rplugin_docfile)
         call delete(g:rplugin_docfile)
     endif
@@ -2624,53 +2627,55 @@ function ShowRDoc(rkeyword, package, getclass)
         let classfor = "eval(expression(" . classfor . "))"
     endif
 
-    if g:vimrplugin_vimpager == "tabnew"
-        let s:rdoctitle = a:rkeyword . "\\ (help)"
-    else
-        let s:tnr = tabpagenr()
-        if g:vimrplugin_vimpager != "tab" && s:tnr > 1
-            let s:rdoctitle = "R_doc" . s:tnr
-        else
-            let s:rdoctitle = "R_doc"
-        endif
-        unlet s:tnr
-    endif
-
-    call SetRTextWidth()
+    call SetRTextWidth(a:rkeyword)
 
     call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
     if classfor == "" && a:package == ""
-        let rcmd = 'vim.help("' . a:rkeyword . '", ' . g:rplugin_htw . 'L)'
+        let rcmd = 'vimcom:::vim.help("' . a:rkeyword . '", ' . g:rplugin_htw . 'L)'
     elseif a:package != ""
-        let rcmd = 'vim.help("' . a:rkeyword . '", ' . g:rplugin_htw . 'L, package="' . a:package  . '")'
+        let rcmd = 'vimcom:::vim.help("' . a:rkeyword . '", ' . g:rplugin_htw . 'L, package="' . a:package  . '")'
     else
         let classfor = substitute(classfor, '\\', "", "g")
         let classfor = substitute(classfor, '"', '\\"', "g")
-        let rcmd = 'vim.help("' . a:rkeyword . '", ' . g:rplugin_htw . 'L, ' . classfor . ')'
+        let rcmd = 'vimcom:::vim.help("' . a:rkeyword . '", ' . g:rplugin_htw . 'L, ' . classfor . ')'
     endif
 
     call g:SendToVimCom("\x08" . $VIMINSTANCEID . rcmd, "I")
+    call ShowRDoc(a:rkeyword, 0)
+endfunction
 
-    let g:rplugin_lastev = ReadEvalReply()
-    if g:rplugin_lastev != "VIMHELP"
-        if g:rplugin_lastev =~ "^MULTILIB"
-            let msg = "The topic '" . a:rkeyword . "' was found in more than one library:\n"
-            let libs = split(g:rplugin_lastev)
-            for idx in range(1, len(libs) - 1)
-                let msg .= idx . " : " . libs[idx] . "\n"
-            endfor
-            redraw
-            let chn = input(msg . "Please, select one of them: ")
-            if chn > 0 && chn < len(libs)
-                call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
-                call g:SendToVimCom("\x08" . $VIMINSTANCEID . 'vim.help("' . a:rkeyword . '", ' . g:rplugin_htw . 'L, package="' . libs[chn] . '")')
-                let g:rplugin_lastev = ReadEvalReply()
+" This function may be called by vimcom
+function ShowRDoc(rkeyword, fromvimcom)
+    if a:fromvimcom
+        if bufname("%") =~ "Object_Browser" || bufname("%") == "R_Output"
+            let savesb = &switchbuf
+            set switchbuf=useopen,usetab
+            exe "sb " . b:rscript_buffer
+            exe "set switchbuf=" . savesb
+        endif
+        call SetRTextWidth(a:rkeyword)
+    else
+        let g:rplugin_lastev = ReadEvalReply()
+        if g:rplugin_lastev != "VIMHELP"
+            if g:rplugin_lastev =~ "^MULTILIB"
+                let msg = "The topic '" . a:rkeyword . "' was found in more than one library:\n"
+                let libs = split(g:rplugin_lastev)
+                for idx in range(1, len(libs) - 1)
+                    let msg .= idx . " : " . libs[idx] . "\n"
+                endfor
+                redraw
+                let chn = input(msg . "Please, select one of them: ")
+                if chn > 0 && chn < len(libs)
+                    call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
+                    call g:SendToVimCom("\x08" . $VIMINSTANCEID . 'vimcom:::vim.help("' . a:rkeyword . '", ' . g:rplugin_htw . 'L, package="' . libs[chn] . '")')
+                    let g:rplugin_lastev = ReadEvalReply()
+                else
+                    return
+                endif
             else
+                call RWarningMsg(g:rplugin_lastev)
                 return
             endif
-        else
-            call RWarningMsg(g:rplugin_lastev)
-            return
         endif
     endif
 
@@ -2901,7 +2906,7 @@ function RAskHelp(...)
         return
     endif
     if g:vimrplugin_vimpager != "no"
-        call ShowRDoc(a:1, "", 0)
+        call AskRDoc(a:1, "", 0)
     else
         call g:SendCmdToR("help(" . a:1. ")")
     endif
@@ -2943,20 +2948,20 @@ function RAction(rcmd)
                             call RWarningMsg("Cmd not available.")
                         else
                             if g:rplugin_editor_sname == "" || has("nvim")
-                                let slog = system("tmux set-buffer '" . "\<C-\>\<C-N>" . ':call ShowRDoc("' . rkeyword . '", "' . pkg . '", 0)' . "\<C-M>' && tmux paste-buffer -t " . g:rplugin_vim_pane . " && tmux select-pane -t " . g:rplugin_vim_pane)
+                                let slog = system("tmux set-buffer '" . "\<C-\>\<C-N>" . ':call AskRDoc("' . rkeyword . '", "' . pkg . '", 0)' . "\<C-M>' && tmux paste-buffer -t " . g:rplugin_vim_pane . " && tmux select-pane -t " . g:rplugin_vim_pane)
                                 if v:shell_error
                                     call RWarningMsg(slog)
                                 endif
                             else
-                                silent exe 'call remote_expr("' . g:rplugin_editor_sname . '", ' . "'ShowRDoc(" . '"' . rkeyword . '", "' . pkg . '", 0)' . "')"
+                                silent exe 'call remote_expr("' . g:rplugin_editor_sname . '", ' . "'AskRDoc(" . '"' . rkeyword . '", "' . pkg . '", 0)' . "')"
                             endif
                         endif
                     else
-                        call ShowRDoc(rkeyword, pkg, 0)
+                        call AskRDoc(rkeyword, pkg, 0)
                     endif
                     return
                 endif
-                call ShowRDoc(rkeyword, "", 1)
+                call AskRDoc(rkeyword, "", 1)
             endif
             return
         endif
@@ -3818,12 +3823,11 @@ call RSetDefaultValue("g:vimrplugin_help_w",           46)
 call RSetDefaultValue("g:vimrplugin_objbr_w",          40)
 call RSetDefaultValue("g:vimrplugin_external_ob",       0)
 if has("nvim")
-    call RSetDefaultValue("g:vimrplugin_vimcom_wait", 15000)
     call RSetDefaultValue("g:vimrplugin_r_in_buffer",     0)
 else
     let g:vimrplugin_r_in_buffer = 0
-    call RSetDefaultValue("g:vimrplugin_vimcom_wait", 5000)
 endif
+call RSetDefaultValue("g:vimrplugin_vimcom_wait",    5000)
 call RSetDefaultValue("g:vimrplugin_show_args",         0)
 call RSetDefaultValue("g:vimrplugin_never_unmake_menu", 0)
 call RSetDefaultValue("g:vimrplugin_insert_mode_cmds",  1)

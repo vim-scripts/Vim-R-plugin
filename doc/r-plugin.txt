@@ -261,6 +261,11 @@ Add the following lines to your `Rprofile`:
    if(Sys.getenv("VIMRPLUGIN_TMPDIR") != "")
        library(vimcom)
 <
+Note: If you do not know where your .Rprofile is, do the following command to
+open it:
+>
+   edit(file = "~/.Rprofile")
+<
 Start GVim again and edit an R script. You can right click a .R file and
 choose "Edit with Vim" or create a new one with the Normal mode command:
 >
@@ -1438,11 +1443,12 @@ If you do not want to see R documentation in a Vim's buffer, put in your
 >
    let vimrplugin_vimpager = "no"
 <
-If you want to use Vim to see R documentation even when looking for help in
-the R console, you have to create a shell script in your path that will call
-Vim in the right way. You can, for example, create a file named
-`~/bin/vimrpager` to do that (see |r-plugin-quick-setup|).
-
+And put in your .Rprofile:
+>
+   options(vimcom.vimpager = FALSE)
+<
+If you want to see R documentation in Vim, but are not satisfied with the way
+it works, please, read the subsection 6.5.2 below.
 
 ------------------------------------------------------------------------------
 6.5.2. Details and other options:~
@@ -1913,26 +1919,14 @@ will be shown only if "preview" is also included in your 'completeopt'.
 
 The Vim-R-plugin waits 5000 milliseconds for vimcom package to be loaded
 during R startup. It then checks whether you are using the correct version of
-vimcom. On Unix, it also sends a message to R update the list of uploaded
-libraries and, then, immediately updates the syntax highlighting of function
-names. If 5000 milliseconds is not enough to your R startup, then set a higher
-value for the variable in your |vimrc|. Example:
+vimcom. If 5000 milliseconds is not enough to your R startup, then set a
+higher value for the variable in your |vimrc|. Example:
 >
    let vimrplugin_vimcom_wait = 10000
 <
 Note: You should have the line  `library(vimcom)`  in your Rprofile. The
 Vim command  :RpluginConfig  adds that line for you.
 
-The plugin has a different behavior with Neovim: it receives a message from
-vimcom as soon as it is loaded and warns if the package was not loaded
-after 15 seconds of sending the command to start R. If you need more than 15
-seconds, change the value of vimrplugin_vimcom_wait.
-
-If you do not want to install the vimcom package, then put in your
-|vimrc|:
->
-   let vimrplugin_vimcom_wait = -1
-<
 
 ------------------------------------------------------------------------------
 							   *vimrplugin_vim_wd*
@@ -2847,14 +2841,13 @@ please read this document from the beginning.
    ~/.Rprofile~
 >
    if(interactive()){
-       # Get startup messages of three packages and set Vim as R pager:
+       # Get startup messages of three packages:
        options(setwidth.verbose = 1,
                colorout.verbose = 1,
-               vimcom.verbose = 1,
-               pager = "vimrpager")
+               vimcom.verbose = 1)
        # Use the text based web browser w3m to navigate through R docs:
-       if(Sys.getenv("TMUX") != "")
-           options(browser="~/bin/vimrw3mbrowser",
+       if(Sys.getenv("TMUX") != "" && Sys.getenv("DISPLAY") == "")
+	   options(browser = function(u) system(paste0("tmux new-window 'w3m ", u, "'")),
                    help_type = "html")
        # Use either Vim or GVim as text editor for R:
        if(nchar(Sys.getenv("DISPLAY")) > 1)
@@ -2863,57 +2856,12 @@ please read this document from the beginning.
            options(editor = 'vim -c "set ft=r"')
        # Load the colorout library:
        library(colorout)
-       if(Sys.getenv("TERM") != "linux" && Sys.getenv("TERM") != ""){
-           # Choose the colors for R output among 256 options.
-           # You should run show256Colors() and help(setOutputColors256) to
-           # know how to change the colors according to your taste:
-           setOutputColors256(verbose = FALSE)
-       }
        # Load the setwidth library:
        library(setwidth)
        # Load the vimcom library only if R was started by Vim:
-       if(Sys.getenv("VIMRPLUGIN_TMPDIR") != ""){
+       if(Sys.getenv("VIMRPLUGIN_TMPDIR") != "")
            library(vimcom)
-           # See R documentation on Vim buffer even if asking for help in R Console:
-           if(Sys.getenv("VIM_PANE") != "")
-               options(help_type = "text", pager = vim.pager)
-       }
    }
-<
-
-   ~/bin/vimrpager~
->
-   #!/bin/sh
-   # I don't know the reason, but we can't pipe the output directly to Vim.
-   # So we need this script to use 'cat' as intermediary.
-   cat | vim -c 'set ft=rdoc' -
-<
-
-   ~/bin/vimrw3mbrowser~
->
-   #!/bin/sh
-   NCOLS=$(tput cols)
-   if [ "$NCOLS" -gt "140" ]
-   then
-       if [ "x$VIM_PANE" = "x" ]
-       then
-           tmux split-window -h "w3m $1 && exit"
-       else
-           tmux split-window -h -t $VIM_PANE "w3m $1 && exit"
-       fi
-   else
-       tmux new-window "w3m $1 && exit"
-   fi
-<
-
-NOTES: 1. The `~/bin` diretory must be in your PATH.
-       2. To use the `vimrw3mbrower` script the web browser w3m must be
-          installed.
-       3. You have to change `~/bin/vimrpager` and `~/bin/vimrw3mbrowser`
-          permissions to make them executable:
->
-   chmod +x ~/bin/vimrpager
-   chmod +x ~/bin/vimrw3mbrowser
 <
 
 Finally, if you want to use vi key bindings in Bash:
@@ -2954,7 +2902,7 @@ See also |vimrplugin_r_in_buffer|.
 							       *r-plugin-news*
 10. News~
 
-1.1.1 (2014-11-29)
+1.1.1 (2014-12-01)
 
  * New option (Neovim only): vimrplugin_r_in_buffer and :Rhistory.
 
