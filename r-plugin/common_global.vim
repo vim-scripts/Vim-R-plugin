@@ -680,13 +680,13 @@ function StartR_ExternalTerm(rcmd)
         let tmuxcnf = ' '
     else
         " Create a custom tmux.conf
-        let cnflines = ['set-option prefix C-a',
+        let cnflines = ['set-option -g prefix C-a',
                     \ 'unbind-key C-b',
                     \ 'bind-key C-a send-prefix',
-                    \ 'set-window-option mode-keys vi',
-                    \ 'set status off',
-                    \ 'set default-terminal "screen-256color"',
-                    \ "set terminal-overrides 'xterm*:smcup@:rmcup@'" ]
+                    \ 'set-window-option -g mode-keys vi',
+                    \ 'set -g status off',
+                    \ 'set -g default-terminal "screen-256color"',
+                    \ "set -g terminal-overrides 'xterm*:smcup@:rmcup@'" ]
 
         if g:vimrplugin_term == "rxvt" || g:vimrplugin_term == "urxvt"
             let cnflines = cnflines + [
