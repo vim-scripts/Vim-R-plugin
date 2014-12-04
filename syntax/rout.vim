@@ -74,12 +74,12 @@ if has("conceal")
     set concealcursor=n
     syn match routConceal '^: ' conceal contained
     syn region routStdErr start='^: ' end="$" contains=routConceal
-    syn region routError start='^: .*Error.*' end='^>' contains=routConceal
-    syn region routWarn start='^: .*Warn.*' end='^>' contains=routConceal
+    syn region routError start='^: .*Error.*' end='\n:\@!' contains=routConceal
+    syn region routWarn start='^: .*Warn.*' end='\n:\@!' contains=routConceal
 else
     syn region routStdErr start='^: ' end="$"
-    syn region routError start='^: .*Error.*' end='^>'
-    syn region routWarn start='^: .*Warn.*' end='^>'
+    syn region routError start='^: .*Error.*' end='\n:\@!'
+    syn region routWarn start='^: .*Warn.*' end='\n:\@!'
 endif
 
 " Index of vectors
