@@ -3,7 +3,7 @@
 " Maintainer:	      Jakson Aquino <jalvesaq@gmail.com>
 " Former Maintainers: Vaidotas Zemlys <zemlys@gmail.com>
 " 		      Tom Payne <tom@tompayne.org>
-" Last Change:	      Thu Jul 10, 2014  06:45PM
+" Last Change:	      Thu Dec 04, 2014  11:07PM
 " Filenames:	      *.R *.r *.Rhistory *.Rt
 "
 " NOTE: The highlighting of R functions is defined in the
@@ -111,17 +111,19 @@ syn match rComplex "\<\d\+\.\d*\([Ee][-+]\=\d\+\)\=i"
 syn match rComplex "\<\.\d\+\([Ee][-+]\=\d\+\)\=i"
 syn match rComplex "\<\d\+[Ee][-+]\=\d\+i"
 
+syn match rAssign    '='
 syn match rOperator    "&"
 syn match rOperator    '-'
 syn match rOperator    '\*'
 syn match rOperator    '+'
-syn match rOperator    '='
 if &filetype != "rmd" && &filetype != "rrst"
   syn match rOperator    "[|!<>^~/:]"
 else
   syn match rOperator    "[|!<>^~`/:]"
 endif
 syn match rOperator    "%\{2}\|%\S\{-}%"
+syn match rOperator '\([!><]\)\@<=='
+syn match rOperator '=='
 syn match rOpError  '\*\{3}'
 syn match rOpError  '//'
 syn match rOpError  '&&&'
@@ -129,8 +131,8 @@ syn match rOpError  '|||'
 syn match rOpError  '<<'
 syn match rOpError  '>>'
 
-syn match rArrow "<\{1,2}-"
-syn match rArrow "->\{1,2}"
+syn match rAssign "<\{1,2}-"
+syn match rAssign "->\{1,2}"
 
 " Special
 syn match rDelimiter "[,;:]"
@@ -191,7 +193,7 @@ else
 endif
 
 " Define the default highlighting.
-hi def link rArrow       Statement	
+hi def link rAssign      Statement
 hi def link rBoolean     Boolean
 hi def link rBraceError  Error
 hi def link rComment     Comment
@@ -210,7 +212,7 @@ hi def link rHelpIdent   Identifier
 hi def link rhPreProc    PreProc
 hi def link rhSection    PreCondit
 hi def link rInteger     Number
-hi def link rLstElmt	 Normal
+hi def link rLstElmt     Normal
 hi def link rNameWSpace  Normal
 hi def link rNumber      Number
 hi def link rOperator    Operator
