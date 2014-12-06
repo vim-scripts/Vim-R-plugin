@@ -260,7 +260,7 @@ function RCompleteArgs()
             let rkeyword0 = RGetKeyWord()
             let classfor = RGetClassFor(rkeyword0)
             let classfor = substitute(classfor, '\\', "", "g")
-            let classfor = substitute(classfor, '"', '\\"', "g")
+            let classfor = substitute(classfor, '\(.\)"\(.\)', '\1\\"\2', "g")
             let rkeyword = '^' . rkeyword0 . "\x06"
             call cursor(cpos[1], cpos[2])
 
@@ -751,6 +751,7 @@ function StartR_Windows()
     let saved_home = $HOME
     let prs = system('reg.exe QUERY "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders" /v "Personal"')
     if len(prs) > 0
+        let g:rdebug_reg_personal = prs
         let prs = substitute(prs, '.*REG_SZ\s*', '', '')
         let prs = substitute(prs, '\n', '', 'g')
         let prs = substitute(prs, '\s*$', '', 'g')
@@ -2636,7 +2637,7 @@ function AskRDoc(rkeyword, package, getclass)
         let rcmd = 'vimcom:::vim.help("' . a:rkeyword . '", ' . g:rplugin_htw . 'L, package="' . a:package  . '")'
     else
         let classfor = substitute(classfor, '\\', "", "g")
-        let classfor = substitute(classfor, '"', '\\"', "g")
+        let classfor = substitute(classfor, '\(.\)"\(.\)', '\1\\"\2', "g")
         let rcmd = 'vimcom:::vim.help("' . a:rkeyword . '", ' . g:rplugin_htw . 'L, ' . classfor . ')'
     endif
 
@@ -2848,6 +2849,11 @@ function ROpenPDF(path)
         return
     endif
 
+    if !filereadable(basenm . ".pdf")
+        call RWarningMsg('File not found: "' . basenm . '.pdf".')
+        exe "cd " . substitute(olddir, ' ', '\\ ', 'g')
+        return
+    endif
     if g:rplugin_pdfviewer == "none"
         call RWarningMsg("Could not find a PDF viewer, and vimrplugin_pdfviewer is not defined.")
     else
@@ -4044,7 +4050,11 @@ if has("win32") || has("win64")
         else
             let rip = filter(split(system('reg.exe QUERY "HKLM\SOFTWARE\R-core\R" /s'), "\n"), 'v:val =~ ".*InstallPath.*REG_SZ"')
             if len(rip) > 0
-                let s:rinstallpath = substitute(rip[0], "InstallPath.*REG_SZ\s*", "", "")
+                let g:rdebug_reg_rpath_1 = rip
+                let s:rinstallpath = substitute(rip[0], '.*InstallPath.*REG_SZ\s*', '', '')
+                let s:rinstallpath = substitute(s:rinstallpath, '\n', '', 'g')
+                let s:rinstallpath = substitute(s:rinstallpath, '\s*$', '', 'g')
+                let g:rdebug_reg_rpath_2 = s:rinstallpath
             endif
 
             if !exists("s:rinstallpath")
