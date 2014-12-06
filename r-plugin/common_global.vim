@@ -744,6 +744,12 @@ function StartR_Windows()
 
     if !executable(g:rplugin_Rgui)
         call RWarningMsg('R executable "' . g:rplugin_Rgui . '" not found.')
+        if exists("g:rdebug_reg_rpath_1")
+            call RWarningMsg('DEBUG message 1: >>' . g:rdebug_reg_rpath_1 . '<<')
+        endif
+        if exists("g:rdebug_reg_rpath_1")
+            call RWarningMsg('DEBUG message 2: >>' . g:rdebug_reg_rpath_2 . '<<')
+        endif
         return
     endif
 
@@ -4033,6 +4039,11 @@ endif
 let g:rplugin_globalenvlines = []
 
 if has("win32") || has("win64")
+    if g:vimrplugin_Rterm
+        let b:rplugin_R = "Rgui.exe"
+    else
+        let b:rplugin_R = "Rterm.exe"
+    endif
     if !exists("g:rplugin_rpathadded")
         if exists("g:vimrplugin_r_path")
             if !isdirectory(g:vimrplugin_r_path)
@@ -4049,8 +4060,8 @@ if has("win32") || has("win64")
             let g:rplugin_Rgui = g:vimrplugin_r_path . "\\Rgui.exe"
         else
             let rip = filter(split(system('reg.exe QUERY "HKLM\SOFTWARE\R-core\R" /s'), "\n"), 'v:val =~ ".*InstallPath.*REG_SZ"')
+            let g:rdebug_reg_rpath_1 = rip
             if len(rip) > 0
-                let g:rdebug_reg_rpath_1 = rip
                 let s:rinstallpath = substitute(rip[0], '.*InstallPath.*REG_SZ\s*', '', '')
                 let s:rinstallpath = substitute(s:rinstallpath, '\n', '', 'g')
                 let s:rinstallpath = substitute(s:rinstallpath, '\s*$', '', 'g')
@@ -4080,9 +4091,6 @@ if has("win32") || has("win64")
             unlet s:rinstallpath
         endif
         let g:rplugin_rpathadded = 1
-    endif
-    if !exists("b:rplugin_R")
-        let b:rplugin_R = "Rgui.exe"
     endif
     let g:vimrplugin_term_cmd = "none"
     let g:vimrplugin_term = "none"
