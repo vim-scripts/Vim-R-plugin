@@ -3817,7 +3817,6 @@ call RSetDefaultValue("g:vimrplugin_strict_rst",        1)
 call RSetDefaultValue("g:vimrplugin_openpdf",           0)
 call RSetDefaultValue("g:vimrplugin_synctex",           1)
 call RSetDefaultValue("g:vimrplugin_openhtml",          0)
-call RSetDefaultValue("g:vimrplugin_i386",              0)
 call RSetDefaultValue("g:vimrplugin_Rterm",             0)
 call RSetDefaultValue("g:vimrplugin_vim_wd",            0)
 call RSetDefaultValue("g:vimrplugin_restart",           0)
@@ -3834,8 +3833,13 @@ call RSetDefaultValue("g:vimrplugin_editor_w",         66)
 call RSetDefaultValue("g:vimrplugin_help_w",           46)
 call RSetDefaultValue("g:vimrplugin_objbr_w",          40)
 call RSetDefaultValue("g:vimrplugin_external_ob",       0)
+if has("win32") && !has("win64") && !has("nvim")
+    let g:vimrplugin_i386 = 1
+else
+    call RSetDefaultValue("g:vimrplugin_i386",          0)
+endif
 if has("nvim")
-    call RSetDefaultValue("g:vimrplugin_r_in_buffer",     0)
+    call RSetDefaultValue("g:vimrplugin_r_in_buffer",   0)
 else
     let g:vimrplugin_r_in_buffer = 0
 endif
