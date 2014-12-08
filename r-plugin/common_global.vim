@@ -134,9 +134,11 @@ function! ReadEvalReply()
         sleep 100m
         if filereadable($VIMRPLUGIN_TMPDIR . "/eval_reply")
             let reply = readfile($VIMRPLUGIN_TMPDIR . "/eval_reply")
-            if len(reply) > 0
-                break
+            if len(reply) == 0
+                call RWarningMsg("Incomplete reply")
+                let reply = ["No reply"]
             endif
+            break
         endif
         let ii += 1
         if ii == 2
@@ -728,7 +730,28 @@ function StartR_ExternalTerm(rcmd)
     endif
 endfunction
 
+function InitializePython()
+    " python3 has priority over python
+    if has("python3")
+        command! -nargs=+ Py :py3 <args>
+        command! -nargs=+ PyFile :py3file <args>
+    elseif has("python")
+        command! -nargs=+ Py :py <args>
+        command! -nargs=+ PyFile :pyfile <args>
+    elseif has("nvim")
+        command! -nargs=+ Py :call RWarningMsg("Py command not implemented yet: '" . <args> . "'")
+        let g:SendToVimCom = function("SendToVimCom_Neovim")
+    else
+        command! -nargs=+ Py :
+        command! -nargs=+ PyFile :
+    endif
+    exe "PyFile " . substitute(g:rplugin_home, " ", '\\ ', "g") . '\r-plugin\windows.py'
+endfunction
+
 function StartR_Windows()
+    if !g:vimrplugin_libcall_send && !g:rplugin_python_initialized
+        call InitializePython()
+    endif
     if string(g:SendCmdToR) != "function('SendCmdToR_fake')"
         let repl = libcall(g:rplugin_vimcom_lib, "FindRConsole", 'R Console')
         if repl == "NotFound"
@@ -1755,7 +1778,16 @@ function SendCmdToR_Windows(cmd)
     else
         let cmd = a:cmd . "\n"
     endif
-    let repl = libcall(g:rplugin_vimcom_lib, "SendToRConsole", cmd)
+    if vimrplugin_libcall_send
+        let repl = libcall(g:rplugin_vimcom_lib, "SendToRConsole", cmd)
+    else
+        let slen = len(cmd)
+        let str = ""
+        for i in range(0, slen)
+            let str = str . printf("\\x%02X", char2nr(cmd[i]))
+        endfor
+        exe "Py" . " SendToRConsole(b'" . str . "')"
+    endif
     return 1
 endfunction
 
@@ -2250,10 +2282,14 @@ endfunction
 " Clear the console screen
 function RClearConsole()
     if (has("win32") || has("win64"))
-        if g:vimrplugin_Rterm
-            let repl = libcall(g:rplugin_vimcom_lib, "RClearConsole()", "Rterm")
+        if g:vimrplugin_libcall_send
+            if g:vimrplugin_Rterm
+                let repl = libcall(g:rplugin_vimcom_lib, "RClearConsole()", "Rterm")
+            else
+                let repl = libcall(g:rplugin_vimcom_lib, "RClearConsole()", "Rgui")
+            endif
         else
-            let repl = libcall(g:rplugin_vimcom_lib, "RClearConsole()", "Rgui")
+            Py RClearConsolePy()
         endif
         if repl != "OK"
             call RWarningMsg(repl)
@@ -3672,6 +3708,7 @@ function RVimLeave()
     call delete($VIMRPLUGIN_TMPDIR . "/unformatted_code")
     call delete($VIMRPLUGIN_TMPDIR . "/vimbol_finished")
     call delete($VIMRPLUGIN_TMPDIR . "/vimcom_running_" . $VIMINSTANCEID)
+    call delete($VIMRPLUGIN_TMPDIR . "/rconsole_hwnd_" . $VIMRPLUGIN_SECRET)
 endfunction
 
 function SetRPath()
@@ -3833,10 +3870,14 @@ call RSetDefaultValue("g:vimrplugin_editor_w",         66)
 call RSetDefaultValue("g:vimrplugin_help_w",           46)
 call RSetDefaultValue("g:vimrplugin_objbr_w",          40)
 call RSetDefaultValue("g:vimrplugin_external_ob",       0)
-if has("win32") && !has("win64") && !has("nvim")
-    let g:vimrplugin_i386 = 1
-else
-    call RSetDefaultValue("g:vimrplugin_i386",          0)
+call RSetDefaultValue("g:vimrplugin_libcall_send",      1)
+call RSetDefaultValue("g:vimrplugin_i386",              0)
+if has("win32")
+    if has("win64")
+        let g:vimrplugin_i386 = 0
+    else
+        let g:vimrplugin_i386 = 1
+    endif
 endif
 if has("nvim")
     call RSetDefaultValue("g:vimrplugin_r_in_buffer",   0)
@@ -4249,6 +4290,7 @@ let g:rplugin_lastrpl = ""
 let g:rplugin_lastev = ""
 let g:rplugin_hasRSFbutton = 0
 let g:rplugin_tmuxsname = "VimR-" . substitute(localtime(), '.*\(...\)', '\1', '')
+let g:rplugin_python_initialized = 0
 
 " SyncTeX options
 let g:rplugin_has_wmctrl = 0
