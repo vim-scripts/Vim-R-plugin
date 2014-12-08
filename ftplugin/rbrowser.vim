@@ -347,7 +347,7 @@ if g:rplugin_do_tmux_split == 0
 else
     au BufUnload <buffer> call ObBrBufUnload()
     " Fix problems caused by some plugins
-    if exists("g:loaded_surround")
+    if exists("g:loaded_surround") && mapcheck("ds", "n") != ""
         nunmap ds
     endif
     if exists("g:loaded_showmarks ")
