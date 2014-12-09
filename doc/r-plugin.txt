@@ -472,8 +472,8 @@ Edit
   . Uncomment (line, sel)                              \xu
   . Add/Align right comment (line, sel)                 \;
   --------------------------------------------------------
-  . Go (next R chunk)                                   gn
-  . Go (previous R chunk)                               gN
+  . Go (next R chunk)                                  \gn
+  . Go (previous R chunk)                              \gN
 -----------------------------------------------------------
 
 Object Browser
@@ -2204,6 +2204,8 @@ RD, "cursor down"; RED, both "echo" and "down"):
    RSyncFor   (SyncTeX search forward)
    RGoToTeX   (Got to LaTeX output)
    RSpinFile
+   RNextRChunk
+   RPreviousRChunk
 
    Object browser~
    RUpdateObjBrowser
