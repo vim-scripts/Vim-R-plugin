@@ -746,6 +746,7 @@ function InitializePython()
         command! -nargs=+ PyFile :
     endif
     exe "PyFile " . substitute(g:rplugin_home, " ", '\\ ', "g") . '\r-plugin\windows.py'
+    let g:rplugin_python_initialized = 1
 endfunction
 
 function StartR_Windows()
@@ -1292,6 +1293,11 @@ function WaitVimComStart()
             call RWarningMsg('Could not find "' . g:rplugin_vimcom_lib . '".')
         endif
         call delete($VIMRPLUGIN_TMPDIR . "/vimcom_running_" . $VIMINSTANCEID)
+
+        if !g:vimrplugin_r_in_buffer && !has("libcall")
+            call RWarningMsgInp("+libcall feature is missing: communication with R will be flawed.")
+        endif
+
         return 1
     else
         call RWarningMsg("The package vimcom wasn't loaded yet.")
