@@ -2280,7 +2280,7 @@ function RSendPartOfLine(direction, correctpos)
     if a:direction == "right"
         let rcmd = strpart(lin, idx)
     else
-        let rcmd = strpart(lin, 0, idx)
+        let rcmd = strpart(lin, 0, idx + 1)
     endif
     call g:SendCmdToR(rcmd)
 endfunction
@@ -3653,12 +3653,10 @@ function RCreateSendMaps()
     call RCreateMaps('ni0', '<Plug>RDSendLine', 'd', ':call SendLineToR("down")')
     call RCreateMaps('ni0', '<Plug>RDSendLineAndInsertOutput', 'o', ':call SendLineToRAndInsertOutput()')
     call RCreateMaps('i', '<Plug>RSendLAndOpenNewOne', 'q', ':call SendLineToR("newline")')
-    nmap <LocalLeader>r<Left> :call RSendPartOfLine("left", 0)<CR>
-    nmap <LocalLeader>r<Right> :call RSendPartOfLine("right", 0)<CR>
-    if g:vimrplugin_insert_mode_cmds
-        imap <buffer><silent> <LocalLeader>r<Left> <Esc>l:call RSendPartOfLine("left", 0)<CR>i
-        imap <buffer><silent> <LocalLeader>r<Right> <Esc>l:call RSendPartOfLine("right", 0)<CR>i
-    endif
+    call RCreateMaps('n', '<Plug>RNLeftPart', 'r<left>', ':call RSendPartOfLine("left", 0)')
+    call RCreateMaps('n', '<Plug>RNRightPart', 'r<right>', ':call RSendPartOfLine("right", 0)')
+    call RCreateMaps('i', '<Plug>RILeftPart', 'r<left>', 'l:call RSendPartOfLine("left", 1)')
+    call RCreateMaps('i', '<Plug>RIRightPart', 'r<right>', 'l:call RSendPartOfLine("right", 1)')
 
     " For compatibility with Johannes Ranke's plugin
     if g:vimrplugin_map_r == 1

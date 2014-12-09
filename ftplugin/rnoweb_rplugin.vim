@@ -273,8 +273,8 @@ if g:vimrplugin_synctex
     call RCreateMaps("ni",  '<Plug>RSyncFor',     'gp', ':call SyncTeX_forward()')
     call RCreateMaps("ni",  '<Plug>RGoToTeX',     'gt', ':call SyncTeX_forward(1)')
 endif
-nmap <buffer><silent> gn :call RnwNextChunk()<CR>
-nmap <buffer><silent> gN :call RnwPreviousChunk()<CR>
+call RCreateMaps("n",  '<Plug>RNextRChunk',     'gn', ':call b:NextRChunk()')
+call RCreateMaps("n",  '<Plug>RPreviousRChunk', 'gN', ':call b:PreviousRChunk()')
 
 " Menu R
 if has("gui_running")
