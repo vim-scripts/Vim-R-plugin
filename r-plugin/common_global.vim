@@ -1248,8 +1248,8 @@ function WaitVimComStart()
         let g:rplugin_vimcom_home = vr[1]
         let g:rplugin_vimcomport = vr[2]
         let g:rplugin_r_pid = vr[3]
-        if g:rplugin_vimcom_version != "1.1.9"
-            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.1.9.')
+        if g:rplugin_vimcom_version != "1.1.10"
+            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.1.10.')
             sleep 1
         endif
         if has("nvim")
@@ -1283,14 +1283,14 @@ function WaitVimComStart()
             endif
         endif
         if has("win32")
-            let g:rplugin_vimcom_lib = g:rplugin_vimcom_home . "/libs/i386/vimcom.dll"
+            let g:rplugin_vimcom_lib = g:rplugin_vimcom_home . "/bin/i386/libvimcom.dll"
         elseif has("win64")
-            let g:rplugin_vimcom_lib = g:rplugin_vimcom_home . "/libs/x64/vimcom.dll"
+            let g:rplugin_vimcom_lib = g:rplugin_vimcom_home . "/bin/x64/libvimcom.dll"
         else
-            let g:rplugin_vimcom_lib = g:rplugin_vimcom_home . "/libs/vimcom.so"
+            let g:rplugin_vimcom_lib = g:rplugin_vimcom_home . "/bin/libvimcom.so"
         endif
         if !filereadable(g:rplugin_vimcom_lib)
-            call RWarningMsg('Could not find "' . g:rplugin_vimcom_lib . '".')
+            call RWarningMsgInp('Could not find "' . g:rplugin_vimcom_lib . '".')
         endif
         call delete($VIMRPLUGIN_TMPDIR . "/vimcom_running_" . $VIMINSTANCEID)
 
@@ -1784,7 +1784,7 @@ function SendCmdToR_Windows(cmd)
     else
         let cmd = a:cmd . "\n"
     endif
-    if vimrplugin_libcall_send
+    if g:vimrplugin_libcall_send
         let repl = libcall(g:rplugin_vimcom_lib, "SendToRConsole", cmd)
     else
         let slen = len(cmd)
@@ -2678,7 +2678,6 @@ function AskRDoc(rkeyword, package, getclass)
 
     call SetRTextWidth(a:rkeyword)
 
-    call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
     if classfor == "" && a:package == ""
         let rcmd = 'vimcom:::vim.help("' . a:rkeyword . '", ' . g:rplugin_htw . 'L)'
     elseif a:package != ""
@@ -2689,6 +2688,7 @@ function AskRDoc(rkeyword, package, getclass)
         let rcmd = 'vimcom:::vim.help("' . a:rkeyword . '", ' . g:rplugin_htw . 'L, ' . classfor . ')'
     endif
 
+    call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
     call g:SendToVimCom("\x08" . $VIMINSTANCEID . rcmd, "I")
     call ShowRDoc(a:rkeyword, 0)
 endfunction
@@ -2704,6 +2704,8 @@ function ShowRDoc(rkeyword, fromvimcom)
         endif
         call SetRTextWidth(a:rkeyword)
     else
+        " FIXME: This sleep should not be needed
+        sleep 100m
         let g:rplugin_lastev = ReadEvalReply()
         if g:rplugin_lastev != "VIMHELP"
             if g:rplugin_lastev =~ "^MULTILIB"
