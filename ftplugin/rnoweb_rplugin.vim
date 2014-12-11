@@ -91,7 +91,7 @@ endfunction
 function! RKnitRmCache()
     let lnum = search('\<cache\.path\>\s*=', 'bnwc')
     if lnum == 0
-        let pathdir = "cache"
+        let pathdir = "cache/"
     else
         let pathregexpr = '.*\<cache\.path\>\s*=\s*[' . "'" . '"]\(.\{-}\)[' . "'" . '"].*'
         let pathdir = substitute(getline(lnum), pathregexpr, '\1', '')
