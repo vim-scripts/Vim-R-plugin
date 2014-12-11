@@ -1248,8 +1248,8 @@ function WaitVimComStart()
         let g:rplugin_vimcom_home = vr[1]
         let g:rplugin_vimcomport = vr[2]
         let g:rplugin_r_pid = vr[3]
-        if g:rplugin_vimcom_version != "1.1.10"
-            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.1.10.')
+        if g:rplugin_vimcom_version != "1.1.11"
+            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.1.11.')
             sleep 1
         endif
         if has("nvim")
@@ -1298,6 +1298,11 @@ function WaitVimComStart()
             call RWarningMsgInp("+libcall feature is missing: communication with R will be flawed.")
         endif
 
+        if g:rplugin_do_tmux_split
+            " Environment variables persists across Tmux windows.
+            " Leave a hint (to vimcom) that R was not started by Vim:
+            call system("tmux set-environment VIMRPLUGIN_TMPDIR None")
+        endif
         return 1
     else
         call RWarningMsg("The package vimcom wasn't loaded yet.")
@@ -3427,6 +3432,7 @@ function MakeRMenu()
         call RCreateMenuItem("v", 'Edit.Add/Align\ right\ comment\ (line,\ sel)', '<Plug>RRightComment', ';', ':call MovePosRCodeComment("selection")')
         if &filetype == "rnoweb" || &filetype == "rrst" || &filetype == "rmd" || g:vimrplugin_never_unmake_menu
             menu R.Edit.-Sep73- <nul>
+            " TODO: Use RCreateMenuItem to make the <LocalLeader> appear in the menu
             nmenu <silent> R.Edit.Go\ (next\ R\ chunk)<Tab>gn :call b:NextRChunk()<CR>
             nmenu <silent> R.Edit.Go\ (previous\ R\ chunk)<Tab>gN :call b:PreviousRChunk()<CR>
         endif
