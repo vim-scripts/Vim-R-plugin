@@ -116,7 +116,7 @@ Before installing the plugin, you should install its dependencies:
 
    Vim >= 7.4: http://www.vim.org/download.php
                In addition to the most commonly used features, the plugin
-               requires: |+clientserver| and |+conceal|.
+               requires: |+libcall|, |+clientserver| and |+conceal|.
 
 	       Note: If you use Neovim, the |+clientserver| feature is not
 	       required.
@@ -599,8 +599,8 @@ shortcut to send the current line makes the cursor to jump to the next chunk.
 While editing Rnoweb files, the following commands are available in Normal
 mode:
 
-   [count]gn : go to the next chunk of R code
-   [count]gN : go to the previous chunk of R code
+   [count]<LocalLeader>gn : go to the next chunk of R code
+   [count]<LocalLeader>gN : go to the previous chunk of R code
 
 The commands <LocalLeader>cc, ce, cd and ca send the current chunk of R code
 to R Console. The command <LocalLeader>ch sends the R code from the first
@@ -1363,7 +1363,7 @@ this will not work:
    par(ask=TRUE)
    plot(1,1)
 <
-The plugin relies 
+
 ------------------------------------------------------------------------------
 						      *vimrplugin_rnowebchunk*
 	                                              *vimrplugin_assign_map*
@@ -2138,6 +2138,8 @@ RD, "cursor down"; RED, both "echo" and "down"):
    RRightComment
    RCompleteArgs
    RIndent
+   RNextRChunk
+   RPreviousRChunk
 
    Send line or part of it to R~
    RSendLine
@@ -2904,13 +2906,15 @@ See also |vimrplugin_r_in_buffer|.
 							       *r-plugin-news*
 10. News~
 
-1.1.1 (2014-12-01)
+1.1.1 (2014-12-11)
+
+ * Change commands gn and gN into <LocalLeader>gn and <LocalLeader>gN.
 
  * New option (Neovim only): vimrplugin_r_in_buffer and :Rhistory.
 
  * New command: :RStop.
 
- * No longer requires +python feature.
+ * No longer requires +python feature; requires +libcall instead.
 
  * Removed option vimrplugin_sleeptime.
 

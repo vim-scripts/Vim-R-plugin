@@ -169,17 +169,17 @@ call RControlMaps()
 call RCreateMaps("nvi", '<Plug>RSetwd',        'rd', ':call RSetWD()')
 
 " Only .Rrst files use these functions:
-call RCreateMaps("nvi", '<Plug>RKnit',        'kn', ':call RKnit()')
-call RCreateMaps("nvi", '<Plug>RMakePDFK',    'kp', ':call RMakePDFrrst()')
-call RCreateMaps("nvi", '<Plug>RMakeHTML',    'kh', ':call RMakeHTMLrrst("html")')
-call RCreateMaps("nvi", '<Plug>RMakeODT',     'ko', ':call RMakeHTMLrrst("odt")')
-call RCreateMaps("nvi", '<Plug>RIndent',      'si', ':call RrstToggleIndentSty()')
-call RCreateMaps("ni",  '<Plug>RSendChunk',   'cc', ':call b:SendChunkToR("silent", "stay")')
-call RCreateMaps("ni",  '<Plug>RESendChunk',  'ce', ':call b:SendChunkToR("echo", "stay")')
-call RCreateMaps("ni",  '<Plug>RDSendChunk',  'cd', ':call b:SendChunkToR("silent", "down")')
-call RCreateMaps("ni",  '<Plug>REDSendChunk', 'ca', ':call b:SendChunkToR("echo", "down")')
-nmap <buffer><silent> gn :call b:NextRChunk()<CR>
-nmap <buffer><silent> gN :call b:PreviousRChunk()<CR>
+call RCreateMaps("nvi", '<Plug>RKnit',          'kn', ':call RKnit()')
+call RCreateMaps("nvi", '<Plug>RMakePDFK',      'kp', ':call RMakePDFrrst()')
+call RCreateMaps("nvi", '<Plug>RMakeHTML',      'kh', ':call RMakeHTMLrrst("html")')
+call RCreateMaps("nvi", '<Plug>RMakeODT',       'ko', ':call RMakeHTMLrrst("odt")')
+call RCreateMaps("nvi", '<Plug>RIndent',        'si', ':call RrstToggleIndentSty()')
+call RCreateMaps("ni",  '<Plug>RSendChunk',     'cc', ':call b:SendChunkToR("silent", "stay")')
+call RCreateMaps("ni",  '<Plug>RESendChunk',    'ce', ':call b:SendChunkToR("echo", "stay")')
+call RCreateMaps("ni",  '<Plug>RDSendChunk',    'cd', ':call b:SendChunkToR("silent", "down")')
+call RCreateMaps("ni",  '<Plug>REDSendChunk',   'ca', ':call b:SendChunkToR("echo", "down")')
+call RCreateMaps("n",  '<Plug>RNextRChunk',     'gn', ':call b:NextRChunk()')
+call RCreateMaps("n",  '<Plug>RPreviousRChunk', 'gN', ':call b:PreviousRChunk()')
 
 " Menu R
 if has("gui_running")
