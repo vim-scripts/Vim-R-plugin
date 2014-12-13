@@ -18,10 +18,12 @@ syn match routNormal "."
 syn region routString start=/"/ skip=/\\\\\|\\"/ end=/"/ end=/$/
 
 " Constants
-syn keyword routConst  NULL NA
-syn keyword routBool   FALSE TRUE
-syn keyword routNumber Inf NaN
+syn keyword routConst  NULL NA NaN
+syn keyword routTrue   TRUE
+syn keyword routFalse  FALSE
 syn match routConst "\<Na's\>"
+syn match routInf "-Inf\>"
+syn match routInf "\<Inf\>"
 
 " integer
 syn match routInteger "\<\d\+L"
@@ -52,8 +54,10 @@ syn match routComplex "\<\d\+\.\d*\([Ee][-+]\=\d\+\)\=i"
 syn match routComplex "\<\.\d\+\([Ee][-+]\=\d\+\)\=i"
 syn match routComplex "\<\d\+[Ee][-+]\=\d\+i"
 
-" dates
-syn match routDate "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][-0-9]"
+" dates and times
+syn match routDate "[0-9][0-9][0-9][0-9][-/][0-9][0-9][-/][0-9][-0-9]"
+syn match routDate "[0-9][0-9][-/][0-9][0-9][-/][0-9][0-9][0-9][-0-9]"
+syn match routDate "[0-9][0-9]:[0-9][0-9]:[0-9][-0-9]"
 
 if !exists("g:vimrplugin_routmorecolors")
     let g:vimrplugin_routmorecolors = 0
@@ -155,7 +159,9 @@ if exists("g:rout_follow_colorscheme") && g:rout_follow_colorscheme
     hi def link routNegNum	Number
     hi def link routNegFlt	Float
     hi def link routDate	Number
-    hi def link routBool	Boolean
+    hi def link routTrue	Boolean
+    hi def link routFalse	Boolean
+    hi def link routInf  	Number
     hi def link routConst	Constant
     hi def link routString	String
     hi def link routError	Error
@@ -176,7 +182,9 @@ else
         hi routNegNum	ctermfg=209
         hi routNegFlt	ctermfg=209
         hi routDate	ctermfg=179
-        hi routBool	ctermfg=35
+        hi routFalse	ctermfg=203
+        hi routTrue	ctermfg=78
+        hi routInf      ctermfg=39
         hi routConst	ctermfg=35
         hi routString	ctermfg=85
         hi routStdErr	ctermfg=117
@@ -194,7 +202,9 @@ else
         hi routNegNum	ctermfg=darkyellow
         hi routNegFlt	ctermfg=darkyellow
         hi routDate	ctermfg=darkyellow
-        hi routBool	ctermfg=magenta
+        hi routInf	ctermfg=darkyellow
+        hi routFalse	ctermfg=magenta
+        hi routTrue	ctermfg=darkgreen
         hi routConst	ctermfg=magenta
         hi routString	ctermfg=darkcyan
         hi routStdErr	ctermfg=cyan
@@ -231,8 +241,14 @@ else
     if exists("g:rout_color_date")
         exe "hi routDate ctermfg=" . g:rout_color_date
     endif
-    if exists("g:rout_color_bool")
-        exe "hi routBool ctermfg=" . g:rout_color_bool
+    if exists("g:rout_color_false")
+        exe "hi routFalse ctermfg=" . g:rout_color_false
+    endif
+    if exists("g:rout_color_true")
+        exe "hi routTrue ctermfg=" . g:rout_color_true
+    endif
+    if exists("g:rout_color_inf")
+        exe "hi routInf ctermfg=" . g:rout_color_inf
     endif
     if exists("g:rout_color_constant")
         exe "hi routConst ctermfg=" . g:rout_color_constant
