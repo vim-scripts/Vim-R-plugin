@@ -886,7 +886,7 @@ function! StartR_Neovim()
 
     let savedterm = $TERM
     let $TERM="NeovimTerm"
-    let g:rplugin_rjob = jobstart("Rjob", 'R', ['--no-readline', '--interactive'])
+    let g:rplugin_rjob = jobstart("Rjob", 'R', ['--no-readline', '--interactive'], 'su')
     exe 'let $TERM="' . savedterm . '"'
     call WaitVimComStart()
 endfunction
@@ -1038,8 +1038,12 @@ function StartR(whatr)
     echon
 endfunction
 
+" For debugging
+let g:lastjobdata = []
+
 function GetRActivity()
     if v:job_data[1] == 'stdout' || v:job_data[1] == 'stderr'
+        let g:lastjobdata += [v:job_data[2]]
         let edbuf = bufname("%")
         if edbuf == "R_Output"
             let isrout = 1
@@ -1047,29 +1051,56 @@ function GetRActivity()
             let isrout = 0
             sbuffer R_Output
         endif
-        for lin in v:job_data[2]
-            if lin =~ ".\x0d."
+
+        " Newline at the beginning disappears after split(). Put it now:
+        if v:job_data[2] =~ "^\x0a"
+            call append("$", "")
+            let g:rplugin_last_r_prompt = ""
+        endif
+
+        " Fix DOS end of line
+        let outstr = substitute(v:job_data[2], "\x0d\x0a", "\x0a", "g")
+
+        let outlst = split(outstr, '\n')
+
+        let lastline = len(outlst) - 1
+        " Newline at the end disappears after split()
+        if v:job_data[2] =~ '\n$'
+            let g:rplugin_last_r_prompt = ""
+            let hasnl = 1
+        else
+            let g:rplugin_last_r_prompt = substitute(outlst[-1], ' *$', '', '')
+            let hasnl = 0
+        endif
+
+        for idx in range(len(outlst))
+            let lin = outlst[idx]
+            " Do carriage return
+            if lin =~ "\x0d"
                 let lin = substitute(lin, ".*\x0d", "", "g")
+                call setline("$", "")
             endif
-            if lin =~ "\x0d$"
-                let lin = substitute(lin, "\x0d$", "", "g")
-            endif
+
+            " Prefix ': '  for syntax highlight
             if v:job_data[1] == 'stderr'
                 let lin = ': ' . lin
             endif
-            if lin != "#<#"
-                if lin == "#>#"
-                    call append(line("$"), "> ")
-                    call cursor("$", 2)
-                    if isrout
-                        startinsert!
-                    endif
-                else
-                    call append(line("$"), lin)
-                    call cursor("$", 1)
-                endif
+
+            " Append characters to current last line
+            call setline("$", getline("$") . lin)
+
+            " Add new line
+            if idx != lastline
+                call append("$", "")
             endif
         endfor
+
+        " Add final newline
+        if hasnl
+            call append("$", "")
+        endif
+
+        call cursor("$", 999)
         if !isrout
             exe "sbuffer " . edbuf
         endif
@@ -1134,25 +1165,24 @@ function AddToRHistory(rcmd)
     let g:rplugin_rhistory += [a:rcmd]
 endfunction
 
-function SendCmdToR_Neovim(rcmd)
+function SendCmdToR_Neovim(...)
     let curbuf = bufname("%")
     sbuffer R_Output
     if winwidth(0) != b:winwidth
         let b:winwidth = winwidth(0)
         call g:SendToVimCom("\x08" . $VIMINSTANCEID . "options(width=" . b:winwidth . ")", "I")
     endif
-    if getline("$") == "> "
-        call setline(line("$"), "> " . a:rcmd)
-    else
-        call append(line("$"), "> " . a:rcmd)
+    if a:0 == 1
+        call setline("$", getline("$") . a:1)
     endif
+    call append("$", "")
     call cursor("$", 1)
     let g:rplugin_addedtohist = 0
-    if a:rcmd !~ '^base::source('
-        call AddToRHistory(a:rcmd)
+    if a:1 !~ '^base::source('
+        call AddToRHistory(a:1)
     endif
     exe "sbuffer " . curbuf
-    let ok = jobsend(g:rplugin_rjob, a:rcmd . "\n")
+    let ok = jobsend(g:rplugin_rjob, a:1 . "\n")
     return ok
 endfunction
 
@@ -1191,20 +1221,18 @@ function RConsoleArrow(dir)
     endif
     call setline(".", "> " . g:rplugin_rhistory[g:rplugin_dyn_rhist_pos])
 endfunction
-    
+
 function EnterRCmd()
     if line(".") != line("$")
         call append(".", "")
         call cursor(line(".")+1, 1)
         return
     endif
-    " First delete only the less than sign because the user may have manually
-    " deleted the space:
-    let lin = substitute(getline("."), '^>', '', '')
-    " Now delete one space in the beginning, if there any:
+    " First delete the last received prompt:
+    let lin = substitute(getline("."), '^' . g:rplugin_last_r_prompt, '', '')
+    " Now delete one space in the beginning, if there is any:
     let lin = substitute(lin, '^ ', '', '')
-    call setline(line("."), "> ")
-    call SendCmdToR_Neovim(lin)
+    call SendCmdToR_Neovim(lin, 0)
 endfunction
 
 function OpenRScratch()
@@ -2402,7 +2430,7 @@ function RQuit(how)
     if g:rplugin_do_tmux_split && g:vimrplugin_tmux_title != "automatic" && g:vimrplugin_tmux_title != ""
         call system("tmux set automatic-rename on")
     endif
-    if has("nvim") 
+    if has("nvim")
         if g:rplugin_do_tmux_split
             " Force Neovim to update the window size
             sleep 500m
@@ -2893,15 +2921,6 @@ function ROpenPDF(path)
     let olddir = getcwd()
     if olddir != expand("%:p:h")
         exe "cd " . substitute(expand("%:p:h"), ' ', '\\ ', 'g')
-    endif
-
-    if (has("win32") || has("win64")) && g:rplugin_pdfviewer == "none"
-        let repl = libcall(g:rplugin_vimcom_lib, 'OpenPDF', pdfpath)
-        if repl != "OK"
-            call RWarningMsg(repl)
-        endif
-        exe "cd " . substitute(olddir, ' ', '\\ ', 'g')
-        return
     endif
 
     if !filereadable(basenm . ".pdf")
@@ -3695,8 +3714,7 @@ function RBufEnter()
     if exists("b:rplugin_funls") && len(b:rplugin_funls) < len(g:rplugin_libls)
         call RUpdateFunSyntax(0)
         " If R code is included in another file type (like rnoweb or
-        " rhelp), the R syntax isn't automatically updated. So, we force
-        " it: 
+        " rhelp), the R syntax isn't automatically updated. So, we force it:
         silent exe "set filetype=" . &filetype
     endif
 endfunction
@@ -4299,6 +4317,7 @@ let g:rplugin_vimcom_home = ""
 let g:rplugin_vimcom_version = 0
 let g:rplugin_lastrpl = ""
 let g:rplugin_lastev = ""
+let g:rplugin_last_r_prompt = ""
 let g:rplugin_hasRSFbutton = 0
 let g:rplugin_tmuxsname = "VimR-" . substitute(localtime(), '.*\(...\)', '\1', '')
 let g:rplugin_python_initialized = 0
