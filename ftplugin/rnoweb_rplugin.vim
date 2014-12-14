@@ -567,7 +567,17 @@ function! SyncTeX_forward(...)
         endif
         call system("wmctrl -a '" . basenm . ".pdf'")
     elseif g:rplugin_pdfviewer == "sumatra"
-        call RWarningMsg("Support for Sumatra not implemented yet.")
+        if !exists("g:rplugin_vimcom_lib")
+            call RWarningMsg("Did you start R?")
+            return
+        endif
+        let wbasenm = substitute(basenm, '/', '\\', 'g')
+        let exstr = '[ForwardSearch("' . basenm . '.pdf' . '","' . basenm . '.tex' . '",' . texln . ',0,0,1)'
+        echomsg "[DEBUG msg] Trying to sending through DDE: " . exstr
+        let repl = libcall(g:rplugin_vimcom_lib, "SumatraFwd", exstr)
+        if repl != "OK"
+            call RWarningMsg(repl)
+        endif
     elseif g:rplugin_pdfviewer == "skim"
         " This command is based on Skim wiki (not tested)
         call system("/Applications/Skim.app/Contents/SharedSupport/displayline " . texln . " '" . basenm . ".pdf' 2> /dev/null >/dev/null &")
