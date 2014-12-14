@@ -936,8 +936,8 @@ function WaitVimComStart()
         let g:rplugin_vimcom_home = vr[1]
         let g:rplugin_vimcomport = vr[2]
         let g:rplugin_r_pid = vr[3]
-        if g:rplugin_vimcom_version != "1.1.12"
-            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.1.12.')
+        if g:rplugin_vimcom_version != "1.1.13"
+            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.1.13.')
             sleep 1
         endif
         if has("nvim")
@@ -2328,25 +2328,57 @@ function AskRDoc(rkeyword, package, getclass)
         let rcmd = 'vimcom:::vim.help("' . a:rkeyword . '", ' . g:rplugin_htw . 'L, ' . classfor . ')'
     endif
 
-    call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
     call g:SendToVimCom("\x08" . $VIMINSTANCEID . rcmd, "I")
 endfunction
 
 " This function is called by vimcom
 function ShowRDoc(rkeyword)
+    let rkeyw = a:rkeyword
+    if a:rkeyword =~ "^MULTILIB"
+        let msgs = split(a:rkeyword)
+        if has("nvim")
+            let msg = "The topic '" . msgs[-1] . "' was found in more than one library:\n"
+            for idx in range(1, len(msgs) - 2)
+                let msg .= idx . " : " . msgs[idx] . "\n"
+            endfor
+            redraw
+            let chn = input(msg . "Please, select one of them: ")
+            if chn > 0 && chn < (len(msgs) - 1)
+                call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
+                call g:SendToVimCom("\x08" . $VIMINSTANCEID . 'vimcom:::vim.help("' . msgs[-1] . '", ' . g:rplugin_htw . 'L, package="' . msgs[chn] . '")')
+            endif
+            return
+        else
+            " Vim cannot receive message from vimcom before replying to this message
+            let flines = ['',
+                        \ 'The topic "' . msgs[-1] . '" was found in more than one library.',
+                        \ 'Press <Enter> over one of them to see the R documentation:',
+                        \ '']
+            for idx in range(1, len(msgs) - 2)
+                let flines += [ '   ' . msgs[idx] ]
+            endfor
+            call writefile(flines, g:rplugin_docfile)
+            let rkeyw = msgs[-1]
+        endif
+    endif
+
     if bufname("%") =~ "Object_Browser" || bufname("%") == "R_Output"
         let savesb = &switchbuf
         set switchbuf=useopen,usetab
         exe "sb " . b:rscript_buffer
         exe "set switchbuf=" . savesb
     endif
-    call SetRTextWidth(a:rkeyword)
+    call SetRTextWidth(rkeyw)
 
     " Local variables that must be inherited by the rdoc buffer
     let g:tmp_tmuxsname = g:rplugin_tmuxsname
     let g:tmp_objbrtitle = b:objbrtitle
 
     let rdoccaption = substitute(s:rdoctitle, '\', '', "g")
+    if a:rkeyword =~ "R History"
+        let rdoccaption = "R_History"
+        let s:rdoctitle = "R_History"
+    endif
     if bufloaded(rdoccaption)
         let curtabnr = tabpagenr()
         let savesb = &switchbuf
@@ -2390,8 +2422,22 @@ function ShowRDoc(rkeyword)
     sil normal! ggdG
     let fcntt = readfile(g:rplugin_docfile)
     call setline(1, fcntt)
-    set filetype=rdoc
-    normal! gg
+    if a:rkeyword =~ "R History"
+        set filetype=r
+        call cursor(1, 1)
+    elseif a:rkeyword =~ "^MULTILIB"
+        syn match Special '<Enter>'
+        exe 'syn match String /"' . rkeyw . '"/'
+        for idx in range(1, len(msgs) - 2)
+            exe "syn match PreProc '^   " . msgs[idx] . "'"
+        endfor
+        exe 'nmap <buffer><silent> <CR> :call AskRDoc("' . rkeyw . '", expand("<cword>"), 0)<CR>'
+        redraw
+        call cursor(5, 4)
+    else
+        set filetype=rdoc
+        call cursor(1, 1)
+    endif
     let @@ = save_unnamed_reg
     setlocal nomodified
     redraw
