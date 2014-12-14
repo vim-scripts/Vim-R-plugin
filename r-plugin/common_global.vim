@@ -3056,7 +3056,6 @@ command -range=% Rformat <line1>,<line2>:call RFormatCode()
 command RBuildTags :call g:SendCmdToR('rtags(ofile = "TAGS")')
 command -nargs=? -complete=customlist,RLisObjs Rhelp :call RAskHelp(<q-args>)
 command -nargs=? -complete=dir RSourceDir :call RSourceDirectory(<q-args>)
-command RpluginConfig :runtime r-plugin/vimrconfig.vim
 command RStop :call StopR()
 command Rhistory :call ShowRhistory()
 

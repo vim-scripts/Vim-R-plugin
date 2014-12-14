@@ -27,7 +27,6 @@ r-plugin/rmd.snippets
 r-plugin/synctex_evince_backward.py
 r-plugin/synctex_evince_forward.py
 r-plugin/synctex_okular_backward.sh
-r-plugin/vimrconfig.vim
 r-plugin/functions.vim
 r-plugin/gui_running.vim
 r-plugin/nvimbuffer.vim

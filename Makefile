@@ -81,7 +81,6 @@ deb:
 	  - r-plugin/synctex_evince_forward.py\n\
 	  - r-plugin/synctex_okular_backward.sh\n\
 	  - r-plugin/global_r_plugin.vim\n\
-	  - r-plugin/vimrconfig.vim\n\
 	  - r-plugin/functions.vim\n\
 	  - r-plugin/gui_running.vim
 	  - r-plugin/nvimbuffer.vim

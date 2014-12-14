@@ -118,18 +118,19 @@ Before installing the plugin, you should install its dependencies:
                In addition to the most commonly used features, the plugin
                requires: |+libcall|, |+clientserver| and |+conceal|.
 
-	       Note: If you use Neovim, the |+clientserver| feature is not
-	       required.
+	       Note: If you use Neovim, the |+clientserver| and |+libcall|
+	       features are not required.
 
 	       Note: If you use Mac OS X, read about the bugs that affect it:
-	       |r-plugin-nox|.
+	       |r-plugin-nox|. The easier solution might be to use Neovim.
 
    R >= 3.0.0: http://www.r-project.org/
 
-   vimcom = 1.1-0: http://www.lepem.ufc.br/jaa/vimcom.html
+   vimcom = 1.2-0: http://www.lepem.ufc.br/jaa/vimcom.html
 
    Tmux >= 1.8:   http://tmux.sourceforge.net
                   Tmux is necessary to send commands from Vim to R Console.
+		  It is optional if you are using Neovim.
 
    wmctrl:     http://tomas.styblo.name/wmctrl/
                Required for SyncTeX support in Rnoweb files.
@@ -139,11 +140,15 @@ Before installing the plugin, you should install its dependencies:
 
    colorout:      http://www.lepem.ufc.br/jaa/colorout.html
                   Colorizes the R output.
+		  Not required if you will run R as a Neovim job. See
+		  |vimrplugin_r_in_buffer|.
 
    setwidth:      An R package that can be installed with the command
                   `install.packages("setwidth")`.
                   The library setwidth adjusts the value of `options("width")`
                   whenever the terminal is resized.
+		  Not required if you will run R as a Neovim job. See
+		  |vimrplugin_r_in_buffer|.
 
    ncurses-term:  http://invisible-island.net/ncurses
 		  Might be necessary if you want support for 256 colors at the
@@ -157,11 +162,19 @@ Before installing the plugin, you should install its dependencies:
    installation instructions vary widely and are beyond the scope of this
    documentation.
 
+Put the following lines in your `~/Rprofile`:
+>
+   if(interactive()){
+       library(colorout)
+       library(setwidth)
+       options(vimcom.verbose = 1) # optional
+       library(vimcom)
+   }
+<
 You need to activate plugins and indentation according to 'filetype'. You
 should have at least the following options at the top or at near the very top
-of your |vimrc|:
+of your |vimrc| (but below `set` `runtimepath`, if you have set it):
 >
-   set nocompatible
    syntax enable
    filetype plugin on
    filetype indent on
@@ -188,25 +201,23 @@ Note: If you need to install the plugin in a non default directory, do
 must be done before the command "filetype on" in both the system and the user
 |vimrc| files, otherwise, some file types might not be correctly recognized.
 
-Start Vim again and edit an R script. Type <LocalLeader>rf to start R and run
-the command below to get help configuring ~/.Rprofile, ~/.vimrc, ~/.tmux.conf,
-and ~/.bashrc (the <LocalLeader> is `\` by default):
->
-   :RpluginConfig
-<
-The above command will guide you through the final configuration steps if you
-answer `y` to all questions, but if you prefer to configure everything by
-yourself, please, read the sections |r-plugin-nox| and |r-plugin-quick-setup|.
+The plugin is installed and will be activated next time that you start to edit
+an R script. But you still can improve the plugin performance if you do
+additional configuration mentioned in the paragraphs below.
 
 If you start either GVim or Vim in a terminal emulator the plugin will start R
 in a external terminal emulator. If you start Vim inside of a Tmux session,
 the plugin will split the Tmux window in two and start R in the other pane.
 
 The recommended way of running the plugin on Linux is running Vim inside a
-Tmux session. If you do not use Tmux frequently, it is recommended that you
-create a custom Bash function as explained in the section |r-plugin-tmux|,
-especially the tip |r-plugin-tvim| (the above command :RpluginConfig should do
-this for you).
+Tmux session. Please, read |r-plugin-tmux| for details.
+
+If you run Vim in a terminal emulator, it must be started with the argument
+|--servername|. Please, read the section |r-plugin-bash-setup| to know some
+tips on how to configure Bash.
+
+The Vim configuration also may be improved. See some tips at
+|r-plugin-vimrc-setup|.
 
 Note: On Mac OS X, in both Vim and GVim, the plugin will use AppleScript to
 send commands to the R Console application unless |vimrplugin_applescript| = 0.
@@ -236,6 +247,19 @@ dependencies:
 
     * Vim's version must be >= 7.4: http://www.vim.org/download.php
 
+Add the following lines to your `Rprofile`:
+>
+   options(vimcom.verbose = 1)
+   library(vimcom)
+<
+If you do not know where your .Rprofile is, do the following command in R
+Console to open it:
+>
+   edit(file = "~/.Rprofile")
+<
+You may want to improve the configuration of your |vimrc| for a better use of
+the plugin. Please, see |r-plugin-vimrc-setup|.
+
 Now, download the latest version of `Vim-R-plugin.vmb` from
 
     http://www.vim.org/scripts/script.php?script_id=2628
@@ -256,42 +280,17 @@ Note: If you need to install the plugin in a non default directory, do
 must be done before the command "filetype on" in both the system and the user
 |vimrc| files, otherwise, some file types might not be correctly recognized.
 
-Add the following lines to your `Rprofile`:
->
-   if(Sys.getenv("VIMRPLUGIN_TMPDIR") != "")
-       library(vimcom)
-<
-Note: If you do not know where your .Rprofile is, do the following command to
-open it:
->
-   edit(file = "~/.Rprofile")
-<
 Start GVim again and edit an R script. You can right click a .R file and
 choose "Edit with Vim" or create a new one with the Normal mode command:
 >
    :e example.R
 <
-To finish the installation, you have to start R to run a configuration script.
-Please, click on the menu bar
->
-   R
-   Start/Close
-   Start R (default)
-<
 If R does not start and you get an error message instead, you may want to
 set the path to your Rgui.exe in your |vimrc|, for example (please adapt to
 your installation)
 >
-   let vimrplugin_r_path = 'C:\Program Files\R\R-3.1.0\bin\i386'
+   let vimrplugin_r_path = 'C:\\Program Files\\R\\R-3.1.2\\bin\\i386'
 <
-Finally, click on the menu bar
->
-   R
-   Configure (Vim-R)
-<
-The above command will guide you through the final configuration steps if you
-answer `y` to all questions.
-
 If you want to uninstall the plugin, do
 >
    :RmVimball Vim-R-plugin
@@ -300,8 +299,7 @@ If you want to uninstall the plugin, do
 ------------------------------------------------------------------------------
 3.3. Troubleshooting (if the plugin doesn't work)~
 
-Note: The <LocalLeader> is '\' by default, but if you have run the
-:RpluginConfig  command the <LocalLeader> may have been changed to ','.
+Note: The <LocalLeader> is '\' by default.
 
 The plugin is a |file-type| plugin. It will be active only if you are editing
 a .R, .Rnw, .Rd, Rmd, or Rrst file. The menu items will not be visible and the
@@ -354,8 +352,7 @@ bar.
 
 4.1. Key bindings~
 
-Note: The <LocalLeader> is '\' by default, but if you have run the
-:RpluginConfig  command the <LocalLeader> may have been changed to ','.
+Note: The <LocalLeader> is '\' by default.
 
 Note: It is recommended the use of different keys for <Leader> and
 <LocalLeader> to avoid clashes between filetype plugins and general plugins
@@ -485,7 +482,6 @@ Object Browser
 
 Help (plugin)
 Help (R)                                            :Rhelp
-Configure (Vim-R)                           :RpluginConfig
 -----------------------------------------------------------
 
 Please see |r-plugin-key-bindings| to learn how to customize the key bindings
@@ -777,34 +773,35 @@ Note: Starting GVim within a Tmux session is not supported.
 
 
 ------------------------------------------------------------------------------
-							       *r-plugin-tvim*
-4.8.1 tvim~
+							 *r-plugin-tmux-setup*
+4.8.1 Tmux configuration~
 
-If, as recommended, you always prefer to run Tmux before running Vim you could
-create a Bash function called `tvim` (please, see the ~/.bashrc example at
-|r-plugin-quick-setup|). Then you will be able to start a Tmux session running
-Vim by typing:
+If, as recommended, you always prefer to run Tmux before running you have to
+create your `~/.tmux.conf` if it does not exist yet. You may put the lines
+below in your `~/.tmux.conf` as a starting point to your own configuration
+file:
 >
-   tvim filename.R
-<
-Using the `tvim` function, the Tmux session is finished when you quits Vim.
-That is, the main advantage of using `tvim` is that you do not have to type
-`tmux` before and `exit` after the edition of the file. Moreover, the `tvim`
-command also pass the |--servername| argument to Vim, which is required to
-update the Object Browser and functions highlight.
+   # Use <C-a> instead of the default <C-b> as Tmux prefix
+   set-option -g prefix C-a
+   unbind-key C-b
+   bind-key C-a send-prefix
 
-If you are going to run Vim inside Tmux, than you should create your
-~/.tmux.conf if it does not exist yet. You may put the lines below in your
-~/.tmux.conf as a starting point to your own configuration file:
->
-    set-option -g prefix C-a
-    unbind-key C-b
-    bind-key C-a send-prefix
-    set-window-option -g mode-keys vi
-    set -g terminal-overrides 'xterm*:smcup@:rmcup@'
-    set -g mode-mouse on
-    set -g mouse-select-pane on
-    set -g mouse-resize-pane on
+   # Options enable mouse support in Tmux
+   set -g terminal-overrides 'xterm*:smcup@:rmcup@'
+   set -g mode-mouse on
+   set -g mouse-select-pane on
+   set -g mouse-resize-pane on
+
+   # Act more like vim:
+   set-window-option -g mode-keys vi
+   bind h select-pane -L
+   bind j select-pane -D
+   bind k select-pane -U
+   bind l select-pane -R
+   unbind p
+   bind p paste-buffer
+   bind -t vi-copy v begin-selection
+   bind -t vi-copy y copy-selection
 <
 
 ------------------------------------------------------------------------------
@@ -1070,11 +1067,11 @@ as below:
 >
    vim --servername VIM script.R
 <
-To avoid having to type this argument every time that you start Vim, please
-either run `:RpluginConfig` or look at the example in |r-plugin-bash-setup|.
+To avoid having to type this argument every time that you start Vim, please,
+look at the example in |r-plugin-bash-setup|.
 
 If the |--servername| argument does not work in your case, you can put the
-following line in your ~/.Rprofile to suppress the message:
+following line in your `~/.Rprofile` to suppress the message:
 >
    options(vimcom.verbose = -1)
 <
@@ -1279,7 +1276,7 @@ the Windows XP Command Prompt (click on the title bar and choose
 >
    let vimrplugin_Rterm = 1
 <
-Technical details: The plugin copies the code to be sent to R to the Windows
+Technical details: The plugin copies the code to be sent to R to Windows
 clipboard and, then, sends the key strokes CTRL-V to R Console window.
 However, neither the Windows 7 PowerShell nor the Windows XP Command Prompt
 has a keyboard shortcut to "paste". The solution is to set the "Quick Edit
@@ -1291,8 +1288,8 @@ it.
 						      *vimrplugin_r_in_buffer*
 6.3. Run R in Neovim buffer (experimental feature)~
 
-Note: This is an experimental feature to test Neovim capabilities and may be
-removed in the future. See bugs at the end of this section.
+Note: This features depends on a pull request not merged yet:
+https://github.com/neovim/neovim/pull/1584
 
 If you are running Neovim and want to try this experimental feature, put in
 your |vimrc|:
@@ -1331,7 +1328,9 @@ emulator that supports 256 colors (see |highlight-ctermfg|):
        let rout_color_negnum = 183
        let rout_color_negfloat = 183
        let rout_color_date = 43
-       let rout_color_bool = 75
+       let rout_color_true = 78
+       let rout_color_false = 203
+       let rout_color_inf = 39
        let rout_color_constant = 75
        let rout_color_string = 79
        let rout_color_stderr = 33
@@ -1341,27 +1340,13 @@ emulator that supports 256 colors (see |highlight-ctermfg|):
    endif
 <
 To know what number corresponds to your preferred color (among the 256
-possibilities), hover you mouser pointer over the table of colors at the end
+possibilities), hover you mouse pointer over the table of colors at the end
 of http://www.lepem.ufc.br/jaa/colorout.html
 
 If you prefer that R output is highlighted using you current |:colorscheme|,
 put in your vimrc:
 >
    let rout_follow_colorscheme = 1
-<
-Note: The Vim-R-plugin relies on special values of `options("continue")` and
-`options("prompt")` set by the vimcom package to recognize the end of output
-and add the prompt symbol. If you need to change either of these two options,
-please, open an issue at https://github.com/jcfaria/Vim-R-plugin/issues
-because it would be possible to add options to customize them.
-
-Note: Output that does not end in a newline character does not generate
-JobActivity and therefore is shown only after an output with a newline. That
-is, if R asks for user input, the question will not be shown. For example,
-this will not work:
->
-   par(ask=TRUE)
-   plot(1,1)
 <
 
 ------------------------------------------------------------------------------
@@ -1443,7 +1428,7 @@ If you do not want to see R documentation in a Vim's buffer, put in your
 >
    let vimrplugin_vimpager = "no"
 <
-And put in your .Rprofile:
+And put in your `~/.Rprofile`:
 >
    options(vimcom.vimpager = FALSE)
 <
@@ -1924,8 +1909,7 @@ higher value for the variable in your |vimrc|. Example:
 >
    let vimrplugin_vimcom_wait = 10000
 <
-Note: You should have the line  `library(vimcom)`  in your Rprofile. The
-Vim command  :RpluginConfig  adds that line for you.
+Note: You should have the line  `library(vimcom)`  in your `~/.Rprofile`.
 
 
 ------------------------------------------------------------------------------
@@ -2292,15 +2276,21 @@ directory after the installation:
    syntax/rdoc.vim
    syntax/rbrowser.vim
    doc/r-plugin.txt
-   r-plugin/global_r_plugin.vim
-   r-plugin/objlist/README
-   r-plugin/r.snippets
    r-plugin/common_buffer.vim
    r-plugin/common_global.vim
+   r-plugin/functions.vim
+   r-plugin/global_r_plugin.vim
+   r-plugin/gui_running.vim
+   r-plugin/nvimbuffer.vim
+   r-plugin/objlist/README
+   r-plugin/osx.vim
+   r-plugin/r.snippets
+   r-plugin/rmd.snippets
    r-plugin/synctex_evince_backward.py
    r-plugin/synctex_evince_forward.py
    r-plugin/synctex_okular_backward.sh
-   r-plugin/vimrconfig.vim
+   r-plugin/windows.py
+   r-plugin/windows.vim
 
 
 ==============================================================================
@@ -2316,7 +2306,7 @@ same signal sent when you press CTRL-C into R's Console.
 ------------------------------------------------------------------------------
 9.2. Html help and custom pager~
 
-If you prefer to see help pages in an html browser, put in your ~/.Rprofile:
+If you prefer to see help pages in an html browser, put in your `~/.Rprofile`:
 >
    options(help_type = "html")
 <
@@ -2574,7 +2564,7 @@ Vim breaks the R code automatically put in your |vimrc|:
 9.13. Vim with 256 colors in a terminal emulator (Linux/Unix only)~
 
 If you want 256 colors support in Vim, install the package ncurses-term. Then
-put in your ~/.bashrc the lines suggested at |r-plugin-bash-setup|.
+put in your `~/.bashrc` the lines suggested at |r-plugin-bash-setup|.
 Finally, put in your |vimrc|:
 >
    if &term =~ "xterm" || &term =~ "256" || $DISPLAY != ""
@@ -2602,9 +2592,9 @@ line in your |vimrc|:
 							   *r-plugin-Rprofile*
 9.15. Edit your ~/.Rprofile~
 
-You may want to edit your ~/.Rprofile in addition to considering the
+You may want to edit your `~/.Rprofile` in addition to considering the
 suggestions of |r-plugin-R-setup| you may also want to put the following
-lines in your .Rprofile if you are using Linux:
+lines in your `~/.Rprofile` if you are using Linux:
 >
    grDevices::X11.options(width = 4.5, height = 4, ypos = 0,
                           xpos = 1000, pointsize = 10)
@@ -2720,7 +2710,7 @@ See also: |vimrplugin_latexcmd|.
 
 ------------------------------------------------------------------------------
 							*r-plugin-quick-setup*
-9.21. Quick setup for the Vim-R-plugin on Linux/Unix environment~
+9.21. Suggestion of setup for the Vim-R-plugin~
 
 Please, look at section |r-plugin-options| if you want information about the
 Vim-r-plugin customization.
@@ -2729,49 +2719,77 @@ Here are some suggestions of configuration of Vim, Bash, Tmux and R. To
 understand what you are doing, and change the configuration to your taste,
 please read this document from the beginning.
 
+							*r-plugin-vimrc-setup*
    ~/.vimrc~
 >
    " Minimum required configuration:
-   set nocompatible
    syntax on
    filetype plugin on
    filetype indent on
+
    " Change Leader and LocalLeader keys:
    let maplocalleader = ","
    let mapleader = ";"
+
    " Use Ctrl+Space to do omnicompletion:
    if has("gui_running")
        inoremap <C-Space> <C-x><C-o>
    else
        inoremap <Nul> <C-x><C-o>
    endif
+
    " Press the space bar to send lines and selection to R:
    vmap <Space> <Plug>RDSendSelection
    nmap <Space> <Plug>RDSendLine
+
    " The lines below are suggestions for Vim in general and are not
    " specific to the improvement of the Vim-R-plugin.
+
    " Highlight the last searched pattern:
    set hlsearch
+
    " Show where the next pattern is as you type it:
    set incsearch
+
    " By default, Vim indents code by 8 spaces. Most people prefer 4
    " spaces:
    set sw=4
+
    " Search "Vim colorscheme 256" in the internet and download color
    " schemes that supports 256 colors in the terminal emulator. Then,
    " uncomment the code below to set you color scheme:
    "colorscheme not_defined
+
    " Use 256 colors even if in a terminal emulator:
    if &term =~ "xterm" || &term =~ "256" || $DISPLAY != ""
        set t_Co=256
    endif
 <
+
+							    *r-plugin-R-setup*
+   ~/.Rprofile~
+>
+   if(interactive()){
+       options(vimcom.verbose = 1)
+       # Load the required libraries:
+       library(colorout)
+       library(setwidth)
+       library(vimcom)
+
+       # Use the text based web browser w3m to navigate through R docs
+       # in Linux Console:
+       if(Sys.getenv("TMUX") != "" && Sys.getenv("DISPLAY") == "")
+	   options(browser = function(u) system(paste0("tmux new-window 'w3m ", u, "'")),
+                   help_type = "html")
+   }
+<
+
 							 *r-plugin-bash-setup*
-   ~/.bashrc for Vim:~
+   ~/.bashrc for Vim and Neovim (Unix):~
 >
    # Change the TERM environment variable (to get 256 colors) and make Vim
-   # connecting to X Server even if running in a terminal emulator (to get
-   # dynamic update of syntax highlight and Object Browser):
+   # connecting to X Server even if running in a terminal emulator (many of
+   # the plugin features depend on this).
    if [ "x$DISPLAY" != "x" ]
    then
        if [ "screen" = "$TERM" ]
@@ -2781,92 +2799,9 @@ please read this document from the beginning.
            export TERM=xterm-256color
        fi
        alias vim='vim --servername VIM'
-       if [ "x$TERM" == "xxterm" ] || [ "x$TERM" == "xxterm-256color" ]
-       then
-           function tvim(){ tmux -2 new-session "TERM=screen-256color vim --servername VIM $@" ; }
-       else
-           function tvim(){ tmux new-session "vim --servername VIM $@" ; }
-       fi
-   else
-       if [ "x$TERM" == "xxterm" ] || [ "x$TERM" == "xxterm-256color" ]
-       then
-           function tvim(){ tmux -2 new-session "TERM=screen-256color vim $@" ; }
-       else
-           function tvim(){ tmux new-session "vim $@" ; }
-       fi
    fi
 <
 
-   ~/.bashrc for Neovim:~
->
-   # Change the TERM environment variable (to get 256 colors):
-   if [ "x$DISPLAY" != "x" ]
-   then
-       if [ "screen" = "$TERM" ]
-       then
-           export TERM=screen-256color
-       else
-           export TERM=xterm-256color
-       fi
-   fi
-   if [ "x$TERM" == "xxterm" ] || [ "x$TERM" == "xxterm-256color" ]
-   then
-       function tvim(){ tmux -2 new-session "TERM=screen-256color nvim $@" ; }
-   else
-       function tvim(){ tmux new-session "nvim $@" ; }
-   fi
-<
-
-							 *r-plugin-tmux-setup*
-   ~/.tmux.conf:~
->
-   set-option -g prefix C-a
-   unbind-key C-b
-   bind-key C-a send-prefix
-   # Set "status on" if you usually create new Tmux windows
-   set -g status off
-   set -g terminal-overrides 'xterm*:smcup@:rmcup@'
-   set -g mode-mouse on
-   set -g mouse-select-pane on
-   set -g mouse-resize-pane on
-   # Act more like vim:
-   set-window-option -g mode-keys vi
-   bind h select-pane -L
-   bind j select-pane -D
-   bind k select-pane -U
-   bind l select-pane -R
-   unbind p
-   bind p paste-buffer
-   bind -t vi-copy v begin-selection
-   bind -t vi-copy y copy-selection
-<
-
-							    *r-plugin-R-setup*
-   ~/.Rprofile~
->
-   if(interactive()){
-       # Get startup messages of three packages:
-       options(setwidth.verbose = 1,
-               colorout.verbose = 1,
-               vimcom.verbose = 1)
-       # Use the text based web browser w3m to navigate through R docs:
-       if(Sys.getenv("TMUX") != "" && Sys.getenv("DISPLAY") == "")
-	   options(browser = function(u) system(paste0("tmux new-window 'w3m ", u, "'")),
-                   help_type = "html")
-       # Use either Vim or GVim as text editor for R:
-       if(nchar(Sys.getenv("DISPLAY")) > 1)
-           options(editor = 'gvim -f -c "set ft=r"')
-       else
-           options(editor = 'vim -c "set ft=r"')
-       # Load the colorout library:
-       library(colorout)
-       # Load the setwidth library:
-       library(setwidth)
-       # Load the vimcom library only if R was started by Vim:
-       if(Sys.getenv("VIMRPLUGIN_TMPDIR") != "")
-           library(vimcom)
-   }
-<
 
 Finally, if you want to use vi key bindings in Bash:
 
@@ -2906,7 +2841,7 @@ See also |vimrplugin_r_in_buffer|.
 							       *r-plugin-news*
 10. News~
 
-1.1.1 (2014-12-11)
+1.1.1 (2014-12-13)
 
  * Change commands gn and gN into <LocalLeader>gn and <LocalLeader>gN.
 
@@ -2917,6 +2852,8 @@ See also |vimrplugin_r_in_buffer|.
  * No longer requires +python feature; requires +libcall instead.
 
  * Removed option vimrplugin_sleeptime.
+
+ * Removed command :RpluginConfig.
 
 1.1 (2014-11-13)
 
