@@ -567,16 +567,8 @@ function! SyncTeX_forward(...)
         endif
         call system("wmctrl -a '" . basenm . ".pdf'")
     elseif g:rplugin_pdfviewer == "sumatra"
-        if !exists("g:rplugin_vimcom_lib")
-            call RWarningMsg("Did you start R?")
-            return
-        endif
-        let wbasenm = substitute(basenm, '/', '\\', 'g')
-        let exstr = '[ForwardSearch("' . basenm . '.pdf' . '","' . basenm . '.tex' . '",' . texln . ',0,0,1)'
-        echomsg "[DEBUG msg] Trying to sending through DDE: " . exstr
-        let repl = libcall(g:rplugin_vimcom_lib, "SumatraFwd", exstr)
-        if repl != "OK"
-            call RWarningMsg(repl)
+        if g:rplugin_sumatra_path != "" || FindSumatra()
+            silent exe '!start "' . g:rplugin_sumatra_path . '" -reuse-instance -forward-search ' . basenm . '.tex ' . texln . ' -inverse-search "gvim --servername ' . v:servername . " --remote-expr SyncTeX_backward('%f',%l)" . '" "' . basenm . '.pdf"'
         endif
     elseif g:rplugin_pdfviewer == "skim"
         " This command is based on Skim wiki (not tested)
