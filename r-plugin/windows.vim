@@ -81,6 +81,10 @@ if !exists("g:vimrplugin_R_window_title")
 endif
 
 function FindSumatra()
+    if executable($ProgramFiles . "\\SumatraPDF\\SumatraPDF.exe")
+        let g:rplugin_sumatra_path = $ProgramFiles . "\\SumatraPDF\\SumatraPDF.exe"
+        return 1
+    endif
     let smtr = system('reg.exe QUERY "HKLM\Software\Microsoft\Windows\CurrentVersion\App Paths" /v "SumatraPDF.exe"')
     if len(smtr) > 0
         let g:rdebug_reg_personal = smtr
