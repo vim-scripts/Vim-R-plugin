@@ -67,7 +67,8 @@ function! ShowRout()
         let rcmd = b:rplugin_R . " CMD BATCH --no-restore --no-save '" . expand("%") . "' '" . b:routfile . "'"
     endif
 
-    echo "Please wait for: " . rcmd
+    echon "Please wait for: " . rcmd
+    redraw
     let rlog = system(rcmd)
     if v:shell_error && rlog != ""
         call RWarningMsg('Error: "' . rlog . '"')
@@ -86,14 +87,6 @@ function! OpenRout(goback)
             exe "tabnew " . b:routfile
         endif
         set filetype=rout
-        if a:goback
-            if g:vimrplugin_routnotab == 1
-                exe "normal! \<c-w>p"
-            else
-                normal! gT
-            endif
-            call setpos(".", curpos)
-        endif
     else
         call RWarningMsg("The file '" . b:routfile . "' is not readable.")
     endif
@@ -146,6 +139,7 @@ call RCreateMaps("nvi", '<Plug>RSetwd',        'rd', ':call RSetWD()')
 
 " Menu R
 if has("gui_running")
+    runtime r-plugin/gui_running.vim
     call MakeRMenu()
 endif
 

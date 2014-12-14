@@ -83,6 +83,9 @@ deb:
 	  - r-plugin/global_r_plugin.vim\n\
 	  - r-plugin/vimrconfig.vim\n\
 	  - r-plugin/functions.vim\n\
+	  - r-plugin/gui_running.vim
+	  - r-plugin/nvimbuffer.vim
+	  - r-plugin/osx.vim
 	  - syntax/r.vim\n\
 	  - syntax/rdoc.vim\n\
 	  - syntax/rout.vim\n\
