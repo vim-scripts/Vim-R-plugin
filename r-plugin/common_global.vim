@@ -936,8 +936,8 @@ function WaitVimComStart()
         let g:rplugin_vimcom_home = vr[1]
         let g:rplugin_vimcomport = vr[2]
         let g:rplugin_r_pid = vr[3]
-        if g:rplugin_vimcom_version != "1.1.11"
-            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.1.11.')
+        if g:rplugin_vimcom_version != "1.1.12"
+            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.1.12.')
             sleep 1
         endif
         if has("nvim")
@@ -2330,45 +2330,17 @@ function AskRDoc(rkeyword, package, getclass)
 
     call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
     call g:SendToVimCom("\x08" . $VIMINSTANCEID . rcmd, "I")
-    call ShowRDoc(a:rkeyword, 0)
 endfunction
 
-" This function may be called by vimcom
-function ShowRDoc(rkeyword, fromvimcom)
-    if a:fromvimcom
-        if bufname("%") =~ "Object_Browser" || bufname("%") == "R_Output"
-            let savesb = &switchbuf
-            set switchbuf=useopen,usetab
-            exe "sb " . b:rscript_buffer
-            exe "set switchbuf=" . savesb
-        endif
-        call SetRTextWidth(a:rkeyword)
-    else
-        " FIXME: This sleep should not be needed
-        sleep 100m
-        let g:rplugin_lastev = ReadEvalReply()
-        if g:rplugin_lastev != "VIMHELP"
-            if g:rplugin_lastev =~ "^MULTILIB"
-                let msg = "The topic '" . a:rkeyword . "' was found in more than one library:\n"
-                let libs = split(g:rplugin_lastev)
-                for idx in range(1, len(libs) - 1)
-                    let msg .= idx . " : " . libs[idx] . "\n"
-                endfor
-                redraw
-                let chn = input(msg . "Please, select one of them: ")
-                if chn > 0 && chn < len(libs)
-                    call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
-                    call g:SendToVimCom("\x08" . $VIMINSTANCEID . 'vimcom:::vim.help("' . a:rkeyword . '", ' . g:rplugin_htw . 'L, package="' . libs[chn] . '")')
-                    let g:rplugin_lastev = ReadEvalReply()
-                else
-                    return
-                endif
-            else
-                call RWarningMsg(g:rplugin_lastev)
-                return
-            endif
-        endif
+" This function is called by vimcom
+function ShowRDoc(rkeyword)
+    if bufname("%") =~ "Object_Browser" || bufname("%") == "R_Output"
+        let savesb = &switchbuf
+        set switchbuf=useopen,usetab
+        exe "sb " . b:rscript_buffer
+        exe "set switchbuf=" . savesb
     endif
+    call SetRTextWidth(a:rkeyword)
 
     " Local variables that must be inherited by the rdoc buffer
     let g:tmp_tmuxsname = g:rplugin_tmuxsname
