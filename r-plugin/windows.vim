@@ -187,6 +187,10 @@ function SendCmdToR_Windows(cmd)
     endif
     if g:vimrplugin_libcall_send
         let repl = libcall(g:rplugin_vimcom_lib, "SendToRConsole", cmd)
+        if repl != "OK"
+            call RWarningMsg(repl)
+            call ClearRInfo()
+        endif
     else
         let slen = len(cmd)
         let str = ""

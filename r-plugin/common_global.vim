@@ -1452,8 +1452,7 @@ function SendCmdToR_TmuxSplit(cmd)
         let rlog = substitute(rlog, "\n", " ", "g")
         let rlog = substitute(rlog, "\r", " ", "g")
         call RWarningMsg(rlog)
-        let g:SendCmdToR = function('SendCmdToR_fake')
-        let g:rplugin_r_pid = 0
+        call ClearRInfo()
         return 0
     endif
     return 1
@@ -1474,8 +1473,7 @@ function SendCmdToR_Term(cmd)
         let rlog = substitute(rlog, '\n', ' ', 'g')
         let rlog = substitute(rlog, '\r', ' ', 'g')
         call RWarningMsg(rlog)
-        let g:SendCmdToR = function('SendCmdToR_fake')
-        let g:rplugin_r_pid = 0
+        call ClearRInfo()
         return 0
     endif
     return 1
@@ -1929,9 +1927,7 @@ endfunction
 function RClearConsole()
     if (has("win32") || has("win64"))
         if g:vimrplugin_libcall_send
-            if g:vimrplugin_Rterm
-                let repl = libcall(g:rplugin_vimcom_lib, "RClearConsole()", "Rterm")
-            else
+            if !g:vimrplugin_Rterm
                 let repl = libcall(g:rplugin_vimcom_lib, "RClearConsole()", "Rgui")
             endif
         else
@@ -1982,6 +1978,26 @@ function CloseExternalOB()
     endif
 endfunction
 
+function ClearRInfo()
+    if exists("g:rplugin_rconsole_pane")
+        unlet g:rplugin_rconsole_pane
+    endif
+
+    call delete($VIMRPLUGIN_TMPDIR . "/globenv_" . $VIMINSTANCEID)
+    call delete($VIMRPLUGIN_TMPDIR . "/liblist_" . $VIMINSTANCEID)
+    call delete($VIMRPLUGIN_TMPDIR . "/libnames_" . $VIMINSTANCEID)
+    call delete($VIMRPLUGIN_TMPDIR . "/GlobalEnvList_" . $VIMINSTANCEID)
+    call delete($VIMRPLUGIN_TMPDIR . "/vimcom_running_" . $VIMINSTANCEID)
+    call delete($VIMRPLUGIN_TMPDIR . "/rconsole_hwnd_" . $VIMRPLUGIN_SECRET)
+    let g:SendCmdToR = function('SendCmdToR_fake')
+    let g:rplugin_r_pid = 0
+    let g:rplugin_vimcomport = 0
+
+    if g:rplugin_do_tmux_split && g:vimrplugin_tmux_title != "automatic" && g:vimrplugin_tmux_title != ""
+        call system("tmux set automatic-rename on")
+    endif
+endfunction
+
 " Quit R
 function RQuit(how)
     if a:how != "restartR"
@@ -2019,24 +2035,10 @@ function RQuit(how)
     endif
 
     sleep 50m
-
     call CloseExternalOB()
 
-    if exists("g:rplugin_rconsole_pane")
-        unlet g:rplugin_rconsole_pane
-    endif
+    call ClearRInfo()
 
-    call delete($VIMRPLUGIN_TMPDIR . "/globenv_" . $VIMINSTANCEID)
-    call delete($VIMRPLUGIN_TMPDIR . "/liblist_" . $VIMINSTANCEID)
-    call delete($VIMRPLUGIN_TMPDIR . "/libnames_" . $VIMINSTANCEID)
-    call delete($VIMRPLUGIN_TMPDIR . "/GlobalEnvList_" . $VIMINSTANCEID)
-    call delete($VIMRPLUGIN_TMPDIR . "/vimcom_running_" . $VIMINSTANCEID)
-    let g:SendCmdToR = function('SendCmdToR_fake')
-    let g:rplugin_r_pid = 0
-    let g:rplugin_vimcomport = 0
-    if g:rplugin_do_tmux_split && g:vimrplugin_tmux_title != "automatic" && g:vimrplugin_tmux_title != ""
-        call system("tmux set automatic-rename on")
-    endif
     if has("nvim")
         if g:rplugin_do_tmux_split
             " Force Neovim to update the window size
