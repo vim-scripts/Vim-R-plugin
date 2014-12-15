@@ -127,13 +127,13 @@ function StartR_Windows()
         call InitializePython()
     endif
     if string(g:SendCmdToR) != "function('SendCmdToR_fake')"
-        let repl = libcall(g:rplugin_vimcom_lib, "FindRConsole", 'R Console')
-        if repl == "NotFound"
+        let repl = libcall(g:rplugin_vimcom_lib, "IsRRunning", 'No argument')
+        if repl =~ "^Yes"
+            call RWarningMsg('R is already running.')
+            return
+        else
             let g:SendCmdToR = function('SendCmdToR_fake')
             let g:rplugin_r_pid = 0
-        else
-            call RWarningMsg('There is already a window called "R Console".')
-            return
         endif
     endif
     let vrph = $VIMRPLUGIN_HOME
