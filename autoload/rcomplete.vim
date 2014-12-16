@@ -10,14 +10,14 @@ function BuildROmniList()
         return
     endif
 
-    let omnilistcmd = 'vimcom:::vim.bol("' . $VIMRPLUGIN_TMPDIR . "/GlobalEnvList_" . $VIMINSTANCEID . '"'
+    let omnilistcmd = 'vimcom:::vim.bol("' . g:rplugin_tmpdir . "/GlobalEnvList_" . $VIMINSTANCEID . '"'
     if g:vimrplugin_allnames == 1
         let omnilistcmd = omnilistcmd . ', allnames = TRUE'
     endif
     let omnilistcmd = omnilistcmd . ')'
 
-    call delete($VIMRPLUGIN_TMPDIR . "/vimbol_finished")
-    call delete($VIMRPLUGIN_TMPDIR . "/eval_reply")
+    call delete(g:rplugin_tmpdir . "/vimbol_finished")
+    call delete(g:rplugin_tmpdir . "/eval_reply")
     call g:SendToVimCom("\x08" . $VIMINSTANCEID . omnilistcmd, "I")
     if g:rplugin_vimcomport == 0
         sleep 500m
@@ -31,7 +31,7 @@ function BuildROmniList()
     endif
     sleep 20m
     let ii = 0
-    while !filereadable($VIMRPLUGIN_TMPDIR . "/vimbol_finished") && ii < 5
+    while !filereadable(g:rplugin_tmpdir . "/vimbol_finished") && ii < 5
         let ii += 1
         sleep
     endwhile
@@ -41,7 +41,7 @@ function BuildROmniList()
         return
     endif
 
-    let g:rplugin_globalenvlines = readfile($VIMRPLUGIN_TMPDIR . "/GlobalEnvList_" . $VIMINSTANCEID)
+    let g:rplugin_globalenvlines = readfile(g:rplugin_tmpdir . "/GlobalEnvList_" . $VIMINSTANCEID)
 endfunction
 
 fun! rcomplete#CompleteR(findstart, base)
@@ -63,11 +63,11 @@ fun! rcomplete#CompleteR(findstart, base)
             return resp
         endif
 
-        if len(g:rplugin_liblist) == 0
+        if len(g:rplugin_omni_lines) == 0
             call add(resp, {'word': a:base, 'menu': " [ List is empty. Did you load vimcom package? ]"})
         endif
 
-        let flines = g:rplugin_liblist + g:rplugin_globalenvlines
+        let flines = g:rplugin_omni_lines + g:rplugin_globalenvlines
         " The char '$' at the end of 'a:base' is treated as end of line, and
         " the pattern is never found in 'line'.
         let newbase = '^' . substitute(a:base, "\\$$", "", "")

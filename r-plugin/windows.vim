@@ -136,8 +136,6 @@ function StartR_Windows()
             let g:rplugin_r_pid = 0
         endif
     endif
-    let vrph = $VIMRPLUGIN_HOME
-    let $VIMRPLUGIN_HOME = substitute($VIMRPLUGIN_HOME, "\\\\ ", " ", "g")
 
     if !executable(g:rplugin_Rgui)
         call RWarningMsg('R executable "' . g:rplugin_Rgui . '" not found.')
@@ -174,7 +172,6 @@ function StartR_Windows()
     if g:vimrplugin_vim_wd == 0
         lcd -
     endif
-    let $VIMRPLUGIN_HOME = vrph
     let g:SendCmdToR = function('SendCmdToR_Windows')
     call WaitVimComStart()
 endfunction

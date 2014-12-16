@@ -247,6 +247,8 @@ dependencies:
 
     * Vim's version must be >= 7.4: http://www.vim.org/download.php
 
+    * Sumatra PDF (only if you write Rnoweb code).
+
 Add the following lines to your `Rprofile`:
 >
    options(vimcom.verbose = 1)
@@ -544,7 +546,7 @@ CTRL-A can also be used to complete knitr chunk options if the cursor is
 inside the chunk header.
 
 If R is not running or if it is running but is busy the completion will be
-based on information from the packages listed by |vimrplugin_permanent_libs|
+based on information from the packages listed by |vimrplugin_start_libs|
 (provided that the libraries were loaded at least once during a session of
 Vim-R-plugin usage). Otherwise, the pop up menu for completion of function
 arguments will include an additional line with the name of the library where
@@ -563,7 +565,7 @@ trigger the autocompletion of R objects names or hit CTRL-D to list the
 possible completions (see |cmdline-completion| for details on the various ways
 of getting command-line completion). The list of objects used for
 completion is the same available for omnicompletion (see
-|vimrplugin_permanent_libs|). You may close the R documentation buffer by
+|vimrplugin_start_libs|). You may close the R documentation buffer by
 simply pressing `q`.
 
 You can source all .R files in a directory with the Normal mode command
@@ -620,7 +622,7 @@ configuration details.
 The plugin adds some features to the default syntax highlight of R code. One
 such feature is the highlight of R functions. However, functions are
 highlighted only if their libraries are loaded by R (but see
-|vimrplugin_permanent_libs|).
+|vimrplugin_start_libs|).
 
 Note: If you have too many loaded packages Vim may be unable to load the list
 of functions for syntax highlight.
@@ -646,13 +648,13 @@ Only the names of objects in .GlobalEnv and in loaded libraries are completed,
 and the |clientserver| feature is required to get the list of loaded libraries
 automatically updated. If either R is not running or Vim is running without
 the |clientserver| feature, only objects of libraries listed in
-|vimrplugin_permanent_libs| will have their names completed.
+|vimrplugin_start_libs| will have their names completed.
 
 Vim uses one file to store the names of .GlobalEnv objects and a list of files
-for all other objects. The .GlobalEnv list is stored in the
-/tmp/r-plugin-yourlogin directory and is deleted when you quits Vim. The other
-files are stored in ~/.vim/r-plugin/objlist/ and remain available until you
-manually delete them.
+for all other objects. The .GlobalEnv list is stored in the `$VIMRPLUGIN_TMPDIR`
+directory and is deleted when you quits Vim. The other files are stored in the
+`$VIMRPLUGIN_COMPLDIR` directory and remain available until you manually delete
+them.
 
 
 ------------------------------------------------------------------------------
@@ -1084,7 +1086,7 @@ When Vim cannot receive messages, the result is:
      omnicompletion are not immediately updated after you load a new R
      package. They are updated only after the |CursorHold| event is triggered,
      that is, after you stay 'updatetime' milliseconds in Normal mode doing
-     nothing. For a workaround, see |vimrplugin_permanent_libs|.
+     nothing. For a workaround, see |vimrplugin_start_libs|.
 
 On Linux you may find Vim binaries without the |clientserver| feature if
 you install packages such as vim-nox on Debian/Ubuntu or vim-enhanced on
@@ -1117,36 +1119,36 @@ through the <LocalLeader>rf command because the plugin was designed to connect
 each Vim instance with its own R instance.
 
 If you start R before Vim, it will not inherit from Vim the environment
-variables VIMRPLUGIN_TMPDIR, VIMRPLUGIN_HOME, VIMEDITOR_SVRNM, VIMINSTANCEID,
-and VIMRPLUGIN_SECRET. The first one is the path used by the R package vimcom
-to save temporary files used by the Vim-R-plugin to: perform omnicompletion,
-show R documentation in a Vim buffer, and update the Object Browser. The two
-last ones are used by the Vim-R-plugin and by vimcom to know that the
-connections are valid. If you use Vim to start R, but then closes Vim, some
-variables will become outdated. Additionally, the Vim-R-plugin sets the value
-of its internal variable SendCmdToR from SendCmdToR_fake to the appropriate
-value when R is successfully started. It is possible to set the values of all
-those variables manually, but, as you can see below, it is not practical to do
-so. If you have either started R before Vim or closed Vim and opened it again
-and really want full communication between Vim and R, you can try the
-following (not all procedures are necessary for all cases):
+variables VIMRPLUGIN_TMPDIR, VIMRPLUGIN_COMPLDIR, VIMEDITOR_SVRNM,
+VIMINSTANCEID, and VIMRPLUGIN_SECRET. The first one is the path used by the R
+package vimcom to save temporary files used by the Vim-R-plugin to: perform
+omnicompletion, show R documentation in a Vim buffer, and update the Object
+Browser. The two last ones are used by the Vim-R-plugin and by vimcom to know
+that the connections are valid. If you use Vim to start R, but then closes
+Vim, some variables will become outdated. Additionally, the Vim-R-plugin sets
+the value of its internal variable SendCmdToR from SendCmdToR_fake to the
+appropriate value when R is successfully started. It is possible to set the
+values of all those variables manually, but, as you can see below, it is not
+practical to do so. If you have either started R before Vim or closed Vim and
+opened it again and really want full communication between Vim and R, you can
+try the following (not all procedures are necessary for all cases):
 
    In Normal mode Vim do:
 >
-   :echo $VIMRPLUGIN_TMPDIR
+   :echo g:rplugin_tmpdir
+   :echo g:rplugin_compldir
    :echo $VIMINSTANCEID
    :echo $VIMRPLUGIN_SECRET
    :echo $VIMEDITOR_SVRNM
-   :echo $VIMRPLUGIN_HOME
 <
    In R do:
 >
    detach("package:vimcom", unload = TRUE)
-   Sys.setenv(VIMRPLUGIN_TMPDIR="T")  # where "T" is what Vim has echoed
-   Sys.setenv(VIMINSTANCEID="I")      # where "I" is what Vim has echoed
-   Sys.setenv(VIMRPLUGIN_SECRET"="S") # where "S" is what Vim has echoed
-   Sys.setenv(VIMEDITOR_SVRNM"="N")   # where "N" is what Vim has echoed
-   Sys.setenv(VIMRPLUGIN_HOME"="H")   # where "H" is what Vim has echoed
+   Sys.setenv(VIMRPLUGIN_TMPDIR="T")    # where "T" is what Vim has echoed
+   Sys.setenv(VIMINSTANCEID="I")        # where "I" is what Vim has echoed
+   Sys.setenv(VIMRPLUGIN_SECRET"="S")   # where "S" is what Vim has echoed
+   Sys.setenv(VIMEDITOR_SVRNM"="N")     # where "N" is what Vim has echoed
+   Sys.setenv(VIMRPLUGIN_COMPLDIR"="C") # where "C" is what Vim has echoed
    library(vimcom)
 <
 If you are running R in a terminal emulator (Linux/Unix) Vim still needs to
@@ -1194,7 +1196,7 @@ is running:
 |vimrplugin_i386|              Use 32 bit version of R
 |vimrplugin_r_path|            Directory where R is
 |vimrplugin_r_args|            Arguments to pass to R
-|vimrplugin_permanent_libs|    Objects for omnicompletion and syntax highlight
+|vimrplugin_start_libs|    Objects for omnicompletion and syntax highlight
 |vimrplugin_routmorecolors|    More syntax highlighting in R output
 |vimrplugin_routnotab|         Show output of R CMD BATCH in new window
 |vimrplugin_indent_commented|  Indent lines commented with the \xx command
@@ -1226,6 +1228,8 @@ is running:
 |vimrplugin_vimcom_wait|       Time to wait for vimcom loading
 |vimrplugin_vim_wd|            Start R in Vim's working directory
 |vimrplugin_user_maps_only|    Only set user specified key bindings
+|vimrplugin_tmpdir|            Where temporary files are created
+|vimrplugin_compldir|          Where lists for omnicompletion are stored
 |r-plugin-SyncTeX|             Options for SyncTeX
 
 
@@ -1510,20 +1514,20 @@ the SDI style of the graphical user interface.
 
 
 ------------------------------------------------------------------------------
-						   *vimrplugin_permanent_libs*
+						   *vimrplugin_start_libs*
 6.9. Omnicompletion and syntax highlight of R functions~
 
 The list of functions to be highlighted and the list of objects for
 omnicompletion are built dynamically as the libraries are loaded by R.
-However, you can set the value of vimrplugin_permanent_libs if you want that
+However, you can set the value of vimrplugin_start_libs if you want that
 the functions and objects of specific packages are respectively highlighted
-and available for omnicompletion even if R is not running. By default, only
-the functions of vanilla R are always highlighted. Below is the default value
-of vimrplugin_permanent_libs:
+and available for omnicompletion even if R is not running yet. By default,
+only the functions of vanilla R are always highlighted. Below is the default
+value of vimrplugin_start_libs:
 >
-   let vimrplugin_permanent_libs = "base,stats,graphics,grDevices,utils,methods"
+   let vimrplugin_start_libs = "base,stats,graphics,grDevices,utils,methods"
 <
-You may also want to define the value of vimrplugin_permanent_libs if you are
+You may also want to define the value of vimrplugin_start_libs if you are
 running Vim without the |clientserver| feature.
 
 
@@ -1937,8 +1941,27 @@ set those key-bindings specified by the user, put in your vimrc:
 <
 
 ------------------------------------------------------------------------------
+							   *vimrplugin_tmpdir*
+							 *vimrplugin_compldir*
+6.33 Temporary files directories~
+
+You can change the directories where temporary files are created and
+stored by setting in your |vimrc| the values of vimrplugin_tmpdir and
+vimrplugin_compldir, as in the example below:
+>
+   let vimrplugin_tmpdir = "/dev/shm/R_tmp_dir"
+   let vimrplugin_compldir = "~/.cache/Vim-R-plugin"
+<
+The default paths of these directories depend on the operating system. If you
+want to know they are, while editing an R file, do in Normal mode:
+>
+   :echo g:rplugin_tmpdir
+   :echo g:rplugin_compldir
+<
+
+------------------------------------------------------------------------------
 							    *r-plugin-SyncTeX*
-6.33 SyncTeX support (Linux only)~
+6.34 SyncTeX support (Linux only)~
 
 SyncTeX is a set of communication systems used by some PDF viewers and by some
 text editors which allow users to jump from a specific line in the text editor
@@ -1978,7 +2001,7 @@ Note: The current knitr package (version 1.7) has at least two limitations:
 
 
 ------------------------------------------------------------------------------
-6.33.1 Evince configuration~
+6.34.1 Evince configuration~
 
 If you have Evince installed, the Vim-R-plugin assumes that you are using it
 to view PDF documents and that you run either GVim or Vim in Gnome-Terminal.
@@ -1991,7 +2014,7 @@ to press <LocalLeader>gp again.
 
 
 ------------------------------------------------------------------------------
-6.33.2 Okular configuration~
+6.34.2 Okular configuration~
 
 You have to configure Okular to call Vim during backward searches.
 In Okular, click in:
@@ -2035,7 +2058,7 @@ requires additional steps because Neovim does not have the argument
 <
 
 ------------------------------------------------------------------------------
-6.33.3 Zathura configuration~
+6.34.3 Zathura configuration~
 
 Zathura (version >= 0.3.1) is also supported. If the terminal emulator is not
 raised during backward search (from PDF to Vim), you have to set the value of
@@ -2049,7 +2072,7 @@ to press <LocalLeader>gp again.
 ------------------------------------------------------------------------------
                                                        *vimrplugin_vim_window*
 				                       *vimrplugin_synctex*
-6.33.4 Configuring the PDF editor and Vim's window title~
+6.34.4 Configuring the PDF editor and Vim's window title~
 
 If SyncTeX does not work (see above), you may try to set in your |vimrc| the
 values of |vimrplugin_pdfviewer| and vimrplugin_vim_window.
@@ -2249,13 +2272,9 @@ Charityware license.
 The following files are part of the plugin and should be in your ~/.vim
 directory after the installation:
 
-   ftdetect/r.vim
-   indent/r.vim
-   indent/rmd.vim
-   indent/rrst.vim
-   indent/rnoweb.vim
-   indent/rhelp.vim
    autoload/rcomplete.vim
+   doc/r-plugin.txt
+   ftdetect/r.vim
    ftplugin/r.vim
    ftplugin/r_rplugin.vim
    ftplugin/rbrowser.vim
@@ -2264,33 +2283,37 @@ directory after the installation:
    ftplugin/rhelp_rplugin.vim
    ftplugin/rmd.vim
    ftplugin/rmd_rplugin.vim
-   ftplugin/rrst.vim
-   ftplugin/rrst_rplugin.vim
    ftplugin/rnoweb.vim
    ftplugin/rnoweb_rplugin.vim
-   syntax/rout.vim
-   syntax/r.vim
-   syntax/rhelp.vim
-   syntax/rmd.vim
-   syntax/rrst.vim
-   syntax/rdoc.vim
-   syntax/rbrowser.vim
-   doc/r-plugin.txt
+   ftplugin/rrst.vim
+   ftplugin/rrst_rplugin.vim
+   indent/r.vim
+   indent/rhelp.vim
+   indent/rmd.vim
+   indent/rnoweb.vim
+   indent/rrst.vim
    r-plugin/common_buffer.vim
    r-plugin/common_global.vim
    r-plugin/functions.vim
    r-plugin/global_r_plugin.vim
    r-plugin/gui_running.vim
    r-plugin/nvimbuffer.vim
-   r-plugin/objlist/README
    r-plugin/osx.vim
    r-plugin/r.snippets
    r-plugin/rmd.snippets
+   r-plugin/setcompldir.vim
    r-plugin/synctex_evince_backward.py
    r-plugin/synctex_evince_forward.py
    r-plugin/synctex_okular_backward.sh
    r-plugin/windows.py
    r-plugin/windows.vim
+   syntax/r.vim
+   syntax/rbrowser.vim
+   syntax/rdoc.vim
+   syntax/rhelp.vim
+   syntax/rmd.vim
+   syntax/rout.vim
+   syntax/rrst.vim
 
 
 ==============================================================================
@@ -2777,10 +2800,9 @@ please read this document from the beginning.
        library(vimcom)
 
        # Use the text based web browser w3m to navigate through R docs
-       # in Linux Console:
+       # in Linux Console after help.start():
        if(Sys.getenv("TMUX") != "" && Sys.getenv("DISPLAY") == "")
-	   options(browser = function(u) system(paste0("tmux new-window 'w3m ", u, "'")),
-                   help_type = "html")
+	   options(browser = function(u) system(paste0("tmux new-window 'w3m ", u, "'")))
    }
 <
 
@@ -2841,7 +2863,7 @@ See also |vimrplugin_r_in_buffer|.
 							       *r-plugin-news*
 10. News~
 
-1.1.1 (2014-12-13)
+1.1.1 (2014-12-16)
 
  * Change commands gn and gN into <LocalLeader>gn and <LocalLeader>gN.
 
@@ -2854,6 +2876,8 @@ See also |vimrplugin_r_in_buffer|.
  * Removed option vimrplugin_sleeptime.
 
  * Removed command :RpluginConfig.
+
+ * Rename vimrplugin_permanent_libs into vimrplugin_start_libs
 
 1.1 (2014-11-13)
 

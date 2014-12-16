@@ -9,6 +9,7 @@ function StartR_OSX()
     else
         let rcmd = "/Applications/R.app"
     endif
+
     if b:rplugin_r_args != " "
         " https://github.com/jcfaria/Vim-R-plugin/issues/63
         " https://stat.ethz.ch/pipermail/r-sig-mac/2013-February/009978.html

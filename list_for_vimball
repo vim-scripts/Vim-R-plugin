@@ -31,6 +31,7 @@ r-plugin/functions.vim
 r-plugin/gui_running.vim
 r-plugin/nvimbuffer.vim
 r-plugin/osx.vim
+r-plugin/setcompldir.vim
 r-plugin/windows.py
 r-plugin/windows.vim
 syntax/r.vim

@@ -207,7 +207,7 @@ function MakeRMenu()
     endif
     amenu R.Help\ (plugin).Options.R\ path :help vimrplugin_r_path<CR>
     amenu R.Help\ (plugin).Options.Arguments\ to\ R :help vimrplugin_r_args<CR>
-    amenu R.Help\ (plugin).Options.Omni\ completion\ when\ R\ not\ running :help vimrplugin_permanent_libs<CR>
+    amenu R.Help\ (plugin).Options.Omni\ completion\ when\ R\ not\ running :help vimrplugin_start_libs<CR>
     amenu R.Help\ (plugin).Options.Syntax\ highlighting\ of\ \.Rout\ files :help vimrplugin_routmorecolors<CR>
     amenu R.Help\ (plugin).Options.Automatically\ open\ the\ \.Rout\ file :help vimrplugin_routnotab<CR>
     amenu R.Help\ (plugin).Options.Special\ R\ functions :help vimrplugin_listmethods<CR>

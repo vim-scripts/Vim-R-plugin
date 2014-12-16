@@ -612,10 +612,10 @@ function! Run_SyncTeX()
         endif
     elseif has("nvim") && (g:rplugin_pdfviewer == "okular" || g:rplugin_pdfviewer == "zathura") && !exists("g:rplugin_tail_follow")
         let g:rplugin_tail_follow = 1
-        call writefile([], $VIMRPLUGIN_TMPDIR . "/" . g:rplugin_pdfviewer . "_search")
-        call jobstart("RnwSyncTeX", "tail", ["-f", $VIMRPLUGIN_TMPDIR . "/" . g:rplugin_pdfviewer . "_search"])
+        call writefile([], g:rplugin_tmpdir . "/" . g:rplugin_pdfviewer . "_search")
+        call jobstart("RnwSyncTeX", "tail", ["-f", g:rplugin_tmpdir . "/" . g:rplugin_pdfviewer . "_search"])
         autocmd JobActivity RnwSyncTeX call ROnJobActivity()
-        autocmd VimLeave * call delete($VIMRPLUGIN_TMPDIR . "/" . g:rplugin_pdfviewer . "_search") | call delete($VIMRPLUGIN_TMPDIR . "/synctex_back.sh")
+        autocmd VimLeave * call delete(g:rplugin_tmpdir . "/" . g:rplugin_pdfviewer . "_search") | call delete(g:rplugin_tmpdir . "/synctex_back.sh")
     endif
     exe "cd " . substitute(olddir, ' ', '\\ ', 'g')
 endfunction

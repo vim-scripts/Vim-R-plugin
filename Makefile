@@ -64,34 +64,34 @@ deb:
 	  - ftplugin/rdoc.vim\n\
 	  - ftplugin/rhelp.vim\n\
 	  - ftplugin/rhelp_rplugin.vim\n\
-	  - ftplugin/rnoweb.vim\n\
-	  - ftplugin/rnoweb_rplugin.vim\n\
 	  - ftplugin/rmd.vim\n\
 	  - ftplugin/rmd_rplugin.vim\n\
+	  - ftplugin/rnoweb.vim\n\
+	  - ftplugin/rnoweb_rplugin.vim\n\
 	  - ftplugin/rrst.vim\n\
 	  - ftplugin/rrst_rplugin.vim\n\
 	  - indent/r.vim\n\
-	  - indent/rnoweb.vim\n\
 	  - indent/rhelp.vim\n\
 	  - indent/rmd.vim\n\
+	  - indent/rnoweb.vim\n\
 	  - indent/rrst.vim\n\
 	  - r-plugin/common_buffer.vim\n\
 	  - r-plugin/common_global.vim\n\
+	  - r-plugin/functions.vim\n\
+	  - r-plugin/global_r_plugin.vim\n\
+	  - r-plugin/gui_running.vim\n\
+	  - r-plugin/nvimbuffer.vim\n\
+	  - r-plugin/setcompldir.vim\n\
 	  - r-plugin/synctex_evince_backward.py\n\
 	  - r-plugin/synctex_evince_forward.py\n\
 	  - r-plugin/synctex_okular_backward.sh\n\
-	  - r-plugin/global_r_plugin.vim\n\
-	  - r-plugin/functions.vim\n\
-	  - r-plugin/gui_running.vim
-	  - r-plugin/nvimbuffer.vim
-	  - r-plugin/osx.vim
 	  - syntax/r.vim\n\
-	  - syntax/rdoc.vim\n\
-	  - syntax/rout.vim\n\
-	  - syntax/rmd.vim\n\
-	  - syntax/rrst.vim\n\
-	  - syntax/rhelp.vim\n\
 	  - syntax/rbrowser.vim\n\
+	  - syntax/rdoc.vim\n\
+	  - syntax/rhelp.vim\n\
+	  - syntax/rmd.vim\n\
+	  - syntax/rout.vim\n\
+	  - syntax/rrst.vim\n\
 	" > /tmp/vim-r-plugin-tmp/usr/share/vim/registry/vim-r-plugin.yaml
 	# Create the copyright
 	echo "Copyright (C) 2011-2014 Jakson Aquino\n\

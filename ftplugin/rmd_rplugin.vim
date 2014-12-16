@@ -157,5 +157,4 @@ call RSetPDFViewer()
 
 call RSourceOtherScripts()
 
-
 let b:undo_ftplugin .= " | unlet! b:IsInRCode b:SourceLines b:PreviousRChunk b:NextRChunk b:SendChunkToR"

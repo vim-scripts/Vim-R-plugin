@@ -3,11 +3,11 @@
 " Maintainer:	      Jakson Aquino <jalvesaq@gmail.com>
 " Former Maintainers: Vaidotas Zemlys <zemlys@gmail.com>
 " 		      Tom Payne <tom@tompayne.org>
-" Last Change:	      Thu Dec 04, 2014  11:07PM
+" Last Change:	      Tue Dec 16, 2014  02:14PM
 " Filenames:	      *.R *.r *.Rhistory *.Rt
 "
 " NOTE: The highlighting of R functions is defined in the
-" r-plugin/functions.vim, which is part of vim-r-plugin2:
+" r-plugin/functions.vim, which is part of Vim-R-plugin:
 " http://www.vim.org/scripts/script.php?script_id=2628
 "
 " CONFIGURATION:

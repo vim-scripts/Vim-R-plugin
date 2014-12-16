@@ -49,14 +49,14 @@ endif
 let b:bname = expand("%:t")
 let b:bname = substitute(b:bname, " ", "",  "g")
 if exists("*getpid") " getpid() was introduced in Vim 7.1.142
-    let b:rsource = $VIMRPLUGIN_TMPDIR . "/Rsource-" . getpid() . "-" . b:bname
+    let b:rsource = g:rplugin_tmpdir . "/Rsource-" . getpid() . "-" . b:bname
 else
     let b:randnbr = system("echo $RANDOM")
     let b:randnbr = substitute(b:randnbr, "\n", "", "")
     if strlen(b:randnbr) == 0
         let b:randnbr = "NoRandom"
     endif
-    let b:rsource = $VIMRPLUGIN_TMPDIR . "/Rsource-" . b:randnbr . "-" . b:bname
+    let b:rsource = g:rplugin_tmpdir . "/Rsource-" . b:randnbr . "-" . b:bname
     unlet b:randnbr
 endif
 unlet b:bname
@@ -71,21 +71,4 @@ let g:rplugin_lastft = &filetype
 if !exists("g:SendCmdToR")
     let g:SendCmdToR = function('SendCmdToR_fake')
 endif
-
-if !has("nvim")
-    if &filetype != "rbrowser"
-        if v:servername == "" || has("gui_macvim")
-            autocmd CursorHold <buffer> call RCheckLibListFile()
-        else
-            if &filetype != "r"
-                autocmd CursorMoved <buffer> call RCheckLibList()
-                if g:vimrplugin_insert_mode_cmds == 1
-                    autocmd CursorMovedI <buffer> call RCheckLibList()
-                endif
-            endif
-        endif
-    endif
-endif
-
-
 

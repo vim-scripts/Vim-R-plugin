@@ -1,72 +1,155 @@
 
-" Users may define the value of g:vimrplugin_permanent_libs to determine what
-" functions should be highlighted even if R is not running. By default, the
-" functions of packages loaded by R --vanilla are highlighted.
-if !exists("g:vimrplugin_permanent_libs")
-    let g:vimrplugin_permanent_libs = "base,stats,graphics,grDevices,utils,methods"
-endif
-
-" Store the names of R package whose functions were already added to syntax
-" highlight to avoid sourcing them repeatedly. Initialize the list with two
-" libraries that don't have any visible function.
-let b:rplugin_funls = ["datasets", "setwidth"]
-
-" The function RUpdateFunSyntax() is called by the Vim-R-plugin whenever the
-" user loads a new package in R. The function should be defined only once.
-" Thus, if it's already defined, call it and finish.
-if exists("*RUpdateFunSyntax")
-    call RUpdateFunSyntax(0)
+" Only source this once
+if exists("*RmFromRLibList")
+    if len(g:rplugin_lists_to_load) > 0
+        for s:lib in g:rplugin_lists_to_load
+            call SourceRFunList(s:lib)
+        endfor
+        unlet s:lib
+    endif
     finish
 endif
 
-function RAddToFunList(lib, verbose)
-    " Only run once for each package:
-    for pkg in b:rplugin_funls
-        if pkg == a:lib
-            return
-        endif
-    endfor
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Set global variables when this script is called for the first time
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-    " The fun_ files list functions of R packages and are created by the
-    " Vim-R-plugin:
-    let fnf = split(globpath(&rtp, 'r-plugin/objlist/fun_' . a:lib . '_*'), "\n")
+" Users may define the value of g:vimrplugin_start_libs
+if !exists("g:vimrplugin_start_libs")
+    let g:vimrplugin_start_libs = "base,stats,graphics,grDevices,utils,methods"
+endif
 
-    if len(fnf) == 1
-        silent exe "source " . substitute(fnf[0], ' ', '\\ ', "g")
-        let b:rplugin_funls += [a:lib]
-    elseif a:verbose && len(fnf) == 0
-        echohl WarningMsg
-        echomsg 'Fun_ file for "' . a:lib . '" not found.'
-        echohl Normal
-        return
-    elseif a:verbose && len(fnf) > 1
-        echohl WarningMsg
-        echomsg 'There is more than one fun_ file for "' . a:lib . '":'
-        for fff in fnf
-            echomsg fff
-        endfor
-        echohl Normal
-        return
-    endif
-endfunction
+let g:rplugin_lists_to_load = split(g:vimrplugin_start_libs, ",")
+let g:rplugin_debug_lists = []
+let g:rplugin_loaded_lists = []
+let g:rplugin_Rhelp_list = []
+let g:rplugin_omni_lines = []
 
-function RUpdateFunSyntax(verbose)
-    " Do nothing if called at a buffer that doesn't include R syntax:
-    if !exists("b:rplugin_funls")
-        return
-    endif
-    if exists("g:rplugin_libls")
-        for lib in g:rplugin_libls
-            call RAddToFunList(lib, a:verbose)
-        endfor
-    else
-        if exists("g:vimrplugin_permanent_libs")
-            for lib in split(g:vimrplugin_permanent_libs, ",")
-                call RAddToFunList(lib, a:verbose)
+" syntax/r.vim may have being called before ftplugin/r.vim
+if !exists("g:rplugin_compldir")
+    runtime r-plugin/setcompldir.vim
+endif
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Function for highlighting rFunction
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" Must be run for each buffer
+function SourceRFunList(lib)
+    if isdirectory(g:rplugin_compldir)
+        let fnf = split(globpath(g:rplugin_compldir, 'fun_' . a:lib . '_*'), "\n")
+        if len(fnf) == 1
+            " Highlight R functions
+            exe "source " . substitute(fnf[0], ' ', '\\ ', 'g')
+        elseif len(fnf) == 0
+            let g:rplugin_debug_lists += ['Function list for "' . a:lib . '" not found.']
+        elseif len(fnf) > 1
+            let g:rplugin_debug_lists += ['There is more than one function list for "' . a:lib . '".']
+            for obl in fnf
+                let g:rplugin_debug_lists += [obl]
             endfor
         endif
     endif
 endfunction
 
-call RUpdateFunSyntax(0)
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Omnicompletion functions
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
+function RLisObjs(arglead, cmdline, curpos)
+    let lob = []
+    let rkeyword = '^' . a:arglead
+    for xx in g:rplugin_Rhelp_list
+        if xx =~ rkeyword
+            call add(lob, xx)
+        endif
+    endfor
+    return lob
+endfunction
+
+function RmFromRLibList(lib)
+    for idx in range(len(g:rplugin_loaded_lists))
+        if g:rplugin_loaded_lists[idx] == a:lib
+            call remove(g:rplugin_loaded_lists, idx)
+            break
+        endif
+    endfor
+    for idx in range(len(g:rplugin_lists_to_load))
+        if g:rplugin_lists_to_load[idx] == a:lib
+            call remove(g:rplugin_lists_to_load, idx)
+            break
+        endif
+    endfor
+endfunction
+
+function AddToRLibList(lib)
+    if isdirectory(g:rplugin_compldir)
+        let omf = split(globpath(g:rplugin_compldir, 'omnils_' . a:lib . '_*'), "\n")
+        if len(omf) == 1
+            let g:rplugin_loaded_lists += [a:lib]
+
+            " List of objects for omni completion
+            let olist = readfile(omf[0])
+            let g:rplugin_omni_lines += olist
+
+            " List of objects for :Rhelp completion
+            for xx in olist
+                let xxx = split(xx, "\x06")
+                if len(xxx) > 0 && xxx[0] !~ '\$'
+                    call add(g:rplugin_Rhelp_list, xxx[0])
+                endif
+            endfor
+        elseif len(omf) == 0
+            let g:rplugin_debug_lists += ['Omnils list for "' . a:lib . '" not found.']
+            call RmFromRLibList(a:lib)
+            return
+        elseif len(omf) > 1
+            let g:rplugin_debug_lists += ['There is more than one omnils and function list for "' . a:lib . '".']
+            for obl in omf
+                let g:rplugin_debug_lists += [obl]
+            endfor
+            call RmFromRLibList(a:lib)
+            return
+        endif
+    endif
+endfunction
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Function called by vimcom
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+function FillRLibList()
+    " Update the list of objects for omnicompletion
+    if filereadable(g:rplugin_tmpdir . "/libnames_" . $VIMINSTANCEID)
+        let g:rplugin_lists_to_load = readfile(g:rplugin_tmpdir . "/libnames_" . $VIMINSTANCEID)
+        for lib in g:rplugin_lists_to_load
+            let isloaded = 0
+            for olib in g:rplugin_loaded_lists
+                if lib == olib
+                    let isloaded = 1
+                    break
+                endif
+            endfor
+            if isloaded == 0
+                call AddToRLibList(lib)
+            endif
+        endfor
+    endif
+    " Reload the syntax for all loaded buffers
+    syntax enable
+    " let g:rplugin_liblist_filled = 1
+endfunction
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Source the Syntax scripts for the first time and Load omnilists
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+for s:lib in g:rplugin_lists_to_load
+    call SourceRFunList(s:lib)
+    call AddToRLibList(s:lib)
+endfor
+
+unlet s:lib
