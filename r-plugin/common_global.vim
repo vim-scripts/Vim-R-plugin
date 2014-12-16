@@ -973,11 +973,11 @@ function WaitVimComStart()
             endif
         endif
         if has("win32")
-            let g:rplugin_vimcom_lib = g:rplugin_vimcom_home . "/bin/i386/libvimcom.dll"
+            let g:rplugin_vimcom_lib = g:rplugin_vimcom_home . "/bin/i386/libVimR.dll"
         elseif has("win64")
-            let g:rplugin_vimcom_lib = g:rplugin_vimcom_home . "/bin/x64/libvimcom.dll"
+            let g:rplugin_vimcom_lib = g:rplugin_vimcom_home . "/bin/x64/libVimR.dll"
         else
-            let g:rplugin_vimcom_lib = g:rplugin_vimcom_home . "/bin/libvimcom.so"
+            let g:rplugin_vimcom_lib = g:rplugin_vimcom_home . "/bin/libVimR.so"
         endif
         if !filereadable(g:rplugin_vimcom_lib)
             call RWarningMsgInp('Could not find "' . g:rplugin_vimcom_lib . '".')
@@ -3178,8 +3178,10 @@ endfunction
 
 function ROnJobActivity()
     if v:job_data[1] == 'stdout'
-        for idx in range(0, len(v:job_data[2]) - 1)
-            let cmd = v:job_data[2][idx]
+        for cmd in v:job_data[2]
+            if cmd == ""
+                continue
+            endif
             if cmd =~ "^call " || cmd  =~ "^let "
                 exe cmd
             else
