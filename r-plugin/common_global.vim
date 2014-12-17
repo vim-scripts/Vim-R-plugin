@@ -127,32 +127,31 @@ function ReplaceUnderS()
 endfunction
 
 function! ReadEvalReply()
-    let reply = ["No reply"]
+    let reply = "No reply"
     let haswaitwarn = 0
     let ii = 0
     while ii < 20
         sleep 100m
-        if filereadable(g:rplugin_tmpdir . "/eval_reply")
-            let reply = readfile(g:rplugin_tmpdir . "/eval_reply")
-            if len(reply) == 0
-                call RWarningMsg("Incomplete reply")
-                let reply = ["No reply"]
+        if filereadable($VIMRPLUGIN_TMPDIR . "/eval_reply")
+            let tmp = readfile($VIMRPLUGIN_TMPDIR . "/eval_reply")
+            if len(tmp) > 0
+                let reply = tmp[0]
+                break
             endif
-            break
         endif
         let ii += 1
         if ii == 2
             echohl WarningMsg
-            echon "\rWaiting..."
+            echon "\rWaiting for reply"
             echohl Normal
             let haswaitwarn = 1
         endif
     endwhile
     if haswaitwarn
-        echon "\r              "
+        echon "\r                 "
         redraw
     endif
-    return reply[0]
+    return reply
 endfunction
 
 function! CompleteChunkOptions()
