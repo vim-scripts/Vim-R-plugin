@@ -72,3 +72,9 @@ if !exists("g:SendCmdToR")
     let g:SendCmdToR = function('SendCmdToR_fake')
 endif
 
+" Were new libraries loaded by R?
+if !exists("b:rplugin_new_libs")
+    let b:rplugin_new_libs = 0
+endif
+autocmd CursorMoved <buffer> call RCheckLibList()
+

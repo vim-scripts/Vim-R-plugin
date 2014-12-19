@@ -24,6 +24,7 @@ let g:rplugin_debug_lists = []
 let g:rplugin_loaded_lists = []
 let g:rplugin_Rhelp_list = []
 let g:rplugin_omni_lines = []
+let g:rplugin_new_libs = 0
 
 " syntax/r.vim may have being called before ftplugin/r.vim
 if !exists("g:rplugin_compldir")
@@ -137,11 +138,27 @@ function FillRLibList()
             endif
         endfor
     endif
-    " Reload the syntax for all loaded buffers
-    syntax enable
-    " let g:rplugin_liblist_filled = 1
+    " Now we need to update the syntax in all R files. There should be a
+    " better solution than setting a flag to let other buffers know that they
+    " also need to update the syntax on CursorMoved event:
+    " https://github.com/neovim/neovim/issues/901
+    let g:rplugin_new_libs = len("g:rplugin_loaded_lists")
+    silent exe 'set filetype=' . &filetype
+    let b:rplugin_new_libs = g:rplugin_new_libs
 endfunction
 
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Update the buffer syntax if necessary
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+function RCheckLibList()
+    if b:rplugin_new_libs == g:rplugin_new_libs
+        return
+    endif
+    silent exe 'set filetype=' . &filetype
+    let b:rplugin_new_libs = g:rplugin_new_libs
+endfunction
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Source the Syntax scripts for the first time and Load omnilists
