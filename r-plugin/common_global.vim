@@ -141,9 +141,7 @@ function! ReadEvalReply()
         endif
         let ii += 1
         if ii == 2
-            echohl WarningMsg
             echon "\rWaiting for reply"
-            echohl Normal
             let haswaitwarn = 1
         endif
     endwhile
@@ -705,8 +703,6 @@ function StartR_ExternalTerm(rcmd)
     endif
 
     let rcmd = 'VIMRPLUGIN_TMPDIR=' . substitute(g:rplugin_tmpdir, ' ', '\\ ', 'g') . ' VIMRPLUGIN_COMPLDIR=' . substitute(g:rplugin_compldir, ' ', '\\ ', 'g') . ' VIMINSTANCEID=' . $VIMINSTANCEID . ' VIMRPLUGIN_SECRET=' . $VIMRPLUGIN_SECRET . ' VIMEDITOR_SVRNM=' . $VIMEDITOR_SVRNM . ' ' . a:rcmd
-
-    echomsg rcmd
 
     call system("tmux has-session -t " . g:rplugin_tmuxsname)
     if v:shell_error
@@ -1407,7 +1403,7 @@ function RInsert(cmd)
     if g:rplugin_lastev == "R is busy." || g:rplugin_lastev == "UNKNOWN" || g:rplugin_lastev =~ "^Error" || g:rplugin_lastev == "INVALID" || g:rplugin_lastev == "ERROR" || g:rplugin_lastev == "EMPTY" || g:rplugin_lastev == "No reply"
         call RWarningMsg(g:rplugin_lastev)
     else
-        silent exe "read " . g:rplugin_esc_tmpdir . "/Rinsert"
+        silent exe "read " . substitute(g:rplugin_tmpdir, ' ', '\\ ', 'g') . "/Rinsert"
     endif
 endfunction
 
@@ -1419,7 +1415,7 @@ function SendLineToRAndInsertOutput()
     else
         let curpos = getpos(".")
         " comment the output
-        let ilines = readfile(g:rplugin_esc_tmpdir . "/Rinsert")
+        let ilines = readfile(substitute(g:rplugin_tmpdir, ' ', '\\ ', 'g') . "/Rinsert")
         for iln in ilines
             call RSimpleCommentLine("normal", "c")
             normal! j

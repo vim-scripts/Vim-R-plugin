@@ -322,7 +322,7 @@ function! ObBrBufUnload()
 endfunction
 
 function! SourceObjBrLines()
-    exe "source " . g:rplugin_esc_tmpdir . "/objbrowserInit"
+    exe "source " . substitute(g:rplugin_tmpdir, ' ', '\\ ', 'g') . "/objbrowserInit"
 endfunction
 
 nmap <buffer><silent> <CR> :call RBrowserDoubleClick()<CR>
