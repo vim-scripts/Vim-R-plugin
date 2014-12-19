@@ -55,9 +55,9 @@ fun! rcomplete#CompleteR(findstart, base)
         while start > 0 && (line[start - 1] =~ '\w' || line[start - 1] =~ '\.' || line[start - 1] =~ '\$')
             let start -= 1
         endwhile
+        call BuildROmniList()
         return start
     else
-        call BuildROmniList()
         let resp = []
         if strlen(a:base) == 0
             return resp
