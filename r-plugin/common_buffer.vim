@@ -76,5 +76,5 @@ endif
 if !exists("b:rplugin_new_libs")
     let b:rplugin_new_libs = 0
 endif
-autocmd CursorMoved <buffer> call RCheckLibList()
+autocmd BufEnter <buffer> call RCheckLibList()
 
