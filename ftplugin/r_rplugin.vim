@@ -13,19 +13,6 @@ endif
 " need be defined after the global ones:
 runtime r-plugin/common_buffer.vim
 
-function! RCmdBatchJob()
-    if v:job_data[1] == 'stdout'
-        echo join(v:job_data[2])
-    elseif v:job_data[1] == 'stderr'
-        call RWarningMsg(join(v:job_data[2]))
-    else
-        if v:job_data[0] == b:RCmdBatchID
-            let b:RCmdBatchID = -2
-        endif
-        call OpenRout(1)
-    endif
-endfunction
-
 " Run R CMD BATCH on current file and load the resulting .Rout in a split
 " window
 function! ShowRout()
@@ -42,25 +29,6 @@ function! ShowRout()
     " if not silent, the user will have to type <Enter>
     silent update
 
-    if has("nvim")
-        if b:RCmdBatchID != -2
-            call RWarningMsg("There is R CMD BATCH job running already.")
-            return
-        endif
-        if has("win32") || has("win64")
-            let b:RCmdBatchID = jobstart("RCmdBatch", 'Rcmd.exe', ['BATCH', '--no-restore', '--no-save',  expand("%"), b:routfile])
-        else
-            let b:RCmdBatchID = jobstart("RCmdBatch", b:rplugin_R, ['CMD', 'BATCH', '--no-restore', '--no-save', expand("%"), b:routfile])
-        endif
-        if b:RCmdBatchID == 0
-            call RWarningMsg("The job table is full.")
-        elseif b:RCmdBatchID == -1
-            call RWarningMsg("Failed to execute R.")
-        endif
-        echomsg 'R CMD BATCH job is running.'
-        return
-    endif
-
     if has("win32") || has("win64")
         let rcmd = 'Rcmd.exe BATCH --no-restore --no-save "' . expand("%") . '" "' . b:routfile . '"'
     else
@@ -74,13 +42,7 @@ function! ShowRout()
         call RWarningMsg('Error: "' . rlog . '"')
         sleep 1
     endif
-    call OpenRout(0)
-    return
-endfunction
-
-function! OpenRout(goback)
     if filereadable(b:routfile)
-        let curpos = getcurpos()
         if g:vimrplugin_routnotab == 1
             exe "split " . b:routfile
         else
@@ -108,14 +70,6 @@ let b:IsInRCode = function("DefaultIsInRCode")
 " Pointer to function that must be different if the plugin is used as a
 " global one:
 let b:SourceLines = function("RSourceLines")
-
-" job id for R CMD BATCH
-if has("nvim")
-    if !exists("b:RCmdBatchID")
-        let b:RCmdBatchID = -2
-        autocmd JobActivity RCmdBatch call RCmdBatchJob()
-    endif
-endif
 
 "==========================================================================
 " Key bindings and menu items
