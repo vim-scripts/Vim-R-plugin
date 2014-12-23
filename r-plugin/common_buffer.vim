@@ -76,5 +76,8 @@ endif
 if !exists("b:rplugin_new_libs")
     let b:rplugin_new_libs = 0
 endif
-autocmd BufEnter <buffer> call RCheckLibList()
+" When using as a global plugin for non R files, RCheckLibList will not exist
+if exists("*RCheckLibList")
+    autocmd BufEnter <buffer> call RCheckLibList()
+endif
 
