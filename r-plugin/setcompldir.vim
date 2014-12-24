@@ -51,6 +51,8 @@ elseif (has("win32") || has("win64")) && $AppData != "" && isdirectory($AppData)
     let g:rplugin_compldir = $AppData . "\\Vim-R-plugin"
 elseif isdirectory(expand("~/.cache"))
     let g:rplugin_compldir = expand("~/.cache/Vim-R-plugin")
+elseif isdirectory(expand("~/Library/Caches"))
+    let g:rplugin_compldir = expand("~/Library/Caches/Vim-R-plugin")
 else
     let g:rplugin_compldir = g:rplugin_uservimfiles . "/r-plugin/objlist/"
 endif
