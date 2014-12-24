@@ -2994,51 +2994,10 @@ command Rhistory :call ShowRhistory()
 "             rplugin_    for internal parameters
 "==========================================================================
 
-" g:rplugin_home should be the directory where the r-plugin files are.  For
-" users following the installation instructions it will be at ~/.vim or
-" ~/vimfiles, that is, the same value of g:rplugin_uservimfiles. However the
-" variables will have different values if the plugin is installed somewhere
-" else in the runtimepath.
-let g:rplugin_home = expand("<sfile>:h:h")
-
-" g:rplugin_uservimfiles must be a writable directory. It will be g:rplugin_home
-" unless it's not writable. Then it wil be ~/.vim or ~/vimfiles.
-if filewritable(g:rplugin_home) == 2
-    let g:rplugin_uservimfiles = g:rplugin_home
-else
-    let g:rplugin_uservimfiles = split(&runtimepath, ",")[0]
+if exists("g:rplugin_compldir")
+    runtime r-plugin/setcompldir.vim
 endif
 
-" From changelog.vim, with bug fixed by "Si" ("i5ivem")
-" Windows logins can include domain, e.g: 'DOMAIN\Username', need to remove
-" the backslash from this as otherwise cause file path problems.
-if executable("whoami")
-    let g:rplugin_userlogin = substitute(system('whoami'), "\\", "-", "")
-elseif $USER != ""
-    let g:rplugin_userlogin = $USER
-else
-    call RWarningMsgInp("Could not determine user name.")
-    let g:rplugin_failed = 1
-    finish
-endif
-
-if v:shell_error
-    let g:rplugin_userlogin = 'unknown'
-else
-    let newuline = stridx(g:rplugin_userlogin, "\n")
-    if newuline != -1
-        let g:rplugin_userlogin = strpart(g:rplugin_userlogin, 0, newuline)
-    endif
-    unlet newuline
-endif
-
-if has("win32") || has("win64")
-    let g:rplugin_home = substitute(g:rplugin_home, "\\", "/", "g")
-    let g:rplugin_uservimfiles = substitute(g:rplugin_uservimfiles, "\\", "/", "g")
-    if $USERNAME != ""
-        let g:rplugin_userlogin = substitute($USERNAME, " ", "", "g")
-    endif
-endif
 
 if exists("g:vimrplugin_tmpdir")
     let g:rplugin_tmpdir = expand(g:vimrplugin_tmpdir)
@@ -3066,13 +3025,6 @@ endif
 let $VIMRPLUGIN_TMPDIR = g:rplugin_tmpdir
 if !isdirectory(g:rplugin_tmpdir)
     call mkdir(g:rplugin_tmpdir, "p", 0700)
-endif
-
-if exists("g:rplugin_compldir")
-    " syntax/r.vim was already called and a `syntax enable` may be required
-    syntax enable
-else
-    runtime r-plugin/setcompldir.vim
 endif
 
 " Old name of vimrplugin_assign option
@@ -3300,29 +3252,30 @@ let s:all_marks = "abcdefghijklmnopqrstuvwxyz"
 
 
 " Choose a terminal (code adapted from screen.vim)
-if has("win32") || has("win64") || g:vimrplugin_applescript || $DISPLAY == "" || g:rplugin_do_tmux_split
+if exists("g:vimrplugin_term")
+    if !executable(g:vimrplugin_term)
+        call RWarningMsgInp("'" . g:vimrplugin_term . "' not found. Please change the value of 'vimrplugin_term' in your vimrc.")
+        let g:vimrplugin_term = "xterm"
+    endif
+endif
+if has("win32") || has("win64") || g:vimrplugin_applescript || g:rplugin_do_tmux_split || g:vimrplugin_r_in_buffer
     " No external terminal emulator will be called, so any value is good
     let g:vimrplugin_term = "xterm"
-else
-    let s:terminals = ['gnome-terminal', 'konsole', 'xfce4-terminal', 'terminal', 'Eterm', 'rxvt', 'urxvt', 'aterm', 'roxterm', 'terminator', 'lxterminal', 'xterm']
-    if has('mac')
-        let s:terminals = ['iTerm', 'Terminal', 'Terminal.app'] + s:terminals
+endif
+if !exists("g:vimrplugin_term")
+    let s:terminals = ['gnome-terminal', 'konsole', 'xfce4-terminal', 'terminal', 'Eterm', 'rxvt', 'urxvt', 'aterm', 'roxterm', 'terminator', 'lxterminal']
+    if has("mac") || has("macvim") || has("gui_macvim")
+        let s:terminals = ['iTerm', 'Terminal', 'Terminal.app', 'xterm'] + s:terminals
+    else
+        let s:terminals += ['xterm']
     endif
-    if exists("g:vimrplugin_term")
-        if !executable(g:vimrplugin_term)
-            call RWarningMsgInp("'" . g:vimrplugin_term . "' not found. Please change the value of 'vimrplugin_term' in your vimrc.")
-            unlet g:vimrplugin_term
+    for s:term in s:terminals
+        if executable(s:term)
+            let g:vimrplugin_term = s:term
+            break
         endif
-    endif
-    if !exists("g:vimrplugin_term")
-        for term in s:terminals
-            if executable(term)
-                let g:vimrplugin_term = term
-                break
-            endif
-        endfor
-        unlet term
-    endif
+    endfor
+    unlet s:term
     unlet s:terminals
 endif
 
