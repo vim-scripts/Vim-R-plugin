@@ -933,8 +933,8 @@ function WaitVimComStart()
         let g:rplugin_vimcom_home = vr[1]
         let g:rplugin_vimcomport = vr[2]
         let g:rplugin_r_pid = vr[3]
-        if g:rplugin_vimcom_version != "1.1.14"
-            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.1.14.')
+        if g:rplugin_vimcom_version != "1.1.15"
+            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.1.15.')
             sleep 1
         endif
         if has("nvim")
