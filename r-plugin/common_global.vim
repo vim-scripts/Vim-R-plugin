@@ -3263,9 +3263,12 @@ if has("win32") || has("win64") || g:vimrplugin_applescript || g:rplugin_do_tmux
     let g:vimrplugin_term = "xterm"
 endif
 if !exists("g:vimrplugin_term")
-    let s:terminals = ['gnome-terminal', 'konsole', 'xfce4-terminal', 'terminal', 'Eterm', 'rxvt', 'urxvt', 'aterm', 'roxterm', 'terminator', 'lxterminal']
+    let s:terminals = ['gnome-terminal', 'konsole', 'xfce4-terminal', 'terminal',
+                \ 'Eterm', 'rxvt', 'urxvt', 'aterm', 'roxterm', 'terminator', 'lxterminal']
     if has("mac") || has("macvim") || has("gui_macvim")
-        let s:terminals = ['iTerm', 'Terminal', 'Terminal.app', 'xterm'] + s:terminals
+        let s:terminals = ['/Applications/Utilities/iTerm.app/Contents/MacOS/iTerm',
+                    \ '/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal',
+                    \ 'xterm'] + s:terminals
     else
         let s:terminals += ['xterm']
     endif
