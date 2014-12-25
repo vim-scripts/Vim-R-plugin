@@ -662,13 +662,6 @@ function StartR_TmuxSplit(rcmd)
     if WaitVimComStart()
         call g:SendToVimCom("\005B Update OB [StartR]")
     endif
-    if has("nvim")
-        let g:RBrOpenCloseLs = function("RBrOpenCloseLs_TmuxNeovim")
-        " Force Neovim to update the window size
-        mode
-    else
-        let g:RBrOpenCloseLs = function("RBrOpenCloseLs_TmuxVim")
-    endif
 endfunction
 
 
@@ -695,7 +688,7 @@ function StartR_ExternalTerm(rcmd)
                     \ "set terminal-overrides 'rxvt*:smcup@:rmcup@'" ]
         endif
 
-        if g:vimrplugin_external_ob || !has("gui_running")
+        if g:vimrplugin_tmux_ob || !has("gui_running")
             call extend(cnflines, ['set -g mode-mouse on', 'set -g mouse-select-pane on', 'set -g mouse-resize-pane on'])
         endif
         call writefile(cnflines, g:rplugin_tmpdir . "/tmux.conf")
@@ -1017,6 +1010,14 @@ function StartObjBrowser_Tmux()
         return
     endif
 
+    if has("nvim")
+        let g:RBrOpenCloseLs = function("RBrOpenCloseLs_TmuxNeovim")
+        " Force Neovim to update the window size
+        mode
+    else
+        let g:RBrOpenCloseLs = function("RBrOpenCloseLs_TmuxVim")
+    endif
+
     call g:SendToVimCom("\005G GlobalEnv [OB StartObjBrowser_Tmux]")
     sleep 50m
     call g:SendToVimCom("\005L Libraries [OB StartObjBrowser_Tmux]")
@@ -1061,6 +1062,7 @@ function StartObjBrowser_Tmux()
                 \ 'let b:rplugin_extern_ob = 1',
                 \ 'set shortmess=atI',
                 \ 'set rulerformat=%3(%l%)',
+                \ 'set laststatus=0',
                 \ 'set noruler',
                 \ 'let g:SendCmdToR = function("SendCmdToR_TmuxSplit")',
                 \ 'let g:RBrOpenCloseLs = function("RBrOpenCloseLs_TmuxOB")',
@@ -1212,6 +1214,9 @@ function StartObjBrowser_Vim()
         else
             set splitright
         endif
+        if g:vimrplugin_objbr_place =~ "console"
+            sb R_Output
+        endif
         sil exe "vsplit " . b:objbrtitle
         let &splitright = l:sr
         sil exe "vertical resize " . g:vimrplugin_objbr_w
@@ -1250,7 +1255,7 @@ function RObjBrowser()
     let g:rplugin_running_objbr = 1
 
     if !b:rplugin_extern_ob
-        if g:rplugin_do_tmux_split
+        if g:vimrplugin_tmux_ob
             call StartObjBrowser_Tmux()
         else
             call StartObjBrowser_Vim()
@@ -2994,7 +2999,7 @@ command Rhistory :call ShowRhistory()
 "             rplugin_    for internal parameters
 "==========================================================================
 
-if exists("g:rplugin_compldir")
+if !exists("g:rplugin_compldir")
     runtime r-plugin/setcompldir.vim
 endif
 
@@ -3064,7 +3069,6 @@ call RSetDefaultValue("g:vimrplugin_routnotab",         0)
 call RSetDefaultValue("g:vimrplugin_editor_w",         66)
 call RSetDefaultValue("g:vimrplugin_help_w",           46)
 call RSetDefaultValue("g:vimrplugin_objbr_w",          40)
-call RSetDefaultValue("g:vimrplugin_external_ob",       0)
 call RSetDefaultValue("g:vimrplugin_libcall_send",      1)
 call RSetDefaultValue("g:vimrplugin_i386",              0)
 if has("nvim")
@@ -3180,35 +3184,41 @@ else
     let g:vimrplugin_applescript = 0
 endif
 
-if has("gui_running")
+if has("gui_running") || g:vimrplugin_applescript
     let vimrplugin_only_in_tmux = 0
 endif
 
-if g:vimrplugin_applescript
-    let g:vimrplugin_only_in_tmux = 0
+if has("gui_running") || has("win32") || g:vimrplugin_applescript
+    let g:vimrplugin_tmux_ob = 0
+    if !g:vimrplugin_r_in_buffer
+        if g:vimrplugin_objbr_place =~ "console"
+            let g:vimrplugin_objbr_place = substitute(g:vimrplugin_objbr_place, "console", "script", "")
+        endif
+    endif
 endif
 
-if $TMUX != ""
+if g:vimrplugin_r_in_buffer
+    let g:vimrplugin_tmux_ob = 0
+    let g:rplugin_do_tmux_split = 0
+endif
+
+if $TMUX == ""
+    let g:rplugin_do_tmux_split = 0
+    call RSetDefaultValue("g:vimrplugin_tmux_ob", 0)
+else
     let g:rplugin_do_tmux_split = 1
     let g:vimrplugin_applescript = 0
-else
-    let g:vimrplugin_external_ob = 0
-    let g:rplugin_do_tmux_split = 0
+    call RSetDefaultValue("g:vimrplugin_tmux_ob", 1)
+endif
+if g:vimrplugin_objbr_place =~ "console" && !g:vimrplugin_r_in_buffer
+    let g:vimrplugin_tmux_ob = 1
 endif
 
 
 " ========================================================================
 
-if g:vimrplugin_external_ob == 1
-    let g:vimrplugin_objbr_place = substitute(g:vimrplugin_objbr_place, "script", "console", "")
-endif
-
-if g:vimrplugin_objbr_place =~ "console"
-    let g:vimrplugin_external_ob = 1
-endif
-
 " Check whether Tmux is OK
-if !has("win32") && !has("win64") && !has("gui_win32") && !has("gui_win64") && g:vimrplugin_applescript == 0
+if !has("win32") && !has("win64") && !has("gui_win32") && !has("gui_win64") && !g:vimrplugin_applescript && !g:vimrplugin_r_in_buffer
     if !executable('tmux') && g:vimrplugin_source !~ "screenR"
         call RWarningMsgInp("Please, install the 'Tmux' application to enable the Vim-R-plugin.")
         let g:rplugin_failed = 1

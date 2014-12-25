@@ -56,7 +56,7 @@ function! UpdateOB(what)
     let g:rplugin_upobcnt = 1
 
     let g:rplugin_switchedbuf = 0
-    if g:rplugin_do_tmux_split == 0
+    if g:vimrplugin_tmux_ob == 0
         redir => s:bufl
         silent buffers
         redir END
@@ -342,9 +342,7 @@ endif
 
 au BufEnter <buffer> stopinsert
 
-if g:rplugin_do_tmux_split == 0
-    au BufUnload <buffer> call g:SendToVimCom("\004Stop updating info [OB BufUnload].")
-else
+if g:vimrplugin_tmux_ob
     au BufUnload <buffer> call ObBrBufUnload()
     " Fix problems caused by some plugins
     if exists("g:loaded_surround") && mapcheck("ds", "n") != ""
@@ -353,6 +351,8 @@ else
     if exists("g:loaded_showmarks ")
         autocmd! ShowMarks
     endif
+else
+    au BufUnload <buffer> call g:SendToVimCom("\004Stop updating info [OB BufUnload].")
 endif
 
 let s:envstring = tolower($LC_MESSAGES . $LC_ALL . $LANG)
