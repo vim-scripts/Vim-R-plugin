@@ -1,3 +1,7 @@
+if has("nvim")
+    " See https://github.com/jalvesaq/Nvim-R
+    finish
+endif
 
 " Only source this once
 if exists("*RmFromRLibList")

@@ -21,7 +21,6 @@ indent/rrst.vim
 r-plugin/common_buffer.vim
 r-plugin/common_global.vim
 r-plugin/global_r_plugin.vim
-r-plugin/objlist/README
 r-plugin/r.snippets
 r-plugin/rmd.snippets
 r-plugin/synctex_evince_backward.py
@@ -29,7 +28,6 @@ r-plugin/synctex_evince_forward.py
 r-plugin/synctex_okular_backward.sh
 r-plugin/functions.vim
 r-plugin/gui_running.vim
-r-plugin/nvimbuffer.vim
 r-plugin/osx.vim
 r-plugin/setcompldir.vim
 r-plugin/windows.py

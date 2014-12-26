@@ -80,7 +80,6 @@ deb:
 	  - r-plugin/functions.vim\n\
 	  - r-plugin/global_r_plugin.vim\n\
 	  - r-plugin/gui_running.vim\n\
-	  - r-plugin/nvimbuffer.vim\n\
 	  - r-plugin/setcompldir.vim\n\
 	  - r-plugin/synctex_evince_backward.py\n\
 	  - r-plugin/synctex_evince_forward.py\n\
@@ -128,7 +127,8 @@ deb:
 	Architecture: all\n\
 	Maintainer: Jakson Alves de Aquino <jalvesaq@gmail.com>\n\
 	Installed-Size: $(INSTALLEDSIZE)\n\
-	Depends: vim | vim-gtk | vim-gnome, tmux (>= 1.8), ncurses-term, wmctrl, latexmk, vim-addon-manager, r-base-core\n\
+	Depends: vim | vim-gtk | vim-gnome, tmux (>= 1.8), ncurses-term, vim-addon-manager, r-base-core\n\
+	Suggests: wmctrl, latexmk\n\
 	Enhances: vim\n\
 	Section: text\n\
 	Priority: extra\n\

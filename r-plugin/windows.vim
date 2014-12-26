@@ -111,9 +111,6 @@ function InitializePython()
     elseif has("python")
         command! -nargs=+ Py :py <args>
         command! -nargs=+ PyFile :pyfile <args>
-    elseif has("nvim")
-        command! -nargs=+ Py :call RWarningMsg("Py command not implemented yet: '" . <args> . "'")
-        let g:SendToVimCom = function("SendToVimCom_Neovim")
     else
         command! -nargs=+ Py :
         command! -nargs=+ PyFile :

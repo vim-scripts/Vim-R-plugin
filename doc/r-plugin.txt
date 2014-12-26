@@ -25,11 +25,13 @@ For Vim version 7.4
 1. Overview~
 
 This plugin improves Vim's support for editing R code and makes it possible to
-integrate Vim with R.
+integrate Vim with R. If you want to use Neovim and R, see:
 
-It uses some ideas and code from Johannes Ranke's (vim-r-plugin), Eric Van
-Dewoestine's (screen.vim plugin), Vincent Nijs (R.vim for Mac OS X) and some
-ideas from the Tinn-R (Windows only) project.
+   https://github.com/jalvesaq/Nvim-R
+
+The plugin uses some ideas and code from Johannes Ranke's (vim-r-plugin), Eric
+Van Dewoestine's (screen.vim plugin), Vincent Nijs (R.vim for Mac OS X) and
+some ideas from the Tinn-R (Windows only) project.
 
 The latest stable version of this plugin is available at:
 
@@ -114,25 +116,18 @@ Before installing the plugin, you should install its dependencies:
 
    Depends:~
 
-   Neovim or Vim:
-       Neovim (development version): https://github.com/neovim/neovim
-       Vim >= 7.4: http://www.vim.org/download.php
+   Vim >= 7.4: http://www.vim.org/download.php
 
        Note: The Vim-R-plugin requires Vim compiled with |+libcall|,
 	    |+clientserver| and |+conceal| features. In Normal mode, do
 	    `:version`  to check if your Vim has these features.
 
-	    The Vim-R-plugin only supports the |+clientserver| based on
-	    Windows and X Server. The Macvim |+clientserver| feature is not
-	    supported.
-
-	    There is no special requirement for Neovim.
-
 	    If you need to use the Vim-R-plugin in a Unix system without the
-	    X Server running (e.g. Mac OS X, Linux Console, and any system
-	    accessed through ssh), you have to use Neovim. If you cannot use
-	    Neovim and need to use Vim in these circumstances, please, read
-	    |r-plugin-nox| and |r-plugin-remote|.
+	    X Server running (e.g. Linux Console, and any system accessed
+	    through ssh), you have to use Neovim and Nvim-R:
+	    https://github.com/jalvesaq/Nvim-R
+	    If you cannot use Neovim and need to use Vim in these
+	    circumstances, please, read |r-plugin-nox| and |r-plugin-remote|.
 
    R >= 3.0.0: http://www.r-project.org/
 
@@ -140,7 +135,6 @@ Before installing the plugin, you should install its dependencies:
 
    Tmux >= 1.8:   http://tmux.sourceforge.net
                   Tmux is necessary to send commands from Vim to R Console.
-		  It is optional if you are using Neovim.
 
    wmctrl:     http://tomas.styblo.name/wmctrl/
                Required for better SyncTeX support under X Server.
@@ -150,15 +144,11 @@ Before installing the plugin, you should install its dependencies:
 
    colorout:      http://www.lepem.ufc.br/jaa/colorout.html
                   Colorizes the R output.
-		  Not required if you will run R as a Neovim job. See
-		  |vimrplugin_r_in_buffer|.
 
    setwidth:      An R package that can be installed with the command
                   `install.packages("setwidth")`.
                   The library setwidth adjusts the value of `options("width")`
                   whenever the terminal is resized.
-		  Not required if you will run R as a Neovim job. See
-		  |vimrplugin_r_in_buffer|.
 
    ncurses-term:  http://invisible-island.net/ncurses
 		  Might be necessary if you want support for 256 colors at the
@@ -230,10 +220,10 @@ tips on how to configure Bash.
 The Vim configuration also may be improved. See some tips at
 |r-plugin-vimrc-setup|.
 
-Note: On Mac OS X, in both Vim and GVim, the plugin will use AppleScript to
-send commands to the R Console application unless |vimrplugin_applescript| = 0.
-Some users have reported more luck with iTerm than with the default Mac OS X
-terminal emulator.
+Note: On Mac OS X, the plugin will use AppleScript to send commands to the R
+Console application unless |vimrplugin_applescript| = 0. Some users have
+reported more luck with iTerm than with the default Mac OS X terminal
+emulator.
 
 If you want to uninstall the plugin, do
 >
@@ -780,7 +770,6 @@ other for Tmux. Then, it's useful (but not required) to know some Tmux
 commands. After you finished editing the file, you have to type `exit` to quit
 the Tmux session.
 
-Note: Neovim does not require the --servername VIM argument.
 Note: Starting GVim within a Tmux session is not supported.
 
 
@@ -892,9 +881,6 @@ support in Tmux. You will be able to toggle mouse support on and off by typing
 ------------------------------------------------------------------------------
 							     *r-plugin-remote*
 4.7.2 Remote access~
-
-Note: Neovim does not require the --servername VIM argument. Thus, you also do
-not need to enable the X11 Forwarding for omnicompletion, etc.
 
 The Vim-R-plugin can not send commands from a local Vim to a remote R, but
 you can access the remote machine through ssh and run Tmux, Vim and R in the
@@ -1060,16 +1046,12 @@ it as a push request on github: https://github.com/jcfaria/Vim-R-plugin
 
 ------------------------------------------------------------------------------
 								*r-plugin-nox*
-5.9. Bugs that affect Mac OS X, Linux Console and ...~
+5.9. Bugs that affect Linux Console and Vim accessed through ssh~
 
-Note: The bug described in this section does not affect Neovim.
+If you run Vim in the Linux Console or start Vim in a terminal emulator
+without the command line argument |--servername|, Vim will not receive remote
+messages and the vimcom package will display one of the following messages:
 
-If you use MacVim, run Vim in the Linux Console or start Vim in a terminal
-emulator without the command line argument |--servername|, Vim will not
-receive remote messages and the vimcom package will display one of the
-following messages:
-
-   MacVim isn't fully supported by vimcom.
    Vim was built without the 'clientserver' feature.
    Did you pass the --servername argument to Vim?
    There is no X Server running.
@@ -1104,13 +1086,10 @@ Hat, you may want to create a symbolic link to "gvim" named "vim". You still
 have to explicitly start the server with the argument |--servername|.
 
 The R package vimcom has support only for Windows and X11 interprocess
-communication systems while MacVim is a Cocoa application, that is, vimcom is
-unable to send messages to MacVim. For vimcom, running MacVim is equivalent to
-running Vim without the |clientserver| feature. For this reason, on Mac OS X,
-by default, vimcom is built without support to Vim's |clientserver| feature.
-
-On Mac OS X, to get omnicompletion, syntax highlight of function names and the
-Object Browser working properly, you have to do the following:
+communication systems while MacVim is a Cocoa application. For this reason, on
+Mac OS X, by default, vimcom is built without support to Vim's |clientserver|
+feature. If you prefer to use Vim instead of MacVim in Mac OS X, then, you
+should:
 
    1. Install XQuartz server (X11.app)
 
@@ -1202,7 +1181,6 @@ is running:
 |vimrplugin_term|              External terminal to be used
 |vimrplugin_term_cmd|          Complete command to open an external terminal
 |vimrplugin_Rterm|             On Windows, use Rterm.exe
-|vimrplugin_r_in_buffer|       Run R in Neovim buffer
 |vimrplugin_assign|            Convert '_' into ' <- '
 |vimrplugin_assign_map|        Choose what to convert into ' <- '
 |vimrplugin_rnowebchunk|       Convert '<' into '<<>>=\n@' in Rnoweb files
@@ -1308,71 +1286,6 @@ it.
 
 
 ------------------------------------------------------------------------------
-						      *vimrplugin_r_in_buffer*
-6.3. Run R in Neovim buffer (experimental feature)~
-
-Note: This feature depends the pull request:
-https://github.com/neovim/neovim/pull/1584
-
-If you are running Neovim and want to try this experimental feature, put in
-your |vimrc|:
->
-   let vimrplugin_r_in_buffer = 1
-<
-R will run as a Neovim job and the output will be displayed in a buffer. If
-the cursor is in the last line of the R_Output buffer and Neovim is in Insert
-mode, an <Enter> will submit the line to R evaluation, <C-x><C-o> will
-complete names of objects, <C-x><C-a> will complete the names of function
-arguments, and <Up> and <Down> will cycle through the history of sent
-commands. Finally, if you type part of a previously issued command, you can
-press <C-H> to complete the line from the history.
-
-Whether you are in the R script buffer or in the R_Output buffer, you can also
-press <LocalLeader><LocalLeader> in Normal mode to open an R scratch buffer to
-type commands that you want to see evaluated by R but do not want in your
-final script. The keys <Esc> and <q> are mapped in Normal mode to quit the
-scratch buffer.
-
-The R command `history()` will not work, but you can do `:Rhistory` in Neovim
-to open a buffer with the history of commands in a new tab. Commands starting
-with the string "base::source" are not added to the history.
-
-You can set the foreground colors of R output in your |vimrc| when you are
-running Neovim in a terminal emulator. The example below is for a terminal
-emulator that supports 256 colors (see |highlight-ctermfg|):
->
-   if &t_Co == 256
-       let rout_color_input = 247
-       let rout_color_normal = 39
-       let rout_color_number = 51
-       let rout_color_integer = 51
-       let rout_color_float = 51
-       let rout_color_complex = 51
-       let rout_color_negnum = 183
-       let rout_color_negfloat = 183
-       let rout_color_date = 43
-       let rout_color_true = 78
-       let rout_color_false = 203
-       let rout_color_inf = 39
-       let rout_color_constant = 75
-       let rout_color_string = 79
-       let rout_color_stderr = 33
-       let rout_color_error = 15
-       let rout_color_warn = 1
-       let rout_color_index = 186
-   endif
-<
-To know what number corresponds to your preferred color (among the 256
-possibilities), hover you mouse pointer over the table of colors at the end
-of http://www.lepem.ufc.br/jaa/colorout.html
-
-If you prefer that R output is highlighted using you current |:colorscheme|,
-put in your vimrc:
->
-   let rout_follow_colorscheme = 1
-<
-
-------------------------------------------------------------------------------
 						      *vimrplugin_rnowebchunk*
 	                                              *vimrplugin_assign_map*
                                                       *vimrplugin_assign*
@@ -1468,11 +1381,10 @@ The valid values of vimrplugin_vimpager are:
 
    "tab"       : Show the help document in a new tab. If there is already a
                  tab with an R help document tab, use it.
-                 This is the default if vimrplugin_r_in_buffer = 0.
+                 This is the default.
    "vertical"  : Split the window vertically if the editor width is large
                  enough; otherwise, split the window horizontally and attempt
                  to set the window height to at least 20 lines.
-                 This is the default if vimrplugin_r_in_buffer = 1.
    "horizontal": Split the window horizontally.
    "tabnew"    : Show the help document in a new tab.
    "no"        : Do not show R documentation in Vim.
@@ -2057,23 +1969,6 @@ Note: If the PDF document is already open the first time that you jump to it,
 and if Okular was not started with the `--unique` argument, another instance
 of Okular will be started.
 
-Note: If you are using Neovim, the configuration of Okular backward search
-requires additional steps because Neovim does not have the argument
-`--remote-expr`:
-
-   - Copy the file synctex_okular_backward.sh from the Vim-R-plugin directory
-     to your path (for example, ~/bin or /usr/local/bin).
-
-   - Turn the file executable. In the terminal, go to the directory where you
-     have copied the file and do:
->
-     chmod +x synctex_okular_backward.sh
-<
-   - In Okular, put the following in the Custom Editor Command field:
->
-     synctex_okular_backward.sh '%f' %l
-<
-
 ------------------------------------------------------------------------------
 6.34.3 Zathura configuration~
 
@@ -2314,7 +2209,6 @@ directory after the installation:
    r-plugin/functions.vim
    r-plugin/global_r_plugin.vim
    r-plugin/gui_running.vim
-   r-plugin/nvimbuffer.vim
    r-plugin/osx.vim
    r-plugin/r.snippets
    r-plugin/rmd.snippets
@@ -2825,7 +2719,7 @@ please read this document from the beginning.
 <
 
 							 *r-plugin-bash-setup*
-   ~/.bashrc for Vim and Neovim (Unix):~
+   ~/.bashrc for Vim (Unix):~
 >
    # Change the TERM environment variable (to get 256 colors) and make Vim
    # connecting to X Server even if running in a terminal emulator (many of
@@ -2874,30 +2768,29 @@ Shell or VimShell to send commands to R. This integration was removed on
 August 20, 2013. People wanting this integration back into the plugin may want
 to use the old Vim-R-plugin code as a starting point to create scripts to be
 sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
-See also |vimrplugin_r_in_buffer|.
 
 
 ==============================================================================
 							       *r-plugin-news*
 10. News~
 
-1.1.1 (2014-12-23)
+1.1.1 (2014-12-26)
+
+ * Remove support for Neovim. See: https://github.com/jalvesaq/Nvim-R
+
+ * Remove option vimrplugin_sleeptime.
+
+ * Remove command :RpluginConfig.
 
  * Change commands gn and gN to <LocalLeader>gn and <LocalLeader>gN.
 
- * New option (Neovim only): vimrplugin_r_in_buffer and :Rhistory.
+ * Replace option vimrplugin_external_ob with vimrplugin_tmux_ob.
+
+ * Rename vimrplugin_permanent_libs to vimrplugin_start_libs
 
  * New command: :RStop.
 
  * No longer require +python feature; require +libcall instead.
-
- * Remove option vimrplugin_sleeptime.
-
- * Replace option vimrplugin_external_ob with vimrplugin_tmux_ob.
-
- * Remove command :RpluginConfig.
-
- * Rename vimrplugin_permanent_libs to vimrplugin_start_libs
 
 1.1 (2014-11-13)
 
