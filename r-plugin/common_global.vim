@@ -741,6 +741,15 @@ function StartR(whatr)
 
     if has("gui_macvim") && v:servername != ""
         let $VIMEDITOR_SVRNM = "MacVim_" . v:servername
+        let $VIM_BINARY_PATH = "mvim"
+        " Try to find Vim binary (code adapted from mvim script):
+        for du in [ '~/Applications', '~/Applications/vim', '/Applications', '/Applications/vim', '/Applications/Utilities', '/Applications/Utilities/vim' ]
+            let de = expand(du)
+            if isdirectory(de . "/MacVim.app")
+                let $VIM_BINARY_PATH = de . "/MacVim.app/Contents/MacOS/Vim"
+                break
+            endif
+        endfor
     elseif !has("clientserver")
         let $VIMEDITOR_SVRNM = "NoClientServer"
     elseif v:servername == ""
