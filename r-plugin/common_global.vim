@@ -666,7 +666,7 @@ endfunction
 
 
 function StartR_ExternalTerm(rcmd)
-    if $DISPLAY == "" && !has("gui_macvim")
+    if $DISPLAY == "" && !g:rplugin_is_darwin
         call RWarningMsg("Start 'tmux' before Vim. The X Window system is required to run R in an external terminal.")
         return
     endif
@@ -1117,12 +1117,7 @@ function StartObjBrowser_Vim()
         endif
         let g:rplugin_ob_warn_shown = 1
     else
-        if has("gui_macvim")
-            let wmsg ="MacVim cannot automatically updated the Object Browser."
-            let g:rplugin_ob_warn_shown = 1
-        else
-            call g:SendToVimCom("\002" . v:servername)
-        endif
+        call g:SendToVimCom("\002" . v:servername)
     endif
 
     " Either load or reload the Object Browser
@@ -2255,24 +2250,18 @@ function RSetPDFViewer()
         " Try to guess what PDF viewer is used:
         if has("win32") || has("win64")
             let g:rplugin_pdfviewer = "sumatra"
+        elseif g:rplugin_is_darwin
+            let g:rplugin_pdfviewer = "skim"
         elseif executable("evince")
             let g:rplugin_pdfviewer = "evince"
         elseif executable("okular")
             let g:rplugin_pdfviewer = "okular"
         else
             let g:rplugin_pdfviewer = "none"
-            if has("gui_macvim") || has("gui_mac") || has("mac") || has("macunix")
-                if $R_PDFVIEWER == ""
-                    let pdfvl = ["open"]
-                else
-                    let pdfvl = [$R_PDFVIEWER, "open"]
-                endif
+            if $R_PDFVIEWER == ""
+                let pdfvl = ["xdg-open"]
             else
-                if $R_PDFVIEWER == ""
-                    let pdfvl = ["xdg-open"]
-                else
-                    let pdfvl = [$R_PDFVIEWER, "xdg-open"]
-                endif
+                let pdfvl = [$R_PDFVIEWER, "xdg-open"]
             endif
             " List from R configure script:
             let pdfvl += ["evince", "okular", "zathura", "xpdf", "gv", "gnome-gv", "ggv", "kpdf", "gpdf", "kghostview,", "acroread", "acroread4"]
@@ -2922,16 +2911,7 @@ if !isdirectory(g:rplugin_tmpdir)
     call mkdir(g:rplugin_tmpdir, "p", 0700)
 endif
 
-" Old name of vimrplugin_assign option
-if exists("g:vimrplugin_underscore")
-    " 07/mar/2014:
-    call RWarningMsgInp("The option vimrplugin_underscore is deprecated. Use vimrplugin_assign instead.")
-endif
-
-if exists("g:vimrplugin_openpdf_quietly")
-    " 25/oct/2014
-    call RWarningMsgInp("The option vimrplugin_openpdf_quietly is deprecated.")
-endif
+let g:rplugin_is_darwin = system("uname") =~ "Darwin"
 
 " Variables whose default value is fixed
 call RSetDefaultValue("g:vimrplugin_map_r",             0)
@@ -3047,7 +3027,7 @@ if has('gui_running')
     let g:rplugin_do_tmux_split = 0
 endif
 
-if has("gui_macvim") || has("gui_mac") || has("mac") || has("macunix")
+if g:rplugin_is_darwin
     let g:rplugin_r64app = 0
     if isdirectory("/Applications/R64.app")
         call RSetDefaultValue("g:vimrplugin_applescript", 1)
@@ -3145,7 +3125,7 @@ endif
 if !exists("g:vimrplugin_term")
     let s:terminals = ['gnome-terminal', 'konsole', 'xfce4-terminal', 'terminal',
                 \ 'Eterm', 'rxvt', 'urxvt', 'aterm', 'roxterm', 'terminator', 'lxterminal']
-    if has("mac") || has("macvim") || has("gui_macvim")
+    if g:rplugin_is_darwin
         let s:terminals = ['/Applications/Utilities/iTerm.app/Contents/MacOS/iTerm',
                     \ '/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal',
                     \ 'xterm'] + s:terminals
@@ -3317,4 +3297,8 @@ endif
 
 if exists("g:vimrplugin_permanent_libs")
     call RWarningMsgInp("The option 'vimrplugin_permanent_libs' was renamed to 'vimrplugin_start_libs'. Please, rename it in your vimrc too.")
+endif
+
+if exists("g:vimrplugin_routmorecolors")
+    call RWarningMsgInp("The option 'vimrplugin_routmorecolors' was renamed to 'Rout_more_colors'. Please, rename it in your vimrc too.")
 endif

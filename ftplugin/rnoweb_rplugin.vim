@@ -566,9 +566,8 @@ function! SyncTeX_forward(...)
             silent exe '!start "' . g:rplugin_sumatra_path . '" -reuse-instance -forward-search ' . basenm . '.tex ' . texln . ' -inverse-search "gvim --servername ' . v:servername . " --remote-expr SyncTeX_backward('%f',%l)" . '" "' . basenm . '.pdf"'
         endif
     elseif g:rplugin_pdfviewer == "skim"
-        " This command is based on Skim wiki (not tested)
-        call system("/Applications/Skim.app/Contents/SharedSupport/displayline " . texln . " '" . basenm . ".pdf' '" . basenm . ".tex' 2> /dev/null >/dev/null &")
-        " Now, add the command to raise Skim window (AppleScript)?
+        " This command is based on macvim-skim
+        call system(g:macvim_skim_app_path . '/Contents/SharedSupport/displayline -r ' . texln . ' "' . basenm . '.pdf" "' . basenm . '.tex" 2> /dev/null >/dev/null &')
     else
         call RWarningMsg('SyncTeX support for "' . g:rplugin_pdfviewer . '" not implemented.')
     endif

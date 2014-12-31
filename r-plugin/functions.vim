@@ -1,5 +1,5 @@
+
 if has("nvim")
-    " See https://github.com/jalvesaq/Nvim-R
     finish
 endif
 

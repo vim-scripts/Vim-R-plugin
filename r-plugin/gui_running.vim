@@ -199,7 +199,7 @@ function MakeRMenu()
     if !(has("gui_win32") || has("gui_win64"))
         amenu R.Help\ (plugin).Options.Terminal\ emulator :help vimrplugin_term<CR>
     endif
-    if has("gui_macvim") || has("gui_mac") || has("mac") || has("macunix")
+    if g:rplugin_is_darwin
         amenu R.Help\ (plugin).Options.Integration\ with\ Apple\ Script :help vimrplugin_applescript<CR>
     endif
     if has("gui_win32") || has("gui_win64")
