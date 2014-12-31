@@ -3,12 +3,11 @@
 " Maintainer:	      Jakson Aquino <jalvesaq@gmail.com>
 " Former Maintainers: Vaidotas Zemlys <zemlys@gmail.com>
 " 		      Tom Payne <tom@tompayne.org>
-" Last Change:	      Tue Dec 16, 2014  02:14PM
+" Last Change:	      Wed Dec 31, 2014  12:36AM
 " Filenames:	      *.R *.r *.Rhistory *.Rt
 "
-" NOTE: The highlighting of R functions is defined in the
-" r-plugin/functions.vim, which is part of Vim-R-plugin:
-" http://www.vim.org/scripts/script.php?script_id=2628
+" NOTE: The highlighting of R functions is defined in
+" runtime files created by a filetype plugin, if installed.
 "
 " CONFIGURATION:
 "   syntax folding can be turned on by
@@ -153,9 +152,14 @@ syn match rBraceError "[)}]" contained
 syn match rCurlyError "[)\]]" contained
 syn match rParenError "[\]}]" contained
 
-" Source list of R functions. The list is produced by the Vim-R-plugin
-" http://www.vim.org/scripts/script.php?script_id=2628
-runtime r-plugin/functions.vim
+" Source list of R functions produced by a filetype plugin (if installed)
+if has("nvim")
+  " Nvim-R
+  runtime R/functions.vim
+else
+  " Vim-R-plugin
+  runtime r-plugin/functions.vim
+endif
 
 syn match rDollar display contained "\$"
 syn match rDollar display contained "@"
