@@ -18,7 +18,7 @@ function BuildROmniList()
 
     call delete(g:rplugin_tmpdir . "/vimbol_finished")
     call delete(g:rplugin_tmpdir . "/eval_reply")
-    call g:SendToVimCom("\x08" . $VIMINSTANCEID . omnilistcmd, "I")
+    call SendToVimCom("\x08" . $VIMINSTANCEID . omnilistcmd)
     if g:rplugin_vimcomport == 0
         sleep 500m
         return

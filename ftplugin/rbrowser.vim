@@ -119,19 +119,13 @@ function! RBrowserDoubleClick()
     " Toggle state of list or data.frame: open X closed
     let key = RBrowserGetName(0, 1)
     if g:rplugin_curview == "GlobalEnv"
-        call g:SendToVimCom("\006" . key)
-        if g:rplugin_lastrpl == "R is busy."
-            call RWarningMsg("R is busy.")
-        endif
+        call SendToVimCom("\006" . key)
     else
         let key = substitute(key, '`', '', "g") 
         if key !~ "^package:"
             let key = "package:" . RBGetPkgName() . '-' . key
         endif
-        call g:SendToVimCom("\006" . key)
-        if g:rplugin_lastrpl == "R is busy."
-            call RWarningMsg("R is busy.")
-        endif
+        call SendToVimCom("\006" . key)
     endif
     if v:servername == "" || has("win32") || has("win64")
         sleep 50m " R needs some time to write the file.
@@ -352,7 +346,7 @@ if g:vimrplugin_tmux_ob
         autocmd! ShowMarks
     endif
 else
-    au BufUnload <buffer> call g:SendToVimCom("\004Stop updating info [OB BufUnload].")
+    au BufUnload <buffer> call SendToVimCom("\004Stop updating info [OB BufUnload].")
 endif
 
 let s:envstring = tolower($LC_MESSAGES . $LC_ALL . $LANG)

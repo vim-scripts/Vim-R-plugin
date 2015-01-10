@@ -2210,7 +2210,6 @@ directory after the installation:
    r-plugin/synctex_evince_backward.py
    r-plugin/synctex_evince_forward.py
    r-plugin/synctex_okular_backward.sh
-   r-plugin/windows.py
    r-plugin/windows.vim
    syntax/r.vim
    syntax/rbrowser.vim
@@ -2768,7 +2767,7 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-1.1.1 (2014-12-30)
+1.1.1 (2015-01-10)
 
  * Remove support for Neovim. See: https://github.com/jalvesaq/Nvim-R
 

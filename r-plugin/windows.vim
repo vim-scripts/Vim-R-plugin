@@ -10,6 +10,9 @@ else
     let g:vimrplugin_i386 = 1
 endif
 
+call RSetDefaultValue("g:vimrplugin_sleeptime", 100)
+let g:rplugin_sleeptime = g:vimrplugin_sleeptime . 'm'
+
 if g:vimrplugin_Rterm
     let b:rplugin_R = "Rgui.exe"
 else
@@ -103,26 +106,7 @@ function FindSumatra()
     return 0
 endfunction
 
-function InitializePython()
-    " python3 has priority over python
-    if has("python3")
-        command! -nargs=+ Py :py3 <args>
-        command! -nargs=+ PyFile :py3file <args>
-    elseif has("python")
-        command! -nargs=+ Py :py <args>
-        command! -nargs=+ PyFile :pyfile <args>
-    else
-        command! -nargs=+ Py :
-        command! -nargs=+ PyFile :
-    endif
-    exe "PyFile " . substitute(g:rplugin_home, " ", '\\ ', "g") . '\r-plugin\windows.py'
-    let g:rplugin_python_initialized = 1
-endfunction
-
 function StartR_Windows()
-    if !g:vimrplugin_libcall_send && !g:rplugin_python_initialized
-        call InitializePython()
-    endif
     if string(g:SendCmdToR) != "function('SendCmdToR_fake')"
         let repl = libcall(g:rplugin_vimcom_lib, "IsRRunning", 'No argument')
         if repl =~ "^Yes"
@@ -179,20 +163,13 @@ function SendCmdToR_Windows(cmd)
     else
         let cmd = a:cmd . "\n"
     endif
-    if g:vimrplugin_libcall_send
-        let repl = libcall(g:rplugin_vimcom_lib, "SendToRConsole", cmd)
-        if repl != "OK"
-            call RWarningMsg(repl)
-            call ClearRInfo()
-        endif
-    else
-        let slen = len(cmd)
-        let str = ""
-        for i in range(0, slen)
-            let str = str . printf("\\x%02X", char2nr(cmd[i]))
-        endfor
-        exe "Py" . " SendToRConsole(b'" . str . "')"
+    let repl = libcall(g:rplugin_vimcom_lib, "SendToRConsole", cmd)
+    if repl != "OK"
+        call RWarningMsg(repl)
+        call ClearRInfo()
     endif
+    exe "sleep " . g:rplugin_sleeptime
+    call foreground()
     return 1
 endfunction
 

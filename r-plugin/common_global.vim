@@ -282,7 +282,7 @@ function RCompleteArgs()
                 else
                     let msg = msg . ')'
                 endif
-                call g:SendToVimCom("\x08" . $VIMINSTANCEID . msg, "I")
+                call SendToVimCom("\x08" . $VIMINSTANCEID . msg)
 
                 if g:rplugin_vimcomport > 0
                     let g:rplugin_lastev = ReadEvalReply()
@@ -660,7 +660,7 @@ function StartR_TmuxSplit(rcmd)
         call system("tmux rename-window " . g:vimrplugin_tmux_title)
     endif
     if WaitVimComStart()
-        call g:SendToVimCom("\005B Update OB [StartR]")
+        call SendToVimCom("\005B Update OB [StartR]")
     endif
 endfunction
 
@@ -719,7 +719,7 @@ function StartR_ExternalTerm(rcmd)
     endif
     let g:SendCmdToR = function('SendCmdToR_Term')
     if WaitVimComStart()
-        call g:SendToVimCom("\005B Update OB [StartR]")
+        call SendToVimCom("\005B Update OB [StartR]")
     endif
 endfunction
 
@@ -737,8 +737,6 @@ endfunction
 
 " Start R
 function StartR(whatr)
-    let g:SendToVimCom = function("SendToVimCom_Vim")
-
     if has("gui_macvim") && v:servername != ""
         let $VIMEDITOR_SVRNM = "MacVim_" . v:servername
         let $VIM_BINARY_PATH = "mvim"
@@ -816,9 +814,9 @@ function StartR(whatr)
                         call g:SendCmdToR("\014")
                     endif
                     call VimExprToOB('ResetVimComPort()')
-                    call g:SendToVimCom("\002" . g:rplugin_obsname)
-                    call g:SendToVimCom("\005G .GlobalEnv [Restarting R]")
-                    call g:SendToVimCom("\005L Libraries [Restarting()]")
+                    call SendToVimCom("\002" . g:rplugin_obsname)
+                    call SendToVimCom("\005G .GlobalEnv [Restarting R]")
+                    call SendToVimCom("\005L Libraries [Restarting()]")
                     " vimcom automatically update the libraries view, but not
                     " the GlobalEnv one because vimcom_count_objects() returns 0.
                     call VimExprToOB('UpdateOB("GlobalEnv")')
@@ -850,9 +848,9 @@ function StartR(whatr)
         call StartR_ExternalTerm(rcmd)
         if g:vimrplugin_restart && bufloaded(b:objbrtitle)
             call WaitVimComStart()
-            call g:SendToVimCom("\002" . v:servername)
-            call g:SendToVimCom("\005G .GlobalEnv [Restarting R]")
-            call g:SendToVimCom("\005L Libraries [Restarting()]")
+            call SendToVimCom("\002" . v:servername)
+            call SendToVimCom("\005G .GlobalEnv [Restarting R]")
+            call SendToVimCom("\005L Libraries [Restarting()]")
             if exists("*UpdateOB")
                 call UpdateOB("GlobalEnv")
             endif
@@ -919,8 +917,8 @@ function WaitVimComStart()
         let g:rplugin_vimcom_home = vr[1]
         let g:rplugin_vimcomport = vr[2]
         let g:rplugin_r_pid = vr[3]
-        if g:rplugin_vimcom_version != "1.1.16"
-            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.1.16.')
+        if g:rplugin_vimcom_version != "1.1.17"
+            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.1.17.')
             sleep 1
         endif
         if has("win32")
@@ -975,9 +973,9 @@ function StartObjBrowser_Tmux()
 
     let g:RBrOpenCloseLs = function("RBrOpenCloseLs_TmuxVim")
 
-    call g:SendToVimCom("\005G GlobalEnv [OB StartObjBrowser_Tmux]")
+    call SendToVimCom("\005G GlobalEnv [OB StartObjBrowser_Tmux]")
     sleep 50m
-    call g:SendToVimCom("\005L Libraries [OB StartObjBrowser_Tmux]")
+    call SendToVimCom("\005L Libraries [OB StartObjBrowser_Tmux]")
     sleep 50m
 
     " Don't start the Object Browser if it already exists
@@ -1013,10 +1011,9 @@ function StartObjBrowser_Tmux()
                 \ 'set noruler',
                 \ 'let g:SendCmdToR = function("SendCmdToR_TmuxSplit")',
                 \ 'let g:RBrOpenCloseLs = function("RBrOpenCloseLs_TmuxOB")',
-                \ 'let g:SendToVimCom = function("SendToVimCom_Vim")',
                 \ 'if has("clientserver") && v:servername != ""',
                 \ '    let g:rplugin_vimcomport = ' . g:rplugin_vimcomport,
-                \ '    call g:SendToVimCom("\002" . v:servername)',
+                \ '    call SendToVimCom("\002" . v:servername)',
                 \ 'endif',
                 \ 'sleep 150m',
                 \ 'call UpdateOB("GlobalEnv")', ], objbrowserfile)
@@ -1117,7 +1114,7 @@ function StartObjBrowser_Vim()
         endif
         let g:rplugin_ob_warn_shown = 1
     else
-        call g:SendToVimCom("\002" . v:servername)
+        call SendToVimCom("\002" . v:servername)
     endif
 
     " Either load or reload the Object Browser
@@ -1153,7 +1150,7 @@ function StartObjBrowser_Vim()
         unlet g:tmp_objbrtitle
         unlet g:tmp_tmuxsname
         unlet g:tmp_curbufname
-        call g:SendToVimCom("\005B Update OB [OB init GVIM]")
+        call SendToVimCom("\005B Update OB [OB init GVIM]")
         sleep 50m
         call UpdateOB("GlobalEnv")
     endif
@@ -1223,7 +1220,7 @@ function RBrOpenCloseLs_Vim(status)
 
     " Avoid possibly freezing cross messages between Vim and R
     if exists("g:rplugin_curview") && v:servername != ""
-        call g:SendToVimCom("\005Stop updating info [RBrOpenCloseLs()]")
+        call SendToVimCom("\005Stop updating info [RBrOpenCloseLs()]")
         let stt = a:status
     else
         let stt = a:status + 2
@@ -1237,11 +1234,7 @@ function RBrOpenCloseLs_Vim(status)
         let switchedbuf = 1
     endif
 
-    call g:SendToVimCom("\007" . stt)
-
-    if g:rplugin_lastrpl == "R is busy."
-        call RWarningMsg("R is busy.")
-    endif
+    call SendToVimCom("\007" . stt)
 
     if switchedbuf
         exe "sil noautocmd sb " . g:rplugin_curbuf
@@ -1250,7 +1243,7 @@ function RBrOpenCloseLs_Vim(status)
     if exists("g:rplugin_curview")
         call UpdateOB("both")
         if v:servername != ""
-            call g:SendToVimCom("\002" . v:servername)
+            call SendToVimCom("\002" . v:servername)
         endif
     endif
 endfunction
@@ -1270,11 +1263,7 @@ function RBrOpenCloseLs_TmuxVim(status)
         endif
     endif
 
-    call g:SendToVimCom("\007" . a:status)
-
-    if g:rplugin_lastrpl == "R is busy."
-        call RWarningMsg("R is busy.")
-    endif
+    call SendToVimCom("\007" . a:status)
 endfunction
 
 function RBrOpenCloseLs_TmuxOB(status)
@@ -1286,7 +1275,7 @@ function RBrOpenCloseLs_TmuxOB(status)
         normal! :<Esc>
         return
     endif
-    call g:SendToVimCom("\007" . a:status)
+    call SendToVimCom("\007" . a:status)
     if v:servername == ""
         call UpdateOB("both")
     endif
@@ -1308,7 +1297,7 @@ function RFormatCode() range
         let wco = 180
     endif
     call delete(g:rplugin_tmpdir . "/eval_reply")
-    call g:SendToVimCom("\x08" . $VIMINSTANCEID . 'formatR::tidy_source("' . g:rplugin_tmpdir . '/unformatted_code", file = "' . g:rplugin_tmpdir . '/formatted_code", width.cutoff = ' . wco . ')', "I")
+    call SendToVimCom("\x08" . $VIMINSTANCEID . 'formatR::tidy_source("' . g:rplugin_tmpdir . '/unformatted_code", file = "' . g:rplugin_tmpdir . '/formatted_code", width.cutoff = ' . wco . ')')
     let g:rplugin_lastev = ReadEvalReply()
     if g:rplugin_lastev == "R is busy." || g:rplugin_lastev == "UNKNOWN" || g:rplugin_lastev =~ "^Error" || g:rplugin_lastev == "INVALID" || g:rplugin_lastev == "ERROR" || g:rplugin_lastev == "EMPTY" || g:rplugin_lastev == "No reply"
         call RWarningMsg(g:rplugin_lastev)
@@ -1327,21 +1316,20 @@ function RInsert(cmd)
 
     call delete(g:rplugin_tmpdir . "/eval_reply")
     call delete(g:rplugin_tmpdir . "/Rinsert")
-    call g:SendToVimCom("\x08" . $VIMINSTANCEID . 'capture.output(' . a:cmd . ', file = "' . g:rplugin_tmpdir . '/Rinsert")')
+    call SendToVimCom("\x08" . $VIMINSTANCEID . 'capture.output(' . a:cmd . ', file = "' . g:rplugin_tmpdir . '/Rinsert")')
     let g:rplugin_lastev = ReadEvalReply()
     if g:rplugin_lastev == "R is busy." || g:rplugin_lastev == "UNKNOWN" || g:rplugin_lastev =~ "^Error" || g:rplugin_lastev == "INVALID" || g:rplugin_lastev == "ERROR" || g:rplugin_lastev == "EMPTY" || g:rplugin_lastev == "No reply"
         call RWarningMsg(g:rplugin_lastev)
+        return 0
     else
         silent exe "read " . substitute(g:rplugin_tmpdir, ' ', '\\ ', 'g') . "/Rinsert"
+        return 1
     endif
 endfunction
 
 function SendLineToRAndInsertOutput()
     let lin = getline(".")
-    call RInsert("print(" . lin . ")")
-    if g:rplugin_lastrpl == "R is busy." || g:rplugin_lastrpl == "UNKNOWN" || g:rplugin_lastrpl =~ "^Error" || g:rplugin_lastrpl == "INVALID" || g:rplugin_lastrpl == "ERROR" || g:rplugin_lastrpl == "EMPTY" || g:rplugin_lastrpl == "No reply"
-        return
-    else
+    if RInsert("print(" . lin . ")")
         let curpos = getpos(".")
         " comment the output
         let ilines = readfile(substitute(g:rplugin_tmpdir, ' ', '\\ ', 'g') . "/Rinsert")
@@ -1854,7 +1842,7 @@ function RClearConsole()
     if (has("win32") || has("win64"))
         if g:vimrplugin_libcall_send
             if !g:vimrplugin_Rterm
-                let repl = libcall(g:rplugin_vimcom_lib, "RClearConsole()", "Rgui")
+                let repl = libcall(g:rplugin_vimcom_lib, "RClearConsole", "Rgui")
             endif
         else
             Py RClearConsolePy()
@@ -2141,7 +2129,7 @@ function AskRDoc(rkeyword, package, getclass)
         let rcmd = 'vimcom:::vim.help("' . a:rkeyword . '", ' . g:rplugin_htw . 'L, ' . classfor . ')'
     endif
 
-    call g:SendToVimCom("\x08" . $VIMINSTANCEID . rcmd, "I")
+    call SendToVimCom("\x08" . $VIMINSTANCEID . rcmd)
 endfunction
 
 " This function is called by vimcom
@@ -2975,13 +2963,13 @@ unlet obpllen
 function RSetMyPort(p)
     let g:rplugin_myport = a:p
     if &filetype == "rbrowser"
-        call g:SendToVimCom("\002" . a:p)
-        call g:SendToVimCom("\005B Update OB [RSetMyPort]")
+        call SendToVimCom("\002" . a:p)
+        call SendToVimCom("\005B Update OB [RSetMyPort]")
     endif
 endfunction
 
 function SendObjPortToVimCom(p)
-    call g:SendToVimCom("\002" . a:p)
+    call SendToVimCom("\002" . a:p)
 endfunction
 
 function ROnJobActivity()
@@ -3001,7 +2989,7 @@ function ROnJobActivity()
     endif
 endfunction
 
-function SendToVimCom_Vim(...)
+function SendToVimCom(...)
     if g:rplugin_vimcomport == 0
         call RWarningMsg("VimCom port is unknown.")
         return
@@ -3224,7 +3212,6 @@ let g:rplugin_myport = 0
 let g:rplugin_vimcomport = 0
 let g:rplugin_vimcom_home = ""
 let g:rplugin_vimcom_version = 0
-let g:rplugin_lastrpl = ""
 let g:rplugin_lastev = ""
 let g:rplugin_last_r_prompt = ""
 let g:rplugin_hasRSFbutton = 0
