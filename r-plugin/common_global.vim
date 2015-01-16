@@ -917,8 +917,8 @@ function WaitVimComStart()
         let g:rplugin_vimcom_home = vr[1]
         let g:rplugin_vimcomport = vr[2]
         let g:rplugin_r_pid = vr[3]
-        if g:rplugin_vimcom_version != "1.1.17"
-            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.1.17.')
+        if g:rplugin_vimcom_version != "1.1.18"
+            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.1.18.')
             sleep 1
         endif
         if has("win32")
@@ -1152,7 +1152,6 @@ function StartObjBrowser_Vim()
         unlet g:tmp_curbufname
         call SendToVimCom("\005B Update OB [OB init GVIM]")
         sleep 50m
-        call UpdateOB("GlobalEnv")
     endif
     if wmsg != ""
         call RWarningMsg(wmsg)
@@ -1220,7 +1219,6 @@ function RBrOpenCloseLs_Vim(status)
 
     " Avoid possibly freezing cross messages between Vim and R
     if exists("g:rplugin_curview") && v:servername != ""
-        call SendToVimCom("\005Stop updating info [RBrOpenCloseLs()]")
         let stt = a:status
     else
         let stt = a:status + 2
@@ -1239,12 +1237,6 @@ function RBrOpenCloseLs_Vim(status)
     if switchedbuf
         exe "sil noautocmd sb " . g:rplugin_curbuf
         exe "set switchbuf=" . savesb
-    endif
-    if exists("g:rplugin_curview")
-        call UpdateOB("both")
-        if v:servername != ""
-            call SendToVimCom("\002" . v:servername)
-        endif
     endif
 endfunction
 
@@ -2345,7 +2337,7 @@ function ROpenPDF(path)
             exe "cd " . substitute(olddir, ' ', '\\ ', 'g')
             return
         elseif g:rplugin_pdfviewer == "sumatra" && (g:rplugin_sumatra_path != "" || FindSumatra())
-            silent exe '!start "' . g:rplugin_sumatra_path . '" -reuse-instance -inverse-search "gvim --servername ' . v:servername . " --remote-expr SyncTeX_backward('%f',%l)" . '" "' . basenm . '.pdf"'
+            silent exe '!start "' . g:rplugin_sumatra_path . '" -reuse-instance -inverse-search "vim --servername ' . v:servername . " --remote-expr SyncTeX_backward('\\%f',\\%l)" . '" "' . basenm . '.pdf"'
             exe "cd " . substitute(olddir, ' ', '\\ ', 'g')
             return
         else
@@ -3074,12 +3066,6 @@ if !has("win32") && !has("win64") && !has("gui_win32") && !has("gui_win64") && !
         finish
     endif
     unlet s:tmuxversion
-endif
-
-if executable("latexmk")
-    let g:rplugin_has_latexmk = 1
-else
-    let g:rplugin_has_latexmk = 0
 endif
 
 " Start with an empty list of objects in the workspace

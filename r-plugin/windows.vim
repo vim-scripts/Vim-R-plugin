@@ -3,13 +3,6 @@
 let g:rplugin_sumatra_path = ""
 let g:rplugin_python_initialized = 0
 
-" Vim and R must have the same architecture
-if has("win64")
-    let g:vimrplugin_i386 = 0
-else
-    let g:vimrplugin_i386 = 1
-endif
-
 call RSetDefaultValue("g:vimrplugin_sleeptime", 100)
 let g:rplugin_sleeptime = g:vimrplugin_sleeptime . 'm'
 

@@ -13,6 +13,14 @@ endif
 " after the global ones:
 runtime r-plugin/common_buffer.vim
 
+if !exists("g:rplugin_has_latexmk")
+  if executable("latexmk") && executable("perl")
+    let g:rplugin_has_latexmk = 1
+  else
+    let g:rplugin_has_latexmk = 0
+  endif
+endif
+
 function! RWriteChunk()
     if getline(".") =~ "^\\s*$" && RnwIsInRCode(0) == 0
         call setline(line("."), "<<>>=")
@@ -563,7 +571,7 @@ function! SyncTeX_forward(...)
         call system("wmctrl -a '" . basenm . ".pdf'")
     elseif g:rplugin_pdfviewer == "sumatra"
         if g:rplugin_sumatra_path != "" || FindSumatra()
-            silent exe '!start "' . g:rplugin_sumatra_path . '" -reuse-instance -forward-search ' . basenm . '.tex ' . texln . ' -inverse-search "gvim --servername ' . v:servername . " --remote-expr SyncTeX_backward('%f',%l)" . '" "' . basenm . '.pdf"'
+            silent exe '!start "' . g:rplugin_sumatra_path . '" -reuse-instance -forward-search ' . basenm . '.tex ' . texln . ' -inverse-search "vim --servername ' . v:servername . " --remote-expr SyncTeX_backward('\\%f',\\%l)" . '" "' . basenm . '.pdf"'
         endif
     elseif g:rplugin_pdfviewer == "skim"
         " This command is based on macvim-skim
