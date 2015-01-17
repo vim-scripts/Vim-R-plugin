@@ -50,7 +50,3 @@ function SendCmdToR_OSX(cmd)
     return 1
 endfunction
 
-if !exists(g:macvim_skim_app_path)
-    let g:macvim_skim_app_path = '/Applications/Skim.app'
-endif
-

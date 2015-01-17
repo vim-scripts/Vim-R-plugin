@@ -13,12 +13,17 @@ endif
 " after the global ones:
 runtime r-plugin/common_buffer.vim
 
+if has("win32") || has("win64")
+    call RSetDefaultValue("g:vimrplugin_latexmk", 0)
+else
+    call RSetDefaultValue("g:vimrplugin_latexmk", 1)
+endif
 if !exists("g:rplugin_has_latexmk")
-  if executable("latexmk") && executable("perl")
-    let g:rplugin_has_latexmk = 1
-  else
-    let g:rplugin_has_latexmk = 0
-  endif
+    if g:vimrplugin_latexmk && executable("latexmk") && executable("perl")
+	let g:rplugin_has_latexmk = 1
+    else
+	let g:rplugin_has_latexmk = 0
+    endif
 endif
 
 function! RWriteChunk()
@@ -438,9 +443,14 @@ function! SyncTeX_backward(fname, ln)
     let rnwbn = substitute(rnwf, '.*/', '', '')
     let rnwf = substitute(rnwf, '^\./', '', '')
 
-    if GoToBuf(rnwbn, rnwf, basedir, rnwln) && g:rplugin_has_wmctrl
+    if GoToBuf(rnwbn, rnwf, basedir, rnwln)
+	if g:rplugin_has_wmctrl
         call system("wmctrl -xa " . g:vimrplugin_vim_window)
+	elseif has("gui_running")
+	    call foreground()
     endif
+    endif
+
 endfunction
 
 function! SyncTeX_forward(...)

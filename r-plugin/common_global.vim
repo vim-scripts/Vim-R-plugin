@@ -699,11 +699,20 @@ function StartR_ExternalTerm(rcmd)
 
     call system("tmux has-session -t " . g:rplugin_tmuxsname)
     if v:shell_error
-        if g:rplugin_termcmd =~ "gnome-terminal" || g:rplugin_termcmd =~ "xfce4-terminal" || g:rplugin_termcmd =~ "terminal" || g:rplugin_termcmd =~ "iterm"
-            let opencmd = printf("%s 'tmux -2 %s new-session -s %s \"%s\"' &", g:rplugin_termcmd, tmuxcnf, g:rplugin_tmuxsname, rcmd)
-        else
-            let opencmd = printf("%s tmux -2 %s new-session -s %s \"%s\" &", g:rplugin_termcmd, tmuxcnf, g:rplugin_tmuxsname, rcmd)
-        endif
+	if g:rplugin_is_darwin
+	    let $VIM_BINARY_PATH = substitute($VIMRUNTIME, "/MacVim.app/Contents/.*", "", "") . "/MacVim.app/Contents/MacOS/Vim"
+	    let rcmd = "VIM_BINARY_PATH=" . substitute($VIM_BINARY_PATH, ' ', '\\ ', 'g') . ' TERM=screen-256color ' . rcmd
+	    let opencmd = printf("tmux -2 %s new-session -s %s '%s'", tmuxcnf, g:rplugin_tmuxsname, rcmd)
+	    call writefile(["#!/bin/sh", opencmd], $VIMRPLUGIN_TMPDIR . "/openR")
+	    call system("chmod +x '" . $VIMRPLUGIN_TMPDIR . "/openR'")
+	    let opencmd = "open '" . $VIMRPLUGIN_TMPDIR . "/openR'"
+	else
+	    if g:rplugin_termcmd =~ "gnome-terminal" || g:rplugin_termcmd =~ "xfce4-terminal" || g:rplugin_termcmd =~ "terminal" || g:rplugin_termcmd =~ "iterm"
+		let opencmd = printf("%s 'tmux -2 %s new-session -s %s \"%s\"' &", g:rplugin_termcmd, tmuxcnf, g:rplugin_tmuxsname, rcmd)
+	    else
+		let opencmd = printf("%s tmux -2 %s new-session -s %s \"%s\" &", g:rplugin_termcmd, tmuxcnf, g:rplugin_tmuxsname, rcmd)
+	    endif
+	endif
     else
         if g:rplugin_termcmd =~ "gnome-terminal" || g:rplugin_termcmd =~ "xfce4-terminal" || g:rplugin_termcmd =~ "terminal" || g:rplugin_termcmd =~ "iterm"
             let opencmd = printf("%s 'tmux -2 %s attach-session -d -t %s' &", g:rplugin_termcmd, tmuxcnf, g:rplugin_tmuxsname)
@@ -739,15 +748,7 @@ endfunction
 function StartR(whatr)
     if has("gui_macvim") && v:servername != ""
         let $VIMEDITOR_SVRNM = "MacVim_" . v:servername
-        let $VIM_BINARY_PATH = "mvim"
-        " Try to find Vim binary (code adapted from mvim script):
-        for du in [ '~/Applications', '~/Applications/vim', '/Applications', '/Applications/vim', '/Applications/Utilities', '/Applications/Utilities/vim' ]
-            let de = expand(du)
-            if isdirectory(de . "/MacVim.app")
-                let $VIM_BINARY_PATH = de . "/MacVim.app/Contents/MacOS/Vim"
-                break
-            endif
-        endfor
+	let $VIM_BINARY_PATH = substitute($VIMRUNTIME, "/MacVim.app/Contents/.*", "", "") . "/MacVim.app/Contents/MacOS/Vim"
     elseif !has("clientserver")
         let $VIMEDITOR_SVRNM = "NoClientServer"
     elseif v:servername == ""
@@ -917,8 +918,8 @@ function WaitVimComStart()
         let g:rplugin_vimcom_home = vr[1]
         let g:rplugin_vimcomport = vr[2]
         let g:rplugin_r_pid = vr[3]
-        if g:rplugin_vimcom_version != "1.1.18"
-            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.1.18.')
+        if g:rplugin_vimcom_version != "1.1.19"
+            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.1.19.')
             sleep 1
         endif
         if has("win32")
@@ -1048,7 +1049,14 @@ function StartObjBrowser_Tmux()
         let obsname = " "
     endif
 
-    let cmd = "tmux split-window -h -l " . panewidth . " -t " . obpane . ' "vim ' . obsname . " -c 'source " . substitute(objbrowserfile, ' ', '\\ ', 'g') . "'" . '"'
+    if g:rplugin_is_darwin && has("gui_macvim")
+	let vimexec = substitute($VIMRUNTIME, "/MacVim.app/Contents/.*", "", "") . "/MacVim.app/Contents/MacOS/Vim"
+        let vimexec = substitute(vimexec, ' ', '\\ ', 'g')
+    else
+        let vimexec = "vim"
+    endif
+
+    let cmd = "tmux split-window -h -l " . panewidth . " -t " . obpane . ' "' . vimexec . ' ' . obsname . " -c 'source " . substitute(objbrowserfile, ' ', '\\ ', 'g') . "'" . '"'
     let rlog = system(cmd)
     if v:shell_error
         let rlog = substitute(rlog, '\n', ' ', 'g')
@@ -2340,10 +2348,12 @@ function ROpenPDF(path)
             silent exe '!start "' . g:rplugin_sumatra_path . '" -reuse-instance -inverse-search "vim --servername ' . v:servername . " --remote-expr SyncTeX_backward('\\%f',\\%l)" . '" "' . basenm . '.pdf"'
             exe "cd " . substitute(olddir, ' ', '\\ ', 'g')
             return
+	elseif g:rplugin_pdfviewer == "skim"
+	    call system(g:macvim_skim_app_path . '/Contents/MacOS/Skim "' . basenm . '.pdf" 2> /dev/null >/dev/null &')
         else
             let pcmd = g:rplugin_pdfviewer . " '" . pdfpath . "' 2>/dev/null >/dev/null &"
-        endif
         call system(pcmd)
+        endif
         if g:rplugin_has_wmctrl
             call system("wmctrl -a '" . basenm . ".pdf'")
         endif
@@ -2877,7 +2887,11 @@ else
         let g:rplugin_tmpdir = substitute(g:rplugin_tmpdir, "\\", "/", "g")
     else
         if isdirectory($TMPDIR)
+	    if $TMPDIR =~ "/$"
+		let g:rplugin_tmpdir = $TMPDIR . "r-plugin-" . g:rplugin_userlogin
+	    else
             let g:rplugin_tmpdir = $TMPDIR . "/r-plugin-" . g:rplugin_userlogin
+	    endif
         elseif isdirectory("/tmp")
             let g:rplugin_tmpdir = "/tmp/r-plugin-" . g:rplugin_userlogin
         else
@@ -2901,7 +2915,7 @@ call RSetDefaultValue("g:vimrplugin_assign",            1)
 call RSetDefaultValue("g:vimrplugin_assign_map",    "'_'")
 call RSetDefaultValue("g:vimrplugin_rnowebchunk",       1)
 call RSetDefaultValue("g:vimrplugin_strict_rst",        1)
-call RSetDefaultValue("g:vimrplugin_openpdf",           0)
+call RSetDefaultValue("g:vimrplugin_openpdf",           2)
 call RSetDefaultValue("g:vimrplugin_synctex",           1)
 call RSetDefaultValue("g:vimrplugin_openhtml",          0)
 call RSetDefaultValue("g:vimrplugin_Rterm",             0)
@@ -3016,6 +3030,9 @@ if g:rplugin_is_darwin
         call RSetDefaultValue("g:vimrplugin_applescript", 1)
     else
         call RSetDefaultValue("g:vimrplugin_applescript", 0)
+    endif
+    if !exists("g:macvim_skim_app_path")
+        let g:macvim_skim_app_path = '/Applications/Skim.app'
     endif
 else
     let g:vimrplugin_applescript = 0
