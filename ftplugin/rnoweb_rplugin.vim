@@ -176,10 +176,6 @@ function! RMakePDF(bibtex, knit)
         let pdfcmd = pdfcmd . ", bibtex = TRUE"
     endif
 
-    if a:bibtex == "verbose"
-        let pdfcmd = pdfcmd . ", quiet = FALSE"
-    endif
-
     if g:vimrplugin_openpdf == 0
         let pdfcmd = pdfcmd . ", view = FALSE"
     else

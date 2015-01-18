@@ -97,25 +97,103 @@ For screenshots see: http://www.lepem.ufc.br/jaa/vim-r-plugin.html
 						       *r-plugin-installation*
 3. Installation~
 
-The installation instructions are split in four sections:
+The installation instructions are split in six sections:
 
-   1. Instructions specific for Unix/Linux/OSX
-   2. Instructions specific for Windows
-   3. Troubleshooting
-   4. Optional steps
+   3.1. Preliminary system setup on Windows
+   3.2. Preliminary system setup on Mac OS X
+   3.3. Preliminary system setup on Unix
+   3.4. Plugin installation
+   3.5. Troubleshooting
+   3.6. Optional steps
+
 
 ------------------------------------------------------------------------------
-3.1. Instructions for Unix (Linux, OS X, etc.)~
+3.1. Preliminary system setup on Windows~
 
-If you are using Windows, jump to section 3.2.
+Before installing the plugin, you should install several external
+dependencies:
+
+    * R's version must be >= 3.0.0: http://www.r-project.org/
+
+    * vimcom = 1.2-0: http://www.lepem.ufc.br/jaa/vimcom.html
+
+      Note: If you cannot build vimcom yourself, you will want to
+      download and install the zip file.
+
+    * Vim's version must be >= 7.4: http://www.vim.org/download.php
+
+    * Only if you write Rnoweb code:
+
+       * Sumatra PDF viewer >= 3.0.
+
+       * MikTeX or other LaTeX distribution.
+
+       * Perl (required to run `latexmk`).
+
+Add the following lines to your `Rprofile`:
+>
+   options(vimcom.verbose = 1)
+   library(vimcom)
+<
+If you do not know where your .Rprofile is, do the following command in R
+Console to open it:
+>
+   edit(file = "~/.Rprofile")
+<
+
+------------------------------------------------------------------------------
+3.2. Preliminary system setup on Mac OS X~
 
 Before installing the plugin, you should install its dependencies:
 
    Depends:~
 
-   Vim, GVim or MacVim >= 7.4: http://www.vim.org/download.php
+   Cocoa MacVim >= 7.4: https://code.google.com/p/macvim
 
-       Note: The Vim-R-plugin requires Vim compiled with |+libcall|,
+   R >= 3.0.0: http://www.r-project.org/
+
+   vimcom = 1.2-0: http://www.lepem.ufc.br/jaa/vimcom.html
+
+   Only if you edit Rnoweb files: MacTeX, BasicTeX or other LaTeX system.
+
+If you want to call R.app from MacVim, put in your `~/.Rprofile`:
+>
+   if(interactive()){
+       options(vimcom.verbose = 1) # optional
+       library(vimcom)
+   }
+<
+On Mac OS X, the plugin will use AppleScript to send commands to the R Console
+application unless |vimrplugin_applescript| = 0. In this case, R will run in a
+external terminal emulator. The advantage of running R in a terminal emulator
+is that its output can be colorized by the R package "colorout". If you want
+to try this configuration, install Tmux and the R packages "setwidth" and
+"colorout" (see instructions in section 3.3) and put in your `~/.Rprofile`:
+>
+   if(interactive()){
+       library(colorout)
+       library(setwidth)
+       options(vimcom.verbose = 1) # optional
+       library(vimcom)
+   }
+<
+Note: The plugin is fully functional with MacVim, but the Vim application that
+comes with MacVim does not have the the server side of the 'clientserver'
+feature which is required to have the plugin working properly. If you want to
+run both Vim and R in the same Tmux window in a terminal emulator, you have to
+follow the instructions from section 3.3.
+
+
+------------------------------------------------------------------------------
+3.3. Preliminary system setup on Unix~
+
+Before installing the plugin, you should install its dependencies:
+
+   Depends:~
+
+   Vim, GVim >= 7.4: http://www.vim.org/download.php
+
+      Note: The Vim-R-plugin requires Vim compiled with |+libcall|,
 	    |+clientserver| and |+conceal| features. In Normal mode, do
 	    `:version`  to check if your Vim has these features.
 
@@ -159,7 +237,7 @@ Before installing the plugin, you should install its dependencies:
    installation instructions vary widely and are beyond the scope of this
    documentation.
 
-Put the following lines in your `~/Rprofile`:
+Put the following lines in your `~/.Rprofile`:
 >
    if(interactive()){
        library(colorout)
@@ -168,6 +246,28 @@ Put the following lines in your `~/Rprofile`:
        library(vimcom)
    }
 <
+Put the following in your `~/.bashrc`:
+>
+   alias vim="vim --servername VIM"
+<
+Before proceeding, you have to start a new shell session to have the alias
+enabled.
+
+If you start either GVim or Vim in a terminal emulator the plugin will start R
+in a external terminal emulator. If you start Vim inside of a Tmux session,
+the plugin will split the Tmux window in two and start R in the other pane.
+
+The recommended way of running the plugin on Linux is running Vim inside a
+Tmux session. Please, read |r-plugin-tmux| for details.
+
+If you run Vim in a terminal emulator, it must be started with the argument
+|--servername|. Please, read the section |r-plugin-bash-setup| to know some
+tips on how to configure Bash.
+
+
+------------------------------------------------------------------------------
+3.4. Plugin installation (instructions for all systems)~
+
 You need to activate plugins and indentation according to 'filetype'. You
 should have at least the following options at the top or at near the very top
 of your |vimrc| (but below `set` `runtimepath`, if you have set it):
@@ -181,8 +281,10 @@ Download the latest version of the plugin from:
 
     http://www.vim.org/scripts/script.php?script_id=2628
 
-Start a terminal emulator, go to the directory where you have downloaded the
-plugin and type:
+If you either are on Windows or prefer to use a graphical interface, start the
+file manager, find the file `Vim-R-plugin.vmb` and open it with GVim or
+MacVim. Otherwise, start a terminal emulator, go to the directory where you
+have downloaded the plugin and type:
 >
    vim Vim-R-plugin.vmb
 <
@@ -190,9 +292,8 @@ Then, in Vim, type:
 >
    :so %
 <
-Press <Enter> and the plugin will be installed (because the plugin has many
-files, you have to press the space bar a few times to finish the
-installation). You should, then, quit Vim.
+Press <Enter> to start the installation and press the <Space> bar as many
+times as necessary to finish the installation. You should, then, quit Vim.
 
 Note: If you need to install the plugin in a non default directory, do
 `:UseVimball` `[path]`. In this case, the configuration of Vim's 'runtimepath'
@@ -200,107 +301,18 @@ must be done before the command "filetype on" in both the system and the user
 |vimrc| files, otherwise, some file types might not be correctly recognized.
 
 The plugin is installed and will be activated next time that you start to edit
-an R script. But you still can improve the plugin performance if you do
-additional configuration mentioned in the paragraphs below.
+an R script.
 
-If you start either GVim or Vim in a terminal emulator the plugin will start R
-in a external terminal emulator. If you start Vim inside of a Tmux session,
-the plugin will split the Tmux window in two and start R in the other pane.
-
-The recommended way of running the plugin on Linux is running Vim inside a
-Tmux session. Please, read |r-plugin-tmux| for details.
-
-If you run Vim in a terminal emulator, it must be started with the argument
-|--servername|. Please, read the section |r-plugin-bash-setup| to know some
-tips on how to configure Bash.
-
-The Vim configuration also may be improved. See some tips at
-|r-plugin-vimrc-setup|.
-
-Note: On Mac OS X, the plugin will use AppleScript to send commands to the R
-Console application unless |vimrplugin_applescript| = 0. Some users have
-reported more luck with iTerm than with the default Mac OS X terminal
-emulator.
-
-If you want to uninstall the plugin, do
->
-   :RmVimball Vim-R-plugin
-<
-
-------------------------------------------------------------------------------
-3.2. Instructions for Windows ~
-
-Before installing the plugin, you should install several external
-dependencies:
-
-    * R's version must be >= 3.0.0: http://www.r-project.org/
-
-    * vimcom = 1.2-0: http://www.lepem.ufc.br/jaa/vimcom.html
-
-      Note: If you cannot build vimcom yourself, you will want to
-      download and install the zip file.
-
-    * Vim's version must be >= 7.4: http://www.vim.org/download.php
-
-    * Only if you write Rnoweb code:
-
-       * Sumatra PDF viewer >= 3.0.
-
-       * MikTeX or other LaTeX distribution.
-
-       * Perl (required to run `latexmk`).
-
-Add the following lines to your `Rprofile`:
->
-   options(vimcom.verbose = 1)
-   library(vimcom)
-<
-If you do not know where your .Rprofile is, do the following command in R
-Console to open it:
->
-   edit(file = "~/.Rprofile")
-<
 You may want to improve the configuration of your |vimrc| for a better use of
 the plugin. Please, see |r-plugin-vimrc-setup|.
 
-Now, download the latest version of `Vim-R-plugin.vmb` from
-
-    http://www.vim.org/scripts/script.php?script_id=2628
-
-and open the directory where you have downloaded it, right click on it and
-choose "Edit with Vim".
->
-Then, in Vim, type:
->
-   :so %
-<
-Press <Enter> and the plugin will be installed (because the plugin has many
-files, you have to press the space bar a few times to finish the
-installation). You should, then, quit Vim.
-
-Note: If you need to install the plugin in a non default directory, do
-`:UseVimball` `[path]`. In this case, the configuration of Vim's 'runtimepath'
-must be done before the command "filetype on" in both the system and the user
-|vimrc| files, otherwise, some file types might not be correctly recognized.
-
-Start GVim again and edit an R script. You can right click a .R file and
-choose "Edit with Vim" or create a new one with the Normal mode command:
->
-   :e example.R
-<
-If R does not start and you get an error message instead, you may want to
-set the path to your Rgui.exe in your |vimrc|, for example (please adapt to
-your installation)
->
-   let vimrplugin_r_path = 'C:\\Program Files\\R\\R-3.1.2\\bin\\i386'
-<
 If you want to uninstall the plugin, do
 >
    :RmVimball Vim-R-plugin
 <
 
 ------------------------------------------------------------------------------
-3.3. Troubleshooting (if the plugin doesn't work)~
+3.5. Troubleshooting (if the plugin doesn't work)~
 
 Note: The <LocalLeader> is '\' by default.
 
@@ -313,6 +325,12 @@ pressing <LocalLeader>rf should start R.
 Did you see warning messages but they disappeared before you have had time to
 read them? Type the command |:messages| in Normal mode to see them again.
 
+On Windows, if R does not start and you get an error message instead, you may
+want to set the path to your Rgui.exe in your |vimrc|, for example (please
+adapt to your installation):
+>
+   let vimrplugin_r_path = 'C:\\Program Files\\R\\R-3.1.2\\bin\\i386'
+<
 Are you using Debian, Ubuntu or other Debian based Linux distribution? If yes,
 you may prefer to install the Debian package available at:
 
@@ -327,29 +345,22 @@ If R takes more than 5 seconds to load, you should adjust the value of
 
 
 ------------------------------------------------------------------------------
-3.4. Optional steps~
+3.6. Optional steps~
 
-3.4.1 Customize the plugin~
+3.6.1 Customize the plugin~
 
 Please, read the section |r-plugin-options|. Emacs/ESS users should read the
-section Indenting setup (|r-plugin-indenting|) of this document.
+section |r-plugin-indenting| of this document.
 
 
 ------------------------------------------------------------------------------
-3.4.2 Install additional plugins~
+3.6.2 Install additional plugins~
 
 You may be interested in installing additional general plugins to get
 functionality not provided by this file type plugin. ShowMarks and snipMate
 are particularly interesting. Please read |r-plugin-tips| for details. If you
 edit Rnoweb files, you may want to try LaTeX-Box for omnicompletion of LaTeX
 code (see |r-plugin-latex-box| for details).
-
-
-------------------------------------------------------------------------------
-3.4.3 Add buttons to GVim~
-
-Please read |r-plugin-toolbar| if you want to add R buttons to GVim's tool
-bar.
 
 
 ==============================================================================
@@ -443,7 +454,6 @@ Command
   --------------------------------------------------------
   . Sweave (cur file)                                  \sw
   . Sweave and PDF (cur file)                          \sp
-  . Sweave and PDF (cur file, verbose) (Windows)       \sv
   . Sweave, BibTeX and PDF (cur file) (Linux/Unix)     \sb
   --------------------------------------------------------
   . Knit (cur file)                                    \kn
@@ -451,7 +461,6 @@ Command
   . Knit, BibTeX and PDF (cur file) (Linux/Unix)       \kb
   . Knit and Beamer PDF (cur file) (only .Rmd)         \kl
   . Knit and HTML (cur file, verbose) (only .Rmd)      \kh
-  . Knit and PDF (cur file, verbose) (Windows)         \kv
   . Spin (cur file) (only .R)                          \ks
   --------------------------------------------------------
   . Open PDF (cur file)                                \op
@@ -893,7 +902,9 @@ the plugin confuse.
 
 If you need to access Vim in a remote Unix machine through ssh, and if you
 want to get omnicompletion, syntax highlight of function names and the Object
-Browser working properly, then you have to:
+Browser working properly, instead of Vim, it is recommended that you use
+Neovim because it does not require the X Server to be fully functional. You if
+you cannot use Neovim, then you have to:
 
    - Enable X11 Forwarding in the remote machine.
 
@@ -1041,7 +1052,7 @@ The vimcom library is started with the state `busy`.
 5.8. SyncTeX on Windows~
 
 On Windows, backward search with Sumatra pop ups a console window (`vim`
-running the required --remote-expr command).
+running the required --remote-expr command) which quickly disappears.
 
 
 ------------------------------------------------------------------------------
@@ -1183,7 +1194,6 @@ is running:
 |vimrplugin_term|              External terminal to be used
 |vimrplugin_term_cmd|          Complete command to open an external terminal
 |vimrplugin_sleeptime|         Delay while sending commands in MS Windows
-|vimrplugin_Rterm|             On Windows, use Rterm.exe
 |vimrplugin_assign|            Convert '_' into ' <- '
 |vimrplugin_assign_map|        Choose what to convert into ' <- '
 |vimrplugin_rnowebchunk|       Convert '<' into '<<>>=\n@' in Rnoweb files
@@ -1274,29 +1284,17 @@ The last argument must be the one which precedes the command to be executed.
 
 ------------------------------------------------------------------------------
 							*vimrplugin_sleeptime*
-							*vimrplugin_Rterm*
 6.2. Options specific to Windows~
 
 
 The plugin gives to R a small amount of time to process the paste command. The
-default value is 100 miliseconds, but you should experiment different values. The
+default value is 100 milliseconds, but you should experiment different values. The
 example show how to adjust the value of sleeptime in your |vimrc|:
 >
    let vimrplugin_sleeptime = 30
 <
-If you rather prefer to use Rterm.exe than Rgui.exe, you have to set both the
-"Quick Edit Mode" and the "Insert mode" on either the Windows 7 PowerShell or
-the Windows XP Command Prompt (click on the title bar and choose
-"properties"). Then, you should put in your |vimrc|:
->
-   let vimrplugin_Rterm = 1
-<
-Technical details: The plugin copies the code to be sent to R to Windows
-clipboard and, then, sends the key strokes CTRL-V to R Console window.
-However, neither the Windows 7 PowerShell nor the Windows XP Command Prompt
-has a keyboard shortcut to "paste". The solution is to set the "Quick Edit
-Mode" on either PowerShell or Command Prompt and to send a "Right click" to
-it.
+Note: the option vimrplugin_Rterm was disabled because the C code to send
+strings from Vim to Windows PowerShell is not working.
 
 
 ------------------------------------------------------------------------------
@@ -1575,9 +1573,7 @@ or let Tmux set the title automatically. Examples:
 6.14. Integration with AppleScript (OS X only)~
 
 In Mac OS X, the plugin will try to send commands to R gui using AppleScript.
-If you prefer either to run R and Vim in the same terminal emulator split in
-two regions (Vim and R) or to run R in an external terminal emulator, put in
-your |vimrc|:
+If you prefer to run R in an external terminal emulator, put in your |vimrc|:
 >
    let vimrplugin_applescript = 0
 <
@@ -2778,22 +2774,8 @@ Finally, if you want to use vi key bindings in Bash:
 <
 
 ------------------------------------------------------------------------------
-							    *r-plugin-toolbar*
-9.22. Add tool bar icons and hide unused buttons~
 
-If you want to add some R buttons to GVim tool bar download the zip file
-http://www.lepem.ufc.br/jaa/bitmaps.zip and unpack it at either ~/.vim
-(Unix/Linux/Mac OS X) or ~/vimfiles (Windows). You may not see the buttons
-because GVim has too many buttons by default. Then, you may want to edit
-GVim's toolbar and remove the buttons that you never use. Please see the page
-below to know how to hide buttons on the toolbar:
-
-   http://vim.wikia.com/wiki/Hide_toolbar_or_menus_to_see_more_text
-
-
-------------------------------------------------------------------------------
-
-9.23. Integration with GNU Screen, screen plugin, Conque Shell or VimShell~
+9.22. Integration with GNU Screen, screen plugin, Conque Shell or VimShell~
 
 The plugin used to be able to use GNU Screen (through screen plugin), Conque
 Shell or VimShell to send commands to R. This integration was removed on
@@ -2806,11 +2788,13 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-1.2 (2015-01-17)
+1.2 (2015-01-18)
 
  * Remove support for Neovim. See: https://github.com/jalvesaq/Nvim-R
 
  * Remove command :RpluginConfig.
+
+ * Remove option vimrplugin_Rterm.
 
  * Change commands gn and gN to <LocalLeader>gn and <LocalLeader>gN.
 

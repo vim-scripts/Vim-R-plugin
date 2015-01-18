@@ -167,7 +167,11 @@ function SendCmdToR_Windows(cmd)
     else
         let cmd = a:cmd . "\n"
     endif
-    let repl = libcall(g:rplugin_vimcom_lib, "SendToRConsole", cmd)
+    if g:vimrplugin_Rterm
+        let repl = libcall(g:rplugin_vimcom_lib, "SendToRTerm", cmd)
+    else
+        let repl = libcall(g:rplugin_vimcom_lib, "SendToRConsole", cmd)
+    endif
     if repl != "OK"
         call RWarningMsg(repl)
         call ClearRInfo()

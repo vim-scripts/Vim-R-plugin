@@ -922,8 +922,8 @@ function WaitVimComStart()
         let g:rplugin_vimcom_home = vr[1]
         let g:rplugin_vimcomport = vr[2]
         let g:rplugin_r_pid = vr[3]
-        if g:rplugin_vimcom_version != "1.1.19"
-            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.1.19.')
+        if g:rplugin_vimcom_version != "1.2.0"
+            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.2.0.')
             sleep 1
         endif
         if has("win32")
@@ -1834,11 +1834,13 @@ endfunction
 " Clear the console screen
 function RClearConsole(...)
     if has("win32") || has("win64")
-        if !g:vimrplugin_Rterm
-            let repl = libcall(g:rplugin_vimcom_lib, "RClearConsole", "RConsole")
-            exe "sleep " . g:rplugin_sleeptime
-            call foreground()
+        if g:vimrplugin_Rterm
+            let repl = libcall(g:rplugin_vimcom_lib, "RClearConsole", "Term")
+        else
+            let repl = libcall(g:rplugin_vimcom_lib, "RClearConsole", "Rgui")
         endif
+        exe "sleep " . g:rplugin_sleeptime
+        call foreground()
     elseif !g:vimrplugin_applescript
         call g:SendCmdToR("\014")
     endif
@@ -2936,6 +2938,9 @@ call RSetDefaultValue("g:vimrplugin_objbr_place",     "'script,right'")
 call RSetDefaultValue("g:vimrplugin_user_maps_only", 0)
 call RSetDefaultValue("g:vimrplugin_latexcmd", "'default'")
 call RSetDefaultValue("g:vimrplugin_rmd_environment", "'.GlobalEnv'")
+
+" The C code in VimCom/src/apps/vimr.c to send strings to RTerm is not working:
+let g:vimrplugin_Rterm = 0
 
 " Look for invalid options
 let objbrplace = split(g:vimrplugin_objbr_place, ",")
