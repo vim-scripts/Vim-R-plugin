@@ -3,12 +3,11 @@
 " Maintainer:	      Jakson Aquino <jalvesaq@gmail.com>
 " Former Maintainers: Vaidotas Zemlys <zemlys@gmail.com>
 " 		      Tom Payne <tom@tompayne.org>
-" Last Change:	      Thu Jul 10, 2014  06:45PM
+" Last Change:	      Wed Dec 31, 2014  12:36AM
 " Filenames:	      *.R *.r *.Rhistory *.Rt
 "
-" NOTE: The highlighting of R functions is defined in the
-" r-plugin/functions.vim, which is part of vim-r-plugin2:
-" http://www.vim.org/scripts/script.php?script_id=2628
+" NOTE: The highlighting of R functions is defined in
+" runtime files created by a filetype plugin, if installed.
 "
 " CONFIGURATION:
 "   syntax folding can be turned on by
@@ -111,17 +110,19 @@ syn match rComplex "\<\d\+\.\d*\([Ee][-+]\=\d\+\)\=i"
 syn match rComplex "\<\.\d\+\([Ee][-+]\=\d\+\)\=i"
 syn match rComplex "\<\d\+[Ee][-+]\=\d\+i"
 
+syn match rAssign    '='
 syn match rOperator    "&"
 syn match rOperator    '-'
 syn match rOperator    '\*'
 syn match rOperator    '+'
-syn match rOperator    '='
 if &filetype != "rmd" && &filetype != "rrst"
   syn match rOperator    "[|!<>^~/:]"
 else
   syn match rOperator    "[|!<>^~`/:]"
 endif
 syn match rOperator    "%\{2}\|%\S\{-}%"
+syn match rOperator '\([!><]\)\@<=='
+syn match rOperator '=='
 syn match rOpError  '\*\{3}'
 syn match rOpError  '//'
 syn match rOpError  '&&&'
@@ -129,8 +130,8 @@ syn match rOpError  '|||'
 syn match rOpError  '<<'
 syn match rOpError  '>>'
 
-syn match rArrow "<\{1,2}-"
-syn match rArrow "->\{1,2}"
+syn match rAssign "<\{1,2}-"
+syn match rAssign "->\{1,2}"
 
 " Special
 syn match rDelimiter "[,;:]"
@@ -151,9 +152,14 @@ syn match rBraceError "[)}]" contained
 syn match rCurlyError "[)\]]" contained
 syn match rParenError "[\]}]" contained
 
-" Source list of R functions. The list is produced by the Vim-R-plugin
-" http://www.vim.org/scripts/script.php?script_id=2628
-runtime r-plugin/functions.vim
+" Source list of R functions produced by a filetype plugin (if installed)
+if has("nvim")
+  " Nvim-R
+  runtime R/functions.vim
+else
+  " Vim-R-plugin
+  runtime r-plugin/functions.vim
+endif
 
 syn match rDollar display contained "\$"
 syn match rDollar display contained "@"
@@ -191,7 +197,7 @@ else
 endif
 
 " Define the default highlighting.
-hi def link rArrow       Statement	
+hi def link rAssign      Statement
 hi def link rBoolean     Boolean
 hi def link rBraceError  Error
 hi def link rComment     Comment
@@ -210,7 +216,7 @@ hi def link rHelpIdent   Identifier
 hi def link rhPreProc    PreProc
 hi def link rhSection    PreCondit
 hi def link rInteger     Number
-hi def link rLstElmt	 Normal
+hi def link rLstElmt     Normal
 hi def link rNameWSpace  Normal
 hi def link rNumber      Number
 hi def link rOperator    Operator

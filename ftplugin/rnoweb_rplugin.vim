@@ -1,5 +1,5 @@
 
-if exists("g:disable_r_ftplugin")
+if exists("g:disable_r_ftplugin") || has("nvim")
     finish
 endif
 
@@ -12,6 +12,19 @@ endif
 " Some buffer variables common to R, Rnoweb, Rhelp and Rdoc need to be defined
 " after the global ones:
 runtime r-plugin/common_buffer.vim
+
+if has("win32") || has("win64")
+    call RSetDefaultValue("g:vimrplugin_latexmk", 0)
+else
+    call RSetDefaultValue("g:vimrplugin_latexmk", 1)
+endif
+if !exists("g:rplugin_has_latexmk")
+    if g:vimrplugin_latexmk && executable("latexmk") && executable("perl")
+	let g:rplugin_has_latexmk = 1
+    else
+	let g:rplugin_has_latexmk = 0
+    endif
+endif
 
 function! RWriteChunk()
     if getline(".") =~ "^\\s*$" && RnwIsInRCode(0) == 0
@@ -74,30 +87,74 @@ function! RnwNextChunk() range
     return
 endfunction
 
+
+" Because this function delete files, it will not be documented.
+" If you want to try it, put in your vimrc:
+"
+" let vimrplugin_rm_knit_cache = 1
+"
+" If don't want to answer the question about deleting files, and
+" if you trust this code more than I do, put in your vimrc:
+"
+" let vimrplugin_ask_rm_knitr_cache = 0
+"
+" Note that if you have the string "cache.path=" in more than one place only
+" the first one above the cursor position will be found. The path must be
+" surrounded by quotes; if it's an R object, it will not be recognized.
+function! RKnitRmCache()
+    let lnum = search('\<cache\.path\>\s*=', 'bnwc')
+    if lnum == 0
+        let pathdir = "cache/"
+    else
+        let pathregexpr = '.*\<cache\.path\>\s*=\s*[' . "'" . '"]\(.\{-}\)[' . "'" . '"].*'
+        let pathdir = substitute(getline(lnum), pathregexpr, '\1', '')
+        if pathdir !~ '/$'
+            let pathdir .= '/'
+        endif
+    endif
+    if exists("g:vimrplugin_ask_rm_knitr_cache") && g:vimrplugin_ask_rm_knitr_cache == 0
+        let cleandir = 1
+    else
+        call inputsave()
+        let answer = input('Delete all files from "' . pathdir . '"? [y/n]: ')
+        call inputrestore()
+        if answer == "y"
+            let cleandir = 1
+        else
+            let cleandir = 0
+        endif
+    endif
+    normal! :<Esc>
+    if cleandir
+        call g:SendCmdToR('rm(list=ls(all.names=TRUE)); unlink("' . pathdir . '*")')
+    endif
+endfunction
+
 " knit the current buffer content
 function! RKnitRnw()
     update
+    let rnwdir = expand("%:p:h")
+    if has("win32") || has("win64")
+        let rnwdir = substitute(rnwdir, '\\', '/', 'g')
+    endif
     if g:vimrplugin_synctex == 0
-        call g:SendCmdToR('vim.interlace.rnoweb("' . expand("%:t") . '", rnwdir = "' . expand("%:p:h") . '", buildpdf = FALSE, synctex = FALSE)')
+        call g:SendCmdToR('vim.interlace.rnoweb("' . expand("%:t") . '", rnwdir = "' . rnwdir . '", buildpdf = FALSE, synctex = FALSE)')
     else
-        call g:SendCmdToR('vim.interlace.rnoweb("' . expand("%:t") . '", rnwdir = "' . expand("%:p:h") . '", buildpdf = FALSE)')
+        call g:SendCmdToR('vim.interlace.rnoweb("' . expand("%:t") . '", rnwdir = "' . rnwdir . '", buildpdf = FALSE)')
     endif
 endfunction
 
 " Sweave and compile the current buffer content
 function! RMakePDF(bibtex, knit)
     if g:rplugin_vimcomport == 0
-        if has("nvim")
-            call jobsend(g:rplugin_clt_job, "DiscoverVimComPort\n")
-        else
-            Py DiscoverVimComPort()
-        endif
-        if g:rplugin_vimcomport == 0
-            call RWarningMsg("The vimcom package is required to make and open the PDF.")
-        endif
+        call RWarningMsg("The vimcom package is required to make and open the PDF.")
     endif
     update
-    let pdfcmd = 'vim.interlace.rnoweb("' . expand("%:t") . '", rnwdir = "' . expand("%:p:h") . '"'
+    let rnwdir = expand("%:p:h")
+    if has("win32") || has("win64")
+        let rnwdir = substitute(rnwdir, '\\', '/', 'g')
+    endif
+    let pdfcmd = 'vim.interlace.rnoweb("' . expand("%:t") . '", rnwdir = "' . rnwdir . '"'
 
     if a:knit == 0
         let pdfcmd = pdfcmd . ', knit = FALSE'
@@ -117,10 +174,6 @@ function! RMakePDF(bibtex, knit)
 
     if a:bibtex == "bibtex"
         let pdfcmd = pdfcmd . ", bibtex = TRUE"
-    endif
-
-    if a:bibtex == "verbose"
-        let pdfcmd = pdfcmd . ", quiet = FALSE"
     endif
 
     if g:vimrplugin_openpdf == 0
@@ -144,7 +197,7 @@ function! RMakePDF(bibtex, knit)
     if ok == 0
         return
     endif
-endfunction  
+endfunction
 
 " Send Sweave chunk to R
 function! RnwSendChunkToR(e, m)
@@ -161,13 +214,17 @@ function! RnwSendChunkToR(e, m)
     endif
     if a:m == "down"
         call RnwNextChunk()
-    endif  
+    endif
 endfunction
 
 " Sweave the current buffer content
 function! RSweave()
     update
-    let scmd = 'vim.interlace.rnoweb("' . expand("%:t") . '", rnwdir = "' . expand("%:p:h") . '", knit = FALSE, buildpdf = FALSE'
+    let rnwdir = expand("%:p:h")
+    if has("win32") || has("win64")
+        let rnwdir = substitute(rnwdir, '\\', '/', 'g')
+    endif
+    let scmd = 'vim.interlace.rnoweb("' . expand("%:t") . '", rnwdir = "' . rnwdir . '", knit = FALSE, buildpdf = FALSE'
     if exists("g:vimrplugin_sweaveargs")
         let scmd .= ', ' . g:vimrplugin_sweaveargs
     endif
@@ -209,6 +266,9 @@ call RCreateMaps("nvi", '<Plug>RSetwd',        'rd', ':call RSetWD()')
 call RCreateMaps("nvi", '<Plug>RSweave',      'sw', ':call RSweave()')
 call RCreateMaps("nvi", '<Plug>RMakePDF',     'sp', ':call RMakePDF("nobib", 0)')
 call RCreateMaps("nvi", '<Plug>RBibTeX',      'sb', ':call RMakePDF("bibtex", 0)')
+if exists("g:vimrplugin_rm_knit_cache") && g:vimrplugin_rm_knit_cache == 1
+    call RCreateMaps("nvi", '<Plug>RKnitRmCache', 'kr', ':call RKnitRmCache()')
+endif
 call RCreateMaps("nvi", '<Plug>RKnit',        'kn', ':call RKnitRnw()')
 call RCreateMaps("nvi", '<Plug>RMakePDFK',    'kp', ':call RMakePDF("nobib", 1)')
 call RCreateMaps("nvi", '<Plug>RBibTeXK',     'kb', ':call RMakePDF("bibtex", 1)')
@@ -218,13 +278,16 @@ call RCreateMaps("ni",  '<Plug>RESendChunk',  'ce', ':call b:SendChunkToR("echo"
 call RCreateMaps("ni",  '<Plug>RDSendChunk',  'cd', ':call b:SendChunkToR("silent", "down")')
 call RCreateMaps("ni",  '<Plug>REDSendChunk', 'ca', ':call b:SendChunkToR("echo", "down")')
 call RCreateMaps("nvi", '<Plug>ROpenPDF',     'op', ':call ROpenPDF("Get Master")')
-call RCreateMaps("ni",  '<Plug>RSyncFor',     'gp', ':call SyncTeX_forward()')
-call RCreateMaps("ni",  '<Plug>RGoToTeX',     'gt', ':call SyncTeX_forward(1)')
-nmap <buffer><silent> gn :call RnwNextChunk()<CR>
-nmap <buffer><silent> gN :call RnwPreviousChunk()<CR>
+if g:vimrplugin_synctex
+    call RCreateMaps("ni",  '<Plug>RSyncFor',     'gp', ':call SyncTeX_forward()')
+    call RCreateMaps("ni",  '<Plug>RGoToTeX',     'gt', ':call SyncTeX_forward(1)')
+endif
+call RCreateMaps("n",  '<Plug>RNextRChunk',     'gn', ':call b:NextRChunk()')
+call RCreateMaps("n",  '<Plug>RPreviousRChunk', 'gN', ':call b:PreviousRChunk()')
 
 " Menu R
 if has("gui_running")
+    runtime r-plugin/gui_running.vim
     call MakeRMenu()
 endif
 
@@ -376,9 +439,14 @@ function! SyncTeX_backward(fname, ln)
     let rnwbn = substitute(rnwf, '.*/', '', '')
     let rnwf = substitute(rnwf, '^\./', '', '')
 
-    if GoToBuf(rnwbn, rnwf, basedir, rnwln) && g:rplugin_has_wmctrl
+    if GoToBuf(rnwbn, rnwf, basedir, rnwln)
+	if g:rplugin_has_wmctrl
         call system("wmctrl -xa " . g:vimrplugin_vim_window)
+	elseif has("gui_running")
+	    call foreground()
     endif
+    endif
+
 endfunction
 
 function! SyncTeX_forward(...)
@@ -487,12 +555,7 @@ function! SyncTeX_forward(...)
     if g:rplugin_pdfviewer == "okular"
         call system("okular --unique " . basenm . ".pdf#src:" . texln . substitute(expand("%:p:h"), ' ', '\\ ', 'g') . "/./" . substitute(basenm, ' ', '\\ ', 'g') . ".tex 2> /dev/null >/dev/null &")
     elseif g:rplugin_pdfviewer == "evince"
-        if has("nvim")
-            call jobstart("RnwSyncFor", "python", [g:rplugin_home . "/r-plugin/synctex_evince_forward.py",  basenm . ".pdf", string(texln), basenm . ".tex"])
-            autocmd JobActivity RnwSyncFor call ROnJobActivity()
-        else
-            call system("python " . g:rplugin_home . "/r-plugin/synctex_evince_forward.py '" . basenm . ".pdf' " . texln . " '" . basenm . ".tex' 2> /dev/null >/dev/null &")
-        endif
+        call system("python " . g:rplugin_home . "/r-plugin/synctex_evince_forward.py '" . basenm . ".pdf' " . texln . " '" . basenm . ".tex' 2> /dev/null >/dev/null &")
         if g:rplugin_has_wmctrl
             call system("wmctrl -a '" . basenm . ".pdf'")
         endif
@@ -509,18 +572,16 @@ function! SyncTeX_forward(...)
             endif
         else
             let g:rplugin_zathura_pid[basenm] = 0
-            if has("nvim")
-                call RStart_Zathura(basenm)
-            else
-                exe "Py Start_Zathura('" . basenm . "', '" . v:servername . "')"
-            endif
+            call RStart_Zathura(basenm)
         endif
         call system("wmctrl -a '" . basenm . ".pdf'")
     elseif g:rplugin_pdfviewer == "sumatra"
-        Py OpenSumatra(basenm . ".pdf", substitute(expand("%:p:h"), ' ', '\\ ', 'g') . "/" . basenm . ".tex", texln)
+        if g:rplugin_sumatra_path != "" || FindSumatra()
+            silent exe '!start "' . g:rplugin_sumatra_path . '" -reuse-instance -forward-search ' . basenm . '.tex ' . texln . ' -inverse-search "vim --servername ' . v:servername . " --remote-expr SyncTeX_backward('\\%f',\\%l)" . '" "' . basenm . '.pdf"'
+        endif
     elseif g:rplugin_pdfviewer == "skim"
-        " This command is based on Skim wiki (not tested)
-        call system("/Applications/Skim.app/Contents/SharedSupport/displayline " . texln . " '" . basenm . ".pdf' 2> /dev/null >/dev/null &")
+        " This command is based on macvim-skim
+        call system(g:macvim_skim_app_path . '/Contents/SharedSupport/displayline -r ' . texln . ' "' . basenm . '.pdf" "' . basenm . '.tex" 2> /dev/null >/dev/null &')
     else
         call RWarningMsg('SyncTeX support for "' . g:rplugin_pdfviewer . '" not implemented.')
     endif
@@ -547,23 +608,12 @@ function! Run_SyncTeX()
         if basedir != '.'
             exe "cd " . substitute(basedir, ' ', '\\ ', 'g')
         endif
-        if has("nvim")
-            call jobstart("RnwSyncTeX", "python", [g:rplugin_home . "/r-plugin/synctex_evince_backward.py", basenm . ".pdf", "nvim"])
-            autocmd JobActivity RnwSyncTeX call ROnJobActivity()
-        else
-            if v:servername != ""
-                call system("python " . g:rplugin_home . "/r-plugin/synctex_evince_backward.py '" . basenm . ".pdf' " . v:servername . " &")
-            endif
+        if v:servername != ""
+            call system("python " . g:rplugin_home . "/r-plugin/synctex_evince_backward.py '" . basenm . ".pdf' " . v:servername . " &")
         endif
         if basedir != '.'
             cd -
         endif
-    elseif has("nvim") && (g:rplugin_pdfviewer == "okular" || g:rplugin_pdfviewer == "zathura") && !exists("g:rplugin_tail_follow")
-        let g:rplugin_tail_follow = 1
-        call writefile([], $VIMRPLUGIN_TMPDIR . "/" . g:rplugin_pdfviewer . "_search")
-        call jobstart("RnwSyncTeX", "tail", ["-f", $VIMRPLUGIN_TMPDIR . "/" . g:rplugin_pdfviewer . "_search"])
-        autocmd JobActivity RnwSyncTeX call ROnJobActivity()
-        autocmd VimLeave * call delete($VIMRPLUGIN_TMPDIR . "/" . g:rplugin_pdfviewer . "_search") | call delete($VIMRPLUGIN_TMPDIR . "/synctex_back.sh")
     endif
     exe "cd " . substitute(olddir, ' ', '\\ ', 'g')
 endfunction
@@ -587,7 +637,9 @@ if g:rplugin_pdfviewer != "none"
         unlet s:key_list
         unlet s:has_key
     endif
-    call Run_SyncTeX()
+    if g:vimrplugin_synctex
+        call Run_SyncTeX()
+    endif
 endif
 
 call RSourceOtherScripts()
