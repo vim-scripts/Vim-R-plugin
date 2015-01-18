@@ -4,7 +4,18 @@ let g:rplugin_sumatra_path = ""
 let g:rplugin_python_initialized = 0
 
 call RSetDefaultValue("g:vimrplugin_sleeptime", 100)
+
+" Avoid invalid values defined by the user
+exe "let s:sleeptimestr = " . '"' . g:vimrplugin_sleeptime . '"'
+let s:sleeptime = str2nr(s:sleeptimestr)
+if s:sleeptime < 1 || s:sleeptime > 1000
+    let g:vimrplugin_sleeptime = 100
+endif
+unlet s:sleeptimestr
+unlet s:sleeptime
+
 let g:rplugin_sleeptime = g:vimrplugin_sleeptime . 'm'
+exe 'let $VIM_SLEEPTIME = ' . '"' . g:vimrplugin_sleeptime . '"'
 
 if g:vimrplugin_Rterm
     let b:rplugin_R = "Rgui.exe"

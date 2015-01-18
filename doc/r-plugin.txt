@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 1.1.1
+Version: 1.2
 For Vim version 7.4
 
  1. Overview                                    |r-plugin-overview|
@@ -108,9 +108,6 @@ The installation instructions are split in four sections:
 3.1. Instructions for Unix (Linux, OS X, etc.)~
 
 If you are using Windows, jump to section 3.2.
-
-If you are an unexperienced Vim user, start a terminal emulator and type in
-it: `vimtutor`<Enter>
 
 Before installing the plugin, you should install its dependencies:
 
@@ -233,9 +230,6 @@ If you want to uninstall the plugin, do
 ------------------------------------------------------------------------------
 3.2. Instructions for Windows ~
 
-Note: This version was not tested on Windows. If it does not work well in your
-system, please try version 1.0.
-
 Before installing the plugin, you should install several external
 dependencies:
 
@@ -327,6 +321,9 @@ you may prefer to install the Debian package available at:
 Did you see the message "VimCom port not found"? This means that R is not
 running, the vimcom package is not installed (or is installed but is not
 loaded), or R was not started by Vim.
+
+If R takes more than 5 seconds to load, you should adjust the value of
+|vimrplugin_vimcom_wait|.
 
 
 ------------------------------------------------------------------------------
@@ -1082,6 +1079,8 @@ When Vim cannot receive messages, the result is:
      omnicompletion are not immediately updated after you load a new R
      package. For a workaround, see |vimrplugin_start_libs|.
 
+   * You cannot see R documentation in a Vim buffer.
+
 On Linux you may find Vim binaries without the |clientserver| feature if
 you install packages such as vim-nox on Debian/Ubuntu or vim-enhanced on
 Fedora/Red Hat. If you want to use Vim in a terminal emulator in Fedora/Red
@@ -1183,6 +1182,7 @@ is running:
 
 |vimrplugin_term|              External terminal to be used
 |vimrplugin_term_cmd|          Complete command to open an external terminal
+|vimrplugin_sleeptime|         Delay while sending commands in MS Windows
 |vimrplugin_Rterm|             On Windows, use Rterm.exe
 |vimrplugin_assign|            Convert '_' into ' <- '
 |vimrplugin_assign_map|        Choose what to convert into ' <- '
@@ -1237,6 +1237,9 @@ is running:
 							     *vimrplugin_term*
 6.1. Terminal emulator (Linux/Unix only)~
 
+Note: The options of this section are ignored on Mac OS X, where the command
+`open` is called to run the default application used to run shell scripts.
+
 The plugin uses the first terminal emulator that it finds in the following
 list:
     1. gnome-terminal,
@@ -1270,9 +1273,17 @@ The last argument must be the one which precedes the command to be executed.
 
 
 ------------------------------------------------------------------------------
-							    *vimrplugin_Rterm*
-6.2. Use Rterm.exe on Windows~
+							*vimrplugin_sleeptime*
+							*vimrplugin_Rterm*
+6.2. Options specific to Windows~
 
+
+The plugin gives to R a small amount of time to process the paste command. The
+default value is 100 miliseconds, but you should experiment different values. The
+example show how to adjust the value of sleeptime in your |vimrc|:
+>
+   let vimrplugin_sleeptime = 30
+<
 If you rather prefer to use Rterm.exe than Rgui.exe, you have to set both the
 "Quick Edit Mode" and the "Insert mode" on either the Windows 7 PowerShell or
 the Windows XP Command Prompt (click on the title bar and choose
@@ -2795,17 +2806,17 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-1.2 (2015-01-16)
+1.2 (2015-01-17)
 
  * Remove support for Neovim. See: https://github.com/jalvesaq/Nvim-R
-
- * Remove option vimrplugin_sleeptime.
 
  * Remove command :RpluginConfig.
 
  * Change commands gn and gN to <LocalLeader>gn and <LocalLeader>gN.
 
  * Change default value of vimrplugin_openpdf to 2.
+
+ * Options vimrplugin_sleeptime now should be in miliseconds.
 
  * Replace option vimrplugin_external_ob with vimrplugin_tmux_ob.
 

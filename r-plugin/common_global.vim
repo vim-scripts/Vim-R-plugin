@@ -699,21 +699,25 @@ function StartR_ExternalTerm(rcmd)
 
     call system("tmux has-session -t " . g:rplugin_tmuxsname)
     if v:shell_error
-	if g:rplugin_is_darwin
-	    let $VIM_BINARY_PATH = substitute($VIMRUNTIME, "/MacVim.app/Contents/.*", "", "") . "/MacVim.app/Contents/MacOS/Vim"
-	    let rcmd = "VIM_BINARY_PATH=" . substitute($VIM_BINARY_PATH, ' ', '\\ ', 'g') . ' TERM=screen-256color ' . rcmd
-	    let opencmd = printf("tmux -2 %s new-session -s %s '%s'", tmuxcnf, g:rplugin_tmuxsname, rcmd)
-	    call writefile(["#!/bin/sh", opencmd], $VIMRPLUGIN_TMPDIR . "/openR")
-	    call system("chmod +x '" . $VIMRPLUGIN_TMPDIR . "/openR'")
-	    let opencmd = "open '" . $VIMRPLUGIN_TMPDIR . "/openR'"
-	else
-	    if g:rplugin_termcmd =~ "gnome-terminal" || g:rplugin_termcmd =~ "xfce4-terminal" || g:rplugin_termcmd =~ "terminal" || g:rplugin_termcmd =~ "iterm"
-		let opencmd = printf("%s 'tmux -2 %s new-session -s %s \"%s\"' &", g:rplugin_termcmd, tmuxcnf, g:rplugin_tmuxsname, rcmd)
-	    else
-		let opencmd = printf("%s tmux -2 %s new-session -s %s \"%s\" &", g:rplugin_termcmd, tmuxcnf, g:rplugin_tmuxsname, rcmd)
-	    endif
-	endif
+        if g:rplugin_is_darwin
+            let $VIM_BINARY_PATH = substitute($VIMRUNTIME, "/MacVim.app/Contents/.*", "", "") . "/MacVim.app/Contents/MacOS/Vim"
+            let rcmd = "VIM_BINARY_PATH=" . substitute($VIM_BINARY_PATH, ' ', '\\ ', 'g') . ' TERM=screen-256color ' . rcmd
+            let opencmd = printf("tmux -2 %s new-session -s %s '%s'", tmuxcnf, g:rplugin_tmuxsname, rcmd)
+            call writefile(["#!/bin/sh", opencmd], $VIMRPLUGIN_TMPDIR . "/openR")
+            call system("chmod +x '" . $VIMRPLUGIN_TMPDIR . "/openR'")
+            let opencmd = "open '" . $VIMRPLUGIN_TMPDIR . "/openR'"
+        else
+            if g:rplugin_termcmd =~ "gnome-terminal" || g:rplugin_termcmd =~ "xfce4-terminal" || g:rplugin_termcmd =~ "terminal" || g:rplugin_termcmd =~ "iterm"
+                let opencmd = printf("%s 'tmux -2 %s new-session -s %s \"%s\"' &", g:rplugin_termcmd, tmuxcnf, g:rplugin_tmuxsname, rcmd)
+            else
+                let opencmd = printf("%s tmux -2 %s new-session -s %s \"%s\" &", g:rplugin_termcmd, tmuxcnf, g:rplugin_tmuxsname, rcmd)
+            endif
+        endif
     else
+        if g:rplugin_is_darwin
+            call RWarningMsg("Tmux session with R is already running")
+            return
+        endif
         if g:rplugin_termcmd =~ "gnome-terminal" || g:rplugin_termcmd =~ "xfce4-terminal" || g:rplugin_termcmd =~ "terminal" || g:rplugin_termcmd =~ "iterm"
             let opencmd = printf("%s 'tmux -2 %s attach-session -d -t %s' &", g:rplugin_termcmd, tmuxcnf, g:rplugin_tmuxsname)
         else
@@ -734,12 +738,12 @@ endfunction
 
 function IsSendCmdToRFake()
     if string(g:SendCmdToR) != "function('SendCmdToR_fake')"
-	if exists("g:maplocalleader")
-	    call RWarningMsg("As far as I know, R is already running. Did you quit it from within Vim (" . g:maplocalleader . "rq if not remapped)?")
-	else
-	    call RWarningMsg("As far as I know, R is already running. Did you quit it from within Vim (\\rq if not remapped)?")
-	endif
-	return 1
+        if exists("g:maplocalleader")
+            call RWarningMsg("As far as I know, R is already running. Did you quit it from within Vim (" . g:maplocalleader . "rq if not remapped)?")
+        else
+            call RWarningMsg("As far as I know, R is already running. Did you quit it from within Vim (\\rq if not remapped)?")
+        endif
+        return 1
     endif
     return 0
 endfunction
@@ -748,7 +752,7 @@ endfunction
 function StartR(whatr)
     if has("gui_macvim") && v:servername != ""
         let $VIMEDITOR_SVRNM = "MacVim_" . v:servername
-	let $VIM_BINARY_PATH = substitute($VIMRUNTIME, "/MacVim.app/Contents/.*", "", "") . "/MacVim.app/Contents/MacOS/Vim"
+        let $VIM_BINARY_PATH = substitute($VIMRUNTIME, "/MacVim.app/Contents/.*", "", "") . "/MacVim.app/Contents/MacOS/Vim"
     elseif !has("clientserver")
         let $VIMEDITOR_SVRNM = "NoClientServer"
     elseif v:servername == ""
@@ -824,7 +828,7 @@ function StartR(whatr)
                 endif
                 return
             elseif IsSendCmdToRFake()
-		return
+                return
             endif
         else
             if g:vimrplugin_restart
@@ -1050,7 +1054,7 @@ function StartObjBrowser_Tmux()
     endif
 
     if g:rplugin_is_darwin && has("gui_macvim")
-	let vimexec = substitute($VIMRUNTIME, "/MacVim.app/Contents/.*", "", "") . "/MacVim.app/Contents/MacOS/Vim"
+        let vimexec = substitute($VIMRUNTIME, "/MacVim.app/Contents/.*", "", "") . "/MacVim.app/Contents/MacOS/Vim"
         let vimexec = substitute(vimexec, ' ', '\\ ', 'g')
     else
         let vimexec = "vim"
@@ -1097,16 +1101,6 @@ endfunction
 
 function StartObjBrowser_Vim()
     let g:RBrOpenCloseLs = function("RBrOpenCloseLs_Vim")
-
-    if has("win32") || has("win64")
-	" The vimcom server will stop working if starting the Object
-	" Browser is the first thing the user does.
-	"if !exists("g:rplugin_liblist_filled")
-	"    call RWarningMsg("Please, try again after sending at least one line of code to the R Console.!")
-	"    return
-	"endif
-    endif
-
     let wmsg = ""
     if v:servername == ""
         if g:rplugin_ob_warn_shown == 0
@@ -1838,19 +1832,14 @@ function RSendPartOfLine(direction, correctpos)
 endfunction
 
 " Clear the console screen
-function RClearConsole()
-    if (has("win32") || has("win64"))
-        if g:vimrplugin_libcall_send
-            if !g:vimrplugin_Rterm
-                let repl = libcall(g:rplugin_vimcom_lib, "RClearConsole", "Rgui")
-            endif
-        else
-            Py RClearConsolePy()
+function RClearConsole(...)
+    if has("win32") || has("win64")
+        if !g:vimrplugin_Rterm
+            let repl = libcall(g:rplugin_vimcom_lib, "RClearConsole", "RConsole")
+            exe "sleep " . g:rplugin_sleeptime
+            call foreground()
         endif
-        if repl != "OK"
-            call RWarningMsg(repl)
-        endif
-    else
+    elseif !g:vimrplugin_applescript
         call g:SendCmdToR("\014")
     endif
 endfunction
@@ -2348,8 +2337,8 @@ function ROpenPDF(path)
             silent exe '!start "' . g:rplugin_sumatra_path . '" -reuse-instance -inverse-search "vim --servername ' . v:servername . " --remote-expr SyncTeX_backward('\\%f',\\%l)" . '" "' . basenm . '.pdf"'
             exe "cd " . substitute(olddir, ' ', '\\ ', 'g')
             return
-	elseif g:rplugin_pdfviewer == "skim"
-	    call system(g:macvim_skim_app_path . '/Contents/MacOS/Skim "' . basenm . '.pdf" 2> /dev/null >/dev/null &')
+        elseif g:rplugin_pdfviewer == "skim"
+            call system(g:macvim_skim_app_path . '/Contents/MacOS/Skim "' . basenm . '.pdf" 2> /dev/null >/dev/null &')
         else
             let pcmd = g:rplugin_pdfviewer . " '" . pdfpath . "' 2>/dev/null >/dev/null &"
         call system(pcmd)
@@ -2819,6 +2808,7 @@ function RVimLeave()
     call delete(g:rplugin_tmpdir . "/vimbol_finished")
     call delete(g:rplugin_tmpdir . "/vimcom_running_" . $VIMINSTANCEID)
     call delete(g:rplugin_tmpdir . "/rconsole_hwnd_" . $VIMRPLUGIN_SECRET)
+    call delete(g:rplugin_tmpdir . "/openR'")
 endfunction
 
 function SetRPath()
@@ -2887,11 +2877,11 @@ else
         let g:rplugin_tmpdir = substitute(g:rplugin_tmpdir, "\\", "/", "g")
     else
         if isdirectory($TMPDIR)
-	    if $TMPDIR =~ "/$"
-		let g:rplugin_tmpdir = $TMPDIR . "r-plugin-" . g:rplugin_userlogin
-	    else
-            let g:rplugin_tmpdir = $TMPDIR . "/r-plugin-" . g:rplugin_userlogin
-	    endif
+            if $TMPDIR =~ "/$"
+                let g:rplugin_tmpdir = $TMPDIR . "r-plugin-" . g:rplugin_userlogin
+            else
+                let g:rplugin_tmpdir = $TMPDIR . "/r-plugin-" . g:rplugin_userlogin
+            endif
         elseif isdirectory("/tmp")
             let g:rplugin_tmpdir = "/tmp/r-plugin-" . g:rplugin_userlogin
         else
@@ -2933,7 +2923,6 @@ call RSetDefaultValue("g:vimrplugin_routnotab",         0)
 call RSetDefaultValue("g:vimrplugin_editor_w",         66)
 call RSetDefaultValue("g:vimrplugin_help_w",           46)
 call RSetDefaultValue("g:vimrplugin_objbr_w",          40)
-call RSetDefaultValue("g:vimrplugin_libcall_send",      1)
 call RSetDefaultValue("g:vimrplugin_i386",              0)
 call RSetDefaultValue("g:vimrplugin_vimcom_wait",    5000)
 call RSetDefaultValue("g:vimrplugin_show_args",         0)
@@ -3109,20 +3098,13 @@ if exists("g:vimrplugin_term")
         let g:vimrplugin_term = "xterm"
     endif
 endif
-if has("win32") || has("win64") || g:vimrplugin_applescript || g:rplugin_do_tmux_split
+if has("win32") || has("win64") || g:rplugin_is_darwin || g:rplugin_do_tmux_split
     " No external terminal emulator will be called, so any value is good
     let g:vimrplugin_term = "xterm"
 endif
 if !exists("g:vimrplugin_term")
-    let s:terminals = ['gnome-terminal', 'konsole', 'xfce4-terminal', 'terminal',
-                \ 'Eterm', 'rxvt', 'urxvt', 'aterm', 'roxterm', 'terminator', 'lxterminal']
-    if g:rplugin_is_darwin
-        let s:terminals = ['/Applications/Utilities/iTerm.app/Contents/MacOS/iTerm',
-                    \ '/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal',
-                    \ 'xterm'] + s:terminals
-    else
-        let s:terminals += ['xterm']
-    endif
+    let s:terminals = ['gnome-terminal', 'konsole', 'xfce4-terminal', 'terminal', 'Eterm',
+                \ 'rxvt', 'urxvt', 'aterm', 'roxterm', 'terminator', 'lxterminal', 'xterm']
     for s:term in s:terminals
         if executable(s:term)
             let g:vimrplugin_term = s:term
