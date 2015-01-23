@@ -167,6 +167,8 @@ function SendCmdToR_Windows(cmd)
     else
         let cmd = a:cmd . "\n"
     endif
+    let save_clip = getreg('+')
+    call setreg('+', cmd)
     if g:vimrplugin_Rterm
         let repl = libcall(g:rplugin_vimcom_lib, "SendToRTerm", cmd)
     else
@@ -178,6 +180,7 @@ function SendCmdToR_Windows(cmd)
     endif
     exe "sleep " . g:rplugin_sleeptime
     call foreground()
+    call setreg('+', save_clip)
     return 1
 endfunction
 

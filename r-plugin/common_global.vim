@@ -922,8 +922,8 @@ function WaitVimComStart()
         let g:rplugin_vimcom_home = vr[1]
         let g:rplugin_vimcomport = vr[2]
         let g:rplugin_r_pid = vr[3]
-        if g:rplugin_vimcom_version != "1.2.0"
-            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.2.0.')
+        if g:rplugin_vimcom_version != "1.2.0.1"
+            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.2.0.1.')
             sleep 1
         endif
         if has("win32")
@@ -1914,20 +1914,16 @@ function RQuit(how)
         endif
     endif
 
-    if has("win32") || has("win64")
-        let repl = libcall(g:rplugin_vimcom_lib, "SendQuitMsg", qcmd . "\n")
-    else
-        call g:SendCmdToR(qcmd)
-        if g:rplugin_do_tmux_split
-            if a:how == "save"
-                sleep 200m
-            endif
-            if g:vimrplugin_restart
-                let ca_ck = g:vimrplugin_ca_ck
-                let g:vimrplugin_ca_ck = 0
-                call g:SendCmdToR("exit")
-                let g:vimrplugin_ca_ck = ca_ck
-            endif
+    call g:SendCmdToR(qcmd)
+    if g:rplugin_do_tmux_split
+        if a:how == "save"
+            sleep 200m
+        endif
+        if g:vimrplugin_restart
+            let ca_ck = g:vimrplugin_ca_ck
+            let g:vimrplugin_ca_ck = 0
+            call g:SendCmdToR("exit")
+            let g:vimrplugin_ca_ck = ca_ck
         endif
     endif
 
@@ -2235,6 +2231,8 @@ function RSetPDFViewer()
             let g:rplugin_pdfviewer = "evince"
         elseif executable("okular")
             let g:rplugin_pdfviewer = "okular"
+        elseif executable("zathura")
+            let g:rplugin_pdfviewer = "zathura"
         else
             let g:rplugin_pdfviewer = "none"
             if $R_PDFVIEWER == ""
@@ -2243,7 +2241,7 @@ function RSetPDFViewer()
                 let pdfvl = [$R_PDFVIEWER, "xdg-open"]
             endif
             " List from R configure script:
-            let pdfvl += ["evince", "okular", "zathura", "xpdf", "gv", "gnome-gv", "ggv", "kpdf", "gpdf", "kghostview,", "acroread", "acroread4"]
+            let pdfvl += ["xpdf", "gv", "gnome-gv", "ggv", "kpdf", "gpdf", "kghostview,", "acroread", "acroread4"]
             for prog in pdfvl
                 if executable(prog)
                     let g:rplugin_pdfviewer = prog
