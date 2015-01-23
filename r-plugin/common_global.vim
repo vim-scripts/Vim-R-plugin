@@ -1420,15 +1420,15 @@ function RSourceLines(lines, e)
     if &filetype == "rmd"
         let lines = map(copy(lines), 'substitute(v:val, "^\\`\\`\\?", "", "")')
     endif
-    call writefile(lines, b:rsource)
+    call writefile(lines, g:rplugin_rsource)
     if a:e == "echo"
         if exists("g:vimrplugin_maxdeparse")
-            let rcmd = 'base::source("' . b:rsource . '", echo=TRUE, max.deparse=' . g:vimrplugin_maxdeparse . ')'
+            let rcmd = 'base::source("' . g:rplugin_rsource . '", echo=TRUE, max.deparse=' . g:vimrplugin_maxdeparse . ')'
         else
-            let rcmd = 'base::source("' . b:rsource . '", echo=TRUE)'
+            let rcmd = 'base::source("' . g:rplugin_rsource . '", echo=TRUE)'
         endif
     else
-        let rcmd = 'base::source("' . b:rsource . '")'
+        let rcmd = 'base::source("' . g:rplugin_rsource . '")'
     endif
     let ok = g:SendCmdToR(rcmd)
     return ok
@@ -2341,7 +2341,7 @@ function ROpenPDF(path)
             call system(g:macvim_skim_app_path . '/Contents/MacOS/Skim "' . basenm . '.pdf" 2> /dev/null >/dev/null &')
         else
             let pcmd = g:rplugin_pdfviewer . " '" . pdfpath . "' 2>/dev/null >/dev/null &"
-        call system(pcmd)
+            call system(pcmd)
         endif
         if g:rplugin_has_wmctrl
             call system("wmctrl -a '" . basenm . ".pdf'")
@@ -2790,10 +2790,7 @@ function RBufEnter()
 endfunction
 
 function RVimLeave()
-    if exists("b:rsource")
-        " b:rsource only exists if the filetype of the last buffer is .R*
-        call delete(b:rsource)
-    endif
+    call delete(g:rplugin_rsource)
     call delete(g:rplugin_tmpdir . "/eval_reply")
     call delete(g:rplugin_tmpdir . "/formatted_code")
     call delete(g:rplugin_tmpdir . "/GlobalEnvList_" . $VIMINSTANCEID)
@@ -2895,6 +2892,9 @@ if !isdirectory(g:rplugin_tmpdir)
     call mkdir(g:rplugin_tmpdir, "p", 0700)
 endif
 
+" Make the file name of files to be sourced
+let g:rplugin_rsource = g:rplugin_tmpdir . "/Rsource-" . getpid()
+
 let g:rplugin_is_darwin = system("uname") =~ "Darwin"
 
 " Variables whose default value is fixed
@@ -2964,10 +2964,6 @@ function RSetMyPort(p)
         call SendToVimCom("\002" . a:p)
         call SendToVimCom("\005B Update OB [RSetMyPort]")
     endif
-endfunction
-
-function SendObjPortToVimCom(p)
-    call SendToVimCom("\002" . a:p)
 endfunction
 
 function ROnJobActivity()
