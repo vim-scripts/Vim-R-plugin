@@ -20,9 +20,9 @@ else
 endif
 if !exists("g:rplugin_has_latexmk")
     if g:vimrplugin_latexmk && executable("latexmk") && executable("perl")
-	let g:rplugin_has_latexmk = 1
+        let g:rplugin_has_latexmk = 1
     else
-	let g:rplugin_has_latexmk = 0
+        let g:rplugin_has_latexmk = 0
     endif
 endif
 
@@ -440,13 +440,12 @@ function! SyncTeX_backward(fname, ln)
     let rnwf = substitute(rnwf, '^\./', '', '')
 
     if GoToBuf(rnwbn, rnwf, basedir, rnwln)
-	if g:rplugin_has_wmctrl
-        call system("wmctrl -xa " . g:vimrplugin_vim_window)
-	elseif has("gui_running")
-	    call foreground()
+        if g:rplugin_has_wmctrl
+            call system("wmctrl -xa " . g:vimrplugin_vim_window)
+        elseif has("gui_running")
+            call foreground()
+        endif
     endif
-    endif
-
 endfunction
 
 function! SyncTeX_forward(...)
