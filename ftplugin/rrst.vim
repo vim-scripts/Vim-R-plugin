@@ -1,12 +1,12 @@
 " Vim filetype plugin file
 " Language: reStructuredText documentation format with R code
 " Maintainer: Jakson Alves de Aquino <jalvesaq@gmail.com>
-" Last Change:	Sun Feb 23, 2014  04:07PM
+" Last Change:	Wed Jul 09, 2014  06:23PM
 " Original work by Alex Zvoleff
 
 " Only do this when not yet done for this buffer
 if exists("b:did_ftplugin")
-    finish
+  finish
 endif
 
 " Don't load another plugin for this buffer
@@ -33,3 +33,5 @@ endif
 
 let &cpo = s:cpo_save
 unlet s:cpo_save
+
+" vim: sw=2

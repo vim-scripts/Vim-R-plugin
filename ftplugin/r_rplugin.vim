@@ -1,5 +1,5 @@
 
-if exists("g:disable_r_ftplugin")
+if exists("g:disable_r_ftplugin") || has("nvim")
     finish
 endif
 
@@ -16,10 +16,10 @@ runtime r-plugin/common_buffer.vim
 " Run R CMD BATCH on current file and load the resulting .Rout in a split
 " window
 function! ShowRout()
-    let routfile = expand("%:r") . ".Rout"
-    if bufloaded(routfile)
-        exe "bunload " . routfile
-        call delete(routfile)
+    let b:routfile = expand("%:r") . ".Rout"
+    if bufloaded(b:routfile)
+        exe "bunload " . b:routfile
+        call delete(b:routfile)
     endif
 
     if !exists("b:rplugin_R")
@@ -28,35 +28,36 @@ function! ShowRout()
 
     " if not silent, the user will have to type <Enter>
     silent update
+
     if has("win32") || has("win64")
-        let rcmd = 'Rcmd.exe BATCH --no-restore --no-save "' . expand("%") . '" "' . routfile . '"'
+        let rcmd = 'Rcmd.exe BATCH --no-restore --no-save "' . expand("%") . '" "' . b:routfile . '"'
     else
-        let rcmd = b:rplugin_R . " CMD BATCH --no-restore --no-save '" . expand("%") . "' '" . routfile . "'"
+        let rcmd = b:rplugin_R . " CMD BATCH --no-restore --no-save '" . expand("%") . "' '" . b:routfile . "'"
     endif
-    echo "Please wait for: " . rcmd
+
+    echon "Please wait for: " . rcmd
+    redraw
     let rlog = system(rcmd)
     if v:shell_error && rlog != ""
         call RWarningMsg('Error: "' . rlog . '"')
         sleep 1
     endif
-
-    if filereadable(routfile)
+    if filereadable(b:routfile)
         if g:vimrplugin_routnotab == 1
-            exe "split " . routfile
+            exe "split " . b:routfile
         else
-            exe "tabnew " . routfile
+            exe "tabnew " . b:routfile
         endif
         set filetype=rout
     else
-        call RWarningMsg("The file '" . routfile . "' is not readable.")
+        call RWarningMsg("The file '" . b:routfile . "' is not readable.")
     endif
 endfunction
 
 " Convert R script into Rmd, md and, then, html.
 function! RSpin()
     update
-    call RSetWD()
-    call g:SendCmdToR('require(knitr); spin("' . expand("%:t") . '")')
+    call g:SendCmdToR('require(knitr); .vim_oldwd <- getwd(); setwd("' . expand("%:p:h") . '"); spin("' . expand("%:t") . '"); setwd(.vim_oldwd); rm(.vim_oldwd)')
 endfunction
 
 " Default IsInRCode function when the plugin is used as a global plugin
@@ -93,10 +94,14 @@ call RCreateMaps("nvi", '<Plug>RSetwd',        'rd', ':call RSetWD()')
 
 " Menu R
 if has("gui_running")
+    runtime r-plugin/gui_running.vim
     call MakeRMenu()
 endif
 
 call RSourceOtherScripts()
 
-
-let b:undo_ftplugin .= " | unlet! b:IsInRCode b:SourceLines"
+if exists("b:undo_ftplugin")
+    let b:undo_ftplugin .= " | unlet! b:IsInRCode b:SourceLines"
+else
+    let b:undo_ftplugin = "unlet! b:IsInRCode b:SourceLines"   
+endif
