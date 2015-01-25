@@ -159,6 +159,13 @@ function StartR_Windows()
     endif
     let g:SendCmdToR = function('SendCmdToR_Windows')
     call WaitVimComStart()
+    call foreground()
+    if g:vimrplugin_arrange_windows && v:servername != "" && filereadable(g:rplugin_compldir . "/win_pos")
+        let repl = libcall(g:rplugin_vimcom_lib, "ArrangeWindows", $VIMRPLUGIN_COMPLDIR)
+        if repl != "OK"
+            call RWarningMsg(repl)
+        endif
+    endif
 endfunction
 
 function SendCmdToR_Windows(cmd)

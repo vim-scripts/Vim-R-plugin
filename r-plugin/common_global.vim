@@ -922,8 +922,8 @@ function WaitVimComStart()
         let g:rplugin_vimcom_home = vr[1]
         let g:rplugin_vimcomport = vr[2]
         let g:rplugin_r_pid = vr[3]
-        if g:rplugin_vimcom_version != "1.2.0.1"
-            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.2.0.1.')
+        if g:rplugin_vimcom_version != "1.2.0.2"
+            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.2.0.2.')
             sleep 1
         endif
         if has("win32")
@@ -1911,6 +1911,13 @@ function RQuit(how)
             let qcmd = 'quit(save = "yes")'
         else
             let qcmd = 'quit(save = "no")'
+        endif
+    endif
+
+    if g:vimrplugin_save_win_pos && v:servername != ""
+        let repl = libcall(g:rplugin_vimcom_lib, "SaveWinPos", $VIMRPLUGIN_COMPLDIR)
+        if repl != "OK"
+            call RWarningMsg(repl)
         endif
     endif
 
@@ -2908,7 +2915,6 @@ call RSetDefaultValue("g:vimrplugin_strict_rst",        1)
 call RSetDefaultValue("g:vimrplugin_openpdf",           2)
 call RSetDefaultValue("g:vimrplugin_synctex",           1)
 call RSetDefaultValue("g:vimrplugin_openhtml",          0)
-call RSetDefaultValue("g:vimrplugin_Rterm",             0)
 call RSetDefaultValue("g:vimrplugin_vim_wd",            0)
 call RSetDefaultValue("g:vimrplugin_restart",           0)
 call RSetDefaultValue("g:vimrplugin_vsplit",            0)
@@ -2936,6 +2942,15 @@ call RSetDefaultValue("g:vimrplugin_objbr_place",     "'script,right'")
 call RSetDefaultValue("g:vimrplugin_user_maps_only", 0)
 call RSetDefaultValue("g:vimrplugin_latexcmd", "'default'")
 call RSetDefaultValue("g:vimrplugin_rmd_environment", "'.GlobalEnv'")
+if has("win32") || has("win64")
+    call RSetDefaultValue("g:vimrplugin_Rterm",           0)
+    call RSetDefaultValue("g:vimrplugin_save_win_pos",    1)
+    call RSetDefaultValue("g:vimrplugin_arrange_windows", 1)
+else
+    let g:vimrplugin_Rterm = 0
+    call RSetDefaultValue("g:vimrplugin_save_win_pos",    0)
+    call RSetDefaultValue("g:vimrplugin_arrange_windows", 0)
+endif
 
 " The C code in VimCom/src/apps/vimr.c to send strings to RTerm is not working:
 let g:vimrplugin_Rterm = 0

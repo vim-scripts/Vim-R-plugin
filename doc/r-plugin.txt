@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 1.2
+Version: 1.2.1
 For Vim version 7.4
 
  1. Overview                                    |r-plugin-overview|
@@ -1185,6 +1185,8 @@ is running:
 |vimrplugin_term|              External terminal to be used
 |vimrplugin_term_cmd|          Complete command to open an external terminal
 |vimrplugin_sleeptime|         Delay while sending commands in MS Windows
+|vimrplugin_save_win_pos|      Save positions of R and GVim windows
+|vimrplugin_arrange_windows|   Restore positions of R and GVim windows
 |vimrplugin_assign|            Convert '_' into ' <- '
 |vimrplugin_assign_map|        Choose what to convert into ' <- '
 |vimrplugin_rnowebchunk|       Convert '<' into '<<>>=\n@' in Rnoweb files
@@ -1274,7 +1276,9 @@ The last argument must be the one which precedes the command to be executed.
 
 
 ------------------------------------------------------------------------------
-							*vimrplugin_sleeptime*
+						  *vimrplugin_sleeptime*
+						  *vimrplugin_save_win_pos*
+						  *vimrplugin_arrange_windows*
 6.2. Options specific to Windows~
 
 
@@ -1284,6 +1288,19 @@ example show how to adjust the value of sleeptime in your |vimrc|:
 >
    let vimrplugin_sleeptime = 30
 <
+By default, the Vim-R-plugin will save the positions of R Console and GVim
+windows when you quits R with the <LocalLeader>rq command, and will restore
+the positions of the windows when you start R. If you do not like this
+behavior, you can put in your |vimrc|:
+>
+   let vimrplugin_save_win_pos = 0
+   let vimrplugin_arrange_windows = 0
+<
+If you want R and GVim windows always in a specific arrangement, regardless of
+their state when you have quited R for the last time, you should arrange them
+in the way you want, quit R, change in your |vimrc| only the value of
+vimrplugin_save_win_pos and, finally, quit Vim.
+
 Note: the option vimrplugin_Rterm was disabled because the C code to send
 strings from Vim to Windows PowerShell is not working.
 
@@ -2788,7 +2805,14 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-1.2 (2015-01-22)
+1.2.1 (2015-01-24)
+
+ * Minor bug fixes.
+
+ * New options for Windows: vimrplugin_save_win_pos and
+   vimrplugin_arrange_windows.
+
+1.2 (2015-01-18)
 
  * Remove support for Neovim. See: https://github.com/jalvesaq/Nvim-R
 
