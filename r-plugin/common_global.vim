@@ -661,6 +661,9 @@ function StartR_TmuxSplit(rcmd)
     endif
     if WaitVimComStart()
         call SendToVimCom("\005B Update OB [StartR]")
+        if g:vimrplugin_after_start != ''
+            call system(g:vimrplugin_after_start)
+        endif
     endif
 endfunction
 
@@ -733,6 +736,9 @@ function StartR_ExternalTerm(rcmd)
     let g:SendCmdToR = function('SendCmdToR_Term')
     if WaitVimComStart()
         call SendToVimCom("\005B Update OB [StartR]")
+        if g:vimrplugin_after_start != ''
+            call system(g:vimrplugin_after_start)
+        endif
     endif
 endfunction
 
@@ -2916,6 +2922,7 @@ call RSetDefaultValue("g:vimrplugin_openpdf",           2)
 call RSetDefaultValue("g:vimrplugin_synctex",           1)
 call RSetDefaultValue("g:vimrplugin_openhtml",          0)
 call RSetDefaultValue("g:vimrplugin_vim_wd",            0)
+call RSetDefaultValue("g:vimrplugin_after_start",    "''")
 call RSetDefaultValue("g:vimrplugin_restart",           0)
 call RSetDefaultValue("g:vimrplugin_vsplit",            0)
 call RSetDefaultValue("g:vimrplugin_rconsole_width",   -1)

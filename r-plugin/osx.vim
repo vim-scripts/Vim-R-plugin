@@ -27,8 +27,11 @@ function StartR_OSX()
         call SendToVimCom("\005B Update OB [StartR]")
         sleep 200m
         if g:vimrplugin_vim_wd == 0
-            "Set vim's working directory as R working directory
+            "Set Vim's working directory as R working directory
             call SendToVimCom("\x08" . $VIMINSTANCEID . 'setwd("' . expand("%:p:h") . '")')
+        endif
+        if g:vimrplugin_after_start != ''
+            call system(g:vimrplugin_after_start)
         endif
     endif
 endfunction
