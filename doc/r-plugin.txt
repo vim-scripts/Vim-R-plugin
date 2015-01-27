@@ -1239,7 +1239,7 @@ is running:
 
 ------------------------------------------------------------------------------
 							     *vimrplugin_term*
-6.1. Terminal emulator (Linux/Unix only)~
+6.1. Terminal emulator (Linux/Unix only, but not Mac OS X)~
 
 Note: The options of this section are ignored on Mac OS X, where the command
 `open` is called to run the default application used to run shell scripts.
@@ -1261,7 +1261,6 @@ If Vim does not select your favorite terminal emulator, you may define it in
 your |vimrc| by setting the variable vimrplugin_term, as shown below:
 >
    let vimrplugin_term = "xterm"
-   let vimrplugin_term = "/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
 <
 							 *vimrplugin_term_cmd*
 If your terminal emulator is not listed above, or if you are not satisfied
@@ -1270,7 +1269,6 @@ your |vimrc| the variable vimrplugin_term_cmd, as in the examples below:
 >
    let vimrplugin_term_cmd = "gnome-terminal --title R -e"
    let vimrplugin_term_cmd = "terminator --title R -x"
-   let vimrplugin_term_cmd = "/Applications/Utilities/iTerm.app/Contents/MacOS/iTerm -t R"
 <
 Please, look at the manual of your terminal emulator to know how to call it.
 The last argument must be the one which precedes the command to be executed.
@@ -2829,7 +2827,7 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-1.2.1 (2015-01-24)
+1.2.1 (2015-01-26)
 
  * Minor bug fixes.
 
