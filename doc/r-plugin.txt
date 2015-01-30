@@ -1228,6 +1228,7 @@ is running:
 |vimrplugin_source|            Source additional scripts
 |vimrplugin_restart|           Restart R if it is already running
 |vimrplugin_show_args|         Show extra information during omnicompletion
+|vimrplugin_args_in_stline|    Set 'statusline' to function arguments
 |vimrplugin_vimcom_wait|       Time to wait for vimcom loading
 |vimrplugin_vim_wd|            Start R in Vim's working directory
 |vimrplugin_after_start|       System command to execute after R startup
@@ -1840,7 +1841,8 @@ do <LocalLeader>rf, <LocalLeader>rv or <LocalLeader>rc, then, put in your
 
 ------------------------------------------------------------------------------
 							*vimrplugin_show_args*
-6.28. Show extra information during omnicompletion~
+						   *vimrplugin_args_in_stline*
+6.28. Function arguments~
 
 If you want that Vim shows a preview window with the function arguments as you
 do omnicompletion, put in your |vimrc|:
@@ -1850,6 +1852,18 @@ do omnicompletion, put in your |vimrc|:
 The preview window is not shown by default because it is more convenient to
 run <Ctrl-X><Ctrl-A> to complete the function arguments. The preview window
 will be shown only if "preview" is also included in your 'completeopt'.
+
+If you want that function arguments are displayed in Vim's status line when
+you insert `(`, put in your |vimrc|:
+>
+   let vimrplugin_args_in_stline = 1
+<
+The status line is restored when `)` is typed. This option is useful only if
+the window has a status line. See |laststatus|. If the string with the list of
+arguments is longer than the status line width, the list is not displayed
+completely. This argument is incompatible with any plugin that changes the
+status line because it is always restored to the value that it had at Vim's
+startup. Functions of .GlobalEnv do not have their arguments displayed.
 
 
 ------------------------------------------------------------------------------
@@ -2827,14 +2841,12 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-1.2.1 (2015-01-26)
+1.2.1 (2015-01-29)
 
  * Minor bug fixes.
 
- * New option: vimrplugin_after_start.
-
- * New options for Windows: vimrplugin_save_win_pos and
-   vimrplugin_arrange_windows.
+ * New options: vimrplugin_after_start, vimrplugin_args_in_stline,
+   vimrplugin_save_win_pos and vimrplugin_arrange_windows.
 
 1.2 (2015-01-18)
 

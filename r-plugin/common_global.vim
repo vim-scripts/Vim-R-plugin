@@ -2389,6 +2389,40 @@ function RAskHelp(...)
     endif
 endfunction
 
+function DisplayArgs()
+    if &filetype == "r" || b:IsInRCode(0)
+        let rkeyword = RGetKeyWord()
+        let s:sttl_str = g:rplugin_status_line
+        let fargs = "Not a function"
+        for omniL in g:rplugin_omni_lines
+            if omniL =~ '^' . rkeyword . "\x06"
+                let tmp = split(omniL, "\x06")
+                if len(tmp) < 5
+                    break
+                else
+                    let fargs = rkeyword . '(' . tmp[4] . ')'
+                endif
+            endif
+        endfor
+        if fargs !~ "Not a function"
+            let fargs = substitute(fargs, "NO_ARGS", '', 'g')
+            let fargs = substitute(fargs, "\x07", '=', 'g')
+            let s:sttl_str = substitute(fargs, "\x09", ', ', 'g')
+            silent set statusline=%!RArgsStatusLine()
+        endif
+    endif
+    exe "normal! a("
+endfunction
+
+function RArgsStatusLine()
+    return s:sttl_str
+endfunction
+
+function RestoreStatusLine()
+    exe 'set statusline=' . substitute(g:rplugin_status_line, ' ', '\\ ', 'g')
+    normal! a)
+endfunction
+
 function PrintRObject(rkeyword)
     if bufname("%") =~ "Object_Browser"
         let classfor = ""
@@ -2726,6 +2760,10 @@ function RCreateEditMaps()
     if g:vimrplugin_assign == 1 || g:vimrplugin_assign == 2
         silent exe 'imap <buffer><silent> ' . g:vimrplugin_assign_map . ' <Esc>:call ReplaceUnderS()<CR>a'
     endif
+    if g:vimrplugin_args_in_stline
+        imap <buffer><silent> ( <Esc>:call DisplayArgs()<CR>a
+        imap <buffer><silent> ) <Esc>:call RestoreStatusLine()<CR>a
+    endif
     if hasmapto("<Plug>RCompleteArgs", "i")
         imap <buffer><silent> <Plug>RCompleteArgs <C-R>=RCompleteArgs()<CR>
     else
@@ -2916,6 +2954,7 @@ call RSetDefaultValue("g:vimrplugin_allnames",          0)
 call RSetDefaultValue("g:vimrplugin_rmhidden",          0)
 call RSetDefaultValue("g:vimrplugin_assign",            1)
 call RSetDefaultValue("g:vimrplugin_assign_map",    "'_'")
+call RSetDefaultValue("g:vimrplugin_args_in_stline",    0)
 call RSetDefaultValue("g:vimrplugin_rnowebchunk",       1)
 call RSetDefaultValue("g:vimrplugin_strict_rst",        1)
 call RSetDefaultValue("g:vimrplugin_openpdf",           2)
@@ -2985,23 +3024,6 @@ function RSetMyPort(p)
     if &filetype == "rbrowser"
         call SendToVimCom("\002" . a:p)
         call SendToVimCom("\005B Update OB [RSetMyPort]")
-    endif
-endfunction
-
-function ROnJobActivity()
-    if v:job_data[1] == 'stdout'
-        for cmd in v:job_data[2]
-            if cmd == ""
-                continue
-            endif
-            if cmd =~ "^call " || cmd  =~ "^let "
-                exe cmd
-            else
-                call RWarningMsg("[JobActivity] Unknown command: " . cmd)
-            endif
-        endfor
-    elseif v:job_data[1] == 'stderr'
-        call RWarningMsg('JobActivity error: ' . join(v:job_data[2]))
     endif
 endfunction
 
@@ -3211,8 +3233,8 @@ endif
 let g:rplugin_firstbuffer = expand("%:p")
 let g:rplugin_running_objbr = 0
 let g:rplugin_newliblist = 0
+let g:rplugin_status_line = &statusline
 let g:rplugin_ob_warn_shown = 0
-let g:rplugin_clt_job = 0
 let g:rplugin_r_pid = 0
 let g:rplugin_myport = 0
 let g:rplugin_vimcomport = 0
