@@ -35,6 +35,9 @@ function StartR_OSX()
            " Else, set the R's working directory as the actual buffer one.
             call SendToVimCom("\x08" . $VIMINSTANCEID . 'setwd("' . expand("%:p:h") . '")')
         endif
+        if g:vimrplugin_after_start != ''
+            call system(g:vimrplugin_after_start)
+        endif
     endif
 endfunction
 

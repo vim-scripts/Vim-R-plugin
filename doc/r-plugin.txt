@@ -1228,8 +1228,10 @@ is running:
 |vimrplugin_source|            Source additional scripts
 |vimrplugin_restart|           Restart R if it is already running
 |vimrplugin_show_args|         Show extra information during omnicompletion
+|vimrplugin_args_in_stline|    Set 'statusline' to function arguments
 |vimrplugin_vimcom_wait|       Time to wait for vimcom loading
 |vimrplugin_vim_wd|            Start R in Vim's working directory
+|vimrplugin_after_start|       System command to execute after R startup
 |vimrplugin_user_maps_only|    Only set user specified key bindings
 |vimrplugin_tmpdir|            Where temporary files are created
 |vimrplugin_compldir|          Where lists for omnicompletion are stored
@@ -1238,7 +1240,7 @@ is running:
 
 ------------------------------------------------------------------------------
 							     *vimrplugin_term*
-6.1. Terminal emulator (Linux/Unix only)~
+6.1. Terminal emulator (Linux/Unix only, but not Mac OS X)~
 
 Note: The options of this section are ignored on Mac OS X, where the command
 `open` is called to run the default application used to run shell scripts.
@@ -1260,7 +1262,6 @@ If Vim does not select your favorite terminal emulator, you may define it in
 your |vimrc| by setting the variable vimrplugin_term, as shown below:
 >
    let vimrplugin_term = "xterm"
-   let vimrplugin_term = "/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
 <
 							 *vimrplugin_term_cmd*
 If your terminal emulator is not listed above, or if you are not satisfied
@@ -1269,7 +1270,6 @@ your |vimrc| the variable vimrplugin_term_cmd, as in the examples below:
 >
    let vimrplugin_term_cmd = "gnome-terminal --title R -e"
    let vimrplugin_term_cmd = "terminator --title R -x"
-   let vimrplugin_term_cmd = "/Applications/Utilities/iTerm.app/Contents/MacOS/iTerm -t R"
 <
 Please, look at the manual of your terminal emulator to know how to call it.
 The last argument must be the one which precedes the command to be executed.
@@ -1841,7 +1841,8 @@ do <LocalLeader>rf, <LocalLeader>rv or <LocalLeader>rc, then, put in your
 
 ------------------------------------------------------------------------------
 							*vimrplugin_show_args*
-6.28. Show extra information during omnicompletion~
+						   *vimrplugin_args_in_stline*
+6.28. Function arguments~
 
 If you want that Vim shows a preview window with the function arguments as you
 do omnicompletion, put in your |vimrc|:
@@ -1851,6 +1852,18 @@ do omnicompletion, put in your |vimrc|:
 The preview window is not shown by default because it is more convenient to
 run <Ctrl-X><Ctrl-A> to complete the function arguments. The preview window
 will be shown only if "preview" is also included in your 'completeopt'.
+
+If you want that function arguments are displayed in Vim's status line when
+you insert `(`, put in your |vimrc|:
+>
+   let vimrplugin_args_in_stline = 1
+<
+The status line is restored when `)` is typed. This option is useful only if
+the window has a status line. See |laststatus|. If the string with the list of
+arguments is longer than the status line width, the list is not displayed
+completely. This argument is incompatible with any plugin that changes the
+status line because it is always restored to the value that it had at Vim's
+startup. Functions of .GlobalEnv do not have their arguments displayed.
 
 
 ------------------------------------------------------------------------------
@@ -1881,8 +1894,31 @@ This option is useful only for those who did not enable 'autochdir'.
 
 
 ------------------------------------------------------------------------------
+						      *vimrplugin_after_start*
+6.31 System command to execute after R startup~
+
+If you want that Vim executes a command right after R startup, set the value
+of vimrplugin_after_start in your |vimrc|.
+
+For example, if you are using GVim and running R in the Gnome-terminal,
+`~/bin` is in your path, and you want to resize and change the positions of
+GVim and the Terminal windows, you may create a script `~/bin/after_R_start`
+with the following contents
+>
+   #!/bin/sh
+   wmctrl -F -r R -e 0,0,200,1200,800
+   wmctrl -r GVIM -e 0,300,40,1200,800
+<
+make the script executable, and put in your |vimrc|:
+>
+   if has("gui_running")
+       let vimrplugin_after_start = "after_R_start"
+   endif
+<
+
+------------------------------------------------------------------------------
 						   *vimrplugin_user_maps_only*
-6.31 Only set key bindings that are user specified~
+6.32 Only set key bindings that are user specified~
 
 The Vim-R-plugin sets many default key bindings.  The user can set custom
 key bindings (|r-plugin-key-bindings|).  If you wish the Vim-R-plugin to only
@@ -1894,7 +1930,7 @@ set those key-bindings specified by the user, put in your vimrc:
 ------------------------------------------------------------------------------
 							   *vimrplugin_tmpdir*
 							 *vimrplugin_compldir*
-6.32 Temporary files directories~
+6.33 Temporary files directories~
 
 You can change the directories where temporary files are created and
 stored by setting in your |vimrc| the values of vimrplugin_tmpdir and
@@ -1912,7 +1948,7 @@ want to know they are, while editing an R file, do in Normal mode:
 
 ------------------------------------------------------------------------------
 							    *r-plugin-SyncTeX*
-6.33 SyncTeX support~
+6.34 SyncTeX support~
 
 SyncTeX is a set of communication systems used by some PDF viewers and by some
 text editors which allow users to jump from a specific line in the text editor
@@ -1952,7 +1988,7 @@ Note: The current knitr package (version 1.7) has at least two limitations:
 
 
 ------------------------------------------------------------------------------
-6.33.1 Evince configuration~
+6.34.1 Evince configuration~
 
 No configuration should be required.
 
@@ -1967,7 +2003,7 @@ to press <LocalLeader>gp again.
 
 
 ------------------------------------------------------------------------------
-6.33.2 Okular configuration~
+6.34.2 Okular configuration~
 
 You have to configure Okular to call Vim during backward searches.
 In Okular, click in:
@@ -1995,7 +2031,7 @@ of Okular will be started.
 
 
 ------------------------------------------------------------------------------
-6.33.3 Zathura configuration~
+6.34.3 Zathura configuration~
 
 No configuration should be required if Evince is not installed. If evince is
 installed, put in your |vimrc|:
@@ -2012,7 +2048,7 @@ to press <LocalLeader>gp again.
 
 
 ------------------------------------------------------------------------------
-6.33.4 Skim with MacVim configuration (Mac OS X)~
+6.34.4 Skim with MacVim configuration (Mac OS X)~
 
 You have to configure Skim to call MacVim during backward searches.
 In Skim click in the drop down menu and fill the fields:
@@ -2026,7 +2062,7 @@ In Skim click in the drop down menu and fill the fields:
 <
 
 ------------------------------------------------------------------------------
-6.33.5 Sumatra configuration (Windows)~
+6.34.5 Sumatra configuration (Windows)~
 
 No configuration is required.
 
@@ -2034,7 +2070,7 @@ No configuration is required.
 ------------------------------------------------------------------------------
                                                        *vimrplugin_vim_window*
 				                       *vimrplugin_synctex*
-6.33.6 Configuring the PDF editor and Vim's window title~
+6.34.6 Configuring the PDF editor and Vim's window title~
 
 If SyncTeX does not work (see above), you may try to set in your |vimrc| the
 values of |vimrplugin_pdfviewer| and vimrplugin_vim_window.
@@ -2805,12 +2841,12 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-1.2.1 (2015-01-24)
+1.2.1 (2015-01-29)
 
  * Minor bug fixes.
 
- * New options for Windows: vimrplugin_save_win_pos and
-   vimrplugin_arrange_windows.
+ * New options: vimrplugin_after_start, vimrplugin_args_in_stline,
+   vimrplugin_save_win_pos and vimrplugin_arrange_windows.
 
 1.2 (2015-01-18)
 
