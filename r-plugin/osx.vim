@@ -26,8 +26,13 @@ function StartR_OSX()
     if WaitVimComStart()
         call SendToVimCom("\005B Update OB [StartR]")
         sleep 200m
-        if g:vimrplugin_vim_wd == 0
-            "Set vim's working directory as R working directory
+        if g:vimrplugin_vim_wd
+            " If the user want's R's working directory to be the same as Vim's 
+            " working directory, then send a setwd() to R via vimcom at the
+            " start of R.
+            call SendToVimCom("\x08" . $VIMINSTANCEID . 'setwd("' . getcwd() . '")')
+        else
+           " Else, set the R's working directory as the actual buffer one.
             call SendToVimCom("\x08" . $VIMINSTANCEID . 'setwd("' . expand("%:p:h") . '")')
         endif
     endif
