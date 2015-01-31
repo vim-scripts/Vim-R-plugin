@@ -199,7 +199,7 @@ Before installing the plugin, you should install its dependencies:
 
 	    If you need to use the Vim-R-plugin in a Unix system without the
 	    X Server running (e.g. Linux Console, and any system accessed
-	    through ssh), you have to use Neovim and Nvim-R:
+	    through ssh), the best option is to use Neovim and Nvim-R:
 	    https://github.com/jalvesaq/Nvim-R
 	    If you cannot use Neovim and need to use Vim in these
 	    circumstances, please, read |r-plugin-nox| and |r-plugin-remote|.
@@ -1914,6 +1914,13 @@ make the script executable, and put in your |vimrc|:
    if has("gui_running")
        let vimrplugin_after_start = "after_R_start"
    endif
+<
+On Mac OS X, if you are using MacVim and R.app, the `~/bin/after_R_start`
+contents might be:
+>
+   #!/bin/sh
+   osascript -e 'tell application "Terminal" to set the bounds of the front window to {0, 200, 1200, 1000}'
+   osascript -e 'tell application "MacVim" to set the bounds of the front window to {300, 40, 1500, 840}'
 <
 
 ------------------------------------------------------------------------------
