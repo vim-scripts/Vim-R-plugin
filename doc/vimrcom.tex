@@ -92,7 +92,7 @@
         }
         \only<2>{
             \node at (1.5, 6.1) {\texttt{\textcolor{black!50!green}{Cocoa}}};
-            \node at (8.5, 6.1) {\texttt{\textcolor{black!50!green}{vimcom.so}}};
+            \node at (8.5, 6.1) {\texttt{\textcolor{black!50!green}{system()}}};
             \node at (8.5, 2.6) {\texttt{\textcolor{black!50!green}{vimcom.so}}};
             \node at (1.5, 2.6) {\texttt{\textcolor{black!50!green}{libVimR.so}}};
             \node at (5, 4.3) {\emph{via osascript}};
@@ -113,7 +113,9 @@
 
         \draw (7, 3) -- (10, 3);
         \draw (7, 5) -- (10, 5);
-        \node at (8.5, 5.6) {TCP client};
+        \only<1>{ \node at (8.5, 5.6) {X11 client}; }
+        \only<2>{ \node at (8.5, 5.6) {Vim application}; }
+        \only<3>{ \node at (8.5, 5.6) {Windows client}; }
         \node at (8.5, 2.1) {TCP server};
 
         \footnotesize
