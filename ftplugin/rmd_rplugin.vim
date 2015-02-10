@@ -1,5 +1,5 @@
 
-if exists("g:disable_r_ftplugin")
+if exists("g:disable_r_ftplugin") || has("nvim")
     finish
 endif
 
@@ -80,15 +80,19 @@ function! RMakeRmd(t)
         endif
     endif
 
+    let rmddir = expand("%:p:h")
+    if has("win32") || has("win64")
+        let rmddir = substitute(rnwdir, '\\', '/', 'g')
+    endif
     if a:t == "default"
-        let rcmd = 'vim.interlace.rmd("' . expand("%:t") . '", rmddir = "' . expand("%:p:h") . '"'
+        let rcmd = 'vim.interlace.rmd("' . expand("%:t") . '", rmddir = "' . rmddir . '"'
     else
-        let rcmd = 'vim.interlace.rmd("' . expand("%:t") . '", outform = "' . a:t .'", rmddir = "' . expand("%:p:h") . '"'
+        let rcmd = 'vim.interlace.rmd("' . expand("%:t") . '", outform = "' . a:t .'", rmddir = "' . rmddir . '"'
     endif
     if (g:vimrplugin_openhtml  == 0 && a:t == "html_document") || (g:vimrplugin_openpdf == 0 && (a:t == "pdf_document" || a:t == "beamer_presentation"))
         let rcmd .= ", view = FALSE"
     endif
-    let rcmd = rcmd . ')'
+    let rcmd = rcmd . ', envir = ' . g:vimrplugin_rmd_environment . ')'
     call g:SendCmdToR(rcmd)
 endfunction
 
@@ -107,7 +111,7 @@ function! SendRmdChunkToR(e, m)
     endif
     if a:m == "down"
         call RmdNextChunk()
-    endif  
+    endif
 endfunction
 
 let b:IsInRCode = function("RmdIsInRCode")
@@ -126,22 +130,22 @@ call RControlMaps()
 call RCreateMaps("nvi", '<Plug>RSetwd',        'rd', ':call RSetWD()')
 
 " Only .Rmd files use these functions:
-call RCreateMaps("nvi", '<Plug>RKnit',        'kn', ':call RKnit()')
-call RCreateMaps("nvi", '<Plug>RMakeRmd',     'kr', ':call RMakeRmd("default")')
-call RCreateMaps("nvi", '<Plug>RMakeAll',     'ka', ':call RMakeRmd("all")')
-call RCreateMaps("nvi", '<Plug>RMakePDFK',    'kp', ':call RMakeRmd("pdf_document")')
-call RCreateMaps("nvi", '<Plug>RMakePDFKb',   'kl', ':call RMakeRmd("beamer_presentation")')
-call RCreateMaps("nvi", '<Plug>RMakeHTML',    'kh', ':call RMakeRmd("html_document")')
-call RCreateMaps("nvi", '<Plug>RMakeODT',     'ko', ':call RMakeRmd("odt")')
-call RCreateMaps("ni",  '<Plug>RSendChunk',   'cc', ':call b:SendChunkToR("silent", "stay")')
-call RCreateMaps("ni",  '<Plug>RESendChunk',  'ce', ':call b:SendChunkToR("echo", "stay")')
-call RCreateMaps("ni",  '<Plug>RDSendChunk',  'cd', ':call b:SendChunkToR("silent", "down")')
-call RCreateMaps("ni",  '<Plug>REDSendChunk', 'ca', ':call b:SendChunkToR("echo", "down")')
-nmap <buffer><silent> gn :call b:NextRChunk()<CR>
-nmap <buffer><silent> gN :call b:PreviousRChunk()<CR>
+call RCreateMaps("nvi", '<Plug>RKnit',          'kn', ':call RKnit()')
+call RCreateMaps("nvi", '<Plug>RMakeRmd',       'kr', ':call RMakeRmd("default")')
+call RCreateMaps("nvi", '<Plug>RMakePDFK',      'kp', ':call RMakeRmd("pdf_document")')
+call RCreateMaps("nvi", '<Plug>RMakePDFKb',     'kl', ':call RMakeRmd("beamer_presentation")')
+call RCreateMaps("nvi", '<Plug>RMakeHTML',      'kh', ':call RMakeRmd("html_document")')
+call RCreateMaps("nvi", '<Plug>RMakeODT',       'ko', ':call RMakeRmd("odt")')
+call RCreateMaps("ni",  '<Plug>RSendChunk',     'cc', ':call b:SendChunkToR("silent", "stay")')
+call RCreateMaps("ni",  '<Plug>RESendChunk',    'ce', ':call b:SendChunkToR("echo", "stay")')
+call RCreateMaps("ni",  '<Plug>RDSendChunk',    'cd', ':call b:SendChunkToR("silent", "down")')
+call RCreateMaps("ni",  '<Plug>REDSendChunk',   'ca', ':call b:SendChunkToR("echo", "down")')
+call RCreateMaps("n",  '<Plug>RNextRChunk',     'gn', ':call b:NextRChunk()')
+call RCreateMaps("n",  '<Plug>RPreviousRChunk', 'gN', ':call b:PreviousRChunk()')
 
 " Menu R
 if has("gui_running")
+    runtime r-plugin/gui_running.vim
     call MakeRMenu()
 endif
 
@@ -151,6 +155,5 @@ let g:rplugin_has_soffice = 0
 call RSetPDFViewer()
 
 call RSourceOtherScripts()
-
 
 let b:undo_ftplugin .= " | unlet! b:IsInRCode b:SourceLines b:PreviousRChunk b:NextRChunk b:SendChunkToR"

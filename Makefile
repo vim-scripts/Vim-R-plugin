@@ -22,7 +22,7 @@
 
 
 PLUGINHOME=`pwd`
-PLUGINVERSION=1.0.1
+PLUGINVERSION=1.2
 DEBIANTIME=`date -R`
 PLUGINRELEASEDATE=`date +"%Y-%m-%d"`
 VIM2HTML=/usr/local/share/vim/vim74/doc/vim2html.pl 
@@ -64,35 +64,33 @@ deb:
 	  - ftplugin/rdoc.vim\n\
 	  - ftplugin/rhelp.vim\n\
 	  - ftplugin/rhelp_rplugin.vim\n\
-	  - ftplugin/rnoweb.vim\n\
-	  - ftplugin/rnoweb_rplugin.vim\n\
 	  - ftplugin/rmd.vim\n\
 	  - ftplugin/rmd_rplugin.vim\n\
+	  - ftplugin/rnoweb.vim\n\
+	  - ftplugin/rnoweb_rplugin.vim\n\
 	  - ftplugin/rrst.vim\n\
 	  - ftplugin/rrst_rplugin.vim\n\
 	  - indent/r.vim\n\
-	  - indent/rnoweb.vim\n\
 	  - indent/rhelp.vim\n\
 	  - indent/rmd.vim\n\
+	  - indent/rnoweb.vim\n\
 	  - indent/rrst.vim\n\
 	  - r-plugin/common_buffer.vim\n\
 	  - r-plugin/common_global.vim\n\
-	  - r-plugin/vimcom.py\n\
-	  - r-plugin/nvimcom.py\n\
-	  - r-plugin/nvimserver.py\n\
+	  - r-plugin/functions.vim\n\
+	  - r-plugin/global_r_plugin.vim\n\
+	  - r-plugin/gui_running.vim\n\
+	  - r-plugin/setcompldir.vim\n\
 	  - r-plugin/synctex_evince_backward.py\n\
 	  - r-plugin/synctex_evince_forward.py\n\
 	  - r-plugin/synctex_okular_backward.sh\n\
-	  - r-plugin/global_r_plugin.vim\n\
-	  - r-plugin/vimrconfig.vim\n\
-	  - r-plugin/functions.vim\n\
 	  - syntax/r.vim\n\
-	  - syntax/rdoc.vim\n\
-	  - syntax/rout.vim\n\
-	  - syntax/rmd.vim\n\
-	  - syntax/rrst.vim\n\
-	  - syntax/rhelp.vim\n\
 	  - syntax/rbrowser.vim\n\
+	  - syntax/rdoc.vim\n\
+	  - syntax/rhelp.vim\n\
+	  - syntax/rmd.vim\n\
+	  - syntax/rout.vim\n\
+	  - syntax/rrst.vim\n\
 	" > /tmp/vim-r-plugin-tmp/usr/share/vim/registry/vim-r-plugin.yaml
 	# Create the copyright
 	echo "Copyright (C) 2011-2014 Jakson Aquino\n\
@@ -119,9 +117,6 @@ deb:
 	" > /tmp/vim-r-plugin-tmp/usr/share/doc/vim-r-plugin/copyright
 	# Unpack the plugin
 	vim -c 'set nomore' -c 'let g:vimball_home="/tmp/vim-r-plugin-tmp/usr/share/vim/addons"' -c "so %" -c "q" /tmp/Vim-R-plugin.vmb
-	# Delete file unnecessary in a Debian system
-	(cd /tmp/vim-r-plugin-tmp/usr/share/vim/addons ;\
-	    rm r-plugin/windows.py )
 	# Create the DEBIAN directory
 	( cd /tmp/vim-r-plugin-tmp ;\
 	    mkdir DEBIAN ;\
@@ -132,7 +127,8 @@ deb:
 	Architecture: all\n\
 	Maintainer: Jakson Alves de Aquino <jalvesaq@gmail.com>\n\
 	Installed-Size: $(INSTALLEDSIZE)\n\
-	Depends: vim | vim-gtk | vim-gnome, tmux (>= 1.8), ncurses-term, wmctrl, latexmk, vim-addon-manager, r-base-core\n\
+	Depends: vim | vim-gtk | vim-gnome, tmux (>= 1.8), ncurses-term, vim-addon-manager, r-base-core\n\
+	Suggests: wmctrl, latexmk\n\
 	Enhances: vim\n\
 	Section: text\n\
 	Priority: extra\n\
