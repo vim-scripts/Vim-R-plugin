@@ -516,10 +516,10 @@ Rnoweb, RMarkdown or RreStructuredText document), and you use one of the
 commands that send a single line of code to R, then the plugin will send to R
 the command to knit the child document.
 
-After the commands that send sweave or knit the current buffer, Vim will save
-the current buffer if it has any pending changes before performing the tasks.
-After <LocalLeader>ao, Vim will run "R CMD BATCH --no-restore --no-save" on
-the current file and show the resulting .Rout file in a new tab. Please see
+After the send, sweave and knit commands, Vim will save the current buffer if
+it has any pending changes before performing the tasks.  After
+<LocalLeader>ao, Vim will run "R CMD BATCH --no-restore --no-save" on the
+current file and show the resulting .Rout file in a new tab. Please see
 |vimrplugin_routnotab| if you prefer that the file is open in a new split
 window. Note: The command <LocalLeader>ao, silently writes the current buffer
 to its file if it was modified and deletes the .Rout file if it exists.
@@ -671,13 +671,13 @@ them.
 ------------------------------------------------------------------------------
 4.4. The Object Browser~
 
-You have to do <LocalLeader>ro to either start or update the Object Browser.
-The Object Browser has two views: .GlobalEnv and Libraries. If you either
-press <Enter> or double click (GVim or Vim with 'mouse' set to "a") on the
-first line of the Object Browser, you will toggle the view between the objects
-in .GlobalEnv and the currently loaded libraries. The Object Browser requires
-the |+clientserver| feature to be automatically updated and the |+conceal|
-feature to correctly align list items.
+You have to use <LocalLeader>ro to start the Object Browser. The Object
+Browser has two views: .GlobalEnv and Libraries. If you either press <Enter>
+or double click (GVim or Vim with 'mouse' set to "a") on the first line of the
+Object Browser, you will toggle the view between the objects in .GlobalEnv and
+the currently loaded libraries. The Object Browser requires the
+|+clientserver| feature to be automatically updated and the |+conceal| feature
+to correctly align list items.
 
 In the .GlobalEnv view, if an object has the attribute "label", it will also
 be displayed. Please, see the R help for package vimcom for some options
