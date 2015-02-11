@@ -517,12 +517,12 @@ commands that send a single line of code to R, then the plugin will send to R
 the command to knit the child document.
 
 After the send, sweave and knit commands, Vim will save the current buffer if
-it has any pending changes before performing the tasks.  After
-<LocalLeader>ao, Vim will run "R CMD BATCH --no-restore --no-save" on the
-current file and show the resulting .Rout file in a new tab. Please see
-|vimrplugin_routnotab| if you prefer that the file is open in a new split
-window. Note: The command <LocalLeader>ao, silently writes the current buffer
-to its file if it was modified and deletes the .Rout file if it exists.
+it has any pending changes before performing the tasks. After <LocalLeader>ao,
+Vim will run "R CMD BATCH --no-restore --no-save" on the current file and show
+the resulting .Rout file in a new tab. Please see |vimrplugin_routnotab| if
+you prefer that the file is open in a new split window. Note: The command
+<LocalLeader>ao, silently writes the current buffer to its file if it was
+modified and deletes the .Rout file if it exists.
 
 R syntax uses " <- " to assign values to variables which is inconvenient to
 type. In insert mode, typing a single underscore, "_", will write " <- ",
@@ -1023,16 +1023,16 @@ issue is to define the chunk option `cache.lazy=FALSE`.
 ------------------------------------------------------------------------------
 5.6. Wrong message that "R is busy" (Windows only)~
 
-On Windows, when code is sent from Vim to R Console, the vimcom library
-sets the value of the internal variable `r_is_busy` to 1. The value is set
-back to 0 when any code is successfully evaluated. If you send invalid code to
-R, there will be no successful evaluation of code and, thus, the value of
-`r_is_busy` will remain set to 1. If you then try to update the Object
-Browser, see the R documentation for any function, or do other tasks that
-require the hidden evaluation of code by R, the vimcom library will
-refuse to do the tasks to avoid any risk of corrupting R's memory. It will
-tell Vim that "R is busy" and Vim will display this message. Everything should
-work as expected again after any valid code is executed in the R Console.
+On Windows, when code is sent from Vim to R Console, the vimcom library sets
+the value of the internal variable `r_is_busy` to 1. The value is set back to
+0 when any code is successfully evaluated. If you send invalid code to R,
+there will be no successful evaluation of code and the value of `r_is_busy`
+will remain set to 1. If you then try to update the Object Browser, see the R
+documentation for any function, or do other tasks that require the hidden
+evaluation of code by R, the vimcom library will refuse to do the tasks to
+avoid any risk of corrupting R's memory. It will tell Vim that "R is busy" and
+Vim will display this message. Everything should work as expected again after
+any valid code is executed in the R Console.
 
 The vimcom library is started with the state `busy`.
 
@@ -1124,7 +1124,7 @@ VIMINSTANCEID, and VIMRPLUGIN_SECRET. The first one is the path used by the R
 package vimcom to save temporary files used by the Vim-R-plugin to: perform
 omnicompletion, show R documentation in a Vim buffer, and update the Object
 Browser. The two last ones are used by the Vim-R-plugin and by vimcom to know
-that the connections are valid. If you use Vim to start R, but then closes
+that the connections are valid. If you use Vim to start R, but then close
 Vim, some variables will become outdated. Additionally, the Vim-R-plugin sets
 the value of its internal variable SendCmdToR from SendCmdToR_fake to the
 appropriate value when R is successfully started. It is possible to set the
@@ -1390,8 +1390,8 @@ it works, please, read the subsection 6.5.2 below.
 ------------------------------------------------------------------------------
 6.5.2. Details and other options:~
 
-The plugin key bindings will remain active in the documentation buffer, and,
-thus, you will be able to send commands to R as you do while editing an R
+The plugin key bindings will remain active in the documentation buffer
+allowing you to send commands to R as you would do do while editing an R
 script. You can, for example, use <LocalLeader>rh to jump to another R help
 document.
 
@@ -2126,7 +2126,7 @@ can type |:map| to see the complete list of current mappings, and below is the
 list of the names for custom key bindings (the prefix RE means "echo";
 RD, "cursor down"; RED, both "echo" and "down"):
 
-   Star/Close R~
+   Start/Close R~
    RStart
    RVanillaStart
    RCustomStart
@@ -2259,7 +2259,7 @@ later version.
 
 The Vim-R-plugin is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
 details.
 
 A copy of the GNU General Public License is available at
@@ -2552,9 +2552,9 @@ develop a better algorithm in the future.
 9.10. Highlight chunk header as R code~
 
 By default, Vim will highlight chunk headers of RMarkdown and
-RreStructuredText with a single color. When the code is processed by knitr,
-chunk headers should contain valid R code and, thus, you may want to highlight
-them as such. You can do this by putting in your |vimrc|:
+RreStructuredText with a single color. Chunk headers should contain valid R
+code when the code is processed by knitr, so you may want to highlight them as
+such. You can do this by putting in your |vimrc|:
 >
    let rrst_syn_hl_chunk = 1
    let rmd_syn_hl_chunk = 1
