@@ -1,7 +1,7 @@
 " Vim indent file
 " Language:	R
 " Author:	Jakson Alves de Aquino <jalvesaq@gmail.com>
-" Last Change:	Thu Feb 19, 2015  11:25PM
+" Last Change:	Fri Feb 20, 2015  12:16PM
 
 
 " Only load this indent file when no other was loaded.
@@ -32,7 +32,7 @@ if ! exists("g:r_indent_ess_compatible")
   let g:r_indent_ess_compatible = 0
 endif
 if ! exists("g:r_indent_op_pattern")
-  let g:r_indent_op_pattern = '\(+\|-\|\*\|/\|=\|\~\|%[^%]*%\)$'
+  let g:r_indent_op_pattern = '\(+\|-\|\*\|/\|=\|\~\|%\)$'
 endif
 
 function s:RDelete_quotes(line)
