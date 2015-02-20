@@ -1,7 +1,7 @@
 " Vim indent file
 " Language:	R
 " Author:	Jakson Alves de Aquino <jalvesaq@gmail.com>
-" Last Change:	Thu Feb 19, 2015  07:50PM
+" Last Change:	Thu Feb 19, 2015  11:25PM
 
 
 " Only load this indent file when no other was loaded.
@@ -30,6 +30,9 @@ if !exists("g:r_indent_comment_column")
 endif
 if ! exists("g:r_indent_ess_compatible")
   let g:r_indent_ess_compatible = 0
+endif
+if ! exists("g:r_indent_op_pattern")
+  let g:r_indent_op_pattern = '\(+\|-\|\*\|/\|=\|\~\|%[^%]*%\)$'
 endif
 
 function s:RDelete_quotes(line)
@@ -297,10 +300,6 @@ function GetRIndent()
 
     let bb = s:Get_paren_balance(line, '[', ']')
 
-    if pb == 0 && bb == 0 && (line =~ '.*[,&|\-\*+<>]$' || cline =~ '^\s*[,&|\-\*+<>]')
-      return indent(lnum)
-    endif
-
     if pb > 0
       if &filetype == "rhelp"
         let ind = s:Get_last_paren_idx(line, '(', ')', pb)
@@ -352,21 +351,19 @@ function GetRIndent()
     let post_block = 1
   endif
 
-  " Indent after user defined operator
-  if exists("g:r_indent_op_pattern")
-    let olnum = s:Get_prev_line(lnum)
-    let oline = getline(olnum)
-    if olnum > 0
-      if line =~ g:r_indent_op_pattern
-        if oline =~ g:r_indent_op_pattern
-          return indent(lnum)
-        else
-          return indent(lnum) + &sw
-        endif
+  " Indent after operator pattern
+  let olnum = s:Get_prev_line(lnum)
+  let oline = getline(olnum)
+  if olnum > 0
+    if line =~ g:r_indent_op_pattern
+      if oline =~ g:r_indent_op_pattern
+        return indent(lnum)
       else
-        if oline =~ g:r_indent_op_pattern
-          return indent(lnum) - &sw
-        endif
+        return indent(lnum) + &sw
+      endif
+    else
+      if oline =~ g:r_indent_op_pattern
+        return indent(lnum) - &sw
       endif
     endif
   endif
