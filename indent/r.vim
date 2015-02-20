@@ -1,7 +1,7 @@
 " Vim indent file
 " Language:	R
 " Author:	Jakson Alves de Aquino <jalvesaq@gmail.com>
-" Last Change:	Mon Nov 03, 2014  11:29AM
+" Last Change:	Thu Feb 19, 2015  07:50PM
 
 
 " Only load this indent file when no other was loaded.
@@ -350,6 +350,25 @@ function GetRIndent()
     endif
     let pb = s:Get_paren_balance(line, '(', ')')
     let post_block = 1
+  endif
+
+  " Indent after user defined operator
+  if exists("g:r_indent_op_pattern")
+    let olnum = s:Get_prev_line(lnum)
+    let oline = getline(olnum)
+    if olnum > 0
+      if line =~ g:r_indent_op_pattern
+        if oline =~ g:r_indent_op_pattern
+          return indent(lnum)
+        else
+          return indent(lnum) + &sw
+        endif
+      else
+        if oline =~ g:r_indent_op_pattern
+          return indent(lnum) - &sw
+        endif
+      endif
+    endif
   endif
 
   let post_fun = 0
