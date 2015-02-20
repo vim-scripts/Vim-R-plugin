@@ -542,8 +542,44 @@ test_that('the function works', {
               x <- 0
           })
 
+x <- 1 + 2 + 3 +
+    4 + 5
+x <- 1 - 2 - 3 -
+    4 - 5
+x <- 1 * 2 * 3 *
+    4 * 5
+x <- 1 / 2 / 3 /
+    4 / 5
+y <- x ~
+    x
+y =
+    x
+x <-
+    33
+
+ggplot(data, aes(…)) +
+    geom <- points() +
+    theme <- bw() +
+    scale <- fill <- discrete()
+x <- 0
+
+x = letters %>%
+    sapply(strupper)
+message(x)
+
+flights %>%
+    group <- by(year, month, day) %>%
+    select(arr <- delay, dep <- delay) %>%
+    endop <- "END"
+x <- 0
+
 ############################################################################
 ## indent/r.vim starts to make mistakes here
+
+y = x &
+    x
+y = x |
+    x
 
 test <- this('the function works',
              {
@@ -620,14 +656,15 @@ try <- function(expr, silent = FALSE) {
     f
 }
 
-x <- 1 + 2 + 3 +
-    4 + 5
-x <- 1 - 2 - 3 -
-    4 - 5
-x <- 1 * 2 * 3 *
-    4 * 5
-x <- 1 / 2 / 3 /
-    4 / 5
+flights %>%
+    group <- by(year, month, day) %>%
+    select(arr <- delay, dep <- delay) %>%
+    summarise(
+              arr = mean(arr <- delay, na.rm = TRUE),
+              dep = mean(dep <- delay, na.rm = TRUE)
+             ) %>%
+    filter(arr > 30 | dep > 30)
+x <- 0
 
 cat("The End\n")
 
