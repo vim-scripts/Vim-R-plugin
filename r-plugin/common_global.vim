@@ -1418,7 +1418,7 @@ function RGetKeyWord()
 endfunction
 
 " Send sources to R
-function RSourceLines(lines, e)
+function RSourceLines(lines)
     let lines = a:lines
     if &filetype == "rrst"
         let lines = map(copy(lines), 'substitute(v:val, "^\\.\\. \\?", "", "")')
@@ -1427,37 +1427,33 @@ function RSourceLines(lines, e)
         let lines = map(copy(lines), 'substitute(v:val, "^\\`\\`\\?", "", "")')
     endif
     call writefile(lines, g:rplugin_rsource)
-    if a:e == "echo"
-        if exists("g:vimrplugin_maxdeparse")
-            let rcmd = 'base::source("' . g:rplugin_rsource . '", echo=TRUE, max.deparse=' . g:vimrplugin_maxdeparse . ')'
-        else
-            let rcmd = 'base::source("' . g:rplugin_rsource . '", echo=TRUE)'
-        endif
-    else
+    if g:vimrplugin_source_args == ""
         let rcmd = 'base::source("' . g:rplugin_rsource . '")'
+    else
+        let rcmd = 'base::source("' . g:rplugin_rsource . '", ' . g:vimrplugin_source_args . ')'
     endif
     let ok = g:SendCmdToR(rcmd)
     return ok
 endfunction
 
 " Send file to R
-function SendFileToR(e)
+function SendFileToR()
     update
     let fpath = expand("%:p")
     if has("win32") || has("win64")
         let fpath = substitute(fpath, "\\", "/", "g")
     endif
-    if a:e == "echo"
-        call g:SendCmdToR('base::source("' . fpath . '", echo=TRUE)')
-    else
+    if g:vimrplugin_source_args == ""
         call g:SendCmdToR('base::source("' . fpath . '")')
+    else
+        call g:SendCmdToR('base::source("' . fpath . '", ' . g:vimrplugin_source_args . ')')
     endif
 endfunction
 
 " Send block to R
 " Adapted from marksbrowser plugin
 " Function to get the marks which the cursor is between
-function SendMBlockToR(e, m)
+function SendMBlockToR(m)
     if &filetype != "r" && b:IsInRCode(1) == 0
         return
     endif
@@ -1487,7 +1483,7 @@ function SendMBlockToR(e, m)
         let lineB -= 1
     endif
     let lines = getline(lineA, lineB)
-    let ok = b:SourceLines(lines, a:e)
+    let ok = b:SourceLines(lines)
     if ok == 0
         return
     endif
@@ -1498,7 +1494,7 @@ function SendMBlockToR(e, m)
 endfunction
 
 " Send functions to R
-function SendFunctionToR(e, m)
+function SendFunctionToR(m)
     if &filetype != "r" && b:IsInRCode(1) == 0
         return
     endif
@@ -1550,13 +1546,13 @@ function SendFunctionToR(e, m)
 
     if startline > lastline
         call setpos(".", [0, firstline - 1, 1])
-        call SendFunctionToR(a:e, a:m)
+        call SendFunctionToR(a:m)
         call setpos(".", save_cursor)
         return
     endif
 
     let lines = getline(firstline, lastline)
-    let ok = b:SourceLines(lines, a:e)
+    let ok = b:SourceLines(lines)
     if  ok == 0
         return
     endif
@@ -1567,7 +1563,7 @@ function SendFunctionToR(e, m)
 endfunction
 
 " Send selection to R
-function SendSelectionToR(e, m)
+function SendSelectionToR(m)
     if &filetype != "r" && b:IsInRCode(1) == 0
         if !(&filetype == "rnoweb" && getline(".") =~ "\\Sexpr{")
             return
@@ -1617,7 +1613,7 @@ function SendSelectionToR(e, m)
         let lines[llen] = strpart(lines[llen], 0, j)
     endif
 
-    let ok = b:SourceLines(lines, a:e)
+    let ok = b:SourceLines(lines)
     if ok == 0
         return
     endif
@@ -1630,7 +1626,7 @@ function SendSelectionToR(e, m)
 endfunction
 
 " Send paragraph to R
-function SendParagraphToR(e, m)
+function SendParagraphToR(m)
     if &filetype != "r" && b:IsInRCode(1) == 0
         return
     endif
@@ -1655,7 +1651,7 @@ function SendParagraphToR(e, m)
         endif
     endwhile
     let lines = getline(i, j)
-    let ok = b:SourceLines(lines, a:e)
+    let ok = b:SourceLines(lines)
     if ok == 0
         return
     endif
@@ -1699,7 +1695,7 @@ function SendFHChunkToR()
             " Child R chunk
             if curbuf[idx] =~ chdchk
                 " First run everything up to child chunk and reset buffer
-                call b:SourceLines(codelines, "silent")
+                call b:SourceLines(codelines)
                 let codelines = []
 
                 " Next run child chunk and continue
@@ -1717,7 +1713,7 @@ function SendFHChunkToR()
             let idx += 1
         endif
     endwhile
-    call b:SourceLines(codelines, "silent")
+    call b:SourceLines(codelines)
 endfunction
 
 function KnitChild(line, godown)
@@ -2774,31 +2770,23 @@ endfunction
 function RCreateSendMaps()
     " Block
     "-------------------------------------
-    call RCreateMaps("ni", '<Plug>RSendMBlock',     'bb', ':call SendMBlockToR("silent", "stay")')
-    call RCreateMaps("ni", '<Plug>RESendMBlock',    'be', ':call SendMBlockToR("echo", "stay")')
-    call RCreateMaps("ni", '<Plug>RDSendMBlock',    'bd', ':call SendMBlockToR("silent", "down")')
-    call RCreateMaps("ni", '<Plug>REDSendMBlock',   'ba', ':call SendMBlockToR("echo", "down")')
+    call RCreateMaps("ni", '<Plug>RSendMBlock',     'bb', ':call SendMBlockToR("stay")')
+    call RCreateMaps("ni", '<Plug>RDSendMBlock',    'bd', ':call SendMBlockToR("down")')
 
     " Function
     "-------------------------------------
-    call RCreateMaps("nvi", '<Plug>RSendFunction',  'ff', ':call SendFunctionToR("silent", "stay")')
-    call RCreateMaps("nvi", '<Plug>RDSendFunction', 'fe', ':call SendFunctionToR("echo", "stay")')
-    call RCreateMaps("nvi", '<Plug>RDSendFunction', 'fd', ':call SendFunctionToR("silent", "down")')
-    call RCreateMaps("nvi", '<Plug>RDSendFunction', 'fa', ':call SendFunctionToR("echo", "down")')
+    call RCreateMaps("nvi", '<Plug>RSendFunction',  'ff', ':call SendFunctionToR("stay")')
+    call RCreateMaps("nvi", '<Plug>RDSendFunction', 'fd', ':call SendFunctionToR("down")')
 
     " Selection
     "-------------------------------------
-    call RCreateMaps("v", '<Plug>RSendSelection',   'ss', ':call SendSelectionToR("silent", "stay")')
-    call RCreateMaps("v", '<Plug>RESendSelection',  'se', ':call SendSelectionToR("echo", "stay")')
-    call RCreateMaps("v", '<Plug>RDSendSelection',  'sd', ':call SendSelectionToR("silent", "down")')
-    call RCreateMaps("v", '<Plug>REDSendSelection', 'sa', ':call SendSelectionToR("echo", "down")')
+    call RCreateMaps("v", '<Plug>RSendSelection',   'ss', ':call SendSelectionToR("stay")')
+    call RCreateMaps("v", '<Plug>RDSendSelection',  'sd', ':call SendSelectionToR("down")')
 
     " Paragraph
     "-------------------------------------
-    call RCreateMaps("ni", '<Plug>RSendParagraph',   'pp', ':call SendParagraphToR("silent", "stay")')
-    call RCreateMaps("ni", '<Plug>RESendParagraph',  'pe', ':call SendParagraphToR("echo", "stay")')
-    call RCreateMaps("ni", '<Plug>RDSendParagraph',  'pd', ':call SendParagraphToR("silent", "down")')
-    call RCreateMaps("ni", '<Plug>REDSendParagraph', 'pa', ':call SendParagraphToR("echo", "down")')
+    call RCreateMaps("ni", '<Plug>RSendParagraph',   'pp', ':call SendParagraphToR("stay")')
+    call RCreateMaps("ni", '<Plug>RDSendParagraph',  'pd', ':call SendParagraphToR("down")')
 
     if &filetype == "rnoweb" || &filetype == "rmd" || &filetype == "rrst"
         call RCreateMaps("ni", '<Plug>RSendChunkFH', 'ch', ':call SendFHChunkToR()')
@@ -2817,7 +2805,7 @@ function RCreateSendMaps()
 
     " For compatibility with Johannes Ranke's plugin
     if g:vimrplugin_map_r == 1
-        vnoremap <buffer><silent> r <Esc>:call SendSelectionToR("silent", "down")<CR>
+        vnoremap <buffer><silent> r <Esc>:call SendSelectionToR("down")<CR>
     endif
 endfunction
 
@@ -2961,6 +2949,7 @@ call RSetDefaultValue("g:vimrplugin_openpdf",           2)
 call RSetDefaultValue("g:vimrplugin_synctex",           1)
 call RSetDefaultValue("g:vimrplugin_openhtml",          0)
 call RSetDefaultValue("g:vimrplugin_vim_wd",            0)
+call RSetDefaultValue("g:vimrplugin_source_args",    "''")
 call RSetDefaultValue("g:vimrplugin_after_start",    "''")
 call RSetDefaultValue("g:vimrplugin_restart",           0)
 call RSetDefaultValue("g:vimrplugin_vsplit",            0)
