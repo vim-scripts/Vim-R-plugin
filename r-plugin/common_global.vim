@@ -1586,9 +1586,12 @@ endfunction
 
 " Send selection to R
 function SendSelectionToR(m)
-    if &filetype != "r" && b:IsInRCode(1) == 0
-        if !(&filetype == "rnoweb" && getline(".") =~ "\\Sexpr{")
-            return
+    if &filetype != "r"
+        if b:IsInRCode(0) == 0
+            if (&filetype == "rnoweb" && getline(".") !~ "\\Sexpr{") || (&filetype == "rmd" && getline(".") !~ "`r ") || (&filetype == "rrst" && getline(".") !~ ":r:`")
+                call RWarningMsg("Not inside an R code chunk.")
+                return
+            endif
         endif
     endif
 
