@@ -608,7 +608,28 @@ function TmuxActivePane()
   endif
 endfunction
 
+function DelayedFillLibList()
+    autocmd! RStarting
+    augroup! RStarting
+    let g:rplugin_starting_R = 0
+    if exists("g:rplugin_fillrliblist_called") && g:rplugin_fillrliblist_called
+        let g:rplugin_fillrliblist_called = 0
+        call FillRLibList()
+    endif
+endfunction
+
 function StartR_TmuxSplit(rcmd)
+    " Vim crashes if the syntax highlight is changed while the window is
+    " being resized, but only if the R syntax is included in another filetype
+    if &filetype != "r"
+        let g:rplugin_starting_R = 1
+        augroup RStarting
+            autocmd!
+            autocmd CursorMoved <buffer> call DelayedFillLibList()
+            autocmd CursorMovedI <buffer> call DelayedFillLibList()
+        augroup END
+    endif
+
     let g:rplugin_vim_pane = TmuxActivePane()
     let tmuxconf = ['set-environment VIMRPLUGIN_TMPDIR "' . g:rplugin_tmpdir . '"',
                 \ 'set-environment VIMRPLUGIN_COMPLDIR "' . substitute(g:rplugin_compldir, ' ', '\\ ', "g") . '"',
@@ -950,8 +971,9 @@ function WaitVimComStart()
 
         if g:rplugin_do_tmux_split
             " Environment variables persists across Tmux windows.
-            " Leave a hint (to vimcom) that R was not started by Vim:
-            call system("tmux set-environment VIMRPLUGIN_TMPDIR None")
+            " Unset VIMRPLUGIN_TMPDIR to avoid vimcom loading its C library
+            " when R was not started by Vim:
+            call system("tmux set-environment -u VIMRPLUGIN_TMPDIR")
         endif
         return 1
     else
@@ -3233,6 +3255,7 @@ let g:rplugin_lastev = ""
 let g:rplugin_last_r_prompt = ""
 let g:rplugin_hasRSFbutton = 0
 let g:rplugin_tmuxsname = "VimR-" . substitute(localtime(), '.*\(...\)', '\1', '')
+let g:rplugin_starting_R = 0
 
 " SyncTeX options
 let g:rplugin_has_wmctrl = 0
