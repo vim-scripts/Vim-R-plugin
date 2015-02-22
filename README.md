@@ -12,7 +12,3 @@ Please, read the file *doc/r-plugin.txt* for usage details.
 
 If you decide to use this version, you will also need the development version
 of vimcom: https://github.com/jalvesaq/VimCom
-
-Note: Joris Muller wrote [installation instructions for MacVim] on OS X.
-
-[installation instructions for MacVim]: http://jomuller.fr/?p=413
