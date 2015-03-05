@@ -93,7 +93,7 @@ deb:
 	  - syntax/rrst.vim\n\
 	" > /tmp/vim-r-plugin-tmp/usr/share/vim/registry/vim-r-plugin.yaml
 	# Create the copyright
-	echo "Copyright (C) 2011-2014 Jakson Aquino\n\
+	echo "Copyright (C) 2011-2015 Jakson Aquino\n\
 	\n\
 	License: GPLv2+\n\
 	\n\
