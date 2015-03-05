@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 1.2
+Version: 1.2.1
 For Vim version 7.4
 
  1. Overview                                    |r-plugin-overview|
@@ -199,7 +199,7 @@ Before installing the plugin, you should install its dependencies:
 
 	    If you need to use the Vim-R-plugin in a Unix system without the
 	    X Server running (e.g. Linux Console, and any system accessed
-	    through ssh), you have to use Neovim and Nvim-R:
+	    through ssh), the best option is to use Neovim and Nvim-R:
 	    https://github.com/jalvesaq/Nvim-R
 	    If you cannot use Neovim and need to use Vim in these
 	    circumstances, please, read |r-plugin-nox| and |r-plugin-remote|.
@@ -396,34 +396,23 @@ Start/Close
 
 Send
   . File                                               \aa
-  . File (echo)                                        \ae
   . File (open .Rout)                                  \ao
   --------------------------------------------------------
   . Block (cur)                                        \bb
-  . Block (cur, echo)                                  \be
   . Block (cur, down)                                  \bd
-  . Block (cur, echo and down)                         \ba
   --------------------------------------------------------
   . Chunk (cur)                                        \cc
-  . Chunk (cur, echo)                                  \ce
   . Chunk (cur, down)                                  \cd
-  . Chunk (cur, echo and down)                         \ca
   . Chunk (from first to here)                         \ch
   --------------------------------------------------------
   . Function (cur)                                     \ff
-  . Function (cur, echo)                               \fe
   . Function (cur and down)                            \fd
-  . Function (cur, echo and down)                      \fa
   --------------------------------------------------------
   . Selection                                          \ss
-  . Selection (echo)                                   \se
   . Selection (and down)                               \sd
-  . Selection (echo and down)                          \sa
   --------------------------------------------------------
   . Paragraph                                          \pp
-  . Paragraph (echo)                                   \pe
   . Paragraph (and down)                               \pd
-  . Paragraph (echo and down)                          \pa
   --------------------------------------------------------
   . Line                                                \l
   . Line (and down)                                     \d
@@ -506,21 +495,20 @@ The plugin commands that send code to R Console are the most commonly used. If
 the code to be sent to R has a single line it is sent directly to R Console,
 but if it has more than one line (a selection of lines, a block of lines
 between two marks, a paragraph etc) the lines are written to a file and the
-plugin sends to R the command to source the file. You should type quickly
-<LocalLeader>d to send to R Console the line currently under the cursor. If
-you want to see what lines are being sourced when sending a selection of
-lines, you should do either <LocalLeader>se or <LocalLeader>sa instead of
-<LocalLeader>ss.
+plugin sends to R the command to source the file. To send to R Console the
+line currently under the cursor you should type <LocalLeader>d. If you want to
+see what lines are being sourced when sending a selection of lines, you can
+use either <LocalLeader>se or <LocalLeader>sa instead of <LocalLeader>ss.
 
 If the cursor is over the header of an R chunk with the `child` option (from
 Rnoweb, RMarkdown or RreStructuredText document), and you use one of the
 commands that send a single line of code to R, then the plugin will send to R
 the command to knit the child document.
 
-After the commands that send, sweave or knit the current buffer, Vim will save
-the current buffer if it has any pending changes before performing the tasks.
-After <LocalLeader>ao, Vim will run "R CMD BATCH --no-restore --no-save" on
-the current file and show the resulting .Rout file in a new tab. Please see
+After the send, sweave and knit commands, Vim will save the current buffer if
+it has any pending changes before performing the tasks.  After
+<LocalLeader>ao, Vim will run "R CMD BATCH --no-restore --no-save" on the
+current file and show the resulting .Rout file in a new tab. Please see
 |vimrplugin_routnotab| if you prefer that the file is open in a new split
 window. Note: The command <LocalLeader>ao, silently writes the current buffer
 to its file if it was modified and deletes the .Rout file if it exists.
@@ -672,13 +660,13 @@ them.
 ------------------------------------------------------------------------------
 4.4. The Object Browser~
 
-You have to do <LocalLeader>ro to start the Object Browser. The Object Browser
-has two views: .GlobalEnv and Libraries. If you either press <Enter> or double
-click (GVim or Vim with 'mouse' set to "a") on the first line of the Object
-Browser it will toggle the view between the objects in .GlobalEnv and the
-currently loaded libraries. The Object Browser requires the |+clientserver|
-feature to be automatically updated and the |+conceal| feature to correctly
-align list items.
+You have to use <LocalLeader>ro to start the Object Browser. The Object
+Browser has two views: .GlobalEnv and Libraries. If you either press <Enter>
+or double click (GVim or Vim with 'mouse' set to "a") on the first line of the
+Object Browser, you will toggle the view between the objects in .GlobalEnv and
+the currently loaded libraries. The Object Browser requires the
+|+clientserver| feature to be automatically updated and the |+conceal| feature
+to correctly align list items.
 
 In the .GlobalEnv view, if an object has the attribute "label", it will also
 be displayed. Please, see the R help for package vimcom for some options
@@ -690,9 +678,9 @@ UTF-8 is part of either LC_MESSAGES or LC_ALL variables, unicode line drawing
 characters will be used to draw lines in the Object Browser. This is the case
 of most Linux distributions.
 
-In the Libraries view, you can either double click or press <Enter> over a
-library to see its objects. In the Object Browser, the libraries have the
-color defined by the PreProc highlighting group, and the other objects have
+In the Libraries view, you can either double click or press <Enter> on a
+library name to see its objects. In the Object Browser the libraries have the
+color defined by the PreProc highlighting group. The other objects have
 their colors defined by the return value of some R functions. Each line in the
 table below shows a highlighting group and the corresponding R function (if
 any) used to classify the objects:
@@ -829,8 +817,8 @@ copy/scroll back mode (see below).
 
 The configuration script also sets <C-a> as the Tmux escape character (the
 default is <C-b>), that is, you have to type <C-a> before typing a Tmux
-command. Below are the most useful key bindings to use Tmux with the above
-tmux.conf:
+command. Below are the most useful key bindings for Tmux with the tmux.conf
+shown above:
 
     <C-a>arrow keys : Move the cursor to the Tmux panel above, below, at the
                       right or at the left of the current one.
@@ -894,16 +882,16 @@ support in Tmux. You will be able to toggle mouse support on and off by typing
 							     *r-plugin-remote*
 4.7.2 Remote access~
 
-The Vim-R-plugin can not send commands from a local Vim to a remote R, but
-you can access the remote machine through ssh and run Tmux, Vim and R in the
+The Vim-R-plugin can not send commands from a local Vim to a remote R, but you
+can access the remote machine through ssh and run Tmux, Vim and R in the
 remote machine. Tmux should not be running in the local machine because some
-environment variables could pass from the local to the remote Tmux and make
-the plugin confuse.
+environment variables could pass from the local to the remote Tmux and confuse
+the plugin.
 
 If you need to access Vim in a remote Unix machine through ssh, and if you
 want to get omnicompletion, syntax highlight of function names and the Object
 Browser working properly, instead of Vim, it is recommended that you use
-Neovim because it does not require the X Server to be fully functional. You if
+Neovim because it does not require the X Server to be fully functional. If
 you cannot use Neovim, then you have to:
 
    - Enable X11 Forwarding in the remote machine.
@@ -923,10 +911,10 @@ you cannot use Neovim, then you have to:
      tmux
      vim --servername VIM script.R
 <
-With Tmux, you can detach the Vim-R session and reattach it latter (but the
+With Tmux, you can detach the Vim-R session and reattach it later (but the
 connection with the XServer could be lost in the process). This is useful if
-you plan to begin the use the Vim-R-plugin in a machine and latter move to
-another computer and access remotely your previous Vim-R session. Below is the
+you plan to begin the use the Vim-R-plugin in a machine and later move to
+another computer and access your previous Vim-R session remotely. Below is the
 step-by-step procedure to run the Vim-R remotely:
 
   - Start Tmux:
@@ -942,7 +930,7 @@ step-by-step procedure to run the Vim-R remotely:
     The command will be <C-b>d if you have not set <C-a> as the escape
     character in your ~/.tmux.conf.
 
-  - Some time latter (even if accessing the machine remotely) reattach the
+  - Some time later (even if accessing the machine remotely) reattach the
     Tmux session:
       tmux attach
 
@@ -951,33 +939,24 @@ step-by-step procedure to run the Vim-R remotely:
 							 *r-plugin-known-bugs*
 5. Known bugs and workarounds~
 
-The bugs that are known to exist but that will not be fixed are listed in this
-section. Some of them can not be fixed because they depend on either R or Vim
-missing features; others would be very time consuming to fix without breaking
-anything.
+Known bugs that will not be fixed are listed in this section. Some of them can
+not be fixed because they depend on missing features in either R or Vim;
+others would be very time consuming to fix without breaking anything.
 
 
 ------------------------------------------------------------------------------
 5.1. R's source() issues~
 
-The R's `source()` function of base package prints an extra new line between
-commands if the option echo = TRUE, and error and warning messages are printed
-only after the entire code is sourced, which makes it more difficult to find
-errors in the code sent to R. Details:
+The R's `source()` function of the base package prints an extra new line
+between commands if the option echo = TRUE, and error and warning messages are
+printed only after the entire code is sourced. This makes it more difficult to
+find errors in the code sent to R. Details:
 
    https://stat.ethz.ch/pipermail/r-devel/2012-December/065352.html
 
 
 ------------------------------------------------------------------------------
-5.2. The clipboard's content is lost (Windows only)~
-
-On Windows, the plugin copies the command that will be sent to R into the
-clipboard. Thus, if you have anything in the clipboard it will be lost while
-using the plugin.
-
-
-------------------------------------------------------------------------------
-5.3. The menu may not reflect some of your custom key bindings~
+5.2. The menu may not reflect some of your custom key bindings~
 
 If you have created a custom key binding for the Vim-R-plugin, the menu in
 GVim will not always reflect the correct key binding if it is not the same for
@@ -985,11 +964,11 @@ Normal, Visual and Insert modes.
 
 
 ------------------------------------------------------------------------------
-5.4. Syntactically correct code may be wrongly indented~
+5.3. Syntactically correct code may be wrongly indented~
 
 If the Vim-R-plugin indents your code wrongly you may get the correct
-indentation by adding braces and line breaks to it. For example, try to
-indent the code below:
+indentation by adding braces and line breaks to it. For example, try to indent
+the code below:
 >
    # This code will be wrongly indented:
 
@@ -1010,19 +989,21 @@ indent the code below:
 <
 See also:
 
+   https://github.com/jcfaria/Vim-R-plugin/issues/37
    https://github.com/jcfaria/Vim-R-plugin/issues/77
+   https://github.com/jcfaria/Vim-R-plugin/issues/158
    https://github.com/jcfaria/Vim-R-plugin/blob/master/r-plugin/indent_test.R
 
 
 ------------------------------------------------------------------------------
-5.5. Functions are not always correctly sent to R~
+5.4. Functions are not always correctly sent to R~
 
 The plugin is only capable of recognizing functions defined using the `<-`
 operator. See: https://github.com/jcfaria/Vim-R-plugin/issues/94
 
 
 ------------------------------------------------------------------------------
-5.6. Objects Browser does not support knitr cache=TRUE~
+5.5. Objects Browser does not support knitr cache=TRUE~
 
 When processing Rnoweb documents with the knitr package, if the chunk option
 `cache` is `TRUE`, the Object Browser will not be able to detect the classes
@@ -1031,33 +1012,32 @@ issue is to define the chunk option `cache.lazy=FALSE`.
 
 
 ------------------------------------------------------------------------------
-5.7. Wrong message that "R is busy" (Windows only)~
+5.6. Wrong message that "R is busy" (Windows only)~
 
-On Windows, when code is sent from Vim to R Console, the vimcom library sets
-the value of the internal variable `r_is_busy` to 1. The value is set back to
-0 when any code is successfully evaluated. If you send invalid code to R,
-there will be no successful evaluation of code and, thus, the value of
-`r_is_busy` will remain set to 1. Then, if you try to update the object
-browser, see the R documentation for any function, or do other tasks that
-require the hidden evaluation of code by R, the vimcom library will refuse to
-do the tasks to avoid any risk of corrupting R's memory. It will tell Vim that
-"R is busy" and Vim will display this message. Everything should work as
-expected again after any valid code is executed in the R Console.
+On Windows, when code is sent from Vim to R Console, the vimcom library
+sets the value of the internal variable `r_is_busy` to 1. The value is set
+back to 0 when any code is successfully evaluated. If you send invalid code to
+R, there will be no successful evaluation of code and, thus, the value of
+`r_is_busy` will remain set to 1. If you then try to update the Object
+Browser, see the R documentation for any function, or do other tasks that
+require the hidden evaluation of code by R, the vimcom library will
+refuse to do the tasks to avoid any risk of corrupting R's memory. It will
+tell Vim that "R is busy" and Vim will display this message. Everything should
+work as expected again after any valid code is executed in the R Console.
 
 The vimcom library is started with the state `busy`.
 
 ------------------------------------------------------------------------------
 							*r-plugin-SyncTeX-win*
-							*r-plugin-SyncTeX-mac*
-5.8. SyncTeX on Windows~
+5.7. SyncTeX on Windows~
 
-On Windows, backward search with Sumatra pop ups a console window (`vim`
-running the required --remote-expr command) which quickly disappears.
+On Windows, backward search with Sumatra pop ups a console window which
+quickly disappears (it is `vim` running the required `--remote-expr` command).
 
 
 ------------------------------------------------------------------------------
 								*r-plugin-nox*
-5.9. Bugs that affect Linux Console and Vim accessed through ssh~
+5.8. Bugs that affect Linux Console and Vim accessed through ssh~
 
 If you run Vim in the Linux Console or start Vim in a terminal emulator
 without the command line argument |--servername|, Vim will not receive remote
@@ -1123,7 +1103,7 @@ See also: |r-plugin-remote|.
 
 
 ------------------------------------------------------------------------------
-5.10. R must be started by Vim~
+5.9. R must be started by Vim~
 
 The communication between Vim and R will work only if R was started by Vim
 through the <LocalLeader>rf command because the plugin was designed to connect
@@ -1194,6 +1174,8 @@ is running:
 |vimrplugin_term|              External terminal to be used
 |vimrplugin_term_cmd|          Complete command to open an external terminal
 |vimrplugin_sleeptime|         Delay while sending commands in MS Windows
+|vimrplugin_save_win_pos|      Save positions of R and GVim windows
+|vimrplugin_arrange_windows|   Restore positions of R and GVim windows
 |vimrplugin_assign|            Convert '_' into ' <- '
 |vimrplugin_assign_map|        Choose what to convert into ' <- '
 |vimrplugin_rnowebchunk|       Convert '<' into '<<>>=\n@' in Rnoweb files
@@ -1217,7 +1199,7 @@ is running:
 |vimrplugin_applescript|       Use osascript in Mac OS X
 |vimrplugin_listmethods|       Do `vim.list.args()` instead of `args()`
 |vimrplugin_specialplot|       Do `vim.plot()` instead of `plot()`
-|vimrplugin_maxdeparse|        Argument to R `source()` function
+|vimrplugin_source_args|       Arguments to R `source()` function
 |vimrplugin_latexcmd|          Command to run on .tex files
 |vimrplugin_latexmk|           Define wether `latexmk` should be run
 |vimrplugin_sweaveargs|        Arguments do `Sweave()`
@@ -1235,8 +1217,10 @@ is running:
 |vimrplugin_source|            Source additional scripts
 |vimrplugin_restart|           Restart R if it is already running
 |vimrplugin_show_args|         Show extra information during omnicompletion
+|vimrplugin_args_in_stline|    Set 'statusline' to function arguments
 |vimrplugin_vimcom_wait|       Time to wait for vimcom loading
 |vimrplugin_vim_wd|            Start R in Vim's working directory
+|vimrplugin_after_start|       System command to execute after R startup
 |vimrplugin_user_maps_only|    Only set user specified key bindings
 |vimrplugin_tmpdir|            Where temporary files are created
 |vimrplugin_compldir|          Where lists for omnicompletion are stored
@@ -1245,7 +1229,7 @@ is running:
 
 ------------------------------------------------------------------------------
 							     *vimrplugin_term*
-6.1. Terminal emulator (Linux/Unix only)~
+6.1. Terminal emulator (Linux/Unix only, but not Mac OS X)~
 
 Note: The options of this section are ignored on Mac OS X, where the command
 `open` is called to run the default application used to run shell scripts.
@@ -1267,7 +1251,6 @@ If Vim does not select your favorite terminal emulator, you may define it in
 your |vimrc| by setting the variable vimrplugin_term, as shown below:
 >
    let vimrplugin_term = "xterm"
-   let vimrplugin_term = "/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal"
 <
 							 *vimrplugin_term_cmd*
 If your terminal emulator is not listed above, or if you are not satisfied
@@ -1276,14 +1259,15 @@ your |vimrc| the variable vimrplugin_term_cmd, as in the examples below:
 >
    let vimrplugin_term_cmd = "gnome-terminal --title R -e"
    let vimrplugin_term_cmd = "terminator --title R -x"
-   let vimrplugin_term_cmd = "/Applications/Utilities/iTerm.app/Contents/MacOS/iTerm -t R"
 <
 Please, look at the manual of your terminal emulator to know how to call it.
 The last argument must be the one which precedes the command to be executed.
 
 
 ------------------------------------------------------------------------------
-							*vimrplugin_sleeptime*
+						  *vimrplugin_sleeptime*
+						  *vimrplugin_save_win_pos*
+						  *vimrplugin_arrange_windows*
 6.2. Options specific to Windows~
 
 
@@ -1293,6 +1277,19 @@ example show how to adjust the value of sleeptime in your |vimrc|:
 >
    let vimrplugin_sleeptime = 30
 <
+By default, the Vim-R-plugin will save the positions of R Console and GVim
+windows when you quits R with the <LocalLeader>rq command, and will restore
+the positions of the windows when you start R. If you do not like this
+behavior, you can put in your |vimrc|:
+>
+   let vimrplugin_save_win_pos = 0
+   let vimrplugin_arrange_windows = 0
+<
+If you want R and GVim windows always in a specific arrangement, regardless of
+their state when you have quited R for the last time, you should arrange them
+in the way you want, quit R, change in your |vimrc| only the value of
+vimrplugin_save_win_pos and, finally, quit Vim.
+
 Note: the option vimrplugin_Rterm was disabled because the C code to send
 strings from Vim to Windows PowerShell is not working.
 
@@ -1340,7 +1337,7 @@ them converted into `<-`.
 						      *vimrplugin_tmux_ob*
 6.4. Object Browser options~
 
-By default, the object browser will be created with 40 columns. The minimum
+By default, the Object Browser will be created with 40 columns. The minimum
 width of the Object Browser window is 9 columns. You can change the object
 browser's default width by setting the value of |vimrplugin_objbr_w| in your
 |vimrc|, as below:
@@ -1600,13 +1597,12 @@ after <LocalLeader>rg if you put the following line in your |vimrc|:
 <
 
 ------------------------------------------------------------------------------
-						       *vimrplugin_maxdeparse*
-6.16. maxdeparse~
+						      *vimrplugin_source_args*
+6.16. Arguments to R source() function~
 
-You can set the argument maxdeparse to be passed to R's `source()` function.
-Example:
+You can add arguments to be passed to R's `source()` function. Example:
 >
-   let vimrplugin_maxdeparse = 300
+   let vimrplugin_source_args = "max.deparse.length = 300, echo = TRUE"
 <
 
 ------------------------------------------------------------------------------
@@ -1833,7 +1829,8 @@ do <LocalLeader>rf, <LocalLeader>rv or <LocalLeader>rc, then, put in your
 
 ------------------------------------------------------------------------------
 							*vimrplugin_show_args*
-6.28. Show extra information during omnicompletion~
+						   *vimrplugin_args_in_stline*
+6.28. Function arguments~
 
 If you want that Vim shows a preview window with the function arguments as you
 do omnicompletion, put in your |vimrc|:
@@ -1843,6 +1840,18 @@ do omnicompletion, put in your |vimrc|:
 The preview window is not shown by default because it is more convenient to
 run <Ctrl-X><Ctrl-A> to complete the function arguments. The preview window
 will be shown only if "preview" is also included in your 'completeopt'.
+
+If you want that function arguments are displayed in Vim's status line when
+you insert `(`, put in your |vimrc|:
+>
+   let vimrplugin_args_in_stline = 1
+<
+The status line is restored when `)` is typed. This option is useful only if
+the window has a status line. See |laststatus|. If the string with the list of
+arguments is longer than the status line width, the list is not displayed
+completely. This argument is incompatible with any plugin that changes the
+status line because it is always restored to the value that it had at Vim's
+startup. Functions of .GlobalEnv do not have their arguments displayed.
 
 
 ------------------------------------------------------------------------------
@@ -1873,8 +1882,38 @@ This option is useful only for those who did not enable 'autochdir'.
 
 
 ------------------------------------------------------------------------------
+						      *vimrplugin_after_start*
+6.31 System command to execute after R startup~
+
+If you want that Vim executes a command right after R startup, set the value
+of vimrplugin_after_start in your |vimrc|.
+
+For example, if you are using GVim and running R in the Gnome-terminal,
+`~/bin` is in your path, and you want to resize and change the positions of
+GVim and the Terminal windows, you may create a script `~/bin/after_R_start`
+with the following contents
+>
+   #!/bin/sh
+   wmctrl -F -r R -e 0,0,200,1200,800
+   wmctrl -r GVIM -e 0,300,40,1200,800
+<
+make the script executable, and put in your |vimrc|:
+>
+   if has("gui_running")
+       let vimrplugin_after_start = "after_R_start"
+   endif
+<
+On Mac OS X, if you are using MacVim and R.app, the `~/bin/after_R_start`
+contents might be:
+>
+   #!/bin/sh
+   osascript -e 'tell application "Terminal" to set the bounds of the front window to {0, 200, 1200, 1000}'
+   osascript -e 'tell application "MacVim" to set the bounds of the front window to {300, 40, 1500, 840}'
+<
+
+------------------------------------------------------------------------------
 						   *vimrplugin_user_maps_only*
-6.31 Only set key bindings that are user specified~
+6.32 Only set key bindings that are user specified~
 
 The Vim-R-plugin sets many default key bindings.  The user can set custom
 key bindings (|r-plugin-key-bindings|).  If you wish the Vim-R-plugin to only
@@ -1886,7 +1925,7 @@ set those key-bindings specified by the user, put in your vimrc:
 ------------------------------------------------------------------------------
 							   *vimrplugin_tmpdir*
 							 *vimrplugin_compldir*
-6.32 Temporary files directories~
+6.33 Temporary files directories~
 
 You can change the directories where temporary files are created and
 stored by setting in your |vimrc| the values of vimrplugin_tmpdir and
@@ -1904,7 +1943,7 @@ want to know they are, while editing an R file, do in Normal mode:
 
 ------------------------------------------------------------------------------
 							    *r-plugin-SyncTeX*
-6.33 SyncTeX support (Linux only)~
+6.34 SyncTeX support~
 
 SyncTeX is a set of communication systems used by some PDF viewers and by some
 text editors which allow users to jump from a specific line in the text editor
@@ -1944,7 +1983,9 @@ Note: The current knitr package (version 1.7) has at least two limitations:
 
 
 ------------------------------------------------------------------------------
-6.33.1 Evince configuration~
+6.34.1 Evince configuration~
+
+No configuration should be required.
 
 If you have Evince installed, the Vim-R-plugin assumes that you are using it
 to view PDF documents and that you run either GVim or Vim in Gnome-Terminal.
@@ -1957,7 +1998,7 @@ to press <LocalLeader>gp again.
 
 
 ------------------------------------------------------------------------------
-6.33.2 Okular configuration~
+6.34.2 Okular configuration~
 
 You have to configure Okular to call Vim during backward searches.
 In Okular, click in:
@@ -1985,8 +2026,13 @@ of Okular will be started.
 
 
 ------------------------------------------------------------------------------
-6.33.3 Zathura configuration~
+6.34.3 Zathura configuration~
 
+No configuration should be required if Evince is not installed. If evince is
+installed, put in your |vimrc|:
+>
+   let vimrplugin_pdfviewer = "zathura"
+<
 Zathura (version >= 0.3.1) is also supported. If the terminal emulator is not
 raised during backward search (from PDF to Vim), you have to set the value of
 |vimrplugin_vim_window|, as explained below.
@@ -1997,7 +2043,7 @@ to press <LocalLeader>gp again.
 
 
 ------------------------------------------------------------------------------
-6.33.4 Skim with MacVim configuration~
+6.34.4 Skim with MacVim configuration (Mac OS X)~
 
 You have to configure Skim to call MacVim during backward searches.
 In Skim click in the drop down menu and fill the fields:
@@ -2011,9 +2057,15 @@ In Skim click in the drop down menu and fill the fields:
 <
 
 ------------------------------------------------------------------------------
+6.34.5 Sumatra configuration (Windows)~
+
+No configuration is required.
+
+
+------------------------------------------------------------------------------
                                                        *vimrplugin_vim_window*
 				                       *vimrplugin_synctex*
-6.33.4 Configuring the PDF editor and Vim's window title~
+6.34.6 Configuring the PDF editor and Vim's window title~
 
 If SyncTeX does not work (see above), you may try to set in your |vimrc| the
 values of |vimrplugin_pdfviewer| and vimrplugin_vim_window.
@@ -2041,10 +2093,6 @@ To completely disable SyncTeX support, put in your |vimrc|:
    let vimrplugin_synctex = 0
 <
 
-There is no support for Windows and Mac OS X. See |r-plugin-SyncTeX-win| and
-|r-plugin-SyncTeX-mac|.
-
-
 ==============================================================================
 						       *r-plugin-key-bindings*
 7. Custom key bindings~
@@ -2065,8 +2113,7 @@ The above example shows how to change key binding used to start R from
 
 Only the custom key bindings for Normal mode are shown in Vim's menu, but you
 can type |:map| to see the complete list of current mappings, and below is the
-list of the names for custom key bindings (the prefix RE means "echo";
-RD, "cursor down"; RED, both "echo" and "down"):
+list of the names for custom key bindings (the prefix RD means "cursor down"):
 
    Star/Close R~
    RStart
@@ -2101,21 +2148,13 @@ RD, "cursor down"; RED, both "echo" and "down"):
 
    Send code to R console~
    RSendSelection
-   RESendSelection
    RDSendSelection
-   REDSendSelection
    RSendMBlock
-   RESendMBlock
    RDSendMBlock
-   REDSendMBlock
    RSendParagraph
-   RESendParagraph
    RDSendParagraph
-   REDSendParagraph
    RSendFunction
-   RESendFunction
    RDSendFunction
-   REDSendFunction
    RSendFile
    RESendFile
 
@@ -2136,8 +2175,6 @@ RD, "cursor down"; RED, both "echo" and "down"):
    Support to Sweave and knitr~
    RSendChunk
    RDSendChunk
-   RESendChunk
-   REDSendChunk
    RSendChunkFH (from the first chunk to here)
    RBibTeX    (Sweave)
    RBibTeXK   (Knitr)
@@ -2672,7 +2709,7 @@ See also: |vimrplugin_latexcmd|.
 
 ------------------------------------------------------------------------------
 							*r-plugin-quick-setup*
-9.21. Suggestion of setup for the Vim-R-plugin~
+9.21. Suggested setup for the Vim-R-plugin~
 
 Please, look at section |r-plugin-options| if you want information about the
 Vim-r-plugin customization.
@@ -2787,6 +2824,16 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 ==============================================================================
 							       *r-plugin-news*
 10. News~
+
+1.2.1 (2015-03-04)
+
+ * Minor bug fixes.
+
+ * New options: vimrplugin_after_start, vimrplugin_args_in_stline,
+   vimrplugin_save_win_pos and vimrplugin_arrange_windows.
+
+ * Remove option vimrplugin_maxdeparse, remove the "echo" send
+   commands and add the option vimrplugin_source_args.
 
 1.2 (2015-01-18)
 
@@ -3027,7 +3074,7 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 110222 (2011-02-22)
  * Added syntax/rhelp.vim.
  * New command for rnoweb files: BibTeX current file (\sb).
- * New commands for the object browser: open visible lists (\r=) and close
+ * New commands for the Object Browser: open visible lists (\r=) and close
    visible lists (\r-).
  * Reorganization of the GUI menu.
 

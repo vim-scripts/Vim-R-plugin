@@ -608,7 +608,28 @@ function TmuxActivePane()
   endif
 endfunction
 
+function DelayedFillLibList()
+    autocmd! RStarting
+    augroup! RStarting
+    let g:rplugin_starting_R = 0
+    if exists("g:rplugin_fillrliblist_called") && g:rplugin_fillrliblist_called
+        let g:rplugin_fillrliblist_called = 0
+        call FillRLibList()
+    endif
+endfunction
+
 function StartR_TmuxSplit(rcmd)
+    " Vim crashes if the syntax highlight is changed while the window is
+    " being resized, but only if the R syntax is included in another filetype
+    if &filetype != "r"
+        let g:rplugin_starting_R = 1
+        augroup RStarting
+            autocmd!
+            autocmd CursorMoved <buffer> call DelayedFillLibList()
+            autocmd CursorMovedI <buffer> call DelayedFillLibList()
+        augroup END
+    endif
+
     let g:rplugin_vim_pane = TmuxActivePane()
     let tmuxconf = ['set-environment VIMRPLUGIN_TMPDIR "' . g:rplugin_tmpdir . '"',
                 \ 'set-environment VIMRPLUGIN_COMPLDIR "' . substitute(g:rplugin_compldir, ' ', '\\ ', "g") . '"',
@@ -661,6 +682,9 @@ function StartR_TmuxSplit(rcmd)
     endif
     if WaitVimComStart()
         call SendToVimCom("\005B Update OB [StartR]")
+        if g:vimrplugin_after_start != ''
+            call system(g:vimrplugin_after_start)
+        endif
     endif
 endfunction
 
@@ -733,6 +757,9 @@ function StartR_ExternalTerm(rcmd)
     let g:SendCmdToR = function('SendCmdToR_Term')
     if WaitVimComStart()
         call SendToVimCom("\005B Update OB [StartR]")
+        if g:vimrplugin_after_start != ''
+            call system(g:vimrplugin_after_start)
+        endif
     endif
 endfunction
 
@@ -922,8 +949,8 @@ function WaitVimComStart()
         let g:rplugin_vimcom_home = vr[1]
         let g:rplugin_vimcomport = vr[2]
         let g:rplugin_r_pid = vr[3]
-        if g:rplugin_vimcom_version != "1.2.0"
-            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.2.0.')
+        if g:rplugin_vimcom_version != "1.2.1"
+            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.2.1.')
             sleep 1
         endif
         if has("win32")
@@ -944,8 +971,9 @@ function WaitVimComStart()
 
         if g:rplugin_do_tmux_split
             " Environment variables persists across Tmux windows.
-            " Leave a hint (to vimcom) that R was not started by Vim:
-            call system("tmux set-environment VIMRPLUGIN_TMPDIR None")
+            " Unset VIMRPLUGIN_TMPDIR to avoid vimcom loading its C library
+            " when R was not started by Vim:
+            call system("tmux set-environment -u VIMRPLUGIN_TMPDIR")
         endif
         return 1
     else
@@ -1412,7 +1440,7 @@ function RGetKeyWord()
 endfunction
 
 " Send sources to R
-function RSourceLines(lines, e)
+function RSourceLines(lines)
     let lines = a:lines
     if &filetype == "rrst"
         let lines = map(copy(lines), 'substitute(v:val, "^\\.\\. \\?", "", "")')
@@ -1420,38 +1448,34 @@ function RSourceLines(lines, e)
     if &filetype == "rmd"
         let lines = map(copy(lines), 'substitute(v:val, "^\\`\\`\\?", "", "")')
     endif
-    call writefile(lines, b:rsource)
-    if a:e == "echo"
-        if exists("g:vimrplugin_maxdeparse")
-            let rcmd = 'base::source("' . b:rsource . '", echo=TRUE, max.deparse=' . g:vimrplugin_maxdeparse . ')'
-        else
-            let rcmd = 'base::source("' . b:rsource . '", echo=TRUE)'
-        endif
+    call writefile(lines, g:rplugin_rsource)
+    if g:vimrplugin_source_args == ""
+        let rcmd = 'base::source("' . g:rplugin_rsource . '")'
     else
-        let rcmd = 'base::source("' . b:rsource . '")'
+        let rcmd = 'base::source("' . g:rplugin_rsource . '", ' . g:vimrplugin_source_args . ')'
     endif
     let ok = g:SendCmdToR(rcmd)
     return ok
 endfunction
 
 " Send file to R
-function SendFileToR(e)
+function SendFileToR()
     update
     let fpath = expand("%:p")
     if has("win32") || has("win64")
         let fpath = substitute(fpath, "\\", "/", "g")
     endif
-    if a:e == "echo"
-        call g:SendCmdToR('base::source("' . fpath . '", echo=TRUE)')
-    else
+    if g:vimrplugin_source_args == ""
         call g:SendCmdToR('base::source("' . fpath . '")')
+    else
+        call g:SendCmdToR('base::source("' . fpath . '", ' . g:vimrplugin_source_args . ')')
     endif
 endfunction
 
 " Send block to R
 " Adapted from marksbrowser plugin
 " Function to get the marks which the cursor is between
-function SendMBlockToR(e, m)
+function SendMBlockToR(m)
     if &filetype != "r" && b:IsInRCode(1) == 0
         return
     endif
@@ -1481,7 +1505,7 @@ function SendMBlockToR(e, m)
         let lineB -= 1
     endif
     let lines = getline(lineA, lineB)
-    let ok = b:SourceLines(lines, a:e)
+    let ok = b:SourceLines(lines)
     if ok == 0
         return
     endif
@@ -1492,7 +1516,7 @@ function SendMBlockToR(e, m)
 endfunction
 
 " Send functions to R
-function SendFunctionToR(e, m)
+function SendFunctionToR(m)
     if &filetype != "r" && b:IsInRCode(1) == 0
         return
     endif
@@ -1544,13 +1568,13 @@ function SendFunctionToR(e, m)
 
     if startline > lastline
         call setpos(".", [0, firstline - 1, 1])
-        call SendFunctionToR(a:e, a:m)
+        call SendFunctionToR(a:m)
         call setpos(".", save_cursor)
         return
     endif
 
     let lines = getline(firstline, lastline)
-    let ok = b:SourceLines(lines, a:e)
+    let ok = b:SourceLines(lines)
     if  ok == 0
         return
     endif
@@ -1561,10 +1585,13 @@ function SendFunctionToR(e, m)
 endfunction
 
 " Send selection to R
-function SendSelectionToR(e, m)
-    if &filetype != "r" && b:IsInRCode(1) == 0
-        if !(&filetype == "rnoweb" && getline(".") =~ "\\Sexpr{")
-            return
+function SendSelectionToR(m)
+    if &filetype != "r"
+        if b:IsInRCode(0) == 0
+            if (&filetype == "rnoweb" && getline(".") !~ "\\Sexpr{") || (&filetype == "rmd" && getline(".") !~ "`r ") || (&filetype == "rrst" && getline(".") !~ ":r:`")
+                call RWarningMsg("Not inside an R code chunk.")
+                return
+            endif
         endif
     endif
 
@@ -1611,7 +1638,7 @@ function SendSelectionToR(e, m)
         let lines[llen] = strpart(lines[llen], 0, j)
     endif
 
-    let ok = b:SourceLines(lines, a:e)
+    let ok = b:SourceLines(lines)
     if ok == 0
         return
     endif
@@ -1624,7 +1651,7 @@ function SendSelectionToR(e, m)
 endfunction
 
 " Send paragraph to R
-function SendParagraphToR(e, m)
+function SendParagraphToR(m)
     if &filetype != "r" && b:IsInRCode(1) == 0
         return
     endif
@@ -1649,7 +1676,7 @@ function SendParagraphToR(e, m)
         endif
     endwhile
     let lines = getline(i, j)
-    let ok = b:SourceLines(lines, a:e)
+    let ok = b:SourceLines(lines)
     if ok == 0
         return
     endif
@@ -1693,7 +1720,7 @@ function SendFHChunkToR()
             " Child R chunk
             if curbuf[idx] =~ chdchk
                 " First run everything up to child chunk and reset buffer
-                call b:SourceLines(codelines, "silent")
+                call b:SourceLines(codelines)
                 let codelines = []
 
                 " Next run child chunk and continue
@@ -1711,7 +1738,7 @@ function SendFHChunkToR()
             let idx += 1
         endif
     endwhile
-    call b:SourceLines(codelines, "silent")
+    call b:SourceLines(codelines)
 endfunction
 
 function KnitChild(line, godown)
@@ -1914,20 +1941,23 @@ function RQuit(how)
         endif
     endif
 
-    if has("win32") || has("win64")
-        let repl = libcall(g:rplugin_vimcom_lib, "SendQuitMsg", qcmd . "\n")
-    else
-        call g:SendCmdToR(qcmd)
-        if g:rplugin_do_tmux_split
-            if a:how == "save"
-                sleep 200m
-            endif
-            if g:vimrplugin_restart
-                let ca_ck = g:vimrplugin_ca_ck
-                let g:vimrplugin_ca_ck = 0
-                call g:SendCmdToR("exit")
-                let g:vimrplugin_ca_ck = ca_ck
-            endif
+    if g:vimrplugin_save_win_pos && v:servername != ""
+        let repl = libcall(g:rplugin_vimcom_lib, "SaveWinPos", $VIMRPLUGIN_COMPLDIR)
+        if repl != "OK"
+            call RWarningMsg(repl)
+        endif
+    endif
+
+    call g:SendCmdToR(qcmd)
+    if g:rplugin_do_tmux_split
+        if a:how == "save"
+            sleep 200m
+        endif
+        if g:vimrplugin_restart
+            let ca_ck = g:vimrplugin_ca_ck
+            let g:vimrplugin_ca_ck = 0
+            call g:SendCmdToR("exit")
+            let g:vimrplugin_ca_ck = ca_ck
         endif
     endif
 
@@ -2235,6 +2265,8 @@ function RSetPDFViewer()
             let g:rplugin_pdfviewer = "evince"
         elseif executable("okular")
             let g:rplugin_pdfviewer = "okular"
+        elseif executable("zathura")
+            let g:rplugin_pdfviewer = "zathura"
         else
             let g:rplugin_pdfviewer = "none"
             if $R_PDFVIEWER == ""
@@ -2243,7 +2275,7 @@ function RSetPDFViewer()
                 let pdfvl = [$R_PDFVIEWER, "xdg-open"]
             endif
             " List from R configure script:
-            let pdfvl += ["evince", "okular", "zathura", "xpdf", "gv", "gnome-gv", "ggv", "kpdf", "gpdf", "kghostview,", "acroread", "acroread4"]
+            let pdfvl += ["xpdf", "gv", "gnome-gv", "ggv", "kpdf", "gpdf", "kghostview,", "acroread", "acroread4"]
             for prog in pdfvl
                 if executable(prog)
                     let g:rplugin_pdfviewer = prog
@@ -2343,7 +2375,7 @@ function ROpenPDF(path)
             call system(g:macvim_skim_app_path . '/Contents/MacOS/Skim "' . basenm . '.pdf" 2> /dev/null >/dev/null &')
         else
             let pcmd = g:rplugin_pdfviewer . " '" . pdfpath . "' 2>/dev/null >/dev/null &"
-        call system(pcmd)
+            call system(pcmd)
         endif
         if g:rplugin_has_wmctrl
             call system("wmctrl -a '" . basenm . ".pdf'")
@@ -2376,6 +2408,40 @@ function RAskHelp(...)
     else
         call g:SendCmdToR("help(" . a:1. ")")
     endif
+endfunction
+
+function DisplayArgs()
+    if &filetype == "r" || b:IsInRCode(0)
+        let rkeyword = RGetKeyWord()
+        let s:sttl_str = g:rplugin_status_line
+        let fargs = "Not a function"
+        for omniL in g:rplugin_omni_lines
+            if omniL =~ '^' . rkeyword . "\x06"
+                let tmp = split(omniL, "\x06")
+                if len(tmp) < 5
+                    break
+                else
+                    let fargs = rkeyword . '(' . tmp[4] . ')'
+                endif
+            endif
+        endfor
+        if fargs !~ "Not a function"
+            let fargs = substitute(fargs, "NO_ARGS", '', 'g')
+            let fargs = substitute(fargs, "\x07", '=', 'g')
+            let s:sttl_str = substitute(fargs, "\x09", ', ', 'g')
+            silent set statusline=%!RArgsStatusLine()
+        endif
+    endif
+    exe "normal! a("
+endfunction
+
+function RArgsStatusLine()
+    return s:sttl_str
+endfunction
+
+function RestoreStatusLine()
+    exe 'set statusline=' . substitute(g:rplugin_status_line, ' ', '\\ ', 'g')
+    normal! a)
 endfunction
 
 function PrintRObject(rkeyword)
@@ -2715,6 +2781,10 @@ function RCreateEditMaps()
     if g:vimrplugin_assign == 1 || g:vimrplugin_assign == 2
         silent exe 'imap <buffer><silent> ' . g:vimrplugin_assign_map . ' <Esc>:call ReplaceUnderS()<CR>a'
     endif
+    if g:vimrplugin_args_in_stline
+        imap <buffer><silent> ( <Esc>:call DisplayArgs()<CR>a
+        imap <buffer><silent> ) <Esc>:call RestoreStatusLine()<CR>a
+    endif
     if hasmapto("<Plug>RCompleteArgs", "i")
         imap <buffer><silent> <Plug>RCompleteArgs <C-R>=RCompleteArgs()<CR>
     else
@@ -2725,31 +2795,23 @@ endfunction
 function RCreateSendMaps()
     " Block
     "-------------------------------------
-    call RCreateMaps("ni", '<Plug>RSendMBlock',     'bb', ':call SendMBlockToR("silent", "stay")')
-    call RCreateMaps("ni", '<Plug>RESendMBlock',    'be', ':call SendMBlockToR("echo", "stay")')
-    call RCreateMaps("ni", '<Plug>RDSendMBlock',    'bd', ':call SendMBlockToR("silent", "down")')
-    call RCreateMaps("ni", '<Plug>REDSendMBlock',   'ba', ':call SendMBlockToR("echo", "down")')
+    call RCreateMaps("ni", '<Plug>RSendMBlock',     'bb', ':call SendMBlockToR("stay")')
+    call RCreateMaps("ni", '<Plug>RDSendMBlock',    'bd', ':call SendMBlockToR("down")')
 
     " Function
     "-------------------------------------
-    call RCreateMaps("nvi", '<Plug>RSendFunction',  'ff', ':call SendFunctionToR("silent", "stay")')
-    call RCreateMaps("nvi", '<Plug>RDSendFunction', 'fe', ':call SendFunctionToR("echo", "stay")')
-    call RCreateMaps("nvi", '<Plug>RDSendFunction', 'fd', ':call SendFunctionToR("silent", "down")')
-    call RCreateMaps("nvi", '<Plug>RDSendFunction', 'fa', ':call SendFunctionToR("echo", "down")')
+    call RCreateMaps("nvi", '<Plug>RSendFunction',  'ff', ':call SendFunctionToR("stay")')
+    call RCreateMaps("nvi", '<Plug>RDSendFunction', 'fd', ':call SendFunctionToR("down")')
 
     " Selection
     "-------------------------------------
-    call RCreateMaps("v", '<Plug>RSendSelection',   'ss', ':call SendSelectionToR("silent", "stay")')
-    call RCreateMaps("v", '<Plug>RESendSelection',  'se', ':call SendSelectionToR("echo", "stay")')
-    call RCreateMaps("v", '<Plug>RDSendSelection',  'sd', ':call SendSelectionToR("silent", "down")')
-    call RCreateMaps("v", '<Plug>REDSendSelection', 'sa', ':call SendSelectionToR("echo", "down")')
+    call RCreateMaps("v", '<Plug>RSendSelection',   'ss', ':call SendSelectionToR("stay")')
+    call RCreateMaps("v", '<Plug>RDSendSelection',  'sd', ':call SendSelectionToR("down")')
 
     " Paragraph
     "-------------------------------------
-    call RCreateMaps("ni", '<Plug>RSendParagraph',   'pp', ':call SendParagraphToR("silent", "stay")')
-    call RCreateMaps("ni", '<Plug>RESendParagraph',  'pe', ':call SendParagraphToR("echo", "stay")')
-    call RCreateMaps("ni", '<Plug>RDSendParagraph',  'pd', ':call SendParagraphToR("silent", "down")')
-    call RCreateMaps("ni", '<Plug>REDSendParagraph', 'pa', ':call SendParagraphToR("echo", "down")')
+    call RCreateMaps("ni", '<Plug>RSendParagraph',   'pp', ':call SendParagraphToR("stay")')
+    call RCreateMaps("ni", '<Plug>RDSendParagraph',  'pd', ':call SendParagraphToR("down")')
 
     if &filetype == "rnoweb" || &filetype == "rmd" || &filetype == "rrst"
         call RCreateMaps("ni", '<Plug>RSendChunkFH', 'ch', ':call SendFHChunkToR()')
@@ -2768,7 +2830,7 @@ function RCreateSendMaps()
 
     " For compatibility with Johannes Ranke's plugin
     if g:vimrplugin_map_r == 1
-        vnoremap <buffer><silent> r <Esc>:call SendSelectionToR("silent", "down")<CR>
+        vnoremap <buffer><silent> r <Esc>:call SendSelectionToR("down")<CR>
     endif
 endfunction
 
@@ -2792,10 +2854,7 @@ function RBufEnter()
 endfunction
 
 function RVimLeave()
-    if exists("b:rsource")
-        " b:rsource only exists if the filetype of the last buffer is .R*
-        call delete(b:rsource)
-    endif
+    call delete(g:rplugin_rsource)
     call delete(g:rplugin_tmpdir . "/eval_reply")
     call delete(g:rplugin_tmpdir . "/formatted_code")
     call delete(g:rplugin_tmpdir . "/GlobalEnvList_" . $VIMINSTANCEID)
@@ -2897,6 +2956,9 @@ if !isdirectory(g:rplugin_tmpdir)
     call mkdir(g:rplugin_tmpdir, "p", 0700)
 endif
 
+" Make the file name of files to be sourced
+let g:rplugin_rsource = g:rplugin_tmpdir . "/Rsource-" . getpid()
+
 let g:rplugin_is_darwin = system("uname") =~ "Darwin"
 
 " Variables whose default value is fixed
@@ -2905,13 +2967,15 @@ call RSetDefaultValue("g:vimrplugin_allnames",          0)
 call RSetDefaultValue("g:vimrplugin_rmhidden",          0)
 call RSetDefaultValue("g:vimrplugin_assign",            1)
 call RSetDefaultValue("g:vimrplugin_assign_map",    "'_'")
+call RSetDefaultValue("g:vimrplugin_args_in_stline",    0)
 call RSetDefaultValue("g:vimrplugin_rnowebchunk",       1)
 call RSetDefaultValue("g:vimrplugin_strict_rst",        1)
 call RSetDefaultValue("g:vimrplugin_openpdf",           2)
 call RSetDefaultValue("g:vimrplugin_synctex",           1)
 call RSetDefaultValue("g:vimrplugin_openhtml",          0)
-call RSetDefaultValue("g:vimrplugin_Rterm",             0)
 call RSetDefaultValue("g:vimrplugin_vim_wd",            0)
+call RSetDefaultValue("g:vimrplugin_source_args",    "''")
+call RSetDefaultValue("g:vimrplugin_after_start",    "''")
 call RSetDefaultValue("g:vimrplugin_restart",           0)
 call RSetDefaultValue("g:vimrplugin_vsplit",            0)
 call RSetDefaultValue("g:vimrplugin_rconsole_width",   -1)
@@ -2938,6 +3002,15 @@ call RSetDefaultValue("g:vimrplugin_objbr_place",     "'script,right'")
 call RSetDefaultValue("g:vimrplugin_user_maps_only", 0)
 call RSetDefaultValue("g:vimrplugin_latexcmd", "'default'")
 call RSetDefaultValue("g:vimrplugin_rmd_environment", "'.GlobalEnv'")
+if has("win32") || has("win64")
+    call RSetDefaultValue("g:vimrplugin_Rterm",           0)
+    call RSetDefaultValue("g:vimrplugin_save_win_pos",    1)
+    call RSetDefaultValue("g:vimrplugin_arrange_windows", 1)
+else
+    let g:vimrplugin_Rterm = 0
+    call RSetDefaultValue("g:vimrplugin_save_win_pos",    0)
+    call RSetDefaultValue("g:vimrplugin_arrange_windows", 0)
+endif
 
 " The C code in VimCom/src/apps/vimr.c to send strings to RTerm is not working:
 let g:vimrplugin_Rterm = 0
@@ -2965,27 +3038,6 @@ function RSetMyPort(p)
     if &filetype == "rbrowser"
         call SendToVimCom("\002" . a:p)
         call SendToVimCom("\005B Update OB [RSetMyPort]")
-    endif
-endfunction
-
-function SendObjPortToVimCom(p)
-    call SendToVimCom("\002" . a:p)
-endfunction
-
-function ROnJobActivity()
-    if v:job_data[1] == 'stdout'
-        for cmd in v:job_data[2]
-            if cmd == ""
-                continue
-            endif
-            if cmd =~ "^call " || cmd  =~ "^let "
-                exe cmd
-            else
-                call RWarningMsg("[JobActivity] Unknown command: " . cmd)
-            endif
-        endfor
-    elseif v:job_data[1] == 'stderr'
-        call RWarningMsg('JobActivity error: ' . join(v:job_data[2]))
     endif
 endfunction
 
@@ -3195,8 +3247,8 @@ endif
 let g:rplugin_firstbuffer = expand("%:p")
 let g:rplugin_running_objbr = 0
 let g:rplugin_newliblist = 0
+let g:rplugin_status_line = &statusline
 let g:rplugin_ob_warn_shown = 0
-let g:rplugin_clt_job = 0
 let g:rplugin_r_pid = 0
 let g:rplugin_myport = 0
 let g:rplugin_vimcomport = 0
@@ -3206,6 +3258,7 @@ let g:rplugin_lastev = ""
 let g:rplugin_last_r_prompt = ""
 let g:rplugin_hasRSFbutton = 0
 let g:rplugin_tmuxsname = "VimR-" . substitute(localtime(), '.*\(...\)', '\1', '')
+let g:rplugin_starting_R = 0
 
 " SyncTeX options
 let g:rplugin_has_wmctrl = 0

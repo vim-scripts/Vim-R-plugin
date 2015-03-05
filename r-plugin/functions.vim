@@ -126,6 +126,12 @@ endfunction
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 function FillRLibList()
+    " Avoid crash (segmentation fault)
+    if g:rplugin_starting_R
+        let g:rplugin_fillrliblist_called = 1
+        return
+    endif
+
     " Update the list of objects for omnicompletion
     if filereadable(g:rplugin_tmpdir . "/libnames_" . $VIMINSTANCEID)
         let g:rplugin_lists_to_load = readfile(g:rplugin_tmpdir . "/libnames_" . $VIMINSTANCEID)

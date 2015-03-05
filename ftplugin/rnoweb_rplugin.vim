@@ -20,9 +20,9 @@ else
 endif
 if !exists("g:rplugin_has_latexmk")
     if g:vimrplugin_latexmk && executable("latexmk") && executable("perl")
-	let g:rplugin_has_latexmk = 1
+        let g:rplugin_has_latexmk = 1
     else
-	let g:rplugin_has_latexmk = 0
+        let g:rplugin_has_latexmk = 0
     endif
 endif
 
@@ -200,7 +200,7 @@ function! RMakePDF(bibtex, knit)
 endfunction
 
 " Send Sweave chunk to R
-function! RnwSendChunkToR(e, m)
+function! RnwSendChunkToR(m)
     if RnwIsInRCode(0) == 0
         call RWarningMsg("Not inside an R code chunk.")
         return
@@ -208,7 +208,7 @@ function! RnwSendChunkToR(e, m)
     let chunkline = search("^<<", "bncW") + 1
     let docline = search("^@", "ncW") - 1
     let lines = getline(chunkline, docline)
-    let ok = RSourceLines(lines, a:e)
+    let ok = RSourceLines(lines)
     if ok == 0
         return
     endif
@@ -273,10 +273,8 @@ call RCreateMaps("nvi", '<Plug>RKnit',        'kn', ':call RKnitRnw()')
 call RCreateMaps("nvi", '<Plug>RMakePDFK',    'kp', ':call RMakePDF("nobib", 1)')
 call RCreateMaps("nvi", '<Plug>RBibTeXK',     'kb', ':call RMakePDF("bibtex", 1)')
 call RCreateMaps("nvi", '<Plug>RIndent',      'si', ':call RnwToggleIndentSty()')
-call RCreateMaps("ni",  '<Plug>RSendChunk',   'cc', ':call b:SendChunkToR("silent", "stay")')
-call RCreateMaps("ni",  '<Plug>RESendChunk',  'ce', ':call b:SendChunkToR("echo", "stay")')
-call RCreateMaps("ni",  '<Plug>RDSendChunk',  'cd', ':call b:SendChunkToR("silent", "down")')
-call RCreateMaps("ni",  '<Plug>REDSendChunk', 'ca', ':call b:SendChunkToR("echo", "down")')
+call RCreateMaps("ni",  '<Plug>RSendChunk',   'cc', ':call b:SendChunkToR("stay")')
+call RCreateMaps("ni",  '<Plug>RDSendChunk',  'cd', ':call b:SendChunkToR("down")')
 call RCreateMaps("nvi", '<Plug>ROpenPDF',     'op', ':call ROpenPDF("Get Master")')
 if g:vimrplugin_synctex
     call RCreateMaps("ni",  '<Plug>RSyncFor',     'gp', ':call SyncTeX_forward()')
@@ -440,13 +438,12 @@ function! SyncTeX_backward(fname, ln)
     let rnwf = substitute(rnwf, '^\./', '', '')
 
     if GoToBuf(rnwbn, rnwf, basedir, rnwln)
-	if g:rplugin_has_wmctrl
-        call system("wmctrl -xa " . g:vimrplugin_vim_window)
-	elseif has("gui_running")
-	    call foreground()
+        if g:rplugin_has_wmctrl
+            call system("wmctrl -xa " . g:vimrplugin_vim_window)
+        elseif has("gui_running")
+            call foreground()
+        endif
     endif
-    endif
-
 endfunction
 
 function! SyncTeX_forward(...)
