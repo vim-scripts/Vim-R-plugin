@@ -801,14 +801,10 @@ function StartR(whatr)
         lcd %:p:h
     endif
 
-    if a:whatr =~ "vanilla"
-        let b:rplugin_r_args = "--vanilla"
-    else
-        if a:whatr =~ "custom"
-            call inputsave()
-            let b:rplugin_r_args = input('Enter parameters for R: ')
-            call inputrestore()
-        endif
+    if a:whatr =~ "custom"
+        call inputsave()
+        let b:rplugin_r_args = input('Enter parameters for R: ')
+        call inputrestore()
     endif
 
     if g:vimrplugin_applescript
@@ -879,12 +875,13 @@ function StartR(whatr)
         endif
         call StartR_ExternalTerm(rcmd)
         if g:vimrplugin_restart && bufloaded(b:objbrtitle)
-            call WaitVimComStart()
-            call SendToVimCom("\002" . v:servername)
-            call SendToVimCom("\005G .GlobalEnv [Restarting R]")
-            call SendToVimCom("\005L Libraries [Restarting()]")
-            if exists("*UpdateOB")
-                call UpdateOB("GlobalEnv")
+            if WaitVimComStart()
+                call SendToVimCom("\002" . v:servername)
+                call SendToVimCom("\005G .GlobalEnv [Restarting R]")
+                call SendToVimCom("\005L Libraries [Restarting()]")
+                if exists("*UpdateOB")
+                    call UpdateOB("GlobalEnv")
+                endif
             endif
         endif
     endif
@@ -928,6 +925,9 @@ function OpenRScratch()
 endfunction
 
 function WaitVimComStart()
+    if b:rplugin_r_args =~ "vanilla"
+        return 0
+    endif
     if g:vimrplugin_vimcom_wait < 300
         g:vimrplugin_vimcom_wait = 300
     endif
@@ -2756,7 +2756,6 @@ function RCreateStartMaps()
     " Start
     "-------------------------------------
     call RCreateMaps("nvi", '<Plug>RStart',        'rf', ':call StartR("R")')
-    call RCreateMaps("nvi", '<Plug>RVanillaStart', 'rv', ':call StartR("vanilla")')
     call RCreateMaps("nvi", '<Plug>RCustomStart',  'rc', ':call StartR("custom")')
 
     " Close

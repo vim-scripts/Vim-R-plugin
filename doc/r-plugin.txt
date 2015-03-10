@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 1.2.1
+Version: 1.2.2
 For Vim version 7.4
 
  1. Overview                                    |r-plugin-overview|
@@ -387,7 +387,6 @@ rhelp, rrst, rmd).
 Menu entry                                Default shortcut~
 Start/Close
   . Start R (default)                                  \rf
-  . Start R --vanilla                                  \rv
   . Start R (custom)                                   \rc
   --------------------------------------------------------
   . Close R (no save)                                  \rq
@@ -2117,7 +2116,6 @@ list of the names for custom key bindings (the prefix RD means "cursor down"):
 
    Star/Close R~
    RStart
-   RVanillaStart
    RCustomStart
    RClose
    RSaveClose
@@ -2825,7 +2823,11 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-1.2.1 (2015-03-04)
+1.2.2 (2015-03-10)
+
+ * Remove option to start R with the --vanilla argument.
+
+1.2.1 (2015-03-05)
 
  * Minor bug fixes.
 
