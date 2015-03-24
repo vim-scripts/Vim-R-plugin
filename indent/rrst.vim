@@ -1,7 +1,7 @@
 " Vim indent file
 " Language:	Rrst
 " Author:	Jakson Alves de Aquino <jalvesaq@gmail.com>
-" Last Change:	Thu Jul 10, 2014  07:11PM
+" Last Change:	Thu Jul 09, 2014  07:33PM
 
 
 " Only load this indent file when no other was loaded.

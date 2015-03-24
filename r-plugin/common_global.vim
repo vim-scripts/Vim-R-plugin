@@ -795,20 +795,21 @@ function StartR(whatr)
     if !exists("b:rplugin_R")
         call SetRPath()
     endif
+    if !exists("g:vimrplugin_r_args")
+        let b:rplugin_r_args = " "
+    else
+        let b:rplugin_r_args = g:vimrplugin_r_args
+    endif
 
     " Change to buffer's directory before starting R
     if g:vimrplugin_vim_wd == 0
         lcd %:p:h
     endif
 
-    if a:whatr =~ "vanilla"
-        let b:rplugin_r_args = "--vanilla"
-    else
-        if a:whatr =~ "custom"
-            call inputsave()
-            let b:rplugin_r_args = input('Enter parameters for R: ')
-            call inputrestore()
-        endif
+    if a:whatr =~ "custom"
+        call inputsave()
+        let b:rplugin_r_args = input('Enter parameters for R: ')
+        call inputrestore()
     endif
 
     if g:vimrplugin_applescript
@@ -879,12 +880,13 @@ function StartR(whatr)
         endif
         call StartR_ExternalTerm(rcmd)
         if g:vimrplugin_restart && bufloaded(b:objbrtitle)
-            call WaitVimComStart()
-            call SendToVimCom("\002" . v:servername)
-            call SendToVimCom("\005G .GlobalEnv [Restarting R]")
-            call SendToVimCom("\005L Libraries [Restarting()]")
-            if exists("*UpdateOB")
-                call UpdateOB("GlobalEnv")
+            if WaitVimComStart()
+                call SendToVimCom("\002" . v:servername)
+                call SendToVimCom("\005G .GlobalEnv [Restarting R]")
+                call SendToVimCom("\005L Libraries [Restarting()]")
+                if exists("*UpdateOB")
+                    call UpdateOB("GlobalEnv")
+                endif
             endif
         endif
     endif
@@ -928,6 +930,9 @@ function OpenRScratch()
 endfunction
 
 function WaitVimComStart()
+    if b:rplugin_r_args =~ "vanilla"
+        return 0
+    endif
     if g:vimrplugin_vimcom_wait < 300
         g:vimrplugin_vimcom_wait = 300
     endif
@@ -949,8 +954,8 @@ function WaitVimComStart()
         let g:rplugin_vimcom_home = vr[1]
         let g:rplugin_vimcomport = vr[2]
         let g:rplugin_r_pid = vr[3]
-        if g:rplugin_vimcom_version != "1.2.1"
-            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.2.1.')
+        if g:rplugin_vimcom_version != "1.2.2"
+            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.2.2.')
             sleep 1
         endif
         if has("win32")
@@ -2756,7 +2761,6 @@ function RCreateStartMaps()
     " Start
     "-------------------------------------
     call RCreateMaps("nvi", '<Plug>RStart',        'rf', ':call StartR("R")')
-    call RCreateMaps("nvi", '<Plug>RVanillaStart', 'rv', ':call StartR("vanilla")')
     call RCreateMaps("nvi", '<Plug>RCustomStart',  'rc', ':call StartR("custom")')
 
     " Close
@@ -2883,11 +2887,6 @@ function SetRPath()
     endif
     if !executable(b:rplugin_R)
         call RWarningMsgInp("R executable not found: '" . b:rplugin_R . "'")
-    endif
-    if !exists("g:vimrplugin_r_args")
-        let b:rplugin_r_args = " "
-    else
-        let b:rplugin_r_args = g:vimrplugin_r_args
     endif
 endfunction
 
