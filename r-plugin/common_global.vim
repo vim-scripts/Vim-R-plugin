@@ -1169,9 +1169,6 @@ function StartObjBrowser_Vim()
         else
             set splitright
         endif
-        if g:vimrplugin_objbr_place =~ "console"
-            sb R_Output
-        endif
         sil exe "vsplit " . b:objbrtitle
         let &splitright = l:sr
         sil exe "vertical resize " . g:vimrplugin_objbr_w
@@ -2127,7 +2124,7 @@ function AskRDoc(rkeyword, package, getclass)
     endif
 
     let classfor = ""
-    if bufname("%") =~ "Object_Browser" || bufname("%") == "R_Output"
+    if bufname("%") =~ "Object_Browser"
         let savesb = &switchbuf
         set switchbuf=useopen,usetab
         exe "sb " . b:rscript_buffer
@@ -2174,7 +2171,16 @@ function ShowRDoc(rkeyword)
         let rkeyw = msgs[-1]
     endif
 
-    if bufname("%") =~ "Object_Browser" || bufname("%") == "R_Output"
+    " If the help command was triggered in the R Console, jump to Vim pane
+    if g:rplugin_do_tmux_split && !g:rplugin_running_rhelp
+        let slog = system("tmux select-pane -t " . g:rplugin_vim_pane)
+        if v:shell_error
+            call RWarningMsg(slog)
+        endif
+    endif
+    let g:rplugin_running_rhelp = 0
+
+    if bufname("%") =~ "Object_Browser"
         let savesb = &switchbuf
         set switchbuf=useopen,usetab
         exe "sb " . b:rscript_buffer
@@ -2470,6 +2476,7 @@ function RAction(rcmd)
     endif
     if strlen(rkeyword) > 0
         if a:rcmd == "help"
+            let g:rplugin_running_rhelp = 1
             if g:vimrplugin_vimpager == "no"
                 call g:SendCmdToR("help(" . rkeyword . ")")
             else
@@ -3244,6 +3251,7 @@ endif
 
 let g:rplugin_firstbuffer = expand("%:p")
 let g:rplugin_running_objbr = 0
+let g:rplugin_running_rhelp = 0
 let g:rplugin_newliblist = 0
 let g:rplugin_status_line = &statusline
 let g:rplugin_ob_warn_shown = 0
