@@ -15,7 +15,6 @@ unlet s:sleeptimestr
 unlet s:sleeptime
 
 let g:rplugin_sleeptime = g:vimrplugin_sleeptime . 'm'
-exe 'let $VIM_SLEEPTIME = ' . '"' . g:vimrplugin_sleeptime . '"'
 
 if g:vimrplugin_Rterm
     let b:rplugin_R = "Rgui.exe"
