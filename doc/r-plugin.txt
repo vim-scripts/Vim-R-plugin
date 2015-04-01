@@ -1356,6 +1356,8 @@ Valid values for the Object Browser placement are "script" or "console" and
    let vimrplugin_objbr_place = "script,right"
    let vimrplugin_objbr_place = "console,left"
 <
+The "console" option is valid only if Vim is running inside of a Tmux session.
+
 
 ------------------------------------------------------------------------------
 							 *vimrplugin_vimpager*
