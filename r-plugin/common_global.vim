@@ -791,6 +791,38 @@ function StartR(whatr)
     call writefile([], g:rplugin_tmpdir . "/liblist_" . $VIMINSTANCEID)
     call delete(g:rplugin_tmpdir . "/libnames_" . $VIMINSTANCEID)
 
+    if g:vimrplugin_objbr_opendf
+        let start_options = ['options(vimcom.opendf = TRUE)']
+    else
+        let start_options = ['options(vimcom.opendf = FALSE)']
+    endif
+    if g:vimrplugin_objbr_openlist
+        let start_options += ['options(vimcom.openlist = TRUE)']
+    else
+        let start_options += ['options(vimcom.openlist = FALSE)']
+    endif
+    if g:vimrplugin_objbr_allnames
+        let start_options += ['options(vimcom.allnames = TRUE)']
+    else
+        let start_options += ['options(vimcom.allnames = FALSE)']
+    endif
+    if g:vimrplugin_texerr
+        let start_options += ['options(vimcom.texerrs = TRUE)']
+    else
+        let start_options += ['options(vimcom.texerrs = FALSE)']
+    endif
+    if g:vimrplugin_objbr_labelerr
+        let start_options += ['options(vimcom.labelerr = TRUE)']
+    else
+        let start_options += ['options(vimcom.labelerr = FALSE)']
+    endif
+    if g:vimrplugin_vimpager == "no" || !has("clientserver") || v:servername == ""
+        let start_options += ['options(vimcom.vimpager = FALSE)']
+    else
+        let start_options += ['options(vimcom.vimpager = TRUE)']
+    endif
+    call writefile(start_options, g:rplugin_tmpdir . "/start_options.R")
+
     if !exists("b:rplugin_R")
         call SetRPath()
     endif
@@ -953,8 +985,8 @@ function WaitVimComStart()
         let g:rplugin_vimcom_home = vr[1]
         let g:rplugin_vimcomport = vr[2]
         let g:rplugin_r_pid = vr[3]
-        if g:rplugin_vimcom_version != "1.2.2"
-            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.2.2.')
+        if g:rplugin_vimcom_version != "1.2.2.1"
+            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.2.2.1.')
             sleep 1
         endif
         if has("win32")
@@ -2865,6 +2897,7 @@ endfunction
 
 function RVimLeave()
     call delete(g:rplugin_rsource)
+    call delete(g:rplugin_tmpdir . "/start_options.R")
     call delete(g:rplugin_tmpdir . "/eval_reply")
     call delete(g:rplugin_tmpdir . "/formatted_code")
     call delete(g:rplugin_tmpdir . "/GlobalEnvList_" . $VIMINSTANCEID)
@@ -2997,6 +3030,11 @@ call RSetDefaultValue("g:vimrplugin_routnotab",         0)
 call RSetDefaultValue("g:vimrplugin_editor_w",         66)
 call RSetDefaultValue("g:vimrplugin_help_w",           46)
 call RSetDefaultValue("g:vimrplugin_objbr_w",          40)
+call RSetDefaultValue("g:vimrplugin_objbr_opendf",      1)
+call RSetDefaultValue("g:vimrplugin_objbr_openlist",    0)
+call RSetDefaultValue("g:vimrplugin_objbr_allnames",    0)
+call RSetDefaultValue("g:vimrplugin_texerr",            1)
+call RSetDefaultValue("g:vimrplugin_objbr_labelerr",    1)
 call RSetDefaultValue("g:vimrplugin_i386",              0)
 call RSetDefaultValue("g:vimrplugin_vimcom_wait",    5000)
 call RSetDefaultValue("g:vimrplugin_show_args",         0)
