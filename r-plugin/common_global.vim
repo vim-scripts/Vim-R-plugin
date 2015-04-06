@@ -821,6 +821,11 @@ function StartR(whatr)
     else
         let start_options += ['options(vimcom.vimpager = TRUE)']
     endif
+    if g:vimrplugin_vim_wd == 0
+        let start_options += ['setwd("' . expand("%:p:h") . '")']
+    elseif g:vimrplugin_vim_wd == 1
+        let start_options += ['setwd("' . getcwd() . '")']
+    endif
     call writefile(start_options, g:rplugin_tmpdir . "/start_options.R")
 
     if !exists("b:rplugin_R")
@@ -830,11 +835,6 @@ function StartR(whatr)
         let b:rplugin_r_args = " "
     else
         let b:rplugin_r_args = g:vimrplugin_r_args
-    endif
-
-    " Change to buffer's directory before starting R
-    if g:vimrplugin_vim_wd == 0
-        lcd %:p:h
     endif
 
     if a:whatr =~ "custom"
@@ -855,9 +855,6 @@ function StartR(whatr)
 
     if g:vimrplugin_only_in_tmux && $TMUX_PANE == ""
         call RWarningMsg("Not inside Tmux.")
-        if g:vimrplugin_vim_wd == 0
-            lcd -
-        endif
         return
     endif
 
@@ -922,10 +919,6 @@ function StartR(whatr)
         endif
     endif
 
-    " Go back to original directory:
-    if g:vimrplugin_vim_wd == 0
-        lcd -
-    endif
     echon
 endfunction
 

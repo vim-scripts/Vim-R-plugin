@@ -153,9 +153,6 @@ function StartR_Windows()
 
     let $HOME = saved_home
 
-    if g:vimrplugin_vim_wd == 0
-        lcd -
-    endif
     let g:SendCmdToR = function('SendCmdToR_Windows')
     if WaitVimComStart()
         call foreground()

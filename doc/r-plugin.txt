@@ -1915,14 +1915,21 @@ Note: You should have the line  `library(vimcom)`  in your `~/.Rprofile`.
 							   *vimrplugin_vim_wd*
 6.30 Start R in working directory of Vim~
 
-The Vim-R-plugin starts R in the directory where the current buffer is. If you
-want R's working directory to be the same as Vim's working directory, put in
-your |vimrc|:
+When you are editing an R file (.R, .Rnw, .Rd, .Rmd, .Rrst) and start R, the
+R package vimcom runs the command `setwd()` with the directory of the file
+being edited as argument, that is, the R working directory becomes the same
+directory of the R file. If you want R's working directory to be the same as
+Vim's working directory, put in your |vimrc|:
 >
     let vimrplugin_vim_wd = 1
 <
 This option is useful only for those who did not enable 'autochdir'.
 
+If you prefer that the Vim-R-plugin does not set the working directory in any
+way, put in |vimrc|:
+>
+    let vimrplugin_vim_wd = -1
+<
 
 ------------------------------------------------------------------------------
 						      *vimrplugin_after_start*
