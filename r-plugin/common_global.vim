@@ -2880,6 +2880,9 @@ function RVimLeave()
     call delete(g:rplugin_tmpdir . "/vimcom_running_" . $VIMINSTANCEID)
     call delete(g:rplugin_tmpdir . "/rconsole_hwnd_" . $VIMRPLUGIN_SECRET)
     call delete(g:rplugin_tmpdir . "/openR'")
+    if executable("rmdir")
+        call system("rmdir '" . g:rplugin_tmpdir . "'")
+    endif
 endfunction
 
 function SetRPath()
