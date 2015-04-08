@@ -821,10 +821,17 @@ function StartR(whatr)
     else
         let start_options += ['options(vimcom.vimpager = TRUE)']
     endif
+    let rwd = ""
     if g:vimrplugin_vim_wd == 0
-        let start_options += ['setwd("' . expand("%:p:h") . '")']
+        let rwd = expand("%:p:h")
     elseif g:vimrplugin_vim_wd == 1
-        let start_options += ['setwd("' . getcwd() . '")']
+        let rwd = getcwd()
+    endif
+    if rwd != ""
+        if has("win32") || has("win64")
+            let rwd = substitute(rwd, '\\', '/', 'g')
+        endif
+        let start_options += ['setwd("' . rwd . '")']
     endif
     call writefile(start_options, g:rplugin_tmpdir . "/start_options.R")
 
