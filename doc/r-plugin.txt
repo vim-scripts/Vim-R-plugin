@@ -963,46 +963,14 @@ Normal, Visual and Insert modes.
 
 
 ------------------------------------------------------------------------------
-5.3. Syntactically correct code may be wrongly indented~
-
-If the Vim-R-plugin indents your code wrongly you may get the correct
-indentation by adding braces and line breaks to it. For example, try to indent
-the code below:
->
-   # This code will be wrongly indented:
-
-   levels(x) <- ## nl == nL or 1
-       if (nl == nL) as.character(labels)
-       else paste(labels, seq_along(levels), sep = "")
-   class(x) <- c(if(ordered) "ordered", "factor")
-
-
-   # But this one will be correctly indented:
-
-   levels(x) <- ## nl == nL or 1
-       if (nl == nL)
-           as.character(labels)
-       else
-           paste(labels, seq_along(levels), sep = "")
-   class(x) <- c(if(ordered) "ordered", "factor")
-<
-See also:
-
-   https://github.com/jcfaria/Vim-R-plugin/issues/37
-   https://github.com/jcfaria/Vim-R-plugin/issues/77
-   https://github.com/jcfaria/Vim-R-plugin/issues/158
-   https://github.com/jcfaria/Vim-R-plugin/blob/master/r-plugin/indent_test.R
-
-
-------------------------------------------------------------------------------
-5.4. Functions are not always correctly sent to R~
+5.3. Functions are not always correctly sent to R~
 
 The plugin is only capable of recognizing functions defined using the `<-`
 operator. See: https://github.com/jcfaria/Vim-R-plugin/issues/94
 
 
 ------------------------------------------------------------------------------
-5.5. Objects Browser does not support knitr cache=TRUE~
+5.4. Objects Browser does not support knitr cache=TRUE~
 
 When processing Rnoweb documents with the knitr package, if the chunk option
 `cache` is `TRUE`, the Object Browser will not be able to detect the classes
@@ -1011,7 +979,7 @@ issue is to define the chunk option `cache.lazy=FALSE`.
 
 
 ------------------------------------------------------------------------------
-5.6. Wrong message that "R is busy" (Windows only)~
+5.5. Wrong message that "R is busy" (Windows only)~
 
 On Windows, when code is sent from Vim to R Console, the vimcom library
 sets the value of the internal variable `r_is_busy` to 1. The value is set
@@ -1028,7 +996,7 @@ The vimcom library is started with the state `busy`.
 
 ------------------------------------------------------------------------------
 							*r-plugin-SyncTeX-win*
-5.7. SyncTeX on Windows~
+5.6. SyncTeX on Windows~
 
 On Windows, backward search with Sumatra pop ups a console window which
 quickly disappears (it is `vim` running the required `--remote-expr` command).
@@ -1036,7 +1004,7 @@ quickly disappears (it is `vim` running the required `--remote-expr` command).
 
 ------------------------------------------------------------------------------
 								*r-plugin-nox*
-5.8. Bugs that affect Linux Console and Vim accessed through ssh~
+5.7. Bugs that affect Linux Console and Vim accessed through ssh~
 
 If you run Vim in the Linux Console or start Vim in a terminal emulator
 without the command line argument |--servername|, Vim will not receive remote
@@ -1102,7 +1070,7 @@ See also: |r-plugin-remote|.
 
 
 ------------------------------------------------------------------------------
-5.9. R must be started by Vim~
+5.8. R must be started by Vim~
 
 The communication between Vim and R will work only if R was started by Vim
 through the <LocalLeader>rf command because the plugin was designed to connect
@@ -2302,23 +2270,13 @@ directory after the installation:
    autoload/rcomplete.vim
    doc/r-plugin.txt
    ftdetect/r.vim
-   ftplugin/r.vim
    ftplugin/r_rplugin.vim
    ftplugin/rbrowser.vim
    ftplugin/rdoc.vim
-   ftplugin/rhelp.vim
    ftplugin/rhelp_rplugin.vim
-   ftplugin/rmd.vim
    ftplugin/rmd_rplugin.vim
-   ftplugin/rnoweb.vim
    ftplugin/rnoweb_rplugin.vim
-   ftplugin/rrst.vim
    ftplugin/rrst_rplugin.vim
-   indent/r.vim
-   indent/rhelp.vim
-   indent/rmd.vim
-   indent/rnoweb.vim
-   indent/rrst.vim
    r-plugin/common_buffer.vim
    r-plugin/common_global.vim
    r-plugin/functions.vim
@@ -2332,13 +2290,9 @@ directory after the installation:
    r-plugin/synctex_evince_forward.py
    r-plugin/synctex_okular_backward.sh
    r-plugin/windows.vim
-   syntax/r.vim
    syntax/rbrowser.vim
    syntax/rdoc.vim
-   syntax/rhelp.vim
-   syntax/rmd.vim
    syntax/rout.vim
-   syntax/rrst.vim
 
 
 ==============================================================================
@@ -2931,7 +2885,7 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 							       *r-plugin-news*
 10. News~
 
-1.2.3 (2015-04-07)
+1.2.3 (2015-04-08)
 
  * News options to control the Object Browser: vimrplugin_objbr_opendf,
    vimrplugin_objbr_openlist, vimrplugin_objbr_allnames and
