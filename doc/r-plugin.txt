@@ -2887,6 +2887,9 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 
 1.2.3 (2015-04-08)
 
+ * Official runtime files were deleted. See:
+   https://github.com/jalvesaq/R-Vim-runtime
+
  * News options to control the Object Browser: vimrplugin_objbr_opendf,
    vimrplugin_objbr_openlist, vimrplugin_objbr_allnames and
    vimrplugin_objbr_labelerr.
