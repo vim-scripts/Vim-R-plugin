@@ -35,8 +35,8 @@ function SourceNotDefined(lines)
 endfunction
 
 function JuliaSourceLines(lines)
-    call writefile(a:lines, b:rsource)
-    let jcmd = 'include("' . b:rsource . '")'
+    call writefile(a:lines, $VIMRPLUGIN_TMPDIR . "/julia_code")
+    let jcmd = 'include("' . $VIMRPLUGIN_TMPDIR . "/julia_code" . '")'
     let ok = g:SendCmdToR(jcmd)
     return ok
 endfunction

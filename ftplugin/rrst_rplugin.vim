@@ -13,6 +13,13 @@ endif
 " defined after the global ones:
 runtime r-plugin/common_buffer.vim
 
+if !exists("b:did_ftplugin")
+    if !exists("g:rplugin_runtime_warn")
+        call RWarningMsgInp("Your runtime files seems to be outdated.\nSee: https://github.com/jalvesaq/R-Vim-runtime")
+    endif
+    let g:rplugin_runtime_warn = 1
+endif
+
 function! RrstIsInRCode(vrb)
     let chunkline = search("^\\.\\. {r", "bncW")
     let docline = search("^\\.\\. \\.\\.", "bncW")
@@ -189,4 +196,8 @@ let g:rplugin_has_rst2pdf = 0
 
 call RSourceOtherScripts()
 
-let b:undo_ftplugin .= " | unlet! b:IsInRCode b:SourceLines b:PreviousRChunk b:NextRChunk b:SendChunkToR"
+if exists("b:undo_ftplugin")
+    let b:undo_ftplugin .= " | unlet! b:IsInRCode b:SourceLines b:PreviousRChunk b:NextRChunk b:SendChunkToR"
+else
+    let b:undo_ftplugin = " | unlet! b:IsInRCode b:SourceLines b:PreviousRChunk b:NextRChunk b:SendChunkToR"
+endif

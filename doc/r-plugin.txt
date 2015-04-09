@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 1.2.2
+Version: 1.2.3
 For Vim version 7.4
 
  1. Overview                                    |r-plugin-overview|
@@ -115,7 +115,7 @@ dependencies:
 
     * R's version must be >= 3.0.0: http://www.r-project.org/
 
-    * vimcom = 1.2-1: http://www.lepem.ufc.br/jaa/vimcom.html
+    * vimcom = 1.2-3: http://www.lepem.ufc.br/jaa/vimcom.html
 
       Note: If you cannot build vimcom yourself, you will want to
       download and install the zip file.
@@ -152,7 +152,7 @@ Before installing the plugin, you should install its dependencies:
 
    R >= 3.0.0: http://www.r-project.org/
 
-   vimcom = 1.2-1: http://www.lepem.ufc.br/jaa/vimcom.html
+   vimcom = 1.2-3: http://www.lepem.ufc.br/jaa/vimcom.html
 
    Only if you edit Rnoweb files: MacTeX, BasicTeX or other LaTeX system.
 
@@ -206,7 +206,7 @@ Before installing the plugin, you should install its dependencies:
 
    R >= 3.0.0: http://www.r-project.org/
 
-   vimcom = 1.2-1: http://www.lepem.ufc.br/jaa/vimcom.html
+   vimcom = 1.2-3: http://www.lepem.ufc.br/jaa/vimcom.html
 
    Tmux >= 1.8:   http://tmux.sourceforge.net
                   Tmux is necessary to send commands from Vim to R Console.
@@ -963,46 +963,14 @@ Normal, Visual and Insert modes.
 
 
 ------------------------------------------------------------------------------
-5.3. Syntactically correct code may be wrongly indented~
-
-If the Vim-R-plugin indents your code wrongly you may get the correct
-indentation by adding braces and line breaks to it. For example, try to indent
-the code below:
->
-   # This code will be wrongly indented:
-
-   levels(x) <- ## nl == nL or 1
-       if (nl == nL) as.character(labels)
-       else paste(labels, seq_along(levels), sep = "")
-   class(x) <- c(if(ordered) "ordered", "factor")
-
-
-   # But this one will be correctly indented:
-
-   levels(x) <- ## nl == nL or 1
-       if (nl == nL)
-           as.character(labels)
-       else
-           paste(labels, seq_along(levels), sep = "")
-   class(x) <- c(if(ordered) "ordered", "factor")
-<
-See also:
-
-   https://github.com/jcfaria/Vim-R-plugin/issues/37
-   https://github.com/jcfaria/Vim-R-plugin/issues/77
-   https://github.com/jcfaria/Vim-R-plugin/issues/158
-   https://github.com/jcfaria/Vim-R-plugin/blob/master/r-plugin/indent_test.R
-
-
-------------------------------------------------------------------------------
-5.4. Functions are not always correctly sent to R~
+5.3. Functions are not always correctly sent to R~
 
 The plugin is only capable of recognizing functions defined using the `<-`
 operator. See: https://github.com/jcfaria/Vim-R-plugin/issues/94
 
 
 ------------------------------------------------------------------------------
-5.5. Objects Browser does not support knitr cache=TRUE~
+5.4. Objects Browser does not support knitr cache=TRUE~
 
 When processing Rnoweb documents with the knitr package, if the chunk option
 `cache` is `TRUE`, the Object Browser will not be able to detect the classes
@@ -1011,7 +979,7 @@ issue is to define the chunk option `cache.lazy=FALSE`.
 
 
 ------------------------------------------------------------------------------
-5.6. Wrong message that "R is busy" (Windows only)~
+5.5. Wrong message that "R is busy" (Windows only)~
 
 On Windows, when code is sent from Vim to R Console, the vimcom library
 sets the value of the internal variable `r_is_busy` to 1. The value is set
@@ -1028,7 +996,7 @@ The vimcom library is started with the state `busy`.
 
 ------------------------------------------------------------------------------
 							*r-plugin-SyncTeX-win*
-5.7. SyncTeX on Windows~
+5.6. SyncTeX on Windows~
 
 On Windows, backward search with Sumatra pop ups a console window which
 quickly disappears (it is `vim` running the required `--remote-expr` command).
@@ -1036,7 +1004,7 @@ quickly disappears (it is `vim` running the required `--remote-expr` command).
 
 ------------------------------------------------------------------------------
 								*r-plugin-nox*
-5.8. Bugs that affect Linux Console and Vim accessed through ssh~
+5.7. Bugs that affect Linux Console and Vim accessed through ssh~
 
 If you run Vim in the Linux Console or start Vim in a terminal emulator
 without the command line argument |--servername|, Vim will not receive remote
@@ -1102,7 +1070,7 @@ See also: |r-plugin-remote|.
 
 
 ------------------------------------------------------------------------------
-5.9. R must be started by Vim~
+5.8. R must be started by Vim~
 
 The communication between Vim and R will work only if R was started by Vim
 through the <LocalLeader>rf command because the plugin was designed to connect
@@ -1181,6 +1149,10 @@ is running:
 |vimrplugin_objbr_place|       Placement of Object Browser
 |vimrplugin_objbr_w|           Initial width of Object Browser window
 |vimrplugin_tmux_ob|           Run Object Browser in Tmux pane
+|vimrplugin_objbr_opendf|      Display data.frames open in the Object Browser
+|vimrplugin_objbr_openlist|    Display lists open in the Object Browser
+|vimrplugin_objbr_allnames|    Display hidden objects in the Object Browser
+|vimrplugin_objbr_labelerr|    Show error if "label" attribute is invalid
 |vimrplugin_vimpager|          Use Vim to see R documentation
 |vimrplugin_editor_w|          Minimum width of R script buffer
 |vimrplugin_help_w|            Desired width of R documentation buffer
@@ -1201,6 +1173,7 @@ is running:
 |vimrplugin_source_args|       Arguments to R `source()` function
 |vimrplugin_latexcmd|          Command to run on .tex files
 |vimrplugin_latexmk|           Define wether `latexmk` should be run
+|vimrplugin_texerr|            Show a summary of LaTeX errors after compilation
 |vimrplugin_sweaveargs|        Arguments do `Sweave()`
 |vimrplugin_rmd_environment|   Environment in which to save evaluated rmd code
 |vimrplugin_never_unmake_menu| Do not unmake the menu when switching buffers
@@ -1331,9 +1304,13 @@ the value vimrplugin_assign to 2. Then, you will have to type two `_` to get
 them converted into `<-`.
 
 ------------------------------------------------------------------------------
-						      *vimrplugin_objbr_place*
-						      *vimrplugin_objbr_w*
-						      *vimrplugin_tmux_ob*
+						   *vimrplugin_objbr_place*
+						   *vimrplugin_objbr_w*
+						   *vimrplugin_tmux_ob*
+						   *vimrplugin_objbr_opendf*
+						   *vimrplugin_objbr_openlist*
+						   *vimrplugin_objbr_allnames*
+						   *vimrplugin_objbr_labelerr*
 6.4. Object Browser options~
 
 By default, the Object Browser will be created with 40 columns. The minimum
@@ -1356,6 +1333,32 @@ Valid values for the Object Browser placement are "script" or "console" and
    let vimrplugin_objbr_place = "script,right"
    let vimrplugin_objbr_place = "console,left"
 <
+The "console" option is valid only if Vim is running inside of a Tmux session.
+
+Below is an example of setup of some other options in the |vimrc| that control
+the behavior of the Object Browser:
+>
+   let vimrplugin_objbr_opendf = 1    " Show data.frames elements
+   let vimrplugin_objbr_openlist = 0  " Show lists elements
+   let vimrplugin_objbr_allnames = 0  " Show .GlobalEnv hidden objects
+   let vimrplugin_objbr_labelerr = 1  " Warn if label is not a valid text
+<
+Objects whose names start with a "." are hidden by default. If you want that
+they are displayed in the Object Browser, set the value of
+`vimrplugin_objbr_allnames` to `1`.
+
+when a `data.frame` appears in the Object Browser for the first time, its
+elements are immediately displayed, but the elements of a `list` are displayed
+only if it is explicitly opened. The options `vimrplugin_objbr_opendf` and
+`vimrplugin_objbr_openlist` control the initial status (either opened or
+closed) of, respectively, `data.frames` and `lists`. The options are ignored
+for `data.frames` and `lists` of libraries which are always started closed.
+
+If an object R's workspace has the attribute `"label"`, it is displayed in
+Nvim's Object Browser. If the `"label"` attribute is not of class
+`"character"`, and if  `vimrplugin_objbr_labelerr` is `1`, an error message is
+printed in the Object Browser.
+
 
 ------------------------------------------------------------------------------
 							 *vimrplugin_vimpager*
@@ -1369,10 +1372,6 @@ If you do not want to see R documentation in a Vim's buffer, put in your
 |vimrc|:
 >
    let vimrplugin_vimpager = "no"
-<
-And put in your `~/.Rprofile`:
->
-   options(vimcom.vimpager = FALSE)
 <
 If you want to see R documentation in Vim, but are not satisfied with the way
 it works, please, read the subsection 6.5.2 below.
@@ -1615,7 +1614,8 @@ argument between `TRUE` and `FALSE`.
 						       *vimrplugin_sweaveargs*
 						       *vimrplugin_latexcmd*
 						       *vimrplugin_latexmk*
-6.17. LaTeX command~
+						       *vimrplugin_texerr*
+6.17. LaTeX options~
 
 To produce a pdf document from the .tex file generated by either `Sweave()` or
 `knit()` command, if vimrplugin_latexmk = 1 and both `latexmk` and `perl`
@@ -1638,6 +1638,11 @@ this behavior. Examples:
 By default, vimrplugin_latexmk is 0 on Windows and 1 on other systems.
 If you want to pass arguments do the `Sweave()` function, set the value of the
 vimrplugin_sweaveargs variable.
+
+If the value of `vimrplugin_texerr` is `1`, a summary of LaTeX errors
+and warnings are produced by the compilation of the .tex document into .pdf
+file will be output to R Console at the end of the compilation. So, you do not
+have to scroll the R Console seeking for these messages.
 
 
 ------------------------------------------------------------------------------
@@ -1878,14 +1883,21 @@ Note: You should have the line  `library(vimcom)`  in your `~/.Rprofile`.
 							   *vimrplugin_vim_wd*
 6.30 Start R in working directory of Vim~
 
-The Vim-R-plugin starts R in the directory where the current buffer is. If you
-want R's working directory to be the same as Vim's working directory, put in
-your |vimrc|:
+When you are editing an R file (.R, .Rnw, .Rd, .Rmd, .Rrst) and start R, the
+R package vimcom runs the command `setwd()` with the directory of the file
+being edited as argument, that is, the R working directory becomes the same
+directory of the R file. If you want R's working directory to be the same as
+Vim's working directory, put in your |vimrc|:
 >
     let vimrplugin_vim_wd = 1
 <
 This option is useful only for those who did not enable 'autochdir'.
 
+If you prefer that the Vim-R-plugin does not set the working directory in any
+way, put in |vimrc|:
+>
+    let vimrplugin_vim_wd = -1
+<
 
 ------------------------------------------------------------------------------
 						      *vimrplugin_after_start*
@@ -2258,23 +2270,13 @@ directory after the installation:
    autoload/rcomplete.vim
    doc/r-plugin.txt
    ftdetect/r.vim
-   ftplugin/r.vim
    ftplugin/r_rplugin.vim
    ftplugin/rbrowser.vim
    ftplugin/rdoc.vim
-   ftplugin/rhelp.vim
    ftplugin/rhelp_rplugin.vim
-   ftplugin/rmd.vim
    ftplugin/rmd_rplugin.vim
-   ftplugin/rnoweb.vim
    ftplugin/rnoweb_rplugin.vim
-   ftplugin/rrst.vim
    ftplugin/rrst_rplugin.vim
-   indent/r.vim
-   indent/rhelp.vim
-   indent/rmd.vim
-   indent/rnoweb.vim
-   indent/rrst.vim
    r-plugin/common_buffer.vim
    r-plugin/common_global.vim
    r-plugin/functions.vim
@@ -2288,13 +2290,9 @@ directory after the installation:
    r-plugin/synctex_evince_forward.py
    r-plugin/synctex_okular_backward.sh
    r-plugin/windows.vim
-   syntax/r.vim
    syntax/rbrowser.vim
    syntax/rdoc.vim
-   syntax/rhelp.vim
-   syntax/rmd.vim
    syntax/rout.vim
-   syntax/rrst.vim
 
 
 ==============================================================================
@@ -2886,6 +2884,19 @@ sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
 ==============================================================================
 							       *r-plugin-news*
 10. News~
+
+1.2.3 (2015-04-09)
+
+ * Official runtime files were deleted. See:
+   https://github.com/jalvesaq/R-Vim-runtime
+
+ * News options to control the Object Browser: vimrplugin_objbr_opendf,
+   vimrplugin_objbr_openlist, vimrplugin_objbr_allnames and
+   vimrplugin_objbr_labelerr.
+
+ * New option to control LaTeX compilation: vimrplugin_texerr.
+
+ * Fix setting of R working directory on Mac OS X.
 
 1.2.2 (2015-03-24)
 

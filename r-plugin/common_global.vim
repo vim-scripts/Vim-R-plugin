@@ -633,7 +633,6 @@ function StartR_TmuxSplit(rcmd)
     let g:rplugin_vim_pane = TmuxActivePane()
     let tmuxconf = ['set-environment VIMRPLUGIN_TMPDIR "' . g:rplugin_tmpdir . '"',
                 \ 'set-environment VIMRPLUGIN_COMPLDIR "' . substitute(g:rplugin_compldir, ' ', '\\ ', "g") . '"',
-                \ 'set-environment VIM_PANE ' . g:rplugin_vim_pane ,
                 \ 'set-environment VIMEDITOR_SVRNM ' . $VIMEDITOR_SVRNM ,
                 \ 'set-environment VIMINSTANCEID ' . $VIMINSTANCEID ,
                 \ 'set-environment VIMRPLUGIN_SECRET ' . $VIMRPLUGIN_SECRET ]
@@ -792,6 +791,50 @@ function StartR(whatr)
     call writefile([], g:rplugin_tmpdir . "/liblist_" . $VIMINSTANCEID)
     call delete(g:rplugin_tmpdir . "/libnames_" . $VIMINSTANCEID)
 
+    if g:vimrplugin_objbr_opendf
+        let start_options = ['options(vimcom.opendf = TRUE)']
+    else
+        let start_options = ['options(vimcom.opendf = FALSE)']
+    endif
+    if g:vimrplugin_objbr_openlist
+        let start_options += ['options(vimcom.openlist = TRUE)']
+    else
+        let start_options += ['options(vimcom.openlist = FALSE)']
+    endif
+    if g:vimrplugin_objbr_allnames
+        let start_options += ['options(vimcom.allnames = TRUE)']
+    else
+        let start_options += ['options(vimcom.allnames = FALSE)']
+    endif
+    if g:vimrplugin_texerr
+        let start_options += ['options(vimcom.texerrs = TRUE)']
+    else
+        let start_options += ['options(vimcom.texerrs = FALSE)']
+    endif
+    if g:vimrplugin_objbr_labelerr
+        let start_options += ['options(vimcom.labelerr = TRUE)']
+    else
+        let start_options += ['options(vimcom.labelerr = FALSE)']
+    endif
+    if g:vimrplugin_vimpager == "no" || !has("clientserver") || v:servername == ""
+        let start_options += ['options(vimcom.vimpager = FALSE)']
+    else
+        let start_options += ['options(vimcom.vimpager = TRUE)']
+    endif
+    let rwd = ""
+    if g:vimrplugin_vim_wd == 0
+        let rwd = expand("%:p:h")
+    elseif g:vimrplugin_vim_wd == 1
+        let rwd = getcwd()
+    endif
+    if rwd != ""
+        if has("win32") || has("win64")
+            let rwd = substitute(rwd, '\\', '/', 'g')
+        endif
+        let start_options += ['setwd("' . rwd . '")']
+    endif
+    call writefile(start_options, g:rplugin_tmpdir . "/start_options.R")
+
     if !exists("b:rplugin_R")
         call SetRPath()
     endif
@@ -799,11 +842,6 @@ function StartR(whatr)
         let b:rplugin_r_args = " "
     else
         let b:rplugin_r_args = g:vimrplugin_r_args
-    endif
-
-    " Change to buffer's directory before starting R
-    if g:vimrplugin_vim_wd == 0
-        lcd %:p:h
     endif
 
     if a:whatr =~ "custom"
@@ -824,9 +862,6 @@ function StartR(whatr)
 
     if g:vimrplugin_only_in_tmux && $TMUX_PANE == ""
         call RWarningMsg("Not inside Tmux.")
-        if g:vimrplugin_vim_wd == 0
-            lcd -
-        endif
         return
     endif
 
@@ -891,10 +926,6 @@ function StartR(whatr)
         endif
     endif
 
-    " Go back to original directory:
-    if g:vimrplugin_vim_wd == 0
-        lcd -
-    endif
     echon
 endfunction
 
@@ -954,8 +985,8 @@ function WaitVimComStart()
         let g:rplugin_vimcom_home = vr[1]
         let g:rplugin_vimcomport = vr[2]
         let g:rplugin_r_pid = vr[3]
-        if g:rplugin_vimcom_version != "1.2.2"
-            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.2.2.')
+        if g:rplugin_vimcom_version != "1.2.3"
+            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.2.3.')
             sleep 1
         endif
         if has("win32")
@@ -1169,9 +1200,6 @@ function StartObjBrowser_Vim()
             set nosplitright
         else
             set splitright
-        endif
-        if g:vimrplugin_objbr_place =~ "console"
-            sb R_Output
         endif
         sil exe "vsplit " . b:objbrtitle
         let &splitright = l:sr
@@ -2128,7 +2156,7 @@ function AskRDoc(rkeyword, package, getclass)
     endif
 
     let classfor = ""
-    if bufname("%") =~ "Object_Browser" || bufname("%") == "R_Output"
+    if bufname("%") =~ "Object_Browser"
         let savesb = &switchbuf
         set switchbuf=useopen,usetab
         exe "sb " . b:rscript_buffer
@@ -2175,7 +2203,16 @@ function ShowRDoc(rkeyword)
         let rkeyw = msgs[-1]
     endif
 
-    if bufname("%") =~ "Object_Browser" || bufname("%") == "R_Output"
+    " If the help command was triggered in the R Console, jump to Vim pane
+    if g:rplugin_do_tmux_split && !g:rplugin_running_rhelp
+        let slog = system("tmux select-pane -t " . g:rplugin_vim_pane)
+        if v:shell_error
+            call RWarningMsg(slog)
+        endif
+    endif
+    let g:rplugin_running_rhelp = 0
+
+    if bufname("%") =~ "Object_Browser"
         let savesb = &switchbuf
         set switchbuf=useopen,usetab
         exe "sb " . b:rscript_buffer
@@ -2471,6 +2508,7 @@ function RAction(rcmd)
     endif
     if strlen(rkeyword) > 0
         if a:rcmd == "help"
+            let g:rplugin_running_rhelp = 1
             if g:vimrplugin_vimpager == "no"
                 call g:SendCmdToR("help(" . rkeyword . ")")
             else
@@ -2859,6 +2897,7 @@ endfunction
 
 function RVimLeave()
     call delete(g:rplugin_rsource)
+    call delete(g:rplugin_tmpdir . "/start_options.R")
     call delete(g:rplugin_tmpdir . "/eval_reply")
     call delete(g:rplugin_tmpdir . "/formatted_code")
     call delete(g:rplugin_tmpdir . "/GlobalEnvList_" . $VIMINSTANCEID)
@@ -2874,6 +2913,9 @@ function RVimLeave()
     call delete(g:rplugin_tmpdir . "/vimcom_running_" . $VIMINSTANCEID)
     call delete(g:rplugin_tmpdir . "/rconsole_hwnd_" . $VIMRPLUGIN_SECRET)
     call delete(g:rplugin_tmpdir . "/openR'")
+    if executable("rmdir")
+        call system("rmdir '" . g:rplugin_tmpdir . "'")
+    endif
 endfunction
 
 function SetRPath()
@@ -2988,6 +3030,11 @@ call RSetDefaultValue("g:vimrplugin_routnotab",         0)
 call RSetDefaultValue("g:vimrplugin_editor_w",         66)
 call RSetDefaultValue("g:vimrplugin_help_w",           46)
 call RSetDefaultValue("g:vimrplugin_objbr_w",          40)
+call RSetDefaultValue("g:vimrplugin_objbr_opendf",      1)
+call RSetDefaultValue("g:vimrplugin_objbr_openlist",    0)
+call RSetDefaultValue("g:vimrplugin_objbr_allnames",    0)
+call RSetDefaultValue("g:vimrplugin_texerr",            1)
+call RSetDefaultValue("g:vimrplugin_objbr_labelerr",    1)
 call RSetDefaultValue("g:vimrplugin_i386",              0)
 call RSetDefaultValue("g:vimrplugin_vimcom_wait",    5000)
 call RSetDefaultValue("g:vimrplugin_show_args",         0)
@@ -3245,6 +3292,7 @@ endif
 
 let g:rplugin_firstbuffer = expand("%:p")
 let g:rplugin_running_objbr = 0
+let g:rplugin_running_rhelp = 0
 let g:rplugin_newliblist = 0
 let g:rplugin_status_line = &statusline
 let g:rplugin_ob_warn_shown = 0
