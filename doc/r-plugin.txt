@@ -870,10 +870,11 @@ pane and, then, paste.
 
 However, if you want to copy something from either Vim or R to another
 application not running inside Tmux, Tmux may prevent the X server from
-capturing the text selected by the mouse. The solution is to press
-the <Shift> key while selecting text with the mouse, so the selected
-text is transferred to the X server clipboard and can be inserted using
-the middle mouse button.
+capturing the text selected by the mouse. This can be prevented by
+pressing the <Shift> key, as it suspends the capturing of mouse events
+by tmux. If you keep <Shift> pressed while selecting text with the mouse, 
+it will be available in the X server clipboard and can be inserted
+using the middle mouse button.
 
 ------------------------------------------------------------------------------
 							     *r-plugin-remote*
