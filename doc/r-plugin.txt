@@ -874,7 +874,8 @@ capturing the text selected by the mouse. This can be prevented by
 pressing the <Shift> key, as it suspends the capturing of mouse events
 by tmux. If you keep <Shift> pressed while selecting text with the mouse, 
 it will be available in the X server clipboard and can be inserted
-using the middle mouse button.
+into other windows using the middle mouse button. It can of course also be
+inserted into a tmux window using <Shift> and the middle mouse button.
 
 ------------------------------------------------------------------------------
 							     *r-plugin-remote*
