@@ -3040,14 +3040,27 @@ call RSetDefaultValue("g:vimrplugin_vimcom_wait",    5000)
 call RSetDefaultValue("g:vimrplugin_show_args",         0)
 call RSetDefaultValue("g:vimrplugin_never_unmake_menu", 0)
 call RSetDefaultValue("g:vimrplugin_insert_mode_cmds",  1)
-call RSetDefaultValue("g:vimrplugin_indent_commented",  1)
 call RSetDefaultValue("g:vimrplugin_source",         "''")
-call RSetDefaultValue("g:vimrplugin_rcomment_string", "'# '")
 call RSetDefaultValue("g:vimrplugin_vimpager",      "'tab'")
 call RSetDefaultValue("g:vimrplugin_objbr_place",     "'script,right'")
 call RSetDefaultValue("g:vimrplugin_user_maps_only", 0)
 call RSetDefaultValue("g:vimrplugin_latexcmd", "'default'")
 call RSetDefaultValue("g:vimrplugin_rmd_environment", "'.GlobalEnv'")
+call RSetDefaultValue("g:vimrplugin_indent_commented",  1)
+
+if !exists("g:r_indent_ess_comments")
+    let g:r_indent_ess_comments = 0
+endif
+if g:r_indent_ess_comments
+    if g:vimrplugin_indent_commented
+        call RSetDefaultValue("g:vimrplugin_rcomment_string", "'## '")
+    else
+        call RSetDefaultValue("g:vimrplugin_rcomment_string", "'### '")
+    endif
+else
+    call RSetDefaultValue("g:vimrplugin_rcomment_string", "'# '")
+endif
+
 if has("win32") || has("win64")
     call RSetDefaultValue("g:vimrplugin_Rterm",           0)
     call RSetDefaultValue("g:vimrplugin_save_win_pos",    1)
