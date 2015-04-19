@@ -68,7 +68,6 @@ deb:
 	  - r-plugin/common_buffer.vim\n\
 	  - r-plugin/common_global.vim\n\
 	  - r-plugin/functions.vim\n\
-	  - r-plugin/global_r_plugin.vim\n\
 	  - r-plugin/gui_running.vim\n\
 	  - r-plugin/setcompldir.vim\n\
 	  - r-plugin/synctex_evince_backward.py\n\

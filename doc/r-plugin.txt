@@ -872,7 +872,7 @@ However, if you want to copy something from either Vim or R to another
 application not running inside Tmux, Tmux may prevent the X server from
 capturing the text selected by the mouse. This can be prevented by
 pressing the <Shift> key, as it suspends the capturing of mouse events
-by tmux. If you keep <Shift> pressed while selecting text with the mouse, 
+by tmux. If you keep <Shift> pressed while selecting text with the mouse,
 it will be available in the X server clipboard and can be inserted
 into other windows using the middle mouse button. It can of course also be
 inserted into a tmux window using <Shift> and the middle mouse button.
@@ -2288,7 +2288,6 @@ directory after the installation:
    r-plugin/common_buffer.vim
    r-plugin/common_global.vim
    r-plugin/functions.vim
-   r-plugin/global_r_plugin.vim
    r-plugin/gui_running.vim
    r-plugin/osx.vim
    r-plugin/r.snippets

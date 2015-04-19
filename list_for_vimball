@@ -10,7 +10,6 @@ ftplugin/rnoweb_rplugin.vim
 ftplugin/rrst_rplugin.vim
 r-plugin/common_buffer.vim
 r-plugin/common_global.vim
-r-plugin/global_r_plugin.vim
 r-plugin/r.snippets
 r-plugin/rmd.snippets
 r-plugin/synctex_evince_backward.py
