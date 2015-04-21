@@ -985,10 +985,6 @@ function WaitVimComStart()
         let g:rplugin_vimcom_home = vr[1]
         let g:rplugin_vimcomport = vr[2]
         let g:rplugin_r_pid = vr[3]
-        if g:rplugin_vimcom_version != "1.2.3"
-            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.2.3.')
-            sleep 1
-        endif
         if has("win32")
             let g:rplugin_vimcom_lib = g:rplugin_vimcom_home . "/bin/i386/libVimR.dll"
         elseif has("win64")
@@ -998,6 +994,16 @@ function WaitVimComStart()
         endif
         if !filereadable(g:rplugin_vimcom_lib)
             call RWarningMsgInp('Could not find "' . g:rplugin_vimcom_lib . '".')
+        endif
+        if g:rplugin_vimcom_version != "1.2.3"
+            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.2.3.') | sleep 1
+            " vmb only: if input('This version of Vim-R-plugin requires vimcom 1.2-3. Do you want to install it now? [y/n] ') == 'y'
+            " vmb only:     if has("win32") || has("win64")
+            " vmb only:         call g:SendCmdToR('install.packages("http://www.lepem.ufc.br/jaa/vimr/vimcom_1.2-3.zip", repos=NULL, type="binary")')
+            " vmb only:     else
+            " vmb only:         call g:SendCmdToR('install.packages("http://www.lepem.ufc.br/jaa/vimr/vimcom_1.2-3.tar.gz", repos=NULL, type="source")')
+            " vmb only:     endif
+            " vmb only: endif
         endif
         call delete(g:rplugin_tmpdir . "/vimcom_running_" . $VIMINSTANCEID)
 

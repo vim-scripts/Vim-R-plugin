@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 1.2.3
+Version: 1.2.4
 For Vim version 7.4
 
  1. Overview                                    |r-plugin-overview|
@@ -2834,6 +2834,11 @@ put in your |vimrc|:
 ==============================================================================
 							       *r-plugin-news*
 10. News~
+
+1.2.4 (2015-04-21)
+
+ * Deleted r-plugin/global_R_plugin.vim. See:
+   https://github.com/jalvesaq/vimcmdline
 
 1.2.3 (2015-04-09)
 
