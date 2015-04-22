@@ -33,8 +33,6 @@ vimball:
 	sed -i -e "s/^Version: [0-9].[0-9].[0-9].[0-9]/Version: $(PLUGINVERSION)/" doc/r-plugin.txt
 	sed -i -e "s/^$(PLUGINVERSION) (201[0-9]-[0-9][0-9]-[0-9][0-9])$$/$(PLUGINVERSION) ($(PLUGINRELEASEDATE))/" doc/r-plugin.txt
 	vim -c "%MkVimball Vim-R-plugin ." -c "q" list_for_vimball
-	sed -i -e "s/call RWarningMsg('This version of Vim-R-plugin requires/\" call RWarningMsg('This version of Vim-R-plugin requires/" Vim-R-plugin.vmb
-	sed -i -e 's/" vmb only: //' Vim-R-plugin.vmb
 	mv Vim-R-plugin.vmb /tmp
 
 deb:

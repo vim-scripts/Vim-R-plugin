@@ -821,6 +821,8 @@ function StartR(whatr)
     else
         let start_options += ['options(vimcom.vimpager = TRUE)']
     endif
+    let start_options += ['if(utils::packageVersion("vimcom") != "1.2.3") warning("Your version of Vim-R-plugin requires vimcom-1.2-3.", call. = FALSE)']
+
     let rwd = ""
     if g:vimrplugin_vim_wd == 0
         let rwd = expand("%:p:h")
@@ -996,14 +998,8 @@ function WaitVimComStart()
             call RWarningMsgInp('Could not find "' . g:rplugin_vimcom_lib . '".')
         endif
         if g:rplugin_vimcom_version != "1.2.3"
-            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.2.3.') | sleep 1
-            " vmb only: if input('This version of Vim-R-plugin requires vimcom 1.2-3. Do you want to install it now? [y/n] ') == 'y'
-            " vmb only:     if has("win32") || has("win64")
-            " vmb only:         call g:SendCmdToR('install.packages("http://www.lepem.ufc.br/jaa/vimr/vimcom_1.2-3.zip", repos=NULL, type="binary")')
-            " vmb only:     else
-            " vmb only:         call g:SendCmdToR('install.packages("http://www.lepem.ufc.br/jaa/vimr/vimcom_1.2-3.tar.gz", repos=NULL, type="source")')
-            " vmb only:     endif
-            " vmb only: endif
+            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.2.3.')
+            sleep 1
         endif
         call delete(g:rplugin_tmpdir . "/vimcom_running_" . $VIMINSTANCEID)
 
@@ -1017,6 +1013,7 @@ function WaitVimComStart()
             " when R was not started by Vim:
             call system("tmux set-environment -u VIMRPLUGIN_TMPDIR")
         endif
+        call delete(g:rplugin_tmpdir . "/start_options.R")
         return 1
     else
         call RWarningMsg("The package vimcom wasn't loaded yet.")
