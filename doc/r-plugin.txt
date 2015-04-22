@@ -2835,7 +2835,7 @@ put in your |vimrc|:
 							       *r-plugin-news*
 10. News~
 
-1.2.4 (2015-04-21)
+1.2.4 (2015-04-22)
 
  * Deleted r-plugin/global_R_plugin.vim. See:
    https://github.com/jalvesaq/vimcmdline
