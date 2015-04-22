@@ -13,11 +13,12 @@ endif
 " defined after the global ones:
 runtime r-plugin/common_buffer.vim
 
-if !exists("b:did_ftplugin")
-    if !exists("g:rplugin_runtime_warn")
+if !exists("b:did_ftplugin") && !exists("g:rplugin_runtime_warn")
+    runtime ftplugin/rhelp.vim
+    if !exists("b:did_ftplugin")
         call RWarningMsgInp("Your runtime files seems to be outdated.\nSee: https://github.com/jalvesaq/R-Vim-runtime")
+        let g:rplugin_runtime_warn = 1
     endif
-    let g:rplugin_runtime_warn = 1
 endif
 
 function! RhelpIsInRCode(vrb)

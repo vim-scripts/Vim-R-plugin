@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 1.2.3
+Version: 1.2.4
 For Vim version 7.4
 
  1. Overview                                    |r-plugin-overview|
@@ -870,12 +870,12 @@ pane and, then, paste.
 
 However, if you want to copy something from either Vim or R to another
 application not running inside Tmux, Tmux may prevent the X server from
-capturing the text selected by the mouse. The solution is to disable mouse
-support in Tmux. You will be able to toggle mouse support on and off by typing
-<C-a>m if you add the following line to your ~/.tmux.conf:
->
-   bind m run-shell '( if [ "mode-mouse off" = "$(tmux show-window-option mode-mouse)" ]; then toggle=on; else toggle=off; fi; tmux display-message "mouse $toggle"; tmux set-option -w mode-mouse $toggle ; for cmd in mouse-select-pane mouse-resize-pane mouse-select-window; do tmux set-option -g $cmd $toggle ; done;) > /dev/null 2>&1'
-<
+capturing the text selected by the mouse. This can be prevented by
+pressing the <Shift> key, as it suspends the capturing of mouse events
+by tmux. If you keep <Shift> pressed while selecting text with the mouse,
+it will be available in the X server clipboard and can be inserted
+into other windows using the middle mouse button. It can of course also be
+inserted into a tmux window using <Shift> and the middle mouse button.
 
 ------------------------------------------------------------------------------
 							     *r-plugin-remote*
@@ -1162,6 +1162,7 @@ is running:
 |vimrplugin_start_libs|        Objects for omnicompletion and syntax highlight
 |vimrplugin_routnotab|         Show output of R CMD BATCH in new window
 |vimrplugin_indent_commented|  Indent lines commented with the \xx command
+|vimrplugin_rcomment_string|   String to comment code with \xx and \o
 |vimrplugin_notmuxconf|        Don't use a specially built Tmux config file
 |vimrplugin_rconsole_height|   The number of lines of R Console (Tmux split)
 |vimrplugin_vsplit|            Make Tmux split the window vertically
@@ -1491,6 +1492,7 @@ scripts, put the following in your |vimrc|:
 ------------------------------------------------------------------------------
 						 *vimrplugin_indent_commented*
                                                  *r_indent_ess_comments*
+						 *vimrplugin_rcomment_string*
 6.11. Indent commented lines~
 
 You can type <LocalLeader>xx to comment out a line or selected lines. If the
@@ -1509,6 +1511,12 @@ table below (see |r-plugin-indenting|):
                  0                        0                #
                  1                        1                ##
                  0                        1                ###
+<
+The string used to comment text with <LocalLeader>xc, <LocalLeader>xu,
+<LocalLeader>xx and <LocalLeader>o is defined by vimrplugin_rcomment_string.
+Example:
+>
+   let vimrplugin_rcomment_string = "# "
 <
 
 ------------------------------------------------------------------------------
@@ -2280,7 +2288,6 @@ directory after the installation:
    r-plugin/common_buffer.vim
    r-plugin/common_global.vim
    r-plugin/functions.vim
-   r-plugin/global_r_plugin.vim
    r-plugin/gui_running.vim
    r-plugin/osx.vim
    r-plugin/r.snippets
@@ -2636,32 +2643,7 @@ on top" or a similar option provided by your desktop manager.
 
 
 ------------------------------------------------------------------------------
-							     *r-plugin-global*
-9.17. Turn the R-plugin into a global plugin (Linux/Unix only)~
-
-The Vim-R-plugin is a file type plugin. If you want its functionality
-available for all file types, then put in your |vimrc|:
->
-   runtime r-plugin/global_r_plugin.vim
-<
-You will then be able to type <LocalLeader>rf to start and <LocalLeader>rq to
-quit different command line interpreters and <LocalLeader>d, l, ss, bb, etc to
-send code to the interpreter. If you want support for a language other than
-Julia, Python, Haskell, Ruby and Lisp, you have to set the values of
-vimrplugin_exe and vimrplugin_quit in two Vim auto commands in your |vimrc|,
-BEFORE the `runtime` command above. Example:
->
-   autocmd FileType matlab let vimrplugin_exe = "octave" | let vimrplugin_quit = "quit"
-   autocmd BufNewFile,BufRead *.m let vimrplugin_exe = "octave" | let vimrplugin_quit = "quit"
-<
-If you use GVim, you may also want to set |vimrplugin_never_unmake_menu| in
-your |vimrc|:
->
-   let vimrplugin_never_unmake_menu = 1
-<
-
-------------------------------------------------------------------------------
-9.18. Disable syntax highlight of R functions~
+9.17. Disable syntax highlight of R functions~
 
 If you want to disable the syntax highlight of R functions put in your
 |vimrc|:
@@ -2670,26 +2652,8 @@ If you want to disable the syntax highlight of R functions put in your
 <
 
 ------------------------------------------------------------------------------
-							      *r-plugin-knitr*
-9.19. Tips for knitr users~
-
-If you are using knitr with option cache=TRUE, you may want from time to time
-to delete all objects in R workspace and all files in the cache directory. If
-you want to use <LocalLeader>kr in Normal mode for this, put in your |vimrc|:
->
-   nmap <LocalLeader>kr :call g:SendCmdToR('rm(list=ls(all.names=TRUE)); unlink("cache/*")')<CR>
-<
-When generating pdfs out of Rmd-files, you can send options to pandoc. State
-them in your vimrc. For example
-
-   let vimrplugin_pandoc_args = "--toc -V lang=german"
-
-will produce a german document with a table of contents.
-
-
-------------------------------------------------------------------------------
 							  *r-plugin-latex-box*
-9.20. Integration with LaTeX-Box~
+9.18. Integration with LaTeX-Box~
 
 LaTeX-Box does not automatically recognize Rnoweb files as a valid LaTeX file.
 You have to tell LaTeX-BoX that the .tex file compiled by either `knitr()` or
@@ -2712,7 +2676,7 @@ See also: |vimrplugin_latexcmd|.
 
 ------------------------------------------------------------------------------
 							*r-plugin-quick-setup*
-9.21. Suggested setup for the Vim-R-plugin~
+9.19. Suggested setup for the Vim-R-plugin~
 
 Please, look at section |r-plugin-options| if you want information about the
 Vim-r-plugin customization.
@@ -2815,25 +2779,22 @@ Finally, if you want to use vi key bindings in Bash:
 
 ------------------------------------------------------------------------------
 							*r-plugin-source-echo*
-9.22. Set echo to TRUE or FALSE when sending multiple lines of code too R~
+9.20. Set echo to TRUE or FALSE when sending multiple lines of code too R~
 
 If you want to alternate the `echo` argument of the `source()` function
 between `TRUE` and `FALSE`, then, you might want to create a couple of maps in
 your vimrc. You can use |nmap| to restrict the maps to Normal mode, |autocmd|
 and <buffer> to restrict the maps to R code, and <silent> if you prefer that
 the command is not displayed in Vim's command line. In the example below,
-<LocalLeader>`ee` sets `echo=TRUE`:
+<LocalLeader>`et` sets `echo=TRUE` and you could also create <LocalLeader>`ef`
+to set `echo=FALSE`:
 >
-   autocmd BufNewFile,BufRead *.R* nmap <silent><buffer> <LocalLeader>ee :let vimrplugin_source_args = "echo = TRUE"<CR>
+   autocmd BufNewFile,BufRead *.R* nmap <silent><buffer> <LocalLeader>et :let vimrplugin_source_args = "echo = TRUE"<CR>
 <
-You can make another map to set `echo=FALSE`, and, if some of your files are
-named with lowercase "r" extensions, you have to repeat the commands with
-`*.r*`.
-
 
 ------------------------------------------------------------------------------
 
-9.23. Syntax highlight of .Rout files~
+9.21. Syntax highlight of .Rout files~
 
 You can set the foreground colors of R output in your |vimrc|. The example
 below is for a terminal emulator that supports 256 colors (see
@@ -2870,20 +2831,14 @@ put in your |vimrc|:
    let rout_follow_colorscheme = 1
 <
 
-------------------------------------------------------------------------------
-
-9.24. Integration with GNU Screen, screen plugin, Conque Shell or VimShell~
-
-The plugin used to be able to use GNU Screen (through screen plugin), Conque
-Shell or VimShell to send commands to R. This integration was removed on
-August 20, 2013. People wanting this integration back into the plugin may want
-to use the old Vim-R-plugin code as a starting point to create scripts to be
-sourced by the Vim-R-plugin. Please look at |vimrplugin_source| for details.
-
-
 ==============================================================================
 							       *r-plugin-news*
 10. News~
+
+1.2.4 (2015-04-22)
+
+ * Deleted r-plugin/global_R_plugin.vim. See:
+   https://github.com/jalvesaq/vimcmdline
 
 1.2.3 (2015-04-09)
 

@@ -821,6 +821,8 @@ function StartR(whatr)
     else
         let start_options += ['options(vimcom.vimpager = TRUE)']
     endif
+    let start_options += ['if(utils::packageVersion("vimcom") != "1.2.3") warning("Your version of Vim-R-plugin requires vimcom-1.2-3.", call. = FALSE)']
+
     let rwd = ""
     if g:vimrplugin_vim_wd == 0
         let rwd = expand("%:p:h")
@@ -985,10 +987,6 @@ function WaitVimComStart()
         let g:rplugin_vimcom_home = vr[1]
         let g:rplugin_vimcomport = vr[2]
         let g:rplugin_r_pid = vr[3]
-        if g:rplugin_vimcom_version != "1.2.3"
-            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.2.3.')
-            sleep 1
-        endif
         if has("win32")
             let g:rplugin_vimcom_lib = g:rplugin_vimcom_home . "/bin/i386/libVimR.dll"
         elseif has("win64")
@@ -998,6 +996,10 @@ function WaitVimComStart()
         endif
         if !filereadable(g:rplugin_vimcom_lib)
             call RWarningMsgInp('Could not find "' . g:rplugin_vimcom_lib . '".')
+        endif
+        if g:rplugin_vimcom_version != "1.2.3"
+            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.2.3.')
+            sleep 1
         endif
         call delete(g:rplugin_tmpdir . "/vimcom_running_" . $VIMINSTANCEID)
 
@@ -1011,6 +1013,7 @@ function WaitVimComStart()
             " when R was not started by Vim:
             call system("tmux set-environment -u VIMRPLUGIN_TMPDIR")
         endif
+        call delete(g:rplugin_tmpdir . "/start_options.R")
         return 1
     else
         call RWarningMsg("The package vimcom wasn't loaded yet.")
@@ -1415,6 +1418,9 @@ function SendCmdToR_TmuxSplit(cmd)
         call RWarningMsg("Missing internal variable: g:rplugin_rconsole_pane")
     endif
     let str = substitute(cmd, "'", "'\\\\''", "g")
+    if str =~ '^-'
+        let str = ' ' . str
+    endif
     let scmd = "tmux set-buffer '" . str . "\<C-M>' && tmux paste-buffer -t " . g:rplugin_rconsole_pane
     let rlog = system(scmd)
     if v:shell_error
@@ -3040,14 +3046,27 @@ call RSetDefaultValue("g:vimrplugin_vimcom_wait",    5000)
 call RSetDefaultValue("g:vimrplugin_show_args",         0)
 call RSetDefaultValue("g:vimrplugin_never_unmake_menu", 0)
 call RSetDefaultValue("g:vimrplugin_insert_mode_cmds",  1)
-call RSetDefaultValue("g:vimrplugin_indent_commented",  1)
 call RSetDefaultValue("g:vimrplugin_source",         "''")
-call RSetDefaultValue("g:vimrplugin_rcomment_string", "'# '")
 call RSetDefaultValue("g:vimrplugin_vimpager",      "'tab'")
 call RSetDefaultValue("g:vimrplugin_objbr_place",     "'script,right'")
 call RSetDefaultValue("g:vimrplugin_user_maps_only", 0)
 call RSetDefaultValue("g:vimrplugin_latexcmd", "'default'")
 call RSetDefaultValue("g:vimrplugin_rmd_environment", "'.GlobalEnv'")
+call RSetDefaultValue("g:vimrplugin_indent_commented",  1)
+
+if !exists("g:r_indent_ess_comments")
+    let g:r_indent_ess_comments = 0
+endif
+if g:r_indent_ess_comments
+    if g:vimrplugin_indent_commented
+        call RSetDefaultValue("g:vimrplugin_rcomment_string", "'## '")
+    else
+        call RSetDefaultValue("g:vimrplugin_rcomment_string", "'### '")
+    endif
+else
+    call RSetDefaultValue("g:vimrplugin_rcomment_string", "'# '")
+endif
+
 if has("win32") || has("win64")
     call RSetDefaultValue("g:vimrplugin_Rterm",           0)
     call RSetDefaultValue("g:vimrplugin_save_win_pos",    1)
