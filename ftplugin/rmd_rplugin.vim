@@ -126,7 +126,6 @@ let b:IsInRCode = function("RmdIsInRCode")
 let b:PreviousRChunk = function("RmdPreviousChunk")
 let b:NextRChunk = function("RmdNextChunk")
 let b:SendChunkToR = function("SendRmdChunkToR")
-let b:SourceLines = function("RSourceLines")
 
 "==========================================================================
 " Key bindings and menu items
@@ -165,7 +164,7 @@ call RSetPDFViewer()
 call RSourceOtherScripts()
 
 if exists("b:undo_ftplugin")
-    let b:undo_ftplugin .= " | unlet! b:IsInRCode b:SourceLines b:PreviousRChunk b:NextRChunk b:SendChunkToR"
+    let b:undo_ftplugin .= " | unlet! b:IsInRCode b:PreviousRChunk b:NextRChunk b:SendChunkToR"
 else
-    let b:undo_ftplugin = " | unlet! b:IsInRCode b:SourceLines b:PreviousRChunk b:NextRChunk b:SendChunkToR"
+    let b:undo_ftplugin = " | unlet! b:IsInRCode b:PreviousRChunk b:NextRChunk b:SendChunkToR"
 endif
