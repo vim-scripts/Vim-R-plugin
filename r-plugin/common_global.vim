@@ -1367,19 +1367,23 @@ function RFormatCode() range
     echo (a:lastline - a:firstline + 1) . " lines formatted."
 endfunction
 
-function RInsert(cmd)
+function RInsert(...)
     if g:rplugin_vimcomport == 0
         return
     endif
 
     call delete(g:rplugin_tmpdir . "/eval_reply")
     call delete(g:rplugin_tmpdir . "/Rinsert")
-    call SendToVimCom("\x08" . $VIMINSTANCEID . 'capture.output(' . a:cmd . ', file = "' . g:rplugin_tmpdir . '/Rinsert")')
+    call SendToVimCom("\x08" . $VIMINSTANCEID . 'capture.output(' . a:1 . ', file = "' . g:rplugin_tmpdir . '/Rinsert")')
     let g:rplugin_lastev = ReadEvalReply()
     if g:rplugin_lastev == "R is busy." || g:rplugin_lastev == "UNKNOWN" || g:rplugin_lastev =~ "^Error" || g:rplugin_lastev == "INVALID" || g:rplugin_lastev == "ERROR" || g:rplugin_lastev == "EMPTY" || g:rplugin_lastev == "No reply"
         call RWarningMsg(g:rplugin_lastev)
         return 0
     else
+        if a:0 == 2 && a:2 == "newtab"
+            tabnew
+            set ft=rout
+        endif
         silent exe "read " . substitute(g:rplugin_tmpdir, ' ', '\\ ', 'g') . "/Rinsert"
         return 1
     endif
@@ -1479,8 +1483,8 @@ function RGetKeyWord()
 endfunction
 
 " Send sources to R
-function RSourceLines(lines, e)
-    let lines = a:lines
+function RSourceLines(...)
+    let lines = a:1
     if &filetype == "rrst"
         let lines = map(copy(lines), 'substitute(v:val, "^\\.\\. \\?", "", "")')
     endif
@@ -1492,7 +1496,14 @@ function RSourceLines(lines, e)
     if g:vimrplugin_source_args != ""
         let sargs = ", " . g:vimrplugin_source_args
     endif
-    if a:e == "echo"
+
+    if a:0 == 3 && a:3 == "NewtabInsert"
+        let rcmd = 'base::source("' . g:rplugin_rsource . '", echo=TRUE)'
+        call RInsert(rcmd, "newtab")
+        return 1
+    endif
+
+    if a:2 == "echo"
         let sargs .= ', echo=TRUE'
     endif
     let rcmd = 'base::source("' . g:rplugin_rsource . '"' . sargs . ')'
@@ -1627,7 +1638,7 @@ function SendFunctionToR(e, m)
 endfunction
 
 " Send selection to R
-function SendSelectionToR(e, m)
+function SendSelectionToR(...)
     if &filetype != "r"
         if b:IsInRCode(0) == 0
             if (&filetype == "rnoweb" && getline(".") !~ "\\Sexpr{") || (&filetype == "rmd" && getline(".") !~ "`r ") || (&filetype == "rrst" && getline(".") !~ ":r:`")
@@ -1643,7 +1654,7 @@ function SendSelectionToR(e, m)
         let l = getline("'<")
         let line = strpart(l, i, j)
         let ok = g:SendCmdToR(line)
-        if ok && a:m =~ "down"
+        if ok && a:2 =~ "down"
             call GoDown()
         endif
         return
@@ -1680,12 +1691,17 @@ function SendSelectionToR(e, m)
         let lines[llen] = strpart(lines[llen], 0, j)
     endif
 
-    let ok = b:SourceLines(lines, a:e)
+    if a:0 == 3 && a:3 == "NewtabInsert"
+        let ok = b:SourceLines(lines, a:1, "NewtabInsert")
+    else
+        let ok = b:SourceLines(lines, a:1)
+    endif
+
     if ok == 0
         return
     endif
 
-    if a:m == "down"
+    if a:2 == "down"
         call GoDown()
     else
         normal! gv
@@ -2880,12 +2896,15 @@ function RCreateSendMaps()
     "-------------------------------------
     call RCreateMaps("ni", '<Plug>RSendLine', 'l', ':call SendLineToR("stay")')
     call RCreateMaps('ni0', '<Plug>RDSendLine', 'd', ':call SendLineToR("down")')
-    call RCreateMaps('ni0', '<Plug>RDSendLineAndInsertOutput', 'o', ':call SendLineToRAndInsertOutput()')
     call RCreateMaps('i', '<Plug>RSendLAndOpenNewOne', 'q', ':call SendLineToR("newline")')
     call RCreateMaps('n', '<Plug>RNLeftPart', 'r<left>', ':call RSendPartOfLine("left", 0)')
     call RCreateMaps('n', '<Plug>RNRightPart', 'r<right>', ':call RSendPartOfLine("right", 0)')
     call RCreateMaps('i', '<Plug>RILeftPart', 'r<left>', 'l:call RSendPartOfLine("left", 1)')
     call RCreateMaps('i', '<Plug>RIRightPart', 'r<right>', 'l:call RSendPartOfLine("right", 1)')
+
+    " *Run and insert output*
+    call RCreateMaps('ni0', '<Plug>RDSendLineAndInsertOutput', 'o', ':call SendLineToRAndInsertOutput()')
+    call RCreateMaps('v', '<Plug>RSendSelAndInsertOutput', 'so', ':call SendSelectionToR("echo", "stay", "NewtabInsert")')
 
     " For compatibility with Johannes Ranke's plugin
     if g:vimrplugin_map_r == 1

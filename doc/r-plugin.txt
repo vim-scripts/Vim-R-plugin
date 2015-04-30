@@ -418,6 +418,7 @@ Send
   . Selection (echo)                                   \se
   . Selection (and down)                               \sd
   . Selection (echo and down)                          \sa
+  . Selection (evaluate and insert output in new tab)  \so
   --------------------------------------------------------
   . Paragraph                                          \pp
   . Paragraph (echo)                                   \pe
@@ -2186,6 +2187,7 @@ RD, "cursor down"; RED, both "echo" and "down"):
    RESendSelection
    RDSendSelection
    REDSendSelection
+   RSendSelAndInsertOutput
    RSendMBlock
    RESendMBlock
    RDSendMBlock
@@ -2841,6 +2843,8 @@ put in your |vimrc|:
 10. News~
 
 1.2.5
+
+ * New command to evaluate selection and get output in newtab: \so
 
  * Bring back the "echo" send commands because some users need them.
 
