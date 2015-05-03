@@ -595,28 +595,33 @@ function! SyncTeX_SetPID(spid)
     exe 'autocmd VimLeave * call system("kill ' . a:spid . '")'
 endfunction
 
-function! Run_SyncTeX()
-    if $DISPLAY == "" || g:rplugin_pdfviewer == "none" || exists("b:did_synctex")
-        return
-    endif
-    let b:did_synctex = 1
-
+function! Run_EvinceBackward()
     let olddir = getcwd()
     if olddir != expand("%:p:h")
-        exe "cd " . substitute(expand("%:p:h"), ' ', '\\ ', 'g')
+        try
+            exe "cd " . substitute(expand("%:p:h"), ' ', '\\ ', 'g')
+        catch /.*/
+            return
+        endtry
     endif
-
-    if g:rplugin_pdfviewer == "evince"
-        let [basenm, basedir] = SyncTeX_GetMaster()
-        if basedir != '.'
-            exe "cd " . substitute(basedir, ' ', '\\ ', 'g')
-        endif
-        if v:servername != ""
-            call system("python " . g:rplugin_home . "/r-plugin/synctex_evince_backward.py '" . basenm . ".pdf' " . v:servername . " &")
-        endif
-        if basedir != '.'
-            cd -
-        endif
+    let [basenm, basedir] = SyncTeX_GetMaster()
+    if basedir != '.'
+        exe "cd " . substitute(basedir, ' ', '\\ ', 'g')
+    endif
+    let did_evince = 0
+    if !exists("g:rplugin_evince_list")
+        let g:rplugin_evince_list = []
+    else
+        for bb in g:rplugin_evince_list
+            if bb == basenm
+                let did_evince = 1
+                break
+            endif
+        endfor
+    endif
+    if !did_evince
+        call add(g:rplugin_evince_list, basenm)
+        call system("python " . g:rplugin_home . "/r-plugin/synctex_evince_backward.py '" . basenm . ".pdf' " . v:servername . " &")
     endif
     exe "cd " . substitute(olddir, ' ', '\\ ', 'g')
 endfunction
@@ -640,8 +645,8 @@ if g:rplugin_pdfviewer != "none"
         unlet s:key_list
         unlet s:has_key
     endif
-    if g:vimrplugin_synctex
-        call Run_SyncTeX()
+    if g:vimrplugin_synctex && g:rplugin_pdfviewer == "evince" && $DISPLAY != "" && v:servername != ""
+        call Run_EvinceBackward()
     endif
 endif
 
