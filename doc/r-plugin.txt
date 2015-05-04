@@ -357,10 +357,10 @@ section |r-plugin-indenting| of this document.
 3.6.2 Install additional plugins~
 
 You may be interested in installing additional general plugins to get
-functionality not provided by this file type plugin. ShowMarks and snipMate
-are particularly interesting. Please read |r-plugin-tips| for details. If you
-edit Rnoweb files, you may want to try LaTeX-Box for omnicompletion of LaTeX
-code (see |r-plugin-latex-box| for details).
+functionality not provided by this file type plugin. Particularly interesting
+are vim-signature, csv.vim and snipMate. Please read |r-plugin-tips| for
+details. If you edit Rnoweb files, you may want to try LaTeX-Box for
+omnicompletion of LaTeX code (see |r-plugin-latex-box| for details).
 
 
 ==============================================================================
@@ -441,6 +441,7 @@ Command
   . Print (cur)                                        \rp
   . Names (cur)                                        \rn
   . Structure (cur)                                    \rt
+  . View data.frame (cur)                              \rv
   --------------------------------------------------------
   . Arguments (cur)                                    \ra
   . Example (cur)                                      \re
@@ -549,6 +550,14 @@ in each case:
    summary(x)
    summary(m)
 <
+If the object under the cursor is a data.frame or a matrix, <LocalLeader>rv
+will show it in a new tab. If the csv.vim plugin is not installed, the
+Vim-R-plugin will warn you about that (see |r-plugin-df-view|). Specially
+useful commands from the csv.vim plugin are |:CSVHeader|, |:ArrangeColumn| and
+|:CSVHiColumn|. It can be installed from:
+
+   http://www.vim.org/scripts/script.php?script_id=2830
+
 When completing object names (CTRL-X CTRL-O) and function arguments (CTRL-X
 CTRL-A) you have to press CTRL-N to go foward in the list and CTRL-P to go
 backward (see |popupmenu-completion|). Note: if using Vim in a terminal
@@ -1209,6 +1218,7 @@ is running:
 |vimrplugin_user_maps_only|    Only set user specified key bindings
 |vimrplugin_tmpdir|            Where temporary files are created
 |vimrplugin_compldir|          Where lists for omnicompletion are stored
+|r-plugin-df-view|             Options for visualizing a data.frame or matrix
 |r-plugin-SyncTeX|             Options for SyncTeX
 
 
@@ -1978,8 +1988,34 @@ want to know they are, while editing an R file, do in Normal mode:
 <
 
 ------------------------------------------------------------------------------
+							    *r-plugin-df-view*
+6.34 View a data.frame or matrix~
+
+The csv.vim plugin helps to visualize and edit csv files, and if it is not
+installed, the Vim-R-plugin will warn you about that when you do
+<LocalLeader>rv. If you do not want to install the csv.vim plugin, put in your
+|vimrc|:
+>
+   let vimrplugin_csv_warn = 0
+<
+If you rather prefer to see the table in a graphical viewer, you should set
+the value of vimrplugin_csv_app in your |vimrc|. Examples:
+>
+   let vimrplugin_csv_app = "localc"
+   let vimrplugin_csv_app = "c:/Program Files (x86)/LibreOffice 4/program/scalc.exe"
+<
+There is also the option of configuring the Vim-R-plugin to run an R command
+to display the data. Example:
+>
+   let vimrplugin_df_viewer = "relimp::showData(%s, font = 'Courier 14')"
+<
+The value of vimrplugin_df_viewer is a string and the substring `%s` is
+replaced by the name of the object under the cursor.
+
+
+------------------------------------------------------------------------------
 							    *r-plugin-SyncTeX*
-6.34 SyncTeX support~
+6.35 SyncTeX support~
 
 SyncTeX is a set of communication systems used by some PDF viewers and by some
 text editors which allow users to jump from a specific line in the text editor
@@ -2213,6 +2249,7 @@ RD, "cursor down"; RED, both "echo" and "down"):
    RObjectNames
    RObjectPr
    RObjectStr
+   RViewDF
    RSetwd
    RSummary
    RListSpace
@@ -2359,17 +2396,11 @@ mark, the plugin will send from the mark to the end of the file. The mark
 above the cursor is included and the mark below is excluded from the block to
 be sent to R. To create a mark, press m<letter> in Normal mode.
 
-We recommended the use of ShowMarks plugin which show what lines have marks
-defined. The plugin is available at:
+We recommended the use of vim-signature which show what lines have marks
+defined. The plugin are available at:
 
-   http://www.vim.org/scripts/script.php?script_id=152
+   https://github.com/kshenoy/vim-signature
 
-You may want to add the following two lines to your |vimrc| to customize
-ShowMarks behavior:
->
-   let marksCloseWhenSelected = 0
-   let showmarks_include = "abcdefghijklmnopqrstuvwxyz"
-<
 
 ------------------------------------------------------------------------------
 							   *r-plugin-snippets*
@@ -2842,9 +2873,12 @@ put in your |vimrc|:
 							       *r-plugin-news*
 10. News~
 
-1.2.5
+1.2.5 (2015-05-02)
 
  * New command to evaluate selection and get output in newtab: \so
+
+ * New command (\rv) and new options (vimrplugin_csv_warn,
+   vimrplugin_csv_app and vimrplugin_df_viewer).
 
  * Bring back the "echo" send commands because some users need them.
 

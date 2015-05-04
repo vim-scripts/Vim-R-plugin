@@ -1482,6 +1482,34 @@ function RGetKeyWord()
     return rkeyword
 endfunction
 
+function RViewDF(oname)
+    if exists("g:vimrplugin_csv_app")
+        if !executable(g:vimrplugin_csv_app)
+            call RWarningMsg('vimrplugin_csv_app ("' . g:vimrplugin_csv_app . '") is not executable')
+            return
+        endif
+        normal! :<Esc>
+        call system('cp "' . g:rplugin_tmpdir . '/Rinsert" "' . a:oname . '.csv"')
+        if has("win32") || has("win64")
+            silent exe '!start "' . g:vimrplugin_csv_app . '" "' . a:oname . '.csv"'
+        else
+            call system(g:vimrplugin_csv_app . ' "' . a:oname . '.csv" >/dev/null 2>/dev/null &')
+        endif
+        return
+    endif
+    echo 'Opening "' . a:oname . '.csv"'
+    silent exe 'tabnew ' . a:oname . '.csv'
+    silent 1,$d
+    silent exe 'read ' . substitute(g:rplugin_tmpdir, " ", '\\ ', 'g') . '/Rinsert'
+    silent 1d
+    set filetype=csv
+    set nomodified
+    redraw
+    if !exists(":CSVTable") && g:vimrplugin_csv_warn
+        call RWarningMsg("csv.vim is not installed (http://www.vim.org/scripts/script.php?script_id=2830)")
+    endif
+endfunction
+
 function GetROutput(outf)
     if a:outf =~ g:rplugin_tmpdir
         let tnum = 1
@@ -2602,6 +2630,16 @@ function RAction(rcmd)
             call g:SendCmdToR(raction)
             return
         endif
+        if a:rcmd == "viewdf"
+            if exists("g:vimrplugin_df_viewer")
+                call g:SendCmdToR(printf(g:vimrplugin_df_viewer, rkeyword))
+            else
+                echo "Wait..."
+                call delete(g:rplugin_tmpdir . "/Rinsert")
+                call SendToVimCom("\x08" . $VIMINSTANCEID . 'vimcom:::vim_viewdf("' . rkeyword . '")')
+            endif
+            return
+        endif
 
         let raction = rfun . "(" . rkeyword . ")"
         call g:SendCmdToR(raction)
@@ -2734,6 +2772,7 @@ function RControlMenu()
     call RCreateMenuItem("nvi", 'Command.Print\ (cur)', '<Plug>RObjectPr', 'rp', ':call RAction("print")')
     call RCreateMenuItem("nvi", 'Command.Names\ (cur)', '<Plug>RObjectNames', 'rn', ':call RAction("vim.names")')
     call RCreateMenuItem("nvi", 'Command.Structure\ (cur)', '<Plug>RObjectStr', 'rt', ':call RAction("str")')
+    call RCreateMenuItem("nvi", 'Command.View\ data\.frame\ (cur)', '<Plug>RViewDF', 'rv', ':call RAction("viewdf")')
     "-------------------------------
     menu R.Command.-Sep2- <nul>
     call RCreateMenuItem("nvi", 'Command.Arguments\ (cur)', '<Plug>RShowArgs', 'ra', ':call RAction("args")')
@@ -2759,6 +2798,7 @@ function RControlMaps()
     call RCreateMaps("nvi", '<Plug>RObjectPr',     'rp', ':call RAction("print")')
     call RCreateMaps("nvi", '<Plug>RObjectNames',  'rn', ':call RAction("vim.names")')
     call RCreateMaps("nvi", '<Plug>RObjectStr',    'rt', ':call RAction("str")')
+    call RCreateMaps("nvi", '<Plug>RViewDF',    'rv', ':call RAction("viewdf")')
 
     " Arguments, example, help
     "-------------------------------------
@@ -3072,6 +3112,7 @@ call RSetDefaultValue("g:vimrplugin_source_args",    "''")
 call RSetDefaultValue("g:vimrplugin_after_start",    "''")
 call RSetDefaultValue("g:vimrplugin_restart",           0)
 call RSetDefaultValue("g:vimrplugin_vsplit",            0)
+call RSetDefaultValue("g:vimrplugin_csv_warn",          1)
 call RSetDefaultValue("g:vimrplugin_rconsole_width",   -1)
 call RSetDefaultValue("g:vimrplugin_rconsole_height",  15)
 call RSetDefaultValue("g:vimrplugin_tmux_title", "'VimR'")
