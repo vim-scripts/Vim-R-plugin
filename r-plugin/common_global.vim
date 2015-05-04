@@ -1394,7 +1394,7 @@ function SendLineToRAndInsertOutput()
     if RInsert("print(" . lin . ")")
         let curpos = getpos(".")
         " comment the output
-        let ilines = readfile(substitute(g:rplugin_tmpdir, ' ', '\\ ', 'g') . "/Rinsert")
+        let ilines = readfile(g:rplugin_tmpdir . "/Rinsert")
         for iln in ilines
             call RSimpleCommentLine("normal", "c")
             normal! j
@@ -1482,6 +1482,24 @@ function RGetKeyWord()
     return rkeyword
 endfunction
 
+function GetROutput(outf)
+    if a:outf =~ g:rplugin_tmpdir
+        let tnum = 1
+        while bufexists("so" . tnum)
+            let tnum += 1
+        endwhile
+        exe 'tabnew so' . tnum
+        exe 'read ' . substitute(a:outf, " ", '\\ ', 'g')
+        set filetype=rout
+        setlocal buftype=nofile
+        setlocal noswapfile
+    else
+        exe 'tabnew ' . substitute(a:outf, " ", '\\ ', 'g')
+    endif
+    normal! gT
+    redraw
+endfunction
+
 " Send sources to R
 function RSourceLines(...)
     let lines = a:1
@@ -1498,8 +1516,7 @@ function RSourceLines(...)
     endif
 
     if a:0 == 3 && a:3 == "NewtabInsert"
-        let rcmd = 'base::source("' . g:rplugin_rsource . '", echo=TRUE)'
-        call RInsert(rcmd, "newtab")
+        call SendToVimCom("\x08" . $VIMINSTANCEID . 'vimcom:::vim_capture_source_output("' . g:rplugin_rsource . '", "' . g:rplugin_tmpdir . '/Rinsert")')
         return 1
     endif
 
