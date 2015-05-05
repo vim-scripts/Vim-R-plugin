@@ -30,17 +30,13 @@ function! ShowRout()
         call delete(b:routfile)
     endif
 
-    if !exists("b:rplugin_R")
-        call SetRPath()
-    endif
-
     " if not silent, the user will have to type <Enter>
     silent update
 
     if has("win32") || has("win64")
         let rcmd = 'Rcmd.exe BATCH --no-restore --no-save "' . expand("%") . '" "' . b:routfile . '"'
     else
-        let rcmd = b:rplugin_R . " CMD BATCH --no-restore --no-save '" . expand("%") . "' '" . b:routfile . "'"
+        let rcmd = g:rplugin_R . " CMD BATCH --no-restore --no-save '" . expand("%") . "' '" . b:routfile . "'"
     endif
 
     if has("win32") || has("win64") || v:servername == ""

@@ -837,9 +837,6 @@ function StartR(whatr)
     endif
     call writefile(start_options, g:rplugin_tmpdir . "/start_options.R")
 
-    if !exists("b:rplugin_R")
-        call SetRPath()
-    endif
     if !exists("g:vimrplugin_r_args")
         let b:rplugin_r_args = " "
     else
@@ -904,9 +901,9 @@ function StartR(whatr)
     endif
 
     if b:rplugin_r_args == " "
-        let rcmd = b:rplugin_R
+        let rcmd = g:rplugin_R
     else
-        let rcmd = b:rplugin_R . " " . b:rplugin_r_args
+        let rcmd = g:rplugin_R . " " . b:rplugin_r_args
     endif
 
     if g:rplugin_do_tmux_split
@@ -2937,6 +2934,7 @@ function RCreateSendMaps()
     call RCreateMaps("v", '<Plug>RESendSelection',  'se', ':call SendSelectionToR("echo", "stay")')
     call RCreateMaps("v", '<Plug>RDSendSelection',  'sd', ':call SendSelectionToR("silent", "down")')
     call RCreateMaps("v", '<Plug>REDSendSelection', 'sa', ':call SendSelectionToR("echo", "down")')
+    call RCreateMaps('v', '<Plug>RSendSelAndInsertOutput', 'so', ':call SendSelectionToR("echo", "stay", "NewtabInsert")')
 
     " Paragraph
     "-------------------------------------
@@ -2953,15 +2951,12 @@ function RCreateSendMaps()
     "-------------------------------------
     call RCreateMaps("ni", '<Plug>RSendLine', 'l', ':call SendLineToR("stay")')
     call RCreateMaps('ni0', '<Plug>RDSendLine', 'd', ':call SendLineToR("down")')
+    call RCreateMaps('ni0', '<Plug>RDSendLineAndInsertOutput', 'o', ':call SendLineToRAndInsertOutput()')
     call RCreateMaps('i', '<Plug>RSendLAndOpenNewOne', 'q', ':call SendLineToR("newline")')
     call RCreateMaps('n', '<Plug>RNLeftPart', 'r<left>', ':call RSendPartOfLine("left", 0)')
     call RCreateMaps('n', '<Plug>RNRightPart', 'r<right>', ':call RSendPartOfLine("right", 0)')
     call RCreateMaps('i', '<Plug>RILeftPart', 'r<left>', 'l:call RSendPartOfLine("left", 1)')
     call RCreateMaps('i', '<Plug>RIRightPart', 'r<right>', 'l:call RSendPartOfLine("right", 1)')
-
-    " *Run and insert output*
-    call RCreateMaps('ni0', '<Plug>RDSendLineAndInsertOutput', 'o', ':call SendLineToRAndInsertOutput()')
-    call RCreateMaps('v', '<Plug>RSendSelAndInsertOutput', 'so', ':call SendSelectionToR("echo", "stay", "NewtabInsert")')
 
     " For compatibility with Johannes Ranke's plugin
     if g:vimrplugin_map_r == 1
@@ -3008,20 +3003,6 @@ function RVimLeave()
     call delete(g:rplugin_tmpdir . "/openR'")
     if executable("rmdir")
         call system("rmdir '" . g:rplugin_tmpdir . "'")
-    endif
-endfunction
-
-function SetRPath()
-    if exists("g:vimrplugin_r_path")
-        let b:rplugin_R = expand(g:vimrplugin_r_path)
-        if isdirectory(b:rplugin_R)
-            let b:rplugin_R = b:rplugin_R . "/R"
-        endif
-    else
-        let b:rplugin_R = "R"
-    endif
-    if !executable(b:rplugin_R)
-        call RWarningMsgInp("R executable not found: '" . b:rplugin_R . "'")
     endif
 endfunction
 
@@ -3469,9 +3450,28 @@ if has("win32") || has("win64")
     runtime r-plugin/windows.vim
     let g:rplugin_has_icons = len(globpath(&rtp, "bitmaps/RStart.bmp")) > 0
 else
-    call SetRPath()
     let g:rplugin_has_icons = len(globpath(&rtp, "bitmaps/RStart.png")) > 0
 endif
+
+" Set the value of R path
+if exists("g:vimrplugin_r_path")
+    let g:rplugin_R = expand(g:vimrplugin_r_path)
+    if isdirectory(g:rplugin_R)
+        let g:rplugin_R = g:rplugin_R . "/R"
+    endif
+elseif has("win32") || has("win64")
+    if g:vimrplugin_Rterm
+        let g:rplugin_R = "Rgui.exe"
+    else
+        let g:rplugin_R = "Rterm.exe"
+    endif
+else
+    let g:rplugin_R = "R"
+endif
+if !executable(g:rplugin_R)
+    call RWarningMsgInp("R executable not found: '" . g:rplugin_R . "'")
+endif
+
 if has("gui_running")
     runtime r-plugin/gui_running.vim
 endif
