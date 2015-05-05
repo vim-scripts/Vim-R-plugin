@@ -154,8 +154,27 @@ if exists("g:rout_follow_colorscheme") && g:rout_follow_colorscheme
     hi def link routError	ErrorMsg
     hi def link routWarn	WarningMsg
 else
-    if &t_Co == 256
-        " Defalt 256 colors scheme for R output:
+    if has("gui_running")
+        " Default 256 colors scheme for R output:
+        hi routInput	guifg=#9e9e9e
+        hi routNormal	guifg=#00d700
+        hi routNumber	guifg=#ffaf00
+        hi routInteger	guifg=#ffaf00
+        hi routFloat	guifg=#ffaf00
+        hi routComplex	guifg=#ffaf00
+        hi routNegNum	guifg=#ff875f
+        hi routNegFlt	guifg=#ff875f
+        hi routDate	guifg=#d7af5f
+        hi routFalse	guifg=#ff5f5f
+        hi routTrue	guifg=#5fd787
+        hi routInf      guifg=#00afff
+        hi routConst	guifg=#00af5f
+        hi routString	guifg=#5fffaf
+        hi routError	guifg=#ffffff guibg=#c00000
+        hi routWarn	guifg=#c00000
+        hi routIndex	guifg=#87afaf
+    elseif &t_Co == 256
+        " Default 256 colors scheme for R output:
         hi routInput	ctermfg=247
         hi routNormal	ctermfg=40
         hi routNumber	ctermfg=214
@@ -174,7 +193,7 @@ else
         hi routWarn	ctermfg=1
         hi routIndex	ctermfg=109
     else
-        " Defalt 16 colors scheme for R output:
+        " Default 16 colors scheme for R output:
         hi routInput	ctermfg=gray
         hi routNormal	ctermfg=darkgreen
         hi routNumber	ctermfg=darkyellow
