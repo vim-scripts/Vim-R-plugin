@@ -215,55 +215,55 @@ else
 
     " Change colors under user request:
     if exists("g:rout_color_input")
-        exe "hi routInput ctermfg=" . g:rout_color_input
+        exe "hi routInput " . g:rout_color_input
     endif
     if exists("g:rout_color_normal")
-        exe "hi routNormal ctermfg=" . g:rout_color_normal
+        exe "hi routNormal " . g:rout_color_normal
     endif
     if exists("g:rout_color_number")
-        exe "hi routNumber ctermfg=" . g:rout_color_number
+        exe "hi routNumber " . g:rout_color_number
     endif
     if exists("g:rout_color_integer")
-        exe "hi routInteger ctermfg=" . g:rout_color_integer
+        exe "hi routInteger " . g:rout_color_integer
     endif
     if exists("g:rout_color_float")
-        exe "hi routFloat ctermfg=" . g:rout_color_float
+        exe "hi routFloat " . g:rout_color_float
     endif
     if exists("g:rout_color_complex")
-        exe "hi routComplex ctermfg=" . g:rout_color_complex
+        exe "hi routComplex " . g:rout_color_complex
     endif
     if exists("g:rout_color_negnum")
-        exe "hi routNegNum ctermfg=" . g:rout_color_negnum
+        exe "hi routNegNum " . g:rout_color_negnum
     endif
     if exists("g:rout_color_negfloat")
-        exe "hi routNegFlt ctermfg=" . g:rout_color_negfloat
+        exe "hi routNegFlt " . g:rout_color_negfloat
     endif
     if exists("g:rout_color_date")
-        exe "hi routDate ctermfg=" . g:rout_color_date
+        exe "hi routDate " . g:rout_color_date
     endif
     if exists("g:rout_color_false")
-        exe "hi routFalse ctermfg=" . g:rout_color_false
+        exe "hi routFalse " . g:rout_color_false
     endif
     if exists("g:rout_color_true")
-        exe "hi routTrue ctermfg=" . g:rout_color_true
+        exe "hi routTrue " . g:rout_color_true
     endif
     if exists("g:rout_color_inf")
-        exe "hi routInf ctermfg=" . g:rout_color_inf
+        exe "hi routInf " . g:rout_color_inf
     endif
     if exists("g:rout_color_constant")
-        exe "hi routConst ctermfg=" . g:rout_color_constant
+        exe "hi routConst " . g:rout_color_constant
     endif
     if exists("g:rout_color_string")
-        exe "hi routString ctermfg=" . g:rout_color_string
+        exe "hi routString " . g:rout_color_string
     endif
     if exists("g:rout_color_error")
-        exe "hi routError ctermfg=" . g:rout_color_error
+        exe "hi routError " . g:rout_color_error
     endif
     if exists("g:rout_color_warn")
-        exe "hi routWarn ctermfg=" . g:rout_color_warn
+        exe "hi routWarn " . g:rout_color_warn
     endif
     if exists("g:rout_color_index")
-        exe "hi routIndex ctermfg=" . g:rout_color_index
+        exe "hi routIndex " . g:rout_color_index
     endif
 endif
 

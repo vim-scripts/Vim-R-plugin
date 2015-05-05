@@ -2055,7 +2055,7 @@ Note: The current knitr package (version 1.7) has at least two limitations:
 
 
 ------------------------------------------------------------------------------
-6.34.1 Evince configuration~
+6.35.1 Evince configuration~
 
 No configuration should be required.
 
@@ -2070,7 +2070,7 @@ to press <LocalLeader>gp again.
 
 
 ------------------------------------------------------------------------------
-6.34.2 Okular configuration~
+6.35.2 Okular configuration~
 
 You have to configure Okular to call Vim during backward searches.
 In Okular, click in:
@@ -2098,7 +2098,7 @@ of Okular will be started.
 
 
 ------------------------------------------------------------------------------
-6.34.3 Zathura configuration~
+6.35.3 Zathura configuration~
 
 No configuration should be required if Evince is not installed. If evince is
 installed, put in your |vimrc|:
@@ -2115,7 +2115,7 @@ to press <LocalLeader>gp again.
 
 
 ------------------------------------------------------------------------------
-6.34.4 Skim with MacVim configuration (Mac OS X)~
+6.35.4 Skim with MacVim configuration (Mac OS X)~
 
 You have to configure Skim to call MacVim during backward searches.
 In Skim click in the drop down menu and fill the fields:
@@ -2129,7 +2129,7 @@ In Skim click in the drop down menu and fill the fields:
 <
 
 ------------------------------------------------------------------------------
-6.34.5 Sumatra configuration (Windows)~
+6.35.5 Sumatra configuration (Windows)~
 
 No configuration is required.
 
@@ -2137,7 +2137,7 @@ No configuration is required.
 ------------------------------------------------------------------------------
                                                        *vimrplugin_vim_window*
 				                       *vimrplugin_synctex*
-6.34.6 Configuring the PDF editor and Vim's window title~
+6.35.6 Configuring the PDF editor and Vim's window title~
 
 If SyncTeX does not work (see above), you may try to set in your |vimrc| the
 values of |vimrplugin_pdfviewer| and vimrplugin_vim_window.
@@ -2397,7 +2397,7 @@ above the cursor is included and the mark below is excluded from the block to
 be sent to R. To create a mark, press m<letter> in Normal mode.
 
 We recommended the use of vim-signature which show what lines have marks
-defined. The plugin are available at:
+defined. The plugins are available at:
 
    https://github.com/kshenoy/vim-signature
 
@@ -2835,28 +2835,26 @@ Finally, if you want to use vi key bindings in Bash:
 9.20. Syntax highlight of .Rout files~
 
 You can set the foreground colors of R output in your |vimrc|. The example
-below is for a terminal emulator that supports 256 colors (see
-|highlight-ctermfg|):
+below is for a terminal emulator that supports 256 colors (see |:highlight|):
 >
    if &t_Co == 256
-       let rout_color_input = 247
-       let rout_color_normal = 39
-       let rout_color_number = 51
-       let rout_color_integer = 51
-       let rout_color_float = 51
-       let rout_color_complex = 51
-       let rout_color_negnum = 183
-       let rout_color_negfloat = 183
-       let rout_color_date = 43
-       let rout_color_true = 78
-       let rout_color_false = 203
-       let rout_color_inf = 39
-       let rout_color_constant = 75
-       let rout_color_string = 79
-       let rout_color_stderr = 33
-       let rout_color_error = 15
-       let rout_color_warn = 1
-       let rout_color_index = 186
+       let rout_color_input    = 'ctermfg=247'
+       let rout_color_normal   = 'ctermfg=39'
+       let rout_color_number   = 'ctermfg=51'
+       let rout_color_integer  = 'ctermfg=51'
+       let rout_color_float    = 'ctermfg=51'
+       let rout_color_complex  = 'ctermfg=51'
+       let rout_color_negnum   = 'ctermfg=183'
+       let rout_color_negfloat = 'ctermfg=183'
+       let rout_color_date     = 'ctermfg=43'
+       let rout_color_true     = 'ctermfg=78'
+       let rout_color_false    = 'ctermfg=203'
+       let rout_color_inf      = 'ctermfg=39'
+       let rout_color_constant = 'ctermfg=75'
+       let rout_color_string   = 'ctermfg=79'
+       let rout_color_error    = 'ctermfg=15 ctermbg=1'
+       let rout_color_warn     = 'ctermfg=1'
+       let rout_color_index    = 'ctermfg=186'
    endif
 <
 To know what number corresponds to your preferred color (among the 256
@@ -2873,7 +2871,7 @@ put in your |vimrc|:
 							       *r-plugin-news*
 10. News~
 
-1.2.5 (2015-05-02)
+1.2.5 (2015-05-04)
 
  * New command to evaluate selection and get output in newtab: \so
 
