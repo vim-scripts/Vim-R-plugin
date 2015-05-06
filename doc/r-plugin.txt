@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 1.2.4
+Version: 1.2.5
 For Vim version 7.4
 
  1. Overview                                    |r-plugin-overview|
@@ -115,7 +115,7 @@ dependencies:
 
     * R's version must be >= 3.0.0: http://www.r-project.org/
 
-    * vimcom = 1.2-3: http://www.lepem.ufc.br/jaa/vimcom.html
+    * vimcom = 1.2-5: http://www.lepem.ufc.br/jaa/vimcom.html
 
       Note: If you cannot build vimcom yourself, you will want to
       download and install the zip file.
@@ -152,7 +152,7 @@ Before installing the plugin, you should install its dependencies:
 
    R >= 3.0.0: http://www.r-project.org/
 
-   vimcom = 1.2-3: http://www.lepem.ufc.br/jaa/vimcom.html
+   vimcom = 1.2-5: http://www.lepem.ufc.br/jaa/vimcom.html
 
    Only if you edit Rnoweb files: MacTeX, BasicTeX or other LaTeX system.
 
@@ -206,7 +206,7 @@ Before installing the plugin, you should install its dependencies:
 
    R >= 3.0.0: http://www.r-project.org/
 
-   vimcom = 1.2-3: http://www.lepem.ufc.br/jaa/vimcom.html
+   vimcom = 1.2-5: http://www.lepem.ufc.br/jaa/vimcom.html
 
    Tmux >= 1.8:   http://tmux.sourceforge.net
                   Tmux is necessary to send commands from Vim to R Console.
@@ -357,10 +357,10 @@ section |r-plugin-indenting| of this document.
 3.6.2 Install additional plugins~
 
 You may be interested in installing additional general plugins to get
-functionality not provided by this file type plugin. ShowMarks and snipMate
-are particularly interesting. Please read |r-plugin-tips| for details. If you
-edit Rnoweb files, you may want to try LaTeX-Box for omnicompletion of LaTeX
-code (see |r-plugin-latex-box| for details).
+functionality not provided by this file type plugin. Particularly interesting
+are vim-signature, csv.vim and snipMate. Please read |r-plugin-tips| for
+details. If you edit Rnoweb files, you may want to try LaTeX-Box for
+omnicompletion of LaTeX code (see |r-plugin-latex-box| for details).
 
 
 ==============================================================================
@@ -395,23 +395,35 @@ Start/Close
 
 Send
   . File                                               \aa
+  . File (echo)                                        \ae
   . File (open .Rout)                                  \ao
   --------------------------------------------------------
   . Block (cur)                                        \bb
+  . Block (cur, echo)                                  \be
   . Block (cur, down)                                  \bd
+  . Block (cur, echo and down)                         \ba
   --------------------------------------------------------
   . Chunk (cur)                                        \cc
+  . Chunk (cur, echo)                                  \ce
   . Chunk (cur, down)                                  \cd
+  . Chunk (cur, echo and down)                         \ca
   . Chunk (from first to here)                         \ch
   --------------------------------------------------------
   . Function (cur)                                     \ff
+  . Function (cur, echo)                               \fe
   . Function (cur and down)                            \fd
+  . Function (cur, echo and down)                      \fa
   --------------------------------------------------------
   . Selection                                          \ss
+  . Selection (echo)                                   \se
   . Selection (and down)                               \sd
+  . Selection (echo and down)                          \sa
+  . Selection (evaluate and insert output in new tab)  \so
   --------------------------------------------------------
   . Paragraph                                          \pp
+  . Paragraph (echo)                                   \pe
   . Paragraph (and down)                               \pd
+  . Paragraph (echo and down)                          \pa
   --------------------------------------------------------
   . Line                                                \l
   . Line (and down)                                     \d
@@ -429,6 +441,7 @@ Command
   . Print (cur)                                        \rp
   . Names (cur)                                        \rn
   . Structure (cur)                                    \rt
+  . View data.frame (cur)                              \rv
   --------------------------------------------------------
   . Arguments (cur)                                    \ra
   . Example (cur)                                      \re
@@ -537,6 +550,14 @@ in each case:
    summary(x)
    summary(m)
 <
+If the object under the cursor is a data.frame or a matrix, <LocalLeader>rv
+will show it in a new tab. If the csv.vim plugin is not installed, the
+Vim-R-plugin will warn you about that (see |r-plugin-df-view|). Specially
+useful commands from the csv.vim plugin are |:CSVHeader|, |:ArrangeColumn| and
+|:CSVHiColumn|. It can be installed from:
+
+   http://www.vim.org/scripts/script.php?script_id=2830
+
 When completing object names (CTRL-X CTRL-O) and function arguments (CTRL-X
 CTRL-A) you have to press CTRL-N to go foward in the list and CTRL-P to go
 backward (see |popupmenu-completion|). Note: if using Vim in a terminal
@@ -668,14 +689,13 @@ the currently loaded libraries. The Object Browser requires the
 to correctly align list items.
 
 In the .GlobalEnv view, if an object has the attribute "label", it will also
-be displayed. Please, see the R help for package vimcom for some options
-to control the Object Browser behavior. In the Object Browser window, while in
-Normal mode, you can either press <Enter> or double click (GVim only) over a
-data.frame or list to show/hide its elements (not if viewing the content of
-loaded libraries). If you are running R in an environment where the string
-UTF-8 is part of either LC_MESSAGES or LC_ALL variables, unicode line drawing
-characters will be used to draw lines in the Object Browser. This is the case
-of most Linux distributions.
+be displayed. In the Object Browser window, while in Normal mode, you can
+either press <Enter> or double click (GVim only) over a data.frame or list to
+show/hide its elements (not if viewing the content of loaded libraries). If
+you are running R in an environment where the string UTF-8 is part of either
+LC_MESSAGES or LC_ALL variables, unicode line drawing characters will be used
+to draw lines in the Object Browser. This is the case of most Linux
+distributions.
 
 In the Libraries view, you can either double click or press <Enter> on a
 library name to see its objects. In the Object Browser the libraries have the
@@ -1197,6 +1217,7 @@ is running:
 |vimrplugin_user_maps_only|    Only set user specified key bindings
 |vimrplugin_tmpdir|            Where temporary files are created
 |vimrplugin_compldir|          Where lists for omnicompletion are stored
+|r-plugin-df-view|             Options for visualizing a data.frame or matrix
 |r-plugin-SyncTeX|             Options for SyncTeX
 
 
@@ -1613,10 +1634,8 @@ temporary file.
 
 You can add arguments to be passed to R's `source()` function. Example:
 >
-   let vimrplugin_source_args = "max.deparse.length = 300, echo = TRUE"
+   let vimrplugin_source_args = "max.deparse.length = 300"
 <
-See |r-plugin-source-echo| if you frequently need to alternate the `echo`
-argument between `TRUE` and `FALSE`.
 
 ------------------------------------------------------------------------------
 						       *vimrplugin_sweaveargs*
@@ -1968,8 +1987,34 @@ want to know they are, while editing an R file, do in Normal mode:
 <
 
 ------------------------------------------------------------------------------
+							    *r-plugin-df-view*
+6.34 View a data.frame or matrix~
+
+The csv.vim plugin helps to visualize and edit csv files, and if it is not
+installed, the Vim-R-plugin will warn you about that when you do
+<LocalLeader>rv. If you do not want to install the csv.vim plugin, put in your
+|vimrc|:
+>
+   let vimrplugin_csv_warn = 0
+<
+If you rather prefer to see the table in a graphical viewer, you should set
+the value of vimrplugin_csv_app in your |vimrc|. Examples:
+>
+   let vimrplugin_csv_app = "localc"
+   let vimrplugin_csv_app = "c:/Program Files (x86)/LibreOffice 4/program/scalc.exe"
+<
+There is also the option of configuring the Vim-R-plugin to run an R command
+to display the data. Example:
+>
+   let vimrplugin_df_viewer = "relimp::showData(%s, font = 'Courier 14')"
+<
+The value of vimrplugin_df_viewer is a string and the substring `%s` is
+replaced by the name of the object under the cursor.
+
+
+------------------------------------------------------------------------------
 							    *r-plugin-SyncTeX*
-6.34 SyncTeX support~
+6.35 SyncTeX support~
 
 SyncTeX is a set of communication systems used by some PDF viewers and by some
 text editors which allow users to jump from a specific line in the text editor
@@ -2009,7 +2054,7 @@ Note: The current knitr package (version 1.7) has at least two limitations:
 
 
 ------------------------------------------------------------------------------
-6.34.1 Evince configuration~
+6.35.1 Evince configuration~
 
 No configuration should be required.
 
@@ -2024,7 +2069,7 @@ to press <LocalLeader>gp again.
 
 
 ------------------------------------------------------------------------------
-6.34.2 Okular configuration~
+6.35.2 Okular configuration~
 
 You have to configure Okular to call Vim during backward searches.
 In Okular, click in:
@@ -2052,7 +2097,7 @@ of Okular will be started.
 
 
 ------------------------------------------------------------------------------
-6.34.3 Zathura configuration~
+6.35.3 Zathura configuration~
 
 No configuration should be required if Evince is not installed. If evince is
 installed, put in your |vimrc|:
@@ -2069,7 +2114,7 @@ to press <LocalLeader>gp again.
 
 
 ------------------------------------------------------------------------------
-6.34.4 Skim with MacVim configuration (Mac OS X)~
+6.35.4 Skim with MacVim configuration (Mac OS X)~
 
 You have to configure Skim to call MacVim during backward searches.
 In Skim click in the drop down menu and fill the fields:
@@ -2083,7 +2128,7 @@ In Skim click in the drop down menu and fill the fields:
 <
 
 ------------------------------------------------------------------------------
-6.34.5 Sumatra configuration (Windows)~
+6.35.5 Sumatra configuration (Windows)~
 
 No configuration is required.
 
@@ -2091,7 +2136,7 @@ No configuration is required.
 ------------------------------------------------------------------------------
                                                        *vimrplugin_vim_window*
 				                       *vimrplugin_synctex*
-6.34.6 Configuring the PDF editor and Vim's window title~
+6.35.6 Configuring the PDF editor and Vim's window title~
 
 If SyncTeX does not work (see above), you may try to set in your |vimrc| the
 values of |vimrplugin_pdfviewer| and vimrplugin_vim_window.
@@ -2139,7 +2184,8 @@ The above example shows how to change key binding used to start R from
 
 Only the custom key bindings for Normal mode are shown in Vim's menu, but you
 can type |:map| to see the complete list of current mappings, and below is the
-list of the names for custom key bindings (the prefix RD means "cursor down"):
+list of the names for custom key bindings (the prefix RE means "echo";
+RD, "cursor down"; RED, both "echo" and "down"):
 
    Star/Close R~
    RStart
@@ -2173,13 +2219,22 @@ list of the names for custom key bindings (the prefix RD means "cursor down"):
 
    Send code to R console~
    RSendSelection
+   RESendSelection
    RDSendSelection
+   REDSendSelection
+   RSendSelAndInsertOutput
    RSendMBlock
+   RESendMBlock
    RDSendMBlock
+   REDSendMBlock
    RSendParagraph
+   RESendParagraph
    RDSendParagraph
+   REDSendParagraph
    RSendFunction
+   RESendFunction
    RDSendFunction
+   REDSendFunction
    RSendFile
    RESendFile
 
@@ -2193,6 +2248,7 @@ list of the names for custom key bindings (the prefix RD means "cursor down"):
    RObjectNames
    RObjectPr
    RObjectStr
+   RViewDF
    RSetwd
    RSummary
    RListSpace
@@ -2200,6 +2256,8 @@ list of the names for custom key bindings (the prefix RD means "cursor down"):
    Support to Sweave and knitr~
    RSendChunk
    RDSendChunk
+   RESendChunk
+   REDSendChunk
    RSendChunkFH (from the first chunk to here)
    RBibTeX    (Sweave)
    RBibTeXK   (Knitr)
@@ -2337,17 +2395,11 @@ mark, the plugin will send from the mark to the end of the file. The mark
 above the cursor is included and the mark below is excluded from the block to
 be sent to R. To create a mark, press m<letter> in Normal mode.
 
-We recommended the use of ShowMarks plugin which show what lines have marks
-defined. The plugin is available at:
+We recommended the use of vim-signature which show what lines have marks
+defined. The plugins are available at:
 
-   http://www.vim.org/scripts/script.php?script_id=152
+   https://github.com/kshenoy/vim-signature
 
-You may want to add the following two lines to your |vimrc| to customize
-ShowMarks behavior:
->
-   let marksCloseWhenSelected = 0
-   let showmarks_include = "abcdefghijklmnopqrstuvwxyz"
-<
 
 ------------------------------------------------------------------------------
 							   *r-plugin-snippets*
@@ -2778,47 +2830,30 @@ Finally, if you want to use vi key bindings in Bash:
 <
 
 ------------------------------------------------------------------------------
-							*r-plugin-source-echo*
-9.20. Set echo to TRUE or FALSE when sending multiple lines of code too R~
 
-If you want to alternate the `echo` argument of the `source()` function
-between `TRUE` and `FALSE`, then, you might want to create a couple of maps in
-your vimrc. You can use |nmap| to restrict the maps to Normal mode, |autocmd|
-and <buffer> to restrict the maps to R code, and <silent> if you prefer that
-the command is not displayed in Vim's command line. In the example below,
-<LocalLeader>`et` sets `echo=TRUE` and you could also create <LocalLeader>`ef`
-to set `echo=FALSE`:
->
-   autocmd BufNewFile,BufRead *.R* nmap <silent><buffer> <LocalLeader>et :let vimrplugin_source_args = "echo = TRUE"<CR>
-<
-
-------------------------------------------------------------------------------
-
-9.21. Syntax highlight of .Rout files~
+9.20. Syntax highlight of .Rout files~
 
 You can set the foreground colors of R output in your |vimrc|. The example
-below is for a terminal emulator that supports 256 colors (see
-|highlight-ctermfg|):
+below is for a terminal emulator that supports 256 colors (see |:highlight|):
 >
    if &t_Co == 256
-       let rout_color_input = 247
-       let rout_color_normal = 39
-       let rout_color_number = 51
-       let rout_color_integer = 51
-       let rout_color_float = 51
-       let rout_color_complex = 51
-       let rout_color_negnum = 183
-       let rout_color_negfloat = 183
-       let rout_color_date = 43
-       let rout_color_true = 78
-       let rout_color_false = 203
-       let rout_color_inf = 39
-       let rout_color_constant = 75
-       let rout_color_string = 79
-       let rout_color_stderr = 33
-       let rout_color_error = 15
-       let rout_color_warn = 1
-       let rout_color_index = 186
+       let rout_color_input    = 'ctermfg=247'
+       let rout_color_normal   = 'ctermfg=39'
+       let rout_color_number   = 'ctermfg=51'
+       let rout_color_integer  = 'ctermfg=51'
+       let rout_color_float    = 'ctermfg=51'
+       let rout_color_complex  = 'ctermfg=51'
+       let rout_color_negnum   = 'ctermfg=183'
+       let rout_color_negfloat = 'ctermfg=183'
+       let rout_color_date     = 'ctermfg=43'
+       let rout_color_true     = 'ctermfg=78'
+       let rout_color_false    = 'ctermfg=203'
+       let rout_color_inf      = 'ctermfg=39'
+       let rout_color_constant = 'ctermfg=75'
+       let rout_color_string   = 'ctermfg=79'
+       let rout_color_error    = 'ctermfg=15 ctermbg=1'
+       let rout_color_warn     = 'ctermfg=1'
+       let rout_color_index    = 'ctermfg=186'
    endif
 <
 To know what number corresponds to your preferred color (among the 256
@@ -2834,6 +2869,17 @@ put in your |vimrc|:
 ==============================================================================
 							       *r-plugin-news*
 10. News~
+
+1.2.5 (2015-05-06)
+
+ * New command to evaluate selection and get output in newtab: \so
+
+ * The command \ao no longer blocks Vim.
+
+ * New command (\rv) and new options (vimrplugin_csv_warn,
+   vimrplugin_csv_app and vimrplugin_df_viewer).
+
+ * Bring back the "echo" send commands because some users need them.
 
 1.2.4 (2015-04-22)
 

@@ -821,7 +821,7 @@ function StartR(whatr)
     else
         let start_options += ['options(vimcom.vimpager = TRUE)']
     endif
-    let start_options += ['if(utils::packageVersion("vimcom") != "1.2.3") warning("Your version of Vim-R-plugin requires vimcom-1.2-3.", call. = FALSE)']
+    let start_options += ['if(utils::packageVersion("vimcom") != "1.2.5") warning("Your version of Vim-R-plugin requires vimcom-1.2-5.", call. = FALSE)']
 
     let rwd = ""
     if g:vimrplugin_vim_wd == 0
@@ -837,9 +837,6 @@ function StartR(whatr)
     endif
     call writefile(start_options, g:rplugin_tmpdir . "/start_options.R")
 
-    if !exists("b:rplugin_R")
-        call SetRPath()
-    endif
     if !exists("g:vimrplugin_r_args")
         let b:rplugin_r_args = " "
     else
@@ -904,9 +901,9 @@ function StartR(whatr)
     endif
 
     if b:rplugin_r_args == " "
-        let rcmd = b:rplugin_R
+        let rcmd = g:rplugin_R
     else
-        let rcmd = b:rplugin_R . " " . b:rplugin_r_args
+        let rcmd = g:rplugin_R . " " . b:rplugin_r_args
     endif
 
     if g:rplugin_do_tmux_split
@@ -997,8 +994,8 @@ function WaitVimComStart()
         if !filereadable(g:rplugin_vimcom_lib)
             call RWarningMsgInp('Could not find "' . g:rplugin_vimcom_lib . '".')
         endif
-        if g:rplugin_vimcom_version != "1.2.3"
-            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.2.3.')
+        if g:rplugin_vimcom_version != "1.2.5"
+            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.2.5.')
             sleep 1
         endif
         call delete(g:rplugin_tmpdir . "/vimcom_running_" . $VIMINSTANCEID)
@@ -1367,19 +1364,23 @@ function RFormatCode() range
     echo (a:lastline - a:firstline + 1) . " lines formatted."
 endfunction
 
-function RInsert(cmd)
+function RInsert(...)
     if g:rplugin_vimcomport == 0
         return
     endif
 
     call delete(g:rplugin_tmpdir . "/eval_reply")
     call delete(g:rplugin_tmpdir . "/Rinsert")
-    call SendToVimCom("\x08" . $VIMINSTANCEID . 'capture.output(' . a:cmd . ', file = "' . g:rplugin_tmpdir . '/Rinsert")')
+    call SendToVimCom("\x08" . $VIMINSTANCEID . 'capture.output(' . a:1 . ', file = "' . g:rplugin_tmpdir . '/Rinsert")')
     let g:rplugin_lastev = ReadEvalReply()
     if g:rplugin_lastev == "R is busy." || g:rplugin_lastev == "UNKNOWN" || g:rplugin_lastev =~ "^Error" || g:rplugin_lastev == "INVALID" || g:rplugin_lastev == "ERROR" || g:rplugin_lastev == "EMPTY" || g:rplugin_lastev == "No reply"
         call RWarningMsg(g:rplugin_lastev)
         return 0
     else
+        if a:0 == 2 && a:2 == "newtab"
+            tabnew
+            set ft=rout
+        endif
         silent exe "read " . substitute(g:rplugin_tmpdir, ' ', '\\ ', 'g') . "/Rinsert"
         return 1
     endif
@@ -1390,7 +1391,7 @@ function SendLineToRAndInsertOutput()
     if RInsert("print(" . lin . ")")
         let curpos = getpos(".")
         " comment the output
-        let ilines = readfile(substitute(g:rplugin_tmpdir, ' ', '\\ ', 'g') . "/Rinsert")
+        let ilines = readfile(g:rplugin_tmpdir . "/Rinsert")
         for iln in ilines
             call RSimpleCommentLine("normal", "c")
             normal! j
@@ -1478,9 +1479,55 @@ function RGetKeyWord()
     return rkeyword
 endfunction
 
+function RViewDF(oname)
+    if exists("g:vimrplugin_csv_app")
+        if !executable(g:vimrplugin_csv_app)
+            call RWarningMsg('vimrplugin_csv_app ("' . g:vimrplugin_csv_app . '") is not executable')
+            return
+        endif
+        normal! :<Esc>
+        call system('cp "' . g:rplugin_tmpdir . '/Rinsert" "' . a:oname . '.csv"')
+        if has("win32") || has("win64")
+            silent exe '!start "' . g:vimrplugin_csv_app . '" "' . a:oname . '.csv"'
+        else
+            call system(g:vimrplugin_csv_app . ' "' . a:oname . '.csv" >/dev/null 2>/dev/null &')
+        endif
+        return
+    endif
+    echo 'Opening "' . a:oname . '.csv"'
+    silent exe 'tabnew ' . a:oname . '.csv'
+    silent 1,$d
+    silent exe 'read ' . substitute(g:rplugin_tmpdir, " ", '\\ ', 'g') . '/Rinsert'
+    silent 1d
+    set filetype=csv
+    set nomodified
+    redraw
+    if !exists(":CSVTable") && g:vimrplugin_csv_warn
+        call RWarningMsg("csv.vim is not installed (http://www.vim.org/scripts/script.php?script_id=2830)")
+    endif
+endfunction
+
+function GetROutput(outf)
+    if a:outf =~ g:rplugin_tmpdir
+        let tnum = 1
+        while bufexists("so" . tnum)
+            let tnum += 1
+        endwhile
+        exe 'tabnew so' . tnum
+        exe 'read ' . substitute(a:outf, " ", '\\ ', 'g')
+        set filetype=rout
+        setlocal buftype=nofile
+        setlocal noswapfile
+    else
+        exe 'tabnew ' . substitute(a:outf, " ", '\\ ', 'g')
+    endif
+    normal! gT
+    redraw
+endfunction
+
 " Send sources to R
-function RSourceLines(lines)
-    let lines = a:lines
+function RSourceLines(...)
+    let lines = a:1
     if &filetype == "rrst"
         let lines = map(copy(lines), 'substitute(v:val, "^\\.\\. \\?", "", "")')
     endif
@@ -1488,33 +1535,42 @@ function RSourceLines(lines)
         let lines = map(copy(lines), 'substitute(v:val, "^\\`\\`\\?", "", "")')
     endif
     call writefile(lines, g:rplugin_rsource)
-    if g:vimrplugin_source_args == ""
-        let rcmd = 'base::source("' . g:rplugin_rsource . '")'
-    else
-        let rcmd = 'base::source("' . g:rplugin_rsource . '", ' . g:vimrplugin_source_args . ')'
+    let sargs = ""
+    if g:vimrplugin_source_args != ""
+        let sargs = ", " . g:vimrplugin_source_args
     endif
+
+    if a:0 == 3 && a:3 == "NewtabInsert"
+        call SendToVimCom("\x08" . $VIMINSTANCEID . 'vimcom:::vim_capture_source_output("' . g:rplugin_rsource . '", "' . g:rplugin_tmpdir . '/Rinsert")')
+        return 1
+    endif
+
+    if a:2 == "echo"
+        let sargs .= ', echo=TRUE'
+    endif
+    let rcmd = 'base::source("' . g:rplugin_rsource . '"' . sargs . ')'
     let ok = g:SendCmdToR(rcmd)
     return ok
 endfunction
 
 " Send file to R
-function SendFileToR()
+function SendFileToR(e)
     update
     let fpath = expand("%:p")
     if has("win32") || has("win64")
         let fpath = substitute(fpath, "\\", "/", "g")
     endif
-    if g:vimrplugin_source_args == ""
-        call g:SendCmdToR('base::source("' . fpath . '")')
+    if a:e == "echo"
+        call g:SendCmdToR('base::source("' . fpath . '", echo=TRUE)')
     else
-        call g:SendCmdToR('base::source("' . fpath . '", ' . g:vimrplugin_source_args . ')')
+        call g:SendCmdToR('base::source("' . fpath . '")')
     endif
 endfunction
 
 " Send block to R
 " Adapted from marksbrowser plugin
 " Function to get the marks which the cursor is between
-function SendMBlockToR(m)
+function SendMBlockToR(e, m)
     if &filetype != "r" && b:IsInRCode(1) == 0
         return
     endif
@@ -1544,7 +1600,7 @@ function SendMBlockToR(m)
         let lineB -= 1
     endif
     let lines = getline(lineA, lineB)
-    let ok = b:SourceLines(lines)
+    let ok = RSourceLines(lines, a:e)
     if ok == 0
         return
     endif
@@ -1555,7 +1611,7 @@ function SendMBlockToR(m)
 endfunction
 
 " Send functions to R
-function SendFunctionToR(m)
+function SendFunctionToR(e, m)
     if &filetype != "r" && b:IsInRCode(1) == 0
         return
     endif
@@ -1607,13 +1663,13 @@ function SendFunctionToR(m)
 
     if startline > lastline
         call setpos(".", [0, firstline - 1, 1])
-        call SendFunctionToR(a:m)
+        call SendFunctionToR(a:e, a:m)
         call setpos(".", save_cursor)
         return
     endif
 
     let lines = getline(firstline, lastline)
-    let ok = b:SourceLines(lines)
+    let ok = RSourceLines(lines, a:e)
     if  ok == 0
         return
     endif
@@ -1624,7 +1680,7 @@ function SendFunctionToR(m)
 endfunction
 
 " Send selection to R
-function SendSelectionToR(m)
+function SendSelectionToR(...)
     if &filetype != "r"
         if b:IsInRCode(0) == 0
             if (&filetype == "rnoweb" && getline(".") !~ "\\Sexpr{") || (&filetype == "rmd" && getline(".") !~ "`r ") || (&filetype == "rrst" && getline(".") !~ ":r:`")
@@ -1640,7 +1696,7 @@ function SendSelectionToR(m)
         let l = getline("'<")
         let line = strpart(l, i, j)
         let ok = g:SendCmdToR(line)
-        if ok && a:m =~ "down"
+        if ok && a:2 =~ "down"
             call GoDown()
         endif
         return
@@ -1677,12 +1733,17 @@ function SendSelectionToR(m)
         let lines[llen] = strpart(lines[llen], 0, j)
     endif
 
-    let ok = b:SourceLines(lines)
+    if a:0 == 3 && a:3 == "NewtabInsert"
+        let ok = RSourceLines(lines, a:1, "NewtabInsert")
+    else
+        let ok = RSourceLines(lines, a:1)
+    endif
+
     if ok == 0
         return
     endif
 
-    if a:m == "down"
+    if a:2 == "down"
         call GoDown()
     else
         normal! gv
@@ -1690,7 +1751,7 @@ function SendSelectionToR(m)
 endfunction
 
 " Send paragraph to R
-function SendParagraphToR(m)
+function SendParagraphToR(e, m)
     if &filetype != "r" && b:IsInRCode(1) == 0
         return
     endif
@@ -1715,7 +1776,7 @@ function SendParagraphToR(m)
         endif
     endwhile
     let lines = getline(i, j)
-    let ok = b:SourceLines(lines)
+    let ok = RSourceLines(lines, a:e)
     if ok == 0
         return
     endif
@@ -1759,7 +1820,7 @@ function SendFHChunkToR()
             " Child R chunk
             if curbuf[idx] =~ chdchk
                 " First run everything up to child chunk and reset buffer
-                call b:SourceLines(codelines)
+                call RSourceLines(codelines, "silent")
                 let codelines = []
 
                 " Next run child chunk and continue
@@ -1777,7 +1838,7 @@ function SendFHChunkToR()
             let idx += 1
         endif
     endwhile
-    call b:SourceLines(codelines)
+    call RSourceLines(codelines, "silent")
 endfunction
 
 function KnitChild(line, godown)
@@ -2566,6 +2627,16 @@ function RAction(rcmd)
             call g:SendCmdToR(raction)
             return
         endif
+        if a:rcmd == "viewdf"
+            if exists("g:vimrplugin_df_viewer")
+                call g:SendCmdToR(printf(g:vimrplugin_df_viewer, rkeyword))
+            else
+                echo "Wait..."
+                call delete(g:rplugin_tmpdir . "/Rinsert")
+                call SendToVimCom("\x08" . $VIMINSTANCEID . 'vimcom:::vim_viewdf("' . rkeyword . '")')
+            endif
+            return
+        endif
 
         let raction = rfun . "(" . rkeyword . ")"
         call g:SendCmdToR(raction)
@@ -2698,6 +2769,7 @@ function RControlMenu()
     call RCreateMenuItem("nvi", 'Command.Print\ (cur)', '<Plug>RObjectPr', 'rp', ':call RAction("print")')
     call RCreateMenuItem("nvi", 'Command.Names\ (cur)', '<Plug>RObjectNames', 'rn', ':call RAction("vim.names")')
     call RCreateMenuItem("nvi", 'Command.Structure\ (cur)', '<Plug>RObjectStr', 'rt', ':call RAction("str")')
+    call RCreateMenuItem("nvi", 'Command.View\ data\.frame\ (cur)', '<Plug>RViewDF', 'rv', ':call RAction("viewdf")')
     "-------------------------------
     menu R.Command.-Sep2- <nul>
     call RCreateMenuItem("nvi", 'Command.Arguments\ (cur)', '<Plug>RShowArgs', 'ra', ':call RAction("args")')
@@ -2723,6 +2795,7 @@ function RControlMaps()
     call RCreateMaps("nvi", '<Plug>RObjectPr',     'rp', ':call RAction("print")')
     call RCreateMaps("nvi", '<Plug>RObjectNames',  'rn', ':call RAction("vim.names")')
     call RCreateMaps("nvi", '<Plug>RObjectStr',    'rt', ':call RAction("str")')
+    call RCreateMaps("nvi", '<Plug>RViewDF',    'rv', ':call RAction("viewdf")')
 
     " Arguments, example, help
     "-------------------------------------
@@ -2843,23 +2916,32 @@ endfunction
 function RCreateSendMaps()
     " Block
     "-------------------------------------
-    call RCreateMaps("ni", '<Plug>RSendMBlock',     'bb', ':call SendMBlockToR("stay")')
-    call RCreateMaps("ni", '<Plug>RDSendMBlock',    'bd', ':call SendMBlockToR("down")')
+    call RCreateMaps("ni", '<Plug>RSendMBlock',     'bb', ':call SendMBlockToR("silent", "stay")')
+    call RCreateMaps("ni", '<Plug>RESendMBlock',    'be', ':call SendMBlockToR("echo", "stay")')
+    call RCreateMaps("ni", '<Plug>RDSendMBlock',    'bd', ':call SendMBlockToR("silent", "down")')
+    call RCreateMaps("ni", '<Plug>REDSendMBlock',   'ba', ':call SendMBlockToR("echo", "down")')
 
     " Function
     "-------------------------------------
-    call RCreateMaps("nvi", '<Plug>RSendFunction',  'ff', ':call SendFunctionToR("stay")')
-    call RCreateMaps("nvi", '<Plug>RDSendFunction', 'fd', ':call SendFunctionToR("down")')
+    call RCreateMaps("nvi", '<Plug>RSendFunction',  'ff', ':call SendFunctionToR("silent", "stay")')
+    call RCreateMaps("nvi", '<Plug>RDSendFunction', 'fe', ':call SendFunctionToR("echo", "stay")')
+    call RCreateMaps("nvi", '<Plug>RDSendFunction', 'fd', ':call SendFunctionToR("silent", "down")')
+    call RCreateMaps("nvi", '<Plug>RDSendFunction', 'fa', ':call SendFunctionToR("echo", "down")')
 
     " Selection
     "-------------------------------------
-    call RCreateMaps("v", '<Plug>RSendSelection',   'ss', ':call SendSelectionToR("stay")')
-    call RCreateMaps("v", '<Plug>RDSendSelection',  'sd', ':call SendSelectionToR("down")')
+    call RCreateMaps("v", '<Plug>RSendSelection',   'ss', ':call SendSelectionToR("silent", "stay")')
+    call RCreateMaps("v", '<Plug>RESendSelection',  'se', ':call SendSelectionToR("echo", "stay")')
+    call RCreateMaps("v", '<Plug>RDSendSelection',  'sd', ':call SendSelectionToR("silent", "down")')
+    call RCreateMaps("v", '<Plug>REDSendSelection', 'sa', ':call SendSelectionToR("echo", "down")')
+    call RCreateMaps('v', '<Plug>RSendSelAndInsertOutput', 'so', ':call SendSelectionToR("echo", "stay", "NewtabInsert")')
 
     " Paragraph
     "-------------------------------------
-    call RCreateMaps("ni", '<Plug>RSendParagraph',   'pp', ':call SendParagraphToR("stay")')
-    call RCreateMaps("ni", '<Plug>RDSendParagraph',  'pd', ':call SendParagraphToR("down")')
+    call RCreateMaps("ni", '<Plug>RSendParagraph',   'pp', ':call SendParagraphToR("silent", "stay")')
+    call RCreateMaps("ni", '<Plug>RESendParagraph',  'pe', ':call SendParagraphToR("echo", "stay")')
+    call RCreateMaps("ni", '<Plug>RDSendParagraph',  'pd', ':call SendParagraphToR("silent", "down")')
+    call RCreateMaps("ni", '<Plug>REDSendParagraph', 'pa', ':call SendParagraphToR("echo", "down")')
 
     if &filetype == "rnoweb" || &filetype == "rmd" || &filetype == "rrst"
         call RCreateMaps("ni", '<Plug>RSendChunkFH', 'ch', ':call SendFHChunkToR()')
@@ -2878,7 +2960,7 @@ function RCreateSendMaps()
 
     " For compatibility with Johannes Ranke's plugin
     if g:vimrplugin_map_r == 1
-        vnoremap <buffer><silent> r <Esc>:call SendSelectionToR("down")<CR>
+        vnoremap <buffer><silent> r <Esc>:call SendSelectionToR("silent", "down")<CR>
     endif
 endfunction
 
@@ -2924,20 +3006,6 @@ function RVimLeave()
     endif
 endfunction
 
-function SetRPath()
-    if exists("g:vimrplugin_r_path")
-        let b:rplugin_R = expand(g:vimrplugin_r_path)
-        if isdirectory(b:rplugin_R)
-            let b:rplugin_R = b:rplugin_R . "/R"
-        endif
-    else
-        let b:rplugin_R = "R"
-    endif
-    if !executable(b:rplugin_R)
-        call RWarningMsgInp("R executable not found: '" . b:rplugin_R . "'")
-    endif
-endfunction
-
 function RSourceOtherScripts()
     if exists("g:vimrplugin_source")
         let flist = split(g:vimrplugin_source, ",")
@@ -2957,7 +3025,6 @@ command RBuildTags :call g:SendCmdToR('rtags(ofile = "TAGS")')
 command -nargs=? -complete=customlist,RLisObjs Rhelp :call RAskHelp(<q-args>)
 command -nargs=? -complete=dir RSourceDir :call RSourceDirectory(<q-args>)
 command RStop :call StopR()
-command Rhistory :call ShowRhistory()
 
 
 "==========================================================================
@@ -3025,6 +3092,7 @@ call RSetDefaultValue("g:vimrplugin_source_args",    "''")
 call RSetDefaultValue("g:vimrplugin_after_start",    "''")
 call RSetDefaultValue("g:vimrplugin_restart",           0)
 call RSetDefaultValue("g:vimrplugin_vsplit",            0)
+call RSetDefaultValue("g:vimrplugin_csv_warn",          1)
 call RSetDefaultValue("g:vimrplugin_rconsole_width",   -1)
 call RSetDefaultValue("g:vimrplugin_rconsole_height",  15)
 call RSetDefaultValue("g:vimrplugin_tmux_title", "'VimR'")
@@ -3381,9 +3449,28 @@ if has("win32") || has("win64")
     runtime r-plugin/windows.vim
     let g:rplugin_has_icons = len(globpath(&rtp, "bitmaps/RStart.bmp")) > 0
 else
-    call SetRPath()
     let g:rplugin_has_icons = len(globpath(&rtp, "bitmaps/RStart.png")) > 0
 endif
+
+" Set the value of R path
+if exists("g:vimrplugin_r_path")
+    let g:rplugin_R = expand(g:vimrplugin_r_path)
+    if isdirectory(g:rplugin_R)
+        let g:rplugin_R = g:rplugin_R . "/R"
+    endif
+elseif has("win32") || has("win64")
+    if g:vimrplugin_Rterm
+        let g:rplugin_R = "Rgui.exe"
+    else
+        let g:rplugin_R = "Rterm.exe"
+    endif
+else
+    let g:rplugin_R = "R"
+endif
+if !executable(g:rplugin_R)
+    call RWarningMsgInp("R executable not found: '" . g:rplugin_R . "'")
+endif
+
 if has("gui_running")
     runtime r-plugin/gui_running.vim
 endif
