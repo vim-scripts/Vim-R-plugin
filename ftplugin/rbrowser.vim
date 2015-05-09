@@ -295,16 +295,6 @@ function! RBrowserGetName(cleantail, cleantick)
     endif
 endfunction
 
-function! MakeRBrowserMenu()
-    let g:rplugin_curbuf = bufname("%")
-    if g:rplugin_hasmenu == 1
-        return
-    endif
-    menutranslate clear
-    call RControlMenu()
-    call RBrowserMenu()
-endfunction
-
 function! ObBrBufUnload()
     if exists("g:rplugin_editor_sname")
         call system("tmux select-pane -t " . g:rplugin_vim_pane)
