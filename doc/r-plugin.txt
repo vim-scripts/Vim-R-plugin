@@ -1844,7 +1844,7 @@ features:
    https://github.com/mllg/vim-devtools-plugin
 
    Basic integration with GNU screen~
-   https://github.com/jalvesaq/screenR
+   https://github.com/ssayols/screenR
 
 
 ------------------------------------------------------------------------------
