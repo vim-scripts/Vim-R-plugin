@@ -2412,18 +2412,6 @@ function RSetPDFViewer()
             endif
         endif
     endif
-
-    " Try to guess the title of the window where Vim is running:
-    if has("gui_running")
-        call RSetDefaultValue("g:vimrplugin_vim_window", "'GVim'")
-    elseif g:rplugin_pdfviewer == "evince"
-        call RSetDefaultValue("g:vimrplugin_vim_window", "'Terminal'")
-    elseif g:rplugin_pdfviewer == "okular"
-        call RSetDefaultValue("g:vimrplugin_vim_window", "'Konsole'")
-    else
-        call RSetDefaultValue("g:vimrplugin_vim_window", "'term'")
-    endif
-
 endfunction
 
 function RStart_Zathura(basenm)
@@ -3410,4 +3398,8 @@ endif
 
 if exists("g:vimrplugin_routmorecolors")
     call RWarningMsgInp("The option 'vimrplugin_routmorecolors' was renamed to 'Rout_more_colors'. Please, rename it in your vimrc too.")
+endif
+
+if exists("g:vimrplugin_vim_window")
+    call RWarningMsgInp("The option 'vimrplugin_vim_window' is deprecated. Please, remove it from your vimrc.")
 endif

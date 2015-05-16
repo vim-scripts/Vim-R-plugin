@@ -444,8 +444,8 @@ function! SyncTeX_backward(fname, ln)
     let rnwf = substitute(rnwf, '^\./', '', '')
 
     if GoToBuf(rnwbn, rnwf, basedir, rnwln)
-        if g:rplugin_has_wmctrl
-            call system("wmctrl -xa " . g:vimrplugin_vim_window)
+        if g:rplugin_has_wmctrl && v:windowid != 0
+            call system("wmctrl -ia " . v:windowid)
         elseif has("gui_running")
             call foreground()
         endif

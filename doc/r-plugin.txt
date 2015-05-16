@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 1.2.5
+Version: 1.2.6
 For Vim version 7.4
 
  1. Overview                                    |r-plugin-overview|
@@ -2021,12 +2021,15 @@ text editors which allow users to jump from a specific line in the text editor
 to the corresponding line in the PDF viewer and vice-versa. The Vim-R-plugin
 has support for Evince, Zathura and Okular SyncTeX systems.
 
+To completely disable SyncTeX support, put in your |vimrc|:
+>
+   let vimrplugin_synctex = 0
+<
 The application `wmctrl` is required to raise both the PDF viewer and Vim
-windows. Limitation: the Vim-R-plugin may raise the wrong terminal window or
-GVim window if there is more than one open.
+windows.
 
-No configuration is required if you use Evince, Gnome-Terminal, the knitr
-package, and single file Rnoweb documents. Otherwise, keep reading...
+No configuration is required if you use Evince and the knitr package, and
+single file Rnoweb documents. Otherwise, keep reading...
 
 If you use `Sweave()` rather than `knit()`, you must put in your Rnoweb
 document:
@@ -2044,7 +2047,7 @@ document.
 Note: The current knitr package (version 1.7) has at least two limitations:
 
    - It has no SyncTeX support for child documents. The correspondence data
-     point to lines right below child chunks in the master document and not to
+     point to lines just below child chunks in the master document and not to
      somewhere in the child documents themselves. See:
      https://github.com/yihui/knitr/issues/225
 
@@ -2057,11 +2060,6 @@ Note: The current knitr package (version 1.7) has at least two limitations:
 6.35.1 Evince configuration~
 
 No configuration should be required.
-
-If you have Evince installed, the Vim-R-plugin assumes that you are using it
-to view PDF documents and that you run either GVim or Vim in Gnome-Terminal.
-If you run Vim in another terminal emulator, you have to set the value of
-|vimrplugin_vim_window|, as explained below.
 
 Note: If Evince is not started yet when you try to jump to the PDF document
 for the first time, it will start, but will not jump to desired line; you have
@@ -2084,13 +2082,10 @@ In the command above, replace `vim` with `gvim` if you use GVim.
 
 If Evince is not installed in your system, the Vim-R-plugin will automatically
 use Okular as the PDF viewer. Otherwise, you have to set the value of
-|vimrplugin_pdfviewer| to "okular".
-
-If the Vim-R-plugin is set to use Okular as the PDF viewer, it assumes that
-you run either GVim or Vim in Konsole. If you run Vim in another terminal
-emulator, you have to set the value of |vimrplugin_vim_window|, as explained
-below.
-
+|vimrplugin_pdfviewer| to "okular":
+>
+   let vimrplugin_pdfviewer = "okular"
+<
 Note: If the PDF document is already open the first time that you jump to it,
 and if Okular was not started with the `--unique` argument, another instance
 of Okular will be started.
@@ -2104,9 +2099,7 @@ installed, put in your |vimrc|:
 >
    let vimrplugin_pdfviewer = "zathura"
 <
-Zathura (version >= 0.3.1) is also supported. If the terminal emulator is not
-raised during backward search (from PDF to Vim), you have to set the value of
-|vimrplugin_vim_window|, as explained below.
+Zathura version must be >= 0.3.1.
 
 Note: If Zathura is not started yet when you try to jump to the PDF document
 for the first time, it will start, but will not jump to desired line; you have
@@ -2132,37 +2125,6 @@ In Skim click in the drop down menu and fill the fields:
 
 No configuration is required.
 
-
-------------------------------------------------------------------------------
-                                                       *vimrplugin_vim_window*
-				                       *vimrplugin_synctex*
-6.35.6 Configuring the PDF editor and Vim's window title~
-
-If SyncTeX does not work (see above), you may try to set in your |vimrc| the
-values of |vimrplugin_pdfviewer| and vimrplugin_vim_window.
-
-The valid values for |vimrplugin_pdfviewer| are "evince", "okular" and
-"zathura".
-
-To know the correct value of vimrplugin_vim_window, type in the terminal
-emulator:
->
-   wmctrl -xl
-<
-This command will list the windows currently running under the X Window
-system. You must set the value of vimrplugin_vim_window as a string that is
-part of the title of the window where Vim is running ("GVim", "Terminal",
-"Konsole", "yourlogin", "vim", etc).
-
-Example of |vimrc| configuration:
->
-   let vimrplugin_pdfviewer = "okular"
-   let vimrplugin_vim_window = "XTerm"
-<
-To completely disable SyncTeX support, put in your |vimrc|:
->
-   let vimrplugin_synctex = 0
-<
 
 ==============================================================================
 						       *r-plugin-key-bindings*
@@ -2838,19 +2800,19 @@ below is for a terminal emulator that supports 256 colors (see |:highlight|):
 >
    if &t_Co == 256
        let rout_color_input    = 'ctermfg=247'
-       let rout_color_normal   = 'ctermfg=39'
-       let rout_color_number   = 'ctermfg=51'
-       let rout_color_integer  = 'ctermfg=51'
-       let rout_color_float    = 'ctermfg=51'
-       let rout_color_complex  = 'ctermfg=51'
-       let rout_color_negnum   = 'ctermfg=183'
-       let rout_color_negfloat = 'ctermfg=183'
-       let rout_color_date     = 'ctermfg=43'
+       let rout_color_normal   = 'ctermfg=202'
+       let rout_color_number   = 'ctermfg=214'
+       let rout_color_integer  = 'ctermfg=214'
+       let rout_color_float    = 'ctermfg=214'
+       let rout_color_complex  = 'ctermfg=214'
+       let rout_color_negnum   = 'ctermfg=209'
+       let rout_color_negfloat = 'ctermfg=209'
+       let rout_color_date     = 'ctermfg=184'
        let rout_color_true     = 'ctermfg=78'
        let rout_color_false    = 'ctermfg=203'
        let rout_color_inf      = 'ctermfg=39'
-       let rout_color_constant = 'ctermfg=75'
-       let rout_color_string   = 'ctermfg=79'
+       let rout_color_constant = 'ctermfg=179'
+       let rout_color_string   = 'ctermfg=172'
        let rout_color_error    = 'ctermfg=15 ctermbg=1'
        let rout_color_warn     = 'ctermfg=1'
        let rout_color_index    = 'ctermfg=186'
@@ -2869,6 +2831,10 @@ put in your |vimrc|:
 ==============================================================================
 							       *r-plugin-news*
 10. News~
+
+1.2.6
+
+ * Remove option vimrplugin_vim_window (use $WINDOWID instead).
 
 1.2.5 (2015-05-06)
 
