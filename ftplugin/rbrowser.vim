@@ -27,6 +27,7 @@ setlocal noswapfile
 setlocal buftype=nofile
 setlocal nowrap
 setlocal iskeyword=@,48-57,_,.
+setlocal nolist
 
 if !exists("g:rplugin_hasmenu")
     let g:rplugin_hasmenu = 0
