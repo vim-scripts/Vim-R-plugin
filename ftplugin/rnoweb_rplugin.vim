@@ -399,8 +399,7 @@ function! GoToBuf(rnwbn, rnwf, basedir, rnwln)
 endfunction
 
 function! SyncTeX_backward(fname, ln)
-    let flnm = substitute(a:fname, 'file://', '', '') " Evince
-    let flnm = substitute(flnm, '/\./', '/', '')      " Okular
+    let flnm = substitute(a:fname, '/\./', '/', '')      " Okular
     let basenm = substitute(flnm, "\....$", "", "")   " Delete extension
     if basenm =~ "/"
         let basedir = substitute(basenm, '\(.*\)/.*', '\1', '')
@@ -456,10 +455,6 @@ function! SyncTeX_forward(...)
     let basenm = expand("%:t:r")
     let lnum = 0
     let rnwf = expand("%:t")
-
-    if g:rplugin_pdfviewer == "evince" && expand("%:p") =~ " "
-        call RWarningMsg('SyncTeX may not work because there is space in the file path "' . expand("%:p") . '".')
-    endif
 
     let olddir = getcwd()
     if olddir != expand("%:p:h")
