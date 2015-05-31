@@ -2600,8 +2600,13 @@ function RAction(rcmd)
             return
         endif
         let rfun = a:rcmd
-        if a:rcmd == "args" && g:vimrplugin_listmethods == 1
-            let rfun = "vim.list.args"
+        if a:rcmd == "args"
+          if g:vimrplugin_listmethods == 1
+            call g:SendCmdToR('vim.list.args("' . rkeyword . '")')
+          else
+            call g:SendCmdToR('args("' . rkeyword . '")')
+          endif
+          return
         endif
         if a:rcmd == "plot" && g:vimrplugin_specialplot == 1
             let rfun = "vim.plot"
