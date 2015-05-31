@@ -52,7 +52,7 @@ fun! rcomplete#CompleteR(findstart, base)
     if a:findstart
         let line = getline('.')
         let start = col('.') - 1
-        while start > 0 && (line[start - 1] =~ '\w' || line[start - 1] =~ '\.' || line[start - 1] =~ '\$')
+        while start > 0 && (line[start - 1] =~ '\w' || line[start - 1] =~ '\.' || line[start - 1] =~ '\$' || line[start - 1] =~ '@')
             let start -= 1
         endwhile
         call BuildROmniList()
@@ -75,6 +75,10 @@ fun! rcomplete#CompleteR(findstart, base)
             if line =~ newbase
                 " Skip cols of data frames unless the user is really looking for them.
                 if a:base !~ '\$' && line =~ '\$'
+                    continue
+                endif
+                " Skip slots of S4 objects unless the user is really looking for them.
+                if a:base !~ '@' && line =~ '@'
                     continue
                 endif
                 let tmp1 = split(line, "\x06", 1)
