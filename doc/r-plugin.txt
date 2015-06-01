@@ -115,7 +115,7 @@ dependencies:
 
     * R's version must be >= 3.0.0: http://www.r-project.org/
 
-    * vimcom = 1.2-5: http://www.lepem.ufc.br/jaa/vimcom.html
+    * vimcom = 1.2-6: http://www.lepem.ufc.br/jaa/vimcom.html
 
       Note: If you cannot build vimcom yourself, you will want to
       download and install the zip file.
@@ -152,7 +152,7 @@ Before installing the plugin, you should install its dependencies:
 
    R >= 3.0.0: http://www.r-project.org/
 
-   vimcom = 1.2-5: http://www.lepem.ufc.br/jaa/vimcom.html
+   vimcom = 1.2-6: http://www.lepem.ufc.br/jaa/vimcom.html
 
    Only if you edit Rnoweb files: MacTeX, BasicTeX or other LaTeX system.
 
@@ -206,7 +206,7 @@ Before installing the plugin, you should install its dependencies:
 
    R >= 3.0.0: http://www.r-project.org/
 
-   vimcom = 1.2-5: http://www.lepem.ufc.br/jaa/vimcom.html
+   vimcom = 1.2-6: http://www.lepem.ufc.br/jaa/vimcom.html
 
    Tmux >= 1.8:   http://tmux.sourceforge.net
                   Tmux is necessary to send commands from Vim to R Console.
@@ -698,24 +698,31 @@ to draw lines in the Object Browser. This is the case of most Linux
 distributions.
 
 In the Libraries view, you can either double click or press <Enter> on a
-library name to see its objects. In the Object Browser the libraries have the
+library name to see its objects. In the Object Browser, the libraries have the
 color defined by the PreProc highlighting group. The other objects have
 their colors defined by the return value of some R functions. Each line in the
-table below shows a highlighting group and the corresponding R function (if
-any) used to classify the objects:
+table below shows a highlighting group and the corresponding type of R object:
 
 	 PreProc	libraries
-	 Number		is.numeric()
-	 String		is.character()
-	 Special	is.factor()
-	 Boolean	is.logical()
-	 Type		is.list()
-	 Function	is.function()
-	 Statement	isS4()
+	 Number		numeric
+	 String		character
+	 Special	factor
+	 Boolean	logical
+	 Type		list
+	 Function	function
+	 Statement	s4
+	 Comment	promise (lazy load object)
 
-One limitation is that objects made available by the command `data()` may not
-have their classes recognized in the GlobalEnv view.
-
+One limitation of the Object Browser is that objects made available by the
+command `data()` are only links to the actual objects (promises of lazily
+loading the object when needed) and their real classes are not recognized in
+the GlobalEnv view. The same problem happens when the `knitr` option
+`cache.lazy=TRUE`. If you press <Enter> over the name of the object in the
+Object Browser, it will be actually loaded by the command (ran in the
+background):
+>
+   obj <- obj
+<
 
 ------------------------------------------------------------------------------
 4.5. Commenting and uncommenting lines~
@@ -990,16 +997,7 @@ operator. See: https://github.com/jcfaria/Vim-R-plugin/issues/94
 
 
 ------------------------------------------------------------------------------
-5.4. Objects Browser does not support knitr cache=TRUE~
-
-When processing Rnoweb documents with the knitr package, if the chunk option
-`cache` is `TRUE`, the Object Browser will not be able to detect the classes
-of objects because knitr uses R's lazy load feature. The workaround for this
-issue is to define the chunk option `cache.lazy=FALSE`.
-
-
-------------------------------------------------------------------------------
-5.5. Wrong message that "R is busy" (Windows only)~
+5.4. Wrong message that "R is busy" (Windows only)~
 
 On Windows, when code is sent from Vim to R Console, the vimcom library
 sets the value of the internal variable `r_is_busy` to 1. The value is set
@@ -1014,9 +1012,10 @@ work as expected again after any valid code is executed in the R Console.
 
 The vimcom library is started with the state `busy`.
 
+
 ------------------------------------------------------------------------------
 							*r-plugin-SyncTeX-win*
-5.6. SyncTeX on Windows~
+5.5. SyncTeX on Windows~
 
 On Windows, backward search with Sumatra pop ups a console window which
 quickly disappears (it is `vim` running the required `--remote-expr` command).
@@ -1024,7 +1023,7 @@ quickly disappears (it is `vim` running the required `--remote-expr` command).
 
 ------------------------------------------------------------------------------
 								*r-plugin-nox*
-5.7. Bugs that affect Linux Console and Vim accessed through ssh~
+5.6. Bugs that affect Linux Console and Vim accessed through ssh~
 
 If you run Vim in the Linux Console or start Vim in a terminal emulator
 without the command line argument |--servername|, Vim will not receive remote
@@ -1090,7 +1089,7 @@ See also: |r-plugin-remote|.
 
 
 ------------------------------------------------------------------------------
-5.8. R must be started by Vim~
+5.7. R must be started by Vim~
 
 The communication between Vim and R will work only if R was started by Vim
 through the <LocalLeader>rf command because the plugin was designed to connect
@@ -2315,7 +2314,6 @@ directory after the installation:
    r-plugin/setcompldir.vim
    r-plugin/synctex_evince_backward.py
    r-plugin/synctex_evince_forward.py
-   r-plugin/synctex_okular_backward.sh
    r-plugin/windows.vim
    syntax/rbrowser.vim
    syntax/rdoc.vim
@@ -2832,7 +2830,7 @@ put in your |vimrc|:
 							       *r-plugin-news*
 10. News~
 
-1.2.6
+1.2.6 (2015-06-01)
 
  * Remove option vimrplugin_vim_window (use $WINDOWID instead).
 
