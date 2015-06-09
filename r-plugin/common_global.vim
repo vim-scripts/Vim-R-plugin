@@ -984,10 +984,10 @@ function WaitVimComStart()
         let g:rplugin_vimcom_home = vr[1]
         let g:rplugin_vimcomport = vr[2]
         let g:rplugin_r_pid = vr[3]
-        if has("win32")
-            let g:rplugin_vimcom_lib = g:rplugin_vimcom_home . "/bin/i386/libVimR.dll"
-        elseif has("win64")
+        if has("win64")
             let g:rplugin_vimcom_lib = g:rplugin_vimcom_home . "/bin/x64/libVimR.dll"
+        elseif has("win32")
+            let g:rplugin_vimcom_lib = g:rplugin_vimcom_home . "/bin/i386/libVimR.dll"
         else
             let g:rplugin_vimcom_lib = g:rplugin_vimcom_home . "/bin/libVimR.so"
         endif
@@ -3175,8 +3175,8 @@ if !has("win32") && !has("win64") && !has("gui_win32") && !has("gui_win64") && !
     if strlen(s:tmuxversion) != 3
         let s:tmuxversion = "1.0"
     endif
-    if s:tmuxversion < "1.5" && g:vimrplugin_source !~ "screenR"
-        call RWarningMsgInp("Vim-R-plugin requires Tmux >= 1.5")
+    if s:tmuxversion < "1.8" && g:vimrplugin_source !~ "screenR"
+        call RWarningMsgInp("Vim-R-plugin requires Tmux >= 1.8")
         let g:rplugin_failed = 1
         finish
     endif
