@@ -2830,9 +2830,13 @@ put in your |vimrc|:
 							       *r-plugin-news*
 10. News~
 
-1.2.6 (2015-06-01)
+1.2.6 (2015-06-12)
+
+ * Improve support for lazy load objects in the Object Browser.
 
  * Remove option vimrplugin_vim_window (use $WINDOWID instead).
+
+ * Fix bug that prevented GVim 64 bit of finding libVimR.dll.
 
 1.2.5 (2015-05-06)
 
