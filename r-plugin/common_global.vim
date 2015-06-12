@@ -821,7 +821,7 @@ function StartR(whatr)
     else
         let start_options += ['options(vimcom.vimpager = TRUE)']
     endif
-    let start_options += ['if(utils::packageVersion("vimcom") != "1.2.5") warning("Your version of Vim-R-plugin requires vimcom-1.2-5.", call. = FALSE)']
+    let start_options += ['if(utils::packageVersion("vimcom") != "1.2.6") warning("Your version of Vim-R-plugin requires vimcom-1.2-6.", call. = FALSE)']
 
     let rwd = ""
     if g:vimrplugin_vim_wd == 0
@@ -984,18 +984,18 @@ function WaitVimComStart()
         let g:rplugin_vimcom_home = vr[1]
         let g:rplugin_vimcomport = vr[2]
         let g:rplugin_r_pid = vr[3]
-        if has("win32")
-            let g:rplugin_vimcom_lib = g:rplugin_vimcom_home . "/bin/i386/libVimR.dll"
-        elseif has("win64")
+        if has("win64")
             let g:rplugin_vimcom_lib = g:rplugin_vimcom_home . "/bin/x64/libVimR.dll"
+        elseif has("win32")
+            let g:rplugin_vimcom_lib = g:rplugin_vimcom_home . "/bin/i386/libVimR.dll"
         else
             let g:rplugin_vimcom_lib = g:rplugin_vimcom_home . "/bin/libVimR.so"
         endif
         if !filereadable(g:rplugin_vimcom_lib)
             call RWarningMsgInp('Could not find "' . g:rplugin_vimcom_lib . '".')
         endif
-        if g:rplugin_vimcom_version != "1.2.5"
-            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.2.5.')
+        if g:rplugin_vimcom_version != "1.2.6"
+            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.2.6.')
             sleep 1
         endif
         call delete(g:rplugin_tmpdir . "/vimcom_running_" . $VIMINSTANCEID)
@@ -2412,18 +2412,6 @@ function RSetPDFViewer()
             endif
         endif
     endif
-
-    " Try to guess the title of the window where Vim is running:
-    if has("gui_running")
-        call RSetDefaultValue("g:vimrplugin_vim_window", "'GVim'")
-    elseif g:rplugin_pdfviewer == "evince"
-        call RSetDefaultValue("g:vimrplugin_vim_window", "'Terminal'")
-    elseif g:rplugin_pdfviewer == "okular"
-        call RSetDefaultValue("g:vimrplugin_vim_window", "'Konsole'")
-    else
-        call RSetDefaultValue("g:vimrplugin_vim_window", "'term'")
-    endif
-
 endfunction
 
 function RStart_Zathura(basenm)
@@ -2612,8 +2600,13 @@ function RAction(rcmd)
             return
         endif
         let rfun = a:rcmd
-        if a:rcmd == "args" && g:vimrplugin_listmethods == 1
-            let rfun = "vim.list.args"
+        if a:rcmd == "args"
+          if g:vimrplugin_listmethods == 1
+            call g:SendCmdToR('vim.list.args("' . rkeyword . '")')
+          else
+            call g:SendCmdToR('args("' . rkeyword . '")')
+          endif
+          return
         endif
         if a:rcmd == "plot" && g:vimrplugin_specialplot == 1
             let rfun = "vim.plot"
@@ -2642,12 +2635,6 @@ function RAction(rcmd)
         call g:SendCmdToR(raction)
     endif
 endfunction
-
-if exists('g:maplocalleader')
-    let s:tll = '<Tab>' . g:maplocalleader
-else
-    let s:tll = '<Tab>\\'
-endif
 
 redir => s:ikblist
 silent imap
@@ -2713,74 +2700,6 @@ function RVMapCmd(plug)
             return el1
         endif
     endfor
-endfunction
-
-function RCreateMenuItem(type, label, plug, combo, target)
-    if a:type =~ '0'
-        let tg = a:target . '<CR>0'
-        let il = 'i'
-    else
-        let tg = a:target . '<CR>'
-        let il = 'a'
-    endif
-    if a:type =~ "n"
-        if hasmapto(a:plug, "n")
-            let boundkey = RNMapCmd(a:plug)
-            exec 'nmenu <silent> &R.' . a:label . '<Tab>' . boundkey . ' ' . tg
-        else
-            exec 'nmenu <silent> &R.' . a:label . s:tll . a:combo . ' ' . tg
-        endif
-    endif
-    if a:type =~ "v"
-        if hasmapto(a:plug, "v")
-            let boundkey = RVMapCmd(a:plug)
-            exec 'vmenu <silent> &R.' . a:label . '<Tab>' . boundkey . ' ' . '<Esc>' . tg
-        else
-            exec 'vmenu <silent> &R.' . a:label . s:tll . a:combo . ' ' . '<Esc>' . tg
-        endif
-    endif
-    if a:type =~ "i"
-        if hasmapto(a:plug, "i")
-            let boundkey = RIMapCmd(a:plug)
-            exec 'imenu <silent> &R.' . a:label . '<Tab>' . boundkey . ' ' . '<Esc>' . tg . il
-        else
-            exec 'imenu <silent> &R.' . a:label . s:tll . a:combo . ' ' . '<Esc>' . tg . il
-        endif
-    endif
-endfunction
-
-function RBrowserMenu()
-    call RCreateMenuItem("nvi", 'Object\ browser.Show/Update', '<Plug>RUpdateObjBrowser', 'ro', ':call RObjBrowser()')
-    call RCreateMenuItem("nvi", 'Object\ browser.Expand\ (all\ lists)', '<Plug>ROpenLists', 'r=', ':call g:RBrOpenCloseLs(1)')
-    call RCreateMenuItem("nvi", 'Object\ browser.Collapse\ (all\ lists)', '<Plug>RCloseLists', 'r-', ':call g:RBrOpenCloseLs(0)')
-    if &filetype == "rbrowser"
-        imenu <silent> R.Object\ browser.Toggle\ (cur)<Tab>Enter <Esc>:call RBrowserDoubleClick()<CR>
-        nmenu <silent> R.Object\ browser.Toggle\ (cur)<Tab>Enter :call RBrowserDoubleClick()<CR>
-    endif
-    let g:rplugin_hasmenu = 1
-endfunction
-
-function RControlMenu()
-    call RCreateMenuItem("nvi", 'Command.List\ space', '<Plug>RListSpace', 'rl', ':call g:SendCmdToR("ls()")')
-    call RCreateMenuItem("nvi", 'Command.Clear\ console\ screen', '<Plug>RClearConsole', 'rr', ':call RClearConsole()')
-    call RCreateMenuItem("nvi", 'Command.Clear\ all', '<Plug>RClearAll', 'rm', ':call RClearAll()')
-    "-------------------------------
-    menu R.Command.-Sep1- <nul>
-    call RCreateMenuItem("nvi", 'Command.Print\ (cur)', '<Plug>RObjectPr', 'rp', ':call RAction("print")')
-    call RCreateMenuItem("nvi", 'Command.Names\ (cur)', '<Plug>RObjectNames', 'rn', ':call RAction("vim.names")')
-    call RCreateMenuItem("nvi", 'Command.Structure\ (cur)', '<Plug>RObjectStr', 'rt', ':call RAction("str")')
-    call RCreateMenuItem("nvi", 'Command.View\ data\.frame\ (cur)', '<Plug>RViewDF', 'rv', ':call RAction("viewdf")')
-    "-------------------------------
-    menu R.Command.-Sep2- <nul>
-    call RCreateMenuItem("nvi", 'Command.Arguments\ (cur)', '<Plug>RShowArgs', 'ra', ':call RAction("args")')
-    call RCreateMenuItem("nvi", 'Command.Example\ (cur)', '<Plug>RShowEx', 're', ':call RAction("example")')
-    call RCreateMenuItem("nvi", 'Command.Help\ (cur)', '<Plug>RHelp', 'rh', ':call RAction("help")')
-    "-------------------------------
-    menu R.Command.-Sep3- <nul>
-    call RCreateMenuItem("nvi", 'Command.Summary\ (cur)', '<Plug>RSummary', 'rs', ':call RAction("summary")')
-    call RCreateMenuItem("nvi", 'Command.Plot\ (cur)', '<Plug>RPlot', 'rg', ':call RAction("plot")')
-    call RCreateMenuItem("nvi", 'Command.Plot\ and\ summary\ (cur)', '<Plug>RSPlot', 'rb', ':call RAction("plotsumm")')
-    let g:rplugin_hasmenu = 1
 endfunction
 
 function RControlMaps()
@@ -3256,8 +3175,8 @@ if !has("win32") && !has("win64") && !has("gui_win32") && !has("gui_win64") && !
     if strlen(s:tmuxversion) != 3
         let s:tmuxversion = "1.0"
     endif
-    if s:tmuxversion < "1.5" && g:vimrplugin_source !~ "screenR"
-        call RWarningMsgInp("Vim-R-plugin requires Tmux >= 1.5")
+    if s:tmuxversion < "1.8" && g:vimrplugin_source !~ "screenR"
+        call RWarningMsgInp("Vim-R-plugin requires Tmux >= 1.8")
         let g:rplugin_failed = 1
         finish
     endif
@@ -3484,4 +3403,8 @@ endif
 
 if exists("g:vimrplugin_routmorecolors")
     call RWarningMsgInp("The option 'vimrplugin_routmorecolors' was renamed to 'Rout_more_colors'. Please, rename it in your vimrc too.")
+endif
+
+if exists("g:vimrplugin_vim_window")
+    call RWarningMsgInp("The option 'vimrplugin_vim_window' is deprecated. Please, remove it from your vimrc.")
 endif

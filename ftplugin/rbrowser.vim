@@ -27,6 +27,7 @@ setlocal noswapfile
 setlocal buftype=nofile
 setlocal nowrap
 setlocal iskeyword=@,48-57,_,.
+setlocal nolist
 
 if !exists("g:rplugin_hasmenu")
     let g:rplugin_hasmenu = 0
@@ -119,7 +120,11 @@ function! RBrowserDoubleClick()
     " Toggle state of list or data.frame: open X closed
     let key = RBrowserGetName(0, 1)
     if g:rplugin_curview == "GlobalEnv"
-        call SendToVimCom("\006" . key)
+        if getline(".") =~ "&#.*\t"
+            call SendToVimCom("\006&" . key)
+        else
+            call SendToVimCom("\006" . key)
+        endif
     else
         let key = substitute(key, '`', '', "g") 
         if key !~ "^package:"
@@ -293,16 +298,6 @@ function! RBrowserGetName(cleantail, cleantick)
             return ""
         endif
     endif
-endfunction
-
-function! MakeRBrowserMenu()
-    let g:rplugin_curbuf = bufname("%")
-    if g:rplugin_hasmenu == 1
-        return
-    endif
-    menutranslate clear
-    call RControlMenu()
-    call RBrowserMenu()
 endfunction
 
 function! ObBrBufUnload()

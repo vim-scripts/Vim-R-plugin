@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 1.2.5
+Version: 1.2.6
 For Vim version 7.4
 
  1. Overview                                    |r-plugin-overview|
@@ -115,7 +115,7 @@ dependencies:
 
     * R's version must be >= 3.0.0: http://www.r-project.org/
 
-    * vimcom = 1.2-5: http://www.lepem.ufc.br/jaa/vimcom.html
+    * vimcom = 1.2-6: http://www.lepem.ufc.br/jaa/vimcom.html
 
       Note: If you cannot build vimcom yourself, you will want to
       download and install the zip file.
@@ -152,7 +152,7 @@ Before installing the plugin, you should install its dependencies:
 
    R >= 3.0.0: http://www.r-project.org/
 
-   vimcom = 1.2-5: http://www.lepem.ufc.br/jaa/vimcom.html
+   vimcom = 1.2-6: http://www.lepem.ufc.br/jaa/vimcom.html
 
    Only if you edit Rnoweb files: MacTeX, BasicTeX or other LaTeX system.
 
@@ -206,7 +206,7 @@ Before installing the plugin, you should install its dependencies:
 
    R >= 3.0.0: http://www.r-project.org/
 
-   vimcom = 1.2-5: http://www.lepem.ufc.br/jaa/vimcom.html
+   vimcom = 1.2-6: http://www.lepem.ufc.br/jaa/vimcom.html
 
    Tmux >= 1.8:   http://tmux.sourceforge.net
                   Tmux is necessary to send commands from Vim to R Console.
@@ -698,24 +698,31 @@ to draw lines in the Object Browser. This is the case of most Linux
 distributions.
 
 In the Libraries view, you can either double click or press <Enter> on a
-library name to see its objects. In the Object Browser the libraries have the
+library name to see its objects. In the Object Browser, the libraries have the
 color defined by the PreProc highlighting group. The other objects have
 their colors defined by the return value of some R functions. Each line in the
-table below shows a highlighting group and the corresponding R function (if
-any) used to classify the objects:
+table below shows a highlighting group and the corresponding type of R object:
 
 	 PreProc	libraries
-	 Number		is.numeric()
-	 String		is.character()
-	 Special	is.factor()
-	 Boolean	is.logical()
-	 Type		is.list()
-	 Function	is.function()
-	 Statement	isS4()
+	 Number		numeric
+	 String		character
+	 Special	factor
+	 Boolean	logical
+	 Type		list
+	 Function	function
+	 Statement	s4
+	 Comment	promise (lazy load object)
 
-One limitation is that objects made available by the command `data()` may not
-have their classes recognized in the GlobalEnv view.
-
+One limitation of the Object Browser is that objects made available by the
+command `data()` are only links to the actual objects (promises of lazily
+loading the object when needed) and their real classes are not recognized in
+the GlobalEnv view. The same problem happens when the `knitr` option
+`cache.lazy=TRUE`. If you press <Enter> over the name of the object in the
+Object Browser, it will be actually loaded by the command (ran in the
+background):
+>
+   obj <- obj
+<
 
 ------------------------------------------------------------------------------
 4.5. Commenting and uncommenting lines~
@@ -990,16 +997,7 @@ operator. See: https://github.com/jcfaria/Vim-R-plugin/issues/94
 
 
 ------------------------------------------------------------------------------
-5.4. Objects Browser does not support knitr cache=TRUE~
-
-When processing Rnoweb documents with the knitr package, if the chunk option
-`cache` is `TRUE`, the Object Browser will not be able to detect the classes
-of objects because knitr uses R's lazy load feature. The workaround for this
-issue is to define the chunk option `cache.lazy=FALSE`.
-
-
-------------------------------------------------------------------------------
-5.5. Wrong message that "R is busy" (Windows only)~
+5.4. Wrong message that "R is busy" (Windows only)~
 
 On Windows, when code is sent from Vim to R Console, the vimcom library
 sets the value of the internal variable `r_is_busy` to 1. The value is set
@@ -1014,9 +1012,10 @@ work as expected again after any valid code is executed in the R Console.
 
 The vimcom library is started with the state `busy`.
 
+
 ------------------------------------------------------------------------------
 							*r-plugin-SyncTeX-win*
-5.6. SyncTeX on Windows~
+5.5. SyncTeX on Windows~
 
 On Windows, backward search with Sumatra pop ups a console window which
 quickly disappears (it is `vim` running the required `--remote-expr` command).
@@ -1024,7 +1023,7 @@ quickly disappears (it is `vim` running the required `--remote-expr` command).
 
 ------------------------------------------------------------------------------
 								*r-plugin-nox*
-5.7. Bugs that affect Linux Console and Vim accessed through ssh~
+5.6. Bugs that affect Linux Console and Vim accessed through ssh~
 
 If you run Vim in the Linux Console or start Vim in a terminal emulator
 without the command line argument |--servername|, Vim will not receive remote
@@ -1090,7 +1089,7 @@ See also: |r-plugin-remote|.
 
 
 ------------------------------------------------------------------------------
-5.8. R must be started by Vim~
+5.7. R must be started by Vim~
 
 The communication between Vim and R will work only if R was started by Vim
 through the <LocalLeader>rf command because the plugin was designed to connect
@@ -1844,7 +1843,7 @@ features:
    https://github.com/mllg/vim-devtools-plugin
 
    Basic integration with GNU screen~
-   https://github.com/jalvesaq/screenR
+   https://github.com/ssayols/screenR
 
 
 ------------------------------------------------------------------------------
@@ -2021,12 +2020,15 @@ text editors which allow users to jump from a specific line in the text editor
 to the corresponding line in the PDF viewer and vice-versa. The Vim-R-plugin
 has support for Evince, Zathura and Okular SyncTeX systems.
 
+To completely disable SyncTeX support, put in your |vimrc|:
+>
+   let vimrplugin_synctex = 0
+<
 The application `wmctrl` is required to raise both the PDF viewer and Vim
-windows. Limitation: the Vim-R-plugin may raise the wrong terminal window or
-GVim window if there is more than one open.
+windows.
 
-No configuration is required if you use Evince, Gnome-Terminal, the knitr
-package, and single file Rnoweb documents. Otherwise, keep reading...
+No configuration is required if you use Evince and the knitr package, and
+single file Rnoweb documents. Otherwise, keep reading...
 
 If you use `Sweave()` rather than `knit()`, you must put in your Rnoweb
 document:
@@ -2044,7 +2046,7 @@ document.
 Note: The current knitr package (version 1.7) has at least two limitations:
 
    - It has no SyncTeX support for child documents. The correspondence data
-     point to lines right below child chunks in the master document and not to
+     point to lines just below child chunks in the master document and not to
      somewhere in the child documents themselves. See:
      https://github.com/yihui/knitr/issues/225
 
@@ -2057,11 +2059,6 @@ Note: The current knitr package (version 1.7) has at least two limitations:
 6.35.1 Evince configuration~
 
 No configuration should be required.
-
-If you have Evince installed, the Vim-R-plugin assumes that you are using it
-to view PDF documents and that you run either GVim or Vim in Gnome-Terminal.
-If you run Vim in another terminal emulator, you have to set the value of
-|vimrplugin_vim_window|, as explained below.
 
 Note: If Evince is not started yet when you try to jump to the PDF document
 for the first time, it will start, but will not jump to desired line; you have
@@ -2084,13 +2081,10 @@ In the command above, replace `vim` with `gvim` if you use GVim.
 
 If Evince is not installed in your system, the Vim-R-plugin will automatically
 use Okular as the PDF viewer. Otherwise, you have to set the value of
-|vimrplugin_pdfviewer| to "okular".
-
-If the Vim-R-plugin is set to use Okular as the PDF viewer, it assumes that
-you run either GVim or Vim in Konsole. If you run Vim in another terminal
-emulator, you have to set the value of |vimrplugin_vim_window|, as explained
-below.
-
+|vimrplugin_pdfviewer| to "okular":
+>
+   let vimrplugin_pdfviewer = "okular"
+<
 Note: If the PDF document is already open the first time that you jump to it,
 and if Okular was not started with the `--unique` argument, another instance
 of Okular will be started.
@@ -2104,9 +2098,7 @@ installed, put in your |vimrc|:
 >
    let vimrplugin_pdfviewer = "zathura"
 <
-Zathura (version >= 0.3.1) is also supported. If the terminal emulator is not
-raised during backward search (from PDF to Vim), you have to set the value of
-|vimrplugin_vim_window|, as explained below.
+Zathura version must be >= 0.3.1.
 
 Note: If Zathura is not started yet when you try to jump to the PDF document
 for the first time, it will start, but will not jump to desired line; you have
@@ -2132,37 +2124,6 @@ In Skim click in the drop down menu and fill the fields:
 
 No configuration is required.
 
-
-------------------------------------------------------------------------------
-                                                       *vimrplugin_vim_window*
-				                       *vimrplugin_synctex*
-6.35.6 Configuring the PDF editor and Vim's window title~
-
-If SyncTeX does not work (see above), you may try to set in your |vimrc| the
-values of |vimrplugin_pdfviewer| and vimrplugin_vim_window.
-
-The valid values for |vimrplugin_pdfviewer| are "evince", "okular" and
-"zathura".
-
-To know the correct value of vimrplugin_vim_window, type in the terminal
-emulator:
->
-   wmctrl -xl
-<
-This command will list the windows currently running under the X Window
-system. You must set the value of vimrplugin_vim_window as a string that is
-part of the title of the window where Vim is running ("GVim", "Terminal",
-"Konsole", "yourlogin", "vim", etc).
-
-Example of |vimrc| configuration:
->
-   let vimrplugin_pdfviewer = "okular"
-   let vimrplugin_vim_window = "XTerm"
-<
-To completely disable SyncTeX support, put in your |vimrc|:
->
-   let vimrplugin_synctex = 0
-<
 
 ==============================================================================
 						       *r-plugin-key-bindings*
@@ -2353,7 +2314,6 @@ directory after the installation:
    r-plugin/setcompldir.vim
    r-plugin/synctex_evince_backward.py
    r-plugin/synctex_evince_forward.py
-   r-plugin/synctex_okular_backward.sh
    r-plugin/windows.vim
    syntax/rbrowser.vim
    syntax/rdoc.vim
@@ -2838,19 +2798,19 @@ below is for a terminal emulator that supports 256 colors (see |:highlight|):
 >
    if &t_Co == 256
        let rout_color_input    = 'ctermfg=247'
-       let rout_color_normal   = 'ctermfg=39'
-       let rout_color_number   = 'ctermfg=51'
-       let rout_color_integer  = 'ctermfg=51'
-       let rout_color_float    = 'ctermfg=51'
-       let rout_color_complex  = 'ctermfg=51'
-       let rout_color_negnum   = 'ctermfg=183'
-       let rout_color_negfloat = 'ctermfg=183'
-       let rout_color_date     = 'ctermfg=43'
+       let rout_color_normal   = 'ctermfg=202'
+       let rout_color_number   = 'ctermfg=214'
+       let rout_color_integer  = 'ctermfg=214'
+       let rout_color_float    = 'ctermfg=214'
+       let rout_color_complex  = 'ctermfg=214'
+       let rout_color_negnum   = 'ctermfg=209'
+       let rout_color_negfloat = 'ctermfg=209'
+       let rout_color_date     = 'ctermfg=184'
        let rout_color_true     = 'ctermfg=78'
        let rout_color_false    = 'ctermfg=203'
        let rout_color_inf      = 'ctermfg=39'
-       let rout_color_constant = 'ctermfg=75'
-       let rout_color_string   = 'ctermfg=79'
+       let rout_color_constant = 'ctermfg=179'
+       let rout_color_string   = 'ctermfg=172'
        let rout_color_error    = 'ctermfg=15 ctermbg=1'
        let rout_color_warn     = 'ctermfg=1'
        let rout_color_index    = 'ctermfg=186'
@@ -2869,6 +2829,14 @@ put in your |vimrc|:
 ==============================================================================
 							       *r-plugin-news*
 10. News~
+
+1.2.6 (2015-06-12)
+
+ * Improve support for lazy load objects in the Object Browser.
+
+ * Remove option vimrplugin_vim_window (use $WINDOWID instead).
+
+ * Fix bug that prevented GVim 64 bit of finding libVimR.dll.
 
 1.2.5 (2015-05-06)
 
