@@ -99,7 +99,6 @@ function! UpdateOB(what)
         exe "sil noautocmd sb " . g:rplugin_curbuf
         exe "set switchbuf=" . savesb
     endif
-    redraw
     let g:rplugin_upobcnt = 0
     return "End of UpdateOB()"
 endfunction
