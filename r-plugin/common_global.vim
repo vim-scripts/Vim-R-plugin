@@ -782,6 +782,9 @@ function StartR(whatr)
     elseif !has("clientserver")
         let $VIMEDITOR_SVRNM = "NoClientServer"
     elseif v:servername == ""
+        if has("gui_macvim") && !has("gui_running")
+            call RWarningMsg("The Vim application that comes with MacVim cannot receive messages from R.")
+        endif
         let $VIMEDITOR_SVRNM = "NoServerName"
     else
         let $VIMEDITOR_SVRNM = v:servername
@@ -3140,13 +3143,6 @@ if has("gui_running") || g:vimrplugin_applescript
     let vimrplugin_only_in_tmux = 0
 endif
 
-if has("gui_running") || has("win32") || g:vimrplugin_applescript
-    let g:vimrplugin_tmux_ob = 0
-    if g:vimrplugin_objbr_place =~ "console"
-        let g:vimrplugin_objbr_place = substitute(g:vimrplugin_objbr_place, "console", "script", "")
-    endif
-endif
-
 if $TMUX == ""
     let g:rplugin_do_tmux_split = 0
     call RSetDefaultValue("g:vimrplugin_tmux_ob", 0)
@@ -3155,6 +3151,14 @@ else
     let g:vimrplugin_applescript = 0
     call RSetDefaultValue("g:vimrplugin_tmux_ob", 1)
 endif
+
+if has("gui_running") || has("win32") || g:vimrplugin_applescript || !g:rplugin_do_tmux_split
+    let g:vimrplugin_tmux_ob = 0
+    if g:vimrplugin_objbr_place =~ "console"
+        let g:vimrplugin_objbr_place = substitute(g:vimrplugin_objbr_place, "console", "script", "")
+    endif
+endif
+
 if g:vimrplugin_objbr_place =~ "console"
     let g:vimrplugin_tmux_ob = 1
 endif
