@@ -619,17 +619,6 @@ function DelayedFillLibList()
 endfunction
 
 function StartR_TmuxSplit(rcmd)
-    " Vim crashes if the syntax highlight is changed while the window is
-    " being resized, but only if the R syntax is included in another filetype
-    if &filetype != "r"
-        let g:rplugin_starting_R = 1
-        augroup RStarting
-            autocmd!
-            autocmd CursorMoved <buffer> call DelayedFillLibList()
-            autocmd CursorMovedI <buffer> call DelayedFillLibList()
-        augroup END
-    endif
-
     let g:rplugin_vim_pane = TmuxActivePane()
     let tmuxconf = ['set-environment VIMRPLUGIN_TMPDIR "' . g:rplugin_tmpdir . '"',
                 \ 'set-environment VIMRPLUGIN_COMPLDIR "' . substitute(g:rplugin_compldir, ' ', '\\ ', "g") . '"',
@@ -852,6 +841,8 @@ function StartR(whatr)
         call inputrestore()
     endif
 
+    let g:rplugin_starting_R = 1
+
     if g:vimrplugin_applescript
         call StartR_OSX()
         return
@@ -1014,6 +1005,17 @@ function WaitVimComStart()
             call system("tmux set-environment -u VIMRPLUGIN_TMPDIR")
         endif
         call delete(g:rplugin_tmpdir . "/start_options.R")
+
+        " Vim may crash when the syntax highlight is changed while the window
+        " is being resized, although only if the R syntax is included in
+        " another filetype. To guarantee a safer startup, we delay the
+        " highlight of functions for all cases:
+        augroup RStarting
+            autocmd!
+            autocmd CursorMoved <buffer> call DelayedFillLibList()
+            autocmd CursorMovedI <buffer> call DelayedFillLibList()
+        augroup END
+
         return 1
     else
         call RWarningMsg("The package vimcom wasn't loaded yet.")
