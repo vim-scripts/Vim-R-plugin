@@ -15,13 +15,7 @@ unlet s:sleeptimestr
 unlet s:sleeptime
 
 let g:rplugin_sleeptime = g:vimrplugin_sleeptime . 'm'
-exe 'let $VIM_SLEEPTIME = ' . '"' . g:vimrplugin_sleeptime . '"'
 
-if g:vimrplugin_Rterm
-    let b:rplugin_R = "Rgui.exe"
-else
-    let b:rplugin_R = "Rterm.exe"
-endif
 if !exists("g:rplugin_rpathadded")
     if exists("g:vimrplugin_r_path")
         if !isdirectory(g:vimrplugin_r_path)
@@ -154,11 +148,19 @@ function StartR_Windows()
 
     let $HOME = saved_home
 
-    if g:vimrplugin_vim_wd == 0
-        lcd -
-    endif
     let g:SendCmdToR = function('SendCmdToR_Windows')
-    call WaitVimComStart()
+    if WaitVimComStart()
+        call foreground()
+        if g:vimrplugin_arrange_windows && v:servername != "" && filereadable(g:rplugin_compldir . "/win_pos")
+            let repl = libcall(g:rplugin_vimcom_lib, "ArrangeWindows", $VIMRPLUGIN_COMPLDIR)
+            if repl != "OK"
+                call RWarningMsg(repl)
+            endif
+        endif
+        if g:vimrplugin_after_start != ''
+            call system(g:vimrplugin_after_start)
+        endif
+    endif
 endfunction
 
 function SendCmdToR_Windows(cmd)
@@ -167,6 +169,8 @@ function SendCmdToR_Windows(cmd)
     else
         let cmd = a:cmd . "\n"
     endif
+    let save_clip = getreg('+')
+    call setreg('+', cmd)
     if g:vimrplugin_Rterm
         let repl = libcall(g:rplugin_vimcom_lib, "SendToRTerm", cmd)
     else
@@ -178,6 +182,7 @@ function SendCmdToR_Windows(cmd)
     endif
     exe "sleep " . g:rplugin_sleeptime
     call foreground()
+    call setreg('+', save_clip)
     return 1
 endfunction
 

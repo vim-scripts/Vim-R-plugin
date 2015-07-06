@@ -13,18 +13,19 @@ function StartR_OSX()
     if b:rplugin_r_args != " "
         " https://github.com/jcfaria/Vim-R-plugin/issues/63
         " https://stat.ethz.ch/pipermail/r-sig-mac/2013-February/009978.html
-        call RWarningMsg('R.app does not support command line arguments. To pass "' . b:rplugin_r_args . '" to R, you must run it in a console. Set "vimrplugin_applescript = 0" (you may need to install XQuartz)')
+        call RWarningMsg('R.app does not support command line arguments. To pass "' . b:rplugin_r_args . '" to R, you must run it in a console. Set "vimrplugin_applescript = 0"')
     endif
     let rlog = system("open " . rcmd)
     if v:shell_error
         call RWarningMsg(rlog)
     endif
-    if g:vimrplugin_vim_wd == 0
-        lcd -
-    endif
     let g:SendCmdToR = function('SendCmdToR_OSX')
     if WaitVimComStart()
         call SendToVimCom("\005B Update OB [StartR]")
+        sleep 200m
+        if g:vimrplugin_after_start != ''
+            call system(g:vimrplugin_after_start)
+        endif
     endif
 endfunction
 

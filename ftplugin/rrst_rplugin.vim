@@ -13,6 +13,14 @@ endif
 " defined after the global ones:
 runtime r-plugin/common_buffer.vim
 
+if !exists("b:did_ftplugin") && !exists("g:rplugin_runtime_warn")
+    runtime ftplugin/rrst.vim
+    if !exists("b:did_ftplugin")
+        call RWarningMsgInp("Your runtime files seems to be outdated.\nSee: https://github.com/jalvesaq/R-Vim-runtime")
+        let g:rplugin_runtime_warn = 1
+    endif
+endif
+
 function! RrstIsInRCode(vrb)
     let chunkline = search("^\\.\\. {r", "bncW")
     let docline = search("^\\.\\. \\.\\.", "bncW")
@@ -157,7 +165,6 @@ let b:IsInRCode = function("RrstIsInRCode")
 let b:PreviousRChunk = function("RrstPreviousChunk")
 let b:NextRChunk = function("RrstNextChunk")
 let b:SendChunkToR = function("SendRrstChunkToR")
-let b:SourceLines = function("RSourceLines")
 
 "==========================================================================
 " Key bindings and menu items
@@ -191,4 +198,8 @@ let g:rplugin_has_rst2pdf = 0
 
 call RSourceOtherScripts()
 
-let b:undo_ftplugin .= " | unlet! b:IsInRCode b:SourceLines b:PreviousRChunk b:NextRChunk b:SendChunkToR"
+if exists("b:undo_ftplugin")
+    let b:undo_ftplugin .= " | unlet! b:IsInRCode b:PreviousRChunk b:NextRChunk b:SendChunkToR"
+else
+    let b:undo_ftplugin = "unlet! b:IsInRCode b:PreviousRChunk b:NextRChunk b:SendChunkToR"
+endif

@@ -13,6 +13,14 @@ endif
 " defined after the global ones:
 runtime r-plugin/common_buffer.vim
 
+if !exists("b:did_ftplugin") && !exists("g:rplugin_runtime_warn")
+    runtime ftplugin/rhelp.vim
+    if !exists("b:did_ftplugin")
+        call RWarningMsgInp("Your runtime files seems to be outdated.\nSee: https://github.com/jalvesaq/R-Vim-runtime")
+        let g:rplugin_runtime_warn = 1
+    endif
+endif
+
 function! RhelpIsInRCode(vrb)
     let lastsec = search('^\\[a-z][a-z]*{', "bncW")
     let secname = getline(lastsec)
@@ -27,7 +35,6 @@ function! RhelpIsInRCode(vrb)
 endfunction
 
 let b:IsInRCode = function("RhelpIsInRCode")
-let b:SourceLines = function("RSourceLines")
 
 "==========================================================================
 " Key bindings and menu items
@@ -46,4 +53,8 @@ endif
 
 call RSourceOtherScripts()
 
-let b:undo_ftplugin .= " | unlet! b:IsInRCode b:SourceLines"
+if exists("b:undo_ftplugin")
+    let b:undo_ftplugin .= " | unlet! b:IsInRCode"
+else
+    let b:undo_ftplugin = "unlet! b:IsInRCode"
+endif

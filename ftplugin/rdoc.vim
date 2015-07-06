@@ -4,12 +4,12 @@
 
 
 " Only do this when not yet done for this buffer
-if exists("b:did_rdoc_ftplugin") || has("nvim")
+if exists("b:did_ftplugin") || has("nvim")
     finish
 endif
 
 " Don't load another plugin for this buffer
-let b:did_rdoc_ftplugin = 1
+let b:did_ftplugin = 1
 
 let s:cpo_save = &cpo
 set cpo&vim
@@ -101,7 +101,6 @@ function! RdocIsInRCode(vrb)
 endfunction
 
 let b:IsInRCode = function("RdocIsInRCode")
-let b:SourceLines = function("RSourceLines")
 
 "==========================================================================
 " Key bindings and menu items
