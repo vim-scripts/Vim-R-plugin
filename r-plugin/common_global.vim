@@ -1083,6 +1083,7 @@ function StartObjBrowser_Tmux()
                 \ 'set rulerformat=%3(%l%)',
                 \ 'set laststatus=0',
                 \ 'set noruler',
+                \ 'set updatetime=100',
                 \ 'let g:SendCmdToR = function("SendCmdToR_TmuxSplit")',
                 \ 'let g:RBrOpenCloseLs = function("RBrOpenCloseLs_TmuxOB")',
                 \ 'if has("clientserver") && v:servername != ""',
