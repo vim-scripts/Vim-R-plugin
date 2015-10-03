@@ -45,7 +45,7 @@ function BuildROmniList(pattern)
 endfunction
 
 fun! rcomplete#CompleteR(findstart, base)
-    if ((&filetype == "rnoweb" && RnwIsInRCode(0) == 0) || (&filetype == "rmd" && RmdIsInRCode(0) == 0) || (&filetype == "rrst" && RrstIsInRCode(0) == 0)) && b:rplugin_nonr_omnifunc != ""
+    if (&filetype == "rnoweb" || &filetype == "rmd" || &filetype == "rrst" || &filetype == "rhelp") && b:IsInRCode(0) == 0 && b:rplugin_nonr_omnifunc != ""
         let Ofun = function(b:rplugin_nonr_omnifunc)
         let thebegin = Ofun(a:findstart, a:base)
         return thebegin
