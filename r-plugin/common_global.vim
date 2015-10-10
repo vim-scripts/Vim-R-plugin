@@ -2436,7 +2436,11 @@ function RStart_Zathura(basenm)
                 \ "sys.stdout.write(str(zpid))" ]
     call writefile(pycode, g:rplugin_tmpdir . "/start_zathura.py")
     let pid = system("python '" . g:rplugin_tmpdir . "/start_zathura.py" . "'")
-    let g:rplugin_zathura_pid[a:basenm] = pid
+    if pid == 0
+        call RWarningMsg("Failed to run Zathura: " . substitute(pid, "\n", " ", "g"))
+    else
+        let g:rplugin_zathura_pid[a:basenm] = pid
+    endif
     call delete(g:rplugin_tmpdir . "/start_zathura.py")
 endfunction
 
