@@ -2424,7 +2424,8 @@ endfunction
 
 function RStart_Zathura(basenm)
     let a2 = 'a2 = "vim --servername ' . v:servername . " --remote-expr \\\"SyncTeX_backward('%{input}',%{line})\\\"" . '"'
-    let pycode = ["import subprocess",
+    let pycode = ["# -*- coding: " . &encoding . " -*-",
+                \ "import subprocess",
                 \ "import os",
                 \ "import sys",
                 \ "FNULL = open(os.devnull, 'w')",
