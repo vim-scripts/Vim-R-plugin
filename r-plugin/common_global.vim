@@ -918,8 +918,13 @@ function StartR(whatr)
             endif
         endif
     endif
-
-    echon
+    if has("clientserver") && v:servername == "" && $DISPLAY != ""
+        call RWarningMsgInp("You have to restart Vim with the --servername argument otherwise Vim cannot receive messages from R.")
+        redraw
+        call RWarningMsg('Example: "vim --servername VIM ' . bufname("%") . '"')
+    else
+        echon
+    endif
 endfunction
 
 " To be called by edit() in R running in Neovim buffer.
