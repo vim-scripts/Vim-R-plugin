@@ -253,23 +253,25 @@ Put the following in your `~/.bashrc`:
 Before proceeding, you have to start a new shell session to have the alias
 enabled.
 
-If you start either GVim or Vim in a terminal emulator the plugin will start R
-in a external terminal emulator. If you start Vim inside of a Tmux session,
-the plugin will split the Tmux window in two and start R in the other pane.
-
-The recommended way of running the plugin on Linux is running Vim inside a
-Tmux session. Please, read |r-plugin-tmux| for details.
+If you start Vim in a terminal emulator, inside of a Tmux session, the plugin
+will split the Tmux window in two and start R in the other pane. This is the
+recommended way of running the plugin on Linux (read |r-plugin-tmux| for
+details). If you either use GVim or Vim not inside a Tmux session the plugin
+will start R in a external terminal emulator. This is useful if you have two
+monitors.
 
 If you run Vim in a terminal emulator, it must be started with the argument
-|--servername|. Please, read the section |r-plugin-bash-setup| to know some
-tips on how to configure Bash.
+|--servername| to enable the 'clientserver' feature (please, read the section
+|r-plugin-bash-setup| to know some tips on how to configure Bash). This is not
+necessary with GVim because it always runs with the 'clientserver' feature
+enabled.
 
 
 ------------------------------------------------------------------------------
 3.4. Plugin installation (instructions for all systems)~
 
 You need to activate plugins and indentation according to 'filetype'. You
-should have at least the following options at the top or at near the very top
+should have at least the following options at the top or near the very top
 of your |vimrc| (but below `set` `runtimepath`, if you have set it):
 >
    set nocompatible
