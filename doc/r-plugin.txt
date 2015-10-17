@@ -1664,7 +1664,7 @@ this behavior. Examples:
    let vimrplugin_latexcmd = 'latexmk -pdf -pdflatex="xelatex %O -synctex=1 %S"'
 <
 By default, vimrplugin_latexmk is 0 on Windows and 1 on other systems.
-If you want to pass arguments do the `Sweave()` function, set the value of the
+If you want to pass arguments to the `Sweave()` function, set the value of the
 vimrplugin_sweaveargs variable.
 
 If the value of `vimrplugin_texerr` is `1`, a summary of LaTeX errors
