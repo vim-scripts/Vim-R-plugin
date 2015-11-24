@@ -817,9 +817,12 @@ file:
 
    # Options enable mouse support in Tmux
    set -g terminal-overrides 'xterm*:smcup@:rmcup@'
+   # For Tmux < 2.1
    set -g mode-mouse on
    set -g mouse-select-pane on
    set -g mouse-resize-pane on
+   # For Tmux >= 2.1
+   set -g mouse on
 
    # Act more like vim:
    set-window-option -g mode-keys vi

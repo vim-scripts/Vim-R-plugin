@@ -717,7 +717,11 @@ function StartR_ExternalTerm(rcmd)
         endif
 
         if g:vimrplugin_tmux_ob || !has("gui_running")
-            call extend(cnflines, ['set -g mode-mouse on', 'set -g mouse-select-pane on', 'set -g mouse-resize-pane on'])
+            if g:rplugin_tmux_version < "2.1"
+                call extend(cnflines, ['set -g mode-mouse on', 'set -g mouse-select-pane on', 'set -g mouse-resize-pane on'])
+            else
+                call extend(cnflines, ['set -g mouse on'])
+            endif
         endif
         call writefile(cnflines, g:rplugin_tmpdir . "/tmux.conf")
         let tmuxcnf = '-f "' . g:rplugin_tmpdir . "/tmux.conf" . '"'
@@ -2859,16 +2863,16 @@ function RCreateEditMaps()
     call RCreateMaps("v", '<Plug>RRightComment',    ';', ':call MovePosRCodeComment("selection")')
     " Replace 'underline' with '<-'
     if g:vimrplugin_assign == 1 || g:vimrplugin_assign == 2
-        silent exe 'imap <buffer><silent> ' . g:vimrplugin_assign_map . ' <Esc>:call ReplaceUnderS()<CR>a'
+        silent exe 'inoremap <buffer><silent> ' . g:vimrplugin_assign_map . ' <Esc>:call ReplaceUnderS()<CR>a'
     endif
     if g:vimrplugin_args_in_stline
-        imap <buffer><silent> ( <Esc>:call DisplayArgs()<CR>a
-        imap <buffer><silent> ) <Esc>:call RestoreStatusLine()<CR>a
+        inoremap <buffer><silent> ( <Esc>:call DisplayArgs()<CR>a
+        inoremap <buffer><silent> ) <Esc>:call RestoreStatusLine()<CR>a
     endif
     if hasmapto("<Plug>RCompleteArgs", "i")
-        imap <buffer><silent> <Plug>RCompleteArgs <C-R>=RCompleteArgs()<CR>
+        inoremap <buffer><silent> <Plug>RCompleteArgs <C-R>=RCompleteArgs()<CR>
     else
-        imap <buffer><silent> <C-X><C-A> <C-R>=RCompleteArgs()<CR>
+        inoremap <buffer><silent> <C-X><C-A> <C-R>=RCompleteArgs()<CR>
     endif
 endfunction
 
@@ -3212,17 +3216,16 @@ if !has("win32") && !has("win64") && !has("gui_win32") && !has("gui_win64") && !
         finish
     endif
 
-    let s:tmuxversion = system("tmux -V")
-    let s:tmuxversion = substitute(s:tmuxversion, '.*tmux \([0-9]\.[0-9]\).*', '\1', '')
-    if strlen(s:tmuxversion) != 3
-        let s:tmuxversion = "1.0"
+    let g:rplugin_tmux_version = system("tmux -V")
+    let g:rplugin_tmux_version = substitute(g:rplugin_tmux_version, '.*tmux \([0-9]\.[0-9]\).*', '\1', '')
+    if strlen(g:rplugin_tmux_version) != 3
+        let g:rplugin_tmux_version = "1.0"
     endif
-    if s:tmuxversion < "1.8" && g:vimrplugin_source !~ "screenR"
+    if g:rplugin_tmux_version < "1.8" && g:vimrplugin_source !~ "screenR"
         call RWarningMsgInp("Vim-R-plugin requires Tmux >= 1.8")
         let g:rplugin_failed = 1
         finish
     endif
-    unlet s:tmuxversion
 endif
 
 " Start with an empty list of objects in the workspace
