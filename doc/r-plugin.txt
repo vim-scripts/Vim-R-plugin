@@ -514,6 +514,10 @@ line currently under the cursor you should type <LocalLeader>d. If you want to
 see what lines are being sourced when sending a selection of lines, you can
 use either <LocalLeader>se or <LocalLeader>sa instead of <LocalLeader>ss.
 
+The command <LocalLeader>o runs in the background the R command `print(line)`,
+where `line` is the line under cursor, and adds the output as commented lines
+to the source code.
+
 If the cursor is over the header of an R chunk with the `child` option (from
 Rnoweb, RMarkdown or RreStructuredText document), and you use one of the
 commands that send a single line of code to R, then the plugin will send to R
