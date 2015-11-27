@@ -833,7 +833,7 @@ function StartR(whatr)
     else
         let start_options += ['options(vimcom.vimpager = TRUE)']
     endif
-    let start_options += ['if(utils::packageVersion("vimcom") != "1.2.6") warning("Your version of Vim-R-plugin requires vimcom-1.2-6.", call. = FALSE)']
+    let start_options += ['if(utils::packageVersion("vimcom") != "1.2.7") warning("Your version of Vim-R-plugin requires vimcom-1.2-7.", call. = FALSE)']
 
     let rwd = ""
     if g:vimrplugin_vim_wd == 0
@@ -1013,8 +1013,8 @@ function WaitVimComStart()
         if !filereadable(g:rplugin_vimcom_lib)
             call RWarningMsgInp('Could not find "' . g:rplugin_vimcom_lib . '".')
         endif
-        if g:rplugin_vimcom_version != "1.2.6"
-            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.2.6.')
+        if g:rplugin_vimcom_version != "1.2.7"
+            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.2.7.')
             sleep 1
         endif
         call delete(g:rplugin_tmpdir . "/vimcom_running_" . $VIMINSTANCEID)
@@ -3187,7 +3187,10 @@ endif
 
 if $TMUX == ""
     let g:rplugin_do_tmux_split = 0
-    call RSetDefaultValue("g:vimrplugin_tmux_ob", 0)
+    let g:vimrplugin_tmux_ob = 0
+    if g:vimrplugin_objbr_place =~ "console"
+        let g:vimrplugin_objbr_place = substitute(g:vimrplugin_objbr_place, "console", "script", "")
+    endif
 else
     let g:rplugin_do_tmux_split = 1
     let g:vimrplugin_applescript = 0
