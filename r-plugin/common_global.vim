@@ -3284,9 +3284,9 @@ let g:rplugin_termcmd = g:vimrplugin_term . " -e"
 if g:vimrplugin_term == "gnome-terminal" || g:vimrplugin_term == "xfce4-terminal" || g:vimrplugin_term == "terminal" || g:vimrplugin_term == "lxterminal"
     " Cannot set gnome-terminal icon: http://bugzilla.gnome.org/show_bug.cgi?id=126081
     if g:vimrplugin_vim_wd
-        let g:rplugin_termcmd = g:vimrplugin_term . " --title R -e"
+        let g:rplugin_termcmd = g:vimrplugin_term . " -e"
     else
-        let g:rplugin_termcmd = g:vimrplugin_term . " --working-directory='" . expand("%:p:h") . "' --title R -e"
+        let g:rplugin_termcmd = g:vimrplugin_term . " --working-directory='" . expand("%:p:h") . "' -e"
     endif
 endif
 
