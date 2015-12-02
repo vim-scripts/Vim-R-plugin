@@ -1331,7 +1331,15 @@ To completely disable this feature, put in your |vimrc|:
 <
 If you need to type many object names with underscores, you may want to change
 the value vimrplugin_assign to 2. Then, you will have to type two `_` to get
-them converted into `<-`.
+them converted into `<-`. Alternatively, if the value of vimrplugin_assign is
+3, the plugin will run the following command in each buffer containing R code
+(R, Rnoweb, Rhelp, Rrst, and Rmd):
+>
+   iabb <buffer> _ <-
+<
+That is, the underscore will be replaced with the assign operator only if it
+is preceded by a space and followed by a non-word character.
+
 
 ------------------------------------------------------------------------------
 						   *vimrplugin_objbr_place*
