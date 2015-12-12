@@ -835,7 +835,7 @@ function StartR(whatr)
     else
         let start_options += ['options(vimcom.vimpager = TRUE)']
     endif
-    let start_options += ['if(utils::packageVersion("vimcom") != "1.2.7.1") warning("Your version of Vim-R-plugin requires vimcom-1.2-7.1.", call. = FALSE)']
+    let start_options += ['if(utils::packageVersion("vimcom") != "1.2.7.2") warning("Your version of Vim-R-plugin requires vimcom-1.2-7.2.", call. = FALSE)']
 
     let rwd = ""
     if g:vimrplugin_vim_wd == 0
@@ -1015,8 +1015,8 @@ function WaitVimComStart()
         if !filereadable(g:rplugin_vimcom_lib)
             call RWarningMsgInp('Could not find "' . g:rplugin_vimcom_lib . '".')
         endif
-        if g:rplugin_vimcom_version != "1.2.7.1"
-            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.2.7.1.')
+        if g:rplugin_vimcom_version != "1.2.7.2"
+            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.2.7.2.')
             sleep 1
         endif
         call delete(g:rplugin_tmpdir . "/vimcom_running_" . $VIMINSTANCEID)
@@ -2268,7 +2268,7 @@ function RGetFirstObjClass(rkeyword)
     endif
 
     let objclass = ""
-    call SendToVimCom("\x08" . $VIMINSTANCEID . "class(" . firstobj . ")")
+    call SendToVimCom("\x08" . $VIMINSTANCEID . "vimcom:::vim.getclass(" . firstobj . ")")
     if g:rplugin_vimcomport > 0
         let g:rplugin_lastev = ReadEvalReply()
         if g:rplugin_lastev !~ "^R error: "
