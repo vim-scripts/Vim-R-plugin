@@ -1170,6 +1170,7 @@ is running:
 |vimrplugin_term_cmd|          Complete command to open an external terminal
 |vimrplugin_sleeptime|         Delay while sending commands in MS Windows
 |vimrplugin_save_win_pos|      Save positions of R and GVim windows
+|vimrplugin_set_home_env|      Set the value of $HOME for R
 |vimrplugin_arrange_windows|   Restore positions of R and GVim windows
 |vimrplugin_assign|            Convert '_' into ' <- '
 |vimrplugin_assign_map|        Choose what to convert into ' <- '
@@ -1269,6 +1270,7 @@ The last argument must be the one which precedes the command to be executed.
 ------------------------------------------------------------------------------
 						  *vimrplugin_sleeptime*
 						  *vimrplugin_save_win_pos*
+						  *vimrplugin_set_home_env*
 						  *vimrplugin_arrange_windows*
 6.2. Options specific to Windows~
 
@@ -1280,7 +1282,7 @@ example show how to adjust the value of sleeptime in your |vimrc|:
    let vimrplugin_sleeptime = 30
 <
 By default, the Vim-R-plugin will save the positions of R Console and GVim
-windows when you quits R with the <LocalLeader>rq command, and will restore
+windows when you quit R with the <LocalLeader>rq command, and it will restore
 the positions of the windows when you start R. If you do not like this
 behavior, you can put in your |vimrc|:
 >
@@ -1292,8 +1294,15 @@ their state when you have quited R for the last time, you should arrange them
 in the way you want, quit R, change in your |vimrc| only the value of
 vimrplugin_save_win_pos and, finally, quit Vim.
 
-Note: the option vimrplugin_Rterm was disabled because the C code to send
-strings from Vim to Windows PowerShell is not working.
+The plugin sets `$HOME` as the Windows register value for "Personal" "Shell
+Folders" which is the same value set by R. However, if you have set `$HOME`
+yourself with the intention of changing the default value of `$HOME` assumed
+by R, you will want to put in your |vimrc|:
+>
+   let vimrplugin_set_home_env = 0
+<
+Note: the old option vimrplugin_Rterm was deprecated because the C code to
+send strings from Vim to Windows PowerShell is not working.
 
 
 ------------------------------------------------------------------------------
@@ -2841,7 +2850,11 @@ put in your |vimrc|:
 							       *r-plugin-news*
 10. News~
 
-1.2.7 (2015-11-27)
+1.2.8 (2015-12-11)
+
+ * New opton (Windows only): vimrplugin_set_home_env.
+
+1.2.7 (2015-12-11)
 
  * Fix incompatibility with Tmux 2.1.
 
