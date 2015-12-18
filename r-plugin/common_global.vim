@@ -1733,6 +1733,10 @@ function SendSelectionToR(...)
         let j = col("'>") - i
         let l = getline("'<")
         let line = strpart(l, i, j)
+        if strlen(l) == strlen(line)
+            call SendLineToR(a:2)
+            return
+        endif
         let ok = g:SendCmdToR(line)
         if ok && a:2 =~ "down"
             call GoDown()
