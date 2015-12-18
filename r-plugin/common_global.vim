@@ -1733,10 +1733,7 @@ function SendSelectionToR(...)
         let j = col("'>") - i
         let l = getline("'<")
         let line = strpart(l, i, j)
-        if strlen(l) == strlen(line)
-            call SendLineToR(a:2)
-            return
-        endif
+        let line = CleanOxygenLine(line)
         let ok = g:SendCmdToR(line)
         if ok && a:2 =~ "down"
             call GoDown()
@@ -1775,7 +1772,9 @@ function SendSelectionToR(...)
         let lines[llen] = strpart(lines[llen], 0, j)
     endif
 
-    let lines = map(copy(lines), 'substitute(v:val, "^#' . "'" . '", "", "")')
+    for idx in range(0, len(lines) - 1)
+      let lines[idx] = CleanOxygenLine(lines[idx])
+    endfor
 
     if a:0 == 3 && a:3 == "NewtabInsert"
         let ok = RSourceLines(lines, a:1, "NewtabInsert")
