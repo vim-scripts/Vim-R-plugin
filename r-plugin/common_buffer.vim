@@ -62,3 +62,6 @@ if exists("*RCheckLibList")
     autocmd BufEnter <buffer> call RCheckLibList()
 endif
 
+if g:vimrplugin_assign == 3
+    iabb <buffer> _ <-
+endif
