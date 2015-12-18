@@ -1772,9 +1772,14 @@ function SendSelectionToR(...)
         let lines[llen] = strpart(lines[llen], 0, j)
     endif
 
+    let curpos = getpos(".")
+    let curline = line("'<")
     for idx in range(0, len(lines) - 1)
-      let lines[idx] = CleanOxygenLine(lines[idx])
+        call setpos(".", [0, curline, 1, 0])
+        let lines[idx] = CleanOxygenLine(lines[idx])
+        let curline += 1
     endfor
+    call setpos(".", curpos)
 
     if a:0 == 3 && a:3 == "NewtabInsert"
         let ok = RSourceLines(lines, a:1, "NewtabInsert")
