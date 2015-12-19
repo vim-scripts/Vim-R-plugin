@@ -126,7 +126,7 @@ function ReplaceUnderS()
     endif
 endfunction
 
-function! ReadEvalReply()
+function ReadEvalReply()
     let reply = "No reply"
     let haswaitwarn = 0
     let ii = 0
@@ -156,7 +156,7 @@ function! ReadEvalReply()
     endif
 endfunction
 
-function! CompleteChunkOptions()
+function CompleteChunkOptions()
     let cline = getline(".")
     let cpos = getpos(".")
     let idx1 = cpos[2] - 2
@@ -201,11 +201,11 @@ function! CompleteChunkOptions()
     call sort(ktopt)
 
     for kopt in ktopt
-      if kopt =~ newbase
-        let tmp1 = split(kopt, ";")
-        let tmp2 = {'word': tmp1[0], 'menu': tmp1[1]}
-        call add(rr, tmp2)
-      endif
+        if kopt =~ newbase
+            let tmp1 = split(kopt, ";")
+            let tmp2 = {'word': tmp1[0], 'menu': tmp1[1]}
+            call add(rr, tmp2)
+        endif
     endfor
     call complete(idx1 + 1, rr)
 endfunction
@@ -617,23 +617,24 @@ endfunction
 
 " Adapted from screen plugin:
 function TmuxActivePane()
-  let line = system("tmux list-panes | grep \'(active)$'")
-  let paneid = matchstr(line, '\v\%\d+ \(active\)')
-  if !empty(paneid)
-    return matchstr(paneid, '\v^\%\d+')
-  else
-    return matchstr(line, '\v^\d+')
-  endif
+    let line = system("tmux list-panes | grep \'(active)$'")
+    let paneid = matchstr(line, '\v\%\d+ \(active\)')
+    if !empty(paneid)
+        return matchstr(paneid, '\v^\%\d+')
+    else
+        return matchstr(line, '\v^\d+')
+    endif
 endfunction
 
 function DelayedFillLibList()
     autocmd! RStarting
     augroup! RStarting
-    let g:rplugin_starting_R = 0
-    if exists("g:rplugin_fillrliblist_called") && g:rplugin_fillrliblist_called
-        let g:rplugin_fillrliblist_called = 0
-        call FillRLibList()
-    endif
+        let g:rplugin_starting_R = 0
+        if exists("g:rplugin_fillrliblist_called") && g:rplugin_fillrliblist_called
+            let g:rplugin_fillrliblist_called = 0
+            call FillRLibList()
+        endif
+    augroup END
 endfunction
 
 function StartR_TmuxSplit(rcmd)
@@ -715,7 +716,7 @@ function StartR_ExternalTerm(rcmd)
 
         if g:vimrplugin_term == "rxvt" || g:vimrplugin_term == "urxvt"
             let cnflines = cnflines + [
-                    \ "set terminal-overrides 'rxvt*:smcup@:rmcup@'" ]
+                        \ "set terminal-overrides 'rxvt*:smcup@:rmcup@'" ]
         endif
 
         if g:vimrplugin_tmux_ob || !has("gui_running")
@@ -1874,7 +1875,7 @@ function SendFHChunkToR()
                 " Next run child chunk and continue
                 call KnitChild(curbuf[idx], 'stay')
                 let idx += 1
-            " Regular R chunk
+                " Regular R chunk
             else
                 let idx += 1
                 while curbuf[idx] !~ endchk && idx < here
@@ -2119,7 +2120,7 @@ function RQuit(how)
 endfunction
 
 " knit the current buffer content
-function! RKnit()
+function RKnit()
     update
     if has("win32") || has("win64")
         call g:SendCmdToR('require(knitr); .vim_oldwd <- getwd(); setwd("' . substitute(expand("%:p:h"), '\\', '/', 'g') . '"); knit("' . expand("%:t") . '"); setwd(.vim_oldwd); rm(.vim_oldwd)')
@@ -2672,12 +2673,12 @@ function RAction(rcmd)
         endif
         let rfun = a:rcmd
         if a:rcmd == "args"
-          if g:vimrplugin_listmethods == 1
-            call g:SendCmdToR('vim.list.args("' . rkeyword . '")')
-          else
-            call g:SendCmdToR('args("' . rkeyword . '")')
-          endif
-          return
+            if g:vimrplugin_listmethods == 1
+                call g:SendCmdToR('vim.list.args("' . rkeyword . '")')
+            else
+                call g:SendCmdToR('args("' . rkeyword . '")')
+            endif
+            return
         endif
         if a:rcmd == "plot" && g:vimrplugin_specialplot == 1
             let rfun = "vim.plot"
