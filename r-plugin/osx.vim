@@ -15,7 +15,7 @@ function StartR_OSX()
         " https://stat.ethz.ch/pipermail/r-sig-mac/2013-February/009978.html
         call RWarningMsg('R.app does not support command line arguments. To pass "' . b:rplugin_r_args . '" to R, you must run it in a console. Set "vimrplugin_applescript = 0"')
     endif
-    let rlog = system("open " . rcmd)
+    let rlog = system("open -a " . rcmd . " .")
     if v:shell_error
         call RWarningMsg(rlog)
     endif
