@@ -845,10 +845,17 @@ function StartR(whatr)
         let rwd = getcwd()
     endif
     if rwd != ""
-        if has("win32") || has("win64")
+        if has("win32")
             let rwd = substitute(rwd, '\\', '/', 'g')
         endif
-        let start_options += ['setwd("' . rwd . '")']
+        if has("win32") && &encoding == "utf-8"
+            let start_options += ['.vim.rwd <- "' . rwd . '"']
+            let start_options += ['Encoding(.vim.rwd) <- "UTF-8"']
+            let start_options += ['setwd(.vim.rwd)']
+            let start_options += ['rm(.vim.rwd)']
+        else
+            let start_options += ['setwd("' . rwd . '")']
+        endif
     endif
     call writefile(start_options, g:rplugin_tmpdir . "/start_options.R")
 
