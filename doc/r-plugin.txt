@@ -462,6 +462,7 @@ Command
   . Knit and PDF (cur file)                            \kp
   . Knit, BibTeX and PDF (cur file) (Linux/Unix)       \kb
   . Knit and Beamer PDF (cur file) (only .Rmd)         \kl
+  . Knit and Word Document (cur file) (only .Rmd)      \kw
   . Knit and HTML (cur file, verbose) (only .Rmd)      \kh
   . Spin (cur file) (only .R)                          \ks
   --------------------------------------------------------
