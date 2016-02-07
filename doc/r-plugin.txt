@@ -462,6 +462,7 @@ Command
   . Knit and PDF (cur file)                            \kp
   . Knit, BibTeX and PDF (cur file) (Linux/Unix)       \kb
   . Knit and Beamer PDF (cur file) (only .Rmd)         \kl
+  . Knit and Open Document (cur file) (only .Rmd)      \ko
   . Knit and Word Document (cur file) (only .Rmd)      \kw
   . Knit and HTML (cur file, verbose) (only .Rmd)      \kh
   . Spin (cur file) (only .R)                          \ks
@@ -2251,10 +2252,11 @@ RD, "cursor down"; RED, both "echo" and "down"):
    RSweave
    RKnit
    RMakeHTML
-   RMakeODT
    RMakePDF   (Sweave)
    RMakePDFK  (Knitr)
    RMakePDFKb (.Rmd, beamer)
+   RMakeODT   (.Rmd, Open document)
+   RMakeWord  (.Rmd, Word document)
    RMakeRmd   (rmarkdown default)
    RMakeAll   (rmarkdown all in yaml)
    ROpenPDF
