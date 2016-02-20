@@ -5,7 +5,7 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 1.2.7
+Version: 1.2.8
 For Vim version 7.4
 
  1. Overview                                    |r-plugin-overview|
@@ -25,13 +25,14 @@ For Vim version 7.4
 1. Overview~
 
 This plugin improves Vim's support for editing R code and makes it possible to
-integrate Vim with R. If you want to use Neovim and R, see:
+integrate Vim with R. On Unix (Linux, Mac OS X, etc), the combination Neovim +
+Nvim-R + nvimcom works better. Please, see:
 
    https://github.com/jalvesaq/Nvim-R
 
-The plugin uses some ideas and code from Johannes Ranke's (vim-r-plugin), Eric
-Van Dewoestine's (screen.vim plugin), Vincent Nijs (R.vim for Mac OS X) and
-some ideas from the Tinn-R (Windows only) project.
+This plugin uses some ideas and code from Johannes Ranke's (vim-r-plugin),
+Eric Van Dewoestine's (screen.vim plugin), Vincent Nijs (R.vim for Mac OS X)
+and some ideas from the Tinn-R (Windows only) project.
 
 The latest stable version of this plugin is available at:
 
@@ -114,12 +115,13 @@ dependencies:
 
     * R's version must be >= 3.0.0: http://www.r-project.org/
 
-    * vimcom = 1.2-7: https://github.com/jalvesaq/VimCom/releases
+    * vimcom = 1.2-8: https://github.com/jalvesaq/VimCom/releases
 
       Note: If you cannot build vimcom yourself, you will want to
       download and install the zip file.
 
     * Vim's version must be >= 7.4: http://www.vim.org/download.php
+      To get the latest version, look for Vim "without Cream".
 
     * Only if you write Rnoweb code:
 
@@ -132,7 +134,8 @@ dependencies:
 Add the following lines to your `Rprofile`:
 >
    options(vimcom.verbose = 1)
-   library(vimcom)
+   if(Sys.getenv("VIMRPLUGIN_TMPDIR") != "")
+       library(vimcom)
 <
 If you do not know where your .Rprofile is, do the following command in R
 Console to open it:
@@ -151,7 +154,7 @@ Before installing the plugin, you should install its dependencies:
 
    R >= 3.0.0: http://www.r-project.org/
 
-   vimcom = 1.2-7: https://github.com/jalvesaq/VimCom/releases
+   vimcom = 1.2-8: https://github.com/jalvesaq/VimCom/releases
 
    Only if you edit Rnoweb files: MacTeX, BasicTeX or other LaTeX system.
 
@@ -159,7 +162,8 @@ If you want to call R.app from MacVim, put in your `~/.Rprofile`:
 >
    if(interactive()){
        options(vimcom.verbose = 1) # optional
-       library(vimcom)
+       if(Sys.getenv("VIMRPLUGIN_TMPDIR") != "")
+           library(vimcom)
    }
 <
 On Mac OS X, the plugin will use AppleScript to send commands to the R Console
@@ -173,7 +177,8 @@ to try this configuration, install Tmux and the R packages "setwidth" and
        library(colorout)
        library(setwidth)
        options(vimcom.verbose = 1) # optional
-       library(vimcom)
+       if(Sys.getenv("VIMRPLUGIN_TMPDIR") != "")
+           library(vimcom)
    }
 <
 Note: The plugin is fully functional with MacVim, but the Vim application that
@@ -205,7 +210,7 @@ Before installing the plugin, you should install its dependencies:
 
    R >= 3.0.0: http://www.r-project.org/
 
-   vimcom = 1.2-7: https://github.com/jalvesaq/VimCom/releases
+   vimcom = 1.2-8: https://github.com/jalvesaq/VimCom/releases
 
    Tmux >= 1.8:   http://tmux.sourceforge.net
                   Tmux is necessary to send commands from Vim to R Console.
@@ -242,7 +247,8 @@ Put the following lines in your `~/.Rprofile`:
        library(colorout)
        library(setwidth)
        options(vimcom.verbose = 1) # optional
-       library(vimcom)
+       if(Sys.getenv("VIMRPLUGIN_TMPDIR") != "")
+           library(vimcom)
    }
 <
 Put the following in your `~/.bashrc`:
@@ -1085,7 +1091,7 @@ should:
    2. Build vimcom with the argument `--enable-clientserver`. That is, download
       vimcom from https://github.com/jalvesaq/VimCom/releases and do in R:
 >
-      install.packages("vimcom_1.2-7.tar.gz", repos = NULL, type = "source",
+      install.packages("vimcom_1.2-8.tar.gz", repos = NULL, type = "source",
                        configure.args = "--enable-clientserver")
 <
    3. Build Vim with X11 support. A user reported success with the following
@@ -2770,7 +2776,8 @@ please read this document from the beginning.
        # Load the required libraries:
        library(colorout)
        library(setwidth)
-       library(vimcom)
+       if(Sys.getenv("VIMRPLUGIN_TMPDIR") != "")
+           library(vimcom)
 
        # Use the text based web browser w3m to navigate through R docs
        # in Linux Console after help.start():
@@ -2855,9 +2862,11 @@ put in your |vimrc|:
 							       *r-plugin-news*
 10. News~
 
-1.2.8 (2015-12-11)
+1.2.8 (2016-02-20)
 
- * New opton (Windows only): vimrplugin_set_home_env.
+ * New option (Windows only): vimrplugin_set_home_env.
+
+ * Fix bug on Windows: R starting minimized after trying to quit R minimized.
 
 1.2.7 (2015-11-27)
 
