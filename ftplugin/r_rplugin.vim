@@ -39,30 +39,23 @@ function! ShowRout()
         let rcmd = g:rplugin_R . " CMD BATCH --no-restore --no-save '" . expand("%") . "' '" . b:routfile . "'"
     endif
 
-    if has("win32") || has("win64") || v:servername == ""
-        echon "Please wait for: " . rcmd
-        redraw
-        let rlog = system(rcmd)
-        if v:shell_error && rlog != ""
-            call RWarningMsg('Error: "' . rlog . '"')
-            sleep 1
-        endif
-        if filereadable(b:routfile)
-            if g:vimrplugin_routnotab == 1
-                exe "split " . b:routfile
-            else
-                exe "tabnew " . b:routfile
-            endif
-            set filetype=rout
+    " TODO: Run R as a job and don't wait for the output
+    echon "Please wait for: " . rcmd
+    redraw
+    let rlog = system(rcmd)
+    if v:shell_error && rlog != ""
+        call RWarningMsg('Error: "' . rlog . '"')
+        sleep 1
+    endif
+    if filereadable(b:routfile)
+        if g:vimrplugin_routnotab == 1
+            exe "split " . b:routfile
         else
-            call RWarningMsg("The file '" . b:routfile . "' is not readable.")
+            exe "tabnew " . b:routfile
         endif
+        set filetype=rout
     else
-        let shlines = [rcmd,
-                    \ 'vim --servername ' . v:servername . " --remote-expr '" . 'GetROutput("' . b:routfile . '")' . "'",
-                    \ 'rm "' . g:rplugin_tmpdir . '/runRcmdbatch.sh' . '"']
-        call writefile(shlines, g:rplugin_tmpdir . '/runRcmdbatch.sh')
-        call system('sh "' .  g:rplugin_tmpdir . '/runRcmdbatch.sh" >/dev/null 2>/dev/null &')
+        call RWarningMsg("The file '" . b:routfile . "' is not readable.")
     endif
 endfunction
 

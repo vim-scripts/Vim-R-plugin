@@ -112,19 +112,14 @@ class EvinceWindowProxy:
     def on_sync_source(self, input_file, source_link, timestamp):
         input_file = input_file.replace("file://", "")
         input_file = input_file.replace("%20", " ")
-        os.system(vimexec + ' --servername ' + vimnm + ' --remote-expr "' + "SyncTeX_backward('" + input_file + "', " + str(source_link[0]) + ')"')
+        sys.stdout.write("call SyncTeX_backward('" + input_file + "', " + str(source_link[0]) + ")\n")
+        sys.stdout.flush()
 
 path_output = os.getcwd() + '/' + sys.argv[1]
 path_output = path_output.replace(" ", "%20")
 
-vimnm = sys.argv[2]
-if vimnm.find("GVIM") == 0:
-    vimexec = "gvim"
-else:
-    vimexec = "vim"
-time.sleep(1)
-os.system(vimexec + ' --servername ' + vimnm + ' --remote-expr "SyncTeX_SetPID(' + str(os.getpid()) + ')"')
-
+sys.stdout.write("call SyncTeX_SetPID('" + str(os.getpid()) + "')\n")
+sys.stdout.flush()
 
 dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 

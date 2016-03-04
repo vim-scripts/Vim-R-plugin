@@ -21,8 +21,6 @@ function StartR_OSX()
     endif
     let g:SendCmdToR = function('SendCmdToR_OSX')
     if WaitVimComStart()
-        call SendToVimCom("\005B Update OB [StartR]")
-        sleep 200m
         if g:vimrplugin_after_start != ''
             call system(g:vimrplugin_after_start)
         endif

@@ -108,10 +108,10 @@ function! RBrowserDoubleClick()
     if line(".") == 1
         if g:rplugin_curview == "libraries"
             let g:rplugin_curview = "GlobalEnv"
-            call UpdateOB("GlobalEnv")
+            call SendToVimCom("\004G RBrowserDoubleClick")
         else
             let g:rplugin_curview = "libraries"
-            call UpdateOB("libraries")
+            call SendToVimCom("\004L RBrowserDoubleClick")
         endif
         return
     endif
@@ -300,8 +300,12 @@ function! RBrowserGetName(cleantail, cleantick)
 endfunction
 
 function! ObBrBufUnload()
-    if exists("g:rplugin_editor_sname")
-        call system("tmux select-pane -t " . g:rplugin_vim_pane)
+    if g:vimrplugin_tmux_ob
+        if exists("g:rplugin_editor_sname")
+            call system("tmux select-pane -t " . g:rplugin_vim_pane)
+        endif
+    elseif g:rplugin_vimcomport
+        call SendToVimCom("\004Stop updating info [OB BufUnload].")
     endif
 endfunction
 
@@ -327,7 +331,6 @@ endif
 au BufEnter <buffer> stopinsert
 
 if g:vimrplugin_tmux_ob
-    au BufUnload <buffer> call ObBrBufUnload()
     " Fix problems caused by some plugins
     if exists("g:loaded_surround") && mapcheck("ds", "n") != ""
         nunmap ds
@@ -335,9 +338,8 @@ if g:vimrplugin_tmux_ob
     if exists("g:loaded_showmarks ")
         autocmd! ShowMarks
     endif
-else
-    au BufUnload <buffer> call SendToVimCom("\004Stop updating info [OB BufUnload].")
 endif
+au BufUnload <buffer> call ObBrBufUnload()
 
 let s:envstring = tolower($LC_MESSAGES . $LC_ALL . $LANG)
 if s:envstring =~ "utf-8" || s:envstring =~ "utf8"

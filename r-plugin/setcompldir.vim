@@ -73,5 +73,5 @@ if !isdirectory(g:rplugin_compldir)
         call writefile(readme, g:rplugin_compldir . "/README")
     endif
 endif
-let $VIMRPLUGIN_COMPLDIR = g:rplugin_compldir
+let $VIMR_COMPLDIR = g:rplugin_compldir
 

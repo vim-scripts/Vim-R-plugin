@@ -575,7 +575,8 @@ function! SyncTeX_forward(...)
         call system("wmctrl -a '" . basenm . ".pdf'")
     elseif g:rplugin_pdfviewer == "sumatra"
         if g:rplugin_sumatra_path != "" || FindSumatra()
-            silent exe '!start "' . g:rplugin_sumatra_path . '" -reuse-instance -forward-search ' . basenm . '.tex ' . texln . ' -inverse-search "vim --servername ' . v:servername . " --remote-expr SyncTeX_backward('\\%f',\\%l)" . '" "' . basenm . '.pdf"'
+            silent exe '!start "' . g:rplugin_sumatra_path . '" -reuse-instance -forward-search ' . basenm . '.tex ' . texln .
+                        \ ' -inverse-search "vclientserver.exe %%f %%l" ' . basenm . '.pdf"'
         endif
     elseif g:rplugin_pdfviewer == "skim"
         " This command is based on macvim-skim
@@ -616,7 +617,10 @@ function! Run_EvinceBackward()
     endif
     if !did_evince
         call add(g:rplugin_evince_list, basenm)
-        call system("python " . g:rplugin_home . "/r-plugin/synctex_evince_backward.py '" . basenm . ".pdf' " . v:servername . " &")
+        call job_start(["python",
+                    \ g:rplugin_home . "/r-plugin/synctex_evince_backward.py",
+                    \ basenm . ".pdf"],
+                    \ {'out-cb': 'ROnJobStdout', 'err-cb': "ROnJobStderr"})
     endif
     exe "cd " . substitute(olddir, ' ', '\\ ', 'g')
 endfunction
@@ -640,7 +644,7 @@ if g:rplugin_pdfviewer != "none"
         unlet s:key_list
         unlet s:has_key
     endif
-    if g:vimrplugin_synctex && g:rplugin_pdfviewer == "evince" && $DISPLAY != "" && v:servername != ""
+    if g:vimrplugin_synctex && g:rplugin_pdfviewer == "evince" && $DISPLAY != ""
         call Run_EvinceBackward()
     endif
 endif

@@ -5,8 +5,8 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 1.2.8
-For Vim version 7.4
+Version: 1.2.9
+For Vim version >= 7.4.1425
 
  1. Overview                                    |r-plugin-overview|
  2. Main features                               |r-plugin-features|
@@ -100,11 +100,10 @@ Vim-R-plugin (see |vimrplugin_source|).
 The installation instructions are split in six sections:
 
    3.1. Preliminary system setup on Windows
-   3.2. Preliminary system setup on Mac OS X
-   3.3. Preliminary system setup on Unix
-   3.4. Plugin installation
-   3.5. Troubleshooting
-   3.6. Optional steps
+   3.2. Preliminary system setup on Unix
+   3.3. Plugin installation
+   3.4. Troubleshooting
+   3.5. Optional steps
 
 
 ------------------------------------------------------------------------------
@@ -115,12 +114,12 @@ dependencies:
 
     * R's version must be >= 3.0.0: http://www.r-project.org/
 
-    * vimcom = 1.2-8: https://github.com/jalvesaq/VimCom/releases
+    * vimcom = 1.2-9: https://github.com/jalvesaq/VimCom/releases
 
       Note: If you cannot build vimcom yourself, you will want to
       download and install the zip file.
 
-    * Vim's version must be >= 7.4: http://www.vim.org/download.php
+    * Vim's version must be >= 7.4.1425: http://www.vim.org/download.php
       To get the latest version, look for Vim "without Cream".
 
     * Only if you write Rnoweb code:
@@ -144,73 +143,21 @@ Console to open it:
 <
 
 ------------------------------------------------------------------------------
-3.2. Preliminary system setup on Mac OS X~
+3.2. Preliminary system setup on Unix (Linux, Mac OS X, etc)~
 
 Before installing the plugin, you should install its dependencies:
 
    Depends:~
 
-   Cocoa MacVim >= 7.4: https://code.google.com/p/macvim
+   Vim, GVim >= 7.4.1425: http://www.vim.org/download.php
+
+      Note: The Vim-R-plugin requires Vim compiled with |+channel| and
+	    |+conceal| features. In Normal mode, do `:version`  to check if
+	    your Vim has these features.
 
    R >= 3.0.0: http://www.r-project.org/
 
-   vimcom = 1.2-8: https://github.com/jalvesaq/VimCom/releases
-
-   Only if you edit Rnoweb files: MacTeX, BasicTeX or other LaTeX system.
-
-If you want to call R.app from MacVim, put in your `~/.Rprofile`:
->
-   if(interactive()){
-       options(vimcom.verbose = 1) # optional
-       if(Sys.getenv("VIMRPLUGIN_TMPDIR") != "")
-           library(vimcom)
-   }
-<
-On Mac OS X, the plugin will use AppleScript to send commands to the R Console
-application unless |vimrplugin_applescript| = 0. In this case, R will run in a
-external terminal emulator. The advantage of running R in a terminal emulator
-is that its output can be colorized by the R package "colorout". If you want
-to try this configuration, install Tmux and the R packages "setwidth" and
-"colorout" (see instructions in section 3.3) and put in your `~/.Rprofile`:
->
-   if(interactive()){
-       library(colorout)
-       library(setwidth)
-       options(vimcom.verbose = 1) # optional
-       if(Sys.getenv("VIMRPLUGIN_TMPDIR") != "")
-           library(vimcom)
-   }
-<
-Note: The plugin is fully functional with MacVim, but the Vim application that
-comes with MacVim does not have the the server side of the 'clientserver'
-feature which is required to have the plugin working properly. If you want to
-run both Vim and R in the same Tmux window in a terminal emulator, you have to
-follow the instructions from section 3.3.
-
-
-------------------------------------------------------------------------------
-3.3. Preliminary system setup on Unix~
-
-Before installing the plugin, you should install its dependencies:
-
-   Depends:~
-
-   Vim, GVim >= 7.4: http://www.vim.org/download.php
-
-      Note: The Vim-R-plugin requires Vim compiled with |+libcall|,
-	    |+clientserver| and |+conceal| features. In Normal mode, do
-	    `:version`  to check if your Vim has these features.
-
-	    If you need to use the Vim-R-plugin in a Unix system without the
-	    X Server running (e.g. Linux Console, and any system accessed
-	    through ssh), the best option is to use Neovim and Nvim-R:
-	    https://github.com/jalvesaq/Nvim-R
-	    If you cannot use Neovim and need to use Vim in these
-	    circumstances, please, read |r-plugin-nox| and |r-plugin-remote|.
-
-   R >= 3.0.0: http://www.r-project.org/
-
-   vimcom = 1.2-8: https://github.com/jalvesaq/VimCom/releases
+   vimcom = 1.2-9: https://github.com/jalvesaq/VimCom/releases
 
    Tmux >= 1.8:   http://tmux.sourceforge.net
                   Tmux is necessary to send commands from Vim to R Console.
@@ -251,10 +198,6 @@ Put the following lines in your `~/.Rprofile`:
            library(vimcom)
    }
 <
-Put the following in your `~/.bashrc`:
->
-   alias vim="vim --servername VIM"
-<
 Before proceeding, you have to start a new shell session to have the alias
 enabled.
 
@@ -265,15 +208,9 @@ details). If you either use GVim or Vim not inside a Tmux session the plugin
 will start R in a external terminal emulator. This is useful if you have two
 monitors.
 
-If you run Vim in a terminal emulator, it must be started with the argument
-|--servername| to enable the 'clientserver' feature (please, read the section
-|r-plugin-bash-setup| to know some tips on how to configure Bash). This is not
-necessary with GVim because it always runs with the 'clientserver' feature
-enabled.
-
 
 ------------------------------------------------------------------------------
-3.4. Plugin installation (instructions for all systems)~
+3.3. Plugin installation (instructions for all systems)~
 
 You need to activate plugins and indentation according to 'filetype'. You
 should have at least the following options at the top or near the very top
@@ -319,7 +256,7 @@ If you want to uninstall the plugin, do
 <
 
 ------------------------------------------------------------------------------
-3.5. Troubleshooting (if the plugin doesn't work)~
+3.4. Troubleshooting (if the plugin doesn't work)~
 
 Note: The <LocalLeader> is '\' by default.
 
@@ -352,16 +289,16 @@ If R takes more than 5 seconds to load, you should adjust the value of
 
 
 ------------------------------------------------------------------------------
-3.6. Optional steps~
+3.5. Optional steps~
 
-3.6.1 Customize the plugin~
+3.5.1 Customize the plugin~
 
 Please, read the section |r-plugin-options|. Emacs/ESS users should read the
 section |r-plugin-indenting| of this document.
 
 
 ------------------------------------------------------------------------------
-3.6.2 Install additional plugins~
+3.5.2 Install additional plugins~
 
 You may be interested in installing additional general plugins to get
 functionality not provided by this file type plugin. Particularly interesting
@@ -674,10 +611,8 @@ complete the name of a data.frame, the columns are not shown. But when the
 data.frame name is already complete, and you have inserted the '$' symbol,
 omni completion will show the column names.
 
-Only the names of objects in .GlobalEnv and in loaded libraries are completed,
-and the |clientserver| feature is required to get the list of loaded libraries
-automatically updated. If either R is not running or Vim is running without
-the |clientserver| feature, only objects of libraries listed in
+Only the names of objects in .GlobalEnv and in loaded libraries are completed.
+If either R is not running, only objects of libraries listed in
 |vimrplugin_start_libs| will have their names completed. When you load a new
 library in R, only the current buffer has the highlighting of function names
 immediately updated. If you have other buffers open, they will be updated when
@@ -686,7 +621,7 @@ you enter them.
 Vim uses one file to store the names of .GlobalEnv objects and a list of files
 for all other objects. The .GlobalEnv list is stored in the `$VIMRPLUGIN_TMPDIR`
 directory and is deleted when you quits Vim. The other files are stored in the
-`$VIMRPLUGIN_COMPLDIR` directory and remain available until you manually delete
+`$VIMR_COMPLDIR` directory and remain available until you manually delete
 them.
 
 
@@ -697,9 +632,8 @@ You have to use <LocalLeader>ro to start the Object Browser. The Object
 Browser has two views: .GlobalEnv and Libraries. If you either press <Enter>
 or double click (GVim or Vim with 'mouse' set to "a") on the first line of the
 Object Browser, you will toggle the view between the objects in .GlobalEnv and
-the currently loaded libraries. The Object Browser requires the
-|+clientserver| feature to be automatically updated and the |+conceal| feature
-to correctly align list items.
+the currently loaded libraries. The Object Browser requires the |+conceal|
+feature to correctly align list items.
 
 In the .GlobalEnv view, if an object has the attribute "label", it will also
 be displayed. In the Object Browser window, while in Normal mode, you can
@@ -801,7 +735,7 @@ section refers to the case of starting R when Vim already is in a Tmux
 session, that is, if you do:
 >
    tmux
-   vim --servername VIM filename.R
+   vim filename.R
    exit
 <
 In this case, the terminal window is split in two regions: one for Vim and the
@@ -930,29 +864,6 @@ remote machine. Tmux should not be running in the local machine because some
 environment variables could pass from the local to the remote Tmux and confuse
 the plugin.
 
-If you need to access Vim in a remote Unix machine through ssh, and if you
-want to get omnicompletion, syntax highlight of function names and the Object
-Browser working properly, instead of Vim, it is recommended that you use
-Neovim because it does not require the X Server to be fully functional. If
-you cannot use Neovim, then you have to:
-
-   - Enable X11 Forwarding in the remote machine.
-
-   - Have Vim in the remote machine compiled with |clientserver| feature.
-
-   - Have the X Server running in the local machine.
-
-   - Pass either the `-X` or the `-Y` argument to ssh, as in the examples
-     below:
->
-     ssh -X yourlogin@remote.address
-     ssh -Y yourlogin@remote.address
-<
-   - Start Tmux and, then, Vim with the |--servername| argument:
->
-     tmux
-     vim --servername VIM script.R
-<
 With Tmux, you can detach the Vim-R session and reattach it later (but the
 connection with the XServer could be lost in the process). This is useful if
 you plan to begin the use the Vim-R-plugin in a machine and later move to
@@ -1009,7 +920,10 @@ Normal, Visual and Insert modes.
 5.3. Functions are not always correctly sent to R~
 
 The plugin is only capable of recognizing functions defined using the `<-`
-operator. See: https://github.com/jcfaria/Vim-R-plugin/issues/94
+operator. Also, only current function scope is sent to R. See:
+
+   https://github.com/jcfaria/Vim-R-plugin/issues/94
+   https://github.com/jalvesaq/Nvim-R/issues/34
 
 
 ------------------------------------------------------------------------------
@@ -1034,86 +948,19 @@ The vimcom library is started with the state `busy`.
 5.5. SyncTeX on Windows~
 
 On Windows, backward search with Sumatra pop ups a console window which
-quickly disappears (it is `vim` running the required `--remote-expr` command).
+quickly disappears (it is `vclientserver` running the required command).
 
 
 ------------------------------------------------------------------------------
-								*r-plugin-nox*
-5.6. Bugs that affect Linux Console and Vim accessed through ssh~
-
-If you run Vim in the Linux Console or start Vim in a terminal emulator
-without the command line argument |--servername|, Vim will not receive remote
-messages and the vimcom package will display one of the following messages:
-
-   Vim was built without the 'clientserver' feature.
-   Did you pass the --servername argument to Vim?
-   There is no X Server running.
-   Vim's servername is unknown.
-
-To avoid the message, you should start vim with the |--servername| argument,
-as below:
->
-   vim --servername VIM script.R
-<
-To avoid having to type this argument every time that you start Vim, please,
-look at the example in |r-plugin-bash-setup|.
-
-If the |--servername| argument does not work in your case, you can put the
-following line in your `~/.Rprofile` to suppress the message:
->
-   options(vimcom.verbose = -1)
-<
-When Vim cannot receive messages, the result is:
-
-   * The Object Browser is not automatically updated. You have to do
-     <LocalLeader>ro to update it manually.
-
-   * Syntax highlight of function names and the list of objects for
-     omnicompletion are not immediately updated after you load a new R
-     package. For a workaround, see |vimrplugin_start_libs|.
-
-   * You cannot see R documentation in a Vim buffer.
-
-On Linux you may find Vim binaries without the |clientserver| feature if
-you install packages such as vim-nox on Debian/Ubuntu or vim-enhanced on
-Fedora/Red Hat. If you want to use Vim in a terminal emulator in Fedora/Red
-Hat, you may want to create a symbolic link to "gvim" named "vim". You still
-have to explicitly start the server with the argument |--servername|.
-
-The R package vimcom has support only for Windows and X11 interprocess
-communication systems while MacVim is a Cocoa application. For this reason, on
-Mac OS X, by default, vimcom is built without support to Vim's |clientserver|
-feature. If you prefer to use Vim instead of MacVim in Mac OS X, then, you
-should:
-
-   1. Install XQuartz server (X11.app)
-
-   2. Build vimcom with the argument `--enable-clientserver`. That is, download
-      vimcom from https://github.com/jalvesaq/VimCom/releases and do in R:
->
-      install.packages("vimcom_1.2-8.tar.gz", repos = NULL, type = "source",
-                       configure.args = "--enable-clientserver")
-<
-   3. Build Vim with X11 support. A user reported success with the following
-      procedure:
->
-      brew install vim --with-client-server
-      tmux
-      /usr/local/Cellar/vim/7.4.273/bin/vim --servername VIM r_script.R
-<
-See also: |r-plugin-remote|.
-
-
-------------------------------------------------------------------------------
-5.7. R must be started by Vim~
+5.6. R must be started by Vim~
 
 The communication between Vim and R will work only if R was started by Vim
 through the <LocalLeader>rf command because the plugin was designed to connect
 each Vim instance with its own R instance.
 
 If you start R before Vim, it will not inherit from Vim the environment
-variables VIMRPLUGIN_TMPDIR, VIMRPLUGIN_COMPLDIR, VIMEDITOR_SVRNM,
-VIMINSTANCEID, and VIMRPLUGIN_SECRET. The first one is the path used by the R
+variables VIMRPLUGIN_TMPDIR, VIMR_COMPLDIR, VIMEDITOR_SVRNM,
+VIMINSTANCEID, and VIMR_SECRET. The first one is the path used by the R
 package vimcom to save temporary files used by the Vim-R-plugin to: perform
 omnicompletion, show R documentation in a Vim buffer, and update the Object
 Browser. The two last ones are used by the Vim-R-plugin and by vimcom to know
@@ -1131,17 +978,17 @@ try the following (not all procedures are necessary for all cases):
    :echo g:rplugin_tmpdir
    :echo g:rplugin_compldir
    :echo $VIMINSTANCEID
-   :echo $VIMRPLUGIN_SECRET
+   :echo $VIMR_SECRET
    :echo $VIMEDITOR_SVRNM
 <
    In R do:
 >
    detach("package:vimcom", unload = TRUE)
-   Sys.setenv(VIMRPLUGIN_TMPDIR="T")    # where "T" is what Vim has echoed
-   Sys.setenv(VIMINSTANCEID="I")        # where "I" is what Vim has echoed
-   Sys.setenv(VIMRPLUGIN_SECRET"="S")   # where "S" is what Vim has echoed
-   Sys.setenv(VIMEDITOR_SVRNM"="N")     # where "N" is what Vim has echoed
-   Sys.setenv(VIMRPLUGIN_COMPLDIR"="C") # where "C" is what Vim has echoed
+   Sys.setenv(VIMRPLUGIN_TMPDIR="T") # where "T" is what Vim has echoed
+   Sys.setenv(VIMINSTANCEID="I")     # where "I" is what Vim has echoed
+   Sys.setenv(VIMR_SECRET"="S")      # where "S" is what Vim has echoed
+   Sys.setenv(VIMEDITOR_SVRNM"="N")  # where "N" is what Vim has echoed
+   Sys.setenv(VIMR_COMPLDIR"="C")    # where "C" is what Vim has echoed
    library(vimcom)
 <
 If you are running R in a terminal emulator (Linux/Unix) Vim still needs to
@@ -1224,7 +1071,6 @@ is running:
 |vimrplugin_allnames|          Show names which begin with a dot
 |vimrplugin_rmhidden|          Remove hidden objects from R workspace
 |vimrplugin_source|            Source additional scripts
-|vimrplugin_restart|           Restart R if it is already running
 |vimrplugin_show_args|         Show extra information during omnicompletion
 |vimrplugin_args_in_stline|    Set 'statusline' to function arguments
 |vimrplugin_vimcom_wait|       Time to wait for vimcom loading
@@ -1517,9 +1363,6 @@ value of vimrplugin_start_libs:
 >
    let vimrplugin_start_libs = "base,stats,graphics,grDevices,utils,methods"
 <
-You may also want to define the value of vimrplugin_start_libs if you are
-running Vim without the |clientserver| feature.
-
 
 ------------------------------------------------------------------------------
 							*vimrplugin_routnotab*
@@ -1880,24 +1723,6 @@ features:
 
 
 ------------------------------------------------------------------------------
-							  *vimrplugin_restart*
-6.27. Restart R if it is already running (Linux/Unix only)~
-
-When R is already running and you type one of the commands to start R before
-you have done <LocalLeader>rq, the Vim-R-plugin does one of the following:
-(a) If R is in an external terminal emulator, the terminal is closed, a new
-one is opened with the same R session running in it. (b) If both Vim and R are
-running in different Tmux regions of the same terminal emulator, the plugin
-warns that R is already running.
-
-If instead of the default behavior, you prefer to quit and restart R when you
-do <LocalLeader>rf, <LocalLeader>rv or <LocalLeader>rc, then, put in your
-|vimrc|:
->
-   let vimrplugin_restart = 1
-<
-
-------------------------------------------------------------------------------
 							*vimrplugin_show_args*
 						   *vimrplugin_args_in_stline*
 6.28. Function arguments~
@@ -2108,7 +1933,7 @@ In Okular, click in:
    Configure Okular
    Editor
    Dropdown menu: Custom Text Editor
-         Command: vim --remote-expr "SyncTeX_backward('%f', %l)"
+         Command: vclientserver '%f' %l
 
 In the command above, replace `vim` with `gvim` if you use GVim.
 
@@ -2141,15 +1966,15 @@ to press <LocalLeader>gp again.
 ------------------------------------------------------------------------------
 6.35.4 Skim with MacVim configuration (Mac OS X)~
 
-You have to configure Skim to call MacVim during backward searches.
+You have to configure Skim to call `vclientserver` during backward searches.
 In Skim click in the drop down menu and fill the fields:
 >
    Skim
    Settings
    Sync
    Preset: Custom
-   Command: /path/to/MacVim/mvim
-   Arguments: --remote-expr "SyncTeX_backward('%file', %line)"
+   Command: vclientserver
+   Arguments: '%file' %line
 <
 
 ------------------------------------------------------------------------------
@@ -2380,18 +2205,19 @@ and in your |vimrc| (see |vimrplugin_vimpager|):
 							  *r-plugin-showmarks*
 9.3. How do marked blocks work?~
 
-Vim allows you to put several marks (bookmarks) in buffers. The most commonly
-used marks are the lowercase alphabet letters. If the cursor is between any
-two marks, the plugin will send the lines between them to R if you press
-<LocalLeader>bb. If the cursor is above the first mark, the plugin will send
-from the beginning of the file to the mark. If the cursor is below the last
-mark, the plugin will send from the mark to the end of the file. The mark
+Vim allows you to put several marks (bookmarks) in buffers (see |mark|). The
+most commonly used marks are the lowercase alphabet letters. If the cursor is
+between any two marks, the plugin will send the lines between them to R if you
+press <LocalLeader>bb. If the cursor is above the first mark, the plugin will
+send from the beginning of the file to the mark. If the cursor is below the
+last mark, the plugin will send from the mark to the end of the file. The mark
 above the cursor is included and the mark below is excluded from the block to
 be sent to R. To create a mark, press m<letter> in Normal mode.
 
-We recommended the use of vim-signature which show what lines have marks
-defined. The plugins are available at:
+We recommended the use of either ShowMarks or vim-signature which show what
+lines have marks defined. The plugins are available at:
 
+   http://www.vim.org/scripts/script.php?script_id=152
    https://github.com/kshenoy/vim-signature
 
 
@@ -2434,21 +2260,6 @@ emulator or in Linux Console. The use of <Shift>, <Alt> and <Fn> keys in
 mappings are particularly problematic. See:
 
    https://github.com/jcfaria/Vim-R-plugin/issues/111
-
-You can also use Vim's 'clientserver' feature to send remote messages to Vim.
-For example, if you want a keyboard shortcut that sends to Vim the command to
-send the current line to R and go down to the next line of code, then use your
-desktop configuration tools to create a global shortcut to the following
-command:
->
-   vim --remote-expr 'SendLineToR("down")'
-<
-The command above will work properly only if there is a single Vim instance
-running. Otherwise, the |--servername| argument would have to be used to send
-the message to the correct Vim instance. If the command works properly, you
-will be able to send lines of code from Vim to R even if the window
-currently focused is not the Vim's window (either the terminal emulator where
-Vim is running or GVim).
 
 
 ------------------------------------------------------------------------------
@@ -2801,12 +2612,6 @@ please read this document from the beginning.
        export TERM=screen-256color
    fi
 
-   # Make Vim connect to X Server even if the gui is not running (many of the
-   # plugin features depend on this).
-   if [ "x$DISPLAY" != "x" ]
-   then
-       alias vim='vim --servername VIM'
-   fi
 <
 
 
@@ -2861,6 +2666,12 @@ put in your |vimrc|:
 ==============================================================================
 							       *r-plugin-news*
 10. News~
+
+1.2.9 (2016-03-04)
+
+ * Delete option vimrplugin_restart
+
+ * Use the +channel feature instead of +clientserver.
 
 1.2.8 (2016-02-20)
 
