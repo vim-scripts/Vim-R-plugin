@@ -644,6 +644,12 @@ function StartR(whatr)
     call writefile([], g:rplugin_tmpdir . "/liblist_" . $VIMINSTANCEID)
     call delete(g:rplugin_tmpdir . "/libnames_" . $VIMINSTANCEID)
 
+    if $R_DEFAULT_PACKAGES == ""
+        let $R_DEFAULT_PACKAGES = "datasets,utils,grDevices,graphics,stats,methods,vimcom"
+    elseif $R_DEFAULT_PACKAGES !~ "vimcom"
+        let $R_DEFAULT_PACKAGES .= ",vimcom"
+    endif
+
     if g:vimrplugin_objbr_opendf
         let start_options = ['options(vimcom.opendf = TRUE)']
     else

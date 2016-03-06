@@ -130,17 +130,6 @@ dependencies:
 
        * Perl (required to run `latexmk`).
 
-Add the following lines to your `Rprofile`:
->
-   options(vimcom.verbose = 1)
-   if(Sys.getenv("VIMRPLUGIN_TMPDIR") != "")
-       library(vimcom)
-<
-If you do not know where your .Rprofile is, do the following command in R
-Console to open it:
->
-   edit(file = "~/.Rprofile")
-<
 
 ------------------------------------------------------------------------------
 3.2. Preliminary system setup on Unix (Linux, Mac OS X, etc)~
@@ -193,9 +182,6 @@ Put the following lines in your `~/.Rprofile`:
    if(interactive()){
        library(colorout)
        library(setwidth)
-       options(vimcom.verbose = 1) # optional
-       if(Sys.getenv("VIMRPLUGIN_TMPDIR") != "")
-           library(vimcom)
    }
 <
 Before proceeding, you have to start a new shell session to have the alias
@@ -1760,8 +1746,6 @@ higher value for the variable in your |vimrc|. Example:
 >
    let vimrplugin_vimcom_wait = 10000
 <
-Note: You should have the line  `library(vimcom)`  in your `~/.Rprofile`.
-
 
 ------------------------------------------------------------------------------
 							   *vimrplugin_vim_wd*
@@ -2587,8 +2571,6 @@ please read this document from the beginning.
        # Load the required libraries:
        library(colorout)
        library(setwidth)
-       if(Sys.getenv("VIMRPLUGIN_TMPDIR") != "")
-           library(vimcom)
 
        # Use the text based web browser w3m to navigate through R docs
        # in Linux Console after help.start():
