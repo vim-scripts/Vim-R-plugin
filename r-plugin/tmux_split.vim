@@ -16,7 +16,8 @@ function StartR_TmuxSplit(rcmd)
                 \ 'set-environment VIMR_COMPLDIR "' . substitute(g:rplugin_compldir, ' ', '\\ ', "g") . '"',
                 \ 'set-environment VIMEDITOR_SVRNM ' . $VIMEDITOR_SVRNM ,
                 \ 'set-environment VIMINSTANCEID ' . $VIMINSTANCEID ,
-                \ 'set-environment VIMR_SECRET ' . $VIMR_SECRET ]
+                \ 'set-environment VIMR_SECRET ' . $VIMR_SECRET ,
+                \ 'set-environment R_DEFAULT_PACKAGES ' . $R_DEFAULT_PACKAGES ]
     if &t_Co == 256
         call extend(tmuxconf, ['set default-terminal "' . $TERM . '"'])
     endif

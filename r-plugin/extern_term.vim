@@ -33,7 +33,7 @@ function StartR_ExternalTerm(rcmd)
         let tmuxcnf = '-f "' . g:rplugin_tmpdir . "/tmux.conf" . '"'
     endif
 
-    let rcmd = 'VIMRPLUGIN_TMPDIR=' . substitute(g:rplugin_tmpdir, ' ', '\\ ', 'g') . ' VIMR_COMPLDIR=' . substitute(g:rplugin_compldir, ' ', '\\ ', 'g') . ' VIMINSTANCEID=' . $VIMINSTANCEID . ' VIMR_SECRET=' . $VIMR_SECRET . ' VIMEDITOR_SVRNM=' . $VIMEDITOR_SVRNM . ' ' . a:rcmd
+    let rcmd = 'VIMRPLUGIN_TMPDIR=' . substitute(g:rplugin_tmpdir, ' ', '\\ ', 'g') . ' VIMR_COMPLDIR=' . substitute(g:rplugin_compldir, ' ', '\\ ', 'g') . ' VIMINSTANCEID=' . $VIMINSTANCEID . ' VIMR_SECRET=' . $VIMR_SECRET . ' VIMEDITOR_SVRNM=' . $VIMEDITOR_SVRNM . ' R_DEFAULT_PACKAGES=' . $R_DEFAULT_PACKAGES . ' ' . a:rcmd
 
     call system("tmux -L vimr has-session -t " . g:rplugin_tmuxsname)
     if v:shell_error
