@@ -1828,8 +1828,17 @@ want to know they are, while editing an R file, do in Normal mode:
 <
 
 ------------------------------------------------------------------------------
+9.34. Disable syntax highlight of R functions~
+
+If you want to disable the syntax highlight of R functions put in your
+|vimrc|:
+>
+   let vimrplugin_hi_fun = 0
+<
+
+------------------------------------------------------------------------------
 							    *r-plugin-df-view*
-6.34 View a data.frame or matrix~
+6.35 View a data.frame or matrix~
 
 The csv.vim plugin helps to visualize and edit csv files, and if it is not
 installed, the Vim-R-plugin will warn you about that when you do
@@ -1855,7 +1864,7 @@ replaced by the name of the object under the cursor.
 
 ------------------------------------------------------------------------------
 							    *r-plugin-SyncTeX*
-6.35 SyncTeX support~
+6.36 SyncTeX support~
 
 SyncTeX is a set of communication systems used by some PDF viewers and by some
 text editors which allow users to jump from a specific line in the text editor
@@ -1898,7 +1907,7 @@ Note: The current knitr package (version 1.7) has at least two limitations:
 
 
 ------------------------------------------------------------------------------
-6.35.1 Evince configuration~
+6.36.1 Evince configuration~
 
 No configuration should be required.
 
@@ -1908,7 +1917,7 @@ to press <LocalLeader>gp again.
 
 
 ------------------------------------------------------------------------------
-6.35.2 Okular configuration~
+6.36.2 Okular configuration~
 
 You have to configure Okular to call Vim during backward searches.
 In Okular, click in:
@@ -1933,7 +1942,7 @@ of Okular will be started.
 
 
 ------------------------------------------------------------------------------
-6.35.3 Zathura configuration~
+6.36.3 Zathura configuration~
 
 No configuration should be required if Evince is not installed. If evince is
 installed, put in your |vimrc|:
@@ -1948,7 +1957,7 @@ to press <LocalLeader>gp again.
 
 
 ------------------------------------------------------------------------------
-6.35.4 Skim with MacVim configuration (Mac OS X)~
+6.36.4 Skim with MacVim configuration (Mac OS X)~
 
 You have to configure Skim to call `vclientserver` during backward searches.
 In Skim click in the drop down menu and fill the fields:
@@ -1962,7 +1971,7 @@ In Skim click in the drop down menu and fill the fields:
 <
 
 ------------------------------------------------------------------------------
-6.35.5 Sumatra configuration (Windows)~
+6.36.5 Sumatra configuration (Windows)~
 
 No configuration is required.
 
@@ -2478,17 +2487,8 @@ on top" or a similar option provided by your desktop manager.
 
 
 ------------------------------------------------------------------------------
-9.17. Disable syntax highlight of R functions~
-
-If you want to disable the syntax highlight of R functions put in your
-|vimrc|:
->
-   autocmd Syntax * syntax clear rFunction
-<
-
-------------------------------------------------------------------------------
 							  *r-plugin-latex-box*
-9.18. Integration with LaTeX-Box~
+9.17. Integration with LaTeX-Box~
 
 LaTeX-Box does not automatically recognize Rnoweb files as a valid LaTeX file.
 You have to tell LaTeX-BoX that the .tex file compiled by either `knitr()` or
@@ -2511,7 +2511,7 @@ See also: |vimrplugin_latexcmd|.
 
 ------------------------------------------------------------------------------
 							*r-plugin-quick-setup*
-9.19. Suggested setup for the Vim-R-plugin~
+9.18. Suggested setup for the Vim-R-plugin~
 
 Please, look at section |r-plugin-options| if you want information about the
 Vim-r-plugin customization.
@@ -2607,7 +2607,7 @@ Finally, if you want to use vi key bindings in Bash or other shell:
 
 ------------------------------------------------------------------------------
 
-9.20. Syntax highlight of .Rout files~
+9.19. Syntax highlight of .Rout files~
 
 You can set the foreground colors of R output in your |vimrc|. The example
 below is for a terminal emulator that supports 256 colors (see |:highlight|):

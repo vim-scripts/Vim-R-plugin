@@ -2623,6 +2623,13 @@ call RSetDefaultValue("g:vimrplugin_latexcmd", "'default'")
 call RSetDefaultValue("g:vimrplugin_rmd_environment", "'.GlobalEnv'")
 call RSetDefaultValue("g:vimrplugin_indent_commented",  1)
 
+call RSetDefaultValue("g:vimrplugin_hi_fun",            1)
+if !g:vimrplugin_hi_fun
+    " Declare empty function to be called by vimcom
+    function FillRLibList()
+    endfunction
+endif
+
 if !exists("g:r_indent_ess_comments")
     let g:r_indent_ess_comments = 0
 endif
