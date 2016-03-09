@@ -1833,7 +1833,7 @@ want to know they are, while editing an R file, do in Normal mode:
 If you want to disable the syntax highlight of R functions put in your
 |vimrc|:
 >
-   let vimrplugin_hi_fun = 0
+   let R_hi_fun = 0
 <
 
 ------------------------------------------------------------------------------
@@ -2158,7 +2158,7 @@ directory after the installation:
    ftplugin/rrst_rplugin.vim
    r-plugin/common_buffer.vim
    r-plugin/common_global.vim
-   r-plugin/hi_fun.vim
+   r-plugin/functions.vim
    r-plugin/gui_running.vim
    r-plugin/osx.vim
    r-plugin/r.snippets
@@ -2649,7 +2649,7 @@ put in your |vimrc|:
 							       *r-plugin-news*
 10. News~
 
-1.2.9 (2016-03-04)
+1.2.9 (2016-03-09)
 
  * Delete option vimrplugin_restart
 

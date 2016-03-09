@@ -62,11 +62,6 @@ if exists("*RCheckLibList")
     autocmd BufEnter <buffer> call RCheckLibList()
 endif
 
-if g:vimrplugin_hi_fun
-    runtime r-plugin/hi_fun.vim
-    autocmd Syntax <buffer> runtime r-plugin/hi_fun.vim
-endif
-
 if g:vimrplugin_assign == 3
     iabb <buffer> _ <-
 endif

@@ -2509,7 +2509,7 @@ endfunction
 
 function ROnJobStdout(job_id, msg)
     let cmd = substitute(a:msg, '\n', '', 'g')
-    let cmd = substitute(a:msg, '\r', '', 'g')
+    let cmd = substitute(cmd, '\r', '', 'g')
     if cmd =~ "^call " || cmd =~ "^let "
         exe cmd
     else
@@ -2623,8 +2623,9 @@ call RSetDefaultValue("g:vimrplugin_latexcmd", "'default'")
 call RSetDefaultValue("g:vimrplugin_rmd_environment", "'.GlobalEnv'")
 call RSetDefaultValue("g:vimrplugin_indent_commented",  1)
 
-call RSetDefaultValue("g:vimrplugin_hi_fun",            1)
-if !g:vimrplugin_hi_fun
+" This option is used in syntax/r.vim which is not part of Vim-R-plugin
+call RSetDefaultValue("g:R_hi_fun", 1)
+if !g:R_hi_fun
     " Declare empty function to be called by vimcom
     function FillRLibList()
     endfunction
