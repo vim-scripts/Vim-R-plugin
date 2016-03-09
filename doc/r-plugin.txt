@@ -2158,7 +2158,7 @@ directory after the installation:
    ftplugin/rrst_rplugin.vim
    r-plugin/common_buffer.vim
    r-plugin/common_global.vim
-   r-plugin/functions.vim
+   r-plugin/hi_fun.vim
    r-plugin/gui_running.vim
    r-plugin/osx.vim
    r-plugin/r.snippets
