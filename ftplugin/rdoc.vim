@@ -8,6 +8,11 @@ if exists("b:did_ftplugin") || has("nvim")
     finish
 endif
 
+runtime R/flag.vim
+if exists("g:NvimR_installed")
+    finish
+endif
+
 " Don't load another plugin for this buffer
 let b:did_ftplugin = 1
 

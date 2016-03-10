@@ -3,6 +3,10 @@ if exists("g:disable_r_ftplugin") || has("nvim")
     finish
 endif
 
+runtime R/flag.vim
+if exists("g:NvimR_installed")
+    finish
+endif
 
 " Source scripts common to R, Rrst, Rnoweb, Rhelp and Rdoc:
 runtime r-plugin/common_global.vim
