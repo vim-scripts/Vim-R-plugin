@@ -1,7 +1,6 @@
 " This file contains code used only on Windows
 
 let g:rplugin_sumatra_path = ""
-let g:rplugin_python_initialized = 0
 
 call RSetDefaultValue("g:vimrplugin_sleeptime", 100)
 call RSetDefaultValue("g:vimrplugin_set_home_env", 1)
