@@ -140,7 +140,7 @@ Before installing the plugin, you should install its dependencies:
 
    Vim, GVim >= 7.4.1425: http://www.vim.org/download.php
 
-      Note: The Vim-R-plugin requires Vim compiled with |+channel| and
+      Note: The Vim-R-plugin requires Vim compiled with |+channel|, |+job| and
 	    |+conceal| features. In Normal mode, do `:version`  to check if
 	    your Vim has these features.
 

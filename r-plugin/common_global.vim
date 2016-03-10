@@ -60,7 +60,7 @@ function RWarningMsgInp(wmsg)
 endfunction
 
 if !exists("*job_getchannel")
-    call RWarningMsgInp("The Vim-R-plugin requires Vim >= 7.4.1453")
+    call RWarningMsgInp("The Vim-R-plugin requires Vim >= 7.4.1468 with both +channel and +job features enabled.")
     let g:rplugin_failed = 1
     finish
 endif
