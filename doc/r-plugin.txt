@@ -139,6 +139,7 @@ Before installing the plugin, you should install its dependencies:
    Depends:~
 
    Vim, GVim >= 7.4.1425: http://www.vim.org/download.php
+	                  You might have to look for "Vim without Cream".
 
       Note: The Vim-R-plugin requires Vim compiled with |+channel|, |+job| and
 	    |+conceal| features. In Normal mode, do `:version`  to check if
@@ -2649,7 +2650,7 @@ put in your |vimrc|:
 							       *r-plugin-news*
 10. News~
 
-1.2.9 (2016-03-09)
+1.2.9 (2016-03-11)
 
  * Delete option vimrplugin_restart
 
