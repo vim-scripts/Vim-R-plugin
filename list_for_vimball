@@ -8,6 +8,9 @@ ftplugin/rhelp_rplugin.vim
 ftplugin/rmd_rplugin.vim
 ftplugin/rnoweb_rplugin.vim
 ftplugin/rrst_rplugin.vim
+syntax/rbrowser.vim
+syntax/rdoc.vim
+syntax/rout.vim
 r-plugin/common_buffer.vim
 r-plugin/common_global.vim
 r-plugin/r.snippets
@@ -19,6 +22,6 @@ r-plugin/gui_running.vim
 r-plugin/osx.vim
 r-plugin/setcompldir.vim
 r-plugin/windows.vim
-syntax/rbrowser.vim
-syntax/rdoc.vim
-syntax/rout.vim
+r-plugin/extern_term.vim
+r-plugin/tmux.vim
+r-plugin/tmux_split.vim

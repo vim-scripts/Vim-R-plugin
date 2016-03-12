@@ -22,7 +22,7 @@
 
 
 PLUGINHOME=`pwd`
-PLUGINVERSION=1.2.9
+PLUGINVERSION=1.3.0
 DEBIANTIME=`date -R`
 PLUGINRELEASEDATE=`date +"%Y-%m-%d"`
 VIM2HTML=/usr/local/share/vim/vim74/doc/vim2html.pl 
@@ -72,6 +72,9 @@ deb:
 	  - r-plugin/setcompldir.vim\n\
 	  - r-plugin/synctex_evince_backward.py\n\
 	  - r-plugin/synctex_evince_forward.py\n\
+	  - r-plugin/tmux.vim\n\
+	  - r-plugin/tmux_split.vim\n\
+	  - r-plugin/extern_term.vim\n\
 	  - syntax/rbrowser.vim\n\
 	  - syntax/rdoc.vim\n\
 	  - syntax/rout.vim\n\
