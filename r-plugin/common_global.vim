@@ -59,11 +59,12 @@ function RWarningMsgInp(wmsg)
     let &shortmess = savedsm
 endfunction
 
-if !exists("*job_getchannel")
-    call RWarningMsgInp("The Vim-R-plugin requires Vim >= 7.4.1468 with both +channel and +job features enabled.")
+if !exists("*job_getchannel") || !has("patch-7.4.1579")
+    call RWarningMsgInp("The Vim-R-plugin requires Vim >= 7.4.1579 with both +channel and +job features enabled.")
     let g:rplugin_failed = 1
     finish
 endif
+
 
 " Set default value of some variables:
 function RSetDefaultValue(var, val)
@@ -680,7 +681,7 @@ function StartR(whatr)
     else
         let start_options += ['options(vimcom.vimpager = TRUE)']
     endif
-    let start_options += ['if(utils::packageVersion("vimcom") != "1.3") warning("Your version of Vim-R-plugin requires vimcom-1.3.", call. = FALSE)']
+    let start_options += ['if(utils::packageVersion("vimcom") != "1.3.1") warning("Your version of Vim-R-plugin requires vimcom-1.3-1.", call. = FALSE)']
 
     let rwd = ""
     if g:vimrplugin_vim_wd == 0
@@ -824,13 +825,13 @@ function WaitVimComStart()
                 endif
             endif
             let vcs_job = job_start([g:rplugin_vclntsrvr],
-                        \ {'out-cb': 'ROnJobStdout', 'err-cb': "ROnJobStderr"})
+                        \ {'out_cb': 'ROnJobStdout', 'err_cb': "ROnJobStderr"})
             let g:rplugin_channel = job_getchannel(vcs_job)
         else
             call RWarningMsgInp('Could not find "' . g:rplugin_vclntsrvr . '".')
         endif
-        if g:rplugin_vimcom_version != "1.3"
-            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.3.')
+        if g:rplugin_vimcom_version != "1.3.1"
+            call RWarningMsg('This version of Vim-R-plugin requires vimcom 1.3-1.')
             sleep 1
         endif
         call delete(g:rplugin_tmpdir . "/vimcom_running_" . $VIMINSTANCEID)

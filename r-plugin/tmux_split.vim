@@ -97,7 +97,7 @@ function StartObjBrowser_Tmux()
                 \ 'set updatetime=100',
                 \ 'let g:SendCmdToR = function("SendCmdToR_TmuxSplit")',
                 \ 'let g:rplugin_vimcomport = ' . g:rplugin_vimcomport,
-                \ 'let vcs_job = job_start([g:rplugin_vclntsrvr], {"out-cb": "ROnJobStdout", "err-cb": "ROnJobStderr"})',
+                \ 'let vcs_job = job_start([g:rplugin_vclntsrvr], {"out_cb": "ROnJobStdout", "err_cb": "ROnJobStderr"})',
                 \ 'let g:rplugin_channel = job_getchannel(vcs_job)',
                 \ 'sleep 150m'],
                 \ objbrowserfile)

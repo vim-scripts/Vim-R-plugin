@@ -625,7 +625,7 @@ function! Run_EvinceBackward()
         call job_start(["python",
                     \ g:rplugin_home . "/r-plugin/synctex_evince_backward.py",
                     \ basenm . ".pdf"],
-                    \ {'out-cb': 'ROnJobStdout', 'err-cb': "ROnJobStderr"})
+                    \ {'out_cb': 'ROnJobStdout', 'err_cb': "ROnJobStderr"})
     endif
     exe "cd " . substitute(olddir, ' ', '\\ ', 'g')
 endfunction

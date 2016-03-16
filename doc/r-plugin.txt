@@ -5,8 +5,8 @@
 Authors: Jakson A. Aquino   <jalvesaq@gmail.com>
          Jose Claudio Faria <joseclaudio.faria@gmail.com>
 
-Version: 1.3.0
-For Vim version >= 7.4.1425
+Version: 1.3.1
+For Vim version >= 7.4.1579
 
  1. Overview                                    |r-plugin-overview|
  2. Main features                               |r-plugin-features|
@@ -114,12 +114,12 @@ dependencies:
 
     * R's version must be >= 3.0.0: http://www.r-project.org/
 
-    * vimcom = 1.3: https://github.com/jalvesaq/VimCom/releases
+    * vimcom = 1.3-1: https://github.com/jalvesaq/VimCom/releases
 
       Note: If you cannot build vimcom yourself, you will want to
       download and install the zip file.
 
-    * Vim's version must be >= 7.4.1425: http://www.vim.org/download.php
+    * Vim's version must be >= 7.4.1579: http://www.vim.org/download.php
       To get the latest version, look for Vim "without Cream".
 
     * Only if you write Rnoweb code:
@@ -138,16 +138,16 @@ Before installing the plugin, you should install its dependencies:
 
    Depends:~
 
-   Vim, GVim >= 7.4.1425: http://www.vim.org/download.php
+   Vim, GVim >= 7.4.1579: http://www.vim.org/download.php
 	                  You might have to look for "Vim without Cream".
 
       Note: The Vim-R-plugin requires Vim compiled with |+channel|, |+job| and
-	    |+conceal| features. In Normal mode, do `:version`  to check if
+	    |+conceal| features. In Normal mode, do `:version` to check if
 	    your Vim has these features.
 
    R >= 3.0.0: http://www.r-project.org/
 
-   vimcom = 1.3: https://github.com/jalvesaq/VimCom/releases
+   vimcom = 1.3-1: https://github.com/jalvesaq/VimCom/releases
 
    Tmux >= 1.8:   http://tmux.sourceforge.net
                   Tmux is necessary to send commands from Vim to R Console.
@@ -2649,6 +2649,10 @@ put in your |vimrc|:
 ==============================================================================
 							       *r-plugin-news*
 10. News~
+
+1.3.1 (2016-03-16)
+
+ * Require vimcom 1.3-1 and Vim >= 7.4.1579.
 
 1.3.0 (2016-03-12)
 
